@@ -3411,9 +3411,9 @@ begin
                 PInt64(@LDouble)^ := GetNodeValueInt64;
                 result := trunc(LDouble);
                 if result <> LDouble then AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType); // https://stackoverflow.com/questions/41779801/single-double-and-precision
-                                                                                         // Only values that are in form m*2^e, where m and e are integers can be stored in a floating point variable
-                                                                                         // so all integer can be store in the form m*2^e (ie: m = m*2^0)
-                                                                                         // so we can compare result <> aDouble without the need of samevalue
+                                                                                          // Only values that are in form m*2^e, where m and e are integers can be stored in a floating point variable
+                                                                                          // so all integer can be store in the form m*2^e (ie: m = m*2^0)
+                                                                                          // so we can compare result <> aDouble without the need of samevalue
               end;
     nstInt32,
     nstInt64: Result := GetNodeValueInt64;

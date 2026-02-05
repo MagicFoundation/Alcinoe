@@ -1,84 +1,3 @@
-(*******************************************************************************
-Delphi Client for MongoDB database.
-A Delphi driver (with connection pool) to access a mongoDB server. a connection
-pool is a cache of database connections maintained so that the connections can
-be reused when future requests to the database are required. In connection
-pooling, after a connection is created, it is placed in the pool and it is used
-over again so that a new connection does not have to be established. If all the
-connections are being used, a new connection is made and is added to the pool.
-Connection pooling also cuts down on the amount of time a user must wait to
-establish a connection to the database.
-
-
----------
-Exemple :
-
-aJSONDoc := TALJSONDocumentA.create;
-aMongoDBClient := TAlMongoDBClient.create;
-try
-  aMongoDBClient.Connect('', 0);
-  aMongoDBClient.SelectData(
-    'test.exemple',
-    '{fieldA:123}', // the query
-    '{fieldA:1, fieldB:1}', // the return fields selector
-    aJSONDoc.node);
-  aMongoDBClient.disconnect;
-  for i := 0 to aJSONDoc.ChildNodes.count - 1 do
-    with aJSONDoc.ChildNodes[i] do
-      writeln(aJSONDoc.ChildNodes[i].nodename + '=' + aJSONDoc.ChildNodes[i].text)
-finally
-  aMongoDBClient.free;
-  aJSONDoc.free;
-end;
-
-
-------------------------------
-Exemple with connection pool :
-
-aMongoDBConnectionPoolClient := TAlMongoDBConnectionPoolClient.create(aDBHost, aDBPort);
-try
-
-  ::Thread1::
-  aMongoDBConnectionPoolClient.SelectData(
-    'test.exemple',
-    '{fieldA:123}', // the query
-    '{fieldA:1, fieldB:1}', // the return fields selector
-    aLocalVarJSONDOC.node);
-
-  ::Thread2::
-  aMongoDBConnectionPoolClient.SelectData(
-    'test.exemple',
-    '{fieldA:999}', // the query
-    '{fieldA:1, fieldB:1}', // the return fields selector
-    aLocalVarJSONDOC.node);
-
-finally
-  aMongoDBClient.free;
-end;
-
-
--------------------------
-Exemple tail monitoring :
-
-aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(
-  aDBHost,
-  aDBPort,
-  'test.cappedCollectionExemple'
-  '{}', // the query
-  '{fieldA:1, fieldB:1}', // the return fields selector
-
-  Procedure (Sender: TObject; JSONRowData: TALJSONNodeA)
-  begin
-    writeln('New item added in cappedCollectionExemple: ' + JSONRowData.childnodes['fieldA'].text);
-  end,
-
-  procedure (Sender: TObject; Error: Exception)
-  begin
-    writeln(Error.message);
-  end);
-....
-aMongoDBTailMonitoringThread.free;
-*******************************************************************************)
 unit Alcinoe.MongoDB.Client;
 
 interface
@@ -86,5584 +5,2138 @@ interface
 {$I Alcinoe.inc}
 
 uses
-  winapi.WinSock2,
-  system.Contnrs,
-  system.Classes,
-  System.SyncObjs,
+  System.Classes,
   System.SysUtils,
+  Alcinoe.MongoDB.Wrapper,
   Alcinoe.Common,
-  Alcinoe.StringList,
   Alcinoe.JSONDoc;
 
-const
-  MONGO_OP_REPLY = 1; //Reply to a client request. responseTo is set
-  MONGO_OP_MSG = 1000; //generic msg command followed by a string
-  MONGO_OP_UPDATE = 2001; //update document
-  MONGO_OP_INSERT = 2002; //insert new document
-  MONGO_RESERVED = 2003; //formerly used for OP_GET_BY_OID
-  MONGO_OP_QUERY = 2004; //query a collection
-  MONGO_OP_GET_MORE = 2005; //Get more data from a query. See Cursors
-  MONGO_OP_DELETE = 2006; //Delete documents
-  MONGO_OP_KILL_CURSORS = 2007; //Tell database client is done with a cursor
 
 type
 
-    {---------------------------------------------------------------}
-    TALMongoDBClientSelectDataOnNewRowFunct = reference to Procedure(
-                                                             JSONRowData: TALJSONNodeA;
-                                                             const ViewTag: AnsiString;
-                                                             Context: Pointer;
-                                                             Var Continue: Boolean);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  EALMongoDBException = class(EALException)
+  private
+    FDomain: uint32_t;
+    FCode: uint32_t;
+  public
+    constructor Create(const ADomain: uint32_t; const ACode: uint32_t; const AMessage: AnsiString); overload;
+    constructor Create(const ADomain: uint32_t; const ACode: uint32_t; const AMessage: String); overload;
+    constructor CreateFmt(const ADomain: uint32_t; const ACode: uint32_t; const AMessage: ansistring; const Args: array of const); overload;
+    constructor CreateFmt(const ADomain: uint32_t; const ACode: uint32_t; const AMessage: string; const Args: array of const); overload;
+    property Domain: uint32_t read FDomain;
+    property Code: uint32_t read FCode;
+  end;
 
-    {-------------------------------------------------------------------------------------}
-    TALMongoDBClientRunCommandOnNewBatchRowFunct = TALMongoDBClientSelectDataOnNewRowFunct;
+  {----------------------}
+  TALMongoDBClient = class
+  public
+    type
+      // -----------------
+      // TDocumentCallback
+      TOnDocumentObjProc = procedure(Sender: TObject; var ADoc: TALJsonNodeA; const AContext: Pointer) of object;
+      TOnDocumentRefProc = reference to procedure(Sender: TObject; var ADoc: TALJsonNodeA; const AContext: Pointer);
+  private
+    type
+      // ---------------------------
+      // TOnDocumentToRefProcContext
+      TOnDocumentToRefProcContext = class
+        OnDocumentRefProc: TOnDocumentRefProc;
+        Context: Pointer;
+      end;
+  private
+    // A given thread uses at most one TALMongoDBClient at a time.
+    // Therefore, it is safe that FClient and FSession are class threadvars
+    // (per-thread globals) rather than being stored per instance.
+    class threadvar FClient: Pmongoc_client_t;
+    class threadvar FSession: Pmongoc_client_session_t;
+  private
+    FPool: Pmongoc_client_pool_t;
+    procedure OnDocumentToRefProc(Sender: TObject; var ADoc: TALJsonNodeA; const AContext: Pointer);
+    procedure OnDocumentToJSon(Sender: TObject; var ADoc: TALJsonNodeA; const AContext: Pointer);
+  public
+    /// <summary>
+    ///   Creates a MongoDB client pool from a MongoDB connection URI.
+    /// </summary>
+    /// <param name="AUri">
+    ///   MongoDB connection string (e.g. <c>mongodb://host:27017</c> or <c>mongodb://host:27017/mydb</c>).
+    ///   The optional <c>/mydb</c> part is the URI's default database (it does not restrict access; Find()
+    ///   still uses ADatabaseName/ACollectionName). URI options are provided via the query string.
+    /// </param>
+    /// <remarks>
+    ///   For URI syntax and all supported options, see:
+    ///   https://mongoc.org/libmongoc/current/mongoc_uri_t.html
+    /// </remarks>
+    constructor Create(const AUri: AnsiString); virtual;
+    destructor Destroy; override;
+    procedure StartTransaction(
+                const ASessionOpts: AnsiString = '';
+                const AtransactionOpts: AnsiString = '');
+    function CommitTransaction: TALJsonNodeA;
+    procedure AbortTransaction;
+    procedure Find(
+                const AOnDocument: TOnDocumentObjProc;
+                const AContext: Pointer;
+                const ADatabaseName: AnsiString;
+                const ACollectionName: AnsiString;
+                const Afilter: AnsiString;
+                const AOpts: AnsiString = '';
+                const AReadPrefs: AnsiString = ''); overload; virtual;
+    procedure Find(
+                const AOnDocument: TOnDocumentRefProc;
+                const AContext: Pointer;
+                const ADatabaseName: AnsiString;
+                const ACollectionName: AnsiString;
+                const Afilter: AnsiString;
+                const AOpts: AnsiString = '';
+                const AReadPrefs: AnsiString = ''); overload;
+    function Find(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const Afilter: AnsiString;
+               const AOpts: AnsiString = '';
+               const AReadPrefs: AnsiString = ''): TALJsonNodeA; overload;
+    function FindAndModify(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const AQuery: AnsiString;
+               const ASort: AnsiString;
+               const AUpdate: AnsiString;
+               const AFields: AnsiString;
+               const ARemove: ByteBool;
+               const AUpsert: ByteBool;
+               const ANew: ByteBool): TALJsonNodeA; virtual;
+    function InsertOne(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ADocument: AnsiString;
+               const AOpts: AnsiString = ''): TALJsonNodeA; virtual;
+    function InsertMany(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ADocuments: TArray<AnsiString>;
+               const AOpts: AnsiString = ''): TALJsonNodeA; virtual;
+    function UpdateOne(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ASelector: AnsiString;
+               const AUpdate: AnsiString;
+               const AOpts: AnsiString = ''): TALJsonNodeA; virtual;
+    function UpdateMany(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ASelector: AnsiString;
+               const AUpdate: AnsiString;
+               const AOpts: AnsiString = ''): TALJsonNodeA; virtual;
+    function ReplaceOne(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ASelector: AnsiString;
+               const AReplacement: AnsiString;
+               const AOpts: AnsiString = ''): TALJsonNodeA; virtual;
+    function DeleteOne(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ASelector: AnsiString;
+               const AOpts: AnsiString = ''): TALJsonNodeA; virtual;
+    function DeleteMany(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ASelector: AnsiString;
+               const AOpts: AnsiString = ''): TALJsonNodeA; virtual;
+  end;
 
-    {---------------------------------------}
-    //bit num     name            description
-    // 0	      Reserved	        Must be set to 0.
-    // 1	      TailableCursor	  Tailable means cursor is not closed when the last data is retrieved. Rather, the cursor marks the final
-    //                            object’s position. You can resume using the cursor later, from where it was located, if more data were received.
-    //                            Like any “latent cursor”, the cursor may become invalid at some point (CursorNotFound) – for example if
-    //                            the final object it references were deleted.
-    // 2	      SlaveOk	          Allow query of replica slave. Normally these return an error except for namespace “local”.
-    // 3	      OplogReplay	      Internal replication use only - driver should not set
-    // 4	      NoCursorTimeout	  The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use. Set this option to prevent that.
-    // 5	      AwaitData	        Use with TailableCursor. If we are at the end of the data, block for a while rather than returning no data. After a timeout period, we do return as normal.
-    // 6	      Exhaust         	Stream the data down full blast in multiple “more” packages, on the assumption that the client will fully read all data queried.
-    //                            Faster when you are pulling a lot of data and know you want to pull it all down. Note: the client is not allowed to not
-    //                            read all the data unless it closes the connection.
-    // 7	      Partial	          Get partial results from a mongos if some shards are down (instead of throwing an error)
-    // 8-31	                      Reserved	Must be set to 0.
-    TALMongoDBClientSelectDataFlags = set of (
-      sfTailMonitoring,  // it's TailableCursor + AwaitData option. If we are at the end of the data, wait for new data rather than returning no data
-                         // a good explanation can be found here: http://docs.mongodb.org/manual/tutorial/create-tailable-cursor/
-                         //                                       http://shtylman.com/post/the-tail-of-mongodb/
-                         // use only with TALMongoDBClientSelectDataOnNewRowFunct
-      sfSlaveOk,         // Allow query of replica slave.
-                         // Note that you should use this flag even if you do not use the automatic routing to secondaries.
-                         // If you connect directly to a secondary in a replica set, you still need to set this flag, which basically tells
-                         // the database that you are aware that you might be getting older data and you're okay with that.
-                         // If you do not call this, you'll get "not master" errors when you try to query.
-      sfNoCursorTimeout, // The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use.
-                         // Set this option to prevent that.
-      sfPartial);        // Get partial results from a mongos if some shards are down (instead of throwing an error)
-
-    {----------------------------------------}
-    TALMongoDBClientRunCommandFlags = set of (
-      cfSlaveOk,         // Allow query of replica slave.
-                         // Note that you should use this flag even if you do not use the automatic routing to secondaries.
-                         // If you connect directly to a secondary in a replica set, you still need to set this flag, which basically tells
-                         // the database that you are aware that you might be getting older data and you're okay with that.
-                         // If you do not call this, you'll get "not master" errors when you try to query.
-      cfNoCursorTimeout, // The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use.
-                         // Set this option to prevent that.
-      cfPartial);        // Get partial results from a mongos if some shards are down (instead of throwing an error)
-
-    {----------------------------------------}
-    TALMongoDBClientUpdateDataFlags = set of (
-      ufUpsert,       // If set, the database will insert the supplied object into the collection if no matching document is found.
-      ufMultiUpdate); // If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
-
-    {----------------------------------------}
-    TALMongoDBClientInsertDataFlags = set of (
-      ifContinueOnError); // If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
-                          // This makes bulk insert behave similarly to a series of single inserts, except lastError will be set
-                          // if any insert fails, not just the last one. If multiple errors occur, only the most recent will be
-                          // reported by getLastError. (new in 1.9.1)
-
-    {----------------------------------------}
-    TALMongoDBClientDeleteDataFlags = set of (
-      dfSingleRemove); // If set, the database will remove only the first matching document in the
-                       // collection. Otherwise all matching documents will be removed.
-
-    {---------------------------------------------}
-    EAlMongoDBClientException = class(EALException)
-    private
-      FErrorCode: Integer;
-      FCloseConnection: Boolean;
-    public
-      constructor Create(const aMsg: AnsiString; const aErrorCode: integer; const aCloseConnection: Boolean = False);
-      property CloseConnection: Boolean read FCloseConnection write FCloseConnection;
-      property ErrorCode: Integer read FErrorCode write FErrorCode;
-    end;
-
-    {-----------------------------------}
-    TAlBaseMongoDBClient = class(TObject)
-    Private
-      FSendTimeout: Integer;
-      FReceiveTimeout: Integer;
-      fKeepAlive: Boolean;
-      fTCPNoDelay: Boolean;
-    protected
-      function loadCachedData(
-                 const Key: AnsiString;
-                 var DataStr: AnsiString): Boolean; virtual;
-      Procedure SaveDataToCache(
-                  const Key: ansiString;
-                  const CacheThreshold: integer;
-                  const DataStr: ansiString); virtual;
-      procedure DoSetSendTimeout(aSocketDescriptor: TSocket; const Value: integer); virtual;
-      procedure DoSetReceiveTimeout(aSocketDescriptor: TSocket; const Value: integer); virtual;
-      procedure DoSetKeepAlive(aSocketDescriptor: TSocket; const Value: boolean); virtual;
-      procedure DoSetTCPNoDelay(aSocketDescriptor: TSocket; const Value: boolean); virtual;
-      procedure SetSendTimeout(const Value: integer); virtual;
-      procedure SetReceiveTimeout(const Value: integer); virtual;
-      procedure SetKeepAlive(const Value: boolean); virtual;
-      procedure SetTCPNoDelay(const Value: boolean); virtual;
-      procedure CheckOSError(Error: Boolean);
-      procedure DoConnect(
-                  var aSocketDescriptor: TSocket;
-                  const aHost: AnsiString;
-                  const APort: integer;
-                  const aSendTimeout: Integer;
-                  const aReceiveTimeout: Integer;
-                  const aKeepAlive: Boolean;
-                  const aTCPNoDelay: Boolean); virtual;
-      Procedure DoDisconnect(var aSocketDescriptor: TSocket); virtual;
-      Function SocketWrite(aSocketDescriptor: TSocket; const Buf; len: Integer): Integer; Virtual;
-      Function SocketRead(aSocketDescriptor: TSocket; var buf; len: Integer): Integer; Virtual;
-      Function SendCmd(
-                 aSocketDescriptor: TSocket;
-                 const aCmd: AnsiString;
-                 const aGetResponse: boolean): AnsiString;
-      Function GetResponse(aSocketDescriptor: TSocket): AnsiString; virtual;
-      Procedure CheckRunCommandResponse(aResponseNode: TALJSONNodeA); virtual;
-      Procedure CheckServerLastError(
-                  aSocketDescriptor: TSocket;
-                  var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
-                  var UpdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                  var Upserted: ansiString); overload; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-      Procedure CheckServerLastError(aSocketDescriptor: TSocket); overload;
-      Function BuildOPKILLCURSORSMessage(
-                 const requestID: integer;                       // identifier for this message
-                 const responseTo: integer;                      // requestID from the original request (used in reponses from db)
-                 const cursorIDs: array of int64): ansiString;   // cursorIDs to be close
-      Function BuildOPINSERTMessage(
-                 const requestID: integer;                            // identifier for this message
-                 const responseTo: integer;                           // requestID from the original request (used in reponses from db)
-                 const flags: integer;                                // bit vector
-                 const fullCollectionName: ansiString;                // "dbname.collectionname"
-                 const documents: ansiString): ansiString;            // one or more documents to insert into the collection
-      Function BuildOPUPDATEMessage(
-                 const requestID: integer;                            // identifier for this message
-                 const responseTo: integer;                           // requestID from the original request (used in reponses from db)
-                 const flags: integer;                                // bit vector
-                 const fullCollectionName: ansiString;                // "dbname.collectionname"
-                 const selector: ansiString;                          // the query to select the document
-                 const update: ansiString): ansiString;               // specification of the update to perform
-      Function BuildOPDELETEMessage(
-                 const requestID: integer;                            // identifier for this message
-                 const responseTo: integer;                           // requestID from the original request (used in reponses from db)
-                 const flags: integer;                                // bit vector
-                 const fullCollectionName: ansiString;                // "dbname.collectionname"
-                 const selector: ansiString): ansiString;             // query object.
-      Function BuildOPQUERYMessage(
-                 const requestID: integer;                             // identifier for this message
-                 const responseTo: integer;                            // requestID from the original request (used in reponses from db)
-                 const flags: integer;                                 // bit vector of query options.
-                 const fullCollectionName: ansiString;                 // "dbname.collectionname"
-                 const numberToSkip: integer;                          // number of documents to skip
-                 const numberToReturn: integer;                        // number of documents to return in the first OP_REPLY batch
-                 const query: ansiString;                              // query object
-                 const returnFieldsSelector: ansiString): AnsiString;  // Optional. Selector indicating the fields to return
-      Function BuildOPGETMOREMessage(
-                 const requestID: integer;              // identifier for this message
-                 const responseTo: integer;             // requestID from the original request (used in reponses from db)
-                 const fullCollectionName: ansiString;  // "dbname.collectionname"
-                 const numberToReturn: integer;         // number of documents to return in the first OP_REPLY batch
-                 const cursorID: int64): AnsiString;    // cursorID from the OP_REPLY
-      Procedure ParseOPREPLYMessage(
-                  const OpReplyMsg: AnsiString;  // the OP_REPLY message body
-                  var requestID: integer;        // identifier for this message
-                  var responseTo: integer;       // requestID from the original request (used in reponses from db)
-                  var responseFlags: integer;    // bit vector
-                  var cursorID: int64;           // cursor id if client needs to do get more's
-                  var startingFrom: integer;     // where in the cursor this reply is starting
-                  var numberReturned: integer;   // number of documents in the reply
-                  documents: TALJSONNodeA;        // documents
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer;
-                  const RowTag: AnsiString;      // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-                  const ViewTag: AnsiString;     // the node name under with all records will be stored in the JSON/XML result document.
-                  var continue: boolean);
-      Procedure OP_KILL_CURSORS(
-                  aSocketDescriptor: TSocket;
-                  const cursorIDs: array of int64); // cursorIDs to be close
-      Procedure OP_QUERY(
-                  aSocketDescriptor: TSocket;
-                  const flags: integer;                    // bit vector of query options.
-                  const fullCollectionName: ansiString;    // "dbname.collectionname"
-                  const numberToSkip: integer;             // number of documents to skip
-                  const numberToReturn: integer;           // number of documents to return in the first OP_REPLY batch
-                  const query: ansiString;                 // query object.
-                  const returnFieldsSelector: ansiString;  // Optional. Selector indicating the fields to return.
-                  var responseFlags: integer;              // bit vector
-                  var cursorID: int64;                     // cursor id if client needs to do get more's
-                  var startingFrom: integer;               // where in the cursor this reply is starting
-                  var numberReturned: integer;             // number of documents in the reply
-                  documents: TALJSONNodeA;                  // documents
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer;
-                  const RowTag: AnsiString;                // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-                  const ViewTag: AnsiString;               // the node name under with all records will be stored in the JSON/XML result document.
-                  var continue: boolean);
-      Procedure OP_GET_MORE(
-                  aSocketDescriptor: TSocket;
-                  const fullCollectionName: ansiString;   // "dbname.collectionname"
-                  const numberToReturn: integer;          // number of documents to return
-                  var cursorID: int64;                    // cursorID from the OP_REPLY
-                  var responseFlags: integer;             // bit vector
-                  var startingFrom: integer;              // where in the cursor this reply is starting
-                  var numberReturned: integer;            // number of documents in the reply
-                  documents: TALJSONNodeA;                 // documents
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer;
-                  const RowTag: AnsiString;               // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-                  const ViewTag: AnsiString;              // the node name under with all records will be stored in the JSON/XML result document.
-                  var continue: boolean);
-      Procedure OP_INSERT(
-                  aSocketDescriptor: TSocket;
-                  const flags: integer;                  // bit vector
-                  const fullCollectionName: ansiString;  // "dbname.collectionname"
-                  const documents: ansiString);          // one or more documents to insert into the collection
-      Procedure OP_UPDATE(
-                  aSocketDescriptor: TSocket;
-                  const flags: integer;                   // bit vector
-                  const fullCollectionName: ansiString;   // "dbname.collectionname"
-                  const selector: ansiString;             // the query to select the document
-                  const update: ansiString;               // specification of the update to perform
-                  var NumberOfDocumentsUpdated: integer;  // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
-                  var updatedExisting: boolean;           // is true when an update affects at least one document and does not result in an upsert.
-                  var upserted: ansiString);              // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-      Procedure OP_DELETE(
-                  aSocketDescriptor: TSocket;
-                  const flags: integer;                   // bit vector
-                  const fullCollectionName: ansiString;   // "dbname.collectionname"
-                  const selector: ansiString;             // query object.
-                  var NumberOfDocumentsRemoved: integer); // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
-      procedure OnSelectDataDone(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  flags: TALMongoDBClientSelectDataFlags;
-                  const RowTag: AnsiString;
-                  const ViewTag: AnsiString;
-                  Skip: integer;
-                  First: Integer;
-                  CacheThreshold: Integer;
-                  TimeTaken: double); virtual;
-      procedure OnRunCommandDone(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  flags: TALMongoDBClientRunCommandFlags;
-                  const RowTag: AnsiString;
-                  const ViewTag: AnsiString;
-                  CacheThreshold: Integer;
-                  TimeTaken: double); virtual;
-      procedure OnUpdateDataDone(
-                  const FullCollectionName: AnsiString;
-                  const selector: AnsiString;
-                  const update: AnsiString;
-                  flags: TALMongoDBClientUpdateDataFlags;
-                  TimeTaken: double); virtual;
-      procedure OnDeleteDataDone(
-                  const FullCollectionName: AnsiString;
-                  const selector: AnsiString;
-                  flags: TALMongoDBClientDeleteDataFlags;
-                  TimeTaken: double); virtual;
-      procedure OnInsertDataDone(
-                  const FullCollectionName: AnsiString;
-                  const documents: AnsiString;
-                  flags: TALMongoDBClientInsertDataFlags;
-                  TimeTaken: double); virtual;
-      procedure OnFindAndModifyDataDone(
-                  const FullCollectionName: AnsiString;
-                  const query: AnsiString;
-                  const sort: AnsiString;
-                  remove: boolean;
-                  const update: AnsiString;
-                  new: boolean;
-                  const ReturnFieldsSelector: AnsiString;
-                  InsertIfNotFound: boolean;
-                  RowTag: AnsiString;
-                  ViewTag: AnsiString;
-                  TimeTaken: double); virtual;
-    public
-      constructor Create; virtual;
-      destructor Destroy; override;
-      property SendTimeout: Integer read FSendTimeout write SetSendTimeout;
-      property ReceiveTimeout: Integer read FReceiveTimeout write SetReceiveTimeout;
-      property KeepAlive: Boolean read fKeepAlive write SetKeepAlive;
-      property TcpNoDelay: Boolean read fTCPNoDelay write fTCPNoDelay;
-    end;
-
-    {--------------------------------------------}
-    TAlMongoDBClient = class(TAlBaseMongoDBClient)
-    private
-      Fconnected: Boolean;
-      FSocketDescriptor: TSocket;
-      fStopTailMonitoring: Boolean;
-    protected
-      procedure SetSendTimeout(const Value: integer); override;
-      procedure SetReceiveTimeout(const Value: integer); override;
-      procedure SetKeepAlive(const Value: boolean); override;
-      procedure SetTCPNoDelay(const Value: boolean); override;
-    public
-      constructor Create; override;
-      destructor Destroy; override;
-      Procedure Connect(const aHost: AnsiString; const APort: integer); virtual;
-      Procedure Disconnect; virtual;
-
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                        // name with the collection name, using a . for the concatenation. For example, for the database
-                                                        // foo and the collection bar, the full collection name is foo.bar
-                  const Query: AnsiString; // BSON document that represents the query. The query will contain one or more elements,
-                                           // all of which must match for a document to be included in the result set. Possible elements
-                                           // include $query, $orderby, $hint, $explain, and $snapshot.
-                  const ReturnFieldsSelector: AnsiString; // Optional. BSON document that limits the fields in the returned documents.
-                                                          // The returnFieldsSelector contains one or more elements, each of which is the name
-                                                          // of a field that should be returned, and and the integer value 1. In JSON notation,
-                                                          // a returnFieldsSelector to limit to the fields a, b and c would be:
-                                                          // { a : 1, b : 1, c : 1}
-                  flags: TALMongoDBClientSelectDataFlags; // Options (see TALMongoDBClientSelectDataFlags)
-                  const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-                  const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-                  Skip: integer; // Sets the number of documents to omit
-                  First: Integer; // Limits the number of documents to retrieve
-                  CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                                           // cache or not. Values <= 0 deactivate the cache
-                  JSONDATA: TALJSONNodeA;
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  flags: TALMongoDBClientSelectDataFlags;
-                  Skip: integer;
-                  First: Integer;
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  flags: TALMongoDBClientSelectDataFlags;
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  flags: TALMongoDBClientSelectDataFlags;
-                  const RowTag: AnsiString;
-                  Skip: integer;
-                  First: Integer;
-                  JSONDATA: TALJSONNodeA); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  flags: TALMongoDBClientSelectDataFlags;
-                  const RowTag: AnsiString;
-                  JSONDATA: TALJSONNodeA); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  flags: TALMongoDBClientSelectDataFlags;
-                  JSONDATA: TALJSONNodeA); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  Skip: integer;
-                  First: Integer;
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  const RowTag: AnsiString;
-                  Skip: integer;
-                  First: Integer;
-                  JSONDATA: TALJSONNodeA); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  const RowTag: AnsiString;
-                  JSONDATA: TALJSONNodeA); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  JSONDATA: TALJSONNodeA); overload; virtual;
-
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString; // BSON document that represents the Command
-                  flags: TALMongoDBClientRunCommandFlags; // Options (see TALMongoDBClientRunCommandFlags)
-                  const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-                  const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-                  CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                                           // cache or not. Values <= 0 deactivate the cache
-                  JSONDATA: TALJSONNodeA;
-                  OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
-                  Context: Pointer); overload; virtual;
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  flags: TALMongoDBClientRunCommandFlags;
-                  OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
-                  Context: Pointer); overload; virtual;
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  flags: TALMongoDBClientRunCommandFlags;
-                  const RowTag: AnsiString;
-                  JSONDATA: TALJSONNodeA); overload; virtual;
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  flags: TALMongoDBClientRunCommandFlags;
-                  JSONDATA: TALJSONNodeA); overload; virtual;
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
-                  Context: Pointer); overload; virtual;
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  const RowTag: AnsiString;
-                  JSONDATA: TALJSONNodeA); overload; virtual;
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  JSONDATA: TALJSONNodeA); overload; virtual;
-
-      procedure UpdateData(
-                  const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                        // name with the collection name, using a . for the concatenation. For example, for the database
-                                                        // foo and the collection bar, the full collection name is foo.bar
-                  const selector: AnsiString; // BSON document that specifies the query for selection of the document to update.
-                  const update: AnsiString; // BSON document that specifies the update to be performed. For information on specifying updates see
-                                            // http://docs.mongodb.org/manual/tutorial/modify-documents/
-                  flags: TALMongoDBClientUpdateDataFlags; // Options (see TALMongoDBClientUpdateDataFlags)
-                  var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
-                  var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                  var ObjectID: ansiString); overload; virtual; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-      procedure UpdateData(
-                  const FullCollectionName: AnsiString;
-                  const Selector: AnsiString;
-                  const Update: AnsiString;
-                  flags: TALMongoDBClientUpdateDataFlags); overload; virtual;
-      procedure UpdateData(
-                  const FullCollectionName: AnsiString;
-                  const Selector: AnsiString;
-                  const Update: AnsiString); overload; virtual;
-
-      procedure InsertData(
-                  const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                        // name with the collection name, using a . for the concatenation. For example, for the database
-                                                        // foo and the collection bar, the full collection name is foo.bar
-                  const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
-                  flags: TALMongoDBClientInsertDataFlags); overload; virtual; // Options (see TALMongoDBClientInsertDataFlags)
-      procedure InsertData(
-                  const FullCollectionName: AnsiString;
-                  const documents: AnsiString); overload; virtual;
-
-      procedure DeleteData(
-                  const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                        // name with the collection name, using a . for the concatenation. For example, for the database
-                                                        // foo and the collection bar, the full collection name is foo.bar
-                  const selector: AnsiString; // BSON document that represent the query used to select the documents to be removed
-                                              // The selector will contain one or more elements, all of which must match for a document
-                                              // to be removed from the collection
-                  flags: TALMongoDBClientDeleteDataFlags; // Options (see TALMongoDBClientDeleteDataFlags)
-                  var NumberOfDocumentsRemoved: integer); overload; virtual;
-      procedure DeleteData(
-                  const FullCollectionName: AnsiString;
-                  const Selector: AnsiString;
-                  flags: TALMongoDBClientDeleteDataFlags); overload; virtual;
-      procedure DeleteData(
-                  const FullCollectionName: AnsiString;
-                  const Selector: AnsiString); overload; virtual;
-
-      Procedure FindAndModifyData(
-                  const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                        // name with the collection name, using a . for the concatenation. For example, for the database
-                                                        // foo and the collection bar, the full collection name is foo.bar
-                  const query: AnsiString; // Optional. The selection criteria for the modification. The query field employs the same query selectors as used in the
-                                           // db.collection.find() method. Although the query may match multiple documents, findAndModify will select only
-                                           // one document to modify.
-                  const sort: AnsiString; // Optional. Determines which document the operation modifies if the query selects multiple
-                                          // documents. findAndModify modifies the first document in the sort order specified by this argument.
-                  remove: boolean; // Must specify either the remove or the update field. Removes the document specified in the query field.
-                                   // Set this to true to remove the selected document . The default is false.
-                  const update: AnsiString; // Must specify either the remove or the update field. Performs an update of the selected document.
-                                            // The update field employs the same update operators or field: value specifications to modify the selected document.
-                  new: boolean; // Optional. When true, returns the modified document rather than the original. The findAndModify method
-                                // ignores the new option for remove operations. The default is false.
-                  const ReturnFieldsSelector: AnsiString; // Optional. A subset of fields to return. The fields document specifies an inclusion of a
-                                                          // field with 1, as in: fields: { <field1>: 1, <field2>: 1, ... }.
-                  InsertIfNotFound: boolean;  // Optional. Used in conjunction with the update field. When true, findAndModify
-                                              // creates a new document if no document matches the query, or if documents match the query,
-                                              // findAndModify performs an update. The default is false.
-                  const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-                  const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-                  JSONDATA: TALJSONNodeA;
-                  var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-                  var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                  var ObjectID: AnsiString); overload; virtual; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-      Procedure FindAndModifyData(
-                  const FullCollectionName: AnsiString;
-                  const query: AnsiString;
-                  const sort: AnsiString;
-                  remove: boolean;
-                  const update: AnsiString;
-                  new: boolean;
-                  const ReturnFieldsSelector: AnsiString;
-                  InsertIfNotFound: boolean;
-                  JSONDATA: TALJSONNodeA;
-                  var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-                  var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                  var ObjectID: AnsiString); overload; virtual; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-      Procedure FindAndModifyData(
-                  const FullCollectionName: AnsiString;
-                  const query: AnsiString;
-                  const sort: AnsiString;
-                  remove: boolean;
-                  const update: AnsiString;
-                  new: boolean;
-                  const ReturnFieldsSelector: AnsiString;
-                  InsertIfNotFound: boolean;
-                  JSONDATA: TALJSONNodeA); overload; virtual;
-
-      property Connected: Boolean read FConnected;
-      property StopTailMonitoring: boolean read fStopTailMonitoring write fStopTailMonitoring;
-    end;
-
-    {----------------------------------------}
-    TAlMongoDBConnectionPoolContainer = record
-      SocketDescriptor: TSocket;
-      LastAccessDate: int64;
-    End;
-    TAlMongoDBConnectionPool = array of TAlMongoDBConnectionPoolContainer;
-
-    {----------------------------------------------------------}
-    TAlMongoDBConnectionPoolClient = class(TAlBaseMongoDBClient)
-    private
-      FConnectionPool: TAlMongoDBConnectionPool;
-      FConnectionPoolCount: integer;
-      FConnectionPoolCapacity: integer;
-      FConnectionPoolCS: TCriticalSection;
-      FWorkingConnectionCount: Integer;
-      FReleasingAllconnections: Boolean;
-      FLastConnectionGarbage: Int64;
-      FConnectionMaxIdleTime: integer;
-      fHost: AnsiString;
-      fPort: integer;
-    protected
-      procedure SetSendTimeout(const Value: integer); override;
-      procedure SetReceiveTimeout(const Value: integer); override;
-      procedure SetKeepAlive(const Value: boolean); override;
-      procedure SetTCPNoDelay(const Value: boolean); override;
-      Function  AcquireConnection: TSocket; virtual;
-      Procedure ReleaseConnection(
-                  var SocketDescriptor: TSocket;
-                  const CloseConnection: Boolean = False); virtual;
-    public
-      constructor Create(const aHost: AnsiString; const APort: integer); reintroduce;
-      destructor Destroy; override;
-      Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
-
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                        // name with the collection name, using a . for the concatenation. For example, for the database
-                                                        // foo and the collection bar, the full collection name is foo.bar
-                  const Query: AnsiString; // BSON document that represents the query. The query will contain one or more elements,
-                                           // all of which must match for a document to be included in the result set. Possible elements
-                                           // include $query, $orderby, $hint, $explain, and $snapshot.
-                  const ReturnFieldsSelector: AnsiString; // Optional. BSON document that limits the fields in the returned documents.
-                                                          // The returnFieldsSelector contains one or more elements, each of which is the name
-                                                          // of a field that should be returned, and and the integer value 1. In JSON notation,
-                                                          // a returnFieldsSelector to limit to the fields a, b and c would be:
-                                                          // { a : 1, b : 1, c : 1}
-                  flags: TALMongoDBClientSelectDataFlags; // Options (see TALMongoDBClientSelectDataFlags)
-                  const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-                  const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-                  Skip: integer; // Sets the number of documents to omit
-                  First: Integer; // Limits the number of documents to retrieve
-                  CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                                           // cache or not. Values <= 0 deactivate the cache
-                  JSONDATA: TALJSONNodeA;
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  flags: TALMongoDBClientSelectDataFlags;
-                  Skip: integer;
-                  First: Integer;
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  flags: TALMongoDBClientSelectDataFlags;
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  flags: TALMongoDBClientSelectDataFlags;
-                  const RowTag: AnsiString;
-                  Skip: integer;
-                  First: Integer;
-                  JSONDATA: TALJSONNodeA;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  flags: TALMongoDBClientSelectDataFlags;
-                  const RowTag: AnsiString;
-                  JSONDATA: TALJSONNodeA;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  flags: TALMongoDBClientSelectDataFlags;
-                  JSONDATA: TALJSONNodeA;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  Skip: integer;
-                  First: Integer;
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                  Context: Pointer;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  const RowTag: AnsiString;
-                  Skip: integer;
-                  First: Integer;
-                  JSONDATA: TALJSONNodeA;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  const RowTag: AnsiString;
-                  JSONDATA: TALJSONNodeA;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(
-                  const FullCollectionName: AnsiString;
-                  const Query: AnsiString;
-                  const ReturnFieldsSelector: AnsiString;
-                  JSONDATA: TALJSONNodeA;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString; // BSON document that represents the Command
-                  flags: TALMongoDBClientRunCommandFlags; // Options (see TALMongoDBClientRunCommandFlags)
-                  const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-                  const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-                  CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                                           // cache or not. Values <= 0 deactivate the cache
-                  JSONDATA: TALJSONNodeA;
-                  OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
-                  Context: Pointer;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  flags: TALMongoDBClientRunCommandFlags;
-                  OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
-                  Context: Pointer;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  flags: TALMongoDBClientRunCommandFlags;
-                  const RowTag: AnsiString;
-                  JSONDATA: TALJSONNodeA;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  flags: TALMongoDBClientRunCommandFlags;
-                  JSONDATA: TALJSONNodeA;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
-                  Context: Pointer;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  const RowTag: AnsiString;
-                  JSONDATA: TALJSONNodeA;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure RunCommand(
-                  const DatabaseName: AnsiString;
-                  const Command: AnsiString;
-                  JSONDATA: TALJSONNodeA;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-
-      procedure UpdateData(
-                  const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                        // name with the collection name, using a . for the concatenation. For example, for the database
-                                                        // foo and the collection bar, the full collection name is foo.bar
-                  const selector: AnsiString; // BSON document that specifies the query for selection of the document to update.
-                  const update: AnsiString; // BSON document that specifies the update to be performed. For information on specifying updates see
-                                            // http://docs.mongodb.org/manual/tutorial/modify-documents/
-                  flags: TALMongoDBClientUpdateDataFlags; // Options (see TALMongoDBClientUpdateDataFlags)
-                  var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
-                  var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                  var ObjectID: ansiString; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure UpdateData(
-                  const FullCollectionName: AnsiString;
-                  const Selector: AnsiString;
-                  const Update: AnsiString;
-                  flags: TALMongoDBClientUpdateDataFlags;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure UpdateData(
-                  const FullCollectionName: AnsiString;
-                  const Selector: AnsiString;
-                  const Update: AnsiString;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-
-      procedure InsertData(
-                  const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                        // name with the collection name, using a . for the concatenation. For example, for the database
-                                                        // foo and the collection bar, the full collection name is foo.bar
-                  const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
-                  flags: TALMongoDBClientInsertDataFlags;// Options (see TALMongoDBClientInsertDataFlags)
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure InsertData(
-                  const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                        // name with the collection name, using a . for the concatenation. For example, for the database
-                                                        // foo and the collection bar, the full collection name is foo.bar
-                  const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-
-
-      procedure DeleteData(
-                  const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                        // name with the collection name, using a . for the concatenation. For example, for the database
-                                                        // foo and the collection bar, the full collection name is foo.bar
-                  const selector: AnsiString; // BSON document that represent the query used to select the documents to be removed
-                                              // The selector will contain one or more elements, all of which must match for a document
-                                              // to be removed from the collection
-                  flags: TALMongoDBClientDeleteDataFlags; // Options (see TALMongoDBClientDeleteDataFlags)
-                  var NumberOfDocumentsRemoved: integer;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure DeleteData(
-                  const FullCollectionName: AnsiString;
-                  const Selector: AnsiString;
-                  flags: TALMongoDBClientDeleteDataFlags;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure DeleteData(
-                  const FullCollectionName: AnsiString;
-                  const Selector: AnsiString;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-
-      Procedure FindAndModifyData(
-                  const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                        // name with the collection name, using a . for the concatenation. For example, for the database
-                                                        // foo and the collection bar, the full collection name is foo.bar
-                  const query: AnsiString; // Optional. The selection criteria for the modification. The query field employs the same query selectors as used in the
-                                           // db.collection.find() method. Although the query may match multiple documents, findAndModify will select only
-                                           // one document to modify.
-                  const sort: AnsiString; // Optional. Determines which document the operation modifies if the query selects multiple
-                                          // documents. findAndModify modifies the first document in the sort order specified by this argument.
-                  remove: boolean; // Must specify either the remove or the update field. Removes the document specified in the query field.
-                                   // Set this to true to remove the selected document . The default is false.
-                  const update: AnsiString; // Must specify either the remove or the update field. Performs an update of the selected document.
-                                            // The update field employs the same update operators or field: value specifications to modify the selected document.
-                  new: boolean; // Optional. When true, returns the modified document rather than the original. The findAndModify method
-                                // ignores the new option for remove operations. The default is false.
-                  const ReturnFieldsSelector: AnsiString; // Optional. A subset of fields to return. The fields document specifies an inclusion of a
-                                                          // field with 1, as in: fields: { <field1>: 1, <field2>: 1, ... }.
-                  InsertIfNotFound: boolean;  // Optional. Used in conjunction with the update field. When true, findAndModify
-                                              // creates a new document if no document matches the query, or if documents match the query,
-                                              // findAndModify performs an update. The default is false.
-                  const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-                  const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-                  JSONDATA: TALJSONNodeA;
-                  var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-                  var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                  var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure FindAndModifyData(
-                  const FullCollectionName: AnsiString;
-                  const query: AnsiString;
-                  const sort: AnsiString;
-                  remove: boolean;
-                  const update: AnsiString;
-                  new: boolean;
-                  const ReturnFieldsSelector: AnsiString;
-                  InsertIfNotFound: boolean;
-                  JSONDATA: TALJSONNodeA;
-                  var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-                  var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                  var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure FindAndModifyData(
-                  const FullCollectionName: AnsiString;
-                  const query: AnsiString;
-                  const sort: AnsiString;
-                  remove: boolean;
-                  const update: AnsiString;
-                  new: boolean;
-                  const ReturnFieldsSelector: AnsiString;
-                  InsertIfNotFound: boolean;
-                  JSONDATA: TALJSONNodeA;
-                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-
-      property Host: ansiString read fHost;
-      property Port: integer read fPort;
-    end;
-
-    {--------------------------------------------------------------------------------------------------------}
-    TAlMongoDBTailMonitoringThreadEvent = reference to Procedure (Sender: TObject; JSONRowData: TALJSONNodeA);
-    TAlMongoDBTailMonitoringThreadException = reference to procedure (Sender: TObject; Error: Exception);
-
-    {---------------------------------------------}
-    TAlMongoDBTailMonitoringThread = class(TThread)
-    private
-      fMongoDBClient: TALMongoDBClient;
-      FHost: AnsiString;
-      fPort: integer;
-      fFullCollectionName: AnsiString;
-      fQuery: AnsiString;
-      fReturnFieldsSelector: AnsiString;
-      fOnEvent: TAlMongoDBTailMonitoringThreadEvent;
-      fOnException: TAlMongoDBTailMonitoringThreadException;
-    protected
-      Procedure DoEvent(JSONRowData: TALJSONNodeA); virtual;
-      procedure DoException(Error: Exception); virtual;
-    public
-      constructor Create(
-                    const aHost: AnsiString;
-                    const aPort: integer;
-                    const aFullCollectionName: AnsiString;
-                    const aQuery: AnsiString;
-                    const aReturnFieldsSelector: AnsiString;
-                    aOnEvent: TAlMongoDBTailMonitoringThreadEvent;
-                    aOnError: TAlMongoDBTailMonitoringThreadException); virtual;
-      Destructor Destroy; override;
-      procedure Execute; override;
-      property OnEvent: TAlMongoDBTailMonitoringThreadEvent read fOnEvent write fOnEvent;
-      property OnException: TAlMongoDBTailMonitoringThreadException read fOnException write fOnException;
-    end;
+  {---------------------------------------------}
+  TALMongoDBChangeStreamListener = class(TThread)
+  public
+    type
+      TChangeEvent = procedure(Sender: TObject; const AChangeDoc: TALJsonNodeA) of object;
+      TErrorEvent = procedure(Sender: TObject; const AError: Exception) of object;
+  private
+    FUri: AnsiString;
+    FDatabaseName: AnsiString;
+    FCollectionName: AnsiString;
+    FPipeline: AnsiString;
+    FOpts: AnsiString;
+    FOnChange: TChangeEvent;
+    FOnError: TErrorEvent;
+  protected
+    procedure Execute; override;
+    procedure DoChange(const AChangeDoc: TALJsonNodeA); virtual;
+    procedure DoError(const AError: Exception); virtual;
+  public
+    constructor Create; virtual;
+    property Uri: AnsiString read FUri write FUri;
+    property DatabaseName: AnsiString read FDatabaseName write FDatabaseName;
+    property CollectionName: AnsiString read FCollectionName write FCollectionName;
+    property Pipeline: AnsiString read FPipeline write FPipeline;
+    property Opts: AnsiString read FOpts write FOpts;
+    property Onchange: TChangeEvent read FOnChange write FOnChange;
+    property OnError: TErrorEvent read FOnError write FOnError;
+  end;
 
 implementation
 
 uses
-  Winapi.Windows,
-  System.Diagnostics,
-  System.math,
-  Alcinoe.Cipher,
-  Alcinoe.WinSock,
-  Alcinoe.WinApi.Windows,
-  Alcinoe.StringUtils;
+  Winapi.Windows;
 
-{***************************************************************************************************************************************}
-constructor EAlMongoDBClientException.Create(const aMsg: AnsiString; const aErrorCode: integer; const aCloseConnection: Boolean = False);
+{*****************************************************************************************************************}
+constructor EALMongoDBException.Create(const ADomain: uint32_t; const ACode: uint32_t; const AMessage: AnsiString);
 begin
-  fErrorCode := aErrorCode;
-  fCloseConnection := aCloseConnection;
-  inherited create(aMsg);
+  inherited create(AMessage);
+  FDomain := ADomain;
+  FCode := ACode;
 end;
 
-{**************************************}
-constructor TAlBaseMongoDBClient.Create;
-var LWSAData: TWSAData;
+{*************************************************************************************************************}
+constructor EALMongoDBException.Create(const ADomain: uint32_t; const ACode: uint32_t; const AMessage: String);
 begin
-  CheckOSError(WSAStartup(MAKEWORD(2,2), LWSAData) <> 0);
-  FSendTimeout := 2{h}*60{min}*60{s}*1000{ms}; // 2 hours
-  FReceiveTimeout := 2{h}*60{min}*60{s}*1000{ms}; // 2 hours
-  FKeepAlive := True;
-  fTCPNoDelay := True;
+  inherited create(AMessage);
+  FDomain := ADomain;
+  FCode := ACode;
 end;
 
-{**************************************}
-destructor TAlBaseMongoDBClient.Destroy;
+{************************************************************************************************************************************************}
+constructor EALMongoDBException.CreateFmt(const ADomain: uint32_t; const ACode: uint32_t; const AMessage: ansistring; const Args: array of const);
 begin
-  WSACleanup;
-  inherited;
+  inherited CreateFmt(AMessage, Args);
+  FDomain := ADomain;
+  FCode := ACode;
 end;
 
-{**********************************************************}
-procedure TAlBaseMongoDBClient.CheckOSError(Error: Boolean);
+{********************************************************************************************************************************************}
+constructor EALMongoDBException.CreateFmt(const ADomain: uint32_t; const ACode: uint32_t; const AMessage: string; const Args: array of const);
 begin
-  if Error then RaiseLastOSError;
+  inherited CreateFmt(AMessage, Args);
+  FDomain := ADomain;
+  FCode := ACode;
 end;
 
-{***************************************}
-procedure TAlBaseMongoDBClient.DoConnect(
-            var aSocketDescriptor: TSocket;
-            const aHost: AnsiString;
-            const APort: integer;
-            const aSendTimeout: Integer;
-            const aReceiveTimeout: Integer;
-            const aKeepAlive: Boolean;
-            const aTCPNoDelay: Boolean);
+{********************************************************}
+procedure ALRaiseMongoDBError(const AError: bson_error_t);
+begin
+  var LMsg: AnsiString := AnsiString(PAnsiChar(@AError.message[0]));
+  if LMsg = '' then LMsg := 'MongoDB operation failed';
+  raise EALMongoDBException.CreateFmt(
+          AError.domain,
+          AError.code,
+          '%s (domain=%d, code=%d)',
+          [LMsg, AError.domain, AError.code])
+end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _CallServer(const Server:AnsiString; const Port:word);
-  var LSockAddr:Sockaddr_in;
-      LIP: AnsiString;
-  begin
-    aSocketDescriptor:=Socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-    CheckOSError(aSocketDescriptor=INVALID_SOCKET);
-    FillChar(LSockAddr,SizeOf(LSockAddr),0);
-    LSockAddr.sin_family:=AF_INET;
-    LSockAddr.sin_port:=swap(Port);
-    LSockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
-    If LSockAddr.sin_addr.S_addr = INADDR_NONE then begin
-      CheckOSError(not ALHostToIP(Server, LIP));
-      LSockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(LIP));
+{*******************************}
+function ALMakeBsonPtrFromString(
+           const ASource: AnsiString;
+           const ABufferBson: Pbson_t;
+           out AIsAllocatedResult: Boolean;
+           const AReadOnly: Boolean = True): Pbson_t;
+begin
+  if ASource <> '' then begin
+    if ASource[high(ASource)] <> #0 then begin
+      var LError: bson_error_t;
+      Result := bson_new_from_json(
+                  @ASource[low(ASource)], // data: Puint8_t;
+                  ssize_t(Length(ASource)), // len: ssize_t;
+                  @LError); // error: Pbson_error_t
+      if Result = nil then ALRaiseMongoDBError(LError);
+      AIsAllocatedResult := True;
+    end
+    else if AReadOnly then begin
+      if not bson_init_static(
+               ABufferBson, // b: Pbson_t;
+               @ASource[low(ASource)], // data: Puint8_t;
+               size_t(Length(ASource))) then // length: size_t
+        raise Exception.Create('bson_init_static failed');
+      Result := ABufferBson;
+      AIsAllocatedResult := False;
+    end
+    else begin
+      Result := bson_new_from_data(
+                  @ASource[low(ASource)], // data: Puint8_t;
+                  size_t(Length(ASource))); // length: size_t
+      if Result = nil then raise Exception.Create('bson_new_from_data failed');
+      AIsAllocatedResult := True;
     end;
-    CheckOSError(Winapi.WinSock2.Connect(aSocketDescriptor,TSockAddr(LSockAddr),SizeOf(LSockAddr))=SOCKET_ERROR);
+  end
+  else begin
+    bson_init(ABufferBson);
+    Result := ABufferBson;
+    AIsAllocatedResult := False;
   end;
-
-begin
-
-  Try
-
-    _CallServer(aHost,aPort);
-    DoSetSendTimeout(aSocketDescriptor, aSendTimeout);
-    DoSetReceiveTimeout(aSocketDescriptor, aReceiveTimeout);
-    DoSetKeepAlive(aSocketDescriptor, aKeepAlive);
-    DoSetTCPNoDelay(aSocketDescriptor, aTCPNoDelay);
-
-  Except
-    DoDisconnect(aSocketDescriptor);
-    raise;
-  end;
-
-end;
-
-{**************************************************************************}
-procedure TAlBaseMongoDBClient.DoDisconnect(var aSocketDescriptor: TSocket);
-begin
-  if aSocketDescriptor <> INVALID_SOCKET then begin
-    ShutDown(aSocketDescriptor,SD_BOTH);
-    CloseSocket(aSocketDescriptor);
-    aSocketDescriptor := INVALID_SOCKET;
-  end;
-end;
-
-{************************************}
-Function TAlBaseMongoDBClient.SendCmd(
-           aSocketDescriptor: TSocket;
-           const aCmd: AnsiString;
-           const aGetResponse: boolean): AnsiString;
-Var LByteSent: integer;
-    P: PAnsiChar;
-    L: Integer;
-begin
-  p:=@aCmd[1]; // pchar
-  l:=length(aCmd);
-  while l>0 do begin
-    LByteSent:=SocketWrite(aSocketDescriptor, p^,l);
-    if LByteSent<=0 then raise EALException.Create('Connection close gracefully!');
-    inc(p,LByteSent);
-    dec(l,LByteSent);
-  end;
-  if aGetResponse then Result := GetResponse(aSocketDescriptor)
-  else result := '';
-end;
-
-{********************************************************************************}
-function TAlBaseMongoDBClient.GetResponse(aSocketDescriptor: TSocket): AnsiString;
-Var LBytesReceived: Integer;
-    LResultPos: Integer;
-    LMessageLength: Integer;
-const LBuffSize: integer = 8192;
-begin
-
-  //init local var
-  Setlength(Result,LBuffSize);
-  LResultPos := 0;
-  LMessageLength := 0;
-
-  //loop still we receive the full answer
-  While True do begin
-
-    //expnd the buffer
-    if LResultPos = length(Result) then setlength(Result, length(Result) + LBuffSize);
-
-    //read string from socket
-    LBytesReceived := SocketRead(aSocketDescriptor, Result[LResultPos+1], length(Result) - LResultPos);
-    If LBytesReceived <= 0 then raise EALException.Create('Connection close gracefully!');
-    LResultPos := LResultPos + LBytesReceived;
-
-    //the first 4 bytes contain the length of the message
-    if (LMessageLength = 0) and (LResultPos >= sizeof(LMessageLength)) then begin
-      ALMove(Result[1], LMessageLength, sizeof(LMessageLength));
-      if LMessageLength < LResultPos then raise EALException.Create('Wrong socket response');
-      setlength(Result, LMessageLength);
-    end;
-
-    //break if we are at the end of the message
-    if LResultPos = LMessageLength then break;
-
-  end;
-
 end;
 
 {**********************************************************************************}
-Procedure TAlBaseMongoDBClient.CheckRunCommandResponse(aResponseNode: TALJSONNodeA);
+function ALMakeReadPrefsFromString(const ASource: AnsiString): Pmongoc_read_prefs_t;
 begin
 
   //
-  //{
-  //  "ok" : 0.0,
-  //  "errmsg" : "cursor id 379994841580103813 not found",
-  //  "code" : 43.0,
-  //  "codeName" : "CursorNotFound"
-  //}
+  // {
+  //   "mode": "primary_preferred",
+  //   "tags": [
+  //     { "dc": "paris", "use": "reporting" },
+  //     { "dc": "paris" },
+  //     { }
+  //   ],
+  //   "maxStalenessSeconds": 120
+  // }
   //
 
-  if not sameValue(aResponseNode.GetChildNodeValueFloat('ok', 0), 1) then
-    raise EAlMongoDBClientException.Create(
-            aResponseNode.GetChildNodeValueText('errmsg', 'Misc Error'), // const aMsg: AnsiString;
-            aResponseNode.GetChildNodeValueInt32('code', 0)); // const aErrorCode: integer;
-
-end;
-
-{**************************************************}
-Procedure TAlBaseMongoDBClient.CheckServerLastError(
-            aSocketDescriptor: TSocket;
-            var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
-            var UpdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-            var Upserted: ansiString); // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-
-Var LResponseFlags: integer;
-    LCursorID: int64;
-    LStartingFrom: integer;
-    LNumberReturned: integer;
-    LContinue: boolean;
-    LJSONDoc: TALJSONNodeA;
-    LCodeNode: TALJSONNodeA;
-    LCodeInt: int32;
-    LNode: TALJSONNodeA;
-
-begin
-  LJSONDoc := TALJSONDocumentA.Create;
+  var LDoc := TALJSONDocumentA.Create;
   try
 
-    //do the First query
-    OP_QUERY(
-      aSocketDescriptor,
-      0, // flags
-      'db.$cmd', // fullCollectionName
-      0, // skip
-      1, // First
-      '{getLastError:1}', // query
-      '', // ReturnFieldsSelector,
-      LResponseFlags,
-      LCursorID,
-      LStartingFrom,
-      LNumberReturned,
-      LJSONDoc,
-      nil,
-      nil,
-      '',
-      '',
-      LContinue);
+    if ASource <> '' then begin
+      if ASource[high(ASource)] <> #0 then LDoc.LoadFromJSONString(ASource)
+      else LDoc.LoadFromBSONString(ASource);
+    end;
+
+    // mode
+    var LMode := LDoc.GetChildNodeValueText('mode', 'primary');
+    if LMode = 'primary' then Result := mongoc_read_prefs_new(MONGOC_READ_PRIMARY)
+    else if LMode = 'primary_preferred' then Result := mongoc_read_prefs_new(MONGOC_READ_PRIMARY_PREFERRED)
+    else if LMode = 'secondary' then Result := mongoc_read_prefs_new(MONGOC_READ_SECONDARY)
+    else if LMode = 'secondary_preferred' then Result := mongoc_read_prefs_new(MONGOC_READ_SECONDARY_PREFERRED)
+    else if LMode = 'nearest' then Result := mongoc_read_prefs_new(MONGOC_READ_NEAREST)
+    else raise Exception.CreateFmt('Invalid read preference mode: %s', [LMode]);
+    if Result = nil then raise Exception.Create('mongoc_read_prefs_new failed');
+
     try
 
-      CheckRunCommandResponse(LJSONDoc);
-
-      LCodeNode := LJSONDoc.ChildNodes.FindNode('code');
-      if assigned(LCodeNode) and (not LCodeNode.Null) then LCodeInt := LCodeNode.int32
-      else LCodeInt := 0;
-
-      //err is null unless an error occurs. When there was an error with the preceding
-      //operation, err contains a string identifying the error.
-      LNode := LJSONDoc.ChildNodes.FindNode('err');
-      if assigned(LNode) and (not LNode.Null) then
-        raise EAlMongoDBClientException.Create(LNode.Text, LCodeInt);
-
-      //errmsg contains the description of the error. errmsg only appears
-      //if there was an error with the preceding operation.
-      LNode := LJSONDoc.ChildNodes.FindNode('errmsg');
-      if assigned(LNode) and (not LNode.Null) then
-        raise EAlMongoDBClientException.Create(LNode.Text, LCodeInt);
-
-      //code reports the preceding operation's error code.
-      if assigned(LCodeNode) and (not LCodeNode.Null) then
-        raise EAlMongoDBClientException.Create('Misc Error',LCodeInt);
-
-      //If the preceding operation was an update or a remove operation, but not a findAndModify
-      //operation, n reports the number of documents matched by the update or remove operation.
-      //
-      //For a remove operation, the number of matched documents will equal the number removed.
-      //
-      //For an update operation, if the operation results in no change to the document, such as setting
-      //the value of the field to its current value, the number of matched documents may be smaller than
-      //the number of documents actually modified. If the update includes the upsert:true option and
-      //results in the creation of a new document, n returns the number of documents inserted.
-      //
-      //n is 0 if reporting on an update or remove that occurs through a findAndModify operation.
-      LNode := LJSONDoc.ChildNodes.FindNode('n');
-      if assigned(LNode) then NumberOfDocumentsUpdatedOrRemoved := LNode.int32
-      else NumberOfDocumentsUpdatedOrRemoved := 0;
-
-      //updatedExisting is true when an update affects at least one document and
-      //does not result in an upsert.
-      LNode := LJSONDoc.ChildNodes.FindNode('updatedExisting');
-      if assigned(LNode) then UpdatedExisting := LNode.bool
-      else UpdatedExisting := False;
-
-      //If the update results in an insert, upserted is the value of _id field of the document.
-      LNode := LJSONDoc.ChildNodes.FindNode('upserted');
-      if assigned(LNode) then Upserted := LNode.text
-      else Upserted := '';
-
-    finally
-
-      //close the curson
-      if LCursorID <> 0 then OP_KILL_CURSORS(aSocketDescriptor, [LCursorID]);
-
-    end;
-
-  finally
-    LJSONDoc.free;
-  end;
-end;
-
-{******************************************************************************}
-Procedure TAlBaseMongoDBClient.CheckServerLastError(aSocketDescriptor: TSocket);
-var LNumberOfDocumentsUpdatedOrRemoved: integer;
-    LUpdatedExisting: boolean;
-    LUpserted: ansiString;
-begin
-  CheckServerLastError(
-    aSocketDescriptor,
-    LNumberOfDocumentsUpdatedOrRemoved,
-    LUpdatedExisting,
-    LUpserted);
-end;
-
-{******************************************************}
-Function TAlBaseMongoDBClient.BuildOPKILLCURSORSMessage(
-           const requestID: integer;                       // identifier for this message
-           const responseTo: integer;                      // requestID from the original request (used in reponses from db)
-           const cursorIDs: array of int64): ansiString;   // cursorIDs to be close
-var LCurrPos: integer;
-    LMessageLength: Integer;
-    LOPCode: integer;
-    LZERO: integer;
-    LNumberOfCursorIDs: integer;
-    i: integer;
-begin
-
-  //
-  //  messageLength     requestID       responseTo        opCode                 aZERO
-  //  [0][1][2][3]     [4][5][6][7]    [8][9][10][11]   [12][13][14][15]    [16][17][18][19]
-  //
-  //  numberOfCursorIDs             cursorIDs
-  //  [20][21][22][23]   [24][25][26][27][28][29][30][31]....
-  //
-
-  //exit if no cursorID
-  LNumberOfCursorIDs := length(cursorIDs);
-  if LNumberOfCursorIDs <= 0 then exit;
-
-  // init aMessageLength
-  LMessageLength := sizeof(LMessageLength) +
-                    sizeof(requestID) +
-                    sizeof(responseTo) +
-                    sizeof(LOPCode) +
-                    sizeof(LZERO) +
-                    sizeof(LNumberOfCursorIDs) +
-                    LNumberOfCursorIDs * sizeof(cursorIDs[low(cursorIDs)]);
-
-  //init the length of the result
-  setlength(result, LMessageLength);
-  LCurrPos := 1;
-
-  // messageLength
-  ALMove(LMessageLength, Result[LCurrPos], sizeof(LMessageLength));
-  inc(LCurrPos,sizeof(LMessageLength));
-
-  //requestID
-  ALMove(requestID, Result[LCurrPos], sizeof(requestID));
-  inc(LCurrPos,sizeof(requestID));
-
-  //responseTo
-  ALMove(responseTo, Result[LCurrPos], sizeof(responseTo));
-  inc(LCurrPos,sizeof(responseTo));
-
-  //opCode
-  LOPCode := MONGO_OP_KILL_CURSORS;
-  ALMove(LOPCode, Result[LCurrPos], sizeof(LOPCode));
-  inc(LCurrPos,sizeof(LOPCode));
-
-  //aZERO
-  LZERO := 0;
-  ALMove(LZERO, Result[LCurrPos], sizeof(LZERO));
-  inc(LCurrPos,sizeof(LZERO));
-
-  //anumberOfCursorIDs
-  ALMove(LNumberOfCursorIDs, Result[LCurrPos], sizeof(LNumberOfCursorIDs));
-  inc(LCurrPos,sizeof(LNumberOfCursorIDs));
-
-  //cursorIDs
-  for i := low(cursorIDs) to High(cursorIDs) do
-    ALMove(cursorIDs[i], Result[LCurrPos], sizeof(cursorIDs[i]));
-
-end;
-
-{*************************************************}
-Function TAlBaseMongoDBClient.BuildOPINSERTMessage(
-           const requestID: integer;                            // identifier for this message
-           const responseTo: integer;                           // requestID from the original request (used in reponses from db)
-           const flags: integer;                                // bit vector
-           const fullCollectionName: ansiString;                // "dbname.collectionname"
-           const documents: ansiString): ansiString;            // one or more documents to insert into the collection
-var LCurrPos: integer;
-    LMessageLength: Integer;
-    LTmpInt: integer;
-    LOPCode: integer;
-    LBsonDocuments: ansiString;
-    LJsonDocument: TALJSONNodeA;
-    i: integer;
-begin
-
-  //
-  //  messageLength     requestID       responseTo        opCode                 flags
-  //  [0][1][2][3]     [4][5][6][7]    [8][9][10][11]   [12][13][14][15]    [16][17][18][19]
-  //
-  //  fullCollectionName       documents
-  //  [20]...[23]            [24]...
-  //
-
-  //init aBsonQuery
-  if (length(documents) > sizeof(LMessageLength)) then ALMove(documents[1], LMessageLength, sizeof(LMessageLength))
-  else LMessageLength := 0;
-  while (LMessageLength > 0) and
-        (LMessageLength <= length(documents) - sizeof(LTmpInt)) do begin
-    ALMove(documents[LMessageLength+1], LTmpInt, sizeof(LTmpInt));
-    if LTmpInt <= 0 then break;
-    LMessageLength := LMessageLength + LTmpInt;
-  end;
-  if (LMessageLength <> length(documents)) or
-     ((length(documents) > 0) and
-      (documents[length(documents)] <> #0)) then begin
-    LJsonDocument := TALJSONDocumentA.Create;
-    try
-      LJsonDocument.LoadFromJSONString('{"documents":' + documents + '}'); // { .... }                      => {"documents":{ .... } }
-                                                                           // [{ ... }, { ... }, { ... }]   => {"documents":[{ ... }, { ... }, { ... }] }
-      LBsonDocuments := '';
-      with LJsonDocument.ChildNodes['documents'] do begin
-        if nodeType = ntObject then LBsonDocuments := BSON  // {"documents":{ .... } }
-        else begin  // {"documents":[{ ... }, { ... }, { ... }] }
-          for I := 0 to ChildNodes.Count - 1 do
-            LBsonDocuments := LBsonDocuments + ChildNodes[i].BSON;
-        end;
-      end;
-    finally
-      LJsonDocument.Free;
-    end;
-  end
-  else LBsonDocuments := documents;
-
-  // init aMessageLength
-  LMessageLength := sizeof(LMessageLength) +
-                    sizeof(requestID) +
-                    sizeof(responseTo) +
-                    sizeof(LOPCode) +
-                    sizeof(flags) +
-                    length(fullCollectionName) + 1{the trailing #0} +
-                    length(LBsonDocuments);
-
-  //init the length of the result
-  setlength(result, LMessageLength);
-  LCurrPos := 1;
-
-  // messageLength
-  ALMove(LMessageLength, Result[LCurrPos], sizeof(LMessageLength));
-  inc(LCurrPos,sizeof(LMessageLength));
-
-  //requestID
-  ALMove(requestID, Result[LCurrPos], sizeof(requestID));
-  inc(LCurrPos,sizeof(requestID));
-
-  //responseTo
-  ALMove(responseTo, Result[LCurrPos], sizeof(responseTo));
-  inc(LCurrPos,sizeof(responseTo));
-
-  //opCode
-  LOPCode := MONGO_OP_INSERT;
-  ALMove(LOPCode, Result[LCurrPos], sizeof(LOPCode));
-  inc(LCurrPos,sizeof(LOPCode));
-
-  //flags
-  ALMove(flags, Result[LCurrPos], sizeof(flags));
-  inc(LCurrPos,sizeof(flags));
-
-  //fullCollectionName
-  if length(fullCollectionName) <= 0 then raise EALException.Create('FullCollectionName must not be empty');
-  ALMove(fullCollectionName[1], result[LCurrPos], length(fullCollectionName));
-  inc(LCurrPos,length(fullCollectionName));
-  result[LCurrPos] := #0;
-  inc(LCurrPos);
-
-  //aBsonDocuments
-  if length(LBsonDocuments) <= 0 then raise EALException.Create('documents must not be empty');
-  ALMove(LBsonDocuments[1], result[LCurrPos], length(LBsonDocuments));
-
-end;
-
-{*************************************************}
-Function TAlBaseMongoDBClient.BuildOPUPDATEMessage(
-           const requestID: integer;                            // identifier for this message
-           const responseTo: integer;                           // requestID from the original request (used in reponses from db)
-           const flags: integer;                                // bit vector
-           const fullCollectionName: ansiString;                // "dbname.collectionname"
-           const selector: ansiString;                          // the query to select the document
-           const update: ansiString): ansiString;               // specification of the update to perform
-var LCurrPos: integer;
-    LMessageLength: Integer;
-    LOPCode: integer;
-    LZERO: integer;
-    LBsonSelector: ansiString;
-    LBsonUpdate: AnsiString;
-    LJSONDocument: TALJSONNodeA;
-begin
-
-  //
-  //  messageLength     requestID       responseTo        opCode                 ZERO
-  //  [0][1][2][3]     [4][5][6][7]    [8][9][10][11]   [12][13][14][15]    [16][17][18][19]
-  //
-  //  fullCollectionName       flags              selector       update
-  //  [20]...[23]            [24][25][26][27]   [27]...[35]    [36]...[39]
-  //
-
-  //init aBsonselector
-  if (length(Selector) > sizeof(LMessageLength)) then ALMove(Selector[1], LMessageLength, sizeof(LMessageLength))
-  else LMessageLength := 0;
-  if (LMessageLength <> length(Selector)) or
-   ((length(Selector) > 0) and
-    (Selector[length(Selector)] <> #0)) then begin
-    LJSONDocument := TALJSONDocumentA.Create;
-    try
-      LJSONDocument.LoadFromJSONString(Selector);
-      LJSONDocument.SaveToBSONString(LBsonSelector);
-    finally
-      LJSONDocument.Free;
-    end;
-  end
-  else begin
-    if Selector = '' then LBsonSelector := #5#0#0#0#0 // empty BSON
-    else LBsonSelector := Selector;
-  end;
-
-  //init aBSONUpdate
-  if (length(Update) > sizeof(LMessageLength)) then ALMove(Update[1], LMessageLength, sizeof(LMessageLength))
-  else LMessageLength := 0;
-  if (LMessageLength <> length(Update)) or
-     ((length(Update) > 0) and
-      (Update[length(Update)] <> #0)) then begin
-    LJSONDocument := TALJSONDocumentA.Create;
-    try
-      LJSONDocument.LoadFromJSONString(Update);
-      LJSONDocument.SaveToBSONString(LBsonUpdate);
-    finally
-      LJSONDocument.Free;
-    end;
-  end
-  else begin
-    if Update = '' then LBsonUpdate := #5#0#0#0#0 // empty BSON
-    else LBsonUpdate := Update;
-  end;
-
-  // init aMessageLength
-  LMessageLength := sizeof(LMessageLength) +
-                    sizeof(requestID) +
-                    sizeof(responseTo) +
-                    sizeof(LOPCode) +
-                    sizeof(LZERO) +
-                    length(fullCollectionName) + 1{the trailing #0} +
-                    sizeof(flags) +
-                    length(LBsonSelector) +
-                    length(LBsonUpdate);
-
-  //init the length of the result
-  setlength(result, LMessageLength);
-  LCurrPos := 1;
-
-  // messageLength
-  ALMove(LMessageLength, Result[LCurrPos], sizeof(LMessageLength));
-  inc(LCurrPos,sizeof(LMessageLength));
-
-  //requestID
-  ALMove(requestID, Result[LCurrPos], sizeof(requestID));
-  inc(LCurrPos,sizeof(requestID));
-
-  //responseTo
-  ALMove(responseTo, Result[LCurrPos], sizeof(responseTo));
-  inc(LCurrPos,sizeof(responseTo));
-
-  //opCode
-  LOPCode := MONGO_OP_UPDATE;
-  ALMove(LOPCode, Result[LCurrPos], sizeof(LOPCode));
-  inc(LCurrPos,sizeof(LOPCode));
-
-  //ZERO
-  LZERO := 0;
-  ALMove(LZERO, Result[LCurrPos], sizeof(LZERO));
-  inc(LCurrPos,sizeof(LZERO));
-
-  //fullCollectionName
-  if length(fullCollectionName) <= 0 then raise EALException.Create('FullCollectionName must not be empty');
-  ALMove(fullCollectionName[1], result[LCurrPos], length(fullCollectionName));
-  inc(LCurrPos,length(fullCollectionName));
-  result[LCurrPos] := #0;
-  inc(LCurrPos);
-
-  //flags
-  ALMove(flags, Result[LCurrPos], sizeof(flags));
-  inc(LCurrPos,sizeof(flags));
-
-  //aBsonselector
-  ALMove(LBsonSelector[1], result[LCurrPos], length(LBsonSelector));
-  inc(LCurrPos,length(LBsonSelector));
-
-  //aBSONUpdate
-  ALMove(LBsonUpdate[1], result[LCurrPos], length(LBsonUpdate));
-
-end;
-
-{*************************************************}
-Function TAlBaseMongoDBClient.BuildOPDELETEMessage(
-           const requestID: integer;                            // identifier for this message
-           const responseTo: integer;                           // requestID from the original request (used in reponses from db)
-           const flags: integer;                                // bit vector
-           const fullCollectionName: ansiString;                // "dbname.collectionname"
-           const selector: ansiString): ansiString;             // query object.
-var LCurrPos: integer;
-    LMessageLength: Integer;
-    LOPCode: integer;
-    LZERO: integer;
-    LBsonSelector: ansiString;
-    LJSONDocument: TALJSONNodeA;
-begin
-
-  //
-  //  messageLength     requestID       responseTo        opCode                 ZERO
-  //  [0][1][2][3]     [4][5][6][7]    [8][9][10][11]   [12][13][14][15]    [16][17][18][19]
-  //
-  //  fullCollectionName       flags              selector
-  //  [20]...[23]            [24][25][26][27]   [27]...[35]
-  //
-
-  //init aBsonselector
-  if (length(Selector) > sizeof(LMessageLength)) then ALMove(Selector[1], LMessageLength, sizeof(LMessageLength))
-  else LMessageLength := 0;
-  if (LMessageLength <> length(Selector)) or
-     ((length(Selector) > 0) and
-      (Selector[length(Selector)] <> #0)) then begin
-    LJSONDocument := TALJSONDocumentA.Create;
-    try
-      LJSONDocument.LoadFromJSONString(Selector);
-      LJSONDocument.SaveToBSONString(LBsonSelector);
-    finally
-      LJSONDocument.Free;
-    end;
-  end
-  else begin
-    if Selector = '' then LBsonSelector := #5#0#0#0#0 // empty BSON
-    else LBsonSelector := Selector;
-  end;
-
-  // init aMessageLength
-  LMessageLength := sizeof(LMessageLength) +
-                    sizeof(requestID) +
-                    sizeof(responseTo) +
-                    sizeof(LOPCode) +
-                    sizeof(LZERO) +
-                    length(fullCollectionName) + 1{the trailing #0} +
-                    sizeof(flags) +
-                    length(LBsonSelector);
-
-  //init the length of the result
-  setlength(result, LMessageLength);
-  LCurrPos := 1;
-
-  // messageLength
-  ALMove(LMessageLength, Result[LCurrPos], sizeof(LMessageLength));
-  inc(LCurrPos,sizeof(LMessageLength));
-
-  //requestID
-  ALMove(requestID, Result[LCurrPos], sizeof(requestID));
-  inc(LCurrPos,sizeof(requestID));
-
-  //responseTo
-  ALMove(responseTo, Result[LCurrPos], sizeof(responseTo));
-  inc(LCurrPos,sizeof(responseTo));
-
-  //opCode
-  LOPCode := MONGO_OP_DELETE;
-  ALMove(LOPCode, Result[LCurrPos], sizeof(LOPCode));
-  inc(LCurrPos,sizeof(LOPCode));
-
-  //ZERO
-  LZERO := 0;
-  ALMove(LZERO, Result[LCurrPos], sizeof(LZERO));
-  inc(LCurrPos,sizeof(LZERO));
-
-  //fullCollectionName
-  if length(fullCollectionName) <= 0 then raise EALException.Create('FullCollectionName must not be empty');
-  ALMove(fullCollectionName[1], result[LCurrPos], length(fullCollectionName));
-  inc(LCurrPos,length(fullCollectionName));
-  result[LCurrPos] := #0;
-  inc(LCurrPos);
-
-  //flags
-  ALMove(flags, Result[LCurrPos], sizeof(flags));
-  inc(LCurrPos,sizeof(flags));
-
-  //aBsonselector
-  ALMove(LBsonSelector[1], result[LCurrPos], length(LBsonSelector));
-
-end;
-
-{************************************************}
-Function TAlBaseMongoDBClient.BuildOPQUERYMessage(
-           const requestID: integer;                             // identifier for this message
-           const responseTo: integer;                            // requestID from the original request (used in reponses from db)
-           const flags: integer;                                 // bit vector of query options.
-           const fullCollectionName: ansiString;                 // "dbname.collectionname"
-           const numberToSkip: integer;                          // number of documents to skip
-           const numberToReturn: integer;                        // number of documents to return in the first OP_REPLY batch
-           const query: ansiString;                              // query object
-           const returnFieldsSelector: ansiString): AnsiString;  // Optional. Selector indicating the fields to return
-var LCurrPos: integer;
-    LMessageLength: Integer;
-    LOPCode: integer;
-    LBsonQuery: ansiString;
-    LBSONReturnFieldsSelector: ansiString;
-    LJsonDocument: TALJSONNodeA;
-begin
-
-  //
-  //  messageLength     requestID       responseTo        opCode                 flags
-  //  [0][1][2][3]     [4][5][6][7]    [8][9][10][11]   [12][13][14][15]    [16][17][18][19]
-  //
-  //  fullCollectionName       numberToSkip        numberToReturn          query     returnFieldsSelector
-  //  [20]...[23]            [24][25][26][27]     [28][29][30][31]      [32]...[50]    [51]...[70]
-  //
-
-  //init aBsonQuery
-  if (length(Query) > sizeof(LMessageLength)) then ALMove(Query[1], LMessageLength, sizeof(LMessageLength))
-  else LMessageLength := 0;
-  if (LMessageLength <> length(Query)) or
-     ((length(Query) > 0) and
-      (Query[length(Query)] <> #0)) then begin
-    LJsonDocument := TALJSONDocumentA.Create;
-    try
-      LJsonDocument.LoadFromJSONString(Query);
-      LJsonDocument.SaveToBSONString(LBsonQuery);
-    finally
-      LJsonDocument.Free;
-    end;
-  end
-  else begin
-    if Query = '' then LBsonQuery := #5#0#0#0#0 // empty BSON
-    else LBsonQuery := Query;
-  end;
-
-  //init aBSONReturnFieldsSelector
-  if (length(ReturnFieldsSelector) > sizeof(LMessageLength)) then ALMove(ReturnFieldsSelector[1], LMessageLength, sizeof(LMessageLength))
-  else LMessageLength := 0;
-  if (LMessageLength <> length(ReturnFieldsSelector)) or
-     ((length(ReturnFieldsSelector) > 0) and
-      (ReturnFieldsSelector[length(ReturnFieldsSelector)] <> #0)) then begin
-    LJsonDocument := TALJSONDocumentA.Create;
-    try
-      LJsonDocument.LoadFromJSONString(ReturnFieldsSelector);
-      LJsonDocument.SaveToBSONString(LBSONReturnFieldsSelector);
-    finally
-      LJsonDocument.Free;
-    end;
-  end
-  else LBSONReturnFieldsSelector := ReturnFieldsSelector;
-
-  // init aMessageLength
-  LMessageLength := sizeof(LMessageLength) +
-                    sizeof(requestID) +
-                    sizeof(responseTo) +
-                    sizeof(LOPCode) +
-                    sizeof(flags) +
-                    length(fullCollectionName) + 1{the trailing #0} +
-                    sizeof(numberToSkip) +
-                    sizeof(numberToReturn) +
-                    length(LBsonQuery) +
-                    length(LBSONReturnFieldsSelector);
-
-  //init the length of the result
-  setlength(result, LMessageLength);
-  LCurrPos := 1;
-
-  // messageLength
-  ALMove(LMessageLength, Result[LCurrPos], sizeof(LMessageLength));
-  inc(LCurrPos,sizeof(LMessageLength));
-
-  //requestID
-  ALMove(requestID, Result[LCurrPos], sizeof(requestID));
-  inc(LCurrPos,sizeof(requestID));
-
-  //responseTo
-  ALMove(responseTo, Result[LCurrPos], sizeof(responseTo));
-  inc(LCurrPos,sizeof(responseTo));
-
-  //opCode
-  LOPCode := MONGO_OP_QUERY;
-  ALMove(LOPCode, Result[LCurrPos], sizeof(LOPCode));
-  inc(LCurrPos,sizeof(LOPCode));
-
-  //flags
-  ALMove(flags, Result[LCurrPos], sizeof(flags));
-  inc(LCurrPos,sizeof(flags));
-
-  //fullCollectionName
-  if length(fullCollectionName) <= 0 then raise EALException.Create('FullCollectionName must not be empty');
-  ALMove(fullCollectionName[1], result[LCurrPos], length(fullCollectionName));
-  inc(LCurrPos,length(fullCollectionName));
-  result[LCurrPos] := #0;
-  inc(LCurrPos);
-
-  //numberToSkip
-  ALMove(numberToSkip, Result[LCurrPos], sizeof(numberToSkip));
-  inc(LCurrPos,sizeof(numberToSkip));
-
-  //numberToReturn
-  ALMove(numberToReturn, Result[LCurrPos], sizeof(numberToReturn));
-  inc(LCurrPos,sizeof(numberToReturn));
-
-  //aBsonQuery
-  ALMove(LBsonQuery[1], result[LCurrPos], length(LBsonQuery));
-  inc(LCurrPos,length(LBsonQuery));
-
-  //aBSONReturnFieldsSelector
-  if length(LBSONReturnFieldsSelector) > 0 then
-    ALMove(LBSONReturnFieldsSelector[1], result[LCurrPos], length(LBSONReturnFieldsSelector));
-
-end;
-
-{**************************************************}
-Function TAlBaseMongoDBClient.BuildOPGETMOREMessage(
-           const requestID: integer;              // identifier for this message
-           const responseTo: integer;             // requestID from the original request (used in reponses from db)
-           const fullCollectionName: ansiString;  // "dbname.collectionname"
-           const numberToReturn: integer;         // number of documents to return in the first OP_REPLY batch
-           const cursorID: int64): AnsiString;
-var LCurrPos: integer;
-    LMessageLength: Integer;
-    LOPCode: integer;
-    LZero: integer;
-begin
-
-  //
-  //  messageLength     requestID       responseTo        opCode                 ZERO
-  //  [0][1][2][3]     [4][5][6][7]    [8][9][10][11]   [12][13][14][15]    [16][17][18][19]
-  //
-  //  fullCollectionName      numberToReturn                cursorID
-  //  [20]...[23]            [24][25][26][27]     [28][29][30][31][32][33][34][35]
-  //
-
-  // init aMessageLength
-  LMessageLength := sizeof(LMessageLength) +
-                    sizeof(requestID) +
-                    sizeof(responseTo) +
-                    sizeof(LOPCode) +
-                    sizeof(LZero) +
-                    length(fullCollectionName) + 1{the trailing #0} +
-                    sizeof(numberToReturn) +
-                    sizeof(cursorID);
-
-  //init the length of the result
-  setlength(result, LMessageLength);
-  LCurrPos := 1;
-
-  // messageLength
-  ALMove(LMessageLength, Result[LCurrPos], sizeof(LMessageLength));
-  inc(LCurrPos,sizeof(LMessageLength));
-
-  //requestID
-  ALMove(requestID, Result[LCurrPos], sizeof(requestID));
-  inc(LCurrPos,sizeof(requestID));
-
-  //responseTo
-  ALMove(responseTo, Result[LCurrPos], sizeof(responseTo));
-  inc(LCurrPos,sizeof(responseTo));
-
-  //opCode
-  LOPCode := MONGO_OP_GET_MORE;
-  ALMove(LOPCode, Result[LCurrPos], sizeof(LOPCode));
-  inc(LCurrPos,sizeof(LOPCode));
-
-  //Zero
-  LZero := 0;
-  ALMove(LZero, Result[LCurrPos], sizeof(LZero));
-  inc(LCurrPos,sizeof(LZero));
-
-  //fullCollectionName
-  if length(fullCollectionName) <= 0 then raise EALException.Create('FullCollectionName must not be empty');
-  ALMove(fullCollectionName[1], result[LCurrPos], length(fullCollectionName));
-  inc(LCurrPos,length(fullCollectionName));
-  result[LCurrPos] := #0;
-  inc(LCurrPos);
-
-  //numberToReturn
-  ALMove(numberToReturn, Result[LCurrPos], sizeof(numberToReturn));
-  inc(LCurrPos,sizeof(numberToReturn));
-
-  //cursorID
-  ALMove(cursorID, Result[LCurrPos], sizeof(cursorID));
-
-end;
-
-{*************************************************}
-Procedure TAlBaseMongoDBClient.ParseOPREPLYMessage(
-            const OpReplyMsg: AnsiString;  // the OP_REPLY message body
-            var requestID: integer;        // identifier for this message
-            var responseTo: integer;       // requestID from the original request (used in reponses from db)
-            var responseFlags: integer;    // bit vector
-            var cursorID: int64;           // cursor id if client needs to do get more's
-            var startingFrom: integer;     // where in the cursor this reply is starting
-            var numberReturned: integer;   // number of documents in the reply
-            documents: TALJSONNodeA;        // documents
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer;
-            const RowTag: AnsiString;      // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-            const ViewTag: AnsiString;     // the node name under with all records will be stored in the JSON/XML result document.
-            var continue: boolean);
-Var LMessageLength: integer;
-    LOPCode: integer;
-    LCurrPos: integer;
-    LDocumentStr: AnsiString;
-    LNumberOfDocumentsFounded: Integer;
-    LTmpRowTag: ansiString;
-    LUpdateRowTagByFieldValue: Boolean;
-    LJsonNode1: TALJSONNodeA;
-    LJsonNode2: TALJSONNodeA;
-begin
-
-  //
-  //  messageLength     requestID       responseTo        opCode              responseFlags
-  //  [0][1][2][3]     [4][5][6][7]    [8][9][10][11]   [12][13][14][15]    [16][17][18][19]
-  //
-  //            cursorID                  startingFrom         numberReturned        documents
-  //  [20][22][23][24][25][26][27]       [24][25][26][27]     [28][29][30][31]      [32]...[50]
-  //
-
-  // some checkc
-  if length(OpReplyMsg) < sizeof(LMessageLength) +
-                          sizeof(requestID) +
-                          sizeof(responseTo) +
-                          sizeof(LOPCode) +
-                          sizeof(responseFlags) +
-                          sizeof(cursorID) +
-                          sizeof(startingFrom) +
-                          sizeof(numberReturned) then raise EALException.Create('Wrong OP_REPLY message');
-
-  // init aCurrPos
-  LCurrPos := 1;
-
-  // messageLength
-  ALMove(OpReplyMsg[LCurrPos], LMessageLength, sizeof(LMessageLength));
-  inc(LCurrPos,sizeof(LMessageLength));
-  if LMessageLength <> length(OpReplyMsg) then raise EALException.Create('Wrong OP_REPLY message');
-
-  // requestID
-  ALMove(OpReplyMsg[LCurrPos], requestID, sizeof(requestID));
-  inc(LCurrPos,sizeof(requestID));
-
-  // responseTo
-  ALMove(OpReplyMsg[LCurrPos], responseTo, sizeof(responseTo));
-  inc(LCurrPos,sizeof(responseTo));
-
-  // OPCode
-  ALMove(OpReplyMsg[LCurrPos], LOPCode, sizeof(LOPCode));
-  if LOPCode <> MONGO_OP_REPLY then raise EALException.Create('Wrong OP_REPLY message');
-  inc(LCurrPos,sizeof(LOPCode));
-
-  // responseFlags
-  ALMove(OpReplyMsg[LCurrPos], responseFlags, sizeof(responseFlags));
-  inc(LCurrPos,sizeof(responseFlags));
-
-  //bit num	  name	            description
-  //0	        CursorNotFound	  Set when getMore is called but the cursor id is not valid at the server. Returned with zero results.
-  //1	        QueryFailure	    Set when query failed. Results consist of one document containing an “$err” field describing the failure.
-  //2	        ShardConfigStale	Drivers should ignore this. Only mongos will ever see this set, in which case, it needs to update config from the server.
-  //3        	AwaitCapable	    Set when the server supports the AwaitData Query option. If it doesn’t, a client should sleep a little between
-  //                            getMore’s of a Tailable cursor. Mongod version 1.6 supports AwaitData and thus always sets AwaitCapable.
-  //4-31    	Reserved	        Ignore
-  if responseFlags and (1 shl 0) <> 0 then raise EALException.Create('Cursor Not Found');
-  if responseFlags and (1 shl 1) <> 0 then raise EALException.Create('Query Failure');
-
-  // cursorID
-  ALMove(OpReplyMsg[LCurrPos], cursorID, sizeof(cursorID));
-  inc(LCurrPos,sizeof(cursorID));
-
-  // startingFrom
-  ALMove(OpReplyMsg[LCurrPos], startingFrom, sizeof(startingFrom));
-  inc(LCurrPos,sizeof(startingFrom));
-
-  // numberReturned
-  ALMove(OpReplyMsg[LCurrPos], numberReturned, sizeof(numberReturned));
-  inc(LCurrPos,sizeof(numberReturned));
-
-  // documents
-  LNumberOfDocumentsFounded := 0;
-  if LCurrPos <= LMessageLength then begin
-
-    //init aUpdateRowTagByFieldValue and aTmpRowTag
-    if ALPosA('&>',RowTag) = 1 then begin
-      LTmpRowTag := AlcopyStr(RowTag, 3, maxint);
-      LUpdateRowTagByFieldValue := LTmpRowTag <> '';
-    end
-    else begin
-      LTmpRowTag := RowTag;
-      LUpdateRowTagByFieldValue := False;
-    end;
-
-    //loop on all node to add
-    while True do begin
-      if LCurrPos > length(OpReplyMsg) then break;
-      if LCurrPos > length(OpReplyMsg) - sizeof(LMessageLength) + 1 then raise EALException.Create('Wrong OP_REPLY message');
-      ALMove(OpReplyMsg[LCurrPos], LMessageLength, sizeof(LMessageLength));
-      if LCurrPos + LMessageLength - 1 > length(OpReplyMsg) then raise EALException.Create('Wrong OP_REPLY message');
-      setlength(LDocumentStr, LMessageLength);
-      ALMove(OpReplyMsg[LCurrPos], LDocumentStr[1], LMessageLength);
-      inc(LCurrPos,LMessageLength);
-      if (LTmpRowTag <> '') or
-         (documents.NodeType = ntarray) then LJsonNode1 := documents.AddChild(LTmpRowTag, ntobject)
-      else LJsonNode1 := documents;
-      LJsonNode1.LoadFromBSONString(LDocumentStr, []);
-      if LUpdateRowTagByFieldValue then begin
-        LJsonNode2 := LJsonNode1.ChildNodes.FindNode(LTmpRowTag);
-        if assigned(LJsonNode2) then LJsonNode1.NodeName := LJsonNode2.Text;
-      end;
-      if assigned(OnNewRowFunct) then begin
-        Continue := True;
-        OnNewRowFunct(LJsonNode1, ViewTag, Context, Continue);
-        documents.ChildNodes.Clear;
-        if Not Continue then exit;
-      end;
-      inc(LNumberOfDocumentsFounded);
-    end;
-  end;
-  if LNumberOfDocumentsFounded <> numberReturned then raise EALException.Create('Wrong OP_REPLY message');
-
-end;
-
-{*********************************************}
-Procedure TAlBaseMongoDBClient.OP_KILL_CURSORS(
-            aSocketDescriptor: TSocket;
-            const cursorIDs: array of int64); // cursorIDs to be close
-begin
-  SendCmd(
-    aSocketDescriptor,
-    BuildOPKILLCURSORSMessage(
-      0, // requestID
-      0, // responseTo
-      cursorIDs),
-    False); // aGetResponse
-end;
-
-{**************************************}
-Procedure TAlBaseMongoDBClient.OP_QUERY(
-            aSocketDescriptor: TSocket;
-            const flags: integer;                    // bit vector of query options.
-            const fullCollectionName: ansiString;    // "dbname.collectionname"
-            const numberToSkip: integer;             // number of documents to skip
-            const numberToReturn: integer;           // number of documents to return in the first OP_REPLY batch
-            const query: ansiString;                 // query object.
-            const returnFieldsSelector: ansiString;  // Optional. Selector indicating the fields to return.
-            var responseFlags: integer;              // bit vector
-            var cursorID: int64;                     // cursor id if client needs to do get more's
-            var startingFrom: integer;               // where in the cursor this reply is starting
-            var numberReturned: integer;             // number of documents in the reply
-            documents: TALJSONNodeA;                  // documents
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer;
-            const RowTag: AnsiString;                // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-            const ViewTag: AnsiString;               // the node name under with all records will be stored in the JSON/XML result document.
-            var continue: boolean);
-var LRequestID: integer;
-    LResponseTo: integer;
-begin
-  ParseOPREPLYMessage(
-    SendCmd(
-      aSocketDescriptor,
-      BuildOPQUERYMessage(
-        0, //const requestID: integer;
-        0, //const responseTo: integer;
-        flags,
-        fullCollectionName,
-        numberToSkip,
-        numberToReturn,
-        query,
-        returnFieldsSelector),
-      True), // aGetResponse
-    LRequestID,
-    LResponseTo,
-    responseFlags,
-    cursorID,
-    startingFrom,
-    numberReturned,
-    documents,
-    OnNewRowFunct,
-    Context,
-    RowTag,
-    ViewTag,
-    continue);
-end;
-
-{*****************************************}
-Procedure TAlBaseMongoDBClient.OP_GET_MORE(
-            aSocketDescriptor: TSocket;
-            const fullCollectionName: ansiString;   // "dbname.collectionname"
-            const numberToReturn: integer;          // number of documents to return
-            var cursorID: int64;                    // cursorID from the OP_REPLY
-            var responseFlags: integer;             // bit vector
-            var startingFrom: integer;              // where in the cursor this reply is starting
-            var numberReturned: integer;            // number of documents in the reply
-            documents: TALJSONNodeA;                 // documents
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer;
-            const RowTag: AnsiString;               // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-            const ViewTag: AnsiString;              // the node name under with all records will be stored in the JSON/XML result document.
-            var continue: boolean);
-var LRequestID: integer;
-    LResponseTo: integer;
-begin
-  ParseOPREPLYMessage(
-    SendCmd(
-      aSocketDescriptor,
-      BuildOPGETMOREMessage(
-        0, //const requestID: integer;
-        0, //const responseTo: integer;
-        fullCollectionName,
-        numberToReturn,
-        cursorID),
-      True), // aGetResponse
-    LRequestID,
-    LResponseTo,
-    responseFlags,
-    cursorID,
-    startingFrom,
-    numberReturned,
-    documents,
-    OnNewRowFunct,
-    Context,
-    RowTag,
-    ViewTag,
-    continue);
-end;
-
-{***************************************}
-Procedure TAlBaseMongoDBClient.OP_INSERT(
-            aSocketDescriptor: TSocket;
-            const flags: integer;                  // bit vector
-            const fullCollectionName: ansiString;  // "dbname.collectionname"
-            const documents: ansiString);          // one or more documents to insert into the collection
-begin
-  SendCmd(
-    aSocketDescriptor,
-    BuildOPINSERTMessage(
-      0, //const requestID: integer;
-      0, //const responseTo: integer;
-      flags,
-      fullCollectionName,
-      documents),
-    false);
-  CheckServerLastError(aSocketDescriptor);
-end;
-
-{***************************************}
-Procedure TAlBaseMongoDBClient.OP_UPDATE(
-            aSocketDescriptor: TSocket;
-            const flags: integer;                   // bit vector
-            const fullCollectionName: ansiString;   // "dbname.collectionname"
-            const selector: ansiString;             // the query to select the document
-            const update: ansiString;               // specification of the update to perform
-            var NumberOfDocumentsUpdated: integer;  // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
-            var updatedExisting: boolean;           // is true when an update affects at least one document and does not result in an upsert.
-            var upserted: ansiString);              // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-begin
-  SendCmd(
-    aSocketDescriptor,
-    BuildOPUPDATEMessage(
-      0, //const requestID: integer;
-      0, //const responseTo: integer;
-      flags,
-      fullCollectionName,
-      selector,
-      Update),
-    false);
-  CheckServerLastError(
-    aSocketDescriptor,
-    NumberOfDocumentsUpdated,
-    updatedExisting,
-    upserted);
-end;
-
-{***************************************}
-Procedure TAlBaseMongoDBClient.OP_DELETE(
-            aSocketDescriptor: TSocket;
-            const flags: integer;                   // bit vector
-            const fullCollectionName: ansiString;   // "dbname.collectionname"
-            const selector: ansiString;             // query object.
-            var NumberOfDocumentsRemoved: integer); // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
-var LUpdatedExisting: boolean;
-    LUpserted: ansiString;
-begin
-  SendCmd(
-    aSocketDescriptor,
-    BuildOPDELETEMessage(
-      0, //const requestID: integer;
-      0, //const responseTo: integer;
-      flags,
-      fullCollectionName,
-      selector),
-    false);
-  CheckServerLastError(
-    aSocketDescriptor,
-    NumberOfDocumentsRemoved,
-    LUpdatedExisting,
-    LUpserted);
-end;
-
-{**********************************************}
-procedure TAlBaseMongoDBClient.OnSelectDataDone(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            flags: TALMongoDBClientSelectDataFlags;
-            const RowTag: AnsiString;
-            const ViewTag: AnsiString;
-            Skip: integer;
-            First: Integer;
-            CacheThreshold: Integer;
-            TimeTaken: double);
-begin
-  // virtual
-end;
-
-{**********************************************}
-procedure TAlBaseMongoDBClient.OnRunCommandDone(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            flags: TALMongoDBClientRunCommandFlags;
-            const RowTag: AnsiString;
-            const ViewTag: AnsiString;
-            CacheThreshold: Integer;
-            TimeTaken: double);
-begin
-  // virtual
-end;
-
-{**********************************************}
-procedure TAlBaseMongoDBClient.OnUpdateDataDone(
-            const FullCollectionName: AnsiString;
-            const selector: AnsiString;
-            const update: AnsiString;
-            flags: TALMongoDBClientUpdateDataFlags;
-            TimeTaken: double);
-begin
-  // virtual
-end;
-
-{**********************************************}
-procedure TAlBaseMongoDBClient.OnDeleteDataDone(
-            const FullCollectionName: AnsiString;
-            const selector: AnsiString;
-            flags: TALMongoDBClientDeleteDataFlags;
-            TimeTaken: double);
-begin
-  // virtual
-end;
-
-{**********************************************}
-procedure TAlBaseMongoDBClient.OnInsertDataDone(
-            const FullCollectionName: AnsiString;
-            const documents: AnsiString;
-            flags: TALMongoDBClientInsertDataFlags;
-            TimeTaken: double);
-begin
-  // virtual
-end;
-
-{*****************************************************}
-procedure TAlBaseMongoDBClient.OnFindAndModifyDataDone(
-            const FullCollectionName: AnsiString;
-            const query: AnsiString;
-            const sort: AnsiString;
-            remove: boolean;
-            const update: AnsiString;
-            new: boolean;
-            const ReturnFieldsSelector: AnsiString;
-            InsertIfNotFound: boolean;
-            RowTag: AnsiString;
-            ViewTag: AnsiString;
-            TimeTaken: double);
-begin
-  // virtual
-end;
-
-{******************************************************************************************************}
-Function TAlBaseMongoDBClient.SocketWrite(aSocketDescriptor: TSocket; const Buf; len: Integer): Integer;
-begin
-  Result := Send(aSocketDescriptor,Buf,len,0);
-  CheckOSError(Result =  SOCKET_ERROR);
-end;
-
-{***************************************************************************************************}
-function TAlBaseMongoDBClient.SocketRead(aSocketDescriptor: TSocket; var buf; len: Integer): Integer;
-begin
-  Result := Recv(aSocketDescriptor,buf,len,0);
-  CheckOSError(Result = SOCKET_ERROR);
-end;
-
-{*******************************************}
-function TAlBaseMongoDBClient.loadCachedData(
-           const Key: AnsiString;
-           var DataStr: AnsiString): Boolean;
-begin
-  result := false; //virtual need to be overriden
-end;
-
-{*********************************************}
-Procedure TAlBaseMongoDBClient.SaveDataToCache(
-            const Key: ansiString;
-            const CacheThreshold: integer;
-            const DataStr: ansiString);
-begin
-  //virtual need to be overriden
-end;
-
-{************************************************************************************************}
-procedure TAlBaseMongoDBClient.DoSetSendTimeout(aSocketDescriptor: TSocket; const Value: integer);
-begin
-  CheckOSError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@Value),SizeOf(Value))=SOCKET_ERROR);
-end;
-
-{***************************************************************************************************}
-procedure TAlBaseMongoDBClient.DoSetReceiveTimeout(aSocketDescriptor: TSocket; const Value: integer);
-begin
-  CheckOSError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@Value),SizeOf(Value))=SOCKET_ERROR);
-end;
-
-{*******************************************************************************************************************}
-// http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
-procedure TAlBaseMongoDBClient.DoSetKeepAlive(aSocketDescriptor: TSocket; const Value: boolean);
-var LIntBool: integer;
-begin
-  // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
-  // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
-  // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-  if Value then LIntBool := 1
-  else LIntBool := 0;
-  CheckOSError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
-end;
-
-{***************************************************************************************************************************************************************************************************************}
-// https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_MRG/1.1/html/Realtime_Tuning_Guide/sect-Realtime_Tuning_Guide-Application_Tuning_and_Deployment-TCP_NODELAY_and_Small_Buffer_Writes.html
-procedure TAlBaseMongoDBClient.DoSetTCPNoDelay(aSocketDescriptor: TSocket; const Value: boolean);
-var LIntBool: integer;
-begin
-  // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
-  // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
-  // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-  if Value then LIntBool := 1
-  else LIntBool := 0;
-  CheckOSError(setsockopt(aSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
-end;
-
-{******************************************************************}
-procedure TAlBaseMongoDBClient.SetSendTimeout(const Value: integer);
-begin
-  FSendTimeout := Value;
-end;
-
-{*********************************************************************}
-procedure TAlBaseMongoDBClient.SetReceiveTimeout(const Value: integer);
-begin
-  FReceiveTimeout := Value;
-end;
-
-{****************************************************************}
-procedure TAlBaseMongoDBClient.SetKeepAlive(const Value: boolean);
-begin
-  FKeepAlive := Value;
-end;
-
-{*****************************************************************}
-procedure TAlBaseMongoDBClient.SetTCPNoDelay(const Value: boolean);
-begin
-  fTCPNoDelay := Value;
-end;
-
-{**************************************************************}
-procedure TAlMongoDBClient.SetSendTimeout(const Value: integer);
-begin
-  inherited SetSendTimeout(Value);
-  if FConnected then DoSetSendTimeout(fSocketDescriptor, Value);
-end;
-
-{*****************************************************************}
-procedure TAlMongoDBClient.SetReceiveTimeout(const Value: integer);
-begin
-  inherited SetReceiveTimeout(Value);
-  if FConnected then DoSetReceiveTimeout(fSocketDescriptor, Value);
-end;
-
-{************************************************************}
-procedure TAlMongoDBClient.SetKeepAlive(const Value: boolean);
-begin
-  inherited SetKeepAlive(Value);
-  if FConnected then DoSetKeepAlive(fSocketDescriptor, Value);
-end;
-
-{*************************************************************}
-procedure TAlMongoDBClient.SetTCPNoDelay(const Value: boolean);
-begin
-  inherited SetTCPNoDelay(Value);
-  if FConnected then DoSetTCPNoDelay(fSocketDescriptor, Value);
-end;
-
-{**********************************}
-constructor TAlMongoDBClient.Create;
-begin
-  inherited;
-  Fconnected:= False;
-  FSocketDescriptor:= INVALID_SOCKET;
-  fStopTailMonitoring := False;
-end;
-
-{**********************************}
-destructor TAlMongoDBClient.Destroy;
-begin
-  If Fconnected then Disconnect;
-  inherited;
-end;
-
-{********************************************************************************}
-procedure TAlMongoDBClient.Connect(const aHost: AnsiString; const APort: integer);
-begin
-
-  if FConnected then raise EALException.Create('MongoDB component already connected');
-  DoConnect(
-    fSocketDescriptor,
-    aHost,
-    APort,
-    fSendTimeout,
-    fReceiveTimeout,
-    fKeepAlive,
-    fTCPNoDelay);
-  fConnected := True;
-
-end;
-
-{************************************}
-procedure TAlMongoDBClient.Disconnect;
-begin
-  If Fconnected then begin
-    doDisconnect(FSocketDescriptor);
-    Fconnected := False;
-  end;
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.SelectData(
-            const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                  // name with the collection name, using a . for the concatenation. For example, for the database
-                                                  // foo and the collection bar, the full collection name is foo.bar
-            const Query: AnsiString; // BSON document that represents the query. The query will contain one or more elements,
-                                     // all of which must match for a document to be included in the result set. Possible elements
-                                     // include $query, $orderby, $hint, $explain, and $snapshot.
-            const ReturnFieldsSelector: AnsiString; // Optional. BSON document that limits the fields in the returned documents.
-                                                    // The returnFieldsSelector contains one or more elements, each of which is the name
-                                                    // of a field that should be returned, and and the integer value 1. In JSON notation,
-                                                    // a returnFieldsSelector to limit to the fields a, b and c would be:
-                                                    // { a : 1, b : 1, c : 1}
-            flags: TALMongoDBClientSelectDataFlags; // Options (see TALMongoDBClientSelectDataFlags)
-            const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-            const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-            Skip: integer; // Sets the number of documents to omit
-            First: Integer; // Limits the number of documents to retrieve
-            CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                                     // cache or not. Values <= 0 deactivate the cache
-            JSONDATA: TALJSONNodeA;
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer);
-
-Var LViewRec: TALJSONNodeA;
-    LJSONDocument: TALJSONNodeA;
-    LResponseFlags: integer;
-    LCursorID: int64;
-    LStartingFrom: integer;
-    LNumberReturned: integer;
-    LFlags: integer;
-    LRecAdded: integer;
-    LContinue: boolean;
-    LStopWatch: TStopWatch;
-    LCacheKey: ansiString;
-    LCacheStr: ansiString;
-
-begin
-
-  //Error if we are not connected
-  If not connected then raise EALException.Create('Not connected');
-
-  //only OnNewRowFunct / JSONDATA can be used
-  if assigned(OnNewRowFunct) then JSONDATA := nil;
-
-  //clear the JSONDATA
-  if assigned(JSONDATA) then LJSONDocument := Nil
-  else begin
-    LJSONDocument := TALJSONDocumentA.create;
-    JSONDATA := LJSONDocument;
-  end;
-
-  Try
-
-    //init the TstopWatch
-    LStopWatch := TstopWatch.Create;
-
-    //Handle the CacheThreshold
-    LCacheKey := '';
-    If (CacheThreshold > 0) and
-       (not assigned(LJSONDocument)) and
-       (not (sfTailMonitoring in flags)) and
-       ((JSONDATA.ChildNodes.Count = 0) or  // else the save will not work
-        (ViewTag <> '')) then begin
-
-      //try to load from from cache
-      LCacheKey := ALStringHashSHA1(
-                     ALFormatA(
-                       '%s#%d#%d#%s#%s#%s',
-                       [RowTag,
-                        Skip,
-                        First,
-                        FullCollectionName,
-                        ReturnFieldsSelector,
-                        Query]));
-
-      if loadcachedData(LCacheKey, LCacheStr) then begin
-
-        //init the aViewRec
-        if (ViewTag <> '') then LViewRec := JSONDATA.AddChild(ViewTag, ntobject)
-        else LViewRec := JSONDATA;
-
-        //assign the tmp data to the XMLData
-        LViewRec.LoadFromJsonString(LCacheStr, []);
-
-        //exit
-        exit;
-
-      end;
-
-    end;
-
-    //start the TstopWatch
-    LStopWatch.Reset;
-    LStopWatch.Start;
-
-    //build the flag integer
-    //bit num	   name	            description
-    //0	         Reserved	        Must be set to 0.
-    //1	         TailableCursor	  Tailable means cursor is not closed when the last data is retrieved. Rather, the cursor marks the final object’s
-    //                            position. You can resume using the cursor later, from where it was located, if more data were received. Like any
-    //                            “latent cursor”, the cursor may become invalid at some point (CursorNotFound) – for example if the final object
-    //                            it references were deleted.
-    //2	         SlaveOk	        Allow query of replica slave. Normally these return an error except for namespace “local”.
-    //3	         OplogReplay	    Internal replication use only - driver should not set
-    //4	         NoCursorTimeout	The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use. Set this
-    //                            option to prevent that.
-    //5	         AwaitData	      Use with TailableCursor. If we are at the end of the data, block for a while rather than returning no data. After a
-    //                            timeout period, we do return as normal.
-    //6	         Exhaust	        Stream the data down full blast in multiple “more” packages, on the assumption that the client will fully read all data queried.
-    //                            Faster when you are pulling a lot of data and know you want to pull it all down. Note: the client is not allowed to not read all
-    //                            the data unless it closes the connection.
-    //                            Caveats:
-    //                            * Exhaust and limit are not compatible.
-    //                            * Exhaust cursors are not supported by mongos and can not be used with a sharded cluster.
-    //                            * Exhaust cursors require an exclusive socket connection to MongoDB. If the Cursor is discarded
-    //                              without being completely iterated the underlying socket connection will be closed and discarded
-    //                              without being returned to the connection pool.
-    //                            * If you create an exhaust cursor in a request (http://api.mongodb.org/python/current/examples/requests.html),
-    //                              you must completely iterate the Cursor before executing any other operation.
-    //                            * The per-query network_timeout option is ignored when using an exhaust cursor.
-    //                            Mostly because Exhaust is not compatible with mongos we will not use it
-    //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
-    //8-31	     Reserved	        Must be set to 0.
-    LFlags := 0;
-    if sfTailMonitoring in flags then begin
-      if not assigned(OnNewRowFunct) then raise EALException.Create('OnNewRowFunct is mandatory for tail monitoring');
-      LFlags := LFlags or (1 shl 1); // TailableCursor
-      LFlags := LFlags or (1 shl 5); // AwaitData
-    end;
-    if sfSlaveOk in flags then LFlags := LFlags or (1 shl 2);
-    if sfNoCursorTimeout in flags then LFlags := LFlags or (1 shl 4);
-    if sfPartial in flags then LFlags := LFlags or (1 shl 7);
-
-    //init the aViewRec
-    if (ViewTag <> '') and (not assigned(LJSONDocument)) then LViewRec := JSONdata.AddChild(ViewTag, ntobject)
-    else LViewRec := JSONdata;
-
-    //init aRecAdded
-    LRecAdded := 0;
-
-    //for the TailMonitoring
-    repeat
-
-      //do the First query
-      LContinue := true;
-      OP_QUERY(
-        fSocketDescriptor,
-        LFlags,
-        fullCollectionName,
-        ALIfThen(Skip >= 0, Skip, 0),
-        ALIfThen(First >= 0, First, 0), // The MongoDB server returns the query results in batches. Batch size will not exceed
-                                        // the maximum BSON document size. For most queries, the first batch returns 101
-                                        // documents or just enough documents to exceed 1 megabyte. Subsequent batch size is
-                                        // 4 megabytes. To override the default size of the batch, see batchSize() and limit().
-        query,
-        ReturnFieldsSelector,
-        LResponseFlags,
-        LCursorID,
-        LStartingFrom, // where in the cursor this reply is starting
-        LNumberReturned, // number of documents in the reply
-        LViewRec,
-        OnNewRowFunct,
-        Context,
-        RowTag,
-        ViewTag,
-        LContinue);
-
-      try
-
-        //init aRecAdded
-        LRecAdded := LRecAdded + LNumberReturned;
-
-        //loop still the cursorID > 0
-        while ((not (sfTailMonitoring in flags)) or
-               (not fStopTailMonitoring)) and
-              (LContinue) and
-              (LCursorID <> 0) and
-              ((First <= 0) or
-               (LRecAdded < First)) do begin
-
-          //Get more data
-          OP_GET_MORE(
-            fSocketDescriptor,
-            fullCollectionName,
-            ALIfThen(First > 0, First - LRecAdded, 0),
-            LCursorID,
-            LResponseFlags,
-            LStartingFrom,
-            LNumberReturned,
-            LViewRec,
-            OnNewRowFunct,
-            Context,
-            RowTag,
-            ViewTag,
-            LContinue);
-
-          //init aRecAdded
-          LRecAdded := LRecAdded + LNumberReturned;
-
-        end;
-
-      finally
-
-        //close the curson
-        if LCursorID <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [LCursorID]);
-
-      end;
-
-      //sleep for TailMonitoring to not use 100% CPU
-      if (sfTailMonitoring in flags) and
-         (not fStopTailMonitoring) and
-         ((First <= 0) or
-          (LRecAdded < First)) then sleep(1);
-
-    //loop for the TailMonitoring
-    until (not (sfTailMonitoring in flags)) or
-          (fStopTailMonitoring) or
-          ((First > 0) and
-           (LRecAdded >= First));
-
-    //do the OnSelectDataDone
-    LStopWatch.Stop;
-    OnSelectDataDone(
-      FullCollectionName,
-      Query,
-      ReturnFieldsSelector,
-      flags,
-      RowTag,
-      ViewTag,
-      Skip,
-      First,
-      CacheThreshold,
-      LStopWatch.Elapsed.TotalMilliseconds);
-
-    //save to the cache
-    If LCacheKey <> '' then begin
-
-      //save the data
-      LViewRec.SaveToJSONString(LCacheStr);
-      SaveDataToCache(
-        LCacheKey,
-        CacheThreshold,
-        LCacheStr);
-
-    end;
-
-  Finally
-    if assigned(LJSONDocument) then LJSONDocument.free;
-  End;
-
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            flags: TALMongoDBClientSelectDataFlags;
-            Skip: integer;
-            First: Integer;
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    flags,
-    '', // RowTag,
-    '', // ViewTag,
-    Skip,
-    First,
-    -1, // CacheThreshold,
-    nil, //JSONDATA,
-    OnNewRowFunct,
-    Context);
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            flags: TALMongoDBClientSelectDataFlags;
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    flags,
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // Skip,
-    -1, // First,
-    -1, // CacheThreshold,
-    nil, // JSONDATA,
-    OnNewRowFunct,
-    Context);
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            flags: TALMongoDBClientSelectDataFlags;
-            const RowTag: AnsiString;
-            Skip: integer;
-            First: Integer;
-            JSONDATA: TALJSONNodeA);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    flags,
-    RowTag,
-    '', // ViewTag,
-    Skip,
-    First,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewRowFunct,
-    nil); // Context
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            flags: TALMongoDBClientSelectDataFlags;
-            const RowTag: AnsiString;
-            JSONDATA: TALJSONNodeA);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    flags,
-    RowTag,
-    '', // ViewTag,
-    -1, // Skip,
-    -1, // First,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewRowFunct,
-    nil); // Context
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            flags: TALMongoDBClientSelectDataFlags;
-            JSONDATA: TALJSONNodeA);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    flags,
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // Skip,
-    -1, // First,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewRowFunct,
-    nil); // Context
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            Skip: integer;
-            First: Integer;
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    [],
-    '', // RowTag,
-    '', // ViewTag,
-    Skip,
-    First,
-    -1, // CacheThreshold,
-    nil, //JSONDATA,
-    OnNewRowFunct,
-    Context);
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    [],
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // Skip,
-    -1, // First,
-    -1, // CacheThreshold,
-    nil, // JSONDATA,
-    OnNewRowFunct,
-    Context);
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            const RowTag: AnsiString;
-            Skip: integer;
-            First: Integer;
-            JSONDATA: TALJSONNodeA);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    [],
-    RowTag,
-    '', // ViewTag,
-    Skip,
-    First,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewRowFunct,
-    nil); // Context
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            const RowTag: AnsiString;
-            JSONDATA: TALJSONNodeA);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    [],
-    RowTag,
-    '', // ViewTag,
-    -1, // Skip,
-    -1, // First,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewRowFunct,
-    nil); // Context
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            JSONDATA: TALJSONNodeA);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    [],
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // Skip,
-    -1, // First,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewRowFunct,
-    nil); // Context
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString; // BSON document that represents the Command
-            flags: TALMongoDBClientRunCommandFlags; // Options (see TALMongoDBClientRunCommandFlags)
-            const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-            const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-            CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                                     // cache or not. Values <= 0 deactivate the cache
-            JSONDATA: TALJSONNodeA;
-            OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
-            Context: Pointer);
-
-Var LViewRec: TALJSONNodeA;
-    LRowRec: TALJSONNodeA;
-    LCursorRec: TALJSONNodeA;
-    LFirstBatchRec: TALJSONNodeA;
-    LJSONDocument: TALJSONNodeA;
-    LResponseFlags: integer;
-    LCursorID: int64;
-    LStartingFrom: integer;
-    LNumberReturned: integer;
-    LFlags: integer;
-    LContinue: boolean;
-    LStopWatch: TStopWatch;
-    LCacheKey: ansiString;
-    LCacheStr: ansiString;
-    LFullCollectionName: ansiString;
-    i: integer;
-
-begin
-
-  //Error if we are not connected
-  If not connected then raise EALException.Create('Not connected');
-
-  //init aFullCollectionName
-  LFullCollectionName := DatabaseName + '.$cmd';
-
-  //only OnNewBatchRowFunct / JSONDATA can be used
-  if assigned(OnNewBatchRowFunct) then JSONDATA := nil;
-
-  //clear the JSONDATA
-  if assigned(JSONDATA) then LJSONDocument := Nil
-  else begin
-    LJSONDocument := TALJSONDocumentA.create;
-    JSONDATA := LJSONDocument;
-  end;
-
-  try
-
-    //init the TstopWatch
-    LStopWatch := TstopWatch.Create;
-
-    //Handle the CacheThreshold
-    LCacheKey := '';
-    If (CacheThreshold > 0) and
-       (not assigned(LJSONDocument)) and
-       ((JSONDATA.ChildNodes.Count = 0) or  // else the save will not work
-        (ViewTag <> '')) then begin
-
-      //try to load from from cache
-      LCacheKey := ALStringHashSHA1(
-                     ALFormatA(
-                       '%s#%d#%d#%s#%s#%s',
-                       [RowTag,
-                        0,
-                        1,
-                        LFullCollectionName,
-                        '',
-                        Command]));
-
-      if loadcachedData(LCacheKey, LCacheStr) then begin
-
-        //init the aViewRec
-        if (ViewTag <> '') then LViewRec := JSONDATA.AddChild(ViewTag, ntobject)
-        else LViewRec := JSONDATA;
-
-        //assign the tmp data to the XMLData
-        LViewRec.LoadFromJsonString(LCacheStr, []);
-
-        //exit
-        exit;
-
-      end;
-
-    end;
-
-    //start the TstopWatch
-    LStopWatch.Reset;
-    LStopWatch.Start;
-
-    //build the flag integer
-    //bit num	   name	            description
-    //0	         Reserved	        Must be set to 0.
-    //1	         TailableCursor	  Tailable means cursor is not closed when the last data is retrieved. Rather, the cursor marks the final object’s
-    //                            position. You can resume using the cursor later, from where it was located, if more data were received. Like any
-    //                            “latent cursor”, the cursor may become invalid at some point (CursorNotFound) – for example if the final object
-    //                            it references were deleted.
-    //2	         SlaveOk	        Allow query of replica slave. Normally these return an error except for namespace “local”.
-    //3	         OplogReplay	    Internal replication use only - driver should not set
-    //4	         NoCursorTimeout	The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use. Set this
-    //                            option to prevent that.
-    //5	         AwaitData	      Use with TailableCursor. If we are at the end of the data, block for a while rather than returning no data. After a
-    //                            timeout period, we do return as normal.
-    //6	         Exhaust	        Stream the data down full blast in multiple “more” packages, on the assumption that the client will fully read all data queried.
-    //                            Faster when you are pulling a lot of data and know you want to pull it all down. Note: the client is not allowed to not read all
-    //                            the data unless it closes the connection.
-    //                            Caveats:
-    //                            * Exhaust and limit are not compatible.
-    //                            * Exhaust cursors are not supported by mongos and can not be used with a sharded cluster.
-    //                            * Exhaust cursors require an exclusive socket connection to MongoDB. If the Cursor is discarded
-    //                              without being completely iterated the underlying socket connection will be closed and discarded
-    //                              without being returned to the connection pool.
-    //                            * If you create an exhaust cursor in a request (http://api.mongodb.org/python/current/examples/requests.html),
-    //                              you must completely iterate the Cursor before executing any other operation.
-    //                            * The per-query network_timeout option is ignored when using an exhaust cursor.
-    //                            Mostly because Exhaust is not compatible with mongos we will not use it
-    //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
-    //8-31	     Reserved	        Must be set to 0.
-    LFlags := 0;
-    if cfSlaveOk in flags then LFlags := LFlags or (1 shl 2);
-    if cfNoCursorTimeout in flags then LFlags := LFlags or (1 shl 4);
-    if cfPartial in flags then LFlags := LFlags or (1 shl 7);
-
-    //init the aViewRec
-    if (ViewTag <> '') and (not assigned(LJSONDocument)) then LViewRec := JSONdata.AddChild(ViewTag, ntobject)
-    else LViewRec := JSONdata;
-
-    //do the First query
-    LContinue := true;
-    OP_QUERY(
-      fSocketDescriptor,
-      LFlags,
-      LFullCollectionName,
-      0,
-      1,
-      Command,
-      '', // ReturnFieldsSelector
-      LResponseFlags,
-      LCursorID,
-      LStartingFrom, // where in the cursor this reply is starting
-      LNumberReturned, // number of documents in the reply
-      LViewRec,
-      nil,
-      Context,
-      RowTag,
-      ViewTag,
-      LContinue);
-
-    //aCursorID must be egual to 0 (we retrieve only one doc) but in case
-    if LCursorID <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [LCursorID]);
-
-    //init LRowRec
-    if (RowTag <> '') and (LViewRec.ChildNodes.Count > 0) then LRowRec := LViewRec.ChildNodes[LViewRec.ChildNodes.Count - 1]
-    else LRowRec := LViewRec;
-
-    //check error
-    CheckRunCommandResponse(LRowRec);
-
-    //{
-    //  "cursor" : {
-    //      "id" : NumberLong(3286429289449024015),
-    //      "ns" : "mydatabase.$cmd.listCollections",
-    //      "firstBatch" : [
-    //          {
-    //            ....
-    //          },
-    //          {
-    //            ....
-    //          }
-    //      ]
-    //  },
-    //  "ok" : 1.0
-    //}
-    LCursorRec := LRowRec.ChildNodes.FindNode('cursor');
-    if LCursorRec <> nil then begin
-
-      //init LFirstBatchRec
-      LFirstBatchRec := LCursorRec.ChildNodes.FindNode('firstBatch');
-      if (LFirstBatchRec <> nil) and
-         (assigned(OnNewBatchRowFunct)) and
-         (LContinue) then begin
-        for I := 0 to LFirstBatchRec.ChildNodes.Count - 1 do begin
-          OnNewBatchRowFunct(
-            LFirstBatchRec.ChildNodes[I], // JSONRowData: TALJSONNodeA;
-            ViewTag, // const ViewTag: AnsiString;
-            Context, // Context: Pointer;
-            LContinue); // Var Continue: Boolean);
-          if not LContinue then break;
-        end;
-      end;
-
-      //init LCursorID
-      LCursorID := LCursorRec.getChildNodeValueInt64('id', 0);
-      if LCursorID <> 0 then begin
-
-        try
-
-          //we do the job only if LFirstBatchRec exist
-          if LFirstBatchRec <> nil then begin
-
-            //init LCollectionName
-            LFullCollectionName := LCursorRec.getChildNodeValueText('ns', '');
-
-            //loop still the cursorID > 0
-            while (LContinue) and
-                  (LCursorID <> 0) do begin
-
-              //Get more data
-              OP_GET_MORE(
-                fSocketDescriptor,
-                LFullCollectionName,
-                0, // numberToReturn
-                LCursorID,
-                LResponseFlags,
-                LStartingFrom,
-                LNumberReturned,
-                LFirstBatchRec, // documents
-                OnNewBatchRowFunct,
-                Context,
-                '', // RowTag,
-                ViewTag,
-                LContinue);
-
-            end;
-
-          end;
-
-        finally
-
-          //close the curson
-          if LCursorID <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [LCursorID]);
-
-        end;
-
-        LCursorRec.SetChildNodeValueInt64('id', 0);
-
-      end;
-
-    end;
-
-    //do the OnRunCommandDone
-    LStopWatch.Stop;
-    OnRunCommandDone(
-      DatabaseName,
-      Command,
-      flags,
-      RowTag,
-      ViewTag,
-      CacheThreshold,
-      LStopWatch.Elapsed.TotalMilliseconds);
-
-    //save to the cache
-    If LCacheKey <> '' then begin
-
-      //save the data
-      LViewRec.SaveToJSONString(LCacheStr);
-      SaveDataToCache(
-        LCacheKey,
-        CacheThreshold,
-        LCacheStr);
-
-    end;
-
-  finally
-    if assigned(LJSONDocument) then LJSONDocument.free;
-  end;
-
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            flags: TALMongoDBClientRunCommandFlags;
-            OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
-            Context: Pointer);
-begin
-  RunCommand(
-    DatabaseName,
-    Command,
-    flags,
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // CacheThreshold,
-    nil, //JSONDATA,
-    OnNewBatchRowFunct,
-    Context);
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            flags: TALMongoDBClientRunCommandFlags;
-            const RowTag: AnsiString;
-            JSONDATA: TALJSONNodeA);
-begin
-  RunCommand(
-    DatabaseName,
-    Command,
-    flags,
-    RowTag,
-    '', // ViewTag,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewBatchRowFunct,
-    nil); // Context
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            flags: TALMongoDBClientRunCommandFlags;
-            JSONDATA: TALJSONNodeA);
-begin
-  RunCommand(
-    DatabaseName,
-    Command,
-    flags,
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewBatchRowFunct,
-    nil); // Context
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
-            Context: Pointer);
-begin
-  RunCommand(
-    DatabaseName,
-    Command,
-    [],
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // CacheThreshold,
-    nil, //JSONDATA,
-    OnNewBatchRowFunct,
-    Context);
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            const RowTag: AnsiString;
-            JSONDATA: TALJSONNodeA);
-begin
-  RunCommand(
-    DatabaseName,
-    Command,
-    [],
-    RowTag,
-    '', // ViewTag,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewBatchRowFunct,
-    nil); // Context
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            JSONDATA: TALJSONNodeA);
-begin
-  RunCommand(
-    DatabaseName,
-    Command,
-    [],
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewBatchRowFunct,
-    nil); // Context
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.UpdateData(
-            const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                  // name with the collection name, using a . for the concatenation. For example, for the database
-                                                  // foo and the collection bar, the full collection name is foo.bar
-            const selector: AnsiString; // BSON document that specifies the query for selection of the document to update.
-            const update: AnsiString; // BSON document that specifies the update to be performed. For information on specifying updates see
-                                      // http://docs.mongodb.org/manual/tutorial/modify-documents/
-            flags: TALMongoDBClientUpdateDataFlags; // Options (see TALMongoDBClientUpdateDataFlags)
-            var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
-            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-            var ObjectID: ansiString); // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-Var LFlags: integer;
-    LStopWatch: TStopWatch;
-begin
-
-  //Error if we are not connected
-  If not connected then raise EALException.Create('Not connected');
-
-  //init the TstopWatch
-  LStopWatch := TstopWatch.StartNew;
-
-  //bit num	  name	        description
-  //0	        Upsert	      If set, the database will insert the supplied object into the collection if no matching document is found.
-  //1	        MultiUpdate	  If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
-  //2-31    	Reserved	    Must be set to 0.
-  LFlags := 0;
-  if ufUpsert in flags then LFlags := LFlags or (1 shl 0);
-  if ufMultiUpdate in flags then LFlags := LFlags or (1 shl 1);
-
-  OP_UPDATE(
-    fSocketDescriptor,
-    LFlags,
-    FullCollectionName,
-    selector,
-    Update,
-    NumberOfDocumentsUpdated,
-    updatedExisting,
-    ObjectID);
-
-  //do the OnUpdateDataDone
-  LStopWatch.Stop;
-  OnUpdateDataDone(
-    FullCollectionName,
-    selector,
-    update,
-    flags,
-    LStopWatch.Elapsed.TotalMilliseconds);
-
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.UpdateData(
-            const FullCollectionName: AnsiString;
-            const Selector: AnsiString;
-            const Update: AnsiString;
-            flags: TALMongoDBClientUpdateDataFlags);
-var LNumberOfDocumentsUpdated: integer;
-    LUpdatedExisting: boolean;
-    LObjectID: ansiString;
-begin
-  UpdateData(
-    FullCollectionName,
-    selector,
-    update,
-    flags,
-    LNumberOfDocumentsUpdated,
-    LUpdatedExisting,
-    LObjectID);
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.UpdateData(
-            const FullCollectionName: AnsiString;
-            const Selector: AnsiString;
-            const Update: AnsiString);
-var LNumberOfDocumentsUpdated: integer;
-    LUpdatedExisting: boolean;
-    LObjectID: ansiString;
-begin
-  UpdateData(
-    FullCollectionName,
-    selector,
-    update,
-    [],
-    LNumberOfDocumentsUpdated,
-    LUpdatedExisting,
-    LObjectID);
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.InsertData(
-            const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                  // name with the collection name, using a . for the concatenation. For example, for the database
-                                                  // foo and the collection bar, the full collection name is foo.bar
-            const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
-            flags: TALMongoDBClientInsertDataFlags); // Options (see TALMongoDBClientInsertDataFlags)
-Var LFlags: integer;
-    LStopWatch: TStopWatch;
-begin
-
-  //Error if we are not connected
-  If not connected then raise EALException.Create('Not connected');
-
-  //init the TstopWatch
-  LStopWatch := TstopWatch.Create;
-
-  //start the TstopWatch
-  LStopWatch.Reset;
-  LStopWatch.Start;
-
-  //bit num	 name	            description
-  //0	       ContinueOnError	If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
-  //                          This makes bulk insert behave similarly to a series of single inserts, except lastError will be set if
-  //                          any insert fails, not just the last one. If multiple errors occur, only the most recent will be
-  //                          reported by getLastError. (new in 1.9.1)
-  //1-31	   Reserved	        Must be set to 0.
-  LFlags := 0;
-  if ifContinueOnError in flags then LFlags := LFlags or (1 shl 0);
-
-  OP_INSERT(
-    fSocketDescriptor,
-    LFlags,
-    FullCollectionName,
-    documents);
-
-  //do the OnInsertDataDone
-  LStopWatch.Stop;
-  OnInsertDataDone(
-    FullCollectionName,
-    documents,
-    flags,
-    LStopWatch.Elapsed.TotalMilliseconds);
-
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.InsertData(
-            const FullCollectionName: AnsiString;
-            const documents: AnsiString);
-begin
-  InsertData(
-    FullCollectionName,
-    documents,
-    []);
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.DeleteData(
-            const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                  // name with the collection name, using a . for the concatenation. For example, for the database
-                                                  // foo and the collection bar, the full collection name is foo.bar
-            const selector: AnsiString; // BSON document that represent the query used to select the documents to be removed
-                                        // The selector will contain one or more elements, all of which must match for a document
-                                        // to be removed from the collection
-            flags: TALMongoDBClientDeleteDataFlags; // Options (see TALMongoDBClientDeleteDataFlags)
-            var NumberOfDocumentsRemoved: integer);
-Var LFlags: integer;
-    LStopWatch: TStopWatch;
-begin
-
-  //Error if we are not connected
-  If not connected then raise EALException.Create('Not connected');
-
-  //init the TstopWatch
-  LStopWatch := TstopWatch.StartNew;
-
-  //bit num	   name	          description
-  //0	         SingleRemove	  If set, the database will remove only the first matching document in the collection. Otherwise all matching documents will be removed.
-  //1-31	     Reserved	      Must be set to 0.
-  LFlags := 0;
-  if dfSingleRemove in flags then LFlags := LFlags or (1 shl 0);
-
-  OP_DELETE(
-    fSocketDescriptor,
-    LFlags,
-    FullCollectionName,
-    selector,
-    NumberOfDocumentsRemoved);
-
-  //do the OnDeleteDataDone
-  LStopWatch.Stop;
-  OnDeleteDataDone(
-    FullCollectionName,
-    selector,
-    flags,
-    LStopWatch.Elapsed.TotalMilliseconds);
-
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.DeleteData(
-            const FullCollectionName: AnsiString;
-            const Selector: AnsiString;
-            flags: TALMongoDBClientDeleteDataFlags);
-var LNumberOfDocumentsRemoved: integer;
-begin
-  DeleteData(
-    FullCollectionName,
-    selector,
-    flags,
-    LNumberOfDocumentsRemoved);
-end;
-
-{************************************}
-Procedure TAlMongoDBClient.DeleteData(
-            const FullCollectionName: AnsiString;
-            const Selector: AnsiString);
-var LNumberOfDocumentsRemoved: integer;
-begin
-  DeleteData(
-    FullCollectionName,
-    selector,
-    [],
-    LNumberOfDocumentsRemoved);
-end;
-
-{*******************************************}
-Procedure TAlMongoDBClient.FindAndModifyData(
-            const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                  // name with the collection name, using a . for the concatenation. For example, for the database
-                                                  // foo and the collection bar, the full collection name is foo.bar
-            const query: AnsiString; // Optional. The selection criteria for the modification. The query field employs the same query selectors as used in the
-                                     // db.collection.find() method. Although the query may match multiple documents, findAndModify will select only
-                                     // one document to modify.
-            const sort: AnsiString; // Optional. Determines which document the operation modifies if the query selects multiple
-                                    // documents. findAndModify modifies the first document in the sort order specified by this argument.
-            remove: boolean; // Must specify either the remove or the update field. Removes the document specified in the query field.
-                             // Set this to true to remove the selected document . The default is false.
-            const update: AnsiString; // Must specify either the remove or the update field. Performs an update of the selected document.
-                                      // The update field employs the same update operators or field: value specifications to modify the selected document.
-            new: boolean; // Optional. When true, returns the modified document rather than the original. The findAndModify method
-                          // ignores the new option for remove operations. The default is false.
-            const ReturnFieldsSelector: AnsiString; // Optional. A subset of fields to return. The fields document specifies an inclusion of a
-                                                    // field with 1, as in: fields: { <field1>: 1, <field2>: 1, ... }.
-            InsertIfNotFound: boolean;  // Optional. Used in conjunction with the update field. When true, findAndModify
-                                        // creates a new document if no document matches the query, or if documents match the query,
-                                        // findAndModify performs an update. The default is false.
-            const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-            const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-            JSONDATA: TALJSONNodeA;
-            var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-            var ObjectID: AnsiString); // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-
-Var LStopWatch: TStopWatch;
-    LDatabaseName: AnsiString;
-    LCollectionName: AnsiString;
-    LViewRec: TALJSONNodeA;
-    LResponseFlags: integer;
-    LTmpQuery: ansiString;
-    LCursorID: int64;
-    LStartingFrom: integer;
-    LNumberReturned: integer;
-    LContinue: boolean;
-    LTmpRowTag: ansiString;
-    LUpdateRowTagByFieldValue: Boolean;
-    LJSONDoc: TALJSONNodeA;
-    LNode1: TALJSONNodeA;
-    LNode2: TALJSONNodeA;
-    LLastErrorObjectNode: TALJSONNodeA;
-    P1: integer;
-
-begin
-
-  //Error if we are not connected
-  If not connected then raise EALException.Create('Not connected');
-
-  //init the TstopWatch
-  LStopWatch := TstopWatch.StartNew;
-
-  //create a temp JSONDoc
-  LJSONDoc := TALJSONDocumentA.Create;
-  try
-
-    //init aDatabaseName and aCollectionName
-    P1 := ALPosA('.',FullCollectionName);
-    if P1 <= 0 then raise EALException.Create('The full collection name must be the concatenation of the database name with the collection name');
-    LDatabaseName := ALCopyStr(FullCollectionName, 1, P1-1);
-    LCollectionName := ALCopyStr(FullCollectionName, P1+1, maxint);
-
-    //buid the query
-    LTmpQuery := '{"findAndModify":' + ALJsonEncodeTextWithNodeSubTypeHelperA(LCollectionName);
-    if query <> '' then LTmpQuery := LTmpQuery + ',"query":'+query;
-    if sort <> '' then LTmpQuery := LTmpQuery + ',"sort":'+sort;
-    LTmpQuery := LTmpQuery + ',"remove":'+ALJsonEncodeBooleanWithNodeSubTypeHelperA(remove);
-    if update <> '' then LTmpQuery := LTmpQuery + ',"update":'+update;
-    LTmpQuery := LTmpQuery + ',"new":' + ALJsonEncodeBooleanWithNodeSubTypeHelperA(new);
-    if ReturnFieldsSelector <> '' then LTmpQuery := LTmpQuery + ',"fields":'+ReturnFieldsSelector;
-    LTmpQuery := LTmpQuery + ',"upsert":'+ALJsonEncodeBooleanWithNodeSubTypeHelperA(InsertIfNotFound);
-    LTmpQuery := LTmpQuery + '}';
-
-    //do the First query
-    OP_QUERY(
-      fSocketDescriptor,
-      0, // flags
-      LDatabaseName  + '.$cmd', // fullCollectionName
-      0, // skip
-      1, // First
-      LTmpQuery, // query
-      '', // ReturnFieldsSelector,
-      LResponseFlags,
-      LCursorID,
-      LStartingFrom,
-      LNumberReturned,
-      LJSONDoc,
-      nil,
-      nil,
-      '',
-      '',
-      LContinue);
-    try
-
-      // exemple of returned json result
-
-      //{
-      // "value":{"_id":2,"seq":3},
-      // "lastErrorObject":{
-      //   "updatedExisting":true,
-      //   "n":1
-      // },
-      // "ok":1
-      //}
-
-      //{
-      // "value":null,
-      // "lastErrorObject":{
-      //   "updatedExisting":false,
-      //   "n":1,
-      //   "upserted":2
-      // },
-      // "ok":1
-      //}
-
-      //{
-      // "ok":0,
-      // "errmsg":"remove and returnNew can\u0027t co-exist"
-      //}
-
-      //init the aViewRec
-      if (ViewTag <> '') then LViewRec := JSONdata.AddChild(ViewTag, ntobject)
-      else LViewRec := JSONdata;
-
-      //check error
-      CheckRunCommandResponse(LJSONDoc);
-
-      //get the value node
-      LNode1 := LJSONDoc.ChildNodes.FindNode('value');
-      if assigned(LNode1) and (LNode1.NodeType = ntObject) then begin
-
-        //init aUpdateRowTagByFieldValue and aTmpRowTag
-        if ALPosA('&>',RowTag) = 1 then begin
-          LTmpRowTag := AlcopyStr(RowTag, 3, maxint);
-          LUpdateRowTagByFieldValue := LTmpRowTag <> '';
-        end
-        else begin
-          LTmpRowTag := RowTag;
-          LUpdateRowTagByFieldValue := False;
-        end;
-
-        //add the row tag
-        if (LTmpRowTag <> '') or
-           (LViewRec.NodeType = ntarray) then LViewRec := LViewRec.AddChild(LTmpRowTag, ntobject);
-
-        //move the node
-        while LNode1.ChildNodes.Count > 0 do begin
-          LNode2 := LNode1.ChildNodes.Extract(0);
+      // tags
+      var LTagsNode := LDoc.ChildNodes.FindNode('tags');
+      if (LTagsNode <> nil) then begin
+        if not (LTagsNode is TALJSONArrayNodeA) then
+          raise Exception.Create('Tags must be an array');
+        for var I := 0 to LTagsNode.ChildNodes.Count - 1 do begin
+          var LBsonRec: bson_t;
+          var LBsonIsAllocated: Boolean;
+          var LBsonStr: AnsiString := LTagsNode.ChildNodes[I].BSON;
+          var LBsonPtr := ALMakeBsonPtrFromString(LBsonStr, @LBsonRec, LBsonIsAllocated);
           try
-            LViewRec.ChildNodes.Add(LNode2);
-          except
-            LNode2.Free;
-            raise;
+            mongoc_read_prefs_add_tag(Result, LBsonPtr);
+          finally
+            if LBsonIsAllocated then
+              bson_destroy(LBsonPtr);
           end;
         end;
-
-        // aUpdateRowTagByFieldValue
-        if LUpdateRowTagByFieldValue then begin
-          LNode1 := LViewRec.ChildNodes.FindNode(LTmpRowTag);
-          if assigned(LNode1) then LViewRec.NodeName := LNode1.Text;
-        end;
-
       end;
 
-      //init alastErrorObjectNode;
-      LLastErrorObjectNode := LJSONDoc.ChildNodes['lastErrorObject'];
+      // maxStalenessSeconds
+      var LMaxStalenessNode := LDoc.ChildNodes.FindNode('maxStalenessSeconds');
+      if LMaxStalenessNode <> nil then
+        mongoc_read_prefs_set_max_staleness_seconds(Result, LMaxStalenessNode.int64);
 
-      //NumberOfDocumentsUpdatedOrRemoved
-      LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('n');
-      if assigned(LNode1) then NumberOfDocumentsUpdatedOrRemoved := LNode1.int32
-      else NumberOfDocumentsUpdatedOrRemoved := 0;
-
-      //updatedExisting
-      LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('updatedExisting');
-      if assigned(LNode1) then updatedExisting := LNode1.bool
-      else updatedExisting := False;
-
-      //ObjectID
-      LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('upserted');
-      if assigned(LNode1) then ObjectID := LNode1.text
-      else ObjectID := '';
-
-    finally
-
-      //close the curson
-      if LCursorID <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [LCursorID]);
-
-    end;
-
-  finally
-    LJSONDoc.free;
-  end;
-
-  //do the OnDeleteDataDone
-  LStopWatch.Stop;
-  OnFindAndModifyDataDone(
-    FullCollectionName,
-    query,
-    sort,
-    remove,
-    update,
-    new,
-    ReturnFieldsSelector,
-    InsertIfNotFound,
-    RowTag,
-    ViewTag,
-    LStopWatch.Elapsed.TotalMilliseconds);
-
-end;
-
-
-{*******************************************}
-Procedure TAlMongoDBClient.FindAndModifyData(
-            const FullCollectionName: AnsiString;
-            const query: AnsiString;
-            const sort: AnsiString;
-            remove: boolean;
-            const update: AnsiString;
-            new: boolean;
-            const ReturnFieldsSelector: AnsiString;
-            InsertIfNotFound: boolean;
-            JSONDATA: TALJSONNodeA;
-            var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-            var ObjectID: AnsiString); // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-begin
-  FindAndModifyData(
-    FullCollectionName,
-    query,
-    sort,
-    remove,
-    update,
-    new,
-    ReturnFieldsSelector,
-    InsertIfNotFound,
-    '', // RowTag,
-    '', // ViewTag,
-    JSONDATA,
-    NumberOfDocumentsUpdatedOrRemoved,
-    updatedExisting,
-    ObjectID);
-end;
-
-{*******************************************}
-Procedure TAlMongoDBClient.FindAndModifyData(
-            const FullCollectionName: AnsiString;
-            const query: AnsiString;
-            const sort: AnsiString;
-            remove: boolean;
-            const update: AnsiString;
-            new: boolean;
-            const ReturnFieldsSelector: AnsiString;
-            InsertIfNotFound: boolean;
-            JSONDATA: TALJSONNodeA);
-var LNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-    LUpdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-    LObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-begin
-  FindAndModifyData(
-    FullCollectionName,
-    query,
-    sort,
-    remove,
-    update,
-    new,
-    ReturnFieldsSelector,
-    InsertIfNotFound,
-    '', // RowTag,
-    '', // ViewTag,
-    JSONDATA,
-    LNumberOfDocumentsUpdatedOrRemoved,
-    LUpdatedExisting,
-    LObjectID);
-end;
-
-{****************************************************************************}
-procedure TAlMongoDBConnectionPoolClient.SetSendTimeout(const Value: integer);
-begin
-  FConnectionPoolCS.Acquire;
-  Try
-    inherited SetSendTimeout(Value);
-  finally
-    FConnectionPoolCS.Release;
-  end;
-  ReleaseAllConnections;
-end;
-
-{*******************************************************************************}
-procedure TAlMongoDBConnectionPoolClient.SetReceiveTimeout(const Value: integer);
-begin
-  FConnectionPoolCS.Acquire;
-  Try
-    inherited SetReceiveTimeout(Value);
-  finally
-    FConnectionPoolCS.Release;
-  end;
-  ReleaseAllConnections;
-end;
-
-{**************************************************************************}
-procedure TAlMongoDBConnectionPoolClient.SetKeepAlive(const Value: boolean);
-begin
-  FConnectionPoolCS.Acquire;
-  Try
-    inherited SetKeepAlive(Value);
-  finally
-    FConnectionPoolCS.Release;
-  end;
-  ReleaseAllConnections;
-end;
-
-{***************************************************************************}
-procedure TAlMongoDBConnectionPoolClient.SetTCPNoDelay(const Value: boolean);
-begin
-  FConnectionPoolCS.Acquire;
-  Try
-    inherited SetTCPNoDelay(Value);
-  finally
-    FConnectionPoolCS.Release;
-  end;
-  ReleaseAllConnections;
-end;
-
-{*****************************************************************}
-function TAlMongoDBConnectionPoolClient.AcquireConnection: TSocket;
-Var LTickCount: int64;
-Begin
-
-  //synchronize the code
-  FConnectionPoolCS.Acquire;
-  Try
-
-    //raise an exception if currently realeasing all connection
-    if FReleasingAllconnections then raise EALException.Create('Can not acquire connection: currently releasing all connections');
-
-    //delete the old unused connection
-    LTickCount := GetTickCount64;
-    if LTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
-      while FConnectionPoolCount > 0 do begin
-        if LTickCount - FConnectionPool[0].Lastaccessdate > FConnectionMaxIdleTime then begin
-
-          Try
-            DoDisconnect(FConnectionPool[0].SocketDescriptor);
-          Except
-            //Disconnect must be a "safe" procedure because it's mostly called in
-            //finalization part of the code that it is not protected
-          End;
-
-          Dec(FConnectionPoolCount);
-          if  FConnectionPoolCount > 0 then
-          begin
-            ALMove(
-              FConnectionPool[1],
-              FConnectionPool[0],
-              (FConnectionPoolCount) * SizeOf(TAlMongoDBConnectionPoolContainer));
-          end;
-
-        end
-        else break;
-      end;
-      FLastConnectionGarbage := LTickCount;
-    end;
-
-    //acquire the new connection from the pool
-    If FConnectionPoolCount > 0 then begin
-      Result := FConnectionPool[FConnectionPoolCount - 1].SocketDescriptor;
-      Dec(FConnectionPoolCount);
-    end
-
-    //ask to create a new connection
-    else begin
-      result := INVALID_SOCKET;
-    end;
-
-    //increase the connection count
-    inc(FWorkingConnectionCount);
-
-  //get out of the synchronization
-  finally
-    FConnectionPoolCS.Release;
-  end;
-
-  //create a new connection if pool was empty
-  if result = INVALID_SOCKET then begin
-    try
-      Doconnect(
-        result,
-        fHost,//aHost,
-        fPort,//APort,
-        fSendTimeout,
-        fReceiveTimeout,
-        fKeepAlive,
-        fTCPNoDelay);
     except
-      FConnectionPoolCS.Acquire;
-      dec(FWorkingConnectionCount);
-      FConnectionPoolCS.Release;
+      mongoc_read_prefs_destroy(Result);
       raise;
     end;
-  end;
-
-End;
-
-{*********************************************************}
-procedure TAlMongoDBConnectionPoolClient.ReleaseConnection(
-            var SocketDescriptor: TSocket;
-            const CloseConnection: Boolean = False);
-begin
-
-  //security check
-  if SocketDescriptor = INVALID_SOCKET then raise EALException.Create('Connection handle can not be INVALID_SOCKET');
-
-  //release the connection
-  FConnectionPoolCS.Acquire;
-  Try
-
-    //add the connection to the pool
-    If (not CloseConnection) and (not FReleasingAllconnections) then begin
-      if FConnectionPoolCount = FConnectionPoolCapacity then begin
-        if FConnectionPoolCapacity > 64 then FConnectionPoolCapacity := FConnectionPoolCapacity + (FConnectionPoolCapacity div 4) else
-          if FConnectionPoolCapacity > 8 then FConnectionPoolCapacity := FConnectionPoolCapacity + 16 else
-            FConnectionPoolCapacity := FConnectionPoolCapacity + 4;
-        SetLength(FConnectionPool, FConnectionPoolCapacity);
-      end;
-      FConnectionPool[FConnectionPoolCount].SocketDescriptor := SocketDescriptor;
-      FConnectionPool[FConnectionPoolCount].LastAccessDate := GetTickCount64;
-      Inc(FConnectionPoolCount);
-    end
-
-    //close the connection
-    else begin
-      try
-        doDisconnect(SocketDescriptor);
-      Except
-        //Disconnect must be a "safe" procedure because it's mostly called in
-        //finalization part of the code that it is not protected
-      end;
-    end;
-
-    //set the connectionhandle to nil
-    SocketDescriptor := INVALID_SOCKET;
-
-    //dec the WorkingConnectionCount
-    Dec(FWorkingConnectionCount);
 
   finally
-    FConnectionPoolCS.Release;
+    ALFreeAndNil(LDoc);
   end;
 
 end;
 
-{***********************************************************************************************}
-constructor TAlMongoDBConnectionPoolClient.Create(const aHost: AnsiString; const APort: integer);
+{**************************************************************************************}
+function ALMakeReadConcernFromString(const ASource: AnsiString): Pmongoc_read_concern_t;
 begin
-  inherited create;
-  fHost:= aHost;
-  fPort:= APort;
-  setlength(FConnectionPool,0);
-  FConnectionPoolCount := 0;
-  FConnectionPoolCapacity := 0;
-  FConnectionPoolCS:= TCriticalSection.create;
-  FWorkingConnectionCount:= 0;
-  FReleasingAllconnections := False;
-  FLastConnectionGarbage := GettickCount64;
-  FConnectionMaxIdleTime := 1200000; // 1000 * 60 * 20 = 20 min
+
+  //
+  // {
+  //   "level": "majority"
+  // }
+  //
+
+  var LDoc := TALJSONDocumentA.Create;
+  try
+
+    if ASource <> '' then begin
+      if ASource[high(ASource)] <> #0 then LDoc.LoadFromJSONString(ASource)
+      else LDoc.LoadFromBSONString(ASource);
+    end;
+
+    Result := mongoc_read_concern_new;
+    if Result = nil then raise Exception.Create('mongoc_read_concern_new failed');
+    try
+
+      // level
+      var LLevelNode := LDoc.ChildNodes.FindNode('level');
+      if LLevelNode <> nil then begin
+        var LLevel: AnsiString := LLevelNode.Text;
+        if not mongoc_read_concern_set_level(Result, PAnsiChar(LLevel)) then
+          raise Exception.CreateFmt('Invalid read concern level: %s', [LLevel]);
+      end;
+
+    except
+      mongoc_read_concern_destroy(Result);
+      raise;
+    end;
+
+  finally
+    ALFreeAndNil(LDoc);
+  end;
+
 end;
 
-{************************************************}
-destructor TAlMongoDBConnectionPoolClient.Destroy;
+{****************************************************************************************}
+function ALMakeWriteConcernFromString(const ASource: AnsiString): Pmongoc_write_concern_t;
 begin
-  ReleaseAllConnections;
-  FConnectionPoolCS.free;
+
+  //
+  // {
+  //   "journal": true,
+  //   "w": 3,
+  //   "wtag": "dc_paris",
+  //   "wtimeout": 5000,
+  //   "wmajority": 5000
+  // }
+  //
+
+  var LDoc := TALJSONDocumentA.Create;
+  try
+
+    if ASource <> '' then begin
+      if ASource[high(ASource)] <> #0 then LDoc.LoadFromJSONString(ASource)
+      else LDoc.LoadFromBSONString(ASource);
+    end;
+
+    Result := mongoc_write_concern_new;
+    if Result = nil then raise Exception.Create('mongoc_write_concern_new failed');
+    try
+
+      // journal
+      var LJournalNode := LDoc.ChildNodes.FindNode('journal');
+      if LJournalNode <> nil then
+        mongoc_write_concern_set_journal(Result, LJournalNode.bool);
+
+      // w
+      var LWNode := LDoc.ChildNodes.FindNode('w');
+      if LWNode <> nil then
+        mongoc_write_concern_set_w(Result, LWNode.int32);
+
+      // wtag
+      var LWTagNode := LDoc.ChildNodes.FindNode('wtag');
+      if LWTagNode <> nil then begin
+        var LW: AnsiString := LWTagNode.Text;
+        mongoc_write_concern_set_wtag(Result, PAnsiChar(LW));
+      end;
+
+      // wtimeout
+      var LWTimeoutNode := LDoc.ChildNodes.FindNode('wtimeout');
+      if LWTimeoutNode <> nil then
+        mongoc_write_concern_set_wtimeout_int64(Result, LWTimeoutNode.int64);
+
+      // wmajority
+      var LWMajorityNode := LDoc.ChildNodes.FindNode('wmajority');
+      if LWMajorityNode <> nil then
+        mongoc_write_concern_set_wmajority(Result, LWMajorityNode.int32);
+
+    except
+      mongoc_write_concern_destroy(Result);
+      raise;
+    end;
+
+  finally
+    ALFreeAndNil(LDoc);
+  end;
+
+end;
+
+{*********************************************************************************************}
+function ALMakeTransactionOptsFromString(const ASource: AnsiString): Pmongoc_transaction_opt_t;
+begin
+
+  //
+  // {
+  //   "readConcern": { "level": "snapshot" },
+  //   "writeConcern": { "w": 3, "wtimeout": 5000 },
+  //   "readPrefs": { "mode": "primary" },
+  //   "maxCommitTimeMS": 30000
+  // }
+  //
+
+  var LDoc := TALJSONDocumentA.Create;
+  try
+
+    if ASource <> '' then begin
+      if ASource[high(ASource)] <> #0 then LDoc.LoadFromJSONString(ASource)
+      else LDoc.LoadFromBSONString(ASource);
+    end;
+
+    Result := mongoc_transaction_opts_new();
+    if Result = nil then raise Exception.Create('mongoc_transaction_opts_new failed');
+    try
+
+      // readConcern
+      var LReadConcernNode := LDoc.ChildNodes.FindNode('readConcern');
+      if LReadConcernNode <> nil then begin
+        var LReadConcern := ALMakeReadConcernFromString(LReadConcernNode.BSON);
+        if LReadConcern = nil then raise Exception.Create('ALMakeReadConcernFromString failed');
+        try
+          mongoc_transaction_opts_set_read_concern(Result, LReadConcern);
+        finally
+          mongoc_read_concern_destroy(LReadConcern);
+        end;
+      end;
+
+      // writeConcern
+      var LWriteConcernNode := LDoc.ChildNodes.FindNode('writeConcern');
+      if LWriteConcernNode <> nil then begin
+        var LWriteConcern := ALMakeWriteConcernFromString(LWriteConcernNode.BSON);
+        if LWriteConcern = nil then raise Exception.Create('ALMakeWriteConcernFromString failed');
+        try
+          mongoc_transaction_opts_set_write_concern(Result, LWriteConcern);
+        finally
+          mongoc_write_concern_destroy(LWriteConcern);
+        end;
+      end;
+
+      // readPrefs
+      var LReadPrefsNode := LDoc.ChildNodes.FindNode('readPrefs');
+      if LReadPrefsNode <> nil then begin
+        var LReadPrefs := ALMakeReadPrefsFromString(LReadPrefsNode.BSON);
+        if LReadPrefs = nil then raise Exception.Create('ALMakeReadPrefsFromString failed');
+        try
+          mongoc_transaction_opts_set_read_prefs(Result, LReadPrefs);
+        finally
+          mongoc_read_prefs_destroy(LReadPrefs);
+        end;
+      end;
+
+      // maxCommitTimeMS
+      var LMaxCommitTimeNode := LDoc.ChildNodes.FindNode('maxCommitTimeMS');
+      if LMaxCommitTimeNode <> nil then
+        mongoc_transaction_opts_set_max_commit_time_ms(Result, LMaxCommitTimeNode.int64);
+
+    except
+      mongoc_transaction_opts_destroy(Result);
+      raise;
+    end;
+
+  finally
+    ALFreeAndNil(LDoc);
+  end;
+
+end;
+
+{*************************************************************************************}
+function ALMakeSessionOptsFromString(const ASource: AnsiString): Pmongoc_session_opt_t;
+begin
+
+  //
+  // {
+  //   "causalConsistency": true,
+  //   "snapshot": false,
+  //   "defaultTransactionOpts": {
+  //     "readConcern": { "level": "majority" },
+  //     "writeConcern": { "w": 3 },
+  //     "readPrefs": { "mode": "primary" }
+  //   }
+  // }
+  //
+
+  var LDoc := TALJSONDocumentA.Create;
+  try
+
+    if ASource <> '' then begin
+      if ASource[high(ASource)] <> #0 then LDoc.LoadFromJSONString(ASource)
+      else LDoc.LoadFromBSONString(ASource);
+    end;
+
+    Result := mongoc_session_opts_new();
+    if Result = nil then raise Exception.Create('mongoc_session_opts_new failed');
+    try
+
+      // causalConsistency
+      var LCausalConsistencyNode := LDoc.ChildNodes.FindNode('causalConsistency');
+      if LCausalConsistencyNode <> nil then
+        mongoc_session_opts_set_causal_consistency(Result, LCausalConsistencyNode.Bool);
+
+      // snapshot
+      var LSnapshotNode := LDoc.ChildNodes.FindNode('snapshot');
+      if LSnapshotNode <> nil then
+        mongoc_session_opts_set_snapshot(Result, LSnapshotNode.Bool);
+
+      // defaultTransactionOpts
+      var LDefaultTransactionOptsNode := LDoc.ChildNodes.FindNode('defaultTransactionOpts');
+      if LDefaultTransactionOptsNode <> nil then begin
+        var LDefaultTransactionOpts := ALMakeTransactionOptsFromString(LDefaultTransactionOptsNode.BSON);
+        if LDefaultTransactionOpts = nil then raise Exception.Create('ALMakeTransactionOptsFromString failed');
+        try
+          mongoc_session_opts_set_default_transaction_opts(Result, LDefaultTransactionOpts);
+        finally
+          mongoc_transaction_opts_destroy(LDefaultTransactionOpts);
+        end;
+      end;
+
+    except
+      mongoc_session_opts_destroy(Result);
+      raise;
+    end;
+
+  finally
+    ALFreeAndNil(LDoc);
+  end;
+end;
+
+{**********************************************************}
+constructor TALMongoDBClient.Create(const AUri: AnsiString);
+begin
+  inherited create;
+  var LError: bson_error_t;
+  var LMongoUri := mongoc_uri_new_with_error(
+                     PAnsiChar(AUri), // uri_string: PAnsiChar;
+                     @LError); // error: Pbson_error_t
+  If LMongoUri = nil then ALRaiseMongoDBError(LError);
+  Try
+    FPool := mongoc_client_pool_new_with_error(LMongoUri, @LError);
+    if FPool = nil then ALRaiseMongoDBError(LError);
+  Finally
+    mongoc_uri_destroy(LMongoUri);
+  End;
+end;
+
+{**********************************}
+destructor TALMongoDBClient.Destroy;
+begin
+  // All mongoc_client_t objects obtained from mongoc_client_pool_pop() from
+  // pool must be pushed back onto the pool with mongoc_client_pool_push() prior
+  // to calling mongoc_client_pool_destroy().
+  // This method is NOT thread safe, and must only be called by one thread. It
+  // should be called once the application is shutting down, and after all
+  // other threads that use clients have been joined.
+  mongoc_client_pool_destroy(FPool);
   inherited;
 end;
 
-{***********************************************************************************************************}
-procedure TAlMongoDBConnectionPoolClient.ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True);
+{***************************************************************************************************************}
+procedure TALMongoDBClient.OnDocumentToRefProc(Sender: TObject; var ADoc: TALJsonNodeA; const AContext: Pointer);
 begin
-
-  {we do this to forbid any new thread to create a new transaction}
-  FReleasingAllconnections := True;
-  Try
-
-    //wait that all transaction are finished
-    if WaitWorkingConnections then
-      while true do begin
-        FConnectionPoolCS.Acquire;
-        Try
-          if FWorkingConnectionCount <= 0 then break;
-        finally
-          FConnectionPoolCS.Release;
-        end;
-        sleep(1);
-      end;
-
-    {free all database}
-    FConnectionPoolCS.Acquire;
-    Try
-      while FConnectionPoolCount > 0 do begin
-        Try
-          DoDisconnect(FConnectionPool[FConnectionPoolcount - 1].SocketDescriptor);
-        Except
-          //Disconnect must be a "safe" procedure because it's mostly called in
-          //finalization part of the code that it is not protected
-        End;
-        Dec(FConnectionPoolCount);
-      end;
-      FLastConnectionGarbage := GetTickCount64;
-    finally
-      FConnectionPoolCS.Release;
-    end;
-
-  finally
-    //Do not forbid anymore new thread to create a new transaction
-    FReleasingAllconnections := False;
-  End;
-
+  TOnDocumentToRefProcContext(AContext).OnDocumentRefProc(Sender, ADoc, TOnDocumentToRefProcContext(AContext).Context);
 end;
 
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(
-            const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                  // name with the collection name, using a . for the concatenation. For example, for the database
-                                                  // foo and the collection bar, the full collection name is foo.bar
-            const Query: AnsiString; // BSON document that represents the query. The query will contain one or more elements,
-                                     // all of which must match for a document to be included in the result set. Possible elements
-                                     // include $query, $orderby, $hint, $explain, and $snapshot.
-            const ReturnFieldsSelector: AnsiString; // Optional. BSON document that limits the fields in the returned documents.
-                                                    // The returnFieldsSelector contains one or more elements, each of which is the name
-                                                    // of a field that should be returned, and and the integer value 1. In JSON notation,
-                                                    // a returnFieldsSelector to limit to the fields a, b and c would be:
-                                                    // { a : 1, b : 1, c : 1}
-            flags: TALMongoDBClientSelectDataFlags; // Options (see TALMongoDBClientSelectDataFlags)
-            const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-            const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-            Skip: integer; // Sets the number of documents to omit
-            First: Integer; // Limits the number of documents to retrieve
-            CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                                     // cache or not. Values <= 0 deactivate the cache
-            JSONDATA: TALJSONNodeA;
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-
-Var LViewRec: TALJSONNodeA;
-    LJSONDocument: TALJSONNodeA;
-    LResponseFlags: integer;
-    LCursorID: int64;
-    LStartingFrom: integer;
-    LNumberReturned: integer;
-    LFlags: integer;
-    LRecAdded: integer;
-    LContinue: boolean;
-    LTMPConnectionSocket: TSocket;
-    LOwnConnection: Boolean;
-    LStopWatch: TStopWatch;
-    LCacheKey: ansiString;
-    LCacheStr: ansiString;
-
+{************************************************************************************************************}
+procedure TALMongoDBClient.OnDocumentToJSon(Sender: TObject; var ADoc: TALJsonNodeA; const AContext: Pointer);
 begin
+  TALJSONArrayNodeA(AContext).ChildNodes.Add(ADoc);
+  ADoc := Nil;
+end;
 
-  //only OnNewRowFunct / JSONDATA can be used
-  if assigned(OnNewRowFunct) then JSONDATA := nil;
+{******************************************}
+procedure TALMongoDBClient.StartTransaction(
+            const ASessionOpts: AnsiString = '';
+            const AtransactionOpts: AnsiString = '');
+begin
+  If (FClient <> nil) or
+     (FSession <> nil) then
+    Raise Exception.Create('Active transaction in progress. please commit it or abord it first');
 
-  //clear the JSONDATA
-  if assigned(JSONDATA) then LJSONDocument := Nil
-  else begin
-    LJSONDocument := TALJSONDocumentA.create;
-    JSONDATA := LJSONDocument;
+  var LSession: Pmongoc_client_session_t;
+  var LClient := mongoc_client_pool_try_pop(FPool);
+  if LClient = nil then begin
+    ALLog('TALMongoDBClient', 'Pool at max capacity; waiting for a free client.', TALLogType.WARN);
+    LClient := mongoc_client_pool_pop(FPool);
+    if LClient = nil then raise Exception.Create('mongoc_client_pool_pop failed');
   end;
 
-  try
+  Try
 
-    //init the TstopWatch
-    LStopWatch := TstopWatch.Create;
-
-    //Handle the CacheThreshold
-    LCacheKey := '';
-    If (CacheThreshold > 0) and
-       (not assigned(LJSONDocument)) and
-       (not (sfTailMonitoring in flags)) and
-       ((JSONDATA.ChildNodes.Count = 0) or  // else the save will not work
-        (ViewTag <> '')) then begin
-
-      //try to load from from cache
-      LCacheKey := ALStringHashSHA1(
-                     ALFormatA(
-                       '%s#%d#%d#%s#%s#%s',
-                       [RowTag,
-                        Skip,
-                        First,
-                        FullCollectionName,
-                        ReturnFieldsSelector,
-                        Query]));
-
-      if loadcachedData(LCacheKey, LCacheStr) then begin
-
-        //init the aViewRec
-        if (ViewTag <> '') then LViewRec := JSONDATA.AddChild(ViewTag, ntobject)
-        else LViewRec := JSONDATA;
-
-        //assign the tmp data to the XMLData
-        LViewRec.LoadFromJsonString(LCacheStr, []);
-
-        //exit
-        exit;
-
-      end;
-
-    end;
-
-    //acquire a connection
-    if ConnectionSocket = INVALID_SOCKET then begin
-      LTMPConnectionSocket := AcquireConnection;
-      LOwnConnection := True;
-    end
-    else begin
-      LTMPConnectionSocket := ConnectionSocket;
-      LOwnConnection := False;
-    end;
-
+    var LMongoSessionOpts: Pmongoc_session_opt_t;
+    if ASessionOpts <> '' then LMongoSessionOpts := ALMakeSessionOptsFromString(ASessionOpts)
+    else LMongoSessionOpts := nil;
     try
 
-      //start the TstopWatch
-      LStopWatch.Reset;
-      LStopWatch.Start;
-
-      //build the flag integer
-      //bit num	   name	            description
-      //0	         Reserved	        Must be set to 0.
-      //1	         TailableCursor	  Tailable means cursor is not closed when the last data is retrieved. Rather, the cursor marks the final object’s
-      //                            position. You can resume using the cursor later, from where it was located, if more data were received. Like any
-      //                            “latent cursor”, the cursor may become invalid at some point (CursorNotFound) – for example if the final object
-      //                            it references were deleted.
-      //2	         SlaveOk	        Allow query of replica slave. Normally these return an error except for namespace “local”.
-      //3	         OplogReplay	    Internal replication use only - driver should not set
-      //4	         NoCursorTimeout	The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use. Set this
-      //                            option to prevent that.
-      //5	         AwaitData	      Use with TailableCursor. If we are at the end of the data, block for a while rather than returning no data. After a
-      //                            timeout period, we do return as normal.
-      //6	         Exhaust	        Stream the data down full blast in multiple “more” packages, on the assumption that the client will fully read all data queried.
-      //                            Faster when you are pulling a lot of data and know you want to pull it all down. Note: the client is not allowed to not read all
-      //                            the data unless it closes the connection.
-      //                            Caveats:
-      //                            * Exhaust and limit are not compatible.
-      //                            * Exhaust cursors are not supported by mongos and can not be used with a sharded cluster.
-      //                            * Exhaust cursors require an exclusive socket connection to MongoDB. If the Cursor is discarded
-      //                              without being completely iterated the underlying socket connection will be closed and discarded
-      //                              without being returned to the connection pool.
-      //                            * If you create an exhaust cursor in a request (http://api.mongodb.org/python/current/examples/requests.html),
-      //                              you must completely iterate the Cursor before executing any other operation.
-      //                            * The per-query network_timeout option is ignored when using an exhaust cursor.
-      //                            Mostly because Exhaust is not compatible with mongos we will not use it
-      //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
-      //8-31	     Reserved	        Must be set to 0.
-      LFlags := 0;
-      if sfTailMonitoring in flags then
-        raise EAlMongoDBClientException.Create('Tail monitoring work only with TAlMongoDBClient', 0 {aErrorCode}, false {aCloseConnection});
-      if sfSlaveOk in flags then LFlags := LFlags or (1 shl 2);
-      if sfNoCursorTimeout in flags then LFlags := LFlags or (1 shl 4);
-      if sfPartial in flags then LFlags := LFlags or (1 shl 7);
-
-      //init the aViewRec
-      if (ViewTag <> '') and (not assigned(LJSONDocument)) then LViewRec := JSONdata.AddChild(ViewTag, ntobject)
-      else LViewRec := JSONdata;
-
-      //init aRecAdded
-      LRecAdded := 0;
-
-      //do the First query
-      LContinue := true;
-      OP_QUERY(
-        LTMPConnectionSocket,
-        LFlags,
-        fullCollectionName,
-        ALIfThen(Skip >= 0, Skip, 0),
-        ALIfThen(First >= 0, First, 0), // The MongoDB server returns the query results in batches. Batch size will not exceed
-                                        // the maximum BSON document size. For most queries, the first batch returns 101
-                                        // documents or just enough documents to exceed 1 megabyte. Subsequent batch size is
-                                        // 4 megabytes. To override the default size of the batch, see batchSize() and limit().
-        query,
-        ReturnFieldsSelector,
-        LResponseFlags,
-        LCursorID,
-        LStartingFrom, // where in the cursor this reply is starting
-        LNumberReturned, // number of documents in the reply
-        LViewRec,
-        OnNewRowFunct,
-        Context,
-        RowTag,
-        ViewTag,
-        LContinue);
+      var LError: bson_error_t;
+      LSession := mongoc_client_start_session (
+                    LClient, // client: Pmongoc_client_t;
+                    LMongoSessionOpts, // opts: Pmongoc_session_opt_t;
+                    @LError); // error: Pbson_error_t
+      if LSession = nil then ALRaiseMongoDBError(LError);
 
       try
 
-        //init aRecAdded
-        LRecAdded := LRecAdded + LNumberReturned;
+        var LMongoTransactionOpts: Pmongoc_transaction_opt_t;
+        if ATransactionOpts <> '' then LMongoTransactionOpts := ALMakeTransactionOptsFromString(ATransactionOpts)
+        else LMongoTransactionOpts := nil;
+        try
 
-        //loop still the cursorID > 0
-        while (LContinue) and
-              (LCursorID <> 0) and
-              ((First <= 0) or
-               (LRecAdded < First)) do begin
+          if not mongoc_client_session_start_transaction(
+                   LSession, // session: Pmongoc_client_session_t;
+                   LMongoTransactionOpts, // opts: Pmongoc_transaction_opt_t;
+                   @LError) then
+            ALRaiseMongoDBError(LError);
 
-          //Get more data
-          OP_GET_MORE(
-            LTMPConnectionSocket,
-            fullCollectionName,
-            ALIfThen(First > 0, First - LRecAdded, 0),
-            LCursorID,
-            LResponseFlags,
-            LStartingFrom,
-            LNumberReturned,
-            LViewRec,
-            OnNewRowFunct,
-            Context,
-            RowTag,
-            ViewTag,
-            LContinue);
+        finally
+          if LMongoTransactionOpts <> nil then
+            mongoc_transaction_opts_destroy(LMongoTransactionOpts);
+        end;
 
-          //init aRecAdded
-          LRecAdded := LRecAdded + LNumberReturned;
+      except
+        mongoc_client_session_destroy(LSession);
+        Raise;
+      end;
 
+    finally
+      if LMongoSessionOpts <> nil then
+        mongoc_session_opts_destroy(LMongoSessionOpts);
+    end;
+
+    FClient := LClient;
+    FSession := LSession;
+
+  Except
+    mongoc_client_pool_push(FPool, LClient);
+    Raise;
+  End;
+end;
+
+{********************************************************}
+function TALMongoDBClient.CommitTransaction: TALJsonNodeA;
+begin
+  var LClient := FClient;
+  try
+    var LSession := FSession;
+    Try
+
+      If (LClient = nil) or
+         (LSession = nil) then
+        Raise Exception.Create('No active transaction');
+
+      var LReply: bson_t;
+      bson_init(@LReply);
+      var LPReply: Pbson_t := @LReply;
+      var LError: bson_error_t;
+      var LSuccess := mongoc_client_session_commit_transaction(
+                        LSession, // session: Pmongoc_client_session_t;
+                        LPReply, // reply: Pbson_t;
+                        @LError); // error: Pbson_error_t
+      try
+
+        if not LSuccess then
+          ALRaiseMongoDBError(LError);
+
+        var LStream := TPointerStream.Create(bson_get_data(LPReply){Ptr}, LPReply^.len{Size}, true{ReadOnly});
+        try
+          Result := TALJSONDocumentA.CreateFromBSONStream(LStream);
+        finally
+          ALFreeAndNil(LStream);
         end;
 
       finally
-
-        //close the curson
-        if LCursorID <> 0 then OP_KILL_CURSORS(LTMPConnectionSocket, [LCursorID]);
-
+        bson_destroy(LPReply);
       end;
 
-      //do the OnSelectDataDone
-      LStopWatch.Stop;
-      OnSelectDataDone(
-        FullCollectionName,
-        Query,
-        ReturnFieldsSelector,
-        flags,
-        RowTag,
-        ViewTag,
-        Skip,
-        First,
-        CacheThreshold,
-        LStopWatch.Elapsed.TotalMilliseconds);
+    finally
+      FSession := Nil;
+      if LSession <> nil then
+        mongoc_client_session_destroy(LSession);
+    end;
+  finally
+    FClient := Nil;
+    if LClient <> nil then
+      mongoc_client_pool_push(FPool, LClient);
+  end;
+end;
 
-      //save to the cache
-      If LCacheKey <> '' then begin
+{******************************************}
+procedure TALMongoDBClient.AbortTransaction;
+begin
 
-        //save the data
-        LViewRec.SaveToJSONString(LCacheStr);
-        SaveDataToCache(
-          LCacheKey,
-          CacheThreshold,
-          LCacheStr);
-
+  var LSession := FSession;
+  if LSession <> nil then begin
+    Try
+      Try
+        // Returns true if the transaction was aborted. Returns false and sets
+        // error if there are invalid arguments, such as a session with no
+        // transaction in progress. Network or server errors are ignored.
+        var LError: bson_error_t;
+        If not mongoc_client_session_abort_transaction(
+                 LSession, // session: Pmongoc_client_session_t;
+                 @LError) then // error: Pbson_error_t
+          ALRaiseMongoDBError(LError);
+      finally
+        mongoc_client_session_destroy(LSession);
       end;
-
-      //Release the Connection
-      if LOwnConnection then ReleaseConnection(LTMPConnectionSocket);
-
     except
       On E: Exception do begin
-        if LOwnConnection then ReleaseConnection(
-                                 LTMPConnectionSocket,
-                                 (not (E Is EAlMongoDBClientException)) or
-                                 (E as EAlMongoDBClientException).CloseConnection);
-        raise;
+        // best-effort; do not raise on failure
+        ALLog('TALMongoDBClient', E);
       end;
     end;
-
-  finally
-    if assigned(LJSONDocument) then LJSONDocument.free;
   end;
 
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            flags: TALMongoDBClientSelectDataFlags;
-            Skip: integer;
-            First: Integer;
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    flags,
-    '', // RowTag,
-    '', // ViewTag,
-    Skip,
-    First,
-    -1, // CacheThreshold,
-    nil, // JSONDATA,
-    OnNewRowFunct,
-    Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            flags: TALMongoDBClientSelectDataFlags;
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    flags,
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // Skip,
-    -1, // First,
-    -1, // CacheThreshold,
-    nil, // JSONDATA,
-    OnNewRowFunct,
-    Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            flags: TALMongoDBClientSelectDataFlags;
-            const RowTag: AnsiString;
-            Skip: integer;
-            First: Integer;
-            JSONDATA: TALJSONNodeA;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    flags,
-    RowTag,
-    '', // ViewTag,
-    Skip,
-    First,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewRowFunct,
-    nil, // Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            flags: TALMongoDBClientSelectDataFlags;
-            const RowTag: AnsiString;
-            JSONDATA: TALJSONNodeA;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    flags,
-    RowTag,
-    '', // ViewTag,
-    -1, // Skip,
-    -1, // First,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewRowFunct,
-    nil, // Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            flags: TALMongoDBClientSelectDataFlags;
-            JSONDATA: TALJSONNodeA;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    flags,
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // Skip,
-    -1, // First,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewRowFunct,
-    nil, // Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            Skip: integer;
-            First: Integer;
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    [],
-    '', // RowTag,
-    '', // ViewTag,
-    Skip,
-    First,
-    -1, // CacheThreshold,
-    nil, // JSONDATA,
-    OnNewRowFunct,
-    Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-            Context: Pointer;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    [],
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // Skip,
-    -1, // First,
-    -1, // CacheThreshold,
-    nil, // JSONDATA,
-    OnNewRowFunct,
-    Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            const RowTag: AnsiString;
-            Skip: integer;
-            First: Integer;
-            JSONDATA: TALJSONNodeA;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    [],
-    RowTag,
-    '', // ViewTag,
-    Skip,
-    First,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewRowFunct,
-    nil, // Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            const RowTag: AnsiString;
-            JSONDATA: TALJSONNodeA;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    [],
-    RowTag,
-    '', // ViewTag,
-    -1, // Skip,
-    -1, // First,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewRowFunct,
-    nil, // Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(
-            const FullCollectionName: AnsiString;
-            const Query: AnsiString;
-            const ReturnFieldsSelector: AnsiString;
-            JSONDATA: TALJSONNodeA;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(
-    FullCollectionName,
-    Query,
-    ReturnFieldsSelector,
-    [],
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // Skip,
-    -1, // First,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewRowFunct,
-    nil, // Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString; // BSON document that represents the Command
-            flags: TALMongoDBClientRunCommandFlags; // Options (see TALMongoDBClientRunCommandFlags)
-            const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-            const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-            CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                                     // cache or not. Values <= 0 deactivate the cache
-            JSONDATA: TALJSONNodeA;
-            OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
-            Context: Pointer;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-
-Var LViewRec: TALJSONNodeA;
-    LRowRec: TALJSONNodeA;
-    LCursorRec: TALJSONNodeA;
-    LFirstBatchRec: TALJSONNodeA;
-    LJSONDocument: TALJSONNodeA;
-    LResponseFlags: integer;
-    LCursorID: int64;
-    LStartingFrom: integer;
-    LNumberReturned: integer;
-    LFlags: integer;
-    LContinue: boolean;
-    LTMPConnectionSocket: TSocket;
-    LOwnConnection: Boolean;
-    LStopWatch: TStopWatch;
-    LCacheKey: ansiString;
-    LCacheStr: ansiString;
-    LFullCollectionName: ansiString;
-    i: integer;
-
-begin
-
-  //init aFullCollectionName
-  LFullCollectionName := DatabaseName + '.$cmd';
-
-  //only OnNewBatchRowFunct / JSONDATA can be used
-  if assigned(OnNewBatchRowFunct) then JSONDATA := nil;
-
-  //clear the JSONDATA
-  if assigned(JSONDATA) then LJSONDocument := Nil
-  else begin
-    LJSONDocument := TALJSONDocumentA.create;
-    JSONDATA := LJSONDocument;
+  var LClient := FClient;
+  if LClient <> nil then begin
+    try
+      mongoc_client_pool_push(FPool, LClient);
+    except
+      On E: Exception do begin
+        // best-effort; do not raise on failure
+        ALLog('TALMongoDBClient', E);
+      end;
+    end;
   end;
 
+  FClient := Nil;
+  FSession := Nil;
+
+end;
+
+{*****************************}
+procedure TALMongoDBClient.Find(
+            const AOnDocument: TOnDocumentObjProc;
+            const AContext: Pointer;
+            const ADatabaseName: AnsiString;
+            const ACollectionName: AnsiString;
+            const Afilter: AnsiString;
+            const AOpts: AnsiString = '';
+            const AReadPrefs: AnsiString = '');
+begin
+
+  var LOwnsClient: Boolean := False;
+  var LClient := FClient;
+
+  var LFilterBsonRec: bson_t;
+  var LFilterBsonIsAllocated: Boolean;
+  var LFilterBsonPtr := ALMakeBsonPtrFromString(Afilter, @LFilterBsonRec, LFilterBsonIsAllocated);
   try
 
-    //init the TstopWatch
-    LStopWatch := TstopWatch.Create;
-
-    //Handle the CacheThreshold
-    LCacheKey := '';
-    If (CacheThreshold > 0) and
-       (not assigned(LJSONDocument)) and
-       ((JSONDATA.ChildNodes.Count = 0) or  // else the save will not work
-        (ViewTag <> '')) then begin
-
-      //try to load from from cache
-      LCacheKey := ALStringHashSHA1(
-                     ALFormatA(
-                       '%s#%d#%d#%s#%s#%s',
-                       [RowTag,
-                        0,
-                        1,
-                        LFullCollectionName,
-                        '',
-                        Command]));
-
-      if loadcachedData(LCacheKey, LCacheStr) then begin
-
-        //init the aViewRec
-        if (ViewTag <> '') then LViewRec := JSONDATA.AddChild(ViewTag, ntobject)
-        else LViewRec := JSONDATA;
-
-        //assign the tmp data to the XMLData
-        LViewRec.LoadFromJsonString(LCacheStr, []);
-
-        //exit
-        exit;
-
-      end;
-
-    end;
-
-    //acquire a connection
-    if ConnectionSocket = INVALID_SOCKET then begin
-      LTMPConnectionSocket := AcquireConnection;
-      LOwnConnection := True;
-    end
-    else begin
-      LTMPConnectionSocket := ConnectionSocket;
-      LOwnConnection := False;
-    end;
-
+    var LOptsBsonRec: bson_t;
+    var LOptsBsonIsAllocated := False;
+    var LOptsBsonPtr: Pbson_t;
+    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+    else LOptsBsonPtr := nil;
     try
 
-      //start the TstopWatch
-      LStopWatch.Reset;
-      LStopWatch.Start;
+      var LMongoReadPrefs: Pmongoc_read_prefs_t;
+      if AReadPrefs <> '' then LMongoReadPrefs := ALMakeReadPrefsFromString(AReadPrefs)
+      else LMongoReadPrefs := nil;
+      try
 
-      //build the flag integer
-      //bit num	   name	            description
-      //0	         Reserved	        Must be set to 0.
-      //1	         TailableCursor	  Tailable means cursor is not closed when the last data is retrieved. Rather, the cursor marks the final object’s
-      //                            position. You can resume using the cursor later, from where it was located, if more data were received. Like any
-      //                            “latent cursor”, the cursor may become invalid at some point (CursorNotFound) – for example if the final object
-      //                            it references were deleted.
-      //2	         SlaveOk	        Allow query of replica slave. Normally these return an error except for namespace “local”.
-      //3	         OplogReplay	    Internal replication use only - driver should not set
-      //4	         NoCursorTimeout	The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use. Set this
-      //                            option to prevent that.
-      //5	         AwaitData	      Use with TailableCursor. If we are at the end of the data, block for a while rather than returning no data. After a
-      //                            timeout period, we do return as normal.
-      //6	         Exhaust	        Stream the data down full blast in multiple “more” packages, on the assumption that the client will fully read all data queried.
-      //                            Faster when you are pulling a lot of data and know you want to pull it all down. Note: the client is not allowed to not read all
-      //                            the data unless it closes the connection.
-      //                            Caveats:
-      //                            * Exhaust and limit are not compatible.
-      //                            * Exhaust cursors are not supported by mongos and can not be used with a sharded cluster.
-      //                            * Exhaust cursors require an exclusive socket connection to MongoDB. If the Cursor is discarded
-      //                              without being completely iterated the underlying socket connection will be closed and discarded
-      //                              without being returned to the connection pool.
-      //                            * If you create an exhaust cursor in a request (http://api.mongodb.org/python/current/examples/requests.html),
-      //                              you must completely iterate the Cursor before executing any other operation.
-      //                            * The per-query network_timeout option is ignored when using an exhaust cursor.
-      //                            Mostly because Exhaust is not compatible with mongos we will not use it
-      //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
-      //8-31	     Reserved	        Must be set to 0.
-      LFlags := 0;
-      if cfSlaveOk in flags then LFlags := LFlags or (1 shl 2);
-      if cfNoCursorTimeout in flags then LFlags := LFlags or (1 shl 4);
-      if cfPartial in flags then LFlags := LFlags or (1 shl 7);
-
-      //init the aViewRec
-      if (ViewTag <> '') and (not assigned(LJSONDocument)) then LViewRec := JSONdata.AddChild(ViewTag, ntobject)
-      else LViewRec := JSONdata;
-
-      //do the First query
-      LContinue := true;
-      OP_QUERY(
-        LTMPConnectionSocket,
-        LFlags,
-        LFullCollectionName,
-        0,
-        1,
-        Command,
-        '', // ReturnFieldsSelector
-        LResponseFlags,
-        LCursorID,
-        LStartingFrom, // where in the cursor this reply is starting
-        LNumberReturned, // number of documents in the reply
-        LViewRec,
-        nil,
-        Context,
-        RowTag,
-        ViewTag,
-        LContinue);
-
-      //aCursorID must be egual to 0 (we retrieve only one doc) but in case
-      if LCursorID <> 0 then OP_KILL_CURSORS(LTMPConnectionSocket, [LCursorID]);
-
-      //init LRowRec
-      if (RowTag <> '') and (LViewRec.ChildNodes.Count > 0) then LRowRec := LViewRec.ChildNodes[LViewRec.ChildNodes.Count - 1]
-      else LRowRec := LViewRec;
-
-      //check error
-      CheckRunCommandResponse(LRowRec);
-
-      //{
-      //  "cursor" : {
-      //      "id" : NumberLong(3286429289449024015),
-      //      "ns" : "mydatabase.$cmd.listCollections",
-      //      "firstBatch" : [
-      //          {
-      //            ....
-      //          },
-      //          {
-      //            ....
-      //          }
-      //      ]
-      //  },
-      //  "ok" : 1.0
-      //}
-      LCursorRec := LRowRec.ChildNodes.FindNode('cursor');
-      if LCursorRec <> nil then begin
-
-        //init LFirstBatchRec
-        LFirstBatchRec := LCursorRec.ChildNodes.FindNode('firstBatch');
-        if (LFirstBatchRec <> nil) and
-           (assigned(OnNewBatchRowFunct)) and
-           (LContinue) then begin
-          for I := 0 to LFirstBatchRec.ChildNodes.Count - 1 do begin
-            OnNewBatchRowFunct(
-              LFirstBatchRec.ChildNodes[I], // JSONRowData: TALJSONNodeA;
-              ViewTag, // const ViewTag: AnsiString;
-              Context, // Context: Pointer;
-              LContinue); // Var Continue: Boolean);
-            if not LContinue then break;
+        if LClient = nil then begin
+          LClient := mongoc_client_pool_try_pop(FPool);
+          if LClient = nil then begin
+            ALLog('TALMongoDBClient', 'Pool at max capacity; waiting for a free client.', TALLogType.WARN);
+            LClient := mongoc_client_pool_pop(FPool);
+            if LClient = nil then raise Exception.Create('mongoc_client_pool_pop failed');
+          end;
+          LOwnsClient := True;
+        end
+        else begin
+          var LSession := FSession;
+          if LSession <> nil then begin
+            var LError: bson_error_t;
+            if not mongoc_client_session_append(
+                     FSession, // client_session: Pmongoc_client_session_t;
+                     LOptsBsonPtr, // opts: Pbson_t;
+                     @LError) then // error: Pbson_error_t
+              ALRaiseMongoDBError(LError);
+            LOptsBsonIsAllocated := True;
           end;
         end;
+        Try
 
-        //init LCursorID
-        LCursorID := LCursorRec.getChildNodeValueInt64('id', 0);
-        if LCursorID <> 0 then begin
-
+          var LCollection := mongoc_client_get_collection(
+                              LClient, // client: Pmongoc_client_t;
+                              PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                              PAnsiChar(ACollectionName)); // collection: PAnsiChar
+          if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
           try
 
-            //we do the job only if LFirstBatchRec exist
-            if LFirstBatchRec <> nil then begin
+            var LCursor := mongoc_collection_find_with_opts(
+                             LCollection, // collection: Pmongoc_collection_t;
+                             LFilterBsonPtr, // filter: Pbson_t;
+                             LOptsBsonPtr, // opts: Pbson_t;
+                             LMongoReadPrefs); // read_prefs: Pmongoc_read_prefs_t
+            if LCursor = nil then raise Exception.Create('mongoc_collection_find_with_opts failed');
+            try
 
-              //init LCollectionName
-              LFullCollectionName := LCursorRec.getChildNodeValueText('ns', '');
+              var LStream := TPointerStream.Create(nil{Ptr}, 0{Size}, true{ReadOnly});
+              try
 
-              //loop still the cursorID > 0
-              while (LContinue) and
-                    (LCursorID <> 0) do begin
+                var LPbson: Pbson_t;
+                while mongoc_cursor_next(LCursor, @LPbson) do begin
+                  if LPbson = nil then raise Exception.Create('mongoc_cursor_next failed');
+                  LStream.SetPointer(bson_get_data(LPbson), LPbson^.len);
+                  var LDoc := TALJSONDocumentA.CreateFromBSONStream(LStream);
+                  try
+                    AOnDocument(Self, LDoc, AContext);
+                  finally
+                    ALFreeAndNil(LDoc);
+                  end;
+                end;
 
-                //Get more data
-                OP_GET_MORE(
-                  LTMPConnectionSocket,
-                  LFullCollectionName,
-                  0, // numberToReturn
-                  LCursorID,
-                  LResponseFlags,
-                  LStartingFrom,
-                  LNumberReturned,
-                  LFirstBatchRec, // documents
-                  OnNewBatchRowFunct,
-                  Context,
-                  '', // RowTag,
-                  ViewTag,
-                  LContinue);
+                var LError: bson_error_t;
+                if mongoc_cursor_error(LCursor, @LError) then
+                  ALRaiseMongoDBError(LError);
 
+              finally
+                ALFreeAndNil(LStream);
               end;
 
+            finally
+              mongoc_cursor_destroy(LCursor);
             end;
 
           finally
-
-            //close the curson
-            if LCursorID <> 0 then OP_KILL_CURSORS(LTMPConnectionSocket, [LCursorID]);
-
+            mongoc_collection_destroy(LCollection);
           end;
 
-          LCursorRec.SetChildNodeValueInt64('id', 0);
-
-        end;
-
-      end;
-
-      //do the OnRunCommandDone
-      LStopWatch.Stop;
-      OnRunCommandDone(
-        DatabaseName,
-        Command,
-        flags,
-        RowTag,
-        ViewTag,
-        CacheThreshold,
-        LStopWatch.Elapsed.TotalMilliseconds);
-
-      //save to the cache
-      If LCacheKey <> '' then begin
-
-        //save the data
-        LViewRec.SaveToJSONString(LCacheStr);
-        SaveDataToCache(
-          LCacheKey,
-          CacheThreshold,
-          LCacheStr);
-
-      end;
-
-      //Release the Connection
-      if LOwnConnection then ReleaseConnection(LTMPConnectionSocket);
-
-    except
-      On E: Exception do begin
-        if LOwnConnection then ReleaseConnection(
-                                 LTMPConnectionSocket,
-                                 (not (E Is EAlMongoDBClientException)) or
-                                 (E as EAlMongoDBClientException).CloseConnection);
-        raise;
-      end;
-    end;
-
-  finally
-    if assigned(LJSONDocument) then LJSONDocument.free;
-  end;
-
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            flags: TALMongoDBClientRunCommandFlags;
-            OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
-            Context: Pointer;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  RunCommand(
-    DatabaseName,
-    Command,
-    flags,
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // CacheThreshold,
-    nil, // JSONDATA,
-    OnNewBatchRowFunct,
-    Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            flags: TALMongoDBClientRunCommandFlags;
-            const RowTag: AnsiString;
-            JSONDATA: TALJSONNodeA;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  RunCommand(
-    DatabaseName,
-    Command,
-    flags,
-    RowTag,
-    '', // ViewTag,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewBatchRowFunct,
-    nil, // Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            flags: TALMongoDBClientRunCommandFlags;
-            JSONDATA: TALJSONNodeA;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  RunCommand(
-    DatabaseName,
-    Command,
-    flags,
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewBatchRowFunct,
-    nil, // Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
-            Context: Pointer;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  RunCommand(
-    DatabaseName,
-    Command,
-    [],
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // CacheThreshold,
-    nil, // JSONDATA,
-    OnNewBatchRowFunct,
-    Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            const RowTag: AnsiString;
-            JSONDATA: TALJSONNodeA;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  RunCommand(
-    DatabaseName,
-    Command,
-    [],
-    RowTag,
-    '', // ViewTag,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewBatchRowFunct,
-    nil, // Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.RunCommand(
-            const DatabaseName: AnsiString;
-            const Command: AnsiString;
-            JSONDATA: TALJSONNodeA;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  RunCommand(
-    DatabaseName,
-    Command,
-    [],
-    '', // RowTag,
-    '', // ViewTag,
-    -1, // CacheThreshold,
-    JSONDATA,
-    nil, // OnNewBatchRowFunct,
-    nil, // Context,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.UpdateData(
-            const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                  // name with the collection name, using a . for the concatenation. For example, for the database
-                                                  // foo and the collection bar, the full collection name is foo.bar
-            const selector: AnsiString; // BSON document that specifies the query for selection of the document to update.
-            const update: AnsiString; // BSON document that specifies the update to be performed. For information on specifying updates see
-                                      // http://docs.mongodb.org/manual/tutorial/modify-documents/
-            flags: TALMongoDBClientUpdateDataFlags; // Options (see TALMongoDBClientUpdateDataFlags)
-            var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
-            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-            var ObjectID: ansiString; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-Var LFlags: integer;
-    LTMPConnectionSocket: TSocket;
-    LOwnConnection: Boolean;
-    LStopWatch: TStopWatch;
-begin
-
-  //acquire a connection
-  if ConnectionSocket = INVALID_SOCKET then begin
-    LTMPConnectionSocket := AcquireConnection;
-    LOwnConnection := True;
-  end
-  else begin
-    LTMPConnectionSocket := ConnectionSocket;
-    LOwnConnection := False;
-  end;
-
-  try
-
-    //init the TstopWatch
-    LStopWatch := TstopWatch.StartNew;
-
-    //bit num	  name	        description
-    //0	        Upsert	      If set, the database will insert the supplied object into the collection if no matching document is found.
-    //1	        MultiUpdate	  If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
-    //2-31    	Reserved	    Must be set to 0.
-    LFlags := 0;
-    if ufUpsert in flags then LFlags := LFlags or (1 shl 0);
-    if ufMultiUpdate in flags then LFlags := LFlags or (1 shl 1);
-
-    OP_UPDATE(
-      LTMPConnectionSocket,
-      LFlags,
-      FullCollectionName,
-      selector,
-      Update,
-      NumberOfDocumentsUpdated,
-      updatedExisting,
-      ObjectID);
-
-    //do the OnUpdateDataDone
-    LStopWatch.Stop;
-    OnUpdateDataDone(
-      FullCollectionName,
-      selector,
-      update,
-      flags,
-      LStopWatch.Elapsed.TotalMilliseconds);
-
-    //Release the Connection
-    if LOwnConnection then ReleaseConnection(LTMPConnectionSocket);
-
-  except
-    On E: Exception do begin
-      if LOwnConnection then ReleaseConnection(
-                               LTMPConnectionSocket,
-                               (not (E Is EAlMongoDBClientException)) or
-                               (E as EAlMongoDBClientException).CloseConnection);
-      raise;
-    end;
-  end;
-
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.UpdateData(
-            const FullCollectionName: AnsiString;
-            const Selector: AnsiString;
-            const Update: AnsiString;
-            flags: TALMongoDBClientUpdateDataFlags;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-var LNumberOfDocumentsUpdated: integer;
-    LUpdatedExisting: boolean;
-    LObjectID: ansiString;
-begin
-  UpdateData(
-    FullCollectionName,
-    selector,
-    update,
-    flags,
-    LNumberOfDocumentsUpdated,
-    LUpdatedExisting,
-    LObjectID,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.UpdateData(
-            const FullCollectionName: AnsiString;
-            const Selector: AnsiString;
-            const Update: AnsiString;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-var LNumberOfDocumentsUpdated: integer;
-    LUpdatedExisting: boolean;
-    LObjectID: ansiString;
-begin
-  UpdateData(
-    FullCollectionName,
-    selector,
-    update,
-    [],
-    LNumberOfDocumentsUpdated,
-    LUpdatedExisting,
-    LObjectID,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.InsertData(
-            const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                  // name with the collection name, using a . for the concatenation. For example, for the database
-                                                  // foo and the collection bar, the full collection name is foo.bar
-            const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
-            flags: TALMongoDBClientInsertDataFlags;// Options (see TALMongoDBClientInsertDataFlags)
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-
-Var LFlags: integer;
-    LTMPConnectionSocket: TSocket;
-    LOwnConnection: Boolean;
-    LStopWatch: TStopWatch;
-
-begin
-
-  //acquire a connection
-  if ConnectionSocket = INVALID_SOCKET then begin
-    LTMPConnectionSocket := AcquireConnection;
-    LOwnConnection := True;
-  end
-  else begin
-    LTMPConnectionSocket := ConnectionSocket;
-    LOwnConnection := False;
-  end;
-
-  try
-
-    //init the TstopWatch
-    LStopWatch := TstopWatch.Create;
-
-    //start the TstopWatch
-    LStopWatch.Reset;
-    LStopWatch.Start;
-
-    //bit num	 name	            description
-    //0	       ContinueOnError	If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
-    //                          This makes bulk insert behave similarly to a series of single inserts, except lastError will be set if
-    //                          any insert fails, not just the last one. If multiple errors occur, only the most recent will be
-    //                          reported by getLastError. (new in 1.9.1)
-    //1-31	   Reserved	        Must be set to 0.
-    LFlags := 0;
-    if ifContinueOnError in flags then LFlags := LFlags or (1 shl 0);
-
-    OP_INSERT(
-      LTMPConnectionSocket,
-      LFlags,
-      FullCollectionName,
-      documents);
-
-    //do the OnInsertDataDone
-    LStopWatch.Stop;
-    OnInsertDataDone(
-      FullCollectionName,
-      documents,
-      flags,
-      LStopWatch.Elapsed.TotalMilliseconds);
-
-    //Release the Connection
-    if LOwnConnection then ReleaseConnection(LTMPConnectionSocket);
-
-  except
-    On E: Exception do begin
-      if LOwnConnection then ReleaseConnection(
-                               LTMPConnectionSocket,
-                               (not (E Is EAlMongoDBClientException)) or
-                               (E as EAlMongoDBClientException).CloseConnection);
-      raise;
-    end;
-  end;
-
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.InsertData(
-            const FullCollectionName: AnsiString;
-            const documents: AnsiString;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  InsertData(
-    FullCollectionName,
-    documents,
-    [],
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.DeleteData(
-            const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                  // name with the collection name, using a . for the concatenation. For example, for the database
-                                                  // foo and the collection bar, the full collection name is foo.bar
-            const selector: AnsiString; // BSON document that represent the query used to select the documents to be removed
-                                        // The selector will contain one or more elements, all of which must match for a document
-                                        // to be removed from the collection
-            flags: TALMongoDBClientDeleteDataFlags; // Options (see TALMongoDBClientDeleteDataFlags)
-            var NumberOfDocumentsRemoved: integer;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-
-Var LFlags: integer;
-    LTMPConnectionSocket: TSocket;
-    LOwnConnection: Boolean;
-    LStopWatch: TStopWatch;
-
-begin
-
-  //acquire a connection
-  if ConnectionSocket = INVALID_SOCKET then begin
-    LTMPConnectionSocket := AcquireConnection;
-    LOwnConnection := True;
-  end
-  else begin
-    LTMPConnectionSocket := ConnectionSocket;
-    LOwnConnection := False;
-  end;
-
-  try
-
-    //init the TstopWatch
-    LStopWatch := TstopWatch.StartNew;
-
-    //bit num	   name	          description
-    //0	         SingleRemove	  If set, the database will remove only the first matching document in the collection. Otherwise all matching documents will be removed.
-    //1-31	     Reserved	      Must be set to 0.
-    LFlags := 0;
-    if dfSingleRemove in flags then LFlags := LFlags or (1 shl 0);
-
-    OP_DELETE(
-      LTMPConnectionSocket,
-      LFlags,
-      FullCollectionName,
-      selector,
-      NumberOfDocumentsRemoved);
-
-    //do the OnDeleteDataDone
-    LStopWatch.Stop;
-    OnDeleteDataDone(
-      FullCollectionName,
-      selector,
-      flags,
-      LStopWatch.Elapsed.TotalMilliseconds);
-
-    //Release the Connection
-    if LOwnConnection then ReleaseConnection(LTMPConnectionSocket);
-
-  except
-    On E: Exception do begin
-      if LOwnConnection then ReleaseConnection(
-                               LTMPConnectionSocket,
-                               (not (E Is EAlMongoDBClientException)) or
-                               (E as EAlMongoDBClientException).CloseConnection);
-      raise;
-    end;
-  end;
-
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.DeleteData(
-            const FullCollectionName: AnsiString;
-            const Selector: AnsiString;
-            flags: TALMongoDBClientDeleteDataFlags;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-var LNumberOfDocumentsRemoved: integer;
-begin
-  DeleteData(
-    FullCollectionName,
-    selector,
-    flags,
-    LNumberOfDocumentsRemoved,
-    ConnectionSocket);
-end;
-
-{**************************************************}
-Procedure TAlMongoDBConnectionPoolClient.DeleteData(
-            const FullCollectionName: AnsiString;
-            const Selector: AnsiString;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-var LNumberOfDocumentsRemoved: integer;
-begin
-  DeleteData(
-    FullCollectionName,
-    selector,
-    [],
-    LNumberOfDocumentsRemoved,
-    ConnectionSocket);
-end;
-
-{*********************************************************}
-Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(
-            const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                                  // name with the collection name, using a . for the concatenation. For example, for the database
-                                                  // foo and the collection bar, the full collection name is foo.bar
-            const query: AnsiString; // Optional. The selection criteria for the modification. The query field employs the same query selectors as used in the
-                                     // db.collection.find() method. Although the query may match multiple documents, findAndModify will select only
-                                     // one document to modify.
-            const sort: AnsiString; // Optional. Determines which document the operation modifies if the query selects multiple
-                                    // documents. findAndModify modifies the first document in the sort order specified by this argument.
-            remove: boolean; // Must specify either the remove or the update field. Removes the document specified in the query field.
-                             // Set this to true to remove the selected document . The default is false.
-            const update: AnsiString; // Must specify either the remove or the update field. Performs an update of the selected document.
-                                      // The update field employs the same update operators or field: value specifications to modify the selected document.
-            new: boolean; // Optional. When true, returns the modified document rather than the original. The findAndModify method
-                          // ignores the new option for remove operations. The default is false.
-            const ReturnFieldsSelector: AnsiString; // Optional. A subset of fields to return. The fields document specifies an inclusion of a
-                                                    // field with 1, as in: fields: { <field1>: 1, <field2>: 1, ... }.
-            InsertIfNotFound: boolean;  // Optional. Used in conjunction with the update field. When true, findAndModify
-                                        // creates a new document if no document matches the query, or if documents match the query,
-                                        // findAndModify performs an update. The default is false.
-            const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-            const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-            JSONDATA: TALJSONNodeA;
-            var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-            var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-
-Var LTMPConnectionSocket: TSocket;
-    LOwnConnection: Boolean;
-    LStopWatch: TStopWatch;
-    LDatabaseName: AnsiString;
-    LCollectionName: AnsiString;
-    LViewRec: TALJSONNodeA;
-    LResponseFlags: integer;
-    LTmpQuery: ansiString;
-    LCursorID: int64;
-    LStartingFrom: integer;
-    LNumberReturned: integer;
-    LContinue: boolean;
-    LTmpRowTag: ansiString;
-    LUpdateRowTagByFieldValue: Boolean;
-    LJSONDoc: TALJSONNodeA;
-    LNode1: TALJSONNodeA;
-    LNode2: TALJSONNodeA;
-    LLastErrorObjectNode: TALJSONNodeA;
-    P1: integer;
-
-begin
-
-  //acquire a connection
-  if ConnectionSocket = INVALID_SOCKET then begin
-    LTMPConnectionSocket := AcquireConnection;
-    LOwnConnection := True;
-  end
-  else begin
-    LTMPConnectionSocket := ConnectionSocket;
-    LOwnConnection := False;
-  end;
-
-  try
-
-    //init the TstopWatch
-    LStopWatch := TstopWatch.StartNew;
-
-    //create a temp JSONDoc
-    LJSONDoc := TALJSONDocumentA.Create;
-    try
-
-      //init aDatabaseName and aCollectionName
-      P1 := ALPosA('.',FullCollectionName);
-      if P1 <= 0 then raise EALException.Create('The full collection name must be the concatenation of the database name with the collection name');
-      LDatabaseName := ALCopyStr(FullCollectionName, 1, P1-1);
-      LCollectionName := ALCopyStr(FullCollectionName, P1+1, maxint);
-
-      //buid the query
-      LTmpQuery := '{"findAndModify":' + ALJsonEncodeTextWithNodeSubTypeHelperA(LCollectionName);
-      if query <> '' then LTmpQuery := LTmpQuery + ',"query":'+query;
-      if sort <> '' then LTmpQuery := LTmpQuery + ',"sort":'+sort;
-      LTmpQuery := LTmpQuery + ',"remove":'+ALJsonEncodeBooleanWithNodeSubTypeHelperA(remove);
-      if update <> '' then LTmpQuery := LTmpQuery + ',"update":'+update;
-      LTmpQuery := LTmpQuery + ',"new":' + ALJsonEncodeBooleanWithNodeSubTypeHelperA(new);
-      if ReturnFieldsSelector <> '' then LTmpQuery := LTmpQuery + ',"fields":'+ReturnFieldsSelector;
-      LTmpQuery := LTmpQuery + ',"upsert":'+ALJsonEncodeBooleanWithNodeSubTypeHelperA(InsertIfNotFound);
-      LTmpQuery := LTmpQuery + '}';
-
-      //do the First query
-      OP_QUERY(
-        LTMPConnectionSocket,
-        0, // flags
-        LDatabaseName + '.$cmd', // fullCollectionName
-        0, // skip
-        1, // First
-        LTmpQuery, // query
-        '', // ReturnFieldsSelector,
-        LResponseFlags,
-        LCursorID,
-        LStartingFrom,
-        LNumberReturned,
-        LJSONDoc,
-        nil,
-        nil,
-        '',
-        '',
-        LContinue);
-      try
-
-        // exemple of returned json result
-
-        //{
-        // "value":{"_id":2,"seq":3},
-        // "lastErrorObject":{
-        //   "updatedExisting":true,
-        //   "n":1
-        // },
-        // "ok":1
-        //}
-
-        //{
-        // "value":null,
-        // "lastErrorObject":{
-        //   "updatedExisting":false,
-        //   "n":1,
-        //   "upserted":2
-        // },
-        // "ok":1
-        //}
-
-        //{
-        // "ok":0,
-        // "errmsg":"remove and returnNew can\u0027t co-exist"
-        //}
-
-        //init the aViewRec
-        if (ViewTag <> '') then LViewRec := JSONdata.AddChild(ViewTag, ntobject)
-        else LViewRec := JSONdata;
-
-        //check error
-        CheckRunCommandResponse(LJSONDoc);
-
-        //get the value node
-        LNode1 := LJSONDoc.ChildNodes.FindNode('value');
-        if assigned(LNode1) and (LNode1.NodeType = ntObject) then begin
-
-          //init aUpdateRowTagByFieldValue and aTmpRowTag
-          if ALPosA('&>',RowTag) = 1 then begin
-            LTmpRowTag := AlcopyStr(RowTag, 3, maxint);
-            LUpdateRowTagByFieldValue := LTmpRowTag <> '';
-          end
-          else begin
-            LTmpRowTag := RowTag;
-            LUpdateRowTagByFieldValue := False;
-          end;
-
-          //add the row tag
-          if (LTmpRowTag <> '') or
-             (LViewRec.NodeType = ntarray) then LViewRec := LViewRec.AddChild(LTmpRowTag, ntobject);
-
-          //move the node
-          while LNode1.ChildNodes.Count > 0 do begin
-            LNode2 := LNode1.ChildNodes.Extract(0);
-            try
-              LViewRec.ChildNodes.Add(LNode2);
-            except
-              LNode2.Free;
-              raise;
-            end;
-          end;
-
-          // aUpdateRowTagByFieldValue
-          if LUpdateRowTagByFieldValue then begin
-            LNode1 := LViewRec.ChildNodes.FindNode(LTmpRowTag);
-            if assigned(LNode1) then LViewRec.NodeName := LNode1.Text;
-          end;
-
-        end;
-
-        //init alastErrorObjectNode;
-        LLastErrorObjectNode := LJSONDoc.ChildNodes['lastErrorObject'];
-
-        //NumberOfDocumentsUpdatedOrRemoved
-        LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('n');
-        if assigned(LNode1) then NumberOfDocumentsUpdatedOrRemoved := LNode1.int32
-        else NumberOfDocumentsUpdatedOrRemoved := 0;
-
-        //updatedExisting
-        LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('updatedExisting');
-        if assigned(LNode1) then updatedExisting := LNode1.bool
-        else updatedExisting := False;
-
-        //ObjectID
-        LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('upserted');
-        if assigned(LNode1) then ObjectID := LNode1.text
-        else ObjectID := '';
+        Finally
+          if LOwnsClient then
+            mongoc_client_pool_push(FPool, LClient);
+        End;
 
       finally
-
-        //close the curson
-        if LCursorID <> 0 then OP_KILL_CURSORS(LTMPConnectionSocket, [LCursorID]);
-
+        if LMongoReadPrefs <> nil then
+          mongoc_read_prefs_destroy(LMongoReadPrefs);
       end;
 
     finally
-      LJSONDoc.free;
+      if LOptsBsonIsAllocated then
+        bson_destroy(LOptsBsonPtr);
     end;
 
-    //do the OnDeleteDataDone
-    LStopWatch.Stop;
-    OnFindAndModifyDataDone(
-      FullCollectionName,
-      query,
-      sort,
-      remove,
-      update,
-      new,
-      ReturnFieldsSelector,
-      InsertIfNotFound,
-      RowTag,
-      ViewTag,
-      LStopWatch.Elapsed.TotalMilliseconds);
-
-    //Release the Connection
-    if LOwnConnection then ReleaseConnection(LTMPConnectionSocket);
-
-  except
-    On E: Exception do begin
-      if LOwnConnection then ReleaseConnection(
-                               LTMPConnectionSocket,
-                               (not (E Is EAlMongoDBClientException)) or
-                               (E as EAlMongoDBClientException).CloseConnection);
-      raise;
-    end;
+  finally
+    if LFilterBsonIsAllocated then
+      bson_destroy(LFilterBsonPtr);
   end;
 
 end;
 
-{*********************************************************}
-Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(
-            const FullCollectionName: AnsiString;
-            const query: AnsiString;
-            const sort: AnsiString;
-            remove: boolean;
-            const update: AnsiString;
-            new: boolean;
-            const ReturnFieldsSelector: AnsiString;
-            InsertIfNotFound: boolean;
-            JSONDATA: TALJSONNodeA;
-            var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-            var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
+{******************************}
+procedure TALMongoDBClient.Find(
+            const AOnDocument: TOnDocumentRefProc;
+            const AContext: Pointer;
+            const ADatabaseName: AnsiString;
+            const ACollectionName: AnsiString;
+            const Afilter: AnsiString;
+            const AOpts: AnsiString = '';
+            const AReadPrefs: AnsiString = '');
 begin
-  FindAndModifyData(
-    FullCollectionName,
-    query,
-    sort,
-    remove,
-    update,
-    new,
-    ReturnFieldsSelector,
-    InsertIfNotFound,
-    '', // RowTag,
-    '', // ViewTag,
-    JSONDATA,
-    NumberOfDocumentsUpdatedOrRemoved,
-    updatedExisting,
-    ObjectID,
-    ConnectionSocket);
+  var LOnDocumentToRefProcContext := TOnDocumentToRefProcContext.Create;
+  try
+    LOnDocumentToRefProcContext.OnDocumentRefProc := AOnDocument;
+    LOnDocumentToRefProcContext.Context := AContext;
+    Find(
+      OnDocumentToRefProc, // const OnDocument: TOnDocumentObjProc;
+      LOnDocumentToRefProcContext, // const AContext: Pointer;
+      ADatabaseName, // const ADatabaseName: AnsiString;
+      ACollectionName, // const ACollectionName: AnsiString;
+      Afilter, // const Afilter: AnsiString;
+      AOpts, // const AOpts: AnsiString = '';
+      AReadPrefs); // const AReadPrefs: AnsiString = ''
+  finally
+    ALFreeAndNil(LOnDocumentToRefProcContext);
+  end;
 end;
 
-{*********************************************************}
-Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(
-            const FullCollectionName: AnsiString;
-            const query: AnsiString;
-            const sort: AnsiString;
-            remove: boolean;
-            const update: AnsiString;
-            new: boolean;
-            const ReturnFieldsSelector: AnsiString;
-            InsertIfNotFound: boolean;
-            JSONDATA: TALJSONNodeA;
-            const ConnectionSocket: TSocket = INVALID_SOCKET);
-var LNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-    LUpdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-    LObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+{*****************************}
+function TALMongoDBClient.Find(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const Afilter: AnsiString;
+           const AOpts: AnsiString = '';
+           const AReadPrefs: AnsiString = ''): TALJsonNodeA;
 begin
-  FindAndModifyData(
-    FullCollectionName,
-    query,
-    sort,
-    remove,
-    update,
-    new,
-    ReturnFieldsSelector,
-    InsertIfNotFound,
-    '', // RowTag,
-    '', // ViewTag,
-    JSONDATA,
-    LNumberOfDocumentsUpdatedOrRemoved,
-    LUpdatedExisting,
-    LObjectID,
-    ConnectionSocket);
+  Result := TALJSONArrayNodeA.Create;
+  try
+
+    Find(
+      OnDocumentToJSon, // const OnDocument: TOnDocumentObjProc;
+      Result, // const AContext: Pointer;
+      ADatabaseName, // const ADatabaseName: AnsiString;
+      ACollectionName, // const ACollectionName: AnsiString;
+      Afilter, // const Afilter: AnsiString;
+      AOpts, // const AOpts: AnsiString = '';
+      AReadPrefs); // const AReadPrefs: AnsiString = ''
+
+  Except
+    ALFreeAndNil(Result);
+    Raise;
+  end;
+end;
+
+{**************************************}
+function TALMongoDBClient.FindAndModify(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const AQuery: AnsiString;
+           const ASort: AnsiString;
+           const AUpdate: AnsiString;
+           const AFields: AnsiString;
+           const ARemove: ByteBool;
+           const AUpsert: ByteBool;
+           const ANew: ByteBool): TALJsonNodeA;
+begin
+
+  var LOwnsClient: Boolean := False;
+  var LClient := FClient;
+
+  var LOpts := mongoc_find_and_modify_opts_new();
+  if LOpts = nil then raise Exception.Create('mongoc_find_and_modify_opts_new failed');
+  try
+
+    var LQueryBsonRec: bson_t;
+    var LQueryBsonIsAllocated: Boolean;
+    var LQueryBsonPtr := ALMakeBsonPtrFromString(AQuery, @LQueryBsonRec, LQueryBsonIsAllocated);
+    try
+
+      if ASort <> '' then begin
+        var LSortBsonRec: bson_t;
+        var LSortBsonIsAllocated: Boolean;
+        var LSortBsonPtr := ALMakeBsonPtrFromString(ASort, @LSortBsonRec, LSortBsonIsAllocated);
+        try
+          if not mongoc_find_and_modify_opts_set_sort(LOpts, LSortBsonPtr) then
+            raise Exception.Create('mongoc_find_and_modify_opts_set_sort failed');
+        finally
+          if LSortBsonIsAllocated then
+            bson_destroy(LSortBsonPtr);
+        end;
+      end;
+
+      if AUpdate <> '' then begin
+        var LUpdateBsonRec: bson_t;
+        var LUpdateBsonIsAllocated: Boolean;
+        var LUpdateBsonPtr := ALMakeBsonPtrFromString(AUpdate, @LUpdateBsonRec, LUpdateBsonIsAllocated);
+        try
+          if not mongoc_find_and_modify_opts_set_update(LOpts, LUpdateBsonPtr) then
+            raise Exception.Create('mongoc_find_and_modify_opts_set_update failed');
+        finally
+          if LUpdateBsonIsAllocated then
+            bson_destroy(LUpdateBsonPtr);
+        end;
+      end;
+
+      if AFields <> '' then begin
+        var LFieldsBsonRec: bson_t;
+        var LFieldsBsonIsAllocated: Boolean;
+        var LFieldsBsonPtr := ALMakeBsonPtrFromString(AFields, @LFieldsBsonRec, LFieldsBsonIsAllocated);
+        try
+          if not mongoc_find_and_modify_opts_set_fields(LOpts, LFieldsBsonPtr) then
+            raise Exception.Create('mongoc_find_and_modify_opts_set_fields failed');
+        finally
+          if LFieldsBsonIsAllocated then
+            bson_destroy(LFieldsBsonPtr);
+        end;
+      end;
+
+      var LFlags: UInt32 := UInt32(ord(MONGOC_FIND_AND_MODIFY_NONE));
+      if ARemove then LFlags := LFlags or UInt32(ord(MONGOC_FIND_AND_MODIFY_REMOVE));
+      if AUpsert then LFlags := LFlags or UInt32(ord(MONGOC_FIND_AND_MODIFY_UPSERT));
+      if ANew then LFlags := LFlags or UInt32(ord(MONGOC_FIND_AND_MODIFY_RETURN_NEW));
+      if not mongoc_find_and_modify_opts_set_flags(LOpts, LFlags) then
+        raise Exception.Create('mongoc_find_and_modify_opts_set_flags failed');
+
+      if LClient = nil then begin
+        LClient := mongoc_client_pool_try_pop(FPool);
+        if LClient = nil then begin
+          ALLog('TALMongoDBClient', 'Pool at max capacity; waiting for a free client.', TALLogType.WARN);
+          LClient := mongoc_client_pool_pop(FPool);
+          if LClient = nil then raise Exception.Create('mongoc_client_pool_pop failed');
+        end;
+        LOwnsClient := True;
+      end
+      else begin
+        var LSession := FSession;
+        if LSession <> nil then begin
+          var LOptsBsonRec: bson_t;
+          var LOptsBsonIsAllocated: Boolean;
+          var LOptsBsonPtr := ALMakeBsonPtrFromString('', @LOptsBsonRec, LOptsBsonIsAllocated, False{AReadOnly});
+          try
+            var LError: bson_error_t;
+            if not mongoc_client_session_append(
+                     FSession, // client_session: Pmongoc_client_session_t;
+                     LOptsBsonPtr, // opts: Pbson_t;
+                     @LError) then // error: Pbson_error_t
+              ALRaiseMongoDBError(LError);
+            LOptsBsonIsAllocated := True;
+            if not mongoc_find_and_modify_opts_append(LOpts, LOptsBsonPtr) then
+              raise Exception.Create('mongoc_find_and_modify_opts_append failed');
+          finally
+            if LOptsBsonIsAllocated then
+              bson_destroy(LOptsBsonPtr);
+          end;
+        end;
+      end;
+      Try
+
+        var LCollection := mongoc_client_get_collection(
+                            LClient, // client: Pmongoc_client_t;
+                            PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                            PAnsiChar(ACollectionName)); // collection: PAnsiChar
+        if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
+        try
+
+          var LReply: bson_t;
+          bson_init(@LReply);
+          var LPReply: Pbson_t := @LReply;
+          var LError: bson_error_t;
+          var LSuccess := mongoc_collection_find_and_modify_with_opts(
+                            LCollection, // collection: Pmongoc_collection_t;
+                            LQueryBsonPtr, // query: Pbson_t;
+                            LOpts, // opts: Pmongoc_find_and_modify_opts_t;
+                            LPReply, // reply: Pbson_t;
+                            @LError); // error: Pbson_error_t)
+          try
+
+            if not LSuccess then
+              ALRaiseMongoDBError(LError);
+
+            var LStream := TPointerStream.Create(bson_get_data(LPReply){Ptr}, LPReply^.len{Size}, true{ReadOnly});
+            try
+              Result := TALJSONDocumentA.CreateFromBSONStream(LStream);
+            finally
+              ALFreeAndNil(LStream);
+            end;
+
+          finally
+            bson_destroy(LPReply);
+          end;
+
+        finally
+          mongoc_collection_destroy(LCollection);
+        end;
+
+      Finally
+        if LOwnsClient then
+          mongoc_client_pool_push(FPool, LClient);
+      End;
+
+    finally
+      if LQueryBsonIsAllocated then
+        bson_destroy(LQueryBsonPtr);
+    end;
+
+  finally
+    mongoc_find_and_modify_opts_destroy(LOpts);
+  end;
+
+end;
+
+{**********************************}
+function TALMongoDBClient.InsertOne(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ADocument: AnsiString;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+
+  var LOwnsClient: Boolean := False;
+  var LClient := FClient;
+
+  var LDocumentBsonRec: bson_t;
+  var LDocumentBsonIsAllocated: Boolean;
+  var LDocumentBsonPtr := ALMakeBsonPtrFromString(ADocument, @LDocumentBsonRec, LDocumentBsonIsAllocated);
+  try
+
+    var LOptsBsonRec: bson_t;
+    var LOptsBsonIsAllocated := False;
+    var LOptsBsonPtr: Pbson_t;
+    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+    else LOptsBsonPtr := nil;
+    try
+
+      if LClient = nil then begin
+        LClient := mongoc_client_pool_try_pop(FPool);
+        if LClient = nil then begin
+          ALLog('TALMongoDBClient', 'Pool at max capacity; waiting for a free client.', TALLogType.WARN);
+          LClient := mongoc_client_pool_pop(FPool);
+          if LClient = nil then raise Exception.Create('mongoc_client_pool_pop failed');
+        end;
+        LOwnsClient := True;
+      end
+      else begin
+        var LSession := FSession;
+        if LSession <> nil then begin
+          var LError: bson_error_t;
+          if not mongoc_client_session_append(
+                   FSession, // client_session: Pmongoc_client_session_t;
+                   LOptsBsonPtr, // opts: Pbson_t;
+                   @LError) then // error: Pbson_error_t
+            ALRaiseMongoDBError(LError);
+          LOptsBsonIsAllocated := True;
+        end;
+      end;
+      Try
+
+        var LCollection := mongoc_client_get_collection(
+                            LClient, // client: Pmongoc_client_t;
+                            PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                            PAnsiChar(ACollectionName)); // collection: PAnsiChar
+        if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
+        try
+
+          var LReply: bson_t;
+          bson_init(@LReply);
+          var LPReply: Pbson_t := @LReply;
+          var LError: bson_error_t;
+          var LSuccess := mongoc_collection_insert_one(
+                            LCollection, // collection: Pmongoc_collection_t;
+                            LDocumentBsonPtr, // Document: Pbson_t;
+                            LOptsBsonPtr, // opts: Pbson_t;
+                            LPReply, // reply: Pbson_t;
+                            @LError); // error: Pbson_error_t
+          try
+
+            if not LSuccess then
+              ALRaiseMongoDBError(LError);
+
+            var LStream := TPointerStream.Create(bson_get_data(LPReply){Ptr}, LPReply^.len{Size}, true{ReadOnly});
+            try
+              Result := TALJSONDocumentA.CreateFromBSONStream(LStream);
+            finally
+              ALFreeAndNil(LStream);
+            end;
+
+          finally
+            bson_destroy(LPReply);
+          end;
+
+        finally
+          mongoc_collection_destroy(LCollection);
+        end;
+
+      Finally
+        if LOwnsClient then
+          mongoc_client_pool_push(FPool, LClient);
+      End;
+
+    finally
+      if LOptsBsonIsAllocated then
+        bson_destroy(LOptsBsonPtr);
+    end;
+
+  finally
+    if LDocumentBsonIsAllocated then
+      bson_destroy(LDocumentBsonPtr);
+  end;
+
+end;
+
+{***********************************}
+function TALMongoDBClient.InsertMany(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ADocuments: TArray<AnsiString>;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+
+  var LOwnsClient: Boolean := False;
+  var LClient := FClient;
+
+  if Length(ADocuments) = 0 then
+    raise Exception.Create('No documents to insert');
+
+  var LDocumentBsonRecs: TArray<bson_t>;
+  SetLength(LDocumentBsonRecs, Length(ADocuments));
+
+  var LDocumentBsonPtrs: TArray<Pbson_t>;
+  SetLength(LDocumentBsonPtrs, Length(ADocuments));
+
+  var LDocumentBsonAllocated: TArray<Boolean>;
+  SetLength(LDocumentBsonAllocated, Length(ADocuments));
+  for var I := Low(LDocumentBsonAllocated) to High(LDocumentBsonAllocated) do
+    LDocumentBsonAllocated[I] := False;
+
+  try
+
+    for var I := low(ADocuments) to High(ADocuments) do
+      LDocumentBsonPtrs[I] := ALMakeBsonPtrFromString(ADocuments[I], @LDocumentBsonRecs[I], LDocumentBsonAllocated[I]);
+
+    var LOptsBsonRec: bson_t;
+    var LOptsBsonIsAllocated := False;
+    var LOptsBsonPtr: Pbson_t;
+    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+    else LOptsBsonPtr := nil;
+    try
+
+      if LClient = nil then begin
+        LClient := mongoc_client_pool_try_pop(FPool);
+        if LClient = nil then begin
+          ALLog('TALMongoDBClient', 'Pool at max capacity; waiting for a free client.', TALLogType.WARN);
+          LClient := mongoc_client_pool_pop(FPool);
+          if LClient = nil then raise Exception.Create('mongoc_client_pool_pop failed');
+        end;
+        LOwnsClient := True;
+      end
+      else begin
+        var LSession := FSession;
+        if LSession <> nil then begin
+          var LError: bson_error_t;
+          if not mongoc_client_session_append(
+                   FSession, // client_session: Pmongoc_client_session_t;
+                   LOptsBsonPtr, // opts: Pbson_t;
+                   @LError) then // error: Pbson_error_t
+            ALRaiseMongoDBError(LError);
+          LOptsBsonIsAllocated := True;
+        end;
+      end;
+      Try
+
+        var LCollection := mongoc_client_get_collection(
+                            LClient, // client: Pmongoc_client_t;
+                            PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                            PAnsiChar(ACollectionName)); // collection: PAnsiChar
+        if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
+        try
+
+          var LReply: bson_t;
+          bson_init(@LReply);
+          var LPReply: Pbson_t := @LReply;
+          var LError: bson_error_t;
+          var LSuccess := mongoc_collection_insert_many(
+                            LCollection, // collection: Pmongoc_collection_t;
+                            @LDocumentBsonPtrs[0], // documents: PPbson_t;
+                            size_t(Length(LDocumentBsonPtrs)), // n_documents: size_t;
+                            LOptsBsonPtr, // opts: Pbson_t;
+                            LPReply, // reply: Pbson_t;
+                            @LError); // error: Pbson_error_t
+          try
+
+            if not LSuccess then
+              ALRaiseMongoDBError(LError);
+
+            var LStream := TPointerStream.Create(bson_get_data(LPReply){Ptr}, LPReply^.len{Size}, true{ReadOnly});
+            try
+              Result := TALJSONDocumentA.CreateFromBSONStream(LStream);
+            finally
+              ALFreeAndNil(LStream);
+            end;
+
+          finally
+            bson_destroy(LPReply);
+          end;
+
+        finally
+          mongoc_collection_destroy(LCollection);
+        end;
+
+      Finally
+        if LOwnsClient then
+          mongoc_client_pool_push(FPool, LClient);
+      End;
+
+    finally
+      if LOptsBsonIsAllocated then
+        bson_destroy(LOptsBsonPtr);
+    end;
+
+  finally
+    for var I := low(LDocumentBsonPtrs) to High(LDocumentBsonPtrs) do
+      if LDocumentBsonAllocated[I] then
+        bson_destroy(LDocumentBsonPtrs[I]);
+  end;
+
+end;
+
+{**********************************}
+function TALMongoDBClient.UpdateOne(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ASelector: AnsiString;
+           const AUpdate: AnsiString;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+
+  var LOwnsClient: Boolean := False;
+  var LClient := FClient;
+
+  var LSelectorBsonRec: bson_t;
+  var LSelectorBsonIsAllocated: Boolean;
+  var LSelectorBsonPtr := ALMakeBsonPtrFromString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
+  try
+
+    var LUpdateBsonRec: bson_t;
+    var LUpdateBsonIsAllocated: Boolean;
+    var LUpdateBsonPtr := ALMakeBsonPtrFromString(AUpdate, @LUpdateBsonRec, LUpdateBsonIsAllocated);
+    try
+
+      var LOptsBsonRec: bson_t;
+      var LOptsBsonIsAllocated := False;
+      var LOptsBsonPtr: Pbson_t;
+      if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+      else LOptsBsonPtr := nil;
+      try
+
+        if LClient = nil then begin
+          LClient := mongoc_client_pool_try_pop(FPool);
+          if LClient = nil then begin
+            ALLog('TALMongoDBClient', 'Pool at max capacity; waiting for a free client.', TALLogType.WARN);
+            LClient := mongoc_client_pool_pop(FPool);
+            if LClient = nil then raise Exception.Create('mongoc_client_pool_pop failed');
+          end;
+          LOwnsClient := True;
+        end
+        else begin
+          var LSession := FSession;
+          if LSession <> nil then begin
+            var LError: bson_error_t;
+            if not mongoc_client_session_append(
+                     FSession, // client_session: Pmongoc_client_session_t;
+                     LOptsBsonPtr, // opts: Pbson_t;
+                     @LError) then // error: Pbson_error_t
+              ALRaiseMongoDBError(LError);
+            LOptsBsonIsAllocated := True;
+          end;
+        end;
+        Try
+
+          var LCollection := mongoc_client_get_collection(
+                              LClient, // client: Pmongoc_client_t;
+                              PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                              PAnsiChar(ACollectionName)); // collection: PAnsiChar
+          if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
+          try
+
+            var LReply: bson_t;
+            bson_init(@LReply);
+            var LPReply: Pbson_t := @LReply;
+            var LError: bson_error_t;
+            var LSuccess := mongoc_collection_update_one(
+                              LCollection, // collection: Pmongoc_collection_t;
+                              LSelectorBsonPtr, // selector: Pbson_t;
+                              LUpdateBsonPtr, // update: Pbson_t;
+                              LOptsBsonPtr, // opts: Pbson_t;
+                              LPReply, // reply: Pbson_t;
+                              @LError); // error: Pbson_error_t
+            try
+
+              if not LSuccess then
+                ALRaiseMongoDBError(LError);
+
+              var LStream := TPointerStream.Create(bson_get_data(LPReply){Ptr}, LPReply^.len{Size}, true{ReadOnly});
+              try
+                Result := TALJSONDocumentA.CreateFromBSONStream(LStream);
+              finally
+                ALFreeAndNil(LStream);
+              end;
+
+            finally
+              bson_destroy(LPReply);
+            end;
+
+          finally
+            mongoc_collection_destroy(LCollection);
+          end;
+
+        Finally
+          if LOwnsClient then
+            mongoc_client_pool_push(FPool, LClient);
+        End;
+
+      finally
+        if LOptsBsonIsAllocated then
+          bson_destroy(LOptsBsonPtr);
+      end;
+
+    finally
+      if LUpdateBsonIsAllocated then
+        bson_destroy(LUpdateBsonPtr);
+    end;
+
+  finally
+    if LSelectorBsonIsAllocated then
+      bson_destroy(LSelectorBsonPtr);
+  end;
+
+end;
+
+{***********************************}
+function TALMongoDBClient.UpdateMany(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ASelector: AnsiString;
+           const AUpdate: AnsiString;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+
+  var LOwnsClient: Boolean := False;
+  var LClient := FClient;
+
+  var LSelectorBsonRec: bson_t;
+  var LSelectorBsonIsAllocated: Boolean;
+  var LSelectorBsonPtr := ALMakeBsonPtrFromString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
+  try
+
+    var LUpdateBsonRec: bson_t;
+    var LUpdateBsonIsAllocated: Boolean;
+    var LUpdateBsonPtr := ALMakeBsonPtrFromString(AUpdate, @LUpdateBsonRec, LUpdateBsonIsAllocated);
+    try
+
+      var LOptsBsonRec: bson_t;
+      var LOptsBsonIsAllocated := False;
+      var LOptsBsonPtr: Pbson_t;
+      if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+      else LOptsBsonPtr := nil;
+      try
+
+        if LClient = nil then begin
+          LClient := mongoc_client_pool_try_pop(FPool);
+          if LClient = nil then begin
+            ALLog('TALMongoDBClient', 'Pool at max capacity; waiting for a free client.', TALLogType.WARN);
+            LClient := mongoc_client_pool_pop(FPool);
+            if LClient = nil then raise Exception.Create('mongoc_client_pool_pop failed');
+          end;
+          LOwnsClient := True;
+        end
+        else begin
+          var LSession := FSession;
+          if LSession <> nil then begin
+            var LError: bson_error_t;
+            if not mongoc_client_session_append(
+                     FSession, // client_session: Pmongoc_client_session_t;
+                     LOptsBsonPtr, // opts: Pbson_t;
+                     @LError) then // error: Pbson_error_t
+              ALRaiseMongoDBError(LError);
+            LOptsBsonIsAllocated := True;
+          end;
+        end;
+        Try
+
+          var LCollection := mongoc_client_get_collection(
+                              LClient, // client: Pmongoc_client_t;
+                              PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                              PAnsiChar(ACollectionName)); // collection: PAnsiChar
+          if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
+          try
+
+            var LReply: bson_t;
+            bson_init(@LReply);
+            var LPReply: Pbson_t := @LReply;
+            var LError: bson_error_t;
+            var LSuccess := mongoc_collection_update_many(
+                              LCollection, // collection: Pmongoc_collection_t;
+                              LSelectorBsonPtr, // selector: Pbson_t;
+                              LUpdateBsonPtr, // update: Pbson_t;
+                              LOptsBsonPtr, // opts: Pbson_t;
+                              LPReply, // reply: Pbson_t;
+                              @LError); // error: Pbson_error_t
+            try
+
+              if not LSuccess then
+                ALRaiseMongoDBError(LError);
+
+              var LStream := TPointerStream.Create(bson_get_data(LPReply){Ptr}, LPReply^.len{Size}, true{ReadOnly});
+              try
+                Result := TALJSONDocumentA.CreateFromBSONStream(LStream);
+              finally
+                ALFreeAndNil(LStream);
+              end;
+
+            finally
+              bson_destroy(LPReply);
+            end;
+
+          finally
+            mongoc_collection_destroy(LCollection);
+          end;
+
+        Finally
+          if LOwnsClient then
+            mongoc_client_pool_push(FPool, LClient);
+        End;
+
+      finally
+        if LOptsBsonIsAllocated then
+          bson_destroy(LOptsBsonPtr);
+      end;
+
+    finally
+      if LUpdateBsonIsAllocated then
+        bson_destroy(LUpdateBsonPtr);
+    end;
+
+  finally
+    if LSelectorBsonIsAllocated then
+      bson_destroy(LSelectorBsonPtr);
+  end;
+
+end;
+
+{***********************************}
+function TALMongoDBClient.ReplaceOne(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ASelector: AnsiString;
+           const AReplacement: AnsiString;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+
+  var LOwnsClient: Boolean := False;
+  var LClient := FClient;
+
+  var LSelectorBsonRec: bson_t;
+  var LSelectorBsonIsAllocated: Boolean;
+  var LSelectorBsonPtr := ALMakeBsonPtrFromString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
+  try
+
+    var LReplacementBsonRec: bson_t;
+    var LReplacementBsonIsAllocated: Boolean;
+    var LReplacementBsonPtr := ALMakeBsonPtrFromString(AReplacement, @LReplacementBsonRec, LReplacementBsonIsAllocated);
+    try
+
+      var LOptsBsonRec: bson_t;
+      var LOptsBsonIsAllocated := False;
+      var LOptsBsonPtr: Pbson_t;
+      if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+      else LOptsBsonPtr := nil;
+      try
+
+        if LClient = nil then begin
+          LClient := mongoc_client_pool_try_pop(FPool);
+          if LClient = nil then begin
+            ALLog('TALMongoDBClient', 'Pool at max capacity; waiting for a free client.', TALLogType.WARN);
+            LClient := mongoc_client_pool_pop(FPool);
+            if LClient = nil then raise Exception.Create('mongoc_client_pool_pop failed');
+          end;
+          LOwnsClient := True;
+        end
+        else begin
+          var LSession := FSession;
+          if LSession <> nil then begin
+            var LError: bson_error_t;
+            if not mongoc_client_session_append(
+                     FSession, // client_session: Pmongoc_client_session_t;
+                     LOptsBsonPtr, // opts: Pbson_t;
+                     @LError) then // error: Pbson_error_t
+              ALRaiseMongoDBError(LError);
+            LOptsBsonIsAllocated := True;
+          end;
+        end;
+        Try
+
+          var LCollection := mongoc_client_get_collection(
+                              LClient, // client: Pmongoc_client_t;
+                              PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                              PAnsiChar(ACollectionName)); // collection: PAnsiChar
+          if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
+          try
+
+            var LReply: bson_t;
+            bson_init(@LReply);
+            var LPReply: Pbson_t := @LReply;
+            var LError: bson_error_t;
+            var LSuccess := mongoc_collection_replace_one(
+                              LCollection, // collection: Pmongoc_collection_t;
+                              LSelectorBsonPtr, // selector: Pbson_t;
+                              LReplacementBsonPtr, // Replacement: Pbson_t;
+                              LOptsBsonPtr, // opts: Pbson_t;
+                              LPReply, // reply: Pbson_t;
+                              @LError); // error: Pbson_error_t
+            try
+
+              if not LSuccess then
+                ALRaiseMongoDBError(LError);
+
+              var LStream := TPointerStream.Create(bson_get_data(LPReply){Ptr}, LPReply^.len{Size}, true{ReadOnly});
+              try
+                Result := TALJSONDocumentA.CreateFromBSONStream(LStream);
+              finally
+                ALFreeAndNil(LStream);
+              end;
+
+            finally
+              bson_destroy(LPReply);
+            end;
+
+          finally
+            mongoc_collection_destroy(LCollection);
+          end;
+
+        Finally
+          if LOwnsClient then
+            mongoc_client_pool_push(FPool, LClient);
+        End;
+
+      finally
+        if LOptsBsonIsAllocated then
+          bson_destroy(LOptsBsonPtr);
+      end;
+
+    finally
+      if LReplacementBsonIsAllocated then
+        bson_destroy(LReplacementBsonPtr);
+    end;
+
+  finally
+    if LSelectorBsonIsAllocated then
+      bson_destroy(LSelectorBsonPtr);
+  end;
+
+end;
+
+{**********************************}
+function TALMongoDBClient.DeleteOne(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ASelector: AnsiString;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+
+  var LOwnsClient: Boolean := False;
+  var LClient := FClient;
+
+  var LSelectorBsonRec: bson_t;
+  var LSelectorBsonIsAllocated: Boolean;
+  var LSelectorBsonPtr := ALMakeBsonPtrFromString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
+  try
+
+    var LOptsBsonRec: bson_t;
+    var LOptsBsonIsAllocated := False;
+    var LOptsBsonPtr: Pbson_t;
+    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+    else LOptsBsonPtr := nil;
+    try
+
+      if LClient = nil then begin
+        LClient := mongoc_client_pool_try_pop(FPool);
+        if LClient = nil then begin
+          ALLog('TALMongoDBClient', 'Pool at max capacity; waiting for a free client.', TALLogType.WARN);
+          LClient := mongoc_client_pool_pop(FPool);
+          if LClient = nil then raise Exception.Create('mongoc_client_pool_pop failed');
+        end;
+        LOwnsClient := True;
+      end
+      else begin
+        var LSession := FSession;
+        if LSession <> nil then begin
+          var LError: bson_error_t;
+          if not mongoc_client_session_append(
+                   FSession, // client_session: Pmongoc_client_session_t;
+                   LOptsBsonPtr, // opts: Pbson_t;
+                   @LError) then // error: Pbson_error_t
+            ALRaiseMongoDBError(LError);
+          LOptsBsonIsAllocated := True;
+        end;
+      end;
+      Try
+
+        var LCollection := mongoc_client_get_collection(
+                            LClient, // client: Pmongoc_client_t;
+                            PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                            PAnsiChar(ACollectionName)); // collection: PAnsiChar
+        if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
+        try
+
+          var LReply: bson_t;
+          bson_init(@LReply);
+          var LPReply: Pbson_t := @LReply;
+          var LError: bson_error_t;
+          var LSuccess := mongoc_collection_delete_one(
+                            LCollection, // collection: Pmongoc_collection_t;
+                            LSelectorBsonPtr, // selector: Pbson_t;
+                            LOptsBsonPtr, // opts: Pbson_t;
+                            LPReply, // reply: Pbson_t;
+                            @LError); // error: Pbson_error_t
+          try
+
+            if not LSuccess then
+              ALRaiseMongoDBError(LError);
+
+            var LStream := TPointerStream.Create(bson_get_data(LPReply){Ptr}, LPReply^.len{Size}, true{ReadOnly});
+            try
+              Result := TALJSONDocumentA.CreateFromBSONStream(LStream);
+            finally
+              ALFreeAndNil(LStream);
+            end;
+
+          finally
+            bson_destroy(LPReply);
+          end;
+
+        finally
+          mongoc_collection_destroy(LCollection);
+        end;
+
+      Finally
+        if LOwnsClient then
+          mongoc_client_pool_push(FPool, LClient);
+      End;
+
+    finally
+      if LOptsBsonIsAllocated then
+        bson_destroy(LOptsBsonPtr);
+    end;
+
+  finally
+    if LSelectorBsonIsAllocated then
+      bson_destroy(LSelectorBsonPtr);
+  end;
+
+end;
+
+{***********************************}
+function TALMongoDBClient.DeleteMany(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ASelector: AnsiString;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+
+  var LOwnsClient: Boolean := False;
+  var LClient := FClient;
+
+  var LSelectorBsonRec: bson_t;
+  var LSelectorBsonIsAllocated: Boolean;
+  var LSelectorBsonPtr := ALMakeBsonPtrFromString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
+  try
+
+    var LOptsBsonRec: bson_t;
+    var LOptsBsonIsAllocated := False;
+    var LOptsBsonPtr: Pbson_t;
+    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+    else LOptsBsonPtr := nil;
+    try
+
+      if LClient = nil then begin
+        LClient := mongoc_client_pool_try_pop(FPool);
+        if LClient = nil then begin
+          ALLog('TALMongoDBClient', 'Pool at max capacity; waiting for a free client.', TALLogType.WARN);
+          LClient := mongoc_client_pool_pop(FPool);
+          if LClient = nil then raise Exception.Create('mongoc_client_pool_pop failed');
+        end;
+        LOwnsClient := True;
+      end
+      else begin
+        var LSession := FSession;
+        if LSession <> nil then begin
+          var LError: bson_error_t;
+          if not mongoc_client_session_append(
+                   FSession, // client_session: Pmongoc_client_session_t;
+                   LOptsBsonPtr, // opts: Pbson_t;
+                   @LError) then // error: Pbson_error_t
+            ALRaiseMongoDBError(LError);
+          LOptsBsonIsAllocated := True;
+        end;
+      end;
+      Try
+
+        var LCollection := mongoc_client_get_collection(
+                            LClient, // client: Pmongoc_client_t;
+                            PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                            PAnsiChar(ACollectionName)); // collection: PAnsiChar
+        if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
+        try
+
+          var LReply: bson_t;
+          bson_init(@LReply);
+          var LPReply: Pbson_t := @LReply;
+          var LError: bson_error_t;
+          var LSuccess := mongoc_collection_delete_many(
+                            LCollection, // collection: Pmongoc_collection_t;
+                            LSelectorBsonPtr, // selector: Pbson_t;
+                            LOptsBsonPtr, // opts: Pbson_t;
+                            LPReply, // reply: Pbson_t;
+                            @LError); // error: Pbson_error_t
+          try
+
+            if not LSuccess then
+              ALRaiseMongoDBError(LError);
+
+            var LStream := TPointerStream.Create(bson_get_data(LPReply){Ptr}, LPReply^.len{Size}, true{ReadOnly});
+            try
+              Result := TALJSONDocumentA.CreateFromBSONStream(LStream);
+            finally
+              ALFreeAndNil(LStream);
+            end;
+
+          finally
+            bson_destroy(LPReply);
+          end;
+
+        finally
+          mongoc_collection_destroy(LCollection);
+        end;
+
+      Finally
+        if LOwnsClient then
+          mongoc_client_pool_push(FPool, LClient);
+      End;
+
+    finally
+      if LOptsBsonIsAllocated then
+        bson_destroy(LOptsBsonPtr);
+    end;
+
+  finally
+    if LSelectorBsonIsAllocated then
+      bson_destroy(LSelectorBsonPtr);
+  end;
+
 end;
 
 {************************************************}
-constructor TAlMongoDBTailMonitoringThread.Create(
-              const aHost: AnsiString;
-              const aPort: integer;
-              const aFullCollectionName: AnsiString;
-              const aQuery: AnsiString;
-              const aReturnFieldsSelector: AnsiString;
-              aOnEvent: TAlMongoDBTailMonitoringThreadEvent;
-              aOnError: TAlMongoDBTailMonitoringThreadException);
+constructor TALMongoDBChangeStreamListener.Create;
 begin
-  fMongoDBClient := TalMongoDBClient.Create;
-  FHost := aHost;
-  fPort := aPort;
-  fFullCollectionName := aFullCollectionName;
-  fQuery := aQuery;
-  fReturnFieldsSelector := aReturnFieldsSelector;
-  fOnEvent := aOnEvent;
-  fOnException := aOnError;
-  inherited Create(False); // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
-end;
-
-{************************************************}
-destructor TAlMongoDBTailMonitoringThread.Destroy;
-begin
-  Terminate;
-  If Suspended then start;
-  fMongoDBClient.StopTailMonitoring := True;
-  WaitFor;
-  fMongoDBClient.Free;
-  inherited;
-end;
-
-{**************************************************************************}
-Procedure TAlMongoDBTailMonitoringThread.DoEvent(JSONRowData: TALJSONNodeA);
-begin
-  if assigned(fOnEvent) then fOnEvent(self, JSONRowData);
-end;
-
-{*********************************************************************}
-procedure TAlMongoDBTailMonitoringThread.DoException(Error: Exception);
-begin
-  if assigned(fonException) then fonException(self, Error);
+  inherited Create(True{CreateSuspended});
+  FUri := '';
+  FDatabaseName := '';
+  FCollectionName := '';
+  FPipeline := '';
+  FOpts := '';
+  FOnChange := nil;
+  FOnError := nil;
 end;
 
 {***********************************************}
-procedure TAlMongoDBTailMonitoringThread.Execute;
+procedure TALMongoDBChangeStreamListener.Execute;
 begin
-  while not Terminated do begin
-    Try
+  While not terminated do begin
 
-      //disconnect
-      fMongoDBClient.Disconnect;
+    try
 
-      //connect
-      fMongoDBClient.Connect(fHost, fPort);
+      var LError: bson_error_t;
+      var LMongoUri := mongoc_uri_new_with_error(
+                         PAnsiChar(FUri), // uri_string: PAnsiChar;
+                         @LError); // error: Pbson_error_t
+      If LMongoUri = nil then ALRaiseMongoDBError(LError);
+      Try
 
-      //select the data
-      fMongoDBClient.SelectData(
-        fFullCollectionName,
-        fQuery,
-        fReturnFieldsSelector,
-        [sfTailMonitoring, sfNoCursorTimeout], // sfNoCursorTimeout because if the doEvent is too long then the cursor will timeout
-        Procedure (JSONRowData: TALJSONNodeA;
-                   const ViewTag: AnsiString;
-                   Context: Pointer;
-                   Var Continue: Boolean)
-        begin
-          doEvent(JSONRowData);
-        end,
-        nil);
+        var LClient := mongoc_client_new_from_uri_with_error(
+                         LMongoUri, // uri: Pmongoc_uri_t;
+                         @LError); // error: Pbson_error_t
+        If LClient = nil then ALRaiseMongoDBError(LError);
+        try
 
-    Except
-      on E: Exception do begin
-        DoException(E);
-        sleep(1);
+          {$REGION 'mongoc_collection_watch'}
+          if FCollectionName <> '' then begin
+
+            var LCollection := mongoc_client_get_collection(
+                                LClient, // client: Pmongoc_client_t;
+                                PAnsiChar(FDatabaseName), // db: PAnsiChar;
+                                PAnsiChar(FCollectionName)); // collection: PAnsiChar
+            if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
+            try
+
+              var LPipelineBsonRec: bson_t;
+              var LPipelineBsonIsAllocated: Boolean;
+              var LPipelineBsonPtr := ALMakeBsonPtrFromString(FPipeline, @LPipelineBsonRec, LPipelineBsonIsAllocated);
+              try
+
+                var LOptsBsonRec: bson_t;
+                var LOptsBsonIsAllocated := False;
+                var LOptsBsonPtr: Pbson_t;
+                if FOpts <> '' then LOptsBsonPtr := ALMakeBsonPtrFromString(FOpts, @LOptsBsonRec, LOptsBsonIsAllocated)
+                else LOptsBsonPtr := nil;
+                try
+
+                  var LChangeStream := mongoc_collection_watch(
+                                         LCollection, // coll: Pmongoc_collection_t;
+                                         LPipelineBsonPtr, // pipeline: Pbson_t;
+                                         LOptsBsonPtr); // opts: Pbson_t);
+                  if LChangeStream = nil then raise Exception.Create('mongoc_collection_watch failed');
+                  try
+
+                    var LStream := TPointerStream.Create(nil{Ptr}, 0{Size}, true{ReadOnly});
+                    try
+
+                      var LPbson: Pbson_t;
+                      while not terminated do begin
+                        if mongoc_change_stream_next(LChangeStream, @LPbson) then begin
+                          if LPbson = nil then raise Exception.Create('mongoc_change_stream_next failed');
+                          LStream.SetPointer(bson_get_data(LPbson), LPbson^.len);
+                          var LChangeDoc := TALJSONDocumentA.CreateFromBSONStream(LStream);
+                          try
+                            DoChange(LChangeDoc);
+                          finally
+                            ALFreeAndNil(LChangeDoc);
+                          end;
+                        end
+                        else if (not terminated) and (mongoc_change_stream_error_document(LChangeStream, @LError, @LPbson)) then
+                          ALRaiseMongoDBError(LError);
+                      end;
+
+                    finally
+                      ALFreeAndNil(LStream);
+                    end;
+
+                  finally
+                    mongoc_change_stream_destroy(LChangeStream);
+                  end;
+
+                finally
+                  if LOptsBsonIsAllocated then
+                    bson_destroy(LOptsBsonPtr);
+                end;
+
+              finally
+                if LPipelineBsonIsAllocated then
+                  bson_destroy(LPipelineBsonPtr);
+              end;
+
+            finally
+              mongoc_collection_destroy(LCollection);
+            end;
+
+          end
+          {$ENDREGION}
+
+          {$REGION 'mongoc_database_watch'}
+          else if FDatabaseName <> '' then begin
+
+            var LDatabase := mongoc_client_get_database(
+                                LClient, // client: Pmongoc_client_t;
+                                PAnsiChar(FDatabaseName)); // name: PAnsiChar
+            if LDatabase = nil then raise Exception.Create('mongoc_client_get_database failed');
+            try
+
+              var LPipelineBsonRec: bson_t;
+              var LPipelineBsonIsAllocated: Boolean;
+              var LPipelineBsonPtr := ALMakeBsonPtrFromString(FPipeline, @LPipelineBsonRec, LPipelineBsonIsAllocated);
+              try
+
+                var LOptsBsonRec: bson_t;
+                var LOptsBsonIsAllocated := False;
+                var LOptsBsonPtr: Pbson_t;
+                if FOpts <> '' then LOptsBsonPtr := ALMakeBsonPtrFromString(FOpts, @LOptsBsonRec, LOptsBsonIsAllocated)
+                else LOptsBsonPtr := nil;
+                try
+
+                  var LChangeStream := mongoc_database_watch(
+                                         LDatabase, // db: Pmongoc_database_t;
+                                         LPipelineBsonPtr, // pipeline: Pbson_t;
+                                         LOptsBsonPtr); // opts: Pbson_t
+                  if LChangeStream = nil then raise Exception.Create('mongoc_database_watch failed');
+                  try
+
+                    var LStream := TPointerStream.Create(nil{Ptr}, 0{Size}, true{ReadOnly});
+                    try
+
+                      var LPbson: Pbson_t;
+                      while not terminated do begin
+                        if mongoc_change_stream_next(LChangeStream, @LPbson) then begin
+                          if LPbson = nil then raise Exception.Create('mongoc_change_stream_next failed');
+                          LStream.SetPointer(bson_get_data(LPbson), LPbson^.len);
+                          var LChangeDoc := TALJSONDocumentA.CreateFromBSONStream(LStream);
+                          try
+                            DoChange(LChangeDoc);
+                          finally
+                            ALFreeAndNil(LChangeDoc);
+                          end;
+                        end
+                        else if (not terminated) and (mongoc_change_stream_error_document(LChangeStream, @LError, @LPbson)) then
+                          ALRaiseMongoDBError(LError);
+                      end;
+
+                    finally
+                      ALFreeAndNil(LStream);
+                    end;
+
+                  finally
+                    mongoc_change_stream_destroy(LChangeStream);
+                  end;
+
+                finally
+                  if LOptsBsonIsAllocated then
+                    bson_destroy(LOptsBsonPtr);
+                end;
+
+              finally
+                if LPipelineBsonIsAllocated then
+                  bson_destroy(LPipelineBsonPtr);
+              end;
+
+            finally
+               mongoc_database_destroy(LDatabase);
+            end;
+
+          end
+          {$ENDREGION}
+
+          {$REGION 'mongoc_client_watch'}
+          else begin
+
+            var LPipelineBsonRec: bson_t;
+            var LPipelineBsonIsAllocated: Boolean;
+            var LPipelineBsonPtr := ALMakeBsonPtrFromString(FPipeline, @LPipelineBsonRec, LPipelineBsonIsAllocated);
+            try
+
+              var LOptsBsonRec: bson_t;
+              var LOptsBsonIsAllocated := False;
+              var LOptsBsonPtr: Pbson_t;
+              if FOpts <> '' then LOptsBsonPtr := ALMakeBsonPtrFromString(FOpts, @LOptsBsonRec, LOptsBsonIsAllocated)
+              else LOptsBsonPtr := nil;
+              try
+
+                var LChangeStream := mongoc_client_watch(
+                                       LClient, // client: Pmongoc_client_t;
+                                       LPipelineBsonPtr, // pipeline: Pbson_t;
+                                       LOptsBsonPtr); // opts: Pbson_t
+                if LChangeStream = nil then raise Exception.Create('mongoc_client_watch failed');
+                try
+
+                  var LStream := TPointerStream.Create(nil{Ptr}, 0{Size}, true{ReadOnly});
+                  try
+
+                    var LPbson: Pbson_t;
+                    while not terminated do begin
+                      if mongoc_change_stream_next(LChangeStream, @LPbson) then begin
+                        if LPbson = nil then raise Exception.Create('mongoc_change_stream_next failed');
+                        LStream.SetPointer(bson_get_data(LPbson), LPbson^.len);
+                        var LChangeDoc := TALJSONDocumentA.CreateFromBSONStream(LStream);
+                        try
+                          DoChange(LChangeDoc);
+                        finally
+                          ALFreeAndNil(LChangeDoc);
+                        end;
+                      end
+                      else if (not terminated) and (mongoc_change_stream_error_document(LChangeStream, @LError, @LPbson)) then
+                        ALRaiseMongoDBError(LError);
+                    end;
+
+                  finally
+                    ALFreeAndNil(LStream);
+                  end;
+
+                finally
+                  mongoc_change_stream_destroy(LChangeStream);
+                end;
+
+              finally
+                if LOptsBsonIsAllocated then
+                  bson_destroy(LOptsBsonPtr);
+              end;
+
+            finally
+              if LPipelineBsonIsAllocated then
+                bson_destroy(LPipelineBsonPtr);
+            end;
+
+          end;
+          {$ENDREGION}
+
+        finally
+          mongoc_client_destroy(LClient);
+        end;
+
+      Finally
+        mongoc_uri_destroy(LMongoUri);
+      End;
+
+    except
+      On E: Exception do begin
+        DoError(E);
+        Sleep(1000);
       end;
-    End;
+    end;
+
   end;
+end;
+
+{********************************************************************************}
+procedure TALMongoDBChangeStreamListener.DoChange(const AChangeDoc: TALJsonNodeA);
+begin
+  If Assigned(FOnChange) then
+    FOnChange(Self, AChangeDoc);
+end;
+
+{************************************************************************}
+procedure TALMongoDBChangeStreamListener.DoError(const AError: Exception);
+begin
+  If Assigned(FOnError) then
+    FOnError(Self, AError)
+  else
+    ALLog('TALMongoDBChangeStreamListener', AError);
 end;
 
 end.

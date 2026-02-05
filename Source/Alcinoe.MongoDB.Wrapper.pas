@@ -496,12 +496,12 @@ procedure bson_set_error(
             error: Pbson_error_t;
             domain: uint32_t;
             code: uint32_t;
-            format: PAnsiChar); cdecl; varargs; external 'bson2.dll';
+            format: PAnsiChar); inline;
 
 function bson_strerror_r(
            err_code: Integer;
            buf: PAnsiChar;
-           buflen: size_t): PAnsiChar; cdecl; external 'bson2.dll';
+           buflen: size_t): PAnsiChar; inline;
 
 // * *
 // * @brief Reset the content of a bson_error_t to indicate no error.
@@ -552,36 +552,36 @@ type
   Pbson_mem_vtable_t = ^bson_mem_vtable_t;
 
 procedure bson_mem_set_vtable(
-            vtable: Pbson_mem_vtable_t); cdecl; external 'bson2.dll';
-procedure bson_mem_restore_vtable(); cdecl; external 'bson2.dll';
+            vtable: Pbson_mem_vtable_t); inline;
+procedure bson_mem_restore_vtable(); inline;
 function bson_malloc(
-           num_bytes: size_t): Pvoid; cdecl; external 'bson2.dll';
+           num_bytes: size_t): Pvoid; inline;
 function bson_malloc0(
-           num_bytes: size_t): Pvoid; cdecl; external 'bson2.dll';
+           num_bytes: size_t): Pvoid; inline;
 function bson_aligned_alloc(
            alignment: size_t;
-           num_bytes: size_t): Pvoid; cdecl; external 'bson2.dll';
+           num_bytes: size_t): Pvoid; inline;
 function bson_aligned_alloc0(
            alignment: size_t;
-           num_bytes: size_t): Pvoid; cdecl; external 'bson2.dll';
+           num_bytes: size_t): Pvoid; inline;
 function bson_array_alloc(
            num_elems: size_t;
-           elem_size: size_t): Pvoid; cdecl; external 'bson2.dll';
+           elem_size: size_t): Pvoid; inline;
 function bson_array_alloc0(
            num_elems: size_t;
-           elem_size: size_t): Pvoid; cdecl; external 'bson2.dll';
+           elem_size: size_t): Pvoid; inline;
 function bson_realloc(
            mem: Pvoid;
-           num_bytes: size_t): Pvoid; cdecl; external 'bson2.dll';
+           num_bytes: size_t): Pvoid; inline;
 function bson_realloc_ctx(
            mem: Pvoid;
            num_bytes: size_t;
-           ctx: Pvoid): Pvoid; cdecl; external 'bson2.dll';
+           ctx: Pvoid): Pvoid; inline;
 procedure bson_free(
-            mem: Pvoid); cdecl; external 'bson2.dll';
+            mem: Pvoid); inline;
 procedure bson_zero_free(
             mem: Pvoid;
-            size: size_t); cdecl; external 'bson2.dll';
+            size: size_t); inline;
 
 // #define BSON_ALIGNED_ALLOC(T) ((T * )(bson_aligned_alloc(BSON_ALIGNOF(T), sizeof(T))))
 // #define BSON_ALIGNED_ALLOC0(T) ((T * )(bson_aligned_alloc0(BSON_ALIGNOF(T), sizeof(T))))
@@ -742,18 +742,18 @@ function bson_writer_new(
            buflen: Psize_t;
            offset: size_t;
            realloc_func: bson_realloc_func;
-           realloc_func_ctx: Pvoid): Pbson_writer_t; cdecl; external 'bson2.dll';
+           realloc_func_ctx: Pvoid): Pbson_writer_t; inline;
 procedure bson_writer_destroy(
-            writer: Pbson_writer_t); cdecl; external 'bson2.dll';
+            writer: Pbson_writer_t); inline;
 function bson_writer_get_length(
-           writer: Pbson_writer_t): size_t; cdecl; external 'bson2.dll';
+           writer: Pbson_writer_t): size_t; inline;
 function bson_writer_begin(
            writer: Pbson_writer_t;
-           bson: PPbson_t): ByteBool; cdecl; external 'bson2.dll';
+           bson: PPbson_t): ByteBool; inline;
 procedure bson_writer_end(
-            writer: Pbson_writer_t); cdecl; external 'bson2.dll';
+            writer: Pbson_writer_t); inline;
 procedure bson_writer_rollback(
-            writer: Pbson_writer_t); cdecl; external 'bson2.dll';
+            writer: Pbson_writer_t); inline;
 
 ////////////////
 // bson-types //
@@ -1194,28 +1194,28 @@ type
 // * `flags`.
 // *
 function bson_context_new(
-           flags: bson_context_flags_t): Pbson_context_t; cdecl; external 'bson2.dll';
+           flags: bson_context_flags_t): Pbson_context_t; inline;
 
 // * *
 // * @brief Destroy and free a bson_context_t created by bson_context_new()
 // *
 procedure bson_context_destroy(
-            context: Pbson_context_t); cdecl; external 'bson2.dll';
+            context: Pbson_context_t); inline;
 
 // * *
 // * @brief Obtain a pointer to the application-default bson_context_t
 // *
 // * @note This context_t MUST NOT be passed to bson_context_destroy()
 // *
-function bson_context_get_default(): Pbson_context_t; cdecl; external 'bson2.dll';
+function bson_context_get_default(): Pbson_context_t; inline;
 
 ////////////////
 // bson-clock //
 ////////////////
 
-function bson_get_monotonic_time(): int64_t; cdecl; external 'bson2.dll';
+function bson_get_monotonic_time(): int64_t; inline;
 function bson_gettimeofday(
-           tv: Ptimeval): Integer; cdecl; external 'bson2.dll';
+           tv: Ptimeval): Integer; inline;
 
 /////////////////////
 // bson-decimal128 //
@@ -1237,17 +1237,17 @@ const BSON_DECIMAL128_NAN = 'NaN';
 
 procedure bson_decimal128_to_string(
             dec: Pbson_decimal128_t;
-            str: PAnsiChar); cdecl; external 'bson2.dll';
+            str: PAnsiChar); inline;
 
 // * Note: @string must be ASCII characters only!
 function bson_decimal128_from_string(
            &string: PAnsiChar;
-           dec: Pbson_decimal128_t): ByteBool; cdecl; external 'bson2.dll';
+           dec: Pbson_decimal128_t): ByteBool; inline;
 
 function bson_decimal128_from_string_w_len(
            &string: PAnsiChar;
            len: Integer;
-           dec: Pbson_decimal128_t): ByteBool; cdecl; external 'bson2.dll';
+           dec: Pbson_decimal128_t): ByteBool; inline;
 
 ///////////////
 // bson-json //
@@ -1286,12 +1286,12 @@ type
 
 function bson_json_opts_new(
            mode: bson_json_mode_t;
-           max_len: int32_t): Pbson_json_opts_t; cdecl; external 'bson2.dll';
+           max_len: int32_t): Pbson_json_opts_t; inline;
 procedure bson_json_opts_destroy(
-            opts: Pbson_json_opts_t); cdecl; external 'bson2.dll';
+            opts: Pbson_json_opts_t); inline;
 procedure bson_json_opts_set_outermost_array(
             opts: Pbson_json_opts_t;
-            is_outermost_array: ByteBool); cdecl; external 'bson2.dll';
+            is_outermost_array: ByteBool); inline;
 
 type
   bson_json_reader_cb = function (
@@ -1307,26 +1307,26 @@ function bson_json_reader_new(
            cb: bson_json_reader_cb;
            dcb: bson_json_destroy_cb;
            allow_multiple: ByteBool;
-           buf_size: size_t): Pbson_json_reader_t; cdecl; external 'bson2.dll';
+           buf_size: size_t): Pbson_json_reader_t; inline;
 function bson_json_reader_new_from_fd(
            fd: Integer;
-           close_on_destroy: ByteBool): Pbson_json_reader_t; cdecl; external 'bson2.dll';
+           close_on_destroy: ByteBool): Pbson_json_reader_t; inline;
 function bson_json_reader_new_from_file(
            filename: PAnsiChar;
-           error: Pbson_error_t): Pbson_json_reader_t; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): Pbson_json_reader_t; inline;
 procedure bson_json_reader_destroy(
-            reader: Pbson_json_reader_t); cdecl; external 'bson2.dll';
+            reader: Pbson_json_reader_t); inline;
 function bson_json_reader_read(
            reader: Pbson_json_reader_t;
            bson: Pbson_t;
-           error: Pbson_error_t): Integer; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): Integer; inline;
 function bson_json_data_reader_new(
            allow_multiple: ByteBool;
-           size: size_t): Pbson_json_reader_t; cdecl; external 'bson2.dll';
+           size: size_t): Pbson_json_reader_t; inline;
 procedure bson_json_data_reader_ingest(
             reader: Pbson_json_reader_t;
             data: Puint8_t;
-            len: size_t); cdecl; external 'bson2.dll';
+            len: size_t); inline;
 
 ///////////////
 // bson-keys //
@@ -1336,60 +1336,60 @@ function bson_uint32_to_string(
            value: uint32_t;
            strptr: PPAnsiChar;
            str: PAnsiChar;
-           size: size_t): size_t; cdecl; external 'bson2.dll';
+           size: size_t): size_t; inline;
 
 /////////////////
 // bson-string //
 /////////////////
 
 function bson_strdup(
-           str: PAnsiChar): PAnsiChar; cdecl; external 'bson2.dll';
+           str: PAnsiChar): PAnsiChar; inline;
 
 function bson_strdup_printf(
-           format: PAnsiChar): PAnsiChar; cdecl; varargs; external 'bson2.dll';
+           format: PAnsiChar): PAnsiChar; inline;
 
 function bson_strdupv_printf(
            format: PAnsiChar;
-           args: va_list): PAnsiChar; cdecl; external 'bson2.dll';
+           args: va_list): PAnsiChar; inline;
 
 function bson_strndup(
            str: PAnsiChar;
-           n_bytes: size_t): PAnsiChar; cdecl; external 'bson2.dll';
+           n_bytes: size_t): PAnsiChar; inline;
 
 procedure bson_strncpy(
             dst: PAnsiChar;
             src: PAnsiChar;
-            size: size_t); cdecl; external 'bson2.dll';
+            size: size_t); inline;
 
 function bson_vsnprintf(
            str: PAnsiChar;
            size: size_t;
            format: PAnsiChar;
-           ap: va_list): Integer; cdecl; external 'bson2.dll';
+           ap: va_list): Integer; inline;
 
 function bson_snprintf(
            str: PAnsiChar;
            size: size_t;
-           format: PAnsiChar): Integer; cdecl; varargs; external 'bson2.dll';
+           format: PAnsiChar): Integer; inline;
 
 procedure bson_strfreev(
-            strv: PPAnsiChar); cdecl; external 'bson2.dll';
+            strv: PPAnsiChar); inline;
 
 function bson_strnlen(
            s: PAnsiChar;
-           maxlen: size_t): size_t; cdecl; external 'bson2.dll';
+           maxlen: size_t): size_t; inline;
 
 function bson_ascii_strtoll(
            str: PAnsiChar;
            endptr: PPAnsiChar;
-           base: Integer): int64_t; cdecl; external 'bson2.dll';
+           base: Integer): int64_t; inline;
 
 function bson_strcasecmp(
            s1: PAnsiChar;
-           s2: PAnsiChar): Integer; cdecl; external 'bson2.dll';
+           s2: PAnsiChar): Integer; inline;
 
 function bson_isspace(
-           c: Integer): ByteBool; cdecl; external 'bson2.dll';
+           c: Integer): ByteBool; inline;
 
 ///////////////
 // bson-utf8 //
@@ -1398,18 +1398,18 @@ function bson_isspace(
 function bson_utf8_validate(
            utf8: PAnsiChar;
            utf8_len: size_t;
-           allow_null: ByteBool): ByteBool; cdecl; external 'bson2.dll';
+           allow_null: ByteBool): ByteBool; inline;
 function bson_utf8_escape_for_json(
            utf8: PAnsiChar;
-           utf8_len: ssize_t): PAnsiChar; cdecl; external 'bson2.dll';
+           utf8_len: ssize_t): PAnsiChar; inline;
 function bson_utf8_get_char(
-           utf8: PAnsiChar): bson_unichar_t; cdecl; external 'bson2.dll';
+           utf8: PAnsiChar): bson_unichar_t; inline;
 function bson_utf8_next_char(
-           utf8: PAnsiChar): PAnsiChar; cdecl; external 'bson2.dll';
+           utf8: PAnsiChar): PAnsiChar; inline;
 procedure bson_utf8_from_unichar(
             unichar: bson_unichar_t;
             utf8: TCharArray6;
-            len: Puint32_t); cdecl; external 'bson2.dll';
+            len: Puint32_t); inline;
 
 ////////////////
 // bson-value //
@@ -1417,22 +1417,22 @@ procedure bson_utf8_from_unichar(
 
 procedure bson_value_copy(
             src: Pbson_value_t;
-            dst: Pbson_value_t); cdecl; external 'bson2.dll';
+            dst: Pbson_value_t); inline;
 procedure bson_value_destroy(
-            value: Pbson_value_t); cdecl; external 'bson2.dll';
+            value: Pbson_value_t); inline;
 
 ////////////////////////////
 // bson-version-functions //
 ////////////////////////////
 
-function bson_get_major_version(): Integer; cdecl; external 'bson2.dll';
-function bson_get_minor_version(): Integer; cdecl; external 'bson2.dll';
-function bson_get_micro_version(): Integer; cdecl; external 'bson2.dll';
-function bson_get_version(): PAnsiChar; cdecl; external 'bson2.dll';
+function bson_get_major_version(): Integer; inline;
+function bson_get_minor_version(): Integer; inline;
+function bson_get_micro_version(): Integer; inline;
+function bson_get_version(): PAnsiChar; inline;
 function bson_check_version(
            required_major: Integer;
            required_minor: Integer;
-           required_micro: Integer): ByteBool; cdecl; external 'bson2.dll';
+           required_micro: Integer): ByteBool; inline;
 
 ///////////////
 // bson-bcon //
@@ -1593,37 +1593,37 @@ type
   Pbcon_extract_ctx_t = ^bcon_extract_ctx_t;
 
 procedure bcon_append(
-            bson: Pbson_t); cdecl; varargs; external 'bson2.dll';
+            bson: Pbson_t); inline;
 procedure bcon_append_ctx(
             bson: Pbson_t;
-            ctx: Pbcon_append_ctx_t); cdecl; varargs; external 'bson2.dll';
+            ctx: Pbcon_append_ctx_t); inline;
 procedure bcon_append_ctx_va(
             bson: Pbson_t;
             ctx: Pbcon_append_ctx_t;
-            va: Pva_list); cdecl; external 'bson2.dll';
+            va: Pva_list); inline;
 procedure bcon_append_ctx_init(
-            ctx: Pbcon_append_ctx_t); cdecl; external 'bson2.dll';
+            ctx: Pbcon_append_ctx_t); inline;
 
 procedure bcon_extract_ctx_init(
-            ctx: Pbcon_extract_ctx_t); cdecl; external 'bson2.dll';
+            ctx: Pbcon_extract_ctx_t); inline;
 
 procedure bcon_extract_ctx(
             bson: Pbson_t;
-            ctx: Pbcon_extract_ctx_t); cdecl; varargs; external 'bson2.dll';
+            ctx: Pbcon_extract_ctx_t); inline;
 
 function bcon_extract_ctx_va(
            bson: Pbson_t;
            ctx: Pbcon_extract_ctx_t;
-           ap: Pva_list): ByteBool; cdecl; external 'bson2.dll';
+           ap: Pva_list): ByteBool; inline;
 
 function bcon_extract(
-           bson: Pbson_t): ByteBool; cdecl; varargs; external 'bson2.dll';
+           bson: Pbson_t): ByteBool; inline;
 
 // bool __CALLCONV__
 // bcon_extract_va(bson_t * bson, bcon_extract_ctx_t * ctx, ...);
 
 function bcon_new(
-           unused: Pvoid): Pbson_t; cdecl; varargs; external 'bson2.dll';
+           unused: Pvoid): Pbson_t; inline;
 
 // * *
 // * The bcon_..() functions are all declared with __attribute__((sentinel)).
@@ -1642,8 +1642,8 @@ function bcon_new(
 
 // #define BCON_NEW(...) bcon_new(NULL, __VA_ARGS__, (void * )NULL)
 
-function bson_bcon_magic(): PAnsiChar; cdecl; external 'bson2.dll';
-function bson_bcone_magic(): PAnsiChar; cdecl; external 'bson2.dll';
+function bson_bcon_magic(): PAnsiChar; inline;
+function bson_bcone_magic(): PAnsiChar; inline;
 
 /////////////////
 // bson-reader //
@@ -1713,31 +1713,31 @@ type
 function bson_reader_new_from_handle(
            handle: Pvoid;
            rf: bson_reader_read_func_t;
-           df: bson_reader_destroy_func_t): Pbson_reader_t; cdecl; external 'bson2.dll';
+           df: bson_reader_destroy_func_t): Pbson_reader_t; inline;
 function bson_reader_new_from_fd(
            fd: Integer;
-           close_on_destroy: ByteBool): Pbson_reader_t; cdecl; external 'bson2.dll';
+           close_on_destroy: ByteBool): Pbson_reader_t; inline;
 function bson_reader_new_from_file(
            path: PAnsiChar;
-           error: Pbson_error_t): Pbson_reader_t; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): Pbson_reader_t; inline;
 function bson_reader_new_from_data(
            data: Puint8_t;
-           length: size_t): Pbson_reader_t; cdecl; external 'bson2.dll';
+           length: size_t): Pbson_reader_t; inline;
 procedure bson_reader_destroy(
-            reader: Pbson_reader_t); cdecl; external 'bson2.dll';
+            reader: Pbson_reader_t); inline;
 procedure bson_reader_set_read_func(
             reader: Pbson_reader_t;
-            func: bson_reader_read_func_t); cdecl; external 'bson2.dll';
+            func: bson_reader_read_func_t); inline;
 procedure bson_reader_set_destroy_func(
             reader: Pbson_reader_t;
-            func: bson_reader_destroy_func_t); cdecl; external 'bson2.dll';
+            func: bson_reader_destroy_func_t); inline;
 function bson_reader_read(
            reader: Pbson_reader_t;
-           reached_eof: PByteBool): Pbson_t; cdecl; external 'bson2.dll';
+           reached_eof: PByteBool): Pbson_t; inline;
 function bson_reader_tell(
-           reader: Pbson_reader_t): off_t; cdecl; external 'bson2.dll';
+           reader: Pbson_reader_t): off_t; inline;
 procedure bson_reader_reset(
-            reader: Pbson_reader_t); cdecl; external 'bson2.dll';
+            reader: Pbson_reader_t); inline;
 
 //////////////
 // bson-oid //
@@ -1745,32 +1745,32 @@ procedure bson_reader_reset(
 
 function bson_oid_compare(
            oid1: Pbson_oid_t;
-           oid2: Pbson_oid_t): Integer; cdecl; external 'bson2.dll';
+           oid2: Pbson_oid_t): Integer; inline;
 procedure bson_oid_copy(
             src: Pbson_oid_t;
-            dst: Pbson_oid_t); cdecl; external 'bson2.dll';
+            dst: Pbson_oid_t); inline;
 function bson_oid_equal(
            oid1: Pbson_oid_t;
-           oid2: Pbson_oid_t): ByteBool; cdecl; external 'bson2.dll';
+           oid2: Pbson_oid_t): ByteBool; inline;
 function bson_oid_is_valid(
            str: PAnsiChar;
-           length: size_t): ByteBool; cdecl; external 'bson2.dll';
+           length: size_t): ByteBool; inline;
 function bson_oid_get_time_t(
-           oid: Pbson_oid_t): time_t; cdecl; external 'bson2.dll';
+           oid: Pbson_oid_t): time_t; inline;
 function bson_oid_hash(
-           oid: Pbson_oid_t): uint32_t; cdecl; external 'bson2.dll';
+           oid: Pbson_oid_t): uint32_t; inline;
 procedure bson_oid_init(
             oid: Pbson_oid_t;
-            context: Pbson_context_t); cdecl; external 'bson2.dll';
+            context: Pbson_context_t); inline;
 procedure bson_oid_init_from_data(
             oid: Pbson_oid_t;
-            data: Puint8_t); cdecl; external 'bson2.dll';
+            data: Puint8_t); inline;
 procedure bson_oid_init_from_string(
             oid: Pbson_oid_t;
-            str: PAnsiChar); cdecl; external 'bson2.dll';
+            str: PAnsiChar); inline;
 procedure bson_oid_to_string(
             oid: Pbson_oid_t;
-            str: TCharArray25); cdecl; external 'bson2.dll';
+            str: TCharArray25); inline;
 
 // * *
 // * bson_oid_compare_unsafe:
@@ -1931,7 +1931,7 @@ procedure bson_oid_to_string(
 // #define BSON_ITER_IS_KEY(iter, key) (0 == strcmp((key), bson_iter_key((iter))))
 
 function bson_iter_value(
-           iter: Pbson_iter_t): Pbson_value_t; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): Pbson_value_t; inline;
 
 // * *
 // * bson_iter_utf8_len_unsafe:
@@ -1947,30 +1947,30 @@ function bson_iter_value(
 procedure bson_iter_array(
             iter: Pbson_iter_t;
             array_len: Puint32_t;
-            &array: PPuint8_t); cdecl; external 'bson2.dll';
+            &array: PPuint8_t); inline;
 
 procedure bson_iter_binary(
             iter: Pbson_iter_t;
             subtype: Pbson_subtype_t;
             binary_len: Puint32_t;
-            binary: PPuint8_t); cdecl; external 'bson2.dll';
+            binary: PPuint8_t); inline;
 
 procedure bson_iter_overwrite_binary(
             iter: Pbson_iter_t;
             subtype: bson_subtype_t;
             binary_len: Puint32_t;
-            binary: PPuint8_t); cdecl; external 'bson2.dll';
+            binary: PPuint8_t); inline;
 
 function bson_iter_binary_subtype(
-           iter: Pbson_iter_t): bson_subtype_t; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): bson_subtype_t; inline;
 
 function bson_iter_binary_equal(
            iter_a: Pbson_iter_t;
-           iter_b: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter_b: Pbson_iter_t): ByteBool; inline;
 
 function bson_iter_code(
            iter: Pbson_iter_t;
-           length: Puint32_t): PAnsiChar; cdecl; external 'bson2.dll';
+           length: Puint32_t): PAnsiChar; inline;
 
 // * *
 // * bson_iter_code_unsafe:
@@ -1988,24 +1988,24 @@ function bson_iter_codewscope(
            iter: Pbson_iter_t;
            length: Puint32_t;
            scope_len: Puint32_t;
-           scope: PPuint8_t): PAnsiChar; cdecl; external 'bson2.dll';
+           scope: PPuint8_t): PAnsiChar; inline;
 
 procedure bson_iter_dbpointer(
             iter: Pbson_iter_t;
             collection_len: Puint32_t;
             collection: PPAnsiChar;
-            oid: PPbson_oid_t); cdecl; external 'bson2.dll';
+            oid: PPbson_oid_t); inline;
 
 procedure bson_iter_document(
             iter: Pbson_iter_t;
             document_len: Puint32_t;
-            document: PPuint8_t); cdecl; external 'bson2.dll';
+            document: PPuint8_t); inline;
 
 function bson_iter_double(
-           iter: Pbson_iter_t): double; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): double; inline;
 
 function bson_iter_as_double(
-           iter: Pbson_iter_t): double; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): double; inline;
 
 // * *
 // * bson_iter_double_unsafe:
@@ -2020,38 +2020,38 @@ function bson_iter_as_double(
 
 function bson_iter_init(
            iter: Pbson_iter_t;
-           bson: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           bson: Pbson_t): ByteBool; inline;
 
 function bson_iter_init_from_data(
            iter: Pbson_iter_t;
            data: Puint8_t;
-           length: size_t): ByteBool; cdecl; external 'bson2.dll';
+           length: size_t): ByteBool; inline;
 
 function bson_iter_init_find(
            iter: Pbson_iter_t;
            bson: Pbson_t;
-           key: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
+           key: PAnsiChar): ByteBool; inline;
 
 function bson_iter_init_find_w_len(
            iter: Pbson_iter_t;
            bson: Pbson_t;
            key: PAnsiChar;
-           keylen: Integer): ByteBool; cdecl; external 'bson2.dll';
+           keylen: Integer): ByteBool; inline;
 
 function bson_iter_init_find_case(
            iter: Pbson_iter_t;
            bson: Pbson_t;
-           key: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
+           key: PAnsiChar): ByteBool; inline;
 
 function bson_iter_init_from_data_at_offset(
            iter: Pbson_iter_t;
            data: Puint8_t;
            length: size_t;
            offset: uint32_t;
-           keylen: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           keylen: uint32_t): ByteBool; inline;
 
 function bson_iter_int32(
-           iter: Pbson_iter_t): int32_t; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): int32_t; inline;
 
 // * *
 // * bson_iter_int32_unsafe:
@@ -2065,10 +2065,10 @@ function bson_iter_int32(
 // bson_iter_int32_unsafe(const bson_iter_t * iter)
 
 function bson_iter_int64(
-           iter: Pbson_iter_t): int64_t; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): int64_t; inline;
 
 function bson_iter_as_int64(
-           iter: Pbson_iter_t): int64_t; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): int64_t; inline;
 
 // * *
 // * bson_iter_int64_unsafe:
@@ -2083,27 +2083,27 @@ function bson_iter_as_int64(
 
 function bson_iter_find(
            iter: Pbson_iter_t;
-           key: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
+           key: PAnsiChar): ByteBool; inline;
 
 function bson_iter_find_w_len(
            iter: Pbson_iter_t;
            key: PAnsiChar;
-           keylen: Integer): ByteBool; cdecl; external 'bson2.dll';
+           keylen: Integer): ByteBool; inline;
 
 function bson_iter_find_case(
            iter: Pbson_iter_t;
-           key: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
+           key: PAnsiChar): ByteBool; inline;
 
 function bson_iter_find_descendant(
            iter: Pbson_iter_t;
            dotkey: PAnsiChar;
-           descendant: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           descendant: Pbson_iter_t): ByteBool; inline;
 
 function bson_iter_next(
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 function bson_iter_oid(
-           iter: Pbson_iter_t): Pbson_oid_t; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): Pbson_oid_t; inline;
 
 // * *
 // * bson_iter_oid_unsafe:
@@ -2118,7 +2118,7 @@ function bson_iter_oid(
 
 function bson_iter_decimal128(
            iter: Pbson_iter_t;
-           dec: Pbson_decimal128_t): ByteBool; cdecl; external 'bson2.dll';
+           dec: Pbson_decimal128_t): ByteBool; inline;
 
 // * *
 // * bson_iter_decimal128_unsafe:
@@ -2132,10 +2132,10 @@ function bson_iter_decimal128(
 // bson_iter_decimal128_unsafe(const bson_iter_t * iter, bson_decimal128_t * dec)
 
 function bson_iter_key(
-           iter: Pbson_iter_t): PAnsiChar; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): PAnsiChar; inline;
 
 function bson_iter_key_len(
-           iter: Pbson_iter_t): uint32_t; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): uint32_t; inline;
 
 // * *
 // * bson_iter_key_unsafe:
@@ -2150,7 +2150,7 @@ function bson_iter_key_len(
 
 function bson_iter_utf8(
            iter: Pbson_iter_t;
-           length: Puint32_t): PAnsiChar; cdecl; external 'bson2.dll';
+           length: Puint32_t): PAnsiChar; inline;
 
 // * *
 // * bson_iter_utf8_unsafe:
@@ -2164,13 +2164,13 @@ function bson_iter_utf8(
 
 function bson_iter_dup_utf8(
            iter: Pbson_iter_t;
-           length: Puint32_t): PAnsiChar; cdecl; external 'bson2.dll';
+           length: Puint32_t): PAnsiChar; inline;
 
 function bson_iter_date_time(
-           iter: Pbson_iter_t): int64_t; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): int64_t; inline;
 
 function bson_iter_time_t(
-           iter: Pbson_iter_t): time_t; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): time_t; inline;
 
 // * *
 // * bson_iter_time_t_unsafe:
@@ -2186,7 +2186,7 @@ function bson_iter_time_t(
 
 procedure bson_iter_timeval(
             iter: Pbson_iter_t;
-            tv: Ptimeval); cdecl; external 'bson2.dll';
+            tv: Ptimeval); inline;
 
 // * *
 // * bson_iter_timeval_unsafe:
@@ -2201,10 +2201,10 @@ procedure bson_iter_timeval(
 procedure bson_iter_timestamp(
             iter: Pbson_iter_t;
             timestamp: Puint32_t;
-            increment: Puint32_t); cdecl; external 'bson2.dll';
+            increment: Puint32_t); inline;
 
 function bson_iter_bool(
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 // * *
 // * bson_iter_bool_unsafe:
@@ -2218,18 +2218,18 @@ function bson_iter_bool(
 // bson_iter_bool_unsafe(const bson_iter_t * iter)
 
 function bson_iter_as_bool(
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 function bson_iter_regex(
            iter: Pbson_iter_t;
-           options: PPAnsiChar): PAnsiChar; cdecl; external 'bson2.dll';
+           options: PPAnsiChar): PAnsiChar; inline;
 
 function bson_iter_symbol(
            iter: Pbson_iter_t;
-           length: Puint32_t): PAnsiChar; cdecl; external 'bson2.dll';
+           length: Puint32_t): PAnsiChar; inline;
 
 function bson_iter_type(
-           iter: Pbson_iter_t): bson_type_t; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): bson_type_t; inline;
 
 // * *
 // * bson_iter_type_unsafe:
@@ -2244,48 +2244,48 @@ function bson_iter_type(
 
 function bson_iter_recurse(
            iter: Pbson_iter_t;
-           child: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           child: Pbson_iter_t): ByteBool; inline;
 
 procedure bson_iter_overwrite_int32(
             iter: Pbson_iter_t;
-            value: int32_t); cdecl; external 'bson2.dll';
+            value: int32_t); inline;
 
 procedure bson_iter_overwrite_int64(
             iter: Pbson_iter_t;
-            value: int64_t); cdecl; external 'bson2.dll';
+            value: int64_t); inline;
 
 procedure bson_iter_overwrite_double(
             iter: Pbson_iter_t;
-            value: double); cdecl; external 'bson2.dll';
+            value: double); inline;
 
 procedure bson_iter_overwrite_decimal128(
             iter: Pbson_iter_t;
-            value: Pbson_decimal128_t); cdecl; external 'bson2.dll';
+            value: Pbson_decimal128_t); inline;
 
 procedure bson_iter_overwrite_bool(
             iter: Pbson_iter_t;
-            value: ByteBool); cdecl; external 'bson2.dll';
+            value: ByteBool); inline;
 
 procedure bson_iter_overwrite_oid(
             iter: Pbson_iter_t;
-            value: Pbson_oid_t); cdecl; external 'bson2.dll';
+            value: Pbson_oid_t); inline;
 
 procedure bson_iter_overwrite_timestamp(
             iter: Pbson_iter_t;
             timestamp: uint32_t;
-            increment: uint32_t); cdecl; external 'bson2.dll';
+            increment: uint32_t); inline;
 
 procedure bson_iter_overwrite_date_time(
             iter: Pbson_iter_t;
-            value: int64_t); cdecl; external 'bson2.dll';
+            value: int64_t); inline;
 
 function bson_iter_visit_all(
            iter: Pbson_iter_t;
            visitor: Pbson_visitor_t;
-           data: Pvoid): ByteBool; cdecl; external 'bson2.dll';
+           data: Pvoid): ByteBool; inline;
 
 function bson_iter_offset(
-           iter: Pbson_iter_t): uint32_t; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): uint32_t; inline;
 
 /////////////////
 // bson-vector //
@@ -2385,79 +2385,79 @@ type
 function bson_vector_int8_view_init(
            view_out: Pbson_vector_int8_view_t;
            binary_data: Puint8_t;
-           binary_data_len: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           binary_data_len: uint32_t): ByteBool; inline;
 
 function bson_vector_int8_const_view_init(
            view_out: Pbson_vector_int8_const_view_t;
            binary_data: Puint8_t;
-           binary_data_len: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           binary_data_len: uint32_t): ByteBool; inline;
 
 function bson_vector_float32_view_init(
            view_out: Pbson_vector_float32_view_t;
            binary_data: Puint8_t;
-           binary_data_len: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           binary_data_len: uint32_t): ByteBool; inline;
 
 function bson_vector_float32_const_view_init(
            view_out: Pbson_vector_float32_const_view_t;
            binary_data: Puint8_t;
-           binary_data_len: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           binary_data_len: uint32_t): ByteBool; inline;
 
 function bson_vector_packed_bit_view_init(
            view_out: Pbson_vector_packed_bit_view_t;
            binary_data: Puint8_t;
-           binary_data_len: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           binary_data_len: uint32_t): ByteBool; inline;
 
 function bson_vector_packed_bit_const_view_init(
            view_out: Pbson_vector_packed_bit_const_view_t;
            binary_data: Puint8_t;
-           binary_data_len: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           binary_data_len: uint32_t): ByteBool; inline;
 
 function bson_vector_int8_view_from_iter(
            view_out: Pbson_vector_int8_view_t;
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 function bson_vector_int8_const_view_from_iter(
            view_out: Pbson_vector_int8_const_view_t;
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 function bson_vector_float32_view_from_iter(
            view_out: Pbson_vector_float32_view_t;
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 function bson_vector_float32_const_view_from_iter(
            view_out: Pbson_vector_float32_const_view_t;
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 function bson_vector_packed_bit_view_from_iter(
            view_out: Pbson_vector_packed_bit_view_t;
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 function bson_vector_packed_bit_const_view_from_iter(
            view_out: Pbson_vector_packed_bit_const_view_t;
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 function bson_array_builder_append_vector_int8_elements(
            builder: P_bson_array_builder_t;
-           view: bson_vector_int8_const_view_t): ByteBool; cdecl; external 'bson2.dll';
+           view: bson_vector_int8_const_view_t): ByteBool; inline;
 
 function bson_array_builder_append_vector_float32_elements(
            builder: P_bson_array_builder_t;
-           view: bson_vector_float32_const_view_t): ByteBool; cdecl; external 'bson2.dll';
+           view: bson_vector_float32_const_view_t): ByteBool; inline;
 
 function bson_array_builder_append_vector_packed_bit_elements(
            builder: P_bson_array_builder_t;
-           view: bson_vector_packed_bit_const_view_t): ByteBool; cdecl; external 'bson2.dll';
+           view: bson_vector_packed_bit_const_view_t): ByteBool; inline;
 
 function bson_array_builder_append_vector_elements(
            builder: P_bson_array_builder_t;
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 function bson_append_vector_int8_uninit(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
            element_count: size_t;
-           view_out: Pbson_vector_int8_view_t): ByteBool; cdecl; external 'bson2.dll';
+           view_out: Pbson_vector_int8_view_t): ByteBool; inline;
 
 // #define BSON_APPEND_VECTOR_INT8_UNINIT(b, key, count, view) bson_append_vector_int8_uninit(b, key, (int)strlen(key), count, view)
 
@@ -2466,7 +2466,7 @@ function bson_append_vector_float32_uninit(
            key: PAnsiChar;
            key_length: Integer;
            element_count: size_t;
-           view_out: Pbson_vector_float32_view_t): ByteBool; cdecl; external 'bson2.dll';
+           view_out: Pbson_vector_float32_view_t): ByteBool; inline;
 
 // #define BSON_APPEND_VECTOR_FLOAT32_UNINIT(b, key, count, view) bson_append_vector_float32_uninit(b, key, (int)strlen(key), count, view)
 
@@ -2475,7 +2475,7 @@ function bson_append_vector_packed_bit_uninit(
            key: PAnsiChar;
            key_length: Integer;
            element_count: size_t;
-           view_out: Pbson_vector_packed_bit_view_t): ByteBool; cdecl; external 'bson2.dll';
+           view_out: Pbson_vector_packed_bit_view_t): ByteBool; inline;
 
 // #define BSON_APPEND_VECTOR_PACKED_BIT_UNINIT(b, key, count, view) bson_append_vector_packed_bit_uninit(b, key, (int)strlen(key), count, view)
 
@@ -2484,7 +2484,7 @@ function bson_append_vector_int8_from_array(
            key: PAnsiChar;
            key_length: Integer;
            iter: Pbson_iter_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 // #define BSON_APPEND_VECTOR_INT8_FROM_ARRAY(b, key, iter, err) bson_append_vector_int8_from_array(b, key, (int)strlen(key), iter, err)
 
@@ -2493,7 +2493,7 @@ function bson_append_vector_float32_from_array(
            key: PAnsiChar;
            key_length: Integer;
            iter: Pbson_iter_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 // #define BSON_APPEND_VECTOR_FLOAT32_FROM_ARRAY(b, key, iter, err) bson_append_vector_float32_from_array(b, key, (int)strlen(key), iter, err)
 
@@ -2502,7 +2502,7 @@ function bson_append_vector_packed_bit_from_array(
            key: PAnsiChar;
            key_length: Integer;
            iter: Pbson_iter_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 // #define BSON_APPEND_VECTOR_PACKED_BIT_FROM_ARRAY(b, key, iter, err) bson_append_vector_packed_bit_from_array(b, key, (int)strlen(key), iter, err)
 
@@ -2510,7 +2510,7 @@ function bson_append_array_from_vector_int8(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           view: bson_vector_int8_const_view_t): ByteBool; cdecl; external 'bson2.dll';
+           view: bson_vector_int8_const_view_t): ByteBool; inline;
 
 // #define BSON_APPEND_ARRAY_FROM_VECTOR_INT8(b, key, view) bson_append_array_from_vector_int8(b, key, (int)strlen(key), view)
 
@@ -2518,7 +2518,7 @@ function bson_append_array_from_vector_float32(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           view: bson_vector_float32_const_view_t): ByteBool; cdecl; external 'bson2.dll';
+           view: bson_vector_float32_const_view_t): ByteBool; inline;
 
 // #define BSON_APPEND_ARRAY_FROM_VECTOR_FLOAT32(b, key, view) bson_append_array_from_vector_float32(b, key, (int)strlen(key), view)
 
@@ -2526,7 +2526,7 @@ function bson_append_array_from_vector_packed_bit(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           view: bson_vector_packed_bit_const_view_t): ByteBool; cdecl; external 'bson2.dll';
+           view: bson_vector_packed_bit_const_view_t): ByteBool; inline;
 
 // #define BSON_APPEND_ARRAY_FROM_VECTOR_PACKED_BIT(b, key, view) bson_append_array_from_vector_packed_bit(b, key, (int)strlen(key), view)
 
@@ -2755,18 +2755,18 @@ const BSON_MAX_SIZE: size_t = size_t(((NativeUInt(1) shl 31) - 1));
 // *
 // * Returns: A newly allocated bson_t that should be freed with bson_destroy().
 // *
-function bson_new(): Pbson_t; cdecl; external 'bson2.dll';
+function bson_new(): Pbson_t; inline;
 
 function bson_new_from_json(
            data: Puint8_t;
            len: ssize_t;
-           error: Pbson_error_t): Pbson_t; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): Pbson_t; inline;
 
 function bson_init_from_json(
            bson: Pbson_t;
            data: PAnsiChar;
            len: ssize_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 // * *
 // * bson_init_static:
@@ -2783,7 +2783,7 @@ function bson_init_from_json(
 function bson_init_static(
            b: Pbson_t;
            data: Puint8_t;
-           length: size_t): ByteBool; cdecl; external 'bson2.dll';
+           length: size_t): ByteBool; inline;
 
 // * *
 // * bson_init:
@@ -2799,7 +2799,7 @@ function bson_init_static(
 // * using @b.
 // *
 procedure bson_init(
-            b: Pbson_t); cdecl; external 'bson2.dll';
+            b: Pbson_t); inline;
 
 // * *
 // * bson_reinit:
@@ -2811,7 +2811,7 @@ procedure bson_init(
 // * building many documents.
 // *
 procedure bson_reinit(
-            b: Pbson_t); cdecl; external 'bson2.dll';
+            b: Pbson_t); inline;
 
 // * *
 // * bson_new_from_data:
@@ -2827,7 +2827,7 @@ procedure bson_reinit(
 // *
 function bson_new_from_data(
            data: Puint8_t;
-           length: size_t): Pbson_t; cdecl; external 'bson2.dll';
+           length: size_t): Pbson_t; inline;
 
 // * *
 // * bson_new_from_buffer:
@@ -2846,7 +2846,7 @@ function bson_new_from_buffer(
            buf: PPuint8_t;
            buf_len: Psize_t;
            realloc_func: bson_realloc_func;
-           realloc_func_ctx: Pvoid): Pbson_t; cdecl; external 'bson2.dll';
+           realloc_func_ctx: Pvoid): Pbson_t; inline;
 
 // * *
 // * bson_sized_new:
@@ -2858,7 +2858,7 @@ function bson_new_from_buffer(
 // * Returns: A newly allocated bson_t that should be freed with bson_destroy().
 // *
 function bson_sized_new(
-           size: size_t): Pbson_t; cdecl; external 'bson2.dll';
+           size: size_t): Pbson_t; inline;
 
 // * *
 // * bson_copy:
@@ -2870,7 +2870,7 @@ function bson_sized_new(
 // * Returns: A newly allocated bson_t that should be free'd with bson_destroy()
 // *
 function bson_copy(
-           bson: Pbson_t): Pbson_t; cdecl; external 'bson2.dll';
+           bson: Pbson_t): Pbson_t; inline;
 
 // * *
 // * bson_copy_to:
@@ -2881,7 +2881,7 @@ function bson_copy(
 // *
 procedure bson_copy_to(
             src: Pbson_t;
-            dst: Pbson_t); cdecl; external 'bson2.dll';
+            dst: Pbson_t); inline;
 
 // * *
 // * bson_copy_to_excluding_noinit:
@@ -2894,13 +2894,13 @@ procedure bson_copy_to(
 procedure bson_copy_to_excluding_noinit(
             src: Pbson_t;
             dst: Pbson_t;
-            first_exclude: PAnsiChar); cdecl; varargs; external 'bson2.dll';
+            first_exclude: PAnsiChar); inline;
 
 procedure bson_copy_to_excluding_noinit_va(
             src: Pbson_t;
             dst: Pbson_t;
             first_exclude: PAnsiChar;
-            args: va_list); cdecl; external 'bson2.dll';
+            args: va_list); inline;
 
 // * *
 // * bson_destroy:
@@ -2909,15 +2909,15 @@ procedure bson_copy_to_excluding_noinit_va(
 // * Frees the resources associated with @bson.
 // *
 procedure bson_destroy(
-            bson: Pbson_t); cdecl; external 'bson2.dll';
+            bson: Pbson_t); inline;
 
 function bson_reserve_buffer(
            bson: Pbson_t;
-           total_size: uint32_t): Puint8_t; cdecl; external 'bson2.dll';
+           total_size: uint32_t): Puint8_t; inline;
 
 function bson_steal(
            dst: Pbson_t;
-           src: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           src: Pbson_t): ByteBool; inline;
 
 // * *
 // * bson_destroy_with_steal:
@@ -2941,7 +2941,7 @@ function bson_steal(
 function bson_destroy_with_steal(
            bson: Pbson_t;
            steal: ByteBool;
-           length: Puint32_t): Puint8_t; cdecl; external 'bson2.dll';
+           length: Puint32_t): Puint8_t; inline;
 
 // * *
 // * bson_get_data:
@@ -2952,7 +2952,7 @@ function bson_destroy_with_steal(
 // * Returns: A buffer that should not be modified or freed.
 // *
 function bson_get_data(
-           bson: Pbson_t): Puint8_t; cdecl; external 'bson2.dll';
+           bson: Pbson_t): Puint8_t; inline;
 
 // * *
 // * bson_count_keys:
@@ -2961,7 +2961,7 @@ function bson_get_data(
 // * Counts the number of elements found in @bson.
 // *
 function bson_count_keys(
-           bson: Pbson_t): uint32_t; cdecl; external 'bson2.dll';
+           bson: Pbson_t): uint32_t; inline;
 
 // * *
 // * bson_has_field:
@@ -2976,7 +2976,7 @@ function bson_count_keys(
 // *
 function bson_has_field(
            bson: Pbson_t;
-           key: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
+           key: PAnsiChar): ByteBool; inline;
 
 // * *
 // * bson_compare:
@@ -2990,7 +2990,7 @@ function bson_has_field(
 // *
 function bson_compare(
            bson: Pbson_t;
-           other: Pbson_t): Integer; cdecl; external 'bson2.dll';
+           other: Pbson_t): Integer; inline;
 
 // *
 // * bson_equal:
@@ -3003,7 +3003,7 @@ function bson_compare(
 // *
 function bson_equal(
            bson: Pbson_t;
-           other: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           other: Pbson_t): ByteBool; inline;
 
 // * *
 // * bson_validate:
@@ -3018,7 +3018,7 @@ function bson_equal(
 function bson_validate(
            bson: Pbson_t;
            flags: bson_validate_flags_t;
-           offset: Psize_t): ByteBool; cdecl; external 'bson2.dll';
+           offset: Psize_t): ByteBool; inline;
 
 // * *
 // * bson_validate_with_error:
@@ -3033,7 +3033,7 @@ function bson_validate(
 function bson_validate_with_error(
            bson: Pbson_t;
            flags: bson_validate_flags_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 // * *
 // * bson_validate_with_error_and_offset:
@@ -3051,7 +3051,7 @@ function bson_validate_with_error_and_offset(
            bson: Pbson_t;
            flags: bson_validate_flags_t;
            offset: Psize_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 // * *
 // * bson_as_json_with_opts:
@@ -3075,7 +3075,7 @@ function bson_validate_with_error_and_offset(
 function bson_as_json_with_opts(
            bson: Pbson_t;
            length: Psize_t;
-           opts: Pbson_json_opts_t): PAnsiChar; cdecl; external 'bson2.dll';
+           opts: Pbson_json_opts_t): PAnsiChar; inline;
 
 // * *
 // * bson_as_canonical_extended_json:
@@ -3097,7 +3097,7 @@ function bson_as_json_with_opts(
 // *
 function bson_as_canonical_extended_json(
            bson: Pbson_t;
-           length: Psize_t): PAnsiChar; cdecl; external 'bson2.dll';
+           length: Psize_t): PAnsiChar; inline;
 
 // * *
 // * bson_as_legacy_extended_json:
@@ -3115,7 +3115,7 @@ function bson_as_canonical_extended_json(
 
 function bson_as_legacy_extended_json(
            bson: Pbson_t;
-           length: Psize_t): PAnsiChar; cdecl; external 'bson2.dll';
+           length: Psize_t): PAnsiChar; inline;
 
 // * *
 // * bson_as_relaxed_extended_json:
@@ -3137,22 +3137,22 @@ function bson_as_legacy_extended_json(
 // *
 function bson_as_relaxed_extended_json(
            bson: Pbson_t;
-           length: Psize_t): PAnsiChar; cdecl; external 'bson2.dll';
+           length: Psize_t): PAnsiChar; inline;
 
 // * like bson_as_legacy_extended_json() but for outermost arrays.
 function bson_array_as_legacy_extended_json(
            bson: Pbson_t;
-           length: Psize_t): PAnsiChar; cdecl; external 'bson2.dll';
+           length: Psize_t): PAnsiChar; inline;
 
 // * like bson_as_relaxed_extended_json() but for outermost arrays.
 function bson_array_as_relaxed_extended_json(
            bson: Pbson_t;
-           length: Psize_t): PAnsiChar; cdecl; external 'bson2.dll';
+           length: Psize_t): PAnsiChar; inline;
 
 // * like bson_as_canonical_extended_json() but for outermost arrays.
 function bson_array_as_canonical_extended_json(
            bson: Pbson_t;
-           length: Psize_t): PAnsiChar; cdecl; external 'bson2.dll';
+           length: Psize_t): PAnsiChar; inline;
 
 // bson_array_builder_t defines an API for building arrays.
 // BSON arrays require sequential numeric keys "0", "1", "2", ...
@@ -3167,28 +3167,28 @@ type
 // `[1,2,3]`.
 // To append an array field to a document (Example: `{ "field":[1,2,3] }`), use
 // `bson_append_array_builder_begin`.
-function bson_array_builder_new(): Pbson_array_builder_t; cdecl; external 'bson2.dll';
+function bson_array_builder_new(): Pbson_array_builder_t; inline;
 
 // bson_array_builder_build initializes and moves BSON data to `out`.
 // `bab` may be reused and will start appending a new array at index "0".
 function bson_array_builder_build(
            bab: Pbson_array_builder_t;
-           param1: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           param1: Pbson_t): ByteBool; inline;
 
 procedure bson_array_builder_destroy(
-            bab: Pbson_array_builder_t); cdecl; external 'bson2.dll';
+            bab: Pbson_array_builder_t); inline;
 
 function bson_append_value(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: Pbson_value_t): ByteBool; cdecl; external 'bson2.dll';
+           value: Pbson_value_t): ByteBool; inline;
 
 // #define BSON_APPEND_VALUE(b, key, val) bson_append_value(b, key, (int)strlen(key), (val))
 
 function bson_array_builder_append_value(
            bab: Pbson_array_builder_t;
-           value: Pbson_value_t): ByteBool; cdecl; external 'bson2.dll';
+           value: Pbson_value_t): ByteBool; inline;
 
 // * *
 // * bson_append_array:
@@ -3206,13 +3206,13 @@ function bson_append_array(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           &array: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           &array: Pbson_t): ByteBool; inline;
 
 // #define BSON_APPEND_ARRAY(b, key, val) bson_append_array(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_array(
            bab: Pbson_array_builder_t;
-           &array: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           &array: Pbson_t): ByteBool; inline;
 
 // * *
 // * bson_append_array_from_vector:
@@ -3229,13 +3229,13 @@ function bson_append_array_from_vector(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 // #define BSON_APPEND_ARRAY_FROM_VECTOR(b, key, iter) bson_append_array_from_vector(b, key, (int)strlen(key), iter)
 
 function bson_array_builder_append_array_from_vector(
            bab: Pbson_array_builder_t;
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 // * *
 // * bson_append_binary:
@@ -3256,7 +3256,7 @@ function bson_append_binary(
            key_length: Integer;
            subtype: bson_subtype_t;
            binary: Puint8_t;
-           length: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           length: uint32_t): ByteBool; inline;
 
 // #define BSON_APPEND_BINARY(b, key, subtype, val, len) bson_append_binary(b, key, (int)strlen(key), subtype, val, len)
 
@@ -3264,7 +3264,7 @@ function bson_array_builder_append_binary(
            bab: Pbson_array_builder_t;
            subtype: bson_subtype_t;
            binary: Puint8_t;
-           length: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           length: uint32_t): ByteBool; inline;
 
 // * *
 // * bson_append_binary_uninit:
@@ -3283,7 +3283,7 @@ function bson_append_binary_uninit(
            key_length: Integer;
            subtype: bson_subtype_t;
            binary: PPuint8_t;
-           length: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           length: uint32_t): ByteBool; inline;
 
 // #define BSON_APPEND_BINARY_UNINIT(b, key, subtype, val, len) bson_append_binary_uninit(b, key, (int)strlen(key), subtype, val, len)
 
@@ -3291,7 +3291,7 @@ function bson_array_builder_append_binary_uninit(
            bab: Pbson_array_builder_t;
            subtype: bson_subtype_t;
            binary: PPuint8_t;
-           length: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           length: uint32_t): ByteBool; inline;
 
 // * *
 // * bson_append_bool:
@@ -3307,13 +3307,13 @@ function bson_append_bool(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: ByteBool): ByteBool; cdecl; external 'bson2.dll';
+           value: ByteBool): ByteBool; inline;
 
 // #define BSON_APPEND_BOOL(b, key, val) bson_append_bool(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_bool(
            bab: Pbson_array_builder_t;
-           value: ByteBool): ByteBool; cdecl; external 'bson2.dll';
+           value: ByteBool): ByteBool; inline;
 
 // * *
 // * bson_append_code:
@@ -3330,13 +3330,13 @@ function bson_append_code(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           javascript: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
+           javascript: PAnsiChar): ByteBool; inline;
 
 // #define BSON_APPEND_CODE(b, key, val) bson_append_code(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_code(
            bab: Pbson_array_builder_t;
-           javascript: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
+           javascript: PAnsiChar): ByteBool; inline;
 
 // * *
 // * bson_append_code_with_scope:
@@ -3355,14 +3355,14 @@ function bson_append_code_with_scope(
            key: PAnsiChar;
            key_length: Integer;
            javascript: PAnsiChar;
-           scope: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           scope: Pbson_t): ByteBool; inline;
 
 // #define BSON_APPEND_CODE_WITH_SCOPE(b, key, val, scope) bson_append_code_with_scope(b, key, (int)strlen(key), val, scope)
 
 function bson_array_builder_append_code_with_scope(
            bab: Pbson_array_builder_t;
            javascript: PAnsiChar;
-           scope: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           scope: Pbson_t): ByteBool; inline;
 
 // * *
 // * bson_append_dbpointer:
@@ -3381,14 +3381,14 @@ function bson_append_dbpointer(
            key: PAnsiChar;
            key_length: Integer;
            collection: PAnsiChar;
-           oid: Pbson_oid_t): ByteBool; cdecl; external 'bson2.dll';
+           oid: Pbson_oid_t): ByteBool; inline;
 
 // #define BSON_APPEND_DBPOINTER(b, key, coll, oid) bson_append_dbpointer(b, key, (int)strlen(key), coll, oid)
 
 function bson_array_builder_append_dbpointer(
            bab: Pbson_array_builder_t;
            collection: PAnsiChar;
-           oid: Pbson_oid_t): ByteBool; cdecl; external 'bson2.dll';
+           oid: Pbson_oid_t): ByteBool; inline;
 
 // * *
 // * bson_append_double:
@@ -3403,13 +3403,13 @@ function bson_append_double(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: double): ByteBool; cdecl; external 'bson2.dll';
+           value: double): ByteBool; inline;
 
 // #define BSON_APPEND_DOUBLE(b, key, val) bson_append_double(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_double(
            bab: Pbson_array_builder_t;
-           value: double): ByteBool; cdecl; external 'bson2.dll';
+           value: double): ByteBool; inline;
 
 // * *
 // * bson_append_document:
@@ -3426,13 +3426,13 @@ function bson_append_document(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           value: Pbson_t): ByteBool; inline;
 
 // #define BSON_APPEND_DOCUMENT(b, key, val) bson_append_document(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_document(
            bab: Pbson_array_builder_t;
-           value: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           value: Pbson_t): ByteBool; inline;
 
 // * *
 // * bson_append_document_begin:
@@ -3455,13 +3455,13 @@ function bson_append_document_begin(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           child: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           child: Pbson_t): ByteBool; inline;
 
 // #define BSON_APPEND_DOCUMENT_BEGIN(b, key, child) bson_append_document_begin(b, key, (int)strlen(key), child)
 
 function bson_array_builder_append_document_begin(
            bab: Pbson_array_builder_t;
-           child: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           child: Pbson_t): ByteBool; inline;
 
 // * *
 // * bson_append_document_end:
@@ -3475,11 +3475,11 @@ function bson_array_builder_append_document_begin(
 // *
 function bson_append_document_end(
            bson: Pbson_t;
-           child: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           child: Pbson_t): ByteBool; inline;
 
 function bson_array_builder_append_document_end(
            bab: Pbson_array_builder_t;
-           child: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           child: Pbson_t): ByteBool; inline;
 
 // * *
 // * bson_append_array_begin:
@@ -3505,7 +3505,7 @@ function bson_append_array_begin(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           child: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           child: Pbson_t): ByteBool; inline;
 
 // #define BSON_APPEND_ARRAY_BEGIN(b, key, child) bson_append_array_begin(b, key, (int)strlen(key), child)
 
@@ -3521,7 +3521,7 @@ function bson_append_array_begin(
 // *
 function bson_append_array_end(
            bson: Pbson_t;
-           child: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           child: Pbson_t): ByteBool; inline;
 
 // * *
 // * bson_append_int32:
@@ -3537,13 +3537,13 @@ function bson_append_int32(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: int32_t): ByteBool; cdecl; external 'bson2.dll';
+           value: int32_t): ByteBool; inline;
 
 // #define BSON_APPEND_INT32(b, key, val) bson_append_int32(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_int32(
            bab: Pbson_array_builder_t;
-           value: int32_t): ByteBool; cdecl; external 'bson2.dll';
+           value: int32_t): ByteBool; inline;
 
 // * *
 // * bson_append_int64:
@@ -3559,13 +3559,13 @@ function bson_append_int64(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: int64_t): ByteBool; cdecl; external 'bson2.dll';
+           value: int64_t): ByteBool; inline;
 
 // #define BSON_APPEND_INT64(b, key, val) bson_append_int64(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_int64(
            bab: Pbson_array_builder_t;
-           value: int64_t): ByteBool; cdecl; external 'bson2.dll';
+           value: int64_t): ByteBool; inline;
 
 // * *
 // * bson_append_decimal128:
@@ -3581,13 +3581,13 @@ function bson_append_decimal128(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: Pbson_decimal128_t): ByteBool; cdecl; external 'bson2.dll';
+           value: Pbson_decimal128_t): ByteBool; inline;
 
 // #define BSON_APPEND_DECIMAL128(b, key, val) bson_append_decimal128(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_decimal128(
            bab: Pbson_array_builder_t;
-           value: Pbson_decimal128_t): ByteBool; cdecl; external 'bson2.dll';
+           value: Pbson_decimal128_t): ByteBool; inline;
 
 // * *
 // * bson_append_iter:
@@ -3605,13 +3605,13 @@ function bson_append_iter(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 // #define BSON_APPEND_ITER(b, key, val) bson_append_iter(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_iter(
            bab: Pbson_array_builder_t;
-           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; inline;
 
 // * *
 // * bson_append_minkey:
@@ -3628,12 +3628,12 @@ function bson_array_builder_append_iter(
 function bson_append_minkey(
            bson: Pbson_t;
            key: PAnsiChar;
-           key_length: Integer): ByteBool; cdecl; external 'bson2.dll';
+           key_length: Integer): ByteBool; inline;
 
 // #define BSON_APPEND_MINKEY(b, key) bson_append_minkey(b, key, (int)strlen(key))
 
 function bson_array_builder_append_minkey(
-           bab: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
+           bab: Pbson_array_builder_t): ByteBool; inline;
 
 // * *
 // * bson_append_maxkey:
@@ -3650,12 +3650,12 @@ function bson_array_builder_append_minkey(
 function bson_append_maxkey(
            bson: Pbson_t;
            key: PAnsiChar;
-           key_length: Integer): ByteBool; cdecl; external 'bson2.dll';
+           key_length: Integer): ByteBool; inline;
 
 // #define BSON_APPEND_MAXKEY(b, key) bson_append_maxkey(b, key, (int)strlen(key))
 
 function bson_array_builder_append_maxkey(
-           bab: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
+           bab: Pbson_array_builder_t): ByteBool; inline;
 
 // * *
 // * bson_append_null:
@@ -3669,12 +3669,12 @@ function bson_array_builder_append_maxkey(
 function bson_append_null(
            bson: Pbson_t;
            key: PAnsiChar;
-           key_length: Integer): ByteBool; cdecl; external 'bson2.dll';
+           key_length: Integer): ByteBool; inline;
 
 // #define BSON_APPEND_NULL(b, key) bson_append_null(b, key, (int)strlen(key))
 
 function bson_array_builder_append_null(
-           bab: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
+           bab: Pbson_array_builder_t): ByteBool; inline;
 
 // * *
 // * bson_append_oid:
@@ -3691,13 +3691,13 @@ function bson_append_oid(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           oid: Pbson_oid_t): ByteBool; cdecl; external 'bson2.dll';
+           oid: Pbson_oid_t): ByteBool; inline;
 
 // #define BSON_APPEND_OID(b, key, val) bson_append_oid(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_oid(
            bab: Pbson_array_builder_t;
-           oid: Pbson_oid_t): ByteBool; cdecl; external 'bson2.dll';
+           oid: Pbson_oid_t): ByteBool; inline;
 
 // * *
 // * bson_append_regex:
@@ -3727,14 +3727,14 @@ function bson_append_regex(
            key: PAnsiChar;
            key_length: Integer;
            regex: PAnsiChar;
-           options: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
+           options: PAnsiChar): ByteBool; inline;
 
 // #define BSON_APPEND_REGEX(b, key, val, opt) bson_append_regex(b, key, (int)strlen(key), val, opt)
 
 function bson_array_builder_append_regex(
            bab: Pbson_array_builder_t;
            regex: PAnsiChar;
-           options: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
+           options: PAnsiChar): ByteBool; inline;
 
 // * *
 // * bson_append_regex:
@@ -3767,13 +3767,13 @@ function bson_append_regex_w_len(
            key_length: Integer;
            regex: PAnsiChar;
            regex_length: Integer;
-           options: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
+           options: PAnsiChar): ByteBool; inline;
 
 function bson_array_builder_append_regex_w_len(
            bab: Pbson_array_builder_t;
            regex: PAnsiChar;
            regex_length: Integer;
-           options: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
+           options: PAnsiChar): ByteBool; inline;
 
 // * *
 // * bson_append_utf8:
@@ -3795,14 +3795,14 @@ function bson_append_utf8(
            key: PAnsiChar;
            key_length: Integer;
            value: PAnsiChar;
-           length: Integer): ByteBool; cdecl; external 'bson2.dll';
+           length: Integer): ByteBool; inline;
 
 // #define BSON_APPEND_UTF8(b, key, val) bson_append_utf8(b, key, (int)strlen(key), val, (int)strlen(val))
 
 function bson_array_builder_append_utf8(
            bab: Pbson_array_builder_t;
            value: PAnsiChar;
-           length: Integer): ByteBool; cdecl; external 'bson2.dll';
+           length: Integer): ByteBool; inline;
 
 // * *
 // * bson_append_symbol:
@@ -3823,14 +3823,14 @@ function bson_append_symbol(
            key: PAnsiChar;
            key_length: Integer;
            value: PAnsiChar;
-           length: Integer): ByteBool; cdecl; external 'bson2.dll';
+           length: Integer): ByteBool; inline;
 
 // #define BSON_APPEND_SYMBOL(b, key, val) bson_append_symbol(b, key, (int)strlen(key), val, (int)strlen(val))
 
 function bson_array_builder_append_symbol(
            bab: Pbson_array_builder_t;
            value: PAnsiChar;
-           length: Integer): ByteBool; cdecl; external 'bson2.dll';
+           length: Integer): ByteBool; inline;
 
 // * *
 // * bson_append_time_t:
@@ -3847,13 +3847,13 @@ function bson_append_time_t(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: time_t): ByteBool; cdecl; external 'bson2.dll';
+           value: time_t): ByteBool; inline;
 
 // #define BSON_APPEND_TIME_T(b, key, val) bson_append_time_t(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_time_t(
            bab: Pbson_array_builder_t;
-           value: time_t): ByteBool; cdecl; external 'bson2.dll';
+           value: time_t): ByteBool; inline;
 
 // * *
 // * bson_append_timeval:
@@ -3870,13 +3870,13 @@ function bson_append_timeval(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: Ptimeval): ByteBool; cdecl; external 'bson2.dll';
+           value: Ptimeval): ByteBool; inline;
 
 // #define BSON_APPEND_TIMEVAL(b, key, val) bson_append_timeval(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_timeval(
            bab: Pbson_array_builder_t;
-           value: Ptimeval): ByteBool; cdecl; external 'bson2.dll';
+           value: Ptimeval): ByteBool; inline;
 
 // * *
 // * bson_append_date_time:
@@ -3893,13 +3893,13 @@ function bson_append_date_time(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: int64_t): ByteBool; cdecl; external 'bson2.dll';
+           value: int64_t): ByteBool; inline;
 
 // #define BSON_APPEND_DATE_TIME(b, key, val) bson_append_date_time(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_date_time(
            bab: Pbson_array_builder_t;
-           value: int64_t): ByteBool; cdecl; external 'bson2.dll';
+           value: int64_t): ByteBool; inline;
 
 // * *
 // * bson_append_now_utc:
@@ -3915,12 +3915,12 @@ function bson_array_builder_append_date_time(
 function bson_append_now_utc(
            bson: Pbson_t;
            key: PAnsiChar;
-           key_length: Integer): ByteBool; cdecl; external 'bson2.dll';
+           key_length: Integer): ByteBool; inline;
 
 // #define BSON_APPEND_NOW_UTC(b, key) bson_append_now_utc(b, key, (int)strlen(key))
 
 function bson_array_builder_append_now_utc(
-           bab: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
+           bab: Pbson_array_builder_t): ByteBool; inline;
 
 // * *
 // * bson_append_timestamp:
@@ -3943,14 +3943,14 @@ function bson_append_timestamp(
            key: PAnsiChar;
            key_length: Integer;
            timestamp: uint32_t;
-           increment: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           increment: uint32_t): ByteBool; inline;
 
 // #define BSON_APPEND_TIMESTAMP(b, key, val, inc) bson_append_timestamp(b, key, (int)strlen(key), val, inc)
 
 function bson_array_builder_append_timestamp(
            bab: Pbson_array_builder_t;
            timestamp: uint32_t;
-           increment: uint32_t): ByteBool; cdecl; external 'bson2.dll';
+           increment: uint32_t): ByteBool; inline;
 
 // * *
 // * bson_append_undefined:
@@ -3966,36 +3966,36 @@ function bson_array_builder_append_timestamp(
 function bson_append_undefined(
            bson: Pbson_t;
            key: PAnsiChar;
-           key_length: Integer): ByteBool; cdecl; external 'bson2.dll';
+           key_length: Integer): ByteBool; inline;
 
 // #define BSON_APPEND_UNDEFINED(b, key) bson_append_undefined(b, key, (int)strlen(key))
 
 function bson_array_builder_append_undefined(
-           bab: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
+           bab: Pbson_array_builder_t): ByteBool; inline;
 
 function bson_concat(
            dst: Pbson_t;
-           src: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
+           src: Pbson_t): ByteBool; inline;
 
 function bson_append_array_builder_begin(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           child: PPbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
+           child: PPbson_array_builder_t): ByteBool; inline;
 
 // #define BSON_APPEND_ARRAY_BUILDER_BEGIN(b, key, child) bson_append_array_builder_begin(b, key, (int)strlen(key), child)
 
 function bson_array_builder_append_array_builder_begin(
            bab: Pbson_array_builder_t;
-           child: PPbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
+           child: PPbson_array_builder_t): ByteBool; inline;
 
 function bson_append_array_builder_end(
            bson: Pbson_t;
-           child: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
+           child: Pbson_array_builder_t): ByteBool; inline;
 
 function bson_array_builder_append_array_builder_end(
            bab: Pbson_array_builder_t;
-           child: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
+           child: Pbson_array_builder_t): ByteBool; inline;
 
 ////////////////////
 // mongoc-prelude //
@@ -4493,71 +4493,71 @@ type
   mongoc_write_concern_t = _mongoc_write_concern_t;
   Pmongoc_write_concern_t = ^mongoc_write_concern_t;
 
-function mongoc_write_concern_new(): Pmongoc_write_concern_t; cdecl; external 'mongoc2.dll';
+function mongoc_write_concern_new(): Pmongoc_write_concern_t; inline;
 
 function mongoc_write_concern_copy(
-           write_concern: Pmongoc_write_concern_t): Pmongoc_write_concern_t; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): Pmongoc_write_concern_t; inline;
 
 procedure mongoc_write_concern_destroy(
-            write_concern: Pmongoc_write_concern_t); cdecl; external 'mongoc2.dll';
+            write_concern: Pmongoc_write_concern_t); inline;
 
 function mongoc_write_concern_get_journal(
-           write_concern: Pmongoc_write_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): ByteBool; inline;
 
 function mongoc_write_concern_journal_is_set(
-           write_concern: Pmongoc_write_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): ByteBool; inline;
 
 procedure mongoc_write_concern_set_journal(
             write_concern: Pmongoc_write_concern_t;
-            journal: ByteBool); cdecl; external 'mongoc2.dll';
+            journal: ByteBool); inline;
 
 function mongoc_write_concern_get_w(
-           write_concern: Pmongoc_write_concern_t): int32_t; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): int32_t; inline;
 
 procedure mongoc_write_concern_set_w(
             write_concern: Pmongoc_write_concern_t;
-            w: int32_t); cdecl; external 'mongoc2.dll';
+            w: int32_t); inline;
 
 function mongoc_write_concern_get_wtag(
-           write_concern: Pmongoc_write_concern_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): PAnsiChar; inline;
 
 procedure mongoc_write_concern_set_wtag(
             write_concern: Pmongoc_write_concern_t;
-            tag: PAnsiChar); cdecl; external 'mongoc2.dll';
+            tag: PAnsiChar); inline;
 
 function mongoc_write_concern_get_wtimeout(
-           write_concern: Pmongoc_write_concern_t): int32_t; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): int32_t; inline;
 
 function mongoc_write_concern_get_wtimeout_int64(
-           write_concern: Pmongoc_write_concern_t): int64_t; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): int64_t; inline;
 
 procedure mongoc_write_concern_set_wtimeout(
             write_concern: Pmongoc_write_concern_t;
-            wtimeout_msec: int32_t); cdecl; external 'mongoc2.dll';
+            wtimeout_msec: int32_t); inline;
 
 procedure mongoc_write_concern_set_wtimeout_int64(
             write_concern: Pmongoc_write_concern_t;
-            wtimeout_msec: int64_t); cdecl; external 'mongoc2.dll';
+            wtimeout_msec: int64_t); inline;
 
 function mongoc_write_concern_get_wmajority(
-           write_concern: Pmongoc_write_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): ByteBool; inline;
 
 procedure mongoc_write_concern_set_wmajority(
             write_concern: Pmongoc_write_concern_t;
-            wtimeout_msec: int32_t); cdecl; external 'mongoc2.dll';
+            wtimeout_msec: int32_t); inline;
 
 function mongoc_write_concern_is_acknowledged(
-           write_concern: Pmongoc_write_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): ByteBool; inline;
 
 function mongoc_write_concern_is_valid(
-           write_concern: Pmongoc_write_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): ByteBool; inline;
 
 function mongoc_write_concern_append(
            write_concern: Pmongoc_write_concern_t;
-           doc: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           doc: Pbson_t): ByteBool; inline;
 
 function mongoc_write_concern_is_default(
-           write_concern: Pmongoc_write_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): ByteBool; inline;
 
 /////////////////////////
 // mongoc-read-concern //
@@ -4575,21 +4575,21 @@ type
   mongoc_read_concern_t = _mongoc_read_concern_t;
   Pmongoc_read_concern_t = ^mongoc_read_concern_t;
 
-function mongoc_read_concern_new(): Pmongoc_read_concern_t; cdecl; external 'mongoc2.dll';
+function mongoc_read_concern_new(): Pmongoc_read_concern_t; inline;
 function mongoc_read_concern_copy(
-           read_concern: Pmongoc_read_concern_t): Pmongoc_read_concern_t; cdecl; external 'mongoc2.dll';
+           read_concern: Pmongoc_read_concern_t): Pmongoc_read_concern_t; inline;
 procedure mongoc_read_concern_destroy(
-            read_concern: Pmongoc_read_concern_t); cdecl; external 'mongoc2.dll';
+            read_concern: Pmongoc_read_concern_t); inline;
 function mongoc_read_concern_get_level(
-           read_concern: Pmongoc_read_concern_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           read_concern: Pmongoc_read_concern_t): PAnsiChar; inline;
 function mongoc_read_concern_set_level(
            read_concern: Pmongoc_read_concern_t;
-           level: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           level: PAnsiChar): ByteBool; inline;
 function mongoc_read_concern_append(
            read_concern: Pmongoc_read_concern_t;
-           doc: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           doc: Pbson_t): ByteBool; inline;
 function mongoc_read_concern_is_default(
-           read_concern: Pmongoc_read_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
+           read_concern: Pmongoc_read_concern_t): ByteBool; inline;
 
 /////////////////////
 // mongoc-optional //
@@ -4603,21 +4603,21 @@ type
   Pmongoc_optional_t = ^mongoc_optional_t;
 
 procedure mongoc_optional_init(
-            opt: Pmongoc_optional_t); cdecl; external 'mongoc2.dll';
+            opt: Pmongoc_optional_t); inline;
 
 function mongoc_optional_is_set(
-           opt: Pmongoc_optional_t): ByteBool; cdecl; external 'mongoc2.dll';
+           opt: Pmongoc_optional_t): ByteBool; inline;
 
 function mongoc_optional_value(
-           opt: Pmongoc_optional_t): ByteBool; cdecl; external 'mongoc2.dll';
+           opt: Pmongoc_optional_t): ByteBool; inline;
 
 procedure mongoc_optional_set_value(
             opt: Pmongoc_optional_t;
-            val: ByteBool); cdecl; external 'mongoc2.dll';
+            val: ByteBool); inline;
 
 procedure mongoc_optional_copy(
             source: Pmongoc_optional_t;
-            copy: Pmongoc_optional_t); cdecl; external 'mongoc2.dll';
+            copy: Pmongoc_optional_t); inline;
 
 //////////////////
 // mongoc-error //
@@ -4715,7 +4715,7 @@ type
 
 function mongoc_error_has_label(
            reply: Pbson_t;
-           &label: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           &label: PAnsiChar): ByteBool; inline;
 
 ////////////////////////////
 // mongoc-find-and-modify //
@@ -4734,63 +4734,63 @@ type
   mongoc_find_and_modify_opts_t = _mongoc_find_and_modify_opts_t;
   Pmongoc_find_and_modify_opts_t = ^mongoc_find_and_modify_opts_t;
 
-function mongoc_find_and_modify_opts_new(): Pmongoc_find_and_modify_opts_t; cdecl; external 'mongoc2.dll';
+function mongoc_find_and_modify_opts_new(): Pmongoc_find_and_modify_opts_t; inline;
 
 function mongoc_find_and_modify_opts_set_sort(
            opts: Pmongoc_find_and_modify_opts_t;
-           sort: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           sort: Pbson_t): ByteBool; inline;
 
 procedure mongoc_find_and_modify_opts_get_sort(
             opts: Pmongoc_find_and_modify_opts_t;
-            sort: Pbson_t); cdecl; external 'mongoc2.dll';
+            sort: Pbson_t); inline;
 
 function mongoc_find_and_modify_opts_set_update(
            opts: Pmongoc_find_and_modify_opts_t;
-           update: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           update: Pbson_t): ByteBool; inline;
 
 procedure mongoc_find_and_modify_opts_get_update(
             opts: Pmongoc_find_and_modify_opts_t;
-            update: Pbson_t); cdecl; external 'mongoc2.dll';
+            update: Pbson_t); inline;
 
 function mongoc_find_and_modify_opts_set_fields(
            opts: Pmongoc_find_and_modify_opts_t;
-           fields: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           fields: Pbson_t): ByteBool; inline;
 
 procedure mongoc_find_and_modify_opts_get_fields(
             opts: Pmongoc_find_and_modify_opts_t;
-            fields: Pbson_t); cdecl; external 'mongoc2.dll';
+            fields: Pbson_t); inline;
 
 function mongoc_find_and_modify_opts_set_flags(
            opts: Pmongoc_find_and_modify_opts_t;
-           flags: mongoc_find_and_modify_flags_t): ByteBool; cdecl; external 'mongoc2.dll';
+           flags: UInt32): ByteBool; inline;
 
 function mongoc_find_and_modify_opts_get_flags(
-           opts: Pmongoc_find_and_modify_opts_t): mongoc_find_and_modify_flags_t; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_find_and_modify_opts_t): mongoc_find_and_modify_flags_t; inline;
 
 function mongoc_find_and_modify_opts_set_bypass_document_validation(
            opts: Pmongoc_find_and_modify_opts_t;
-           bypass: ByteBool): ByteBool; cdecl; external 'mongoc2.dll';
+           bypass: ByteBool): ByteBool; inline;
 
 function mongoc_find_and_modify_opts_get_bypass_document_validation(
-           opts: Pmongoc_find_and_modify_opts_t): ByteBool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_find_and_modify_opts_t): ByteBool; inline;
 
 function mongoc_find_and_modify_opts_set_max_time_ms(
            opts: Pmongoc_find_and_modify_opts_t;
-           max_time_ms: uint32_t): ByteBool; cdecl; external 'mongoc2.dll';
+           max_time_ms: uint32_t): ByteBool; inline;
 
 function mongoc_find_and_modify_opts_get_max_time_ms(
-           opts: Pmongoc_find_and_modify_opts_t): uint32_t; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_find_and_modify_opts_t): uint32_t; inline;
 
 function mongoc_find_and_modify_opts_append(
            opts: Pmongoc_find_and_modify_opts_t;
-           extra: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           extra: Pbson_t): ByteBool; inline;
 
 procedure mongoc_find_and_modify_opts_get_extra(
             opts: Pmongoc_find_and_modify_opts_t;
-            extra: Pbson_t); cdecl; external 'mongoc2.dll';
+            extra: Pbson_t); inline;
 
 procedure mongoc_find_and_modify_opts_destroy(
-            opts: Pmongoc_find_and_modify_opts_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_find_and_modify_opts_t); inline;
 
 //////////////////////
 // mongoc-handshake //
@@ -4801,14 +4801,14 @@ const MONGOC_HANDSHAKE_APPNAME_MAX = 128;
 function mongoc_handshake_data_append(
            driver_name: PAnsiChar;
            driver_version: PAnsiChar;
-           platform: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           platform: PAnsiChar): ByteBool; inline;
 
 /////////////////
 // mongoc-init //
 /////////////////
 
-procedure mongoc_init(); cdecl; external 'mongoc2.dll';
-procedure mongoc_cleanup(); cdecl; external 'mongoc2.dll';
+procedure mongoc_init(); inline;
+procedure mongoc_cleanup(); inline;
 
 ////////////////
 // mongoc-log //
@@ -4860,7 +4860,7 @@ type
 // *
 procedure mongoc_log_set_handler(
             log_func: mongoc_log_func_t;
-            user_data: Pvoid); cdecl; external 'mongoc2.dll';
+            user_data: Pvoid); inline;
 
 // * *
 // * mongoc_log:
@@ -4878,13 +4878,13 @@ procedure mongoc_log_set_handler(
 procedure mongoc_log(
             log_level: mongoc_log_level_t;
             log_domain: PAnsiChar;
-            format: PAnsiChar); cdecl; varargs; external 'mongoc2.dll';
+            format: PAnsiChar); inline;
 
 procedure mongoc_log_default_handler(
             log_level: mongoc_log_level_t;
             log_domain: PAnsiChar;
             message: PAnsiChar;
-            user_data: Pvoid); cdecl; external 'mongoc2.dll';
+            user_data: Pvoid); inline;
 
 // * *
 // * mongoc_log_level_str:
@@ -4893,21 +4893,21 @@ procedure mongoc_log_default_handler(
 // * Returns: The string representation of log_level
 // *
 function mongoc_log_level_str(
-           log_level: mongoc_log_level_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           log_level: mongoc_log_level_t): PAnsiChar; inline;
 
 // * *
 // * mongoc_log_trace_enable:
 // *
 // * Enables tracing at runtime (if it has been enabled at compile time).
 // *
-procedure mongoc_log_trace_enable(); cdecl; external 'mongoc2.dll';
+procedure mongoc_log_trace_enable(); inline;
 
 // * *
 // * mongoc_log_trace_disable:
 // *
 // * Disables tracing at runtime (if it has been enabled at compile time).
 // *
-procedure mongoc_log_trace_disable(); cdecl; external 'mongoc2.dll';
+procedure mongoc_log_trace_disable(); inline;
 
 //////////////////////////
 // mongoc-oidc-callback //
@@ -4934,55 +4934,55 @@ type
     params: Pmongoc_oidc_callback_params_t): Pmongoc_oidc_credential_t; cdecl;
 
 function mongoc_oidc_callback_new(
-           fn: mongoc_oidc_callback_fn_t): Pmongoc_oidc_callback_t; cdecl; external 'mongoc2.dll';
+           fn: mongoc_oidc_callback_fn_t): Pmongoc_oidc_callback_t; inline;
 
 function mongoc_oidc_callback_new_with_user_data(
            fn: mongoc_oidc_callback_fn_t;
-           user_data: Pvoid): Pmongoc_oidc_callback_t; cdecl; external 'mongoc2.dll';
+           user_data: Pvoid): Pmongoc_oidc_callback_t; inline;
 
 procedure mongoc_oidc_callback_destroy(
-            callback: Pmongoc_oidc_callback_t); cdecl; external 'mongoc2.dll';
+            callback: Pmongoc_oidc_callback_t); inline;
 
 function mongoc_oidc_callback_get_fn(
-           callback: Pmongoc_oidc_callback_t): mongoc_oidc_callback_fn_t; cdecl; external 'mongoc2.dll';
+           callback: Pmongoc_oidc_callback_t): mongoc_oidc_callback_fn_t; inline;
 
 function mongoc_oidc_callback_get_user_data(
-           callback: Pmongoc_oidc_callback_t): Pvoid; cdecl; external 'mongoc2.dll';
+           callback: Pmongoc_oidc_callback_t): Pvoid; inline;
 
 procedure mongoc_oidc_callback_set_user_data(
             callback: Pmongoc_oidc_callback_t;
-            user_data: Pvoid); cdecl; external 'mongoc2.dll';
+            user_data: Pvoid); inline;
 
 function mongoc_oidc_callback_params_get_version(
-           params: Pmongoc_oidc_callback_params_t): int32_t; cdecl; external 'mongoc2.dll';
+           params: Pmongoc_oidc_callback_params_t): int32_t; inline;
 
 function mongoc_oidc_callback_params_get_user_data(
-           params: Pmongoc_oidc_callback_params_t): Pvoid; cdecl; external 'mongoc2.dll';
+           params: Pmongoc_oidc_callback_params_t): Pvoid; inline;
 
 function mongoc_oidc_callback_params_get_timeout(
-           params: Pmongoc_oidc_callback_params_t): Pint64_t; cdecl; external 'mongoc2.dll';
+           params: Pmongoc_oidc_callback_params_t): Pint64_t; inline;
 
 function mongoc_oidc_callback_params_get_username(
-           params: Pmongoc_oidc_callback_params_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           params: Pmongoc_oidc_callback_params_t): PAnsiChar; inline;
 
 function mongoc_oidc_callback_params_cancel_with_timeout(
-           params: Pmongoc_oidc_callback_params_t): Pmongoc_oidc_credential_t; cdecl; external 'mongoc2.dll';
+           params: Pmongoc_oidc_callback_params_t): Pmongoc_oidc_credential_t; inline;
 
 function mongoc_oidc_credential_new(
-           access_token: PAnsiChar): Pmongoc_oidc_credential_t; cdecl; external 'mongoc2.dll';
+           access_token: PAnsiChar): Pmongoc_oidc_credential_t; inline;
 
 function mongoc_oidc_credential_new_with_expires_in(
            access_token: PAnsiChar;
-           expires_in: int64_t): Pmongoc_oidc_credential_t; cdecl; external 'mongoc2.dll';
+           expires_in: int64_t): Pmongoc_oidc_credential_t; inline;
 
 procedure mongoc_oidc_credential_destroy(
-            cred: Pmongoc_oidc_credential_t); cdecl; external 'mongoc2.dll';
+            cred: Pmongoc_oidc_credential_t); inline;
 
 function mongoc_oidc_credential_get_access_token(
-           cred: Pmongoc_oidc_credential_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           cred: Pmongoc_oidc_credential_t): PAnsiChar; inline;
 
 function mongoc_oidc_credential_get_expires_in(
-           cred: Pmongoc_oidc_credential_t): Pint64_t; cdecl; external 'mongoc2.dll';
+           cred: Pmongoc_oidc_credential_t): Pint64_t; inline;
 
 /////////////////
 // mongoc-rand //
@@ -4990,12 +4990,12 @@ function mongoc_oidc_credential_get_expires_in(
 
 procedure mongoc_rand_seed(
             buf: Pvoid;
-            num: Integer); cdecl; external 'mongoc2.dll';
+            num: Integer); inline;
 procedure mongoc_rand_add(
             buf: Pvoid;
             num: Integer;
-            entropy: double); cdecl; external 'mongoc2.dll';
-function mongoc_rand_status(): Integer; cdecl; external 'mongoc2.dll';
+            entropy: double); inline;
+function mongoc_rand_status(): Integer; inline;
 
 ///////////////////////
 // mongoc-read-prefs //
@@ -5024,50 +5024,50 @@ type
     MONGOC_READ_NEAREST = (1 shl 3) or MONGOC_READ_SECONDARY);
 
 function mongoc_read_prefs_new(
-           read_mode: mongoc_read_mode_t): Pmongoc_read_prefs_t; cdecl; external 'mongoc2.dll';
+           read_mode: mongoc_read_mode_t): Pmongoc_read_prefs_t; inline;
 
 function mongoc_read_prefs_copy(
-           read_prefs: Pmongoc_read_prefs_t): Pmongoc_read_prefs_t; cdecl; external 'mongoc2.dll';
+           read_prefs: Pmongoc_read_prefs_t): Pmongoc_read_prefs_t; inline;
 
 procedure mongoc_read_prefs_destroy(
-            read_prefs: Pmongoc_read_prefs_t); cdecl; external 'mongoc2.dll';
+            read_prefs: Pmongoc_read_prefs_t); inline;
 
 function mongoc_read_prefs_get_mode(
-           read_prefs: Pmongoc_read_prefs_t): mongoc_read_mode_t; cdecl; external 'mongoc2.dll';
+           read_prefs: Pmongoc_read_prefs_t): mongoc_read_mode_t; inline;
 
 procedure mongoc_read_prefs_set_mode(
             read_prefs: Pmongoc_read_prefs_t;
-            mode: mongoc_read_mode_t); cdecl; external 'mongoc2.dll';
+            mode: mongoc_read_mode_t); inline;
 
 function mongoc_read_prefs_get_tags(
-           read_prefs: Pmongoc_read_prefs_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           read_prefs: Pmongoc_read_prefs_t): Pbson_t; inline;
 
 procedure mongoc_read_prefs_set_tags(
             read_prefs: Pmongoc_read_prefs_t;
-            tags: Pbson_t); cdecl; external 'mongoc2.dll';
+            tags: Pbson_t); inline;
 
 procedure mongoc_read_prefs_add_tag(
             read_prefs: Pmongoc_read_prefs_t;
-            tag: Pbson_t); cdecl; external 'mongoc2.dll';
+            tag: Pbson_t); inline;
 
 function mongoc_read_prefs_get_max_staleness_seconds(
-           read_prefs: Pmongoc_read_prefs_t): int64_t; cdecl; external 'mongoc2.dll';
+           read_prefs: Pmongoc_read_prefs_t): int64_t; inline;
 
 procedure mongoc_read_prefs_set_max_staleness_seconds(
             read_prefs: Pmongoc_read_prefs_t;
-            max_staleness_seconds: int64_t); cdecl; external 'mongoc2.dll';
+            max_staleness_seconds: int64_t); inline;
 
 // BSON_DEPRECATED("Hedged reads are deprecated in MongoDB 8.0 and will be removed in a future release")
 function mongoc_read_prefs_get_hedge(
-           read_prefs: Pmongoc_read_prefs_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           read_prefs: Pmongoc_read_prefs_t): Pbson_t; inline;
 
 // BSON_DEPRECATED("Hedged reads are deprecated in MongoDB 8.0 and will be removed in a future release")
 procedure mongoc_read_prefs_set_hedge(
             read_prefs: Pmongoc_read_prefs_t;
-            hedge: Pbson_t); cdecl; external 'mongoc2.dll';
+            hedge: Pbson_t); inline;
 
 function mongoc_read_prefs_is_valid(
-           read_prefs: Pmongoc_read_prefs_t): ByteBool; cdecl; external 'mongoc2.dll';
+           read_prefs: Pmongoc_read_prefs_t): ByteBool; inline;
 
 ///////////////////////
 // mongoc-server-api //
@@ -5085,37 +5085,37 @@ type
   Pmongoc_server_api_t = ^mongoc_server_api_t;
 
 function mongoc_server_api_version_to_string(
-           version: mongoc_server_api_version_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           version: mongoc_server_api_version_t): PAnsiChar; inline;
 
 function mongoc_server_api_version_from_string(
            version: PAnsiChar;
-           param1: Pmongoc_server_api_version_t): ByteBool; cdecl; external 'mongoc2.dll';
+           param1: Pmongoc_server_api_version_t): ByteBool; inline;
 
 function mongoc_server_api_new(
-           version: mongoc_server_api_version_t): Pmongoc_server_api_t; cdecl; external 'mongoc2.dll';
+           version: mongoc_server_api_version_t): Pmongoc_server_api_t; inline;
 
 function mongoc_server_api_copy(
-           api: Pmongoc_server_api_t): Pmongoc_server_api_t; cdecl; external 'mongoc2.dll';
+           api: Pmongoc_server_api_t): Pmongoc_server_api_t; inline;
 
 procedure mongoc_server_api_destroy(
-            api: Pmongoc_server_api_t); cdecl; external 'mongoc2.dll';
+            api: Pmongoc_server_api_t); inline;
 
 procedure mongoc_server_api_strict(
             api: Pmongoc_server_api_t;
-            strict: ByteBool); cdecl; external 'mongoc2.dll';
+            strict: ByteBool); inline;
 
 procedure mongoc_server_api_deprecation_errors(
             api: Pmongoc_server_api_t;
-            deprecation_errors: ByteBool); cdecl; external 'mongoc2.dll';
+            deprecation_errors: ByteBool); inline;
 
 function mongoc_server_api_get_deprecation_errors(
-           api: Pmongoc_server_api_t): Pmongoc_optional_t; cdecl; external 'mongoc2.dll';
+           api: Pmongoc_server_api_t): Pmongoc_optional_t; inline;
 
 function mongoc_server_api_get_strict(
-           api: Pmongoc_server_api_t): Pmongoc_optional_t; cdecl; external 'mongoc2.dll';
+           api: Pmongoc_server_api_t): Pmongoc_optional_t; inline;
 
 function mongoc_server_api_get_version(
-           api: Pmongoc_server_api_t): mongoc_server_api_version_t; cdecl; external 'mongoc2.dll';
+           api: Pmongoc_server_api_t): mongoc_server_api_version_t; inline;
 
 ///////////////////////////////
 // mongoc-server-description //
@@ -5129,31 +5129,31 @@ type
   PPmongoc_server_description_t = ^Pmongoc_server_description_t;
 
 procedure mongoc_server_description_destroy(
-            description: Pmongoc_server_description_t); cdecl; external 'mongoc2.dll';
+            description: Pmongoc_server_description_t); inline;
 
 function mongoc_server_description_new_copy(
-           description: Pmongoc_server_description_t): Pmongoc_server_description_t; cdecl; external 'mongoc2.dll';
+           description: Pmongoc_server_description_t): Pmongoc_server_description_t; inline;
 
 function mongoc_server_description_id(
-           description: Pmongoc_server_description_t): uint32_t; cdecl; external 'mongoc2.dll';
+           description: Pmongoc_server_description_t): uint32_t; inline;
 
 function mongoc_server_description_host(
-           description: Pmongoc_server_description_t): Pmongoc_host_list_t; cdecl; external 'mongoc2.dll';
+           description: Pmongoc_server_description_t): Pmongoc_host_list_t; inline;
 
 function mongoc_server_description_last_update_time(
-           description: Pmongoc_server_description_t): int64_t; cdecl; external 'mongoc2.dll';
+           description: Pmongoc_server_description_t): int64_t; inline;
 
 function mongoc_server_description_round_trip_time(
-           description: Pmongoc_server_description_t): int64_t; cdecl; external 'mongoc2.dll';
+           description: Pmongoc_server_description_t): int64_t; inline;
 
 function mongoc_server_description_type(
-           description: Pmongoc_server_description_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           description: Pmongoc_server_description_t): PAnsiChar; inline;
 
 function mongoc_server_description_hello_response(
-           description: Pmongoc_server_description_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           description: Pmongoc_server_description_t): Pbson_t; inline;
 
 function mongoc_server_description_compressor_id(
-           description: Pmongoc_server_description_t): int32_t; cdecl; external 'mongoc2.dll';
+           description: Pmongoc_server_description_t): int32_t; inline;
 
 ////////////////
 // mongoc-ssl //
@@ -5177,7 +5177,7 @@ type
 // void * padding[6];
 // };
 
-function mongoc_ssl_opt_get_default(): Pmongoc_ssl_opt_t; cdecl; external 'mongoc2.dll';
+function mongoc_ssl_opt_get_default(): Pmongoc_ssl_opt_t; inline;
 
 ///////////////////
 // mongoc-socket //
@@ -5202,67 +5202,67 @@ type
 
 function mongoc_socket_accept(
            sock: Pmongoc_socket_t;
-           expire_at: int64_t): Pmongoc_socket_t; cdecl; external 'mongoc2.dll';
+           expire_at: int64_t): Pmongoc_socket_t; inline;
 function mongoc_socket_bind(
            sock: Pmongoc_socket_t;
            addr: Psockaddr;
-           addrlen: mongoc_socklen_t): Integer; cdecl; external 'mongoc2.dll';
+           addrlen: mongoc_socklen_t): Integer; inline;
 function mongoc_socket_close(
-           socket: Pmongoc_socket_t): Integer; cdecl; external 'mongoc2.dll';
+           socket: Pmongoc_socket_t): Integer; inline;
 function mongoc_socket_connect(
            sock: Pmongoc_socket_t;
            addr: Psockaddr;
            addrlen: mongoc_socklen_t;
-           expire_at: int64_t): Integer; cdecl; external 'mongoc2.dll';
+           expire_at: int64_t): Integer; inline;
 function mongoc_socket_getnameinfo(
-           sock: Pmongoc_socket_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           sock: Pmongoc_socket_t): PAnsiChar; inline;
 procedure mongoc_socket_destroy(
-            sock: Pmongoc_socket_t); cdecl; external 'mongoc2.dll';
+            sock: Pmongoc_socket_t); inline;
 function mongoc_socket_errno(
-           sock: Pmongoc_socket_t): Integer; cdecl; external 'mongoc2.dll';
+           sock: Pmongoc_socket_t): Integer; inline;
 function mongoc_socket_getsockname(
            sock: Pmongoc_socket_t;
            addr: Psockaddr;
-           addrlen: Pmongoc_socklen_t): Integer; cdecl; external 'mongoc2.dll';
+           addrlen: Pmongoc_socklen_t): Integer; inline;
 function mongoc_socket_listen(
            sock: Pmongoc_socket_t;
-           backlog: UINT): Integer; cdecl; external 'mongoc2.dll';
+           backlog: UINT): Integer; inline;
 function mongoc_socket_new(
            domain: Integer;
            &type: Integer;
-           protocol: Integer): Pmongoc_socket_t; cdecl; external 'mongoc2.dll';
+           protocol: Integer): Pmongoc_socket_t; inline;
 function mongoc_socket_recv(
            sock: Pmongoc_socket_t;
            buf: Pvoid;
            buflen: size_t;
            flags: Integer;
-           expire_at: int64_t): ssize_t; cdecl; external 'mongoc2.dll';
+           expire_at: int64_t): ssize_t; inline;
 function mongoc_socket_setsockopt(
            sock: Pmongoc_socket_t;
            level: Integer;
            optname: Integer;
            optval: Pvoid;
-           optlen: mongoc_socklen_t): Integer; cdecl; external 'mongoc2.dll';
+           optlen: mongoc_socklen_t): Integer; inline;
 function mongoc_socket_send(
            sock: Pmongoc_socket_t;
            buf: Pvoid;
            buflen: size_t;
-           expire_at: int64_t): ssize_t; cdecl; external 'mongoc2.dll';
+           expire_at: int64_t): ssize_t; inline;
 function mongoc_socket_sendv(
            sock: Pmongoc_socket_t;
            iov: Pmongoc_iovec_t;
            iovcnt: size_t;
-           expire_at: int64_t): ssize_t; cdecl; external 'mongoc2.dll';
+           expire_at: int64_t): ssize_t; inline;
 function mongoc_socket_check_closed(
-           sock: Pmongoc_socket_t): ByteBool; cdecl; external 'mongoc2.dll';
+           sock: Pmongoc_socket_t): ByteBool; inline;
 procedure mongoc_socket_inet_ntop(
             rp: Paddrinfo;
             buf: PAnsiChar;
-            buflen: size_t); cdecl; external 'mongoc2.dll';
+            buflen: size_t); inline;
 function mongoc_socket_poll(
            sds: Pmongoc_socket_poll_t;
            nsds: size_t;
-           timeout: int32_t): ssize_t; cdecl; external 'mongoc2.dll';
+           timeout: int32_t): ssize_t; inline;
 
 ///////////////////
 // mongoc-stream //
@@ -5314,51 +5314,51 @@ type
 // };
 
 function mongoc_stream_get_base_stream(
-           stream: Pmongoc_stream_t): Pmongoc_stream_t; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_t): Pmongoc_stream_t; inline;
 function mongoc_stream_get_tls_stream(
-           stream: Pmongoc_stream_t): Pmongoc_stream_t; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_t): Pmongoc_stream_t; inline;
 function mongoc_stream_close(
-           stream: Pmongoc_stream_t): Integer; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_t): Integer; inline;
 procedure mongoc_stream_destroy(
-            stream: Pmongoc_stream_t); cdecl; external 'mongoc2.dll';
+            stream: Pmongoc_stream_t); inline;
 procedure mongoc_stream_failed(
-            stream: Pmongoc_stream_t); cdecl; external 'mongoc2.dll';
+            stream: Pmongoc_stream_t); inline;
 function mongoc_stream_flush(
-           stream: Pmongoc_stream_t): Integer; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_t): Integer; inline;
 function mongoc_stream_writev(
            stream: Pmongoc_stream_t;
            iov: Pmongoc_iovec_t;
            iovcnt: size_t;
-           timeout_msec: int32_t): ssize_t; cdecl; external 'mongoc2.dll';
+           timeout_msec: int32_t): ssize_t; inline;
 function mongoc_stream_write(
            stream: Pmongoc_stream_t;
            buf: Pvoid;
            count: size_t;
-           timeout_msec: int32_t): ssize_t; cdecl; external 'mongoc2.dll';
+           timeout_msec: int32_t): ssize_t; inline;
 function mongoc_stream_readv(
            stream: Pmongoc_stream_t;
            iov: Pmongoc_iovec_t;
            iovcnt: size_t;
            min_bytes: size_t;
-           timeout_msec: int32_t): ssize_t; cdecl; external 'mongoc2.dll';
+           timeout_msec: int32_t): ssize_t; inline;
 function mongoc_stream_read(
            stream: Pmongoc_stream_t;
            buf: Pvoid;
            count: size_t;
            min_bytes: size_t;
-           timeout_msec: int32_t): ssize_t; cdecl; external 'mongoc2.dll';
+           timeout_msec: int32_t): ssize_t; inline;
 function mongoc_stream_setsockopt(
            stream: Pmongoc_stream_t;
            level: Integer;
            optname: Integer;
            optval: Pvoid;
-           optlen: mongoc_socklen_t): Integer; cdecl; external 'mongoc2.dll';
+           optlen: mongoc_socklen_t): Integer; inline;
 function mongoc_stream_check_closed(
-           stream: Pmongoc_stream_t): ByteBool; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_t): ByteBool; inline;
 function mongoc_stream_timed_out(
-           stream: Pmongoc_stream_t): ByteBool; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_t): ByteBool; inline;
 function mongoc_stream_should_retry(
-           stream: Pmongoc_stream_t): ByteBool; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_t): ByteBool; inline;
 
 // * *
 // * @brief Poll a set of streams
@@ -5371,7 +5371,7 @@ function mongoc_stream_should_retry(
 function mongoc_stream_poll(
            streams: Pmongoc_stream_poll_t;
            nstreams: size_t;
-           timeout_ms: int32_t): ssize_t; cdecl; external 'mongoc2.dll';
+           timeout_ms: int32_t): ssize_t; inline;
 
 ////////////////////////////
 // mongoc-stream-buffered //
@@ -5379,7 +5379,7 @@ function mongoc_stream_poll(
 
 function mongoc_stream_buffered_new(
            base_stream: Pmongoc_stream_t;
-           buffer_size: size_t): Pmongoc_stream_t; cdecl; external 'mongoc2.dll';
+           buffer_size: size_t): Pmongoc_stream_t; inline;
 
 ////////////////////////
 // mongoc-stream-file //
@@ -5392,13 +5392,13 @@ type
   Pmongoc_stream_file_t = ^mongoc_stream_file_t;
 
 function mongoc_stream_file_new(
-           fd: Integer): Pmongoc_stream_t; cdecl; external 'mongoc2.dll';
+           fd: Integer): Pmongoc_stream_t; inline;
 function mongoc_stream_file_new_for_path(
            path: PAnsiChar;
            flags: Integer;
-           mode: Integer): Pmongoc_stream_t; cdecl; external 'mongoc2.dll';
+           mode: Integer): Pmongoc_stream_t; inline;
 function mongoc_stream_file_get_fd(
-           stream: Pmongoc_stream_file_t): Integer; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_file_t): Integer; inline;
 
 //////////////////////////
 // mongoc-stream-socket //
@@ -5411,9 +5411,9 @@ type
   Pmongoc_stream_socket_t = ^mongoc_stream_socket_t;
 
 function mongoc_stream_socket_new(
-           socket: Pmongoc_socket_t): Pmongoc_stream_t; cdecl; external 'mongoc2.dll';
+           socket: Pmongoc_socket_t): Pmongoc_stream_t; inline;
 function mongoc_stream_socket_get_socket(
-           stream: Pmongoc_stream_socket_t): Pmongoc_socket_t; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_socket_t): Pmongoc_socket_t; inline;
 
 ///////////////////////////
 // mongoc-structured-log //
@@ -5455,80 +5455,80 @@ type
     entry: Pmongoc_structured_log_entry_t;
     user_data: Pvoid); cdecl;
 
-function mongoc_structured_log_opts_new(): Pmongoc_structured_log_opts_t; cdecl; external 'mongoc2.dll';
+function mongoc_structured_log_opts_new(): Pmongoc_structured_log_opts_t; inline;
 
 procedure mongoc_structured_log_opts_destroy(
-            opts: Pmongoc_structured_log_opts_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_structured_log_opts_t); inline;
 
 procedure mongoc_structured_log_opts_set_handler(
             opts: Pmongoc_structured_log_opts_t;
             log_func: mongoc_structured_log_func_t;
-            user_data: Pvoid); cdecl; external 'mongoc2.dll';
+            user_data: Pvoid); inline;
 
 function mongoc_structured_log_opts_set_max_level_for_component(
            opts: Pmongoc_structured_log_opts_t;
            component: mongoc_structured_log_component_t;
-           level: mongoc_structured_log_level_t): ByteBool; cdecl; external 'mongoc2.dll';
+           level: mongoc_structured_log_level_t): ByteBool; inline;
 
 function mongoc_structured_log_opts_set_max_level_for_all_components(
            opts: Pmongoc_structured_log_opts_t;
-           level: mongoc_structured_log_level_t): ByteBool; cdecl; external 'mongoc2.dll';
+           level: mongoc_structured_log_level_t): ByteBool; inline;
 
 function mongoc_structured_log_opts_set_max_levels_from_env(
-           opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_structured_log_opts_t): ByteBool; inline;
 
 function mongoc_structured_log_opts_get_max_level_for_component(
            opts: Pmongoc_structured_log_opts_t;
-           component: mongoc_structured_log_component_t): mongoc_structured_log_level_t; cdecl; external 'mongoc2.dll';
+           component: mongoc_structured_log_component_t): mongoc_structured_log_level_t; inline;
 
 function mongoc_structured_log_opts_get_max_document_length(
-           opts: Pmongoc_structured_log_opts_t): size_t; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_structured_log_opts_t): size_t; inline;
 
 function mongoc_structured_log_opts_set_max_document_length_from_env(
-           opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_structured_log_opts_t): ByteBool; inline;
 
 function mongoc_structured_log_opts_set_max_document_length(
            opts: Pmongoc_structured_log_opts_t;
-           max_document_length: size_t): ByteBool; cdecl; external 'mongoc2.dll';
+           max_document_length: size_t): ByteBool; inline;
 
 function mongoc_structured_log_entry_message_as_bson(
-           entry: Pmongoc_structured_log_entry_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           entry: Pmongoc_structured_log_entry_t): Pbson_t; inline;
 
 function mongoc_structured_log_entry_get_level(
-           entry: Pmongoc_structured_log_entry_t): mongoc_structured_log_level_t; cdecl; external 'mongoc2.dll';
+           entry: Pmongoc_structured_log_entry_t): mongoc_structured_log_level_t; inline;
 
 function mongoc_structured_log_entry_get_component(
-           entry: Pmongoc_structured_log_entry_t): mongoc_structured_log_component_t; cdecl; external 'mongoc2.dll';
+           entry: Pmongoc_structured_log_entry_t): mongoc_structured_log_component_t; inline;
 
 function mongoc_structured_log_entry_get_message_string(
-           entry: Pmongoc_structured_log_entry_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           entry: Pmongoc_structured_log_entry_t): PAnsiChar; inline;
 
 function mongoc_structured_log_get_level_name(
-           level: mongoc_structured_log_level_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           level: mongoc_structured_log_level_t): PAnsiChar; inline;
 
 function mongoc_structured_log_get_named_level(
            name: PAnsiChar;
-           param1: Pmongoc_structured_log_level_t): ByteBool; cdecl; external 'mongoc2.dll';
+           param1: Pmongoc_structured_log_level_t): ByteBool; inline;
 
 function mongoc_structured_log_get_component_name(
-           component: mongoc_structured_log_component_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           component: mongoc_structured_log_component_t): PAnsiChar; inline;
 
 function mongoc_structured_log_get_named_component(
            name: PAnsiChar;
-           param1: Pmongoc_structured_log_component_t): ByteBool; cdecl; external 'mongoc2.dll';
+           param1: Pmongoc_structured_log_component_t): ByteBool; inline;
 
 //////////////////////////////
 // mongoc-version-functions //
 //////////////////////////////
 
-function mongoc_get_major_version(): Integer; cdecl; external 'mongoc2.dll';
-function mongoc_get_minor_version(): Integer; cdecl; external 'mongoc2.dll';
-function mongoc_get_micro_version(): Integer; cdecl; external 'mongoc2.dll';
-function mongoc_get_version(): PAnsiChar; cdecl; external 'mongoc2.dll';
+function mongoc_get_major_version(): Integer; inline;
+function mongoc_get_minor_version(): Integer; inline;
+function mongoc_get_micro_version(): Integer; inline;
+function mongoc_get_version(): PAnsiChar; inline;
 function mongoc_check_version(
            required_major: Integer;
            required_minor: Integer;
-           required_micro: Integer): ByteBool; cdecl; external 'mongoc2.dll';
+           required_micro: Integer): ByteBool; inline;
 
 ///////////////////
 // mongoc-cursor //
@@ -5544,47 +5544,47 @@ type
 // struct _mongoc_client_t;
 
 function mongoc_cursor_clone(
-           cursor: Pmongoc_cursor_t): Pmongoc_cursor_t; cdecl; external 'mongoc2.dll';
+           cursor: Pmongoc_cursor_t): Pmongoc_cursor_t; inline;
 
 procedure mongoc_cursor_destroy(
-            cursor: Pmongoc_cursor_t); cdecl; external 'mongoc2.dll';
+            cursor: Pmongoc_cursor_t); inline;
 
 function mongoc_cursor_more(
-           cursor: Pmongoc_cursor_t): ByteBool; cdecl; external 'mongoc2.dll';
+           cursor: Pmongoc_cursor_t): ByteBool; inline;
 
 function mongoc_cursor_next(
            cursor: Pmongoc_cursor_t;
-           bson: PPbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           bson: PPbson_t): ByteBool; inline;
 
 function mongoc_cursor_error(
            cursor: Pmongoc_cursor_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_cursor_error_document(
            cursor: Pmongoc_cursor_t;
            error: Pbson_error_t;
-           doc: PPbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           doc: PPbson_t): ByteBool; inline;
 
 procedure mongoc_cursor_get_host(
             cursor: Pmongoc_cursor_t;
-            host: Pmongoc_host_list_t); cdecl; external 'mongoc2.dll';
+            host: Pmongoc_host_list_t); inline;
 
 function mongoc_cursor_current(
-           cursor: Pmongoc_cursor_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           cursor: Pmongoc_cursor_t): Pbson_t; inline;
 
 procedure mongoc_cursor_set_batch_size(
             cursor: Pmongoc_cursor_t;
-            batch_size: uint32_t); cdecl; external 'mongoc2.dll';
+            batch_size: uint32_t); inline;
 
 function mongoc_cursor_get_batch_size(
-           cursor: Pmongoc_cursor_t): uint32_t; cdecl; external 'mongoc2.dll';
+           cursor: Pmongoc_cursor_t): uint32_t; inline;
 
 function mongoc_cursor_set_limit(
            cursor: Pmongoc_cursor_t;
-           limit: int64_t): ByteBool; cdecl; external 'mongoc2.dll';
+           limit: int64_t): ByteBool; inline;
 
 function mongoc_cursor_get_limit(
-           cursor: Pmongoc_cursor_t): int64_t; cdecl; external 'mongoc2.dll';
+           cursor: Pmongoc_cursor_t): int64_t; inline;
 
 // `mongoc_cursor_set_hint` is deprecated for more aptly named `mongoc_cursor_set_server_id`.
 // BSON_DEPRECATED_FOR(mongoc_cursor_set_server_id)
@@ -5592,29 +5592,29 @@ function mongoc_cursor_get_limit(
 
 function mongoc_cursor_set_server_id(
            cursor: Pmongoc_cursor_t;
-           server_id: uint32_t): ByteBool; cdecl; external 'mongoc2.dll';
+           server_id: uint32_t): ByteBool; inline;
 
 // `mongoc_cursor_get_hint` is deprecated for more aptly named `mongoc_cursor_get_server_id`.
 // BSON_DEPRECATED_FOR(mongoc_cursor_get_server_id)
 // uint32_t __CALLCONV__ mongoc_cursor_get_hint(const mongoc_cursor_t * cursor);
 
 function mongoc_cursor_get_server_id(
-           cursor: Pmongoc_cursor_t): uint32_t; cdecl; external 'mongoc2.dll';
+           cursor: Pmongoc_cursor_t): uint32_t; inline;
 
 function mongoc_cursor_get_id(
-           cursor: Pmongoc_cursor_t): int64_t; cdecl; external 'mongoc2.dll';
+           cursor: Pmongoc_cursor_t): int64_t; inline;
 
 procedure mongoc_cursor_set_max_await_time_ms(
             cursor: Pmongoc_cursor_t;
-            max_await_time_ms: uint32_t); cdecl; external 'mongoc2.dll';
+            max_await_time_ms: uint32_t); inline;
 
 function mongoc_cursor_get_max_await_time_ms(
-           cursor: Pmongoc_cursor_t): uint32_t; cdecl; external 'mongoc2.dll';
+           cursor: Pmongoc_cursor_t): uint32_t; inline;
 
 function mongoc_cursor_new_from_command_reply_with_opts(
            client: P_mongoc_client_t;
            reply: Pbson_t;
-           opts: Pbson_t): Pmongoc_cursor_t; cdecl; external 'mongoc2.dll';
+           opts: Pbson_t): Pmongoc_cursor_t; inline;
 
 //////////////////////////
 // mongoc-change-stream //
@@ -5627,19 +5627,19 @@ type
   Pmongoc_change_stream_t = ^mongoc_change_stream_t;
 
 procedure mongoc_change_stream_destroy(
-            stream: Pmongoc_change_stream_t); cdecl; external 'mongoc2.dll';
+            stream: Pmongoc_change_stream_t); inline;
 
 function mongoc_change_stream_get_resume_token(
-           stream: Pmongoc_change_stream_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_change_stream_t): Pbson_t; inline;
 
 function mongoc_change_stream_next(
            stream: Pmongoc_change_stream_t;
-           bson: PPbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           bson: PPbson_t): ByteBool; inline;
 
 function mongoc_change_stream_error_document(
            stream: Pmongoc_change_stream_t;
            err: Pbson_error_t;
-           bson: PPbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           bson: PPbson_t): ByteBool; inline;
 
 ///////////////////////////
 // mongoc-bulk-operation //
@@ -5662,93 +5662,93 @@ type
   mongoc_bulk_write_flags_t = _mongoc_bulk_write_flags_t;
 
 procedure mongoc_bulk_operation_destroy(
-            bulk: Pmongoc_bulk_operation_t); cdecl; external 'mongoc2.dll';
+            bulk: Pmongoc_bulk_operation_t); inline;
 
 function mongoc_bulk_operation_execute(
            bulk: Pmongoc_bulk_operation_t;
            reply: Pbson_t;
-           error: Pbson_error_t): uint32_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): uint32_t; inline;
 
 procedure mongoc_bulk_operation_insert(
             bulk: Pmongoc_bulk_operation_t;
-            document: Pbson_t); cdecl; external 'mongoc2.dll';
+            document: Pbson_t); inline;
 
 function mongoc_bulk_operation_insert_with_opts(
            bulk: Pmongoc_bulk_operation_t;
            document: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll'; (* OUT *)
+           error: Pbson_error_t): ByteBool; inline; (* OUT *)
 
 procedure mongoc_bulk_operation_remove(
             bulk: Pmongoc_bulk_operation_t;
-            selector: Pbson_t); cdecl; external 'mongoc2.dll';
+            selector: Pbson_t); inline;
 
 function mongoc_bulk_operation_remove_many_with_opts(
            bulk: Pmongoc_bulk_operation_t;
            selector: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll'; (* OUT *)
+           error: Pbson_error_t): ByteBool; inline; (* OUT *)
 
 procedure mongoc_bulk_operation_remove_one(
             bulk: Pmongoc_bulk_operation_t;
-            selector: Pbson_t); cdecl; external 'mongoc2.dll';
+            selector: Pbson_t); inline;
 
 function mongoc_bulk_operation_remove_one_with_opts(
            bulk: Pmongoc_bulk_operation_t;
            selector: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll'; (* OUT *)
+           error: Pbson_error_t): ByteBool; inline; (* OUT *)
 
 procedure mongoc_bulk_operation_replace_one(
             bulk: Pmongoc_bulk_operation_t;
             selector: Pbson_t;
             document: Pbson_t;
-            upsert: ByteBool); cdecl; external 'mongoc2.dll';
+            upsert: ByteBool); inline;
 
 function mongoc_bulk_operation_replace_one_with_opts(
            bulk: Pmongoc_bulk_operation_t;
            selector: Pbson_t;
            document: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll'; (* OUT *)
+           error: Pbson_error_t): ByteBool; inline; (* OUT *)
 
 procedure mongoc_bulk_operation_update(
             bulk: Pmongoc_bulk_operation_t;
             selector: Pbson_t;
             document: Pbson_t;
-            upsert: ByteBool); cdecl; external 'mongoc2.dll';
+            upsert: ByteBool); inline;
 
 function mongoc_bulk_operation_update_many_with_opts(
            bulk: Pmongoc_bulk_operation_t;
            selector: Pbson_t;
            document: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll'; (* OUT *)
+           error: Pbson_error_t): ByteBool; inline; (* OUT *)
 
 procedure mongoc_bulk_operation_update_one(
             bulk: Pmongoc_bulk_operation_t;
             selector: Pbson_t;
             document: Pbson_t;
-            upsert: ByteBool); cdecl; external 'mongoc2.dll';
+            upsert: ByteBool); inline;
 
 function mongoc_bulk_operation_update_one_with_opts(
            bulk: Pmongoc_bulk_operation_t;
            selector: Pbson_t;
            document: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll'; (* OUT *)
+           error: Pbson_error_t): ByteBool; inline; (* OUT *)
 
 procedure mongoc_bulk_operation_set_bypass_document_validation(
             bulk: Pmongoc_bulk_operation_t;
-            bypass: ByteBool); cdecl; external 'mongoc2.dll';
+            bypass: ByteBool); inline;
 
 procedure mongoc_bulk_operation_set_comment(
             bulk: Pmongoc_bulk_operation_t;
-            comment: Pbson_value_t); cdecl; external 'mongoc2.dll';
+            comment: Pbson_value_t); inline;
 
 procedure mongoc_bulk_operation_set_let(
             bulk: Pmongoc_bulk_operation_t;
-            let: Pbson_t); cdecl; external 'mongoc2.dll';
+            let: Pbson_t); inline;
 
 // *
 // * The following functions are really only useful by language bindings and
@@ -5757,37 +5757,37 @@ procedure mongoc_bulk_operation_set_let(
 // *
 
 function mongoc_bulk_operation_new(
-           ordered: ByteBool): Pmongoc_bulk_operation_t; cdecl; external 'mongoc2.dll';
+           ordered: ByteBool): Pmongoc_bulk_operation_t; inline;
 
 procedure mongoc_bulk_operation_set_write_concern(
             bulk: Pmongoc_bulk_operation_t;
-            write_concern: Pmongoc_write_concern_t); cdecl; external 'mongoc2.dll';
+            write_concern: Pmongoc_write_concern_t); inline;
 
 procedure mongoc_bulk_operation_set_database(
             bulk: Pmongoc_bulk_operation_t;
-            database: PAnsiChar); cdecl; external 'mongoc2.dll';
+            database: PAnsiChar); inline;
 
 procedure mongoc_bulk_operation_set_collection(
             bulk: Pmongoc_bulk_operation_t;
-            collection: PAnsiChar); cdecl; external 'mongoc2.dll';
+            collection: PAnsiChar); inline;
 
 procedure mongoc_bulk_operation_set_client(
             bulk: Pmongoc_bulk_operation_t;
-            client: Pvoid); cdecl; external 'mongoc2.dll';
+            client: Pvoid); inline;
 
 procedure mongoc_bulk_operation_set_client_session(
             bulk: Pmongoc_bulk_operation_t;
-            client_session: P_mongoc_client_session_t); cdecl; external 'mongoc2.dll';
+            client_session: P_mongoc_client_session_t); inline;
 
 procedure mongoc_bulk_operation_set_server_id(
             bulk: Pmongoc_bulk_operation_t;
-            server_id: uint32_t); cdecl; external 'mongoc2.dll';
+            server_id: uint32_t); inline;
 
 function mongoc_bulk_operation_get_server_id(
-           bulk: Pmongoc_bulk_operation_t): uint32_t; cdecl; external 'mongoc2.dll';
+           bulk: Pmongoc_bulk_operation_t): uint32_t; inline;
 
 function mongoc_bulk_operation_get_write_concern(
-           bulk: Pmongoc_bulk_operation_t): Pmongoc_write_concern_t; cdecl; external 'mongoc2.dll';
+           bulk: Pmongoc_bulk_operation_t): Pmongoc_write_concern_t; inline;
 
 ///////////////////////////////////
 // mongoc-client-side-encryption //
@@ -5829,60 +5829,60 @@ type
     param2: Pbson_t;
     error: Pbson_error_t): ByteBool; cdecl;
 
-function mongoc_auto_encryption_opts_new(): Pmongoc_auto_encryption_opts_t; cdecl; external 'mongoc2.dll';
+function mongoc_auto_encryption_opts_new(): Pmongoc_auto_encryption_opts_t; inline;
 
 procedure mongoc_auto_encryption_opts_destroy(
-            opts: Pmongoc_auto_encryption_opts_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_auto_encryption_opts_t); inline;
 
 procedure mongoc_auto_encryption_opts_set_keyvault_client(
             opts: Pmongoc_auto_encryption_opts_t;
-            client: P_mongoc_client_t); cdecl; external 'mongoc2.dll';
+            client: P_mongoc_client_t); inline;
 
 procedure mongoc_auto_encryption_opts_set_keyvault_client_pool(
             opts: Pmongoc_auto_encryption_opts_t;
-            pool: P_mongoc_client_pool_t); cdecl; external 'mongoc2.dll';
+            pool: P_mongoc_client_pool_t); inline;
 
 procedure mongoc_auto_encryption_opts_set_keyvault_namespace(
             opts: Pmongoc_auto_encryption_opts_t;
             db: PAnsiChar;
-            coll: PAnsiChar); cdecl; external 'mongoc2.dll';
+            coll: PAnsiChar); inline;
 
 procedure mongoc_auto_encryption_opts_set_kms_providers(
             opts: Pmongoc_auto_encryption_opts_t;
-            kms_providers: Pbson_t); cdecl; external 'mongoc2.dll';
+            kms_providers: Pbson_t); inline;
 
 procedure mongoc_auto_encryption_opts_set_key_expiration(
             opts: Pmongoc_auto_encryption_opts_t;
-            expiration: uint64_t); cdecl; external 'mongoc2.dll';
+            expiration: uint64_t); inline;
 
 procedure mongoc_auto_encryption_opts_set_tls_opts(
             opts: Pmongoc_auto_encryption_opts_t;
-            tls_opts: Pbson_t); cdecl; external 'mongoc2.dll';
+            tls_opts: Pbson_t); inline;
 
 procedure mongoc_auto_encryption_opts_set_schema_map(
             opts: Pmongoc_auto_encryption_opts_t;
-            schema_map: Pbson_t); cdecl; external 'mongoc2.dll';
+            schema_map: Pbson_t); inline;
 
 procedure mongoc_auto_encryption_opts_set_encrypted_fields_map(
             opts: Pmongoc_auto_encryption_opts_t;
-            encrypted_fields_map: Pbson_t); cdecl; external 'mongoc2.dll';
+            encrypted_fields_map: Pbson_t); inline;
 
 procedure mongoc_auto_encryption_opts_set_bypass_auto_encryption(
             opts: Pmongoc_auto_encryption_opts_t;
-            bypass_auto_encryption: ByteBool); cdecl; external 'mongoc2.dll';
+            bypass_auto_encryption: ByteBool); inline;
 
 procedure mongoc_auto_encryption_opts_set_bypass_query_analysis(
             opts: Pmongoc_auto_encryption_opts_t;
-            bypass_query_analysis: ByteBool); cdecl; external 'mongoc2.dll';
+            bypass_query_analysis: ByteBool); inline;
 
 procedure mongoc_auto_encryption_opts_set_extra(
             opts: Pmongoc_auto_encryption_opts_t;
-            extra: Pbson_t); cdecl; external 'mongoc2.dll';
+            extra: Pbson_t); inline;
 
 procedure mongoc_auto_encryption_opts_set_kms_credential_provider_callback(
             opts: Pmongoc_auto_encryption_opts_t;
             fn: mongoc_kms_credentials_provider_callback_fn;
-            userdata: Pvoid); cdecl; external 'mongoc2.dll';
+            userdata: Pvoid); inline;
 
 type
   _mongoc_client_encryption_opts_t = record
@@ -5935,270 +5935,270 @@ type
   mongoc_client_encryption_rewrap_many_datakey_result_t = _mongoc_client_encryption_rewrap_many_datakey_result_t;
   Pmongoc_client_encryption_rewrap_many_datakey_result_t = ^mongoc_client_encryption_rewrap_many_datakey_result_t;
 
-function mongoc_client_encryption_opts_new(): Pmongoc_client_encryption_opts_t; cdecl; external 'mongoc2.dll';
+function mongoc_client_encryption_opts_new(): Pmongoc_client_encryption_opts_t; inline;
 
 procedure mongoc_client_encryption_opts_destroy(
-            opts: Pmongoc_client_encryption_opts_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_client_encryption_opts_t); inline;
 
 procedure mongoc_client_encryption_opts_set_keyvault_client(
             opts: Pmongoc_client_encryption_opts_t;
-            keyvault_client: P_mongoc_client_t); cdecl; external 'mongoc2.dll';
+            keyvault_client: P_mongoc_client_t); inline;
 
 procedure mongoc_client_encryption_opts_set_keyvault_namespace(
             opts: Pmongoc_client_encryption_opts_t;
             db: PAnsiChar;
-            coll: PAnsiChar); cdecl; external 'mongoc2.dll';
+            coll: PAnsiChar); inline;
 
 procedure mongoc_client_encryption_opts_set_kms_providers(
             opts: Pmongoc_client_encryption_opts_t;
-            kms_providers: Pbson_t); cdecl; external 'mongoc2.dll';
+            kms_providers: Pbson_t); inline;
 
 procedure mongoc_client_encryption_opts_set_tls_opts(
             opts: Pmongoc_client_encryption_opts_t;
-            tls_opts: Pbson_t); cdecl; external 'mongoc2.dll';
+            tls_opts: Pbson_t); inline;
 
 procedure mongoc_client_encryption_opts_set_kms_credential_provider_callback(
             opts: Pmongoc_client_encryption_opts_t;
             fn: mongoc_kms_credentials_provider_callback_fn;
-            userdata: Pvoid); cdecl; external 'mongoc2.dll';
+            userdata: Pvoid); inline;
 
 procedure mongoc_client_encryption_opts_set_key_expiration(
             opts: Pmongoc_client_encryption_opts_t;
-            cache_expiration_ms: uint64_t); cdecl; external 'mongoc2.dll';
+            cache_expiration_ms: uint64_t); inline;
 
-function mongoc_client_encryption_rewrap_many_datakey_result_new(): Pmongoc_client_encryption_rewrap_many_datakey_result_t; cdecl; external 'mongoc2.dll';
+function mongoc_client_encryption_rewrap_many_datakey_result_new(): Pmongoc_client_encryption_rewrap_many_datakey_result_t; inline;
 
 procedure mongoc_client_encryption_rewrap_many_datakey_result_destroy(
-            result: Pmongoc_client_encryption_rewrap_many_datakey_result_t); cdecl; external 'mongoc2.dll';
+            _result: Pmongoc_client_encryption_rewrap_many_datakey_result_t); inline;
 
 function mongoc_client_encryption_rewrap_many_datakey_result_get_bulk_write_result(
-           result: Pmongoc_client_encryption_rewrap_many_datakey_result_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           _result: Pmongoc_client_encryption_rewrap_many_datakey_result_t): Pbson_t; inline;
 
 function mongoc_client_encryption_new(
            opts: Pmongoc_client_encryption_opts_t;
-           error: Pbson_error_t): Pmongoc_client_encryption_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_client_encryption_t; inline;
 
 procedure mongoc_client_encryption_destroy(
-            client_encryption: Pmongoc_client_encryption_t); cdecl; external 'mongoc2.dll';
+            client_encryption: Pmongoc_client_encryption_t); inline;
 
 function mongoc_client_encryption_create_datakey(
            client_encryption: Pmongoc_client_encryption_t;
            kms_provider: PAnsiChar;
            opts: Pmongoc_client_encryption_datakey_opts_t;
            keyid: Pbson_value_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_encryption_rewrap_many_datakey(
            client_encryption: Pmongoc_client_encryption_t;
            filter: Pbson_t;
            provider: PAnsiChar;
            master_key: Pbson_t;
-           result: Pmongoc_client_encryption_rewrap_many_datakey_result_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           _result: Pmongoc_client_encryption_rewrap_many_datakey_result_t;
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_encryption_delete_key(
            client_encryption: Pmongoc_client_encryption_t;
            keyid: Pbson_value_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_encryption_get_key(
            client_encryption: Pmongoc_client_encryption_t;
            keyid: Pbson_value_t;
            key_doc: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
-function mongoc_client_encryption_encrypt_text_prefix_opts_new(): Pmongoc_client_encryption_encrypt_text_prefix_opts_t; cdecl; external 'mongoc2.dll';
+function mongoc_client_encryption_encrypt_text_prefix_opts_new(): Pmongoc_client_encryption_encrypt_text_prefix_opts_t; inline;
 
-function mongoc_client_encryption_encrypt_text_suffix_opts_new(): Pmongoc_client_encryption_encrypt_text_suffix_opts_t; cdecl; external 'mongoc2.dll';
+function mongoc_client_encryption_encrypt_text_suffix_opts_new(): Pmongoc_client_encryption_encrypt_text_suffix_opts_t; inline;
 
-function mongoc_client_encryption_encrypt_text_substring_opts_new(): Pmongoc_client_encryption_encrypt_text_substring_opts_t; cdecl; external 'mongoc2.dll';
+function mongoc_client_encryption_encrypt_text_substring_opts_new(): Pmongoc_client_encryption_encrypt_text_substring_opts_t; inline;
 
 procedure mongoc_client_encryption_encrypt_text_prefix_opts_destroy(
-            opts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_suffix_opts_destroy(
-            opts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_substring_opts_destroy(
-            opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_prefix_opts_set_str_max_query_length(
             opts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t;
-            str_max_query_length: int32_t); cdecl; external 'mongoc2.dll';
+            str_max_query_length: int32_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_prefix_opts_set_str_min_query_length(
             opts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t;
-            str_min_query_length: int32_t); cdecl; external 'mongoc2.dll';
+            str_min_query_length: int32_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_suffix_opts_set_str_max_query_length(
             opts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t;
-            str_max_query_length: int32_t); cdecl; external 'mongoc2.dll';
+            str_max_query_length: int32_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_suffix_opts_set_str_min_query_length(
             opts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t;
-            str_min_query_length: int32_t); cdecl; external 'mongoc2.dll';
+            str_min_query_length: int32_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_substring_opts_set_str_max_length(
             opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t;
-            str_max_length: int32_t); cdecl; external 'mongoc2.dll';
+            str_max_length: int32_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_substring_opts_set_str_max_query_length(
             opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t;
-            str_max_query_length: int32_t); cdecl; external 'mongoc2.dll';
+            str_max_query_length: int32_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_substring_opts_set_str_min_query_length(
             opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t;
-            str_min_query_length: int32_t); cdecl; external 'mongoc2.dll';
+            str_min_query_length: int32_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_opts_set_prefix(
             opts: Pmongoc_client_encryption_encrypt_text_opts_t;
-            popts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t); cdecl; external 'mongoc2.dll';
+            popts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_opts_set_suffix(
             opts: Pmongoc_client_encryption_encrypt_text_opts_t;
-            sopts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t); cdecl; external 'mongoc2.dll';
+            sopts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_opts_set_substring(
             opts: Pmongoc_client_encryption_encrypt_text_opts_t;
-            ssopts: Pmongoc_client_encryption_encrypt_text_substring_opts_t); cdecl; external 'mongoc2.dll';
+            ssopts: Pmongoc_client_encryption_encrypt_text_substring_opts_t); inline;
 
-function mongoc_client_encryption_encrypt_text_opts_new(): Pmongoc_client_encryption_encrypt_text_opts_t; cdecl; external 'mongoc2.dll';
+function mongoc_client_encryption_encrypt_text_opts_new(): Pmongoc_client_encryption_encrypt_text_opts_t; inline;
 
 procedure mongoc_client_encryption_encrypt_text_opts_destroy(
-            topts: Pmongoc_client_encryption_encrypt_text_opts_t); cdecl; external 'mongoc2.dll';
+            topts: Pmongoc_client_encryption_encrypt_text_opts_t); inline;
 
 function mongoc_client_encryption_get_keys(
            client_encryption: Pmongoc_client_encryption_t;
-           error: Pbson_error_t): P_mongoc_cursor_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): P_mongoc_cursor_t; inline;
 
 function mongoc_client_encryption_add_key_alt_name(
            client_encryption: Pmongoc_client_encryption_t;
            keyid: Pbson_value_t;
            keyaltname: PAnsiChar;
            key_doc: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_encryption_remove_key_alt_name(
            client_encryption: Pmongoc_client_encryption_t;
            keyid: Pbson_value_t;
            keyaltname: PAnsiChar;
            key_doc: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_encryption_get_key_by_alt_name(
            client_encryption: Pmongoc_client_encryption_t;
            keyaltname: PAnsiChar;
            key_doc: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_encryption_encrypt(
            client_encryption: Pmongoc_client_encryption_t;
            value: Pbson_value_t;
            opts: Pmongoc_client_encryption_encrypt_opts_t;
            ciphertext: Pbson_value_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_encryption_encrypt_expression(
            client_encryption: Pmongoc_client_encryption_t;
            expr: Pbson_t;
            opts: Pmongoc_client_encryption_encrypt_opts_t;
            expr_out: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_encryption_decrypt(
            client_encryption: Pmongoc_client_encryption_t;
            ciphertext: Pbson_value_t;
            value: Pbson_value_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
-function mongoc_client_encryption_encrypt_opts_new(): Pmongoc_client_encryption_encrypt_opts_t; cdecl; external 'mongoc2.dll';
+function mongoc_client_encryption_encrypt_opts_new(): Pmongoc_client_encryption_encrypt_opts_t; inline;
 
 procedure mongoc_client_encryption_encrypt_opts_destroy(
-            opts: Pmongoc_client_encryption_encrypt_opts_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_client_encryption_encrypt_opts_t); inline;
 
 procedure mongoc_client_encryption_encrypt_opts_set_keyid(
             opts: Pmongoc_client_encryption_encrypt_opts_t;
-            keyid: Pbson_value_t); cdecl; external 'mongoc2.dll';
+            keyid: Pbson_value_t); inline;
 
 procedure mongoc_client_encryption_encrypt_opts_set_keyaltname(
             opts: Pmongoc_client_encryption_encrypt_opts_t;
-            keyaltname: PAnsiChar); cdecl; external 'mongoc2.dll';
+            keyaltname: PAnsiChar); inline;
 
 procedure mongoc_client_encryption_encrypt_opts_set_algorithm(
             opts: Pmongoc_client_encryption_encrypt_opts_t;
-            algorithm: PAnsiChar); cdecl; external 'mongoc2.dll';
+            algorithm: PAnsiChar); inline;
 
 procedure mongoc_client_encryption_encrypt_opts_set_contention_factor(
             opts: Pmongoc_client_encryption_encrypt_opts_t;
-            contention_factor: int64_t); cdecl; external 'mongoc2.dll';
+            contention_factor: int64_t); inline;
 
 procedure mongoc_client_encryption_encrypt_opts_set_text_opts(
             opts: Pmongoc_client_encryption_encrypt_opts_t;
-            text_opts: Pmongoc_client_encryption_encrypt_text_opts_t); cdecl; external 'mongoc2.dll';
+            text_opts: Pmongoc_client_encryption_encrypt_text_opts_t); inline;
 
 procedure mongoc_client_encryption_encrypt_text_opts_set_case_sensitive(
             opts: Pmongoc_client_encryption_encrypt_text_opts_t;
-            case_sensitive: ByteBool); cdecl; external 'mongoc2.dll';
+            case_sensitive: ByteBool); inline;
 
 procedure mongoc_client_encryption_encrypt_text_opts_set_diacritic_sensitive(
             opts: Pmongoc_client_encryption_encrypt_text_opts_t;
-            diacritic_sensitive: ByteBool); cdecl; external 'mongoc2.dll';
+            diacritic_sensitive: ByteBool); inline;
 
 procedure mongoc_client_encryption_encrypt_opts_set_query_type(
             opts: Pmongoc_client_encryption_encrypt_opts_t;
-            query_type: PAnsiChar); cdecl; external 'mongoc2.dll';
+            query_type: PAnsiChar); inline;
 
-function mongoc_client_encryption_encrypt_range_opts_new(): Pmongoc_client_encryption_encrypt_range_opts_t; cdecl; external 'mongoc2.dll';
+function mongoc_client_encryption_encrypt_range_opts_new(): Pmongoc_client_encryption_encrypt_range_opts_t; inline;
 
 procedure mongoc_client_encryption_encrypt_range_opts_destroy(
-            range_opts: Pmongoc_client_encryption_encrypt_range_opts_t); cdecl; external 'mongoc2.dll';
+            range_opts: Pmongoc_client_encryption_encrypt_range_opts_t); inline;
 
 procedure mongoc_client_encryption_encrypt_range_opts_set_trim_factor(
             range_opts: Pmongoc_client_encryption_encrypt_range_opts_t;
-            trim_factor: int32_t); cdecl; external 'mongoc2.dll';
+            trim_factor: int32_t); inline;
 
 procedure mongoc_client_encryption_encrypt_range_opts_set_sparsity(
             range_opts: Pmongoc_client_encryption_encrypt_range_opts_t;
-            sparsity: int64_t); cdecl; external 'mongoc2.dll';
+            sparsity: int64_t); inline;
 
 procedure mongoc_client_encryption_encrypt_range_opts_set_min(
             range_opts: Pmongoc_client_encryption_encrypt_range_opts_t;
-            min: Pbson_value_t); cdecl; external 'mongoc2.dll';
+            min: Pbson_value_t); inline;
 
 procedure mongoc_client_encryption_encrypt_range_opts_set_max(
             range_opts: Pmongoc_client_encryption_encrypt_range_opts_t;
-            max: Pbson_value_t); cdecl; external 'mongoc2.dll';
+            max: Pbson_value_t); inline;
 
 procedure mongoc_client_encryption_encrypt_range_opts_set_precision(
             range_opts: Pmongoc_client_encryption_encrypt_range_opts_t;
-            precision: int32_t); cdecl; external 'mongoc2.dll';
+            precision: int32_t); inline;
 
 procedure mongoc_client_encryption_encrypt_opts_set_range_opts(
             opts: Pmongoc_client_encryption_encrypt_opts_t;
-            range_opts: Pmongoc_client_encryption_encrypt_range_opts_t); cdecl; external 'mongoc2.dll';
+            range_opts: Pmongoc_client_encryption_encrypt_range_opts_t); inline;
 
-function mongoc_client_encryption_datakey_opts_new(): Pmongoc_client_encryption_datakey_opts_t; cdecl; external 'mongoc2.dll';
+function mongoc_client_encryption_datakey_opts_new(): Pmongoc_client_encryption_datakey_opts_t; inline;
 
 procedure mongoc_client_encryption_datakey_opts_destroy(
-            opts: Pmongoc_client_encryption_datakey_opts_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_client_encryption_datakey_opts_t); inline;
 
 procedure mongoc_client_encryption_datakey_opts_set_masterkey(
             opts: Pmongoc_client_encryption_datakey_opts_t;
-            masterkey: Pbson_t); cdecl; external 'mongoc2.dll';
+            masterkey: Pbson_t); inline;
 
 procedure mongoc_client_encryption_datakey_opts_set_keyaltnames(
             opts: Pmongoc_client_encryption_datakey_opts_t;
             keyaltnames: PPAnsiChar;
-            keyaltnames_count: uint32_t); cdecl; external 'mongoc2.dll';
+            keyaltnames_count: uint32_t); inline;
 
 procedure mongoc_client_encryption_datakey_opts_set_keymaterial(
             opts: Pmongoc_client_encryption_datakey_opts_t;
             data: Puint8_t;
-            len: uint32_t); cdecl; external 'mongoc2.dll';
+            len: uint32_t); inline;
 
 function mongoc_client_encryption_get_crypt_shared_version(
-           enc: Pmongoc_client_encryption_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           enc: Pmongoc_client_encryption_t): PAnsiChar; inline;
 
 function mongoc_client_encryption_create_encrypted_collection(
            enc: Pmongoc_client_encryption_t;
@@ -6208,7 +6208,7 @@ function mongoc_client_encryption_create_encrypted_collection(
            opt_out_options: Pbson_t;
            kms_provider: PAnsiChar;
            opt_masterkey: Pbson_t;
-           error: Pbson_error_t): P_mongoc_collection_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): P_mongoc_collection_t; inline;
 
 ///////////////////////
 // mongoc-stream-tls //
@@ -6224,19 +6224,19 @@ function mongoc_stream_tls_handshake(
            host: PAnsiChar;
            timeout_msec: int32_t;
            events: PInteger;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_stream_tls_handshake_block(
            stream: Pmongoc_stream_t;
            host: PAnsiChar;
            timeout_msec: int32_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_stream_tls_new_with_hostname(
            base_stream: Pmongoc_stream_t;
            host: PAnsiChar;
            opt: Pmongoc_ssl_opt_t;
-           client: Integer): Pmongoc_stream_t; cdecl; external 'mongoc2.dll';
+           client: Integer): Pmongoc_stream_t; inline;
 
 ///////////////////////////////
 // mongoc-stream-tls-openssl //
@@ -6256,24 +6256,24 @@ type
   Pmongoc_topology_description_t = ^mongoc_topology_description_t;
 
 procedure mongoc_topology_description_destroy(
-            description: Pmongoc_topology_description_t); cdecl; external 'mongoc2.dll';
+            description: Pmongoc_topology_description_t); inline;
 
 function mongoc_topology_description_new_copy(
-           description: Pmongoc_topology_description_t): Pmongoc_topology_description_t; cdecl; external 'mongoc2.dll';
+           description: Pmongoc_topology_description_t): Pmongoc_topology_description_t; inline;
 
 function mongoc_topology_description_has_readable_server(
            td: Pmongoc_topology_description_t;
-           prefs: Pmongoc_read_prefs_t): ByteBool; cdecl; external 'mongoc2.dll';
+           prefs: Pmongoc_read_prefs_t): ByteBool; inline;
 
 function mongoc_topology_description_has_writable_server(
-           td: Pmongoc_topology_description_t): ByteBool; cdecl; external 'mongoc2.dll';
+           td: Pmongoc_topology_description_t): ByteBool; inline;
 
 function mongoc_topology_description_type(
-           td: Pmongoc_topology_description_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           td: Pmongoc_topology_description_t): PAnsiChar; inline;
 
 function mongoc_topology_description_get_servers(
            td: Pmongoc_topology_description_t;
-           n: Psize_t): PPmongoc_server_description_t; cdecl; external 'mongoc2.dll';
+           n: Psize_t): PPmongoc_server_description_t; inline;
 
 ////////////////
 // mongoc-apm //
@@ -6378,230 +6378,230 @@ type
 // * command-started event fields
 
 function mongoc_apm_command_started_get_command(
-           event: Pmongoc_apm_command_started_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_started_t): Pbson_t; inline;
 
 function mongoc_apm_command_started_get_database_name(
-           event: Pmongoc_apm_command_started_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_started_t): PAnsiChar; inline;
 
 function mongoc_apm_command_started_get_command_name(
-           event: Pmongoc_apm_command_started_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_started_t): PAnsiChar; inline;
 
 function mongoc_apm_command_started_get_request_id(
-           event: Pmongoc_apm_command_started_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_started_t): int64_t; inline;
 
 function mongoc_apm_command_started_get_operation_id(
-           event: Pmongoc_apm_command_started_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_started_t): int64_t; inline;
 
 function mongoc_apm_command_started_get_host(
-           event: Pmongoc_apm_command_started_t): Pmongoc_host_list_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_started_t): Pmongoc_host_list_t; inline;
 
 function mongoc_apm_command_started_get_server_id(
-           event: Pmongoc_apm_command_started_t): uint32_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_started_t): uint32_t; inline;
 
 function mongoc_apm_command_started_get_service_id(
-           event: Pmongoc_apm_command_started_t): Pbson_oid_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_started_t): Pbson_oid_t; inline;
 
 function mongoc_apm_command_started_get_server_connection_id_int64(
-           event: Pmongoc_apm_command_started_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_started_t): int64_t; inline;
 
 function mongoc_apm_command_started_get_context(
-           event: Pmongoc_apm_command_started_t): Pvoid; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_started_t): Pvoid; inline;
 
 // * command-succeeded event fields
 
 function mongoc_apm_command_succeeded_get_duration(
-           event: Pmongoc_apm_command_succeeded_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_succeeded_t): int64_t; inline;
 
 function mongoc_apm_command_succeeded_get_reply(
-           event: Pmongoc_apm_command_succeeded_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_succeeded_t): Pbson_t; inline;
 
 function mongoc_apm_command_succeeded_get_command_name(
-           event: Pmongoc_apm_command_succeeded_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_succeeded_t): PAnsiChar; inline;
 
 function mongoc_apm_command_succeeded_get_database_name(
-           event: Pmongoc_apm_command_succeeded_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_succeeded_t): PAnsiChar; inline;
 
 function mongoc_apm_command_succeeded_get_request_id(
-           event: Pmongoc_apm_command_succeeded_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_succeeded_t): int64_t; inline;
 
 function mongoc_apm_command_succeeded_get_operation_id(
-           event: Pmongoc_apm_command_succeeded_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_succeeded_t): int64_t; inline;
 
 function mongoc_apm_command_succeeded_get_host(
-           event: Pmongoc_apm_command_succeeded_t): Pmongoc_host_list_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_succeeded_t): Pmongoc_host_list_t; inline;
 
 function mongoc_apm_command_succeeded_get_server_id(
-           event: Pmongoc_apm_command_succeeded_t): uint32_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_succeeded_t): uint32_t; inline;
 
 function mongoc_apm_command_succeeded_get_service_id(
-           event: Pmongoc_apm_command_succeeded_t): Pbson_oid_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_succeeded_t): Pbson_oid_t; inline;
 
 function mongoc_apm_command_succeeded_get_server_connection_id_int64(
-           event: Pmongoc_apm_command_succeeded_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_succeeded_t): int64_t; inline;
 
 function mongoc_apm_command_succeeded_get_context(
-           event: Pmongoc_apm_command_succeeded_t): Pvoid; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_succeeded_t): Pvoid; inline;
 
 // * command-failed event fields
 
 function mongoc_apm_command_failed_get_duration(
-           event: Pmongoc_apm_command_failed_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_failed_t): int64_t; inline;
 
 function mongoc_apm_command_failed_get_command_name(
-           event: Pmongoc_apm_command_failed_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_failed_t): PAnsiChar; inline;
 
 function mongoc_apm_command_failed_get_database_name(
-           event: Pmongoc_apm_command_failed_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_failed_t): PAnsiChar; inline;
 // * retrieve the error by filling out the passed-in "error" struct
 
 procedure mongoc_apm_command_failed_get_error(
             event: Pmongoc_apm_command_failed_t;
-            error: Pbson_error_t); cdecl; external 'mongoc2.dll';
+            error: Pbson_error_t); inline;
 
 function mongoc_apm_command_failed_get_reply(
-           event: Pmongoc_apm_command_failed_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_failed_t): Pbson_t; inline;
 
 function mongoc_apm_command_failed_get_request_id(
-           event: Pmongoc_apm_command_failed_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_failed_t): int64_t; inline;
 
 function mongoc_apm_command_failed_get_operation_id(
-           event: Pmongoc_apm_command_failed_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_failed_t): int64_t; inline;
 
 function mongoc_apm_command_failed_get_host(
-           event: Pmongoc_apm_command_failed_t): Pmongoc_host_list_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_failed_t): Pmongoc_host_list_t; inline;
 
 function mongoc_apm_command_failed_get_server_id(
-           event: Pmongoc_apm_command_failed_t): uint32_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_failed_t): uint32_t; inline;
 
 function mongoc_apm_command_failed_get_service_id(
-           event: Pmongoc_apm_command_failed_t): Pbson_oid_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_failed_t): Pbson_oid_t; inline;
 
 function mongoc_apm_command_failed_get_server_connection_id_int64(
-           event: Pmongoc_apm_command_failed_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_failed_t): int64_t; inline;
 
 function mongoc_apm_command_failed_get_context(
-           event: Pmongoc_apm_command_failed_t): Pvoid; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_command_failed_t): Pvoid; inline;
 
 // * server-changed event fields
 
 function mongoc_apm_server_changed_get_host(
-           event: Pmongoc_apm_server_changed_t): Pmongoc_host_list_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_changed_t): Pmongoc_host_list_t; inline;
 
 procedure mongoc_apm_server_changed_get_topology_id(
             event: Pmongoc_apm_server_changed_t;
-            topology_id: Pbson_oid_t); cdecl; external 'mongoc2.dll';
+            topology_id: Pbson_oid_t); inline;
 
 function mongoc_apm_server_changed_get_previous_description(
-           event: Pmongoc_apm_server_changed_t): Pmongoc_server_description_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_changed_t): Pmongoc_server_description_t; inline;
 
 function mongoc_apm_server_changed_get_new_description(
-           event: Pmongoc_apm_server_changed_t): Pmongoc_server_description_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_changed_t): Pmongoc_server_description_t; inline;
 
 function mongoc_apm_server_changed_get_context(
-           event: Pmongoc_apm_server_changed_t): Pvoid; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_changed_t): Pvoid; inline;
 
 // * server-opening event fields
 
 function mongoc_apm_server_opening_get_host(
-           event: Pmongoc_apm_server_opening_t): Pmongoc_host_list_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_opening_t): Pmongoc_host_list_t; inline;
 
 procedure mongoc_apm_server_opening_get_topology_id(
             event: Pmongoc_apm_server_opening_t;
-            topology_id: Pbson_oid_t); cdecl; external 'mongoc2.dll';
+            topology_id: Pbson_oid_t); inline;
 
 function mongoc_apm_server_opening_get_context(
-           event: Pmongoc_apm_server_opening_t): Pvoid; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_opening_t): Pvoid; inline;
 
 // * server-closed event fields
 
 function mongoc_apm_server_closed_get_host(
-           event: Pmongoc_apm_server_closed_t): Pmongoc_host_list_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_closed_t): Pmongoc_host_list_t; inline;
 
 procedure mongoc_apm_server_closed_get_topology_id(
             event: Pmongoc_apm_server_closed_t;
-            topology_id: Pbson_oid_t); cdecl; external 'mongoc2.dll';
+            topology_id: Pbson_oid_t); inline;
 
 function mongoc_apm_server_closed_get_context(
-           event: Pmongoc_apm_server_closed_t): Pvoid; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_closed_t): Pvoid; inline;
 
 // * topology-changed event fields
 
 procedure mongoc_apm_topology_changed_get_topology_id(
             event: Pmongoc_apm_topology_changed_t;
-            topology_id: Pbson_oid_t); cdecl; external 'mongoc2.dll';
+            topology_id: Pbson_oid_t); inline;
 
 function mongoc_apm_topology_changed_get_previous_description(
-           event: Pmongoc_apm_topology_changed_t): Pmongoc_topology_description_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_topology_changed_t): Pmongoc_topology_description_t; inline;
 
 function mongoc_apm_topology_changed_get_new_description(
-           event: Pmongoc_apm_topology_changed_t): Pmongoc_topology_description_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_topology_changed_t): Pmongoc_topology_description_t; inline;
 
 function mongoc_apm_topology_changed_get_context(
-           event: Pmongoc_apm_topology_changed_t): Pvoid; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_topology_changed_t): Pvoid; inline;
 
 // * topology-opening event field
 
 procedure mongoc_apm_topology_opening_get_topology_id(
             event: Pmongoc_apm_topology_opening_t;
-            topology_id: Pbson_oid_t); cdecl; external 'mongoc2.dll';
+            topology_id: Pbson_oid_t); inline;
 
 function mongoc_apm_topology_opening_get_context(
-           event: Pmongoc_apm_topology_opening_t): Pvoid; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_topology_opening_t): Pvoid; inline;
 
 // * topology-closed event field
 
 procedure mongoc_apm_topology_closed_get_topology_id(
             event: Pmongoc_apm_topology_closed_t;
-            topology_id: Pbson_oid_t); cdecl; external 'mongoc2.dll';
+            topology_id: Pbson_oid_t); inline;
 
 function mongoc_apm_topology_closed_get_context(
-           event: Pmongoc_apm_topology_closed_t): Pvoid; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_topology_closed_t): Pvoid; inline;
 
 // * heartbeat-started event field
 
 function mongoc_apm_server_heartbeat_started_get_host(
-           event: Pmongoc_apm_server_heartbeat_started_t): Pmongoc_host_list_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_started_t): Pmongoc_host_list_t; inline;
 
 function mongoc_apm_server_heartbeat_started_get_context(
-           event: Pmongoc_apm_server_heartbeat_started_t): Pvoid; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_started_t): Pvoid; inline;
 
 function mongoc_apm_server_heartbeat_started_get_awaited(
-           event: Pmongoc_apm_server_heartbeat_started_t): ByteBool; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_started_t): ByteBool; inline;
 
 // * heartbeat-succeeded event fields
 
 function mongoc_apm_server_heartbeat_succeeded_get_duration(
-           event: Pmongoc_apm_server_heartbeat_succeeded_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_succeeded_t): int64_t; inline;
 
 function mongoc_apm_server_heartbeat_succeeded_get_reply(
-           event: Pmongoc_apm_server_heartbeat_succeeded_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_succeeded_t): Pbson_t; inline;
 
 function mongoc_apm_server_heartbeat_succeeded_get_host(
-           event: Pmongoc_apm_server_heartbeat_succeeded_t): Pmongoc_host_list_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_succeeded_t): Pmongoc_host_list_t; inline;
 
 function mongoc_apm_server_heartbeat_succeeded_get_context(
-           event: Pmongoc_apm_server_heartbeat_succeeded_t): Pvoid; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_succeeded_t): Pvoid; inline;
 
 function mongoc_apm_server_heartbeat_succeeded_get_awaited(
-           event: Pmongoc_apm_server_heartbeat_succeeded_t): ByteBool; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_succeeded_t): ByteBool; inline;
 
 // * heartbeat-failed event fields
 
 function mongoc_apm_server_heartbeat_failed_get_duration(
-           event: Pmongoc_apm_server_heartbeat_failed_t): int64_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_failed_t): int64_t; inline;
 
 procedure mongoc_apm_server_heartbeat_failed_get_error(
             event: Pmongoc_apm_server_heartbeat_failed_t;
-            error: Pbson_error_t); cdecl; external 'mongoc2.dll';
+            error: Pbson_error_t); inline;
 
 function mongoc_apm_server_heartbeat_failed_get_host(
-           event: Pmongoc_apm_server_heartbeat_failed_t): Pmongoc_host_list_t; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_failed_t): Pmongoc_host_list_t; inline;
 
 function mongoc_apm_server_heartbeat_failed_get_context(
-           event: Pmongoc_apm_server_heartbeat_failed_t): Pvoid; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_failed_t): Pvoid; inline;
 
 function mongoc_apm_server_heartbeat_failed_get_awaited(
-           event: Pmongoc_apm_server_heartbeat_failed_t): ByteBool; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_failed_t): ByteBool; inline;
 
 // *
 // * callbacks
@@ -6648,58 +6648,58 @@ type
 // * registering callbacks
 // *
 
-function mongoc_apm_callbacks_new(): Pmongoc_apm_callbacks_t; cdecl; external 'mongoc2.dll';
+function mongoc_apm_callbacks_new(): Pmongoc_apm_callbacks_t; inline;
 
 procedure mongoc_apm_callbacks_destroy(
-            callbacks: Pmongoc_apm_callbacks_t); cdecl; external 'mongoc2.dll';
+            callbacks: Pmongoc_apm_callbacks_t); inline;
 
 procedure mongoc_apm_set_command_started_cb(
             callbacks: Pmongoc_apm_callbacks_t;
-            cb: mongoc_apm_command_started_cb_t); cdecl; external 'mongoc2.dll';
+            cb: mongoc_apm_command_started_cb_t); inline;
 
 procedure mongoc_apm_set_command_succeeded_cb(
             callbacks: Pmongoc_apm_callbacks_t;
-            cb: mongoc_apm_command_succeeded_cb_t); cdecl; external 'mongoc2.dll';
+            cb: mongoc_apm_command_succeeded_cb_t); inline;
 
 procedure mongoc_apm_set_command_failed_cb(
             callbacks: Pmongoc_apm_callbacks_t;
-            cb: mongoc_apm_command_failed_cb_t); cdecl; external 'mongoc2.dll';
+            cb: mongoc_apm_command_failed_cb_t); inline;
 
 procedure mongoc_apm_set_server_changed_cb(
             callbacks: Pmongoc_apm_callbacks_t;
-            cb: mongoc_apm_server_changed_cb_t); cdecl; external 'mongoc2.dll';
+            cb: mongoc_apm_server_changed_cb_t); inline;
 
 procedure mongoc_apm_set_server_opening_cb(
             callbacks: Pmongoc_apm_callbacks_t;
-            cb: mongoc_apm_server_opening_cb_t); cdecl; external 'mongoc2.dll';
+            cb: mongoc_apm_server_opening_cb_t); inline;
 
 procedure mongoc_apm_set_server_closed_cb(
             callbacks: Pmongoc_apm_callbacks_t;
-            cb: mongoc_apm_server_closed_cb_t); cdecl; external 'mongoc2.dll';
+            cb: mongoc_apm_server_closed_cb_t); inline;
 
 procedure mongoc_apm_set_topology_changed_cb(
             callbacks: Pmongoc_apm_callbacks_t;
-            cb: mongoc_apm_topology_changed_cb_t); cdecl; external 'mongoc2.dll';
+            cb: mongoc_apm_topology_changed_cb_t); inline;
 
 procedure mongoc_apm_set_topology_opening_cb(
             callbacks: Pmongoc_apm_callbacks_t;
-            cb: mongoc_apm_topology_opening_cb_t); cdecl; external 'mongoc2.dll';
+            cb: mongoc_apm_topology_opening_cb_t); inline;
 
 procedure mongoc_apm_set_topology_closed_cb(
             callbacks: Pmongoc_apm_callbacks_t;
-            cb: mongoc_apm_topology_closed_cb_t); cdecl; external 'mongoc2.dll';
+            cb: mongoc_apm_topology_closed_cb_t); inline;
 
 procedure mongoc_apm_set_server_heartbeat_started_cb(
             callbacks: Pmongoc_apm_callbacks_t;
-            cb: mongoc_apm_server_heartbeat_started_cb_t); cdecl; external 'mongoc2.dll';
+            cb: mongoc_apm_server_heartbeat_started_cb_t); inline;
 
 procedure mongoc_apm_set_server_heartbeat_succeeded_cb(
             callbacks: Pmongoc_apm_callbacks_t;
-            cb: mongoc_apm_server_heartbeat_succeeded_cb_t); cdecl; external 'mongoc2.dll';
+            cb: mongoc_apm_server_heartbeat_succeeded_cb_t); inline;
 
 procedure mongoc_apm_set_server_heartbeat_failed_cb(
             callbacks: Pmongoc_apm_callbacks_t;
-            cb: mongoc_apm_server_heartbeat_failed_cb_t); cdecl; external 'mongoc2.dll';
+            cb: mongoc_apm_server_heartbeat_failed_cb_t); inline;
 
 ////////////////
 // mongoc-uri //
@@ -6765,189 +6765,189 @@ type
   Pmongoc_uri_t = ^mongoc_uri_t;
 
 function mongoc_uri_copy(
-           uri: Pmongoc_uri_t): Pmongoc_uri_t; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): Pmongoc_uri_t; inline;
 
 procedure mongoc_uri_destroy(
-            uri: Pmongoc_uri_t); cdecl; external 'mongoc2.dll';
+            uri: Pmongoc_uri_t); inline;
 
 function mongoc_uri_new(
-           uri_string: PAnsiChar): Pmongoc_uri_t; cdecl; external 'mongoc2.dll';
+           uri_string: PAnsiChar): Pmongoc_uri_t; inline;
 
 function mongoc_uri_new_with_error(
            uri_string: PAnsiChar;
-           error: Pbson_error_t): Pmongoc_uri_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_uri_t; inline;
 
 function mongoc_uri_new_for_host_port(
            hostname: PAnsiChar;
-           port: uint16_t): Pmongoc_uri_t; cdecl; external 'mongoc2.dll';
+           port: uint16_t): Pmongoc_uri_t; inline;
 
 function mongoc_uri_get_hosts(
-           uri: Pmongoc_uri_t): Pmongoc_host_list_t; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): Pmongoc_host_list_t; inline;
 
 function mongoc_uri_get_srv_hostname(
-           uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): PAnsiChar; inline;
 
 function mongoc_uri_get_srv_service_name(
-           uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): PAnsiChar; inline;
 
 function mongoc_uri_get_database(
-           uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): PAnsiChar; inline;
 
 function mongoc_uri_set_database(
            uri: Pmongoc_uri_t;
-           database: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           database: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_get_compressors(
-           uri: Pmongoc_uri_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): Pbson_t; inline;
 
 function mongoc_uri_get_options(
-           uri: Pmongoc_uri_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): Pbson_t; inline;
 
 function mongoc_uri_get_password(
-           uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): PAnsiChar; inline;
 
 function mongoc_uri_set_password(
            uri: Pmongoc_uri_t;
-           password: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           password: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_has_option(
            uri: Pmongoc_uri_t;
-           key: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           key: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_option_is_int32(
-           key: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           key: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_option_is_int64(
-           key: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           key: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_option_is_bool(
-           key: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           key: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_option_is_utf8(
-           key: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           key: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_get_option_as_int32(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           fallback: int32_t): int32_t; cdecl; external 'mongoc2.dll';
+           fallback: int32_t): int32_t; inline;
 
 function mongoc_uri_get_option_as_int64(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           fallback: int64_t): int64_t; cdecl; external 'mongoc2.dll';
+           fallback: int64_t): int64_t; inline;
 
 function mongoc_uri_get_option_as_bool(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           fallback: ByteBool): ByteBool; cdecl; external 'mongoc2.dll';
+           fallback: ByteBool): ByteBool; inline;
 
 function mongoc_uri_get_option_as_utf8(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           fallback: PAnsiChar): PAnsiChar; cdecl; external 'mongoc2.dll';
+           fallback: PAnsiChar): PAnsiChar; inline;
 
 function mongoc_uri_set_option_as_int32(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           value: int32_t): ByteBool; cdecl; external 'mongoc2.dll';
+           value: int32_t): ByteBool; inline;
 
 function mongoc_uri_set_option_as_int64(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           value: int64_t): ByteBool; cdecl; external 'mongoc2.dll';
+           value: int64_t): ByteBool; inline;
 
 function mongoc_uri_set_option_as_bool(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           value: ByteBool): ByteBool; cdecl; external 'mongoc2.dll';
+           value: ByteBool): ByteBool; inline;
 
 function mongoc_uri_set_option_as_utf8(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           value: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           value: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_get_replica_set(
-           uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): PAnsiChar; inline;
 
 function mongoc_uri_get_string(
-           uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): PAnsiChar; inline;
 
 function mongoc_uri_get_username(
-           uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): PAnsiChar; inline;
 
 function mongoc_uri_set_username(
            uri: Pmongoc_uri_t;
-           username: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           username: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_get_credentials(
-           uri: Pmongoc_uri_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): Pbson_t; inline;
 
 function mongoc_uri_get_auth_source(
-           uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): PAnsiChar; inline;
 
 function mongoc_uri_set_auth_source(
            uri: Pmongoc_uri_t;
-           value: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           value: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_get_appname(
-           uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): PAnsiChar; inline;
 
 function mongoc_uri_set_appname(
            uri: Pmongoc_uri_t;
-           value: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           value: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_set_compressors(
            uri: Pmongoc_uri_t;
-           value: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           value: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_get_auth_mechanism(
-           uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): PAnsiChar; inline;
 
 function mongoc_uri_set_auth_mechanism(
            uri: Pmongoc_uri_t;
-           value: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           value: PAnsiChar): ByteBool; inline;
 
 function mongoc_uri_get_mechanism_properties(
            uri: Pmongoc_uri_t;
-           properties: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           properties: Pbson_t): ByteBool; inline;
 
 function mongoc_uri_set_mechanism_properties(
            uri: Pmongoc_uri_t;
-           properties: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           properties: Pbson_t): ByteBool; inline;
 
 function mongoc_uri_get_tls(
-           uri: Pmongoc_uri_t): ByteBool; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): ByteBool; inline;
 
 function mongoc_uri_unescape(
-           escaped_string: PAnsiChar): PAnsiChar; cdecl; external 'mongoc2.dll';
+           escaped_string: PAnsiChar): PAnsiChar; inline;
 
 function mongoc_uri_get_read_prefs_t(
-           uri: Pmongoc_uri_t): Pmongoc_read_prefs_t; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): Pmongoc_read_prefs_t; inline;
 
 procedure mongoc_uri_set_read_prefs_t(
             uri: Pmongoc_uri_t;
-            prefs: Pmongoc_read_prefs_t); cdecl; external 'mongoc2.dll';
+            prefs: Pmongoc_read_prefs_t); inline;
 
 function mongoc_uri_get_write_concern(
-           uri: Pmongoc_uri_t): Pmongoc_write_concern_t; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): Pmongoc_write_concern_t; inline;
 
 procedure mongoc_uri_set_write_concern(
             uri: Pmongoc_uri_t;
-            wc: Pmongoc_write_concern_t); cdecl; external 'mongoc2.dll';
+            wc: Pmongoc_write_concern_t); inline;
 
 function mongoc_uri_get_read_concern(
-           uri: Pmongoc_uri_t): Pmongoc_read_concern_t; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): Pmongoc_read_concern_t; inline;
 
 procedure mongoc_uri_set_read_concern(
             uri: Pmongoc_uri_t;
-            rc: Pmongoc_read_concern_t); cdecl; external 'mongoc2.dll';
+            rc: Pmongoc_read_concern_t); inline;
 
 function mongoc_uri_get_server_monitoring_mode(
-           uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): PAnsiChar; inline;
 
 function mongoc_uri_set_server_monitoring_mode(
            uri: Pmongoc_uri_t;
-           value: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           value: PAnsiChar): ByteBool; inline;
 
 ///////////////////////
 // mongoc-collection //
@@ -6964,13 +6964,13 @@ function mongoc_collection_aggregate(
            flags: mongoc_query_flags_t;
            pipeline: Pbson_t;
            opts: Pbson_t;
-           read_prefs: Pmongoc_read_prefs_t): Pmongoc_cursor_t; cdecl; external 'mongoc2.dll';
+           read_prefs: Pmongoc_read_prefs_t): Pmongoc_cursor_t; inline;
 
 procedure mongoc_collection_destroy(
-            collection: Pmongoc_collection_t); cdecl; external 'mongoc2.dll';
+            collection: Pmongoc_collection_t); inline;
 
 function mongoc_collection_copy(
-           collection: Pmongoc_collection_t): Pmongoc_collection_t; cdecl; external 'mongoc2.dll';
+           collection: Pmongoc_collection_t): Pmongoc_collection_t; inline;
 
 function mongoc_collection_read_command_with_opts(
            collection: Pmongoc_collection_t;
@@ -6978,14 +6978,14 @@ function mongoc_collection_read_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_write_command_with_opts(
            collection: Pmongoc_collection_t;
            command: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_read_write_command_with_opts(
            collection: Pmongoc_collection_t;
@@ -6993,7 +6993,7 @@ function mongoc_collection_read_write_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t; // IGNORED
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_command_with_opts(
            collection: Pmongoc_collection_t;
@@ -7001,38 +7001,38 @@ function mongoc_collection_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_command_simple(
            collection: Pmongoc_collection_t;
            command: Pbson_t;
            read_prefs: Pmongoc_read_prefs_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_drop(
            collection: Pmongoc_collection_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_drop_with_opts(
            collection: Pmongoc_collection_t;
            opts: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_drop_index(
            collection: Pmongoc_collection_t;
            index_name: PAnsiChar;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_drop_index_with_opts(
            collection: Pmongoc_collection_t;
            index_name: PAnsiChar;
            opts: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_find_indexes_with_opts(
            collection: Pmongoc_collection_t;
-           opts: Pbson_t): Pmongoc_cursor_t; cdecl; external 'mongoc2.dll';
+           opts: Pbson_t): Pmongoc_cursor_t; inline;
 
 type
   _mongoc_index_model_t = record
@@ -7043,10 +7043,10 @@ type
 
 function mongoc_index_model_new(
            keys: Pbson_t;
-           opts: Pbson_t): Pmongoc_index_model_t; cdecl; external 'mongoc2.dll';
+           opts: Pbson_t): Pmongoc_index_model_t; inline;
 
 procedure mongoc_index_model_destroy(
-            model: Pmongoc_index_model_t); cdecl; external 'mongoc2.dll';
+            model: Pmongoc_index_model_t); inline;
 
 function mongoc_collection_create_indexes_with_opts(
            collection: Pmongoc_collection_t;
@@ -7054,27 +7054,27 @@ function mongoc_collection_create_indexes_with_opts(
            n_models: size_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_find_with_opts(
            collection: Pmongoc_collection_t;
            filter: Pbson_t;
            opts: Pbson_t;
-           read_prefs: Pmongoc_read_prefs_t): Pmongoc_cursor_t; cdecl; external 'mongoc2.dll';
+           read_prefs: Pmongoc_read_prefs_t): Pmongoc_cursor_t; inline;
 
 function mongoc_collection_insert(
            collection: Pmongoc_collection_t;
            flags: mongoc_insert_flags_t;
            document: Pbson_t;
            write_concern: Pmongoc_write_concern_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_insert_one(
            collection: Pmongoc_collection_t;
            document: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_insert_many(
            collection: Pmongoc_collection_t;
@@ -7082,7 +7082,7 @@ function mongoc_collection_insert_many(
            n_documents: size_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_update(
            collection: Pmongoc_collection_t;
@@ -7090,7 +7090,7 @@ function mongoc_collection_update(
            selector: Pbson_t;
            update: Pbson_t;
            write_concern: Pmongoc_write_concern_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_update_one(
            collection: Pmongoc_collection_t;
@@ -7098,7 +7098,7 @@ function mongoc_collection_update_one(
            update: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_update_many(
            collection: Pmongoc_collection_t;
@@ -7106,7 +7106,7 @@ function mongoc_collection_update_many(
            update: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_replace_one(
            collection: Pmongoc_collection_t;
@@ -7114,35 +7114,35 @@ function mongoc_collection_replace_one(
            replacement: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_remove(
            collection: Pmongoc_collection_t;
            flags: mongoc_remove_flags_t;
            selector: Pbson_t;
            write_concern: Pmongoc_write_concern_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_delete_one(
            collection: Pmongoc_collection_t;
            selector: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_delete_many(
            collection: Pmongoc_collection_t;
            selector: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_rename(
            collection: Pmongoc_collection_t;
            new_db: PAnsiChar;
            new_name: PAnsiChar;
            drop_target_before_rename: ByteBool;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_rename_with_opts(
            collection: Pmongoc_collection_t;
@@ -7150,14 +7150,14 @@ function mongoc_collection_rename_with_opts(
            new_name: PAnsiChar;
            drop_target_before_rename: ByteBool;
            opts: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_find_and_modify_with_opts(
            collection: Pmongoc_collection_t;
            query: Pbson_t;
            opts: Pmongoc_find_and_modify_opts_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_find_and_modify(
            collection: Pmongoc_collection_t;
@@ -7169,43 +7169,43 @@ function mongoc_collection_find_and_modify(
            upsert: ByteBool;
            _new: ByteBool;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_collection_create_bulk_operation_with_opts(
            collection: Pmongoc_collection_t;
-           opts: Pbson_t): Pmongoc_bulk_operation_t; cdecl; external 'mongoc2.dll';
+           opts: Pbson_t): Pmongoc_bulk_operation_t; inline;
 
 function mongoc_collection_get_read_prefs(
-           collection: Pmongoc_collection_t): Pmongoc_read_prefs_t; cdecl; external 'mongoc2.dll';
+           collection: Pmongoc_collection_t): Pmongoc_read_prefs_t; inline;
 
 procedure mongoc_collection_set_read_prefs(
             collection: Pmongoc_collection_t;
-            read_prefs: Pmongoc_read_prefs_t); cdecl; external 'mongoc2.dll';
+            read_prefs: Pmongoc_read_prefs_t); inline;
 
 function mongoc_collection_get_read_concern(
-           collection: Pmongoc_collection_t): Pmongoc_read_concern_t; cdecl; external 'mongoc2.dll';
+           collection: Pmongoc_collection_t): Pmongoc_read_concern_t; inline;
 
 procedure mongoc_collection_set_read_concern(
             collection: Pmongoc_collection_t;
-            read_concern: Pmongoc_read_concern_t); cdecl; external 'mongoc2.dll';
+            read_concern: Pmongoc_read_concern_t); inline;
 
 function mongoc_collection_get_write_concern(
-           collection: Pmongoc_collection_t): Pmongoc_write_concern_t; cdecl; external 'mongoc2.dll';
+           collection: Pmongoc_collection_t): Pmongoc_write_concern_t; inline;
 
 procedure mongoc_collection_set_write_concern(
             collection: Pmongoc_collection_t;
-            write_concern: Pmongoc_write_concern_t); cdecl; external 'mongoc2.dll';
+            write_concern: Pmongoc_write_concern_t); inline;
 
 function mongoc_collection_get_name(
-           collection: Pmongoc_collection_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           collection: Pmongoc_collection_t): PAnsiChar; inline;
 
 function mongoc_collection_keys_to_index_string(
-           keys: Pbson_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           keys: Pbson_t): PAnsiChar; inline;
 
 function mongoc_collection_watch(
            coll: Pmongoc_collection_t;
            pipeline: Pbson_t;
-           opts: Pbson_t): Pmongoc_change_stream_t; cdecl; external 'mongoc2.dll';
+           opts: Pbson_t): Pmongoc_change_stream_t; inline;
 
 function mongoc_collection_count_documents(
            coll: Pmongoc_collection_t;
@@ -7213,14 +7213,14 @@ function mongoc_collection_count_documents(
            opts: Pbson_t;
            read_prefs: Pmongoc_read_prefs_t;
            reply: Pbson_t;
-           error: Pbson_error_t): int64_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): int64_t; inline;
 
 function mongoc_collection_estimated_document_count(
            coll: Pmongoc_collection_t;
            opts: Pbson_t;
            read_prefs: Pmongoc_read_prefs_t;
            reply: Pbson_t;
-           error: Pbson_error_t): int64_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): int64_t; inline;
 
 /////////////////////
 // mongoc-database //
@@ -7233,16 +7233,16 @@ type
   Pmongoc_database_t = ^mongoc_database_t;
 
 function mongoc_database_get_name(
-           database: Pmongoc_database_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           database: Pmongoc_database_t): PAnsiChar; inline;
 
 function mongoc_database_remove_user(
            database: Pmongoc_database_t;
            username: PAnsiChar;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_database_remove_all_users(
            database: Pmongoc_database_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_database_add_user(
            database: Pmongoc_database_t;
@@ -7250,19 +7250,19 @@ function mongoc_database_add_user(
            password: PAnsiChar;
            roles: Pbson_t;
            custom_data: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 procedure mongoc_database_destroy(
-            database: Pmongoc_database_t); cdecl; external 'mongoc2.dll';
+            database: Pmongoc_database_t); inline;
 
 function mongoc_database_aggregate(
            db: Pmongoc_database_t;
            pipeline: Pbson_t;
            opts: Pbson_t;
-           read_prefs: Pmongoc_read_prefs_t): Pmongoc_cursor_t; cdecl; external 'mongoc2.dll';
+           read_prefs: Pmongoc_read_prefs_t): Pmongoc_cursor_t; inline;
 
 function mongoc_database_copy(
-           database: Pmongoc_database_t): Pmongoc_database_t; cdecl; external 'mongoc2.dll';
+           database: Pmongoc_database_t): Pmongoc_database_t; inline;
 
 function mongoc_database_read_command_with_opts(
            database: Pmongoc_database_t;
@@ -7270,14 +7270,14 @@ function mongoc_database_read_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_database_write_command_with_opts(
            database: Pmongoc_database_t;
            command: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_database_read_write_command_with_opts(
            database: Pmongoc_database_t;
@@ -7285,7 +7285,7 @@ function mongoc_database_read_write_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t; // IGNORED
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_database_command_with_opts(
            database: Pmongoc_database_t;
@@ -7293,73 +7293,73 @@ function mongoc_database_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_database_command_simple(
            database: Pmongoc_database_t;
            command: Pbson_t;
            read_prefs: Pmongoc_read_prefs_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_database_drop(
            database: Pmongoc_database_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_database_drop_with_opts(
            database: Pmongoc_database_t;
            opts: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_database_has_collection(
            database: Pmongoc_database_t;
            name: PAnsiChar;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_database_create_collection(
            database: Pmongoc_database_t;
            name: PAnsiChar;
            options: Pbson_t;
-           error: Pbson_error_t): Pmongoc_collection_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_collection_t; inline;
 
 function mongoc_database_get_read_prefs(
-           database: Pmongoc_database_t): Pmongoc_read_prefs_t; cdecl; external 'mongoc2.dll';
+           database: Pmongoc_database_t): Pmongoc_read_prefs_t; inline;
 
 procedure mongoc_database_set_read_prefs(
             database: Pmongoc_database_t;
-            read_prefs: Pmongoc_read_prefs_t); cdecl; external 'mongoc2.dll';
+            read_prefs: Pmongoc_read_prefs_t); inline;
 
 function mongoc_database_get_write_concern(
-           database: Pmongoc_database_t): Pmongoc_write_concern_t; cdecl; external 'mongoc2.dll';
+           database: Pmongoc_database_t): Pmongoc_write_concern_t; inline;
 
 procedure mongoc_database_set_write_concern(
             database: Pmongoc_database_t;
-            write_concern: Pmongoc_write_concern_t); cdecl; external 'mongoc2.dll';
+            write_concern: Pmongoc_write_concern_t); inline;
 
 function mongoc_database_get_read_concern(
-           database: Pmongoc_database_t): Pmongoc_read_concern_t; cdecl; external 'mongoc2.dll';
+           database: Pmongoc_database_t): Pmongoc_read_concern_t; inline;
 
 procedure mongoc_database_set_read_concern(
             database: Pmongoc_database_t;
-            read_concern: Pmongoc_read_concern_t); cdecl; external 'mongoc2.dll';
+            read_concern: Pmongoc_read_concern_t); inline;
 
 function mongoc_database_find_collections_with_opts(
            database: Pmongoc_database_t;
-           opts: Pbson_t): Pmongoc_cursor_t; cdecl; external 'mongoc2.dll';
+           opts: Pbson_t): Pmongoc_cursor_t; inline;
 
 function mongoc_database_get_collection_names_with_opts(
            database: Pmongoc_database_t;
            opts: Pbson_t;
-           error: Pbson_error_t): PPAnsiChar; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): PPAnsiChar; inline;
 
 function mongoc_database_get_collection(
            database: Pmongoc_database_t;
-           name: PAnsiChar): Pmongoc_collection_t; cdecl; external 'mongoc2.dll';
+           name: PAnsiChar): Pmongoc_collection_t; inline;
 
 function mongoc_database_watch(
            db: Pmongoc_database_t;
            pipeline: Pbson_t;
-           opts: Pbson_t): Pmongoc_change_stream_t; cdecl; external 'mongoc2.dll';
+           opts: Pbson_t): Pmongoc_change_stream_t; inline;
 
 ////////////////////////
 // mongoc-gridfs-file //
@@ -7396,54 +7396,54 @@ type
 // MONGOC_GRIDFS_FILE_BSON_HEADER(metadata)
 
 function mongoc_gridfs_file_get_id(
-           &file: Pmongoc_gridfs_file_t): Pbson_value_t; cdecl; external 'mongoc2.dll';
+           &file: Pmongoc_gridfs_file_t): Pbson_value_t; inline;
 
 function mongoc_gridfs_file_get_length(
-           &file: Pmongoc_gridfs_file_t): int64_t; cdecl; external 'mongoc2.dll';
+           &file: Pmongoc_gridfs_file_t): int64_t; inline;
 
 function mongoc_gridfs_file_get_chunk_size(
-           &file: Pmongoc_gridfs_file_t): int32_t; cdecl; external 'mongoc2.dll';
+           &file: Pmongoc_gridfs_file_t): int32_t; inline;
 
 function mongoc_gridfs_file_get_upload_date(
-           &file: Pmongoc_gridfs_file_t): int64_t; cdecl; external 'mongoc2.dll';
+           &file: Pmongoc_gridfs_file_t): int64_t; inline;
 
 function mongoc_gridfs_file_writev(
            &file: Pmongoc_gridfs_file_t;
            iov: Pmongoc_iovec_t;
            iovcnt: size_t;
-           timeout_msec: uint32_t): ssize_t; cdecl; external 'mongoc2.dll';
+           timeout_msec: uint32_t): ssize_t; inline;
 function mongoc_gridfs_file_readv(
            &file: Pmongoc_gridfs_file_t;
            iov: Pmongoc_iovec_t;
            iovcnt: size_t;
            min_bytes: size_t;
-           timeout_msec: uint32_t): ssize_t; cdecl; external 'mongoc2.dll';
+           timeout_msec: uint32_t): ssize_t; inline;
 function mongoc_gridfs_file_seek(
            &file: Pmongoc_gridfs_file_t;
            delta: int64_t;
-           whence: Integer): Integer; cdecl; external 'mongoc2.dll';
+           whence: Integer): Integer; inline;
 
 function mongoc_gridfs_file_tell(
-           &file: Pmongoc_gridfs_file_t): uint64_t; cdecl; external 'mongoc2.dll';
+           &file: Pmongoc_gridfs_file_t): uint64_t; inline;
 
 function mongoc_gridfs_file_set_id(
            &file: Pmongoc_gridfs_file_t;
            id: Pbson_value_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_gridfs_file_save(
-           &file: Pmongoc_gridfs_file_t): ByteBool; cdecl; external 'mongoc2.dll';
+           &file: Pmongoc_gridfs_file_t): ByteBool; inline;
 
 procedure mongoc_gridfs_file_destroy(
-            &file: Pmongoc_gridfs_file_t); cdecl; external 'mongoc2.dll';
+            &file: Pmongoc_gridfs_file_t); inline;
 
 function mongoc_gridfs_file_error(
            &file: Pmongoc_gridfs_file_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_gridfs_file_remove(
            &file: Pmongoc_gridfs_file_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 /////////////////////////////
 // mongoc-gridfs-file-list //
@@ -7456,12 +7456,12 @@ type
   Pmongoc_gridfs_file_list_t = ^mongoc_gridfs_file_list_t;
 
 function mongoc_gridfs_file_list_next(
-           list: Pmongoc_gridfs_file_list_t): Pmongoc_gridfs_file_t; cdecl; external 'mongoc2.dll';
+           list: Pmongoc_gridfs_file_list_t): Pmongoc_gridfs_file_t; inline;
 procedure mongoc_gridfs_file_list_destroy(
-            list: Pmongoc_gridfs_file_list_t); cdecl; external 'mongoc2.dll';
+            list: Pmongoc_gridfs_file_list_t); inline;
 function mongoc_gridfs_file_list_error(
            list: Pmongoc_gridfs_file_list_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 /////////////////////////////
 // mongoc-gridfs-file-page //
@@ -7486,21 +7486,21 @@ function mongoc_gridfs_bucket_new(
            db: Pmongoc_database_t;
            opts: Pbson_t;
            read_prefs: Pmongoc_read_prefs_t;
-           error: Pbson_error_t): Pmongoc_gridfs_bucket_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_gridfs_bucket_t; inline;
 
 function mongoc_gridfs_bucket_open_upload_stream(
            bucket: Pmongoc_gridfs_bucket_t;
            filename: PAnsiChar;
            opts: Pbson_t;
            file_id: Pbson_value_t;
-           error: Pbson_error_t): Pmongoc_stream_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_stream_t; inline;
 
 function mongoc_gridfs_bucket_open_upload_stream_with_id(
            bucket: Pmongoc_gridfs_bucket_t;
            file_id: Pbson_value_t;
            filename: PAnsiChar;
            opts: Pbson_t;
-           error: Pbson_error_t): Pmongoc_stream_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_stream_t; inline;
 
 function mongoc_gridfs_bucket_upload_from_stream(
            bucket: Pmongoc_gridfs_bucket_t;
@@ -7508,7 +7508,7 @@ function mongoc_gridfs_bucket_upload_from_stream(
            source: Pmongoc_stream_t;
            opts: Pbson_t;
            file_id: Pbson_value_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_gridfs_bucket_upload_from_stream_with_id(
            bucket: Pmongoc_gridfs_bucket_t;
@@ -7516,38 +7516,38 @@ function mongoc_gridfs_bucket_upload_from_stream_with_id(
            filename: PAnsiChar;
            source: Pmongoc_stream_t;
            opts: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_gridfs_bucket_open_download_stream(
            bucket: Pmongoc_gridfs_bucket_t;
            file_id: Pbson_value_t;
-           error: Pbson_error_t): Pmongoc_stream_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_stream_t; inline;
 
 function mongoc_gridfs_bucket_download_to_stream(
            bucket: Pmongoc_gridfs_bucket_t;
            file_id: Pbson_value_t;
            destination: Pmongoc_stream_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_gridfs_bucket_delete_by_id(
            bucket: Pmongoc_gridfs_bucket_t;
            file_id: Pbson_value_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_gridfs_bucket_find(
            bucket: Pmongoc_gridfs_bucket_t;
            filter: Pbson_t;
-           opts: Pbson_t): Pmongoc_cursor_t; cdecl; external 'mongoc2.dll';
+           opts: Pbson_t): Pmongoc_cursor_t; inline;
 
 function mongoc_gridfs_bucket_stream_error(
            stream: Pmongoc_stream_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 procedure mongoc_gridfs_bucket_destroy(
-            bucket: Pmongoc_gridfs_bucket_t); cdecl; external 'mongoc2.dll';
+            bucket: Pmongoc_gridfs_bucket_t); inline;
 
 function mongoc_gridfs_bucket_abort_upload(
-           stream: Pmongoc_stream_t): ByteBool; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_t): ByteBool; inline;
 
 ///////////////////
 // mongoc-gridfs //
@@ -7562,52 +7562,52 @@ type
 function mongoc_gridfs_create_file_from_stream(
            gridfs: Pmongoc_gridfs_t;
            stream: Pmongoc_stream_t;
-           opt: Pmongoc_gridfs_file_opt_t): Pmongoc_gridfs_file_t; cdecl; external 'mongoc2.dll';
+           opt: Pmongoc_gridfs_file_opt_t): Pmongoc_gridfs_file_t; inline;
 
 function mongoc_gridfs_create_file(
            gridfs: Pmongoc_gridfs_t;
-           opt: Pmongoc_gridfs_file_opt_t): Pmongoc_gridfs_file_t; cdecl; external 'mongoc2.dll';
+           opt: Pmongoc_gridfs_file_opt_t): Pmongoc_gridfs_file_t; inline;
 
 function mongoc_gridfs_find_with_opts(
            gridfs: Pmongoc_gridfs_t;
            filter: Pbson_t;
-           opts: Pbson_t): Pmongoc_gridfs_file_list_t; cdecl; external 'mongoc2.dll';
+           opts: Pbson_t): Pmongoc_gridfs_file_list_t; inline;
 
 function mongoc_gridfs_find_one_with_opts(
            gridfs: Pmongoc_gridfs_t;
            filter: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): Pmongoc_gridfs_file_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_gridfs_file_t; inline;
 
 function mongoc_gridfs_find_one_by_filename(
            gridfs: Pmongoc_gridfs_t;
            filename: PAnsiChar;
-           error: Pbson_error_t): Pmongoc_gridfs_file_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_gridfs_file_t; inline;
 
 function mongoc_gridfs_drop(
            gridfs: Pmongoc_gridfs_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 procedure mongoc_gridfs_destroy(
-            gridfs: Pmongoc_gridfs_t); cdecl; external 'mongoc2.dll';
+            gridfs: Pmongoc_gridfs_t); inline;
 
 function mongoc_gridfs_get_files(
-           gridfs: Pmongoc_gridfs_t): Pmongoc_collection_t; cdecl; external 'mongoc2.dll';
+           gridfs: Pmongoc_gridfs_t): Pmongoc_collection_t; inline;
 
 function mongoc_gridfs_get_chunks(
-           gridfs: Pmongoc_gridfs_t): Pmongoc_collection_t; cdecl; external 'mongoc2.dll';
+           gridfs: Pmongoc_gridfs_t): Pmongoc_collection_t; inline;
 
 function mongoc_gridfs_remove_by_filename(
            gridfs: Pmongoc_gridfs_t;
            filename: PAnsiChar;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 //////////////////////////
 // mongoc-stream-gridfs //
 //////////////////////////
 
 function mongoc_stream_gridfs_new(
-           &file: Pmongoc_gridfs_file_t): Pmongoc_stream_t; cdecl; external 'mongoc2.dll';
+           &file: Pmongoc_gridfs_file_t): Pmongoc_stream_t; inline;
 
 ///////////////////
 // mongoc-client //
@@ -7681,26 +7681,26 @@ type
     error: Pbson_error_t): Pmongoc_stream_t; cdecl;
 
 function mongoc_client_new(
-           uri_string: PAnsiChar): Pmongoc_client_t; cdecl; external 'mongoc2.dll';
+           uri_string: PAnsiChar): Pmongoc_client_t; inline;
 
 function mongoc_client_new_from_uri(
-           uri: Pmongoc_uri_t): Pmongoc_client_t; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): Pmongoc_client_t; inline;
 
 function mongoc_client_new_from_uri_with_error(
            uri: Pmongoc_uri_t;
-           error: Pbson_error_t): Pmongoc_client_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_client_t; inline;
 
 procedure mongoc_client_set_sockettimeoutms(
             client: Pmongoc_client_t;
-            timeoutms: int32_t); cdecl; external 'mongoc2.dll';
+            timeoutms: int32_t); inline;
 
 function mongoc_client_get_uri(
-           client: Pmongoc_client_t): Pmongoc_uri_t; cdecl; external 'mongoc2.dll';
+           client: Pmongoc_client_t): Pmongoc_uri_t; inline;
 
 procedure mongoc_client_set_stream_initiator(
             client: Pmongoc_client_t;
             initiator: mongoc_stream_initiator_t;
-            user_data: Pvoid); cdecl; external 'mongoc2.dll';
+            user_data: Pvoid); inline;
 
 function mongoc_client_command_simple(
            client: Pmongoc_client_t;
@@ -7708,7 +7708,7 @@ function mongoc_client_command_simple(
            command: Pbson_t;
            read_prefs: Pmongoc_read_prefs_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_read_command_with_opts(
            client: Pmongoc_client_t;
@@ -7717,7 +7717,7 @@ function mongoc_client_read_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_write_command_with_opts(
            client: Pmongoc_client_t;
@@ -7725,7 +7725,7 @@ function mongoc_client_write_command_with_opts(
            command: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_read_write_command_with_opts(
            client: Pmongoc_client_t;
@@ -7734,7 +7734,7 @@ function mongoc_client_read_write_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t; // IGNORED
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_command_with_opts(
            client: Pmongoc_client_t;
@@ -7743,7 +7743,7 @@ function mongoc_client_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_command_simple_with_server_id(
            client: Pmongoc_client_t;
@@ -7752,143 +7752,143 @@ function mongoc_client_command_simple_with_server_id(
            read_prefs: Pmongoc_read_prefs_t;
            server_id: uint32_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 procedure mongoc_client_destroy(
-            client: Pmongoc_client_t); cdecl; external 'mongoc2.dll';
+            client: Pmongoc_client_t); inline;
 
 function mongoc_client_start_session(
            client: Pmongoc_client_t;
            opts: Pmongoc_session_opt_t;
-           error: Pbson_error_t): Pmongoc_client_session_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_client_session_t; inline;
 
 function mongoc_client_get_database(
            client: Pmongoc_client_t;
-           name: PAnsiChar): Pmongoc_database_t; cdecl; external 'mongoc2.dll';
+           name: PAnsiChar): Pmongoc_database_t; inline;
 
 function mongoc_client_get_default_database(
-           client: Pmongoc_client_t): Pmongoc_database_t; cdecl; external 'mongoc2.dll';
+           client: Pmongoc_client_t): Pmongoc_database_t; inline;
 
 function mongoc_client_get_gridfs(
            client: Pmongoc_client_t;
            db: PAnsiChar;
            prefix: PAnsiChar;
-           error: Pbson_error_t): Pmongoc_gridfs_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_gridfs_t; inline;
 
 function mongoc_client_get_collection(
            client: Pmongoc_client_t;
            db: PAnsiChar;
-           collection: PAnsiChar): Pmongoc_collection_t; cdecl; external 'mongoc2.dll';
+           collection: PAnsiChar): Pmongoc_collection_t; inline;
 
 // BSON_DEPRECATED_FOR(mongoc_client_get_database_names_with_opts)
 function mongoc_client_get_database_names(
            client: Pmongoc_client_t;
-           error: Pbson_error_t): PPAnsiChar; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): PPAnsiChar; inline;
 
 function mongoc_client_get_database_names_with_opts(
            client: Pmongoc_client_t;
            opts: Pbson_t;
-           error: Pbson_error_t): PPAnsiChar; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): PPAnsiChar; inline;
 
 // BSON_DEPRECATED_FOR(mongoc_client_find_databases_with_opts)
 function mongoc_client_find_databases(
            client: Pmongoc_client_t;
-           error: Pbson_error_t): Pmongoc_cursor_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_cursor_t; inline;
 
 function mongoc_client_find_databases_with_opts(
            client: Pmongoc_client_t;
-           opts: Pbson_t): Pmongoc_cursor_t; cdecl; external 'mongoc2.dll';
+           opts: Pbson_t): Pmongoc_cursor_t; inline;
 
 function mongoc_client_get_write_concern(
-           client: Pmongoc_client_t): Pmongoc_write_concern_t; cdecl; external 'mongoc2.dll';
+           client: Pmongoc_client_t): Pmongoc_write_concern_t; inline;
 
 procedure mongoc_client_set_write_concern(
             client: Pmongoc_client_t;
-            write_concern: Pmongoc_write_concern_t); cdecl; external 'mongoc2.dll';
+            write_concern: Pmongoc_write_concern_t); inline;
 
 function mongoc_client_get_read_concern(
-           client: Pmongoc_client_t): Pmongoc_read_concern_t; cdecl; external 'mongoc2.dll';
+           client: Pmongoc_client_t): Pmongoc_read_concern_t; inline;
 
 procedure mongoc_client_set_read_concern(
             client: Pmongoc_client_t;
-            read_concern: Pmongoc_read_concern_t); cdecl; external 'mongoc2.dll';
+            read_concern: Pmongoc_read_concern_t); inline;
 
 function mongoc_client_get_read_prefs(
-           client: Pmongoc_client_t): Pmongoc_read_prefs_t; cdecl; external 'mongoc2.dll';
+           client: Pmongoc_client_t): Pmongoc_read_prefs_t; inline;
 
 procedure mongoc_client_set_read_prefs(
             client: Pmongoc_client_t;
-            read_prefs: Pmongoc_read_prefs_t); cdecl; external 'mongoc2.dll';
+            read_prefs: Pmongoc_read_prefs_t); inline;
 
 procedure mongoc_client_set_ssl_opts(
             client: Pmongoc_client_t;
-            opts: Pmongoc_ssl_opt_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_ssl_opt_t); inline;
 
 function mongoc_client_set_apm_callbacks(
            client: Pmongoc_client_t;
            callbacks: Pmongoc_apm_callbacks_t;
-           context: Pvoid): ByteBool; cdecl; external 'mongoc2.dll';
+           context: Pvoid): ByteBool; inline;
 
 function mongoc_client_set_structured_log_opts(
            client: Pmongoc_client_t;
-           opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_structured_log_opts_t): ByteBool; inline;
 
 function mongoc_client_get_server_description(
            client: Pmongoc_client_t;
-           server_id: uint32_t): Pmongoc_server_description_t; cdecl; external 'mongoc2.dll';
+           server_id: uint32_t): Pmongoc_server_description_t; inline;
 
 function mongoc_client_get_server_descriptions(
            client: Pmongoc_client_t;
-           n: Psize_t): PPmongoc_server_description_t; cdecl; external 'mongoc2.dll';
+           n: Psize_t): PPmongoc_server_description_t; inline;
 
 procedure mongoc_server_descriptions_destroy_all(
             sds: PPmongoc_server_description_t;
-            n: size_t); cdecl; external 'mongoc2.dll';
+            n: size_t); inline;
 
 function mongoc_client_select_server(
            client: Pmongoc_client_t;
            for_writes: ByteBool;
            prefs: Pmongoc_read_prefs_t;
-           error: Pbson_error_t): Pmongoc_server_description_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_server_description_t; inline;
 
 function mongoc_client_set_error_api(
            client: Pmongoc_client_t;
-           version: int32_t): ByteBool; cdecl; external 'mongoc2.dll';
+           version: int32_t): ByteBool; inline;
 
 function mongoc_client_set_appname(
            client: Pmongoc_client_t;
-           appname: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           appname: PAnsiChar): ByteBool; inline;
 
 function mongoc_client_watch(
            client: Pmongoc_client_t;
            pipeline: Pbson_t;
-           opts: Pbson_t): Pmongoc_change_stream_t; cdecl; external 'mongoc2.dll';
+           opts: Pbson_t): Pmongoc_change_stream_t; inline;
 
 procedure mongoc_client_reset(
-            client: Pmongoc_client_t); cdecl; external 'mongoc2.dll';
+            client: Pmongoc_client_t); inline;
 
 function mongoc_client_enable_auto_encryption(
            client: Pmongoc_client_t;
            opts: Pmongoc_auto_encryption_opts_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_get_crypt_shared_version(
-           client: Pmongoc_client_t): PAnsiChar; cdecl; external 'mongoc2.dll';
+           client: Pmongoc_client_t): PAnsiChar; inline;
 
 function mongoc_client_set_server_api(
            client: Pmongoc_client_t;
            api: Pmongoc_server_api_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_get_handshake_description(
            client: Pmongoc_client_t;
            server_id: uint32_t;
            opts: Pbson_t;
-           error: Pbson_error_t): Pmongoc_server_description_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_server_description_t; inline;
 
 function mongoc_client_set_oidc_callback(
            client: Pmongoc_client_t;
-           callback: Pmongoc_oidc_callback_t): ByteBool; cdecl; external 'mongoc2.dll';
+           callback: Pmongoc_oidc_callback_t): ByteBool; inline;
 
 ////////////////////////
 // mongoc-client-pool //
@@ -7901,63 +7901,63 @@ type
   Pmongoc_client_pool_t = ^mongoc_client_pool_t;
 
 function mongoc_client_pool_new(
-           uri: Pmongoc_uri_t): Pmongoc_client_pool_t; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): Pmongoc_client_pool_t; inline;
 
 function mongoc_client_pool_new_with_error(
            uri: Pmongoc_uri_t;
-           error: Pbson_error_t): Pmongoc_client_pool_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): Pmongoc_client_pool_t; inline;
 
 procedure mongoc_client_pool_destroy(
-            pool: Pmongoc_client_pool_t); cdecl; external 'mongoc2.dll';
+            pool: Pmongoc_client_pool_t); inline;
 
 function mongoc_client_pool_pop(
-           pool: Pmongoc_client_pool_t): Pmongoc_client_t; cdecl; external 'mongoc2.dll';
+           pool: Pmongoc_client_pool_t): Pmongoc_client_t; inline;
 
 procedure mongoc_client_pool_push(
             pool: Pmongoc_client_pool_t;
-            client: Pmongoc_client_t); cdecl; external 'mongoc2.dll';
+            client: Pmongoc_client_t); inline;
 
 function mongoc_client_pool_try_pop(
-           pool: Pmongoc_client_pool_t): Pmongoc_client_t; cdecl; external 'mongoc2.dll';
+           pool: Pmongoc_client_pool_t): Pmongoc_client_t; inline;
 
 procedure mongoc_client_pool_max_size(
             pool: Pmongoc_client_pool_t;
-            max_pool_size: uint32_t); cdecl; external 'mongoc2.dll';
+            max_pool_size: uint32_t); inline;
 
 procedure mongoc_client_pool_set_ssl_opts(
             pool: Pmongoc_client_pool_t;
-            opts: Pmongoc_ssl_opt_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_ssl_opt_t); inline;
 
 function mongoc_client_pool_set_apm_callbacks(
            pool: Pmongoc_client_pool_t;
            callbacks: Pmongoc_apm_callbacks_t;
-           context: Pvoid): ByteBool; cdecl; external 'mongoc2.dll';
+           context: Pvoid): ByteBool; inline;
 
 function mongoc_client_pool_set_error_api(
            pool: Pmongoc_client_pool_t;
-           version: int32_t): ByteBool; cdecl; external 'mongoc2.dll';
+           version: int32_t): ByteBool; inline;
 
 function mongoc_client_pool_set_appname(
            pool: Pmongoc_client_pool_t;
-           appname: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
+           appname: PAnsiChar): ByteBool; inline;
 
 function mongoc_client_pool_enable_auto_encryption(
            pool: Pmongoc_client_pool_t;
            opts: Pmongoc_auto_encryption_opts_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_pool_set_server_api(
            pool: Pmongoc_client_pool_t;
            api: Pmongoc_server_api_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_pool_set_structured_log_opts(
            pool: Pmongoc_client_pool_t;
-           opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_structured_log_opts_t): ByteBool; inline;
 
 function mongoc_client_pool_set_oidc_callback(
            pool: Pmongoc_client_pool_t;
-           callback: Pmongoc_oidc_callback_t): ByteBool; cdecl; external 'mongoc2.dll';
+           callback: Pmongoc_oidc_callback_t): ByteBool; inline;
 
 ///////////////////////////
 // mongoc-client-session //
@@ -7983,102 +7983,102 @@ type
 
 // * these options types are named "opt_t" but their functions are named with
 // * "opts", for consistency with the older mongoc_ssl_opt_t
-function mongoc_transaction_opts_new(): Pmongoc_transaction_opt_t; cdecl; external 'mongoc2.dll';
+function mongoc_transaction_opts_new(): Pmongoc_transaction_opt_t; inline;
 
 function mongoc_transaction_opts_clone(
-           opts: Pmongoc_transaction_opt_t): Pmongoc_transaction_opt_t; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_transaction_opt_t): Pmongoc_transaction_opt_t; inline;
 
 procedure mongoc_transaction_opts_destroy(
-            opts: Pmongoc_transaction_opt_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_transaction_opt_t); inline;
 
 procedure mongoc_transaction_opts_set_max_commit_time_ms(
             opts: Pmongoc_transaction_opt_t;
-            max_commit_time_ms: int64_t); cdecl; external 'mongoc2.dll';
+            max_commit_time_ms: int64_t); inline;
 
 function mongoc_transaction_opts_get_max_commit_time_ms(
-           opts: Pmongoc_transaction_opt_t): int64_t; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_transaction_opt_t): int64_t; inline;
 
 procedure mongoc_transaction_opts_set_read_concern(
             opts: Pmongoc_transaction_opt_t;
-            read_concern: Pmongoc_read_concern_t); cdecl; external 'mongoc2.dll';
+            read_concern: Pmongoc_read_concern_t); inline;
 
 function mongoc_transaction_opts_get_read_concern(
-           opts: Pmongoc_transaction_opt_t): Pmongoc_read_concern_t; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_transaction_opt_t): Pmongoc_read_concern_t; inline;
 
 procedure mongoc_transaction_opts_set_write_concern(
             opts: Pmongoc_transaction_opt_t;
-            write_concern: Pmongoc_write_concern_t); cdecl; external 'mongoc2.dll';
+            write_concern: Pmongoc_write_concern_t); inline;
 
 function mongoc_transaction_opts_get_write_concern(
-           opts: Pmongoc_transaction_opt_t): Pmongoc_write_concern_t; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_transaction_opt_t): Pmongoc_write_concern_t; inline;
 
 procedure mongoc_transaction_opts_set_read_prefs(
             opts: Pmongoc_transaction_opt_t;
-            read_prefs: Pmongoc_read_prefs_t); cdecl; external 'mongoc2.dll';
+            read_prefs: Pmongoc_read_prefs_t); inline;
 
 function mongoc_transaction_opts_get_read_prefs(
-           opts: Pmongoc_transaction_opt_t): Pmongoc_read_prefs_t; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_transaction_opt_t): Pmongoc_read_prefs_t; inline;
 
-function mongoc_session_opts_new(): Pmongoc_session_opt_t; cdecl; external 'mongoc2.dll';
+function mongoc_session_opts_new(): Pmongoc_session_opt_t; inline;
 
 procedure mongoc_session_opts_set_causal_consistency(
             opts: Pmongoc_session_opt_t;
-            causal_consistency: ByteBool); cdecl; external 'mongoc2.dll';
+            causal_consistency: ByteBool); inline;
 
 function mongoc_session_opts_get_causal_consistency(
-           opts: Pmongoc_session_opt_t): ByteBool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_session_opt_t): ByteBool; inline;
 
 procedure mongoc_session_opts_set_snapshot(
             opts: Pmongoc_session_opt_t;
-            snapshot: ByteBool); cdecl; external 'mongoc2.dll';
+            snapshot: ByteBool); inline;
 
 function mongoc_session_opts_get_snapshot(
-           opts: Pmongoc_session_opt_t): ByteBool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_session_opt_t): ByteBool; inline;
 
 procedure mongoc_session_opts_set_default_transaction_opts(
             opts: Pmongoc_session_opt_t;
-            txn_opts: Pmongoc_transaction_opt_t); cdecl; external 'mongoc2.dll';
+            txn_opts: Pmongoc_transaction_opt_t); inline;
 
 function mongoc_session_opts_get_default_transaction_opts(
-           opts: Pmongoc_session_opt_t): Pmongoc_transaction_opt_t; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_session_opt_t): Pmongoc_transaction_opt_t; inline;
 
 function mongoc_session_opts_get_transaction_opts(
-           session: Pmongoc_client_session_t): Pmongoc_transaction_opt_t; cdecl; external 'mongoc2.dll';
+           session: Pmongoc_client_session_t): Pmongoc_transaction_opt_t; inline;
 
 function mongoc_session_opts_clone(
-           opts: Pmongoc_session_opt_t): Pmongoc_session_opt_t; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_session_opt_t): Pmongoc_session_opt_t; inline;
 
 procedure mongoc_session_opts_destroy(
-            opts: Pmongoc_session_opt_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_session_opt_t); inline;
 
 function mongoc_client_session_get_client(
-           session: Pmongoc_client_session_t): Pmongoc_client_t; cdecl; external 'mongoc2.dll';
+           session: Pmongoc_client_session_t): Pmongoc_client_t; inline;
 
 function mongoc_client_session_get_opts(
-           session: Pmongoc_client_session_t): Pmongoc_session_opt_t; cdecl; external 'mongoc2.dll';
+           session: Pmongoc_client_session_t): Pmongoc_session_opt_t; inline;
 
 function mongoc_client_session_get_lsid(
-           session: Pmongoc_client_session_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           session: Pmongoc_client_session_t): Pbson_t; inline;
 
 function mongoc_client_session_get_cluster_time(
-           session: Pmongoc_client_session_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           session: Pmongoc_client_session_t): Pbson_t; inline;
 
 procedure mongoc_client_session_advance_cluster_time(
             session: Pmongoc_client_session_t;
-            cluster_time: Pbson_t); cdecl; external 'mongoc2.dll';
+            cluster_time: Pbson_t); inline;
 
 procedure mongoc_client_session_get_operation_time(
             session: Pmongoc_client_session_t;
             timestamp: Puint32_t;
-            increment: Puint32_t); cdecl; external 'mongoc2.dll';
+            increment: Puint32_t); inline;
 
 function mongoc_client_session_get_server_id(
-           session: Pmongoc_client_session_t): uint32_t; cdecl; external 'mongoc2.dll';
+           session: Pmongoc_client_session_t): uint32_t; inline;
 
 procedure mongoc_client_session_advance_operation_time(
             session: Pmongoc_client_session_t;
             timestamp: uint32_t;
-            increment: uint32_t); cdecl; external 'mongoc2.dll';
+            increment: uint32_t); inline;
 
 function mongoc_client_session_with_transaction(
            session: Pmongoc_client_session_t;
@@ -8086,32 +8086,32 @@ function mongoc_client_session_with_transaction(
            opts: Pmongoc_transaction_opt_t;
            ctx: Pvoid;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_session_start_transaction(
            session: Pmongoc_client_session_t;
            opts: Pmongoc_transaction_opt_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_session_in_transaction(
-           session: Pmongoc_client_session_t): ByteBool; cdecl; external 'mongoc2.dll';
+           session: Pmongoc_client_session_t): ByteBool; inline;
 
 function mongoc_client_session_get_transaction_state(
-           session: Pmongoc_client_session_t): mongoc_transaction_state_t; cdecl; external 'mongoc2.dll';
+           session: Pmongoc_client_session_t): mongoc_transaction_state_t; inline;
 
 function mongoc_client_session_commit_transaction(
            session: Pmongoc_client_session_t;
            reply: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_session_abort_transaction(
            session: Pmongoc_client_session_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 function mongoc_client_session_append(
            client_session: Pmongoc_client_session_t;
            opts: Pbson_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 // * There is no mongoc_client_session_end, only mongoc_client_session_destroy.
 // * Driver Sessions Spec: "In languages that have idiomatic ways of disposing of
@@ -8120,10 +8120,10 @@ function mongoc_client_session_append(
 // *
 
 procedure mongoc_client_session_destroy(
-            session: Pmongoc_client_session_t); cdecl; external 'mongoc2.dll';
+            session: Pmongoc_client_session_t); inline;
 
 function mongoc_client_session_get_dirty(
-           session: Pmongoc_client_session_t): ByteBool; cdecl; external 'mongoc2.dll';
+           session: Pmongoc_client_session_t): ByteBool; inline;
 
 //////////////////////
 // mongoc-bulkwrite //
@@ -8134,37 +8134,37 @@ type
   end;
   mongoc_bulkwriteopts_t = _mongoc_bulkwriteopts_t;
   Pmongoc_bulkwriteopts_t = ^mongoc_bulkwriteopts_t;
-function mongoc_bulkwriteopts_new(): Pmongoc_bulkwriteopts_t; cdecl; external 'mongoc2.dll';
+function mongoc_bulkwriteopts_new(): Pmongoc_bulkwriteopts_t; inline;
 procedure mongoc_bulkwriteopts_set_ordered(
             self: Pmongoc_bulkwriteopts_t;
-            ordered: ByteBool); cdecl; external 'mongoc2.dll';
+            ordered: ByteBool); inline;
 procedure mongoc_bulkwriteopts_set_bypassdocumentvalidation(
             self: Pmongoc_bulkwriteopts_t;
-            bypassdocumentvalidation: ByteBool); cdecl; external 'mongoc2.dll';
+            bypassdocumentvalidation: ByteBool); inline;
 procedure mongoc_bulkwriteopts_set_let(
             self: Pmongoc_bulkwriteopts_t;
-            let: Pbson_t); cdecl; external 'mongoc2.dll';
+            let: Pbson_t); inline;
 procedure mongoc_bulkwriteopts_set_writeconcern(
             self: Pmongoc_bulkwriteopts_t;
-            writeconcern: Pmongoc_write_concern_t); cdecl; external 'mongoc2.dll';
+            writeconcern: Pmongoc_write_concern_t); inline;
 procedure mongoc_bulkwriteopts_set_comment(
             self: Pmongoc_bulkwriteopts_t;
-            comment: Pbson_value_t); cdecl; external 'mongoc2.dll';
+            comment: Pbson_value_t); inline;
 procedure mongoc_bulkwriteopts_set_verboseresults(
             self: Pmongoc_bulkwriteopts_t;
-            verboseresults: ByteBool); cdecl; external 'mongoc2.dll';
+            verboseresults: ByteBool); inline;
 // `mongoc_bulkwriteopts_set_extra` appends `extra` to bulkWrite command.
 // It is intended to support future server options.
 procedure mongoc_bulkwriteopts_set_extra(
             self: Pmongoc_bulkwriteopts_t;
-            extra: Pbson_t); cdecl; external 'mongoc2.dll';
+            extra: Pbson_t); inline;
 // `mongoc_bulkwriteopts_set_serverid` identifies which server to perform the operation. This is intended for use by
 // wrapping drivers that select a server before running the operation.
 procedure mongoc_bulkwriteopts_set_serverid(
             self: Pmongoc_bulkwriteopts_t;
-            serverid: uint32_t); cdecl; external 'mongoc2.dll';
+            serverid: uint32_t); inline;
 procedure mongoc_bulkwriteopts_destroy(
-            self: Pmongoc_bulkwriteopts_t); cdecl; external 'mongoc2.dll';
+            self: Pmongoc_bulkwriteopts_t); inline;
 
 type
   _mongoc_bulkwriteresult_t = record
@@ -8172,15 +8172,15 @@ type
   mongoc_bulkwriteresult_t = _mongoc_bulkwriteresult_t;
   Pmongoc_bulkwriteresult_t = ^mongoc_bulkwriteresult_t;
 function mongoc_bulkwriteresult_insertedcount(
-           self: Pmongoc_bulkwriteresult_t): int64_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_bulkwriteresult_t): int64_t; inline;
 function mongoc_bulkwriteresult_upsertedcount(
-           self: Pmongoc_bulkwriteresult_t): int64_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_bulkwriteresult_t): int64_t; inline;
 function mongoc_bulkwriteresult_matchedcount(
-           self: Pmongoc_bulkwriteresult_t): int64_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_bulkwriteresult_t): int64_t; inline;
 function mongoc_bulkwriteresult_modifiedcount(
-           self: Pmongoc_bulkwriteresult_t): int64_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_bulkwriteresult_t): int64_t; inline;
 function mongoc_bulkwriteresult_deletedcount(
-           self: Pmongoc_bulkwriteresult_t): int64_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_bulkwriteresult_t): int64_t; inline;
 // `mongoc_bulkwriteresult_insertresults` returns a BSON document mapping model indexes to insert results.
 // Example:
 // {
@@ -8189,7 +8189,7 @@ function mongoc_bulkwriteresult_deletedcount(
 // }
 // Returns NULL if verbose results were not requested.
 function mongoc_bulkwriteresult_insertresults(
-           self: Pmongoc_bulkwriteresult_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_bulkwriteresult_t): Pbson_t; inline;
 // `mongoc_bulkwriteresult_updateresults` returns a BSON document mapping model indexes to update results.
 // Example:
 // {
@@ -8198,7 +8198,7 @@ function mongoc_bulkwriteresult_insertresults(
 // }
 // Returns NULL if verbose results were not requested.
 function mongoc_bulkwriteresult_updateresults(
-           self: Pmongoc_bulkwriteresult_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_bulkwriteresult_t): Pbson_t; inline;
 // `mongoc_bulkwriteresult_deleteresults` returns a BSON document mapping model indexes to delete results.
 // Example:
 // {
@@ -8207,14 +8207,14 @@ function mongoc_bulkwriteresult_updateresults(
 // }
 // Returns NULL if verbose results were not requested.
 function mongoc_bulkwriteresult_deleteresults(
-           self: Pmongoc_bulkwriteresult_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_bulkwriteresult_t): Pbson_t; inline;
 // `mongoc_bulkwriteresult_serverid` identifies the most recently selected server. This may differ from a
 // previously set serverid if a retry occurred. A server ID of 0 indicates that no server was successfully selected.
 // This is intended for use by wrapping drivers that select a server before running the operation.
 function mongoc_bulkwriteresult_serverid(
-           self: Pmongoc_bulkwriteresult_t): uint32_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_bulkwriteresult_t): uint32_t; inline;
 procedure mongoc_bulkwriteresult_destroy(
-            self: Pmongoc_bulkwriteresult_t); cdecl; external 'mongoc2.dll';
+            self: Pmongoc_bulkwriteresult_t); inline;
 
 type
   _mongoc_bulkwriteexception_t = record
@@ -8224,7 +8224,7 @@ type
 // Returns true if there was a top-level error.
 function mongoc_bulkwriteexception_error(
            self: Pmongoc_bulkwriteexception_t;
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 // `mongoc_bulkwriteexception_writeerrors` returns a BSON document mapping model indexes to write errors.
 // Example:
 // {
@@ -8233,7 +8233,7 @@ function mongoc_bulkwriteexception_error(
 // }
 // Returns an empty document if there are no write errors.
 function mongoc_bulkwriteexception_writeerrors(
-           self: Pmongoc_bulkwriteexception_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_bulkwriteexception_t): Pbson_t; inline;
 // `mongoc_bulkwriteexception_writeconcernerrors` returns a BSON array of write concern errors.
 // Example:
 // [
@@ -8242,12 +8242,12 @@ function mongoc_bulkwriteexception_writeerrors(
 // ]
 // Returns an empty array if there are no write concern errors.
 function mongoc_bulkwriteexception_writeconcernerrors(
-           self: Pmongoc_bulkwriteexception_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_bulkwriteexception_t): Pbson_t; inline;
 // `mongoc_bulkwriteexception_errorreply` returns a possible server reply related to the error, or an empty document.
 function mongoc_bulkwriteexception_errorreply(
-           self: Pmongoc_bulkwriteexception_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_bulkwriteexception_t): Pbson_t; inline;
 procedure mongoc_bulkwriteexception_destroy(
-            self: Pmongoc_bulkwriteexception_t); cdecl; external 'mongoc2.dll';
+            self: Pmongoc_bulkwriteexception_t); inline;
 
 type
   _mongoc_bulkwrite_t = record
@@ -8255,151 +8255,151 @@ type
   mongoc_bulkwrite_t = _mongoc_bulkwrite_t;
   Pmongoc_bulkwrite_t = ^mongoc_bulkwrite_t;
 function mongoc_client_bulkwrite_new(
-           self: Pmongoc_client_t): Pmongoc_bulkwrite_t; cdecl; external 'mongoc2.dll';
+           self: Pmongoc_client_t): Pmongoc_bulkwrite_t; inline;
 
 type
   _mongoc_bulkwrite_insertoneopts_t = record
   end;
   mongoc_bulkwrite_insertoneopts_t = _mongoc_bulkwrite_insertoneopts_t;
   Pmongoc_bulkwrite_insertoneopts_t = ^mongoc_bulkwrite_insertoneopts_t;
-function mongoc_bulkwrite_insertoneopts_new(): Pmongoc_bulkwrite_insertoneopts_t; cdecl; external 'mongoc2.dll';
+function mongoc_bulkwrite_insertoneopts_new(): Pmongoc_bulkwrite_insertoneopts_t; inline;
 procedure mongoc_bulkwrite_insertoneopts_destroy(
-            self: Pmongoc_bulkwrite_insertoneopts_t); cdecl; external 'mongoc2.dll';
+            self: Pmongoc_bulkwrite_insertoneopts_t); inline;
 function mongoc_bulkwrite_append_insertone(
            self: Pmongoc_bulkwrite_t;
            ns: PAnsiChar;
            document: Pbson_t;
            opts: Pmongoc_bulkwrite_insertoneopts_t; // May be NULL
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 type
   _mongoc_bulkwrite_updateoneopts_t = record
   end;
   mongoc_bulkwrite_updateoneopts_t = _mongoc_bulkwrite_updateoneopts_t;
   Pmongoc_bulkwrite_updateoneopts_t = ^mongoc_bulkwrite_updateoneopts_t;
-function mongoc_bulkwrite_updateoneopts_new(): Pmongoc_bulkwrite_updateoneopts_t; cdecl; external 'mongoc2.dll';
+function mongoc_bulkwrite_updateoneopts_new(): Pmongoc_bulkwrite_updateoneopts_t; inline;
 procedure mongoc_bulkwrite_updateoneopts_set_arrayfilters(
             self: Pmongoc_bulkwrite_updateoneopts_t;
-            arrayfilters: Pbson_t); cdecl; external 'mongoc2.dll';
+            arrayfilters: Pbson_t); inline;
 procedure mongoc_bulkwrite_updateoneopts_set_collation(
             self: Pmongoc_bulkwrite_updateoneopts_t;
-            collation: Pbson_t); cdecl; external 'mongoc2.dll';
+            collation: Pbson_t); inline;
 procedure mongoc_bulkwrite_updateoneopts_set_hint(
             self: Pmongoc_bulkwrite_updateoneopts_t;
-            hint: Pbson_value_t); cdecl; external 'mongoc2.dll';
+            hint: Pbson_value_t); inline;
 procedure mongoc_bulkwrite_updateoneopts_set_upsert(
             self: Pmongoc_bulkwrite_updateoneopts_t;
-            upsert: ByteBool); cdecl; external 'mongoc2.dll';
+            upsert: ByteBool); inline;
 procedure mongoc_bulkwrite_updateoneopts_set_sort(
             self: Pmongoc_bulkwrite_updateoneopts_t;
-            sort: Pbson_t); cdecl; external 'mongoc2.dll';
+            sort: Pbson_t); inline;
 procedure mongoc_bulkwrite_updateoneopts_destroy(
-            self: Pmongoc_bulkwrite_updateoneopts_t); cdecl; external 'mongoc2.dll';
+            self: Pmongoc_bulkwrite_updateoneopts_t); inline;
 function mongoc_bulkwrite_append_updateone(
            self: Pmongoc_bulkwrite_t;
            ns: PAnsiChar;
            filter: Pbson_t;
            update: Pbson_t;
            opts: Pmongoc_bulkwrite_updateoneopts_t; // May be NULL
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 type
   _mongoc_bulkwrite_updatemanyopts_t = record
   end;
   mongoc_bulkwrite_updatemanyopts_t = _mongoc_bulkwrite_updatemanyopts_t;
   Pmongoc_bulkwrite_updatemanyopts_t = ^mongoc_bulkwrite_updatemanyopts_t;
-function mongoc_bulkwrite_updatemanyopts_new(): Pmongoc_bulkwrite_updatemanyopts_t; cdecl; external 'mongoc2.dll';
+function mongoc_bulkwrite_updatemanyopts_new(): Pmongoc_bulkwrite_updatemanyopts_t; inline;
 procedure mongoc_bulkwrite_updatemanyopts_set_arrayfilters(
             self: Pmongoc_bulkwrite_updatemanyopts_t;
-            arrayfilters: Pbson_t); cdecl; external 'mongoc2.dll';
+            arrayfilters: Pbson_t); inline;
 procedure mongoc_bulkwrite_updatemanyopts_set_collation(
             self: Pmongoc_bulkwrite_updatemanyopts_t;
-            collation: Pbson_t); cdecl; external 'mongoc2.dll';
+            collation: Pbson_t); inline;
 procedure mongoc_bulkwrite_updatemanyopts_set_hint(
             self: Pmongoc_bulkwrite_updatemanyopts_t;
-            hint: Pbson_value_t); cdecl; external 'mongoc2.dll';
+            hint: Pbson_value_t); inline;
 procedure mongoc_bulkwrite_updatemanyopts_set_upsert(
             self: Pmongoc_bulkwrite_updatemanyopts_t;
-            upsert: ByteBool); cdecl; external 'mongoc2.dll';
+            upsert: ByteBool); inline;
 procedure mongoc_bulkwrite_updatemanyopts_destroy(
-            self: Pmongoc_bulkwrite_updatemanyopts_t); cdecl; external 'mongoc2.dll';
+            self: Pmongoc_bulkwrite_updatemanyopts_t); inline;
 function mongoc_bulkwrite_append_updatemany(
            self: Pmongoc_bulkwrite_t;
            ns: PAnsiChar;
            filter: Pbson_t;
            update: Pbson_t;
            opts: Pmongoc_bulkwrite_updatemanyopts_t; // May be NULL
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 type
   _mongoc_bulkwrite_replaceoneopts_t = record
   end;
   mongoc_bulkwrite_replaceoneopts_t = _mongoc_bulkwrite_replaceoneopts_t;
   Pmongoc_bulkwrite_replaceoneopts_t = ^mongoc_bulkwrite_replaceoneopts_t;
-function mongoc_bulkwrite_replaceoneopts_new(): Pmongoc_bulkwrite_replaceoneopts_t; cdecl; external 'mongoc2.dll';
+function mongoc_bulkwrite_replaceoneopts_new(): Pmongoc_bulkwrite_replaceoneopts_t; inline;
 procedure mongoc_bulkwrite_replaceoneopts_set_collation(
             self: Pmongoc_bulkwrite_replaceoneopts_t;
-            collation: Pbson_t); cdecl; external 'mongoc2.dll';
+            collation: Pbson_t); inline;
 procedure mongoc_bulkwrite_replaceoneopts_set_hint(
             self: Pmongoc_bulkwrite_replaceoneopts_t;
-            hint: Pbson_value_t); cdecl; external 'mongoc2.dll';
+            hint: Pbson_value_t); inline;
 procedure mongoc_bulkwrite_replaceoneopts_set_upsert(
             self: Pmongoc_bulkwrite_replaceoneopts_t;
-            upsert: ByteBool); cdecl; external 'mongoc2.dll';
+            upsert: ByteBool); inline;
 procedure mongoc_bulkwrite_replaceoneopts_set_sort(
             self: Pmongoc_bulkwrite_replaceoneopts_t;
-            sort: Pbson_t); cdecl; external 'mongoc2.dll';
+            sort: Pbson_t); inline;
 procedure mongoc_bulkwrite_replaceoneopts_destroy(
-            self: Pmongoc_bulkwrite_replaceoneopts_t); cdecl; external 'mongoc2.dll';
+            self: Pmongoc_bulkwrite_replaceoneopts_t); inline;
 function mongoc_bulkwrite_append_replaceone(
            self: Pmongoc_bulkwrite_t;
            ns: PAnsiChar;
            filter: Pbson_t;
            replacement: Pbson_t;
            opts: Pmongoc_bulkwrite_replaceoneopts_t; // May be NULL
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 type
   _mongoc_bulkwrite_deleteoneopts_t = record
   end;
   mongoc_bulkwrite_deleteoneopts_t = _mongoc_bulkwrite_deleteoneopts_t;
   Pmongoc_bulkwrite_deleteoneopts_t = ^mongoc_bulkwrite_deleteoneopts_t;
-function mongoc_bulkwrite_deleteoneopts_new(): Pmongoc_bulkwrite_deleteoneopts_t; cdecl; external 'mongoc2.dll';
+function mongoc_bulkwrite_deleteoneopts_new(): Pmongoc_bulkwrite_deleteoneopts_t; inline;
 procedure mongoc_bulkwrite_deleteoneopts_set_collation(
             self: Pmongoc_bulkwrite_deleteoneopts_t;
-            collation: Pbson_t); cdecl; external 'mongoc2.dll';
+            collation: Pbson_t); inline;
 procedure mongoc_bulkwrite_deleteoneopts_set_hint(
             self: Pmongoc_bulkwrite_deleteoneopts_t;
-            hint: Pbson_value_t); cdecl; external 'mongoc2.dll';
+            hint: Pbson_value_t); inline;
 procedure mongoc_bulkwrite_deleteoneopts_destroy(
-            self: Pmongoc_bulkwrite_deleteoneopts_t); cdecl; external 'mongoc2.dll';
+            self: Pmongoc_bulkwrite_deleteoneopts_t); inline;
 function mongoc_bulkwrite_append_deleteone(
            self: Pmongoc_bulkwrite_t;
            ns: PAnsiChar;
            filter: Pbson_t;
            opts: Pmongoc_bulkwrite_deleteoneopts_t; // May be NULL
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 type
   _mongoc_bulkwrite_deletemanyopts_t = record
   end;
   mongoc_bulkwrite_deletemanyopts_t = _mongoc_bulkwrite_deletemanyopts_t;
   Pmongoc_bulkwrite_deletemanyopts_t = ^mongoc_bulkwrite_deletemanyopts_t;
-function mongoc_bulkwrite_deletemanyopts_new(): Pmongoc_bulkwrite_deletemanyopts_t; cdecl; external 'mongoc2.dll';
+function mongoc_bulkwrite_deletemanyopts_new(): Pmongoc_bulkwrite_deletemanyopts_t; inline;
 procedure mongoc_bulkwrite_deletemanyopts_set_collation(
             self: Pmongoc_bulkwrite_deletemanyopts_t;
-            collation: Pbson_t); cdecl; external 'mongoc2.dll';
+            collation: Pbson_t); inline;
 procedure mongoc_bulkwrite_deletemanyopts_set_hint(
             self: Pmongoc_bulkwrite_deletemanyopts_t;
-            hint: Pbson_value_t); cdecl; external 'mongoc2.dll';
+            hint: Pbson_value_t); inline;
 procedure mongoc_bulkwrite_deletemanyopts_destroy(
-            self: Pmongoc_bulkwrite_deletemanyopts_t); cdecl; external 'mongoc2.dll';
+            self: Pmongoc_bulkwrite_deletemanyopts_t); inline;
 function mongoc_bulkwrite_append_deletemany(
            self: Pmongoc_bulkwrite_t;
            ns: PAnsiChar;
            filter: Pbson_t;
            opts: Pmongoc_bulkwrite_deletemanyopts_t; // May be NULL
-           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; inline;
 
 // `mongoc_bulkwritereturn_t` may outlive `mongoc_bulkwrite_t`.
 type
@@ -8411,19 +8411,19 @@ type
 // `mongoc_bulkwrite_new` and `mongoc_bulkwrite_set_client` may be used by
 // language bindings that want to assemble a `mongoc_bulkwrite_t` and defer
 // `mongoc_client_t` assignment to execution time.
-function mongoc_bulkwrite_new(): Pmongoc_bulkwrite_t; cdecl; external 'mongoc2.dll';
+function mongoc_bulkwrite_new(): Pmongoc_bulkwrite_t; inline;
 procedure mongoc_bulkwrite_set_client(
             self: Pmongoc_bulkwrite_t;
-            client: Pmongoc_client_t); cdecl; external 'mongoc2.dll';
+            client: Pmongoc_client_t); inline;
 // `mongoc_bulkwrite_set_session` sets an optional explicit session.
 // ` * session` may be modified when `mongoc_bulkwrite_execute` is called.
 procedure mongoc_bulkwrite_set_session(
             self: Pmongoc_bulkwrite_t;
-            session: Pmongoc_client_session_t); cdecl; external 'mongoc2.dll';
+            session: Pmongoc_client_session_t); inline;
 // `mongoc_bulkwrite_execute` executes a bulk write operation.
 function mongoc_bulkwrite_execute(
            self: Pmongoc_bulkwrite_t;
-           opts: Pmongoc_bulkwriteopts_t): mongoc_bulkwritereturn_t; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_bulkwriteopts_t): mongoc_bulkwritereturn_t; inline;
 
 type
   mongoc_bulkwrite_check_acknowledged_t = record
@@ -8435,7 +8435,7 @@ type
 // acknowledged write concern.
 function mongoc_bulkwrite_check_acknowledged(
            self: Pmongoc_bulkwrite_t;
-           error: Pbson_error_t): mongoc_bulkwrite_check_acknowledged_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): mongoc_bulkwrite_check_acknowledged_t; inline;
 
 type
   mongoc_bulkwrite_serverid_t = record
@@ -8449,10 +8449,10 @@ type
 // ID.
 function mongoc_bulkwrite_serverid(
            self: Pmongoc_bulkwrite_t;
-           error: Pbson_error_t): mongoc_bulkwrite_serverid_t; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): mongoc_bulkwrite_serverid_t; inline;
 
 procedure mongoc_bulkwrite_destroy(
-            self: Pmongoc_bulkwrite_t); cdecl; external 'mongoc2.dll';
+            self: Pmongoc_bulkwrite_t); inline;
 
 //////////////////
 // mongoc-sleep //
@@ -8482,11 +8482,11 @@ type
 procedure mongoc_client_set_usleep_impl(
             client: Pmongoc_client_t;
             usleep_func: mongoc_usleep_func_t;
-            user_data: Pvoid); cdecl; external 'mongoc2.dll';
+            user_data: Pvoid); inline;
 
 procedure mongoc_usleep_default_impl(
             usec: int64_t;
-            user_data: Pvoid); cdecl; external 'mongoc2.dll';
+            user_data: Pvoid); inline;
 
 ////////////
 // mongoc //
@@ -8494,6 +8494,8007 @@ procedure mongoc_usleep_default_impl(
 
 // #define MONGOC_INSIDE
 
+///////////////////////
+// TALMongoDBLibrary //
+///////////////////////
+
+type
+  TALMongoDBLibrary = class(TObject)
+  private
+    Fbson2Lib: THandle;
+    Fmongoc2Lib: THandle;
+  public
+    bson_set_error: procedure(error: Pbson_error_t; domain: uint32_t; code: uint32_t; format: PAnsiChar); cdecl;
+    bson_strerror_r: function(err_code: Integer; buf: PAnsiChar; buflen: size_t): PAnsiChar; cdecl;
+    bson_mem_set_vtable: procedure(vtable: Pbson_mem_vtable_t); cdecl;
+    bson_mem_restore_vtable: procedure(); cdecl;
+    bson_malloc: function(num_bytes: size_t): Pvoid; cdecl;
+    bson_malloc0: function(num_bytes: size_t): Pvoid; cdecl;
+    bson_aligned_alloc: function(alignment: size_t; num_bytes: size_t): Pvoid; cdecl;
+    bson_aligned_alloc0: function(alignment: size_t; num_bytes: size_t): Pvoid; cdecl;
+    bson_array_alloc: function(num_elems: size_t; elem_size: size_t): Pvoid; cdecl;
+    bson_array_alloc0: function(num_elems: size_t; elem_size: size_t): Pvoid; cdecl;
+    bson_realloc: function(mem: Pvoid; num_bytes: size_t): Pvoid; cdecl;
+    bson_realloc_ctx: function(mem: Pvoid; num_bytes: size_t; ctx: Pvoid): Pvoid; cdecl;
+    bson_free: procedure(mem: Pvoid); cdecl;
+    bson_zero_free: procedure(mem: Pvoid; size: size_t); cdecl;
+    bson_writer_new: function(buf: PPuint8_t; buflen: Psize_t; offset: size_t; realloc_func: bson_realloc_func; realloc_func_ctx: Pvoid): Pbson_writer_t; cdecl;
+    bson_writer_destroy: procedure(writer: Pbson_writer_t); cdecl;
+    bson_writer_get_length: function(writer: Pbson_writer_t): size_t; cdecl;
+    bson_writer_begin: function(writer: Pbson_writer_t; bson: PPbson_t): ByteBool; cdecl;
+    bson_writer_end: procedure(writer: Pbson_writer_t); cdecl;
+    bson_writer_rollback: procedure(writer: Pbson_writer_t); cdecl;
+    bson_context_new: function(flags: bson_context_flags_t): Pbson_context_t; cdecl;
+    bson_context_destroy: procedure(context: Pbson_context_t); cdecl;
+    bson_context_get_default: function(): Pbson_context_t; cdecl;
+    bson_get_monotonic_time: function(): int64_t; cdecl;
+    bson_gettimeofday: function(tv: Ptimeval): Integer; cdecl;
+    bson_decimal128_to_string: procedure(dec: Pbson_decimal128_t; str: PAnsiChar); cdecl;
+    bson_decimal128_from_string: function(&string: PAnsiChar; dec: Pbson_decimal128_t): ByteBool; cdecl;
+    bson_decimal128_from_string_w_len: function(&string: PAnsiChar; len: Integer; dec: Pbson_decimal128_t): ByteBool; cdecl;
+    bson_json_opts_new: function(mode: bson_json_mode_t; max_len: int32_t): Pbson_json_opts_t; cdecl;
+    bson_json_opts_destroy: procedure(opts: Pbson_json_opts_t); cdecl;
+    bson_json_opts_set_outermost_array: procedure(opts: Pbson_json_opts_t; is_outermost_array: ByteBool); cdecl;
+    bson_json_reader_new: function(data: Pvoid; cb: bson_json_reader_cb; dcb: bson_json_destroy_cb; allow_multiple: ByteBool; buf_size: size_t): Pbson_json_reader_t; cdecl;
+    bson_json_reader_new_from_fd: function(fd: Integer; close_on_destroy: ByteBool): Pbson_json_reader_t; cdecl;
+    bson_json_reader_new_from_file: function(filename: PAnsiChar; error: Pbson_error_t): Pbson_json_reader_t; cdecl;
+    bson_json_reader_destroy: procedure(reader: Pbson_json_reader_t); cdecl;
+    bson_json_reader_read: function(reader: Pbson_json_reader_t; bson: Pbson_t; error: Pbson_error_t): Integer; cdecl;
+    bson_json_data_reader_new: function(allow_multiple: ByteBool; size: size_t): Pbson_json_reader_t; cdecl;
+    bson_json_data_reader_ingest: procedure(reader: Pbson_json_reader_t; data: Puint8_t; len: size_t); cdecl;
+    bson_uint32_to_string: function(value: uint32_t; strptr: PPAnsiChar; str: PAnsiChar; size: size_t): size_t; cdecl;
+    bson_strdup: function(str: PAnsiChar): PAnsiChar; cdecl;
+    bson_strdup_printf: function(format: PAnsiChar): PAnsiChar; cdecl;
+    bson_strdupv_printf: function(format: PAnsiChar; args: va_list): PAnsiChar; cdecl;
+    bson_strndup: function(str: PAnsiChar; n_bytes: size_t): PAnsiChar; cdecl;
+    bson_strncpy: procedure(dst: PAnsiChar; src: PAnsiChar; size: size_t); cdecl;
+    bson_vsnprintf: function(str: PAnsiChar; size: size_t; format: PAnsiChar; ap: va_list): Integer; cdecl;
+    bson_snprintf: function(str: PAnsiChar; size: size_t; format: PAnsiChar): Integer; cdecl;
+    bson_strfreev: procedure(strv: PPAnsiChar); cdecl;
+    bson_strnlen: function(s: PAnsiChar; maxlen: size_t): size_t; cdecl;
+    bson_ascii_strtoll: function(str: PAnsiChar; endptr: PPAnsiChar; base: Integer): int64_t; cdecl;
+    bson_strcasecmp: function(s1: PAnsiChar; s2: PAnsiChar): Integer; cdecl;
+    bson_isspace: function(c: Integer): ByteBool; cdecl;
+    bson_utf8_validate: function(utf8: PAnsiChar; utf8_len: size_t; allow_null: ByteBool): ByteBool; cdecl;
+    bson_utf8_escape_for_json: function(utf8: PAnsiChar; utf8_len: ssize_t): PAnsiChar; cdecl;
+    bson_utf8_get_char: function(utf8: PAnsiChar): bson_unichar_t; cdecl;
+    bson_utf8_next_char: function(utf8: PAnsiChar): PAnsiChar; cdecl;
+    bson_utf8_from_unichar: procedure(unichar: bson_unichar_t; utf8: TCharArray6; len: Puint32_t); cdecl;
+    bson_value_copy: procedure(src: Pbson_value_t; dst: Pbson_value_t); cdecl;
+    bson_value_destroy: procedure(value: Pbson_value_t); cdecl;
+    bson_get_major_version: function(): Integer; cdecl;
+    bson_get_minor_version: function(): Integer; cdecl;
+    bson_get_micro_version: function(): Integer; cdecl;
+    bson_get_version: function(): PAnsiChar; cdecl;
+    bson_check_version: function(required_major: Integer; required_minor: Integer; required_micro: Integer): ByteBool; cdecl;
+    bcon_append: procedure(bson: Pbson_t); cdecl;
+    bcon_append_ctx: procedure(bson: Pbson_t; ctx: Pbcon_append_ctx_t); cdecl;
+    bcon_append_ctx_va: procedure(bson: Pbson_t; ctx: Pbcon_append_ctx_t; va: Pva_list); cdecl;
+    bcon_append_ctx_init: procedure(ctx: Pbcon_append_ctx_t); cdecl;
+    bcon_extract_ctx_init: procedure(ctx: Pbcon_extract_ctx_t); cdecl;
+    bcon_extract_ctx: procedure(bson: Pbson_t; ctx: Pbcon_extract_ctx_t); cdecl;
+    bcon_extract_ctx_va: function(bson: Pbson_t; ctx: Pbcon_extract_ctx_t; ap: Pva_list): ByteBool; cdecl;
+    bcon_extract: function(bson: Pbson_t): ByteBool; cdecl;
+    bcon_new: function(unused: Pvoid): Pbson_t; cdecl;
+    bson_bcon_magic: function(): PAnsiChar; cdecl;
+    bson_bcone_magic: function(): PAnsiChar; cdecl;
+    bson_reader_new_from_handle: function(handle: Pvoid; rf: bson_reader_read_func_t; df: bson_reader_destroy_func_t): Pbson_reader_t; cdecl;
+    bson_reader_new_from_fd: function(fd: Integer; close_on_destroy: ByteBool): Pbson_reader_t; cdecl;
+    bson_reader_new_from_file: function(path: PAnsiChar; error: Pbson_error_t): Pbson_reader_t; cdecl;
+    bson_reader_new_from_data: function(data: Puint8_t; length: size_t): Pbson_reader_t; cdecl;
+    bson_reader_destroy: procedure(reader: Pbson_reader_t); cdecl;
+    bson_reader_set_read_func: procedure(reader: Pbson_reader_t; func: bson_reader_read_func_t); cdecl;
+    bson_reader_set_destroy_func: procedure(reader: Pbson_reader_t; func: bson_reader_destroy_func_t); cdecl;
+    bson_reader_read: function(reader: Pbson_reader_t; reached_eof: PByteBool): Pbson_t; cdecl;
+    bson_reader_tell: function(reader: Pbson_reader_t): off_t; cdecl;
+    bson_reader_reset: procedure(reader: Pbson_reader_t); cdecl;
+    bson_oid_compare: function(oid1: Pbson_oid_t; oid2: Pbson_oid_t): Integer; cdecl;
+    bson_oid_copy: procedure(src: Pbson_oid_t; dst: Pbson_oid_t); cdecl;
+    bson_oid_equal: function(oid1: Pbson_oid_t; oid2: Pbson_oid_t): ByteBool; cdecl;
+    bson_oid_is_valid: function(str: PAnsiChar; length: size_t): ByteBool; cdecl;
+    bson_oid_get_time_t: function(oid: Pbson_oid_t): time_t; cdecl;
+    bson_oid_hash: function(oid: Pbson_oid_t): uint32_t; cdecl;
+    bson_oid_init: procedure(oid: Pbson_oid_t; context: Pbson_context_t); cdecl;
+    bson_oid_init_from_data: procedure(oid: Pbson_oid_t; data: Puint8_t); cdecl;
+    bson_oid_init_from_string: procedure(oid: Pbson_oid_t; str: PAnsiChar); cdecl;
+    bson_oid_to_string: procedure(oid: Pbson_oid_t; str: TCharArray25); cdecl;
+    bson_iter_value: function(iter: Pbson_iter_t): Pbson_value_t; cdecl;
+    bson_iter_array: procedure(iter: Pbson_iter_t; array_len: Puint32_t; &array: PPuint8_t); cdecl;
+    bson_iter_binary: procedure(iter: Pbson_iter_t; subtype: Pbson_subtype_t; binary_len: Puint32_t; binary: PPuint8_t); cdecl;
+    bson_iter_overwrite_binary: procedure(iter: Pbson_iter_t; subtype: bson_subtype_t; binary_len: Puint32_t; binary: PPuint8_t); cdecl;
+    bson_iter_binary_subtype: function(iter: Pbson_iter_t): bson_subtype_t; cdecl;
+    bson_iter_binary_equal: function(iter_a: Pbson_iter_t; iter_b: Pbson_iter_t): ByteBool; cdecl;
+    bson_iter_code: function(iter: Pbson_iter_t; length: Puint32_t): PAnsiChar; cdecl;
+    bson_iter_codewscope: function(iter: Pbson_iter_t; length: Puint32_t; scope_len: Puint32_t; scope: PPuint8_t): PAnsiChar; cdecl;
+    bson_iter_dbpointer: procedure(iter: Pbson_iter_t; collection_len: Puint32_t; collection: PPAnsiChar; oid: PPbson_oid_t); cdecl;
+    bson_iter_document: procedure(iter: Pbson_iter_t; document_len: Puint32_t; document: PPuint8_t); cdecl;
+    bson_iter_double: function(iter: Pbson_iter_t): double; cdecl;
+    bson_iter_as_double: function(iter: Pbson_iter_t): double; cdecl;
+    bson_iter_init: function(iter: Pbson_iter_t; bson: Pbson_t): ByteBool; cdecl;
+    bson_iter_init_from_data: function(iter: Pbson_iter_t; data: Puint8_t; length: size_t): ByteBool; cdecl;
+    bson_iter_init_find: function(iter: Pbson_iter_t; bson: Pbson_t; key: PAnsiChar): ByteBool; cdecl;
+    bson_iter_init_find_w_len: function(iter: Pbson_iter_t; bson: Pbson_t; key: PAnsiChar; keylen: Integer): ByteBool; cdecl;
+    bson_iter_init_find_case: function(iter: Pbson_iter_t; bson: Pbson_t; key: PAnsiChar): ByteBool; cdecl;
+    bson_iter_init_from_data_at_offset: function(iter: Pbson_iter_t; data: Puint8_t; length: size_t; offset: uint32_t; keylen: uint32_t): ByteBool; cdecl;
+    bson_iter_int32: function(iter: Pbson_iter_t): int32_t; cdecl;
+    bson_iter_int64: function(iter: Pbson_iter_t): int64_t; cdecl;
+    bson_iter_as_int64: function(iter: Pbson_iter_t): int64_t; cdecl;
+    bson_iter_find: function(iter: Pbson_iter_t; key: PAnsiChar): ByteBool; cdecl;
+    bson_iter_find_w_len: function(iter: Pbson_iter_t; key: PAnsiChar; keylen: Integer): ByteBool; cdecl;
+    bson_iter_find_case: function(iter: Pbson_iter_t; key: PAnsiChar): ByteBool; cdecl;
+    bson_iter_find_descendant: function(iter: Pbson_iter_t; dotkey: PAnsiChar; descendant: Pbson_iter_t): ByteBool; cdecl;
+    bson_iter_next: function(iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_iter_oid: function(iter: Pbson_iter_t): Pbson_oid_t; cdecl;
+    bson_iter_decimal128: function(iter: Pbson_iter_t; dec: Pbson_decimal128_t): ByteBool; cdecl;
+    bson_iter_key: function(iter: Pbson_iter_t): PAnsiChar; cdecl;
+    bson_iter_key_len: function(iter: Pbson_iter_t): uint32_t; cdecl;
+    bson_iter_utf8: function(iter: Pbson_iter_t; length: Puint32_t): PAnsiChar; cdecl;
+    bson_iter_dup_utf8: function(iter: Pbson_iter_t; length: Puint32_t): PAnsiChar; cdecl;
+    bson_iter_date_time: function(iter: Pbson_iter_t): int64_t; cdecl;
+    bson_iter_time_t: function(iter: Pbson_iter_t): time_t; cdecl;
+    bson_iter_timeval: procedure(iter: Pbson_iter_t; tv: Ptimeval); cdecl;
+    bson_iter_timestamp: procedure(iter: Pbson_iter_t; timestamp: Puint32_t; increment: Puint32_t); cdecl;
+    bson_iter_bool: function(iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_iter_as_bool: function(iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_iter_regex: function(iter: Pbson_iter_t; options: PPAnsiChar): PAnsiChar; cdecl;
+    bson_iter_symbol: function(iter: Pbson_iter_t; length: Puint32_t): PAnsiChar; cdecl;
+    bson_iter_type: function(iter: Pbson_iter_t): bson_type_t; cdecl;
+    bson_iter_recurse: function(iter: Pbson_iter_t; child: Pbson_iter_t): ByteBool; cdecl;
+    bson_iter_overwrite_int32: procedure(iter: Pbson_iter_t; value: int32_t); cdecl;
+    bson_iter_overwrite_int64: procedure(iter: Pbson_iter_t; value: int64_t); cdecl;
+    bson_iter_overwrite_double: procedure(iter: Pbson_iter_t; value: double); cdecl;
+    bson_iter_overwrite_decimal128: procedure(iter: Pbson_iter_t; value: Pbson_decimal128_t); cdecl;
+    bson_iter_overwrite_bool: procedure(iter: Pbson_iter_t; value: ByteBool); cdecl;
+    bson_iter_overwrite_oid: procedure(iter: Pbson_iter_t; value: Pbson_oid_t); cdecl;
+    bson_iter_overwrite_timestamp: procedure(iter: Pbson_iter_t; timestamp: uint32_t; increment: uint32_t); cdecl;
+    bson_iter_overwrite_date_time: procedure(iter: Pbson_iter_t; value: int64_t); cdecl;
+    bson_iter_visit_all: function(iter: Pbson_iter_t; visitor: Pbson_visitor_t; data: Pvoid): ByteBool; cdecl;
+    bson_iter_offset: function(iter: Pbson_iter_t): uint32_t; cdecl;
+    bson_vector_int8_view_init: function(view_out: Pbson_vector_int8_view_t; binary_data: Puint8_t; binary_data_len: uint32_t): ByteBool; cdecl;
+    bson_vector_int8_const_view_init: function(view_out: Pbson_vector_int8_const_view_t; binary_data: Puint8_t; binary_data_len: uint32_t): ByteBool; cdecl;
+    bson_vector_float32_view_init: function(view_out: Pbson_vector_float32_view_t; binary_data: Puint8_t; binary_data_len: uint32_t): ByteBool; cdecl;
+    bson_vector_float32_const_view_init: function(view_out: Pbson_vector_float32_const_view_t; binary_data: Puint8_t; binary_data_len: uint32_t): ByteBool; cdecl;
+    bson_vector_packed_bit_view_init: function(view_out: Pbson_vector_packed_bit_view_t; binary_data: Puint8_t; binary_data_len: uint32_t): ByteBool; cdecl;
+    bson_vector_packed_bit_const_view_init: function(view_out: Pbson_vector_packed_bit_const_view_t; binary_data: Puint8_t; binary_data_len: uint32_t): ByteBool; cdecl;
+    bson_vector_int8_view_from_iter: function(view_out: Pbson_vector_int8_view_t; iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_vector_int8_const_view_from_iter: function(view_out: Pbson_vector_int8_const_view_t; iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_vector_float32_view_from_iter: function(view_out: Pbson_vector_float32_view_t; iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_vector_float32_const_view_from_iter: function(view_out: Pbson_vector_float32_const_view_t; iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_vector_packed_bit_view_from_iter: function(view_out: Pbson_vector_packed_bit_view_t; iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_vector_packed_bit_const_view_from_iter: function(view_out: Pbson_vector_packed_bit_const_view_t; iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_array_builder_append_vector_int8_elements: function(builder: P_bson_array_builder_t; view: bson_vector_int8_const_view_t): ByteBool; cdecl;
+    bson_array_builder_append_vector_float32_elements: function(builder: P_bson_array_builder_t; view: bson_vector_float32_const_view_t): ByteBool; cdecl;
+    bson_array_builder_append_vector_packed_bit_elements: function(builder: P_bson_array_builder_t; view: bson_vector_packed_bit_const_view_t): ByteBool; cdecl;
+    bson_array_builder_append_vector_elements: function(builder: P_bson_array_builder_t; iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_append_vector_int8_uninit: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; element_count: size_t; view_out: Pbson_vector_int8_view_t): ByteBool; cdecl;
+    bson_append_vector_float32_uninit: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; element_count: size_t; view_out: Pbson_vector_float32_view_t): ByteBool; cdecl;
+    bson_append_vector_packed_bit_uninit: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; element_count: size_t; view_out: Pbson_vector_packed_bit_view_t): ByteBool; cdecl;
+    bson_append_vector_int8_from_array: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; iter: Pbson_iter_t; error: Pbson_error_t): ByteBool; cdecl;
+    bson_append_vector_float32_from_array: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; iter: Pbson_iter_t; error: Pbson_error_t): ByteBool; cdecl;
+    bson_append_vector_packed_bit_from_array: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; iter: Pbson_iter_t; error: Pbson_error_t): ByteBool; cdecl;
+    bson_append_array_from_vector_int8: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; view: bson_vector_int8_const_view_t): ByteBool; cdecl;
+    bson_append_array_from_vector_float32: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; view: bson_vector_float32_const_view_t): ByteBool; cdecl;
+    bson_append_array_from_vector_packed_bit: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; view: bson_vector_packed_bit_const_view_t): ByteBool; cdecl;
+    bson_new: function(): Pbson_t; cdecl;
+    bson_new_from_json: function(data: Puint8_t; len: ssize_t; error: Pbson_error_t): Pbson_t; cdecl;
+    bson_init_from_json: function(bson: Pbson_t; data: PAnsiChar; len: ssize_t; error: Pbson_error_t): ByteBool; cdecl;
+    bson_init_static: function(b: Pbson_t; data: Puint8_t; length: size_t): ByteBool; cdecl;
+    bson_init: procedure(b: Pbson_t); cdecl;
+    bson_reinit: procedure(b: Pbson_t); cdecl;
+    bson_new_from_data: function(data: Puint8_t; length: size_t): Pbson_t; cdecl;
+    bson_new_from_buffer: function(buf: PPuint8_t; buf_len: Psize_t; realloc_func: bson_realloc_func; realloc_func_ctx: Pvoid): Pbson_t; cdecl;
+    bson_sized_new: function(size: size_t): Pbson_t; cdecl;
+    bson_copy: function(bson: Pbson_t): Pbson_t; cdecl;
+    bson_copy_to: procedure(src: Pbson_t; dst: Pbson_t); cdecl;
+    bson_copy_to_excluding_noinit: procedure(src: Pbson_t; dst: Pbson_t; first_exclude: PAnsiChar); cdecl;
+    bson_copy_to_excluding_noinit_va: procedure(src: Pbson_t; dst: Pbson_t; first_exclude: PAnsiChar; args: va_list); cdecl;
+    bson_destroy: procedure(bson: Pbson_t); cdecl;
+    bson_reserve_buffer: function(bson: Pbson_t; total_size: uint32_t): Puint8_t; cdecl;
+    bson_steal: function(dst: Pbson_t; src: Pbson_t): ByteBool; cdecl;
+    bson_destroy_with_steal: function(bson: Pbson_t; steal: ByteBool; length: Puint32_t): Puint8_t; cdecl;
+    bson_get_data: function(bson: Pbson_t): Puint8_t; cdecl;
+    bson_count_keys: function(bson: Pbson_t): uint32_t; cdecl;
+    bson_has_field: function(bson: Pbson_t; key: PAnsiChar): ByteBool; cdecl;
+    bson_compare: function(bson: Pbson_t; other: Pbson_t): Integer; cdecl;
+    bson_equal: function(bson: Pbson_t; other: Pbson_t): ByteBool; cdecl;
+    bson_validate: function(bson: Pbson_t; flags: bson_validate_flags_t; offset: Psize_t): ByteBool; cdecl;
+    bson_validate_with_error: function(bson: Pbson_t; flags: bson_validate_flags_t; error: Pbson_error_t): ByteBool; cdecl;
+    bson_validate_with_error_and_offset: function(bson: Pbson_t; flags: bson_validate_flags_t; offset: Psize_t; error: Pbson_error_t): ByteBool; cdecl;
+    bson_as_json_with_opts: function(bson: Pbson_t; length: Psize_t; opts: Pbson_json_opts_t): PAnsiChar; cdecl;
+    bson_as_canonical_extended_json: function(bson: Pbson_t; length: Psize_t): PAnsiChar; cdecl;
+    bson_as_legacy_extended_json: function(bson: Pbson_t; length: Psize_t): PAnsiChar; cdecl;
+    bson_as_relaxed_extended_json: function(bson: Pbson_t; length: Psize_t): PAnsiChar; cdecl;
+    bson_array_as_legacy_extended_json: function(bson: Pbson_t; length: Psize_t): PAnsiChar; cdecl;
+    bson_array_as_relaxed_extended_json: function(bson: Pbson_t; length: Psize_t): PAnsiChar; cdecl;
+    bson_array_as_canonical_extended_json: function(bson: Pbson_t; length: Psize_t): PAnsiChar; cdecl;
+    bson_array_builder_new: function(): Pbson_array_builder_t; cdecl;
+    bson_array_builder_build: function(bab: Pbson_array_builder_t; param1: Pbson_t): ByteBool; cdecl;
+    bson_array_builder_destroy: procedure(bab: Pbson_array_builder_t); cdecl;
+    bson_append_value: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: Pbson_value_t): ByteBool; cdecl;
+    bson_array_builder_append_value: function(bab: Pbson_array_builder_t; value: Pbson_value_t): ByteBool; cdecl;
+    bson_append_array: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; &array: Pbson_t): ByteBool; cdecl;
+    bson_array_builder_append_array: function(bab: Pbson_array_builder_t; &array: Pbson_t): ByteBool; cdecl;
+    bson_append_array_from_vector: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_array_builder_append_array_from_vector: function(bab: Pbson_array_builder_t; iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_append_binary: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; subtype: bson_subtype_t; binary: Puint8_t; length: uint32_t): ByteBool; cdecl;
+    bson_array_builder_append_binary: function(bab: Pbson_array_builder_t; subtype: bson_subtype_t; binary: Puint8_t; length: uint32_t): ByteBool; cdecl;
+    bson_append_binary_uninit: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; subtype: bson_subtype_t; binary: PPuint8_t; length: uint32_t): ByteBool; cdecl;
+    bson_array_builder_append_binary_uninit: function(bab: Pbson_array_builder_t; subtype: bson_subtype_t; binary: PPuint8_t; length: uint32_t): ByteBool; cdecl;
+    bson_append_bool: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: ByteBool): ByteBool; cdecl;
+    bson_array_builder_append_bool: function(bab: Pbson_array_builder_t; value: ByteBool): ByteBool; cdecl;
+    bson_append_code: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; javascript: PAnsiChar): ByteBool; cdecl;
+    bson_array_builder_append_code: function(bab: Pbson_array_builder_t; javascript: PAnsiChar): ByteBool; cdecl;
+    bson_append_code_with_scope: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; javascript: PAnsiChar; scope: Pbson_t): ByteBool; cdecl;
+    bson_array_builder_append_code_with_scope: function(bab: Pbson_array_builder_t; javascript: PAnsiChar; scope: Pbson_t): ByteBool; cdecl;
+    bson_append_dbpointer: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; collection: PAnsiChar; oid: Pbson_oid_t): ByteBool; cdecl;
+    bson_array_builder_append_dbpointer: function(bab: Pbson_array_builder_t; collection: PAnsiChar; oid: Pbson_oid_t): ByteBool; cdecl;
+    bson_append_double: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: double): ByteBool; cdecl;
+    bson_array_builder_append_double: function(bab: Pbson_array_builder_t; value: double): ByteBool; cdecl;
+    bson_append_document: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: Pbson_t): ByteBool; cdecl;
+    bson_array_builder_append_document: function(bab: Pbson_array_builder_t; value: Pbson_t): ByteBool; cdecl;
+    bson_append_document_begin: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; child: Pbson_t): ByteBool; cdecl;
+    bson_array_builder_append_document_begin: function(bab: Pbson_array_builder_t; child: Pbson_t): ByteBool; cdecl;
+    bson_append_document_end: function(bson: Pbson_t; child: Pbson_t): ByteBool; cdecl;
+    bson_array_builder_append_document_end: function(bab: Pbson_array_builder_t; child: Pbson_t): ByteBool; cdecl;
+    bson_append_array_begin: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; child: Pbson_t): ByteBool; cdecl;
+    bson_append_array_end: function(bson: Pbson_t; child: Pbson_t): ByteBool; cdecl;
+    bson_append_int32: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: int32_t): ByteBool; cdecl;
+    bson_array_builder_append_int32: function(bab: Pbson_array_builder_t; value: int32_t): ByteBool; cdecl;
+    bson_append_int64: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: int64_t): ByteBool; cdecl;
+    bson_array_builder_append_int64: function(bab: Pbson_array_builder_t; value: int64_t): ByteBool; cdecl;
+    bson_append_decimal128: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: Pbson_decimal128_t): ByteBool; cdecl;
+    bson_array_builder_append_decimal128: function(bab: Pbson_array_builder_t; value: Pbson_decimal128_t): ByteBool; cdecl;
+    bson_append_iter: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_array_builder_append_iter: function(bab: Pbson_array_builder_t; iter: Pbson_iter_t): ByteBool; cdecl;
+    bson_append_minkey: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer): ByteBool; cdecl;
+    bson_array_builder_append_minkey: function(bab: Pbson_array_builder_t): ByteBool; cdecl;
+    bson_append_maxkey: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer): ByteBool; cdecl;
+    bson_array_builder_append_maxkey: function(bab: Pbson_array_builder_t): ByteBool; cdecl;
+    bson_append_null: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer): ByteBool; cdecl;
+    bson_array_builder_append_null: function(bab: Pbson_array_builder_t): ByteBool; cdecl;
+    bson_append_oid: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; oid: Pbson_oid_t): ByteBool; cdecl;
+    bson_array_builder_append_oid: function(bab: Pbson_array_builder_t; oid: Pbson_oid_t): ByteBool; cdecl;
+    bson_append_regex: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; regex: PAnsiChar; options: PAnsiChar): ByteBool; cdecl;
+    bson_array_builder_append_regex: function(bab: Pbson_array_builder_t; regex: PAnsiChar; options: PAnsiChar): ByteBool; cdecl;
+    bson_append_regex_w_len: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; regex: PAnsiChar; regex_length: Integer; options: PAnsiChar): ByteBool; cdecl;
+    bson_array_builder_append_regex_w_len: function(bab: Pbson_array_builder_t; regex: PAnsiChar; regex_length: Integer; options: PAnsiChar): ByteBool; cdecl;
+    bson_append_utf8: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: PAnsiChar; length: Integer): ByteBool; cdecl;
+    bson_array_builder_append_utf8: function(bab: Pbson_array_builder_t; value: PAnsiChar; length: Integer): ByteBool; cdecl;
+    bson_append_symbol: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: PAnsiChar; length: Integer): ByteBool; cdecl;
+    bson_array_builder_append_symbol: function(bab: Pbson_array_builder_t; value: PAnsiChar; length: Integer): ByteBool; cdecl;
+    bson_append_time_t: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: time_t): ByteBool; cdecl;
+    bson_array_builder_append_time_t: function(bab: Pbson_array_builder_t; value: time_t): ByteBool; cdecl;
+    bson_append_timeval: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: Ptimeval): ByteBool; cdecl;
+    bson_array_builder_append_timeval: function(bab: Pbson_array_builder_t; value: Ptimeval): ByteBool; cdecl;
+    bson_append_date_time: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: int64_t): ByteBool; cdecl;
+    bson_array_builder_append_date_time: function(bab: Pbson_array_builder_t; value: int64_t): ByteBool; cdecl;
+    bson_append_now_utc: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer): ByteBool; cdecl;
+    bson_array_builder_append_now_utc: function(bab: Pbson_array_builder_t): ByteBool; cdecl;
+    bson_append_timestamp: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; timestamp: uint32_t; increment: uint32_t): ByteBool; cdecl;
+    bson_array_builder_append_timestamp: function(bab: Pbson_array_builder_t; timestamp: uint32_t; increment: uint32_t): ByteBool; cdecl;
+    bson_append_undefined: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer): ByteBool; cdecl;
+    bson_array_builder_append_undefined: function(bab: Pbson_array_builder_t): ByteBool; cdecl;
+    bson_concat: function(dst: Pbson_t; src: Pbson_t): ByteBool; cdecl;
+    bson_append_array_builder_begin: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; child: PPbson_array_builder_t): ByteBool; cdecl;
+    bson_array_builder_append_array_builder_begin: function(bab: Pbson_array_builder_t; child: PPbson_array_builder_t): ByteBool; cdecl;
+    bson_append_array_builder_end: function(bson: Pbson_t; child: Pbson_array_builder_t): ByteBool; cdecl;
+    bson_array_builder_append_array_builder_end: function(bab: Pbson_array_builder_t; child: Pbson_array_builder_t): ByteBool; cdecl;
+    mongoc_write_concern_new: function(): Pmongoc_write_concern_t; cdecl;
+    mongoc_write_concern_copy: function(write_concern: Pmongoc_write_concern_t): Pmongoc_write_concern_t; cdecl;
+    mongoc_write_concern_destroy: procedure(write_concern: Pmongoc_write_concern_t); cdecl;
+    mongoc_write_concern_get_journal: function(write_concern: Pmongoc_write_concern_t): ByteBool; cdecl;
+    mongoc_write_concern_journal_is_set: function(write_concern: Pmongoc_write_concern_t): ByteBool; cdecl;
+    mongoc_write_concern_set_journal: procedure(write_concern: Pmongoc_write_concern_t; journal: ByteBool); cdecl;
+    mongoc_write_concern_get_w: function(write_concern: Pmongoc_write_concern_t): int32_t; cdecl;
+    mongoc_write_concern_set_w: procedure(write_concern: Pmongoc_write_concern_t; w: int32_t); cdecl;
+    mongoc_write_concern_get_wtag: function(write_concern: Pmongoc_write_concern_t): PAnsiChar; cdecl;
+    mongoc_write_concern_set_wtag: procedure(write_concern: Pmongoc_write_concern_t; tag: PAnsiChar); cdecl;
+    mongoc_write_concern_get_wtimeout: function(write_concern: Pmongoc_write_concern_t): int32_t; cdecl;
+    mongoc_write_concern_get_wtimeout_int64: function(write_concern: Pmongoc_write_concern_t): int64_t; cdecl;
+    mongoc_write_concern_set_wtimeout: procedure(write_concern: Pmongoc_write_concern_t; wtimeout_msec: int32_t); cdecl;
+    mongoc_write_concern_set_wtimeout_int64: procedure(write_concern: Pmongoc_write_concern_t; wtimeout_msec: int64_t); cdecl;
+    mongoc_write_concern_get_wmajority: function(write_concern: Pmongoc_write_concern_t): ByteBool; cdecl;
+    mongoc_write_concern_set_wmajority: procedure(write_concern: Pmongoc_write_concern_t; wtimeout_msec: int32_t); cdecl;
+    mongoc_write_concern_is_acknowledged: function(write_concern: Pmongoc_write_concern_t): ByteBool; cdecl;
+    mongoc_write_concern_is_valid: function(write_concern: Pmongoc_write_concern_t): ByteBool; cdecl;
+    mongoc_write_concern_append: function(write_concern: Pmongoc_write_concern_t; doc: Pbson_t): ByteBool; cdecl;
+    mongoc_write_concern_is_default: function(write_concern: Pmongoc_write_concern_t): ByteBool; cdecl;
+    mongoc_read_concern_new: function(): Pmongoc_read_concern_t; cdecl;
+    mongoc_read_concern_copy: function(read_concern: Pmongoc_read_concern_t): Pmongoc_read_concern_t; cdecl;
+    mongoc_read_concern_destroy: procedure(read_concern: Pmongoc_read_concern_t); cdecl;
+    mongoc_read_concern_get_level: function(read_concern: Pmongoc_read_concern_t): PAnsiChar; cdecl;
+    mongoc_read_concern_set_level: function(read_concern: Pmongoc_read_concern_t; level: PAnsiChar): ByteBool; cdecl;
+    mongoc_read_concern_append: function(read_concern: Pmongoc_read_concern_t; doc: Pbson_t): ByteBool; cdecl;
+    mongoc_read_concern_is_default: function(read_concern: Pmongoc_read_concern_t): ByteBool; cdecl;
+    mongoc_optional_init: procedure(opt: Pmongoc_optional_t); cdecl;
+    mongoc_optional_is_set: function(opt: Pmongoc_optional_t): ByteBool; cdecl;
+    mongoc_optional_value: function(opt: Pmongoc_optional_t): ByteBool; cdecl;
+    mongoc_optional_set_value: procedure(opt: Pmongoc_optional_t; val: ByteBool); cdecl;
+    mongoc_optional_copy: procedure(source: Pmongoc_optional_t; copy: Pmongoc_optional_t); cdecl;
+    mongoc_error_has_label: function(reply: Pbson_t; &label: PAnsiChar): ByteBool; cdecl;
+    mongoc_find_and_modify_opts_new: function(): Pmongoc_find_and_modify_opts_t; cdecl;
+    mongoc_find_and_modify_opts_set_sort: function(opts: Pmongoc_find_and_modify_opts_t; sort: Pbson_t): ByteBool; cdecl;
+    mongoc_find_and_modify_opts_get_sort: procedure(opts: Pmongoc_find_and_modify_opts_t; sort: Pbson_t); cdecl;
+    mongoc_find_and_modify_opts_set_update: function(opts: Pmongoc_find_and_modify_opts_t; update: Pbson_t): ByteBool; cdecl;
+    mongoc_find_and_modify_opts_get_update: procedure(opts: Pmongoc_find_and_modify_opts_t; update: Pbson_t); cdecl;
+    mongoc_find_and_modify_opts_set_fields: function(opts: Pmongoc_find_and_modify_opts_t; fields: Pbson_t): ByteBool; cdecl;
+    mongoc_find_and_modify_opts_get_fields: procedure(opts: Pmongoc_find_and_modify_opts_t; fields: Pbson_t); cdecl;
+    mongoc_find_and_modify_opts_set_flags: function(opts: Pmongoc_find_and_modify_opts_t; flags: UInt32): ByteBool; cdecl;
+    mongoc_find_and_modify_opts_get_flags: function(opts: Pmongoc_find_and_modify_opts_t): mongoc_find_and_modify_flags_t; cdecl;
+    mongoc_find_and_modify_opts_set_bypass_document_validation: function(opts: Pmongoc_find_and_modify_opts_t; bypass: ByteBool): ByteBool; cdecl;
+    mongoc_find_and_modify_opts_get_bypass_document_validation: function(opts: Pmongoc_find_and_modify_opts_t): ByteBool; cdecl;
+    mongoc_find_and_modify_opts_set_max_time_ms: function(opts: Pmongoc_find_and_modify_opts_t; max_time_ms: uint32_t): ByteBool; cdecl;
+    mongoc_find_and_modify_opts_get_max_time_ms: function(opts: Pmongoc_find_and_modify_opts_t): uint32_t; cdecl;
+    mongoc_find_and_modify_opts_append: function(opts: Pmongoc_find_and_modify_opts_t; extra: Pbson_t): ByteBool; cdecl;
+    mongoc_find_and_modify_opts_get_extra: procedure(opts: Pmongoc_find_and_modify_opts_t; extra: Pbson_t); cdecl;
+    mongoc_find_and_modify_opts_destroy: procedure(opts: Pmongoc_find_and_modify_opts_t); cdecl;
+    mongoc_handshake_data_append: function(driver_name: PAnsiChar; driver_version: PAnsiChar; platform: PAnsiChar): ByteBool; cdecl;
+    mongoc_init: procedure(); cdecl;
+    mongoc_cleanup: procedure(); cdecl;
+    mongoc_log_set_handler: procedure(log_func: mongoc_log_func_t; user_data: Pvoid); cdecl;
+    mongoc_log: procedure(log_level: mongoc_log_level_t; log_domain: PAnsiChar; format: PAnsiChar); cdecl;
+    mongoc_log_default_handler: procedure(log_level: mongoc_log_level_t; log_domain: PAnsiChar; message: PAnsiChar; user_data: Pvoid); cdecl;
+    mongoc_log_level_str: function(log_level: mongoc_log_level_t): PAnsiChar; cdecl;
+    mongoc_log_trace_enable: procedure(); cdecl;
+    mongoc_log_trace_disable: procedure(); cdecl;
+    mongoc_oidc_callback_new: function(fn: mongoc_oidc_callback_fn_t): Pmongoc_oidc_callback_t; cdecl;
+    mongoc_oidc_callback_new_with_user_data: function(fn: mongoc_oidc_callback_fn_t; user_data: Pvoid): Pmongoc_oidc_callback_t; cdecl;
+    mongoc_oidc_callback_destroy: procedure(callback: Pmongoc_oidc_callback_t); cdecl;
+    mongoc_oidc_callback_get_fn: function(callback: Pmongoc_oidc_callback_t): mongoc_oidc_callback_fn_t; cdecl;
+    mongoc_oidc_callback_get_user_data: function(callback: Pmongoc_oidc_callback_t): Pvoid; cdecl;
+    mongoc_oidc_callback_set_user_data: procedure(callback: Pmongoc_oidc_callback_t; user_data: Pvoid); cdecl;
+    mongoc_oidc_callback_params_get_version: function(params: Pmongoc_oidc_callback_params_t): int32_t; cdecl;
+    mongoc_oidc_callback_params_get_user_data: function(params: Pmongoc_oidc_callback_params_t): Pvoid; cdecl;
+    mongoc_oidc_callback_params_get_timeout: function(params: Pmongoc_oidc_callback_params_t): Pint64_t; cdecl;
+    mongoc_oidc_callback_params_get_username: function(params: Pmongoc_oidc_callback_params_t): PAnsiChar; cdecl;
+    mongoc_oidc_callback_params_cancel_with_timeout: function(params: Pmongoc_oidc_callback_params_t): Pmongoc_oidc_credential_t; cdecl;
+    mongoc_oidc_credential_new: function(access_token: PAnsiChar): Pmongoc_oidc_credential_t; cdecl;
+    mongoc_oidc_credential_new_with_expires_in: function(access_token: PAnsiChar; expires_in: int64_t): Pmongoc_oidc_credential_t; cdecl;
+    mongoc_oidc_credential_destroy: procedure(cred: Pmongoc_oidc_credential_t); cdecl;
+    mongoc_oidc_credential_get_access_token: function(cred: Pmongoc_oidc_credential_t): PAnsiChar; cdecl;
+    mongoc_oidc_credential_get_expires_in: function(cred: Pmongoc_oidc_credential_t): Pint64_t; cdecl;
+    mongoc_rand_seed: procedure(buf: Pvoid; num: Integer); cdecl;
+    mongoc_rand_add: procedure(buf: Pvoid; num: Integer; entropy: double); cdecl;
+    mongoc_rand_status: function(): Integer; cdecl;
+    mongoc_read_prefs_new: function(read_mode: mongoc_read_mode_t): Pmongoc_read_prefs_t; cdecl;
+    mongoc_read_prefs_copy: function(read_prefs: Pmongoc_read_prefs_t): Pmongoc_read_prefs_t; cdecl;
+    mongoc_read_prefs_destroy: procedure(read_prefs: Pmongoc_read_prefs_t); cdecl;
+    mongoc_read_prefs_get_mode: function(read_prefs: Pmongoc_read_prefs_t): mongoc_read_mode_t; cdecl;
+    mongoc_read_prefs_set_mode: procedure(read_prefs: Pmongoc_read_prefs_t; mode: mongoc_read_mode_t); cdecl;
+    mongoc_read_prefs_get_tags: function(read_prefs: Pmongoc_read_prefs_t): Pbson_t; cdecl;
+    mongoc_read_prefs_set_tags: procedure(read_prefs: Pmongoc_read_prefs_t; tags: Pbson_t); cdecl;
+    mongoc_read_prefs_add_tag: procedure(read_prefs: Pmongoc_read_prefs_t; tag: Pbson_t); cdecl;
+    mongoc_read_prefs_get_max_staleness_seconds: function(read_prefs: Pmongoc_read_prefs_t): int64_t; cdecl;
+    mongoc_read_prefs_set_max_staleness_seconds: procedure(read_prefs: Pmongoc_read_prefs_t; max_staleness_seconds: int64_t); cdecl;
+    mongoc_read_prefs_get_hedge: function(read_prefs: Pmongoc_read_prefs_t): Pbson_t; cdecl;
+    mongoc_read_prefs_set_hedge: procedure(read_prefs: Pmongoc_read_prefs_t; hedge: Pbson_t); cdecl;
+    mongoc_read_prefs_is_valid: function(read_prefs: Pmongoc_read_prefs_t): ByteBool; cdecl;
+    mongoc_server_api_version_to_string: function(version: mongoc_server_api_version_t): PAnsiChar; cdecl;
+    mongoc_server_api_version_from_string: function(version: PAnsiChar; param1: Pmongoc_server_api_version_t): ByteBool; cdecl;
+    mongoc_server_api_new: function(version: mongoc_server_api_version_t): Pmongoc_server_api_t; cdecl;
+    mongoc_server_api_copy: function(api: Pmongoc_server_api_t): Pmongoc_server_api_t; cdecl;
+    mongoc_server_api_destroy: procedure(api: Pmongoc_server_api_t); cdecl;
+    mongoc_server_api_strict: procedure(api: Pmongoc_server_api_t; strict: ByteBool); cdecl;
+    mongoc_server_api_deprecation_errors: procedure(api: Pmongoc_server_api_t; deprecation_errors: ByteBool); cdecl;
+    mongoc_server_api_get_deprecation_errors: function(api: Pmongoc_server_api_t): Pmongoc_optional_t; cdecl;
+    mongoc_server_api_get_strict: function(api: Pmongoc_server_api_t): Pmongoc_optional_t; cdecl;
+    mongoc_server_api_get_version: function(api: Pmongoc_server_api_t): mongoc_server_api_version_t; cdecl;
+    mongoc_server_description_destroy: procedure(description: Pmongoc_server_description_t); cdecl;
+    mongoc_server_description_new_copy: function(description: Pmongoc_server_description_t): Pmongoc_server_description_t; cdecl;
+    mongoc_server_description_id: function(description: Pmongoc_server_description_t): uint32_t; cdecl;
+    mongoc_server_description_host: function(description: Pmongoc_server_description_t): Pmongoc_host_list_t; cdecl;
+    mongoc_server_description_last_update_time: function(description: Pmongoc_server_description_t): int64_t; cdecl;
+    mongoc_server_description_round_trip_time: function(description: Pmongoc_server_description_t): int64_t; cdecl;
+    mongoc_server_description_type: function(description: Pmongoc_server_description_t): PAnsiChar; cdecl;
+    mongoc_server_description_hello_response: function(description: Pmongoc_server_description_t): Pbson_t; cdecl;
+    mongoc_server_description_compressor_id: function(description: Pmongoc_server_description_t): int32_t; cdecl;
+    mongoc_ssl_opt_get_default: function(): Pmongoc_ssl_opt_t; cdecl;
+    mongoc_socket_accept: function(sock: Pmongoc_socket_t; expire_at: int64_t): Pmongoc_socket_t; cdecl;
+    mongoc_socket_bind: function(sock: Pmongoc_socket_t; addr: Psockaddr; addrlen: mongoc_socklen_t): Integer; cdecl;
+    mongoc_socket_close: function(socket: Pmongoc_socket_t): Integer; cdecl;
+    mongoc_socket_connect: function(sock: Pmongoc_socket_t; addr: Psockaddr; addrlen: mongoc_socklen_t; expire_at: int64_t): Integer; cdecl;
+    mongoc_socket_getnameinfo: function(sock: Pmongoc_socket_t): PAnsiChar; cdecl;
+    mongoc_socket_destroy: procedure(sock: Pmongoc_socket_t); cdecl;
+    mongoc_socket_errno: function(sock: Pmongoc_socket_t): Integer; cdecl;
+    mongoc_socket_getsockname: function(sock: Pmongoc_socket_t; addr: Psockaddr; addrlen: Pmongoc_socklen_t): Integer; cdecl;
+    mongoc_socket_listen: function(sock: Pmongoc_socket_t; backlog: UINT): Integer; cdecl;
+    mongoc_socket_new: function(domain: Integer; &type: Integer; protocol: Integer): Pmongoc_socket_t; cdecl;
+    mongoc_socket_recv: function(sock: Pmongoc_socket_t; buf: Pvoid; buflen: size_t; flags: Integer; expire_at: int64_t): ssize_t; cdecl;
+    mongoc_socket_setsockopt: function(sock: Pmongoc_socket_t; level: Integer; optname: Integer; optval: Pvoid; optlen: mongoc_socklen_t): Integer; cdecl;
+    mongoc_socket_send: function(sock: Pmongoc_socket_t; buf: Pvoid; buflen: size_t; expire_at: int64_t): ssize_t; cdecl;
+    mongoc_socket_sendv: function(sock: Pmongoc_socket_t; iov: Pmongoc_iovec_t; iovcnt: size_t; expire_at: int64_t): ssize_t; cdecl;
+    mongoc_socket_check_closed: function(sock: Pmongoc_socket_t): ByteBool; cdecl;
+    mongoc_socket_inet_ntop: procedure(rp: Paddrinfo; buf: PAnsiChar; buflen: size_t); cdecl;
+    mongoc_socket_poll: function(sds: Pmongoc_socket_poll_t; nsds: size_t; timeout: int32_t): ssize_t; cdecl;
+    mongoc_stream_get_base_stream: function(stream: Pmongoc_stream_t): Pmongoc_stream_t; cdecl;
+    mongoc_stream_get_tls_stream: function(stream: Pmongoc_stream_t): Pmongoc_stream_t; cdecl;
+    mongoc_stream_close: function(stream: Pmongoc_stream_t): Integer; cdecl;
+    mongoc_stream_destroy: procedure(stream: Pmongoc_stream_t); cdecl;
+    mongoc_stream_failed: procedure(stream: Pmongoc_stream_t); cdecl;
+    mongoc_stream_flush: function(stream: Pmongoc_stream_t): Integer; cdecl;
+    mongoc_stream_writev: function(stream: Pmongoc_stream_t; iov: Pmongoc_iovec_t; iovcnt: size_t; timeout_msec: int32_t): ssize_t; cdecl;
+    mongoc_stream_write: function(stream: Pmongoc_stream_t; buf: Pvoid; count: size_t; timeout_msec: int32_t): ssize_t; cdecl;
+    mongoc_stream_readv: function(stream: Pmongoc_stream_t; iov: Pmongoc_iovec_t; iovcnt: size_t; min_bytes: size_t; timeout_msec: int32_t): ssize_t; cdecl;
+    mongoc_stream_read: function(stream: Pmongoc_stream_t; buf: Pvoid; count: size_t; min_bytes: size_t; timeout_msec: int32_t): ssize_t; cdecl;
+    mongoc_stream_setsockopt: function(stream: Pmongoc_stream_t; level: Integer; optname: Integer; optval: Pvoid; optlen: mongoc_socklen_t): Integer; cdecl;
+    mongoc_stream_check_closed: function(stream: Pmongoc_stream_t): ByteBool; cdecl;
+    mongoc_stream_timed_out: function(stream: Pmongoc_stream_t): ByteBool; cdecl;
+    mongoc_stream_should_retry: function(stream: Pmongoc_stream_t): ByteBool; cdecl;
+    mongoc_stream_poll: function(streams: Pmongoc_stream_poll_t; nstreams: size_t; timeout_ms: int32_t): ssize_t; cdecl;
+    mongoc_stream_buffered_new: function(base_stream: Pmongoc_stream_t; buffer_size: size_t): Pmongoc_stream_t; cdecl;
+    mongoc_stream_file_new: function(fd: Integer): Pmongoc_stream_t; cdecl;
+    mongoc_stream_file_new_for_path: function(path: PAnsiChar; flags: Integer; mode: Integer): Pmongoc_stream_t; cdecl;
+    mongoc_stream_file_get_fd: function(stream: Pmongoc_stream_file_t): Integer; cdecl;
+    mongoc_stream_socket_new: function(socket: Pmongoc_socket_t): Pmongoc_stream_t; cdecl;
+    mongoc_stream_socket_get_socket: function(stream: Pmongoc_stream_socket_t): Pmongoc_socket_t; cdecl;
+    mongoc_structured_log_opts_new: function(): Pmongoc_structured_log_opts_t; cdecl;
+    mongoc_structured_log_opts_destroy: procedure(opts: Pmongoc_structured_log_opts_t); cdecl;
+    mongoc_structured_log_opts_set_handler: procedure(opts: Pmongoc_structured_log_opts_t; log_func: mongoc_structured_log_func_t; user_data: Pvoid); cdecl;
+    mongoc_structured_log_opts_set_max_level_for_component: function(opts: Pmongoc_structured_log_opts_t; component: mongoc_structured_log_component_t; level: mongoc_structured_log_level_t): ByteBool; cdecl;
+    mongoc_structured_log_opts_set_max_level_for_all_components: function(opts: Pmongoc_structured_log_opts_t; level: mongoc_structured_log_level_t): ByteBool; cdecl;
+    mongoc_structured_log_opts_set_max_levels_from_env: function(opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl;
+    mongoc_structured_log_opts_get_max_level_for_component: function(opts: Pmongoc_structured_log_opts_t; component: mongoc_structured_log_component_t): mongoc_structured_log_level_t; cdecl;
+    mongoc_structured_log_opts_get_max_document_length: function(opts: Pmongoc_structured_log_opts_t): size_t; cdecl;
+    mongoc_structured_log_opts_set_max_document_length_from_env: function(opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl;
+    mongoc_structured_log_opts_set_max_document_length: function(opts: Pmongoc_structured_log_opts_t; max_document_length: size_t): ByteBool; cdecl;
+    mongoc_structured_log_entry_message_as_bson: function(entry: Pmongoc_structured_log_entry_t): Pbson_t; cdecl;
+    mongoc_structured_log_entry_get_level: function(entry: Pmongoc_structured_log_entry_t): mongoc_structured_log_level_t; cdecl;
+    mongoc_structured_log_entry_get_component: function(entry: Pmongoc_structured_log_entry_t): mongoc_structured_log_component_t; cdecl;
+    mongoc_structured_log_entry_get_message_string: function(entry: Pmongoc_structured_log_entry_t): PAnsiChar; cdecl;
+    mongoc_structured_log_get_level_name: function(level: mongoc_structured_log_level_t): PAnsiChar; cdecl;
+    mongoc_structured_log_get_named_level: function(name: PAnsiChar; param1: Pmongoc_structured_log_level_t): ByteBool; cdecl;
+    mongoc_structured_log_get_component_name: function(component: mongoc_structured_log_component_t): PAnsiChar; cdecl;
+    mongoc_structured_log_get_named_component: function(name: PAnsiChar; param1: Pmongoc_structured_log_component_t): ByteBool; cdecl;
+    mongoc_get_major_version: function(): Integer; cdecl;
+    mongoc_get_minor_version: function(): Integer; cdecl;
+    mongoc_get_micro_version: function(): Integer; cdecl;
+    mongoc_get_version: function(): PAnsiChar; cdecl;
+    mongoc_check_version: function(required_major: Integer; required_minor: Integer; required_micro: Integer): ByteBool; cdecl;
+    mongoc_cursor_clone: function(cursor: Pmongoc_cursor_t): Pmongoc_cursor_t; cdecl;
+    mongoc_cursor_destroy: procedure(cursor: Pmongoc_cursor_t); cdecl;
+    mongoc_cursor_more: function(cursor: Pmongoc_cursor_t): ByteBool; cdecl;
+    mongoc_cursor_next: function(cursor: Pmongoc_cursor_t; bson: PPbson_t): ByteBool; cdecl;
+    mongoc_cursor_error: function(cursor: Pmongoc_cursor_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_cursor_error_document: function(cursor: Pmongoc_cursor_t; error: Pbson_error_t; doc: PPbson_t): ByteBool; cdecl;
+    mongoc_cursor_get_host: procedure(cursor: Pmongoc_cursor_t; host: Pmongoc_host_list_t); cdecl;
+    mongoc_cursor_current: function(cursor: Pmongoc_cursor_t): Pbson_t; cdecl;
+    mongoc_cursor_set_batch_size: procedure(cursor: Pmongoc_cursor_t; batch_size: uint32_t); cdecl;
+    mongoc_cursor_get_batch_size: function(cursor: Pmongoc_cursor_t): uint32_t; cdecl;
+    mongoc_cursor_set_limit: function(cursor: Pmongoc_cursor_t; limit: int64_t): ByteBool; cdecl;
+    mongoc_cursor_get_limit: function(cursor: Pmongoc_cursor_t): int64_t; cdecl;
+    mongoc_cursor_set_server_id: function(cursor: Pmongoc_cursor_t; server_id: uint32_t): ByteBool; cdecl;
+    mongoc_cursor_get_server_id: function(cursor: Pmongoc_cursor_t): uint32_t; cdecl;
+    mongoc_cursor_get_id: function(cursor: Pmongoc_cursor_t): int64_t; cdecl;
+    mongoc_cursor_set_max_await_time_ms: procedure(cursor: Pmongoc_cursor_t; max_await_time_ms: uint32_t); cdecl;
+    mongoc_cursor_get_max_await_time_ms: function(cursor: Pmongoc_cursor_t): uint32_t; cdecl;
+    mongoc_cursor_new_from_command_reply_with_opts: function(client: P_mongoc_client_t; reply: Pbson_t; opts: Pbson_t): Pmongoc_cursor_t; cdecl;
+    mongoc_change_stream_destroy: procedure(stream: Pmongoc_change_stream_t); cdecl;
+    mongoc_change_stream_get_resume_token: function(stream: Pmongoc_change_stream_t): Pbson_t; cdecl;
+    mongoc_change_stream_next: function(stream: Pmongoc_change_stream_t; bson: PPbson_t): ByteBool; cdecl;
+    mongoc_change_stream_error_document: function(stream: Pmongoc_change_stream_t; err: Pbson_error_t; bson: PPbson_t): ByteBool; cdecl;
+    mongoc_bulk_operation_destroy: procedure(bulk: Pmongoc_bulk_operation_t); cdecl;
+    mongoc_bulk_operation_execute: function(bulk: Pmongoc_bulk_operation_t; reply: Pbson_t; error: Pbson_error_t): uint32_t; cdecl;
+    mongoc_bulk_operation_insert: procedure(bulk: Pmongoc_bulk_operation_t; document: Pbson_t); cdecl;
+    mongoc_bulk_operation_insert_with_opts: function(bulk: Pmongoc_bulk_operation_t; document: Pbson_t; opts: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulk_operation_remove: procedure(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t); cdecl;
+    mongoc_bulk_operation_remove_many_with_opts: function(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; opts: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulk_operation_remove_one: procedure(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t); cdecl;
+    mongoc_bulk_operation_remove_one_with_opts: function(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; opts: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulk_operation_replace_one: procedure(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; document: Pbson_t; upsert: ByteBool); cdecl;
+    mongoc_bulk_operation_replace_one_with_opts: function(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; document: Pbson_t; opts: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulk_operation_update: procedure(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; document: Pbson_t; upsert: ByteBool); cdecl;
+    mongoc_bulk_operation_update_many_with_opts: function(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; document: Pbson_t; opts: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulk_operation_update_one: procedure(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; document: Pbson_t; upsert: ByteBool); cdecl;
+    mongoc_bulk_operation_update_one_with_opts: function(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; document: Pbson_t; opts: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulk_operation_set_bypass_document_validation: procedure(bulk: Pmongoc_bulk_operation_t; bypass: ByteBool); cdecl;
+    mongoc_bulk_operation_set_comment: procedure(bulk: Pmongoc_bulk_operation_t; comment: Pbson_value_t); cdecl;
+    mongoc_bulk_operation_set_let: procedure(bulk: Pmongoc_bulk_operation_t; let: Pbson_t); cdecl;
+    mongoc_bulk_operation_new: function(ordered: ByteBool): Pmongoc_bulk_operation_t; cdecl;
+    mongoc_bulk_operation_set_write_concern: procedure(bulk: Pmongoc_bulk_operation_t; write_concern: Pmongoc_write_concern_t); cdecl;
+    mongoc_bulk_operation_set_database: procedure(bulk: Pmongoc_bulk_operation_t; database: PAnsiChar); cdecl;
+    mongoc_bulk_operation_set_collection: procedure(bulk: Pmongoc_bulk_operation_t; collection: PAnsiChar); cdecl;
+    mongoc_bulk_operation_set_client: procedure(bulk: Pmongoc_bulk_operation_t; client: Pvoid); cdecl;
+    mongoc_bulk_operation_set_client_session: procedure(bulk: Pmongoc_bulk_operation_t; client_session: P_mongoc_client_session_t); cdecl;
+    mongoc_bulk_operation_set_server_id: procedure(bulk: Pmongoc_bulk_operation_t; server_id: uint32_t); cdecl;
+    mongoc_bulk_operation_get_server_id: function(bulk: Pmongoc_bulk_operation_t): uint32_t; cdecl;
+    mongoc_bulk_operation_get_write_concern: function(bulk: Pmongoc_bulk_operation_t): Pmongoc_write_concern_t; cdecl;
+    mongoc_auto_encryption_opts_new: function(): Pmongoc_auto_encryption_opts_t; cdecl;
+    mongoc_auto_encryption_opts_destroy: procedure(opts: Pmongoc_auto_encryption_opts_t); cdecl;
+    mongoc_auto_encryption_opts_set_keyvault_client: procedure(opts: Pmongoc_auto_encryption_opts_t; client: P_mongoc_client_t); cdecl;
+    mongoc_auto_encryption_opts_set_keyvault_client_pool: procedure(opts: Pmongoc_auto_encryption_opts_t; pool: P_mongoc_client_pool_t); cdecl;
+    mongoc_auto_encryption_opts_set_keyvault_namespace: procedure(opts: Pmongoc_auto_encryption_opts_t; db: PAnsiChar; coll: PAnsiChar); cdecl;
+    mongoc_auto_encryption_opts_set_kms_providers: procedure(opts: Pmongoc_auto_encryption_opts_t; kms_providers: Pbson_t); cdecl;
+    mongoc_auto_encryption_opts_set_key_expiration: procedure(opts: Pmongoc_auto_encryption_opts_t; expiration: uint64_t); cdecl;
+    mongoc_auto_encryption_opts_set_tls_opts: procedure(opts: Pmongoc_auto_encryption_opts_t; tls_opts: Pbson_t); cdecl;
+    mongoc_auto_encryption_opts_set_schema_map: procedure(opts: Pmongoc_auto_encryption_opts_t; schema_map: Pbson_t); cdecl;
+    mongoc_auto_encryption_opts_set_encrypted_fields_map: procedure(opts: Pmongoc_auto_encryption_opts_t; encrypted_fields_map: Pbson_t); cdecl;
+    mongoc_auto_encryption_opts_set_bypass_auto_encryption: procedure(opts: Pmongoc_auto_encryption_opts_t; bypass_auto_encryption: ByteBool); cdecl;
+    mongoc_auto_encryption_opts_set_bypass_query_analysis: procedure(opts: Pmongoc_auto_encryption_opts_t; bypass_query_analysis: ByteBool); cdecl;
+    mongoc_auto_encryption_opts_set_extra: procedure(opts: Pmongoc_auto_encryption_opts_t; extra: Pbson_t); cdecl;
+    mongoc_auto_encryption_opts_set_kms_credential_provider_callback: procedure(opts: Pmongoc_auto_encryption_opts_t; fn: mongoc_kms_credentials_provider_callback_fn; userdata: Pvoid); cdecl;
+    mongoc_client_encryption_opts_new: function(): Pmongoc_client_encryption_opts_t; cdecl;
+    mongoc_client_encryption_opts_destroy: procedure(opts: Pmongoc_client_encryption_opts_t); cdecl;
+    mongoc_client_encryption_opts_set_keyvault_client: procedure(opts: Pmongoc_client_encryption_opts_t; keyvault_client: P_mongoc_client_t); cdecl;
+    mongoc_client_encryption_opts_set_keyvault_namespace: procedure(opts: Pmongoc_client_encryption_opts_t; db: PAnsiChar; coll: PAnsiChar); cdecl;
+    mongoc_client_encryption_opts_set_kms_providers: procedure(opts: Pmongoc_client_encryption_opts_t; kms_providers: Pbson_t); cdecl;
+    mongoc_client_encryption_opts_set_tls_opts: procedure(opts: Pmongoc_client_encryption_opts_t; tls_opts: Pbson_t); cdecl;
+    mongoc_client_encryption_opts_set_kms_credential_provider_callback: procedure(opts: Pmongoc_client_encryption_opts_t; fn: mongoc_kms_credentials_provider_callback_fn; userdata: Pvoid); cdecl;
+    mongoc_client_encryption_opts_set_key_expiration: procedure(opts: Pmongoc_client_encryption_opts_t; cache_expiration_ms: uint64_t); cdecl;
+    mongoc_client_encryption_rewrap_many_datakey_result_new: function(): Pmongoc_client_encryption_rewrap_many_datakey_result_t; cdecl;
+    mongoc_client_encryption_rewrap_many_datakey_result_destroy: procedure(_result: Pmongoc_client_encryption_rewrap_many_datakey_result_t); cdecl;
+    mongoc_client_encryption_rewrap_many_datakey_result_get_bulk_write_result: function(_result: Pmongoc_client_encryption_rewrap_many_datakey_result_t): Pbson_t; cdecl;
+    mongoc_client_encryption_new: function(opts: Pmongoc_client_encryption_opts_t; error: Pbson_error_t): Pmongoc_client_encryption_t; cdecl;
+    mongoc_client_encryption_destroy: procedure(client_encryption: Pmongoc_client_encryption_t); cdecl;
+    mongoc_client_encryption_create_datakey: function(client_encryption: Pmongoc_client_encryption_t; kms_provider: PAnsiChar; opts: Pmongoc_client_encryption_datakey_opts_t; keyid: Pbson_value_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_encryption_rewrap_many_datakey: function(client_encryption: Pmongoc_client_encryption_t; filter: Pbson_t; provider: PAnsiChar; master_key: Pbson_t; _result: Pmongoc_client_encryption_rewrap_many_datakey_result_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_encryption_delete_key: function(client_encryption: Pmongoc_client_encryption_t; keyid: Pbson_value_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_encryption_get_key: function(client_encryption: Pmongoc_client_encryption_t; keyid: Pbson_value_t; key_doc: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_encryption_encrypt_text_prefix_opts_new: function(): Pmongoc_client_encryption_encrypt_text_prefix_opts_t; cdecl;
+    mongoc_client_encryption_encrypt_text_suffix_opts_new: function(): Pmongoc_client_encryption_encrypt_text_suffix_opts_t; cdecl;
+    mongoc_client_encryption_encrypt_text_substring_opts_new: function(): Pmongoc_client_encryption_encrypt_text_substring_opts_t; cdecl;
+    mongoc_client_encryption_encrypt_text_prefix_opts_destroy: procedure(opts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t); cdecl;
+    mongoc_client_encryption_encrypt_text_suffix_opts_destroy: procedure(opts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t); cdecl;
+    mongoc_client_encryption_encrypt_text_substring_opts_destroy: procedure(opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t); cdecl;
+    mongoc_client_encryption_encrypt_text_prefix_opts_set_str_max_query_length: procedure(opts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t; str_max_query_length: int32_t); cdecl;
+    mongoc_client_encryption_encrypt_text_prefix_opts_set_str_min_query_length: procedure(opts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t; str_min_query_length: int32_t); cdecl;
+    mongoc_client_encryption_encrypt_text_suffix_opts_set_str_max_query_length: procedure(opts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t; str_max_query_length: int32_t); cdecl;
+    mongoc_client_encryption_encrypt_text_suffix_opts_set_str_min_query_length: procedure(opts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t; str_min_query_length: int32_t); cdecl;
+    mongoc_client_encryption_encrypt_text_substring_opts_set_str_max_length: procedure(opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t; str_max_length: int32_t); cdecl;
+    mongoc_client_encryption_encrypt_text_substring_opts_set_str_max_query_length: procedure(opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t; str_max_query_length: int32_t); cdecl;
+    mongoc_client_encryption_encrypt_text_substring_opts_set_str_min_query_length: procedure(opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t; str_min_query_length: int32_t); cdecl;
+    mongoc_client_encryption_encrypt_text_opts_set_prefix: procedure(opts: Pmongoc_client_encryption_encrypt_text_opts_t; popts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t); cdecl;
+    mongoc_client_encryption_encrypt_text_opts_set_suffix: procedure(opts: Pmongoc_client_encryption_encrypt_text_opts_t; sopts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t); cdecl;
+    mongoc_client_encryption_encrypt_text_opts_set_substring: procedure(opts: Pmongoc_client_encryption_encrypt_text_opts_t; ssopts: Pmongoc_client_encryption_encrypt_text_substring_opts_t); cdecl;
+    mongoc_client_encryption_encrypt_text_opts_new: function(): Pmongoc_client_encryption_encrypt_text_opts_t; cdecl;
+    mongoc_client_encryption_encrypt_text_opts_destroy: procedure(topts: Pmongoc_client_encryption_encrypt_text_opts_t); cdecl;
+    mongoc_client_encryption_get_keys: function(client_encryption: Pmongoc_client_encryption_t; error: Pbson_error_t): P_mongoc_cursor_t; cdecl;
+    mongoc_client_encryption_add_key_alt_name: function(client_encryption: Pmongoc_client_encryption_t; keyid: Pbson_value_t; keyaltname: PAnsiChar; key_doc: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_encryption_remove_key_alt_name: function(client_encryption: Pmongoc_client_encryption_t; keyid: Pbson_value_t; keyaltname: PAnsiChar; key_doc: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_encryption_get_key_by_alt_name: function(client_encryption: Pmongoc_client_encryption_t; keyaltname: PAnsiChar; key_doc: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_encryption_encrypt: function(client_encryption: Pmongoc_client_encryption_t; value: Pbson_value_t; opts: Pmongoc_client_encryption_encrypt_opts_t; ciphertext: Pbson_value_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_encryption_encrypt_expression: function(client_encryption: Pmongoc_client_encryption_t; expr: Pbson_t; opts: Pmongoc_client_encryption_encrypt_opts_t; expr_out: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_encryption_decrypt: function(client_encryption: Pmongoc_client_encryption_t; ciphertext: Pbson_value_t; value: Pbson_value_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_encryption_encrypt_opts_new: function(): Pmongoc_client_encryption_encrypt_opts_t; cdecl;
+    mongoc_client_encryption_encrypt_opts_destroy: procedure(opts: Pmongoc_client_encryption_encrypt_opts_t); cdecl;
+    mongoc_client_encryption_encrypt_opts_set_keyid: procedure(opts: Pmongoc_client_encryption_encrypt_opts_t; keyid: Pbson_value_t); cdecl;
+    mongoc_client_encryption_encrypt_opts_set_keyaltname: procedure(opts: Pmongoc_client_encryption_encrypt_opts_t; keyaltname: PAnsiChar); cdecl;
+    mongoc_client_encryption_encrypt_opts_set_algorithm: procedure(opts: Pmongoc_client_encryption_encrypt_opts_t; algorithm: PAnsiChar); cdecl;
+    mongoc_client_encryption_encrypt_opts_set_contention_factor: procedure(opts: Pmongoc_client_encryption_encrypt_opts_t; contention_factor: int64_t); cdecl;
+    mongoc_client_encryption_encrypt_opts_set_text_opts: procedure(opts: Pmongoc_client_encryption_encrypt_opts_t; text_opts: Pmongoc_client_encryption_encrypt_text_opts_t); cdecl;
+    mongoc_client_encryption_encrypt_text_opts_set_case_sensitive: procedure(opts: Pmongoc_client_encryption_encrypt_text_opts_t; case_sensitive: ByteBool); cdecl;
+    mongoc_client_encryption_encrypt_text_opts_set_diacritic_sensitive: procedure(opts: Pmongoc_client_encryption_encrypt_text_opts_t; diacritic_sensitive: ByteBool); cdecl;
+    mongoc_client_encryption_encrypt_opts_set_query_type: procedure(opts: Pmongoc_client_encryption_encrypt_opts_t; query_type: PAnsiChar); cdecl;
+    mongoc_client_encryption_encrypt_range_opts_new: function(): Pmongoc_client_encryption_encrypt_range_opts_t; cdecl;
+    mongoc_client_encryption_encrypt_range_opts_destroy: procedure(range_opts: Pmongoc_client_encryption_encrypt_range_opts_t); cdecl;
+    mongoc_client_encryption_encrypt_range_opts_set_trim_factor: procedure(range_opts: Pmongoc_client_encryption_encrypt_range_opts_t; trim_factor: int32_t); cdecl;
+    mongoc_client_encryption_encrypt_range_opts_set_sparsity: procedure(range_opts: Pmongoc_client_encryption_encrypt_range_opts_t; sparsity: int64_t); cdecl;
+    mongoc_client_encryption_encrypt_range_opts_set_min: procedure(range_opts: Pmongoc_client_encryption_encrypt_range_opts_t; min: Pbson_value_t); cdecl;
+    mongoc_client_encryption_encrypt_range_opts_set_max: procedure(range_opts: Pmongoc_client_encryption_encrypt_range_opts_t; max: Pbson_value_t); cdecl;
+    mongoc_client_encryption_encrypt_range_opts_set_precision: procedure(range_opts: Pmongoc_client_encryption_encrypt_range_opts_t; precision: int32_t); cdecl;
+    mongoc_client_encryption_encrypt_opts_set_range_opts: procedure(opts: Pmongoc_client_encryption_encrypt_opts_t; range_opts: Pmongoc_client_encryption_encrypt_range_opts_t); cdecl;
+    mongoc_client_encryption_datakey_opts_new: function(): Pmongoc_client_encryption_datakey_opts_t; cdecl;
+    mongoc_client_encryption_datakey_opts_destroy: procedure(opts: Pmongoc_client_encryption_datakey_opts_t); cdecl;
+    mongoc_client_encryption_datakey_opts_set_masterkey: procedure(opts: Pmongoc_client_encryption_datakey_opts_t; masterkey: Pbson_t); cdecl;
+    mongoc_client_encryption_datakey_opts_set_keyaltnames: procedure(opts: Pmongoc_client_encryption_datakey_opts_t; keyaltnames: PPAnsiChar; keyaltnames_count: uint32_t); cdecl;
+    mongoc_client_encryption_datakey_opts_set_keymaterial: procedure(opts: Pmongoc_client_encryption_datakey_opts_t; data: Puint8_t; len: uint32_t); cdecl;
+    mongoc_client_encryption_get_crypt_shared_version: function(enc: Pmongoc_client_encryption_t): PAnsiChar; cdecl;
+    mongoc_client_encryption_create_encrypted_collection: function(enc: Pmongoc_client_encryption_t; database: P_mongoc_database_t; name: PAnsiChar; in_options: Pbson_t; opt_out_options: Pbson_t; kms_provider: PAnsiChar; opt_masterkey: Pbson_t; error: Pbson_error_t): P_mongoc_collection_t; cdecl;
+    mongoc_stream_tls_handshake: function(stream: Pmongoc_stream_t; host: PAnsiChar; timeout_msec: int32_t; events: PInteger; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_stream_tls_handshake_block: function(stream: Pmongoc_stream_t; host: PAnsiChar; timeout_msec: int32_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_stream_tls_new_with_hostname: function(base_stream: Pmongoc_stream_t; host: PAnsiChar; opt: Pmongoc_ssl_opt_t; client: Integer): Pmongoc_stream_t; cdecl;
+    mongoc_topology_description_destroy: procedure(description: Pmongoc_topology_description_t); cdecl;
+    mongoc_topology_description_new_copy: function(description: Pmongoc_topology_description_t): Pmongoc_topology_description_t; cdecl;
+    mongoc_topology_description_has_readable_server: function(td: Pmongoc_topology_description_t; prefs: Pmongoc_read_prefs_t): ByteBool; cdecl;
+    mongoc_topology_description_has_writable_server: function(td: Pmongoc_topology_description_t): ByteBool; cdecl;
+    mongoc_topology_description_type: function(td: Pmongoc_topology_description_t): PAnsiChar; cdecl;
+    mongoc_topology_description_get_servers: function(td: Pmongoc_topology_description_t; n: Psize_t): PPmongoc_server_description_t; cdecl;
+    mongoc_apm_command_started_get_command: function(event: Pmongoc_apm_command_started_t): Pbson_t; cdecl;
+    mongoc_apm_command_started_get_database_name: function(event: Pmongoc_apm_command_started_t): PAnsiChar; cdecl;
+    mongoc_apm_command_started_get_command_name: function(event: Pmongoc_apm_command_started_t): PAnsiChar; cdecl;
+    mongoc_apm_command_started_get_request_id: function(event: Pmongoc_apm_command_started_t): int64_t; cdecl;
+    mongoc_apm_command_started_get_operation_id: function(event: Pmongoc_apm_command_started_t): int64_t; cdecl;
+    mongoc_apm_command_started_get_host: function(event: Pmongoc_apm_command_started_t): Pmongoc_host_list_t; cdecl;
+    mongoc_apm_command_started_get_server_id: function(event: Pmongoc_apm_command_started_t): uint32_t; cdecl;
+    mongoc_apm_command_started_get_service_id: function(event: Pmongoc_apm_command_started_t): Pbson_oid_t; cdecl;
+    mongoc_apm_command_started_get_server_connection_id_int64: function(event: Pmongoc_apm_command_started_t): int64_t; cdecl;
+    mongoc_apm_command_started_get_context: function(event: Pmongoc_apm_command_started_t): Pvoid; cdecl;
+    mongoc_apm_command_succeeded_get_duration: function(event: Pmongoc_apm_command_succeeded_t): int64_t; cdecl;
+    mongoc_apm_command_succeeded_get_reply: function(event: Pmongoc_apm_command_succeeded_t): Pbson_t; cdecl;
+    mongoc_apm_command_succeeded_get_command_name: function(event: Pmongoc_apm_command_succeeded_t): PAnsiChar; cdecl;
+    mongoc_apm_command_succeeded_get_database_name: function(event: Pmongoc_apm_command_succeeded_t): PAnsiChar; cdecl;
+    mongoc_apm_command_succeeded_get_request_id: function(event: Pmongoc_apm_command_succeeded_t): int64_t; cdecl;
+    mongoc_apm_command_succeeded_get_operation_id: function(event: Pmongoc_apm_command_succeeded_t): int64_t; cdecl;
+    mongoc_apm_command_succeeded_get_host: function(event: Pmongoc_apm_command_succeeded_t): Pmongoc_host_list_t; cdecl;
+    mongoc_apm_command_succeeded_get_server_id: function(event: Pmongoc_apm_command_succeeded_t): uint32_t; cdecl;
+    mongoc_apm_command_succeeded_get_service_id: function(event: Pmongoc_apm_command_succeeded_t): Pbson_oid_t; cdecl;
+    mongoc_apm_command_succeeded_get_server_connection_id_int64: function(event: Pmongoc_apm_command_succeeded_t): int64_t; cdecl;
+    mongoc_apm_command_succeeded_get_context: function(event: Pmongoc_apm_command_succeeded_t): Pvoid; cdecl;
+    mongoc_apm_command_failed_get_duration: function(event: Pmongoc_apm_command_failed_t): int64_t; cdecl;
+    mongoc_apm_command_failed_get_command_name: function(event: Pmongoc_apm_command_failed_t): PAnsiChar; cdecl;
+    mongoc_apm_command_failed_get_database_name: function(event: Pmongoc_apm_command_failed_t): PAnsiChar; cdecl;
+    mongoc_apm_command_failed_get_error: procedure(event: Pmongoc_apm_command_failed_t; error: Pbson_error_t); cdecl;
+    mongoc_apm_command_failed_get_reply: function(event: Pmongoc_apm_command_failed_t): Pbson_t; cdecl;
+    mongoc_apm_command_failed_get_request_id: function(event: Pmongoc_apm_command_failed_t): int64_t; cdecl;
+    mongoc_apm_command_failed_get_operation_id: function(event: Pmongoc_apm_command_failed_t): int64_t; cdecl;
+    mongoc_apm_command_failed_get_host: function(event: Pmongoc_apm_command_failed_t): Pmongoc_host_list_t; cdecl;
+    mongoc_apm_command_failed_get_server_id: function(event: Pmongoc_apm_command_failed_t): uint32_t; cdecl;
+    mongoc_apm_command_failed_get_service_id: function(event: Pmongoc_apm_command_failed_t): Pbson_oid_t; cdecl;
+    mongoc_apm_command_failed_get_server_connection_id_int64: function(event: Pmongoc_apm_command_failed_t): int64_t; cdecl;
+    mongoc_apm_command_failed_get_context: function(event: Pmongoc_apm_command_failed_t): Pvoid; cdecl;
+    mongoc_apm_server_changed_get_host: function(event: Pmongoc_apm_server_changed_t): Pmongoc_host_list_t; cdecl;
+    mongoc_apm_server_changed_get_topology_id: procedure(event: Pmongoc_apm_server_changed_t; topology_id: Pbson_oid_t); cdecl;
+    mongoc_apm_server_changed_get_previous_description: function(event: Pmongoc_apm_server_changed_t): Pmongoc_server_description_t; cdecl;
+    mongoc_apm_server_changed_get_new_description: function(event: Pmongoc_apm_server_changed_t): Pmongoc_server_description_t; cdecl;
+    mongoc_apm_server_changed_get_context: function(event: Pmongoc_apm_server_changed_t): Pvoid; cdecl;
+    mongoc_apm_server_opening_get_host: function(event: Pmongoc_apm_server_opening_t): Pmongoc_host_list_t; cdecl;
+    mongoc_apm_server_opening_get_topology_id: procedure(event: Pmongoc_apm_server_opening_t; topology_id: Pbson_oid_t); cdecl;
+    mongoc_apm_server_opening_get_context: function(event: Pmongoc_apm_server_opening_t): Pvoid; cdecl;
+    mongoc_apm_server_closed_get_host: function(event: Pmongoc_apm_server_closed_t): Pmongoc_host_list_t; cdecl;
+    mongoc_apm_server_closed_get_topology_id: procedure(event: Pmongoc_apm_server_closed_t; topology_id: Pbson_oid_t); cdecl;
+    mongoc_apm_server_closed_get_context: function(event: Pmongoc_apm_server_closed_t): Pvoid; cdecl;
+    mongoc_apm_topology_changed_get_topology_id: procedure(event: Pmongoc_apm_topology_changed_t; topology_id: Pbson_oid_t); cdecl;
+    mongoc_apm_topology_changed_get_previous_description: function(event: Pmongoc_apm_topology_changed_t): Pmongoc_topology_description_t; cdecl;
+    mongoc_apm_topology_changed_get_new_description: function(event: Pmongoc_apm_topology_changed_t): Pmongoc_topology_description_t; cdecl;
+    mongoc_apm_topology_changed_get_context: function(event: Pmongoc_apm_topology_changed_t): Pvoid; cdecl;
+    mongoc_apm_topology_opening_get_topology_id: procedure(event: Pmongoc_apm_topology_opening_t; topology_id: Pbson_oid_t); cdecl;
+    mongoc_apm_topology_opening_get_context: function(event: Pmongoc_apm_topology_opening_t): Pvoid; cdecl;
+    mongoc_apm_topology_closed_get_topology_id: procedure(event: Pmongoc_apm_topology_closed_t; topology_id: Pbson_oid_t); cdecl;
+    mongoc_apm_topology_closed_get_context: function(event: Pmongoc_apm_topology_closed_t): Pvoid; cdecl;
+    mongoc_apm_server_heartbeat_started_get_host: function(event: Pmongoc_apm_server_heartbeat_started_t): Pmongoc_host_list_t; cdecl;
+    mongoc_apm_server_heartbeat_started_get_context: function(event: Pmongoc_apm_server_heartbeat_started_t): Pvoid; cdecl;
+    mongoc_apm_server_heartbeat_started_get_awaited: function(event: Pmongoc_apm_server_heartbeat_started_t): ByteBool; cdecl;
+    mongoc_apm_server_heartbeat_succeeded_get_duration: function(event: Pmongoc_apm_server_heartbeat_succeeded_t): int64_t; cdecl;
+    mongoc_apm_server_heartbeat_succeeded_get_reply: function(event: Pmongoc_apm_server_heartbeat_succeeded_t): Pbson_t; cdecl;
+    mongoc_apm_server_heartbeat_succeeded_get_host: function(event: Pmongoc_apm_server_heartbeat_succeeded_t): Pmongoc_host_list_t; cdecl;
+    mongoc_apm_server_heartbeat_succeeded_get_context: function(event: Pmongoc_apm_server_heartbeat_succeeded_t): Pvoid; cdecl;
+    mongoc_apm_server_heartbeat_succeeded_get_awaited: function(event: Pmongoc_apm_server_heartbeat_succeeded_t): ByteBool; cdecl;
+    mongoc_apm_server_heartbeat_failed_get_duration: function(event: Pmongoc_apm_server_heartbeat_failed_t): int64_t; cdecl;
+    mongoc_apm_server_heartbeat_failed_get_error: procedure(event: Pmongoc_apm_server_heartbeat_failed_t; error: Pbson_error_t); cdecl;
+    mongoc_apm_server_heartbeat_failed_get_host: function(event: Pmongoc_apm_server_heartbeat_failed_t): Pmongoc_host_list_t; cdecl;
+    mongoc_apm_server_heartbeat_failed_get_context: function(event: Pmongoc_apm_server_heartbeat_failed_t): Pvoid; cdecl;
+    mongoc_apm_server_heartbeat_failed_get_awaited: function(event: Pmongoc_apm_server_heartbeat_failed_t): ByteBool; cdecl;
+    mongoc_apm_callbacks_new: function(): Pmongoc_apm_callbacks_t; cdecl;
+    mongoc_apm_callbacks_destroy: procedure(callbacks: Pmongoc_apm_callbacks_t); cdecl;
+    mongoc_apm_set_command_started_cb: procedure(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_command_started_cb_t); cdecl;
+    mongoc_apm_set_command_succeeded_cb: procedure(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_command_succeeded_cb_t); cdecl;
+    mongoc_apm_set_command_failed_cb: procedure(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_command_failed_cb_t); cdecl;
+    mongoc_apm_set_server_changed_cb: procedure(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_server_changed_cb_t); cdecl;
+    mongoc_apm_set_server_opening_cb: procedure(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_server_opening_cb_t); cdecl;
+    mongoc_apm_set_server_closed_cb: procedure(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_server_closed_cb_t); cdecl;
+    mongoc_apm_set_topology_changed_cb: procedure(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_topology_changed_cb_t); cdecl;
+    mongoc_apm_set_topology_opening_cb: procedure(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_topology_opening_cb_t); cdecl;
+    mongoc_apm_set_topology_closed_cb: procedure(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_topology_closed_cb_t); cdecl;
+    mongoc_apm_set_server_heartbeat_started_cb: procedure(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_server_heartbeat_started_cb_t); cdecl;
+    mongoc_apm_set_server_heartbeat_succeeded_cb: procedure(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_server_heartbeat_succeeded_cb_t); cdecl;
+    mongoc_apm_set_server_heartbeat_failed_cb: procedure(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_server_heartbeat_failed_cb_t); cdecl;
+    mongoc_uri_copy: function(uri: Pmongoc_uri_t): Pmongoc_uri_t; cdecl;
+    mongoc_uri_destroy: procedure(uri: Pmongoc_uri_t); cdecl;
+    mongoc_uri_new: function(uri_string: PAnsiChar): Pmongoc_uri_t; cdecl;
+    mongoc_uri_new_with_error: function(uri_string: PAnsiChar; error: Pbson_error_t): Pmongoc_uri_t; cdecl;
+    mongoc_uri_new_for_host_port: function(hostname: PAnsiChar; port: uint16_t): Pmongoc_uri_t; cdecl;
+    mongoc_uri_get_hosts: function(uri: Pmongoc_uri_t): Pmongoc_host_list_t; cdecl;
+    mongoc_uri_get_srv_hostname: function(uri: Pmongoc_uri_t): PAnsiChar; cdecl;
+    mongoc_uri_get_srv_service_name: function(uri: Pmongoc_uri_t): PAnsiChar; cdecl;
+    mongoc_uri_get_database: function(uri: Pmongoc_uri_t): PAnsiChar; cdecl;
+    mongoc_uri_set_database: function(uri: Pmongoc_uri_t; database: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_get_compressors: function(uri: Pmongoc_uri_t): Pbson_t; cdecl;
+    mongoc_uri_get_options: function(uri: Pmongoc_uri_t): Pbson_t; cdecl;
+    mongoc_uri_get_password: function(uri: Pmongoc_uri_t): PAnsiChar; cdecl;
+    mongoc_uri_set_password: function(uri: Pmongoc_uri_t; password: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_has_option: function(uri: Pmongoc_uri_t; key: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_option_is_int32: function(key: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_option_is_int64: function(key: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_option_is_bool: function(key: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_option_is_utf8: function(key: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_get_option_as_int32: function(uri: Pmongoc_uri_t; option: PAnsiChar; fallback: int32_t): int32_t; cdecl;
+    mongoc_uri_get_option_as_int64: function(uri: Pmongoc_uri_t; option: PAnsiChar; fallback: int64_t): int64_t; cdecl;
+    mongoc_uri_get_option_as_bool: function(uri: Pmongoc_uri_t; option: PAnsiChar; fallback: ByteBool): ByteBool; cdecl;
+    mongoc_uri_get_option_as_utf8: function(uri: Pmongoc_uri_t; option: PAnsiChar; fallback: PAnsiChar): PAnsiChar; cdecl;
+    mongoc_uri_set_option_as_int32: function(uri: Pmongoc_uri_t; option: PAnsiChar; value: int32_t): ByteBool; cdecl;
+    mongoc_uri_set_option_as_int64: function(uri: Pmongoc_uri_t; option: PAnsiChar; value: int64_t): ByteBool; cdecl;
+    mongoc_uri_set_option_as_bool: function(uri: Pmongoc_uri_t; option: PAnsiChar; value: ByteBool): ByteBool; cdecl;
+    mongoc_uri_set_option_as_utf8: function(uri: Pmongoc_uri_t; option: PAnsiChar; value: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_get_replica_set: function(uri: Pmongoc_uri_t): PAnsiChar; cdecl;
+    mongoc_uri_get_string: function(uri: Pmongoc_uri_t): PAnsiChar; cdecl;
+    mongoc_uri_get_username: function(uri: Pmongoc_uri_t): PAnsiChar; cdecl;
+    mongoc_uri_set_username: function(uri: Pmongoc_uri_t; username: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_get_credentials: function(uri: Pmongoc_uri_t): Pbson_t; cdecl;
+    mongoc_uri_get_auth_source: function(uri: Pmongoc_uri_t): PAnsiChar; cdecl;
+    mongoc_uri_set_auth_source: function(uri: Pmongoc_uri_t; value: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_get_appname: function(uri: Pmongoc_uri_t): PAnsiChar; cdecl;
+    mongoc_uri_set_appname: function(uri: Pmongoc_uri_t; value: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_set_compressors: function(uri: Pmongoc_uri_t; value: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_get_auth_mechanism: function(uri: Pmongoc_uri_t): PAnsiChar; cdecl;
+    mongoc_uri_set_auth_mechanism: function(uri: Pmongoc_uri_t; value: PAnsiChar): ByteBool; cdecl;
+    mongoc_uri_get_mechanism_properties: function(uri: Pmongoc_uri_t; properties: Pbson_t): ByteBool; cdecl;
+    mongoc_uri_set_mechanism_properties: function(uri: Pmongoc_uri_t; properties: Pbson_t): ByteBool; cdecl;
+    mongoc_uri_get_tls: function(uri: Pmongoc_uri_t): ByteBool; cdecl;
+    mongoc_uri_unescape: function(escaped_string: PAnsiChar): PAnsiChar; cdecl;
+    mongoc_uri_get_read_prefs_t: function(uri: Pmongoc_uri_t): Pmongoc_read_prefs_t; cdecl;
+    mongoc_uri_set_read_prefs_t: procedure(uri: Pmongoc_uri_t; prefs: Pmongoc_read_prefs_t); cdecl;
+    mongoc_uri_get_write_concern: function(uri: Pmongoc_uri_t): Pmongoc_write_concern_t; cdecl;
+    mongoc_uri_set_write_concern: procedure(uri: Pmongoc_uri_t; wc: Pmongoc_write_concern_t); cdecl;
+    mongoc_uri_get_read_concern: function(uri: Pmongoc_uri_t): Pmongoc_read_concern_t; cdecl;
+    mongoc_uri_set_read_concern: procedure(uri: Pmongoc_uri_t; rc: Pmongoc_read_concern_t); cdecl;
+    mongoc_uri_get_server_monitoring_mode: function(uri: Pmongoc_uri_t): PAnsiChar; cdecl;
+    mongoc_uri_set_server_monitoring_mode: function(uri: Pmongoc_uri_t; value: PAnsiChar): ByteBool; cdecl;
+    mongoc_collection_aggregate: function(collection: Pmongoc_collection_t; flags: mongoc_query_flags_t; pipeline: Pbson_t; opts: Pbson_t; read_prefs: Pmongoc_read_prefs_t): Pmongoc_cursor_t; cdecl;
+    mongoc_collection_destroy: procedure(collection: Pmongoc_collection_t); cdecl;
+    mongoc_collection_copy: function(collection: Pmongoc_collection_t): Pmongoc_collection_t; cdecl;
+    mongoc_collection_read_command_with_opts: function(collection: Pmongoc_collection_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_write_command_with_opts: function(collection: Pmongoc_collection_t; command: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_read_write_command_with_opts: function(collection: Pmongoc_collection_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_command_with_opts: function(collection: Pmongoc_collection_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_command_simple: function(collection: Pmongoc_collection_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_drop: function(collection: Pmongoc_collection_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_drop_with_opts: function(collection: Pmongoc_collection_t; opts: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_drop_index: function(collection: Pmongoc_collection_t; index_name: PAnsiChar; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_drop_index_with_opts: function(collection: Pmongoc_collection_t; index_name: PAnsiChar; opts: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_find_indexes_with_opts: function(collection: Pmongoc_collection_t; opts: Pbson_t): Pmongoc_cursor_t; cdecl;
+    mongoc_index_model_new: function(keys: Pbson_t; opts: Pbson_t): Pmongoc_index_model_t; cdecl;
+    mongoc_index_model_destroy: procedure(model: Pmongoc_index_model_t); cdecl;
+    mongoc_collection_create_indexes_with_opts: function(collection: Pmongoc_collection_t; models: PPmongoc_index_model_t; n_models: size_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_find_with_opts: function(collection: Pmongoc_collection_t; filter: Pbson_t; opts: Pbson_t; read_prefs: Pmongoc_read_prefs_t): Pmongoc_cursor_t; cdecl;
+    mongoc_collection_insert: function(collection: Pmongoc_collection_t; flags: mongoc_insert_flags_t; document: Pbson_t; write_concern: Pmongoc_write_concern_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_insert_one: function(collection: Pmongoc_collection_t; document: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_insert_many: function(collection: Pmongoc_collection_t; documents: PPbson_t; n_documents: size_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_update: function(collection: Pmongoc_collection_t; flags: mongoc_update_flags_t; selector: Pbson_t; update: Pbson_t; write_concern: Pmongoc_write_concern_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_update_one: function(collection: Pmongoc_collection_t; selector: Pbson_t; update: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_update_many: function(collection: Pmongoc_collection_t; selector: Pbson_t; update: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_replace_one: function(collection: Pmongoc_collection_t; selector: Pbson_t; replacement: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_remove: function(collection: Pmongoc_collection_t; flags: mongoc_remove_flags_t; selector: Pbson_t; write_concern: Pmongoc_write_concern_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_delete_one: function(collection: Pmongoc_collection_t; selector: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_delete_many: function(collection: Pmongoc_collection_t; selector: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_rename: function(collection: Pmongoc_collection_t; new_db: PAnsiChar; new_name: PAnsiChar; drop_target_before_rename: ByteBool; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_rename_with_opts: function(collection: Pmongoc_collection_t; new_db: PAnsiChar; new_name: PAnsiChar; drop_target_before_rename: ByteBool; opts: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_find_and_modify_with_opts: function(collection: Pmongoc_collection_t; query: Pbson_t; opts: Pmongoc_find_and_modify_opts_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_find_and_modify: function(collection: Pmongoc_collection_t; query: Pbson_t; sort: Pbson_t; update: Pbson_t; fields: Pbson_t; _remove: ByteBool; upsert: ByteBool; _new: ByteBool; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_collection_create_bulk_operation_with_opts: function(collection: Pmongoc_collection_t; opts: Pbson_t): Pmongoc_bulk_operation_t; cdecl;
+    mongoc_collection_get_read_prefs: function(collection: Pmongoc_collection_t): Pmongoc_read_prefs_t; cdecl;
+    mongoc_collection_set_read_prefs: procedure(collection: Pmongoc_collection_t; read_prefs: Pmongoc_read_prefs_t); cdecl;
+    mongoc_collection_get_read_concern: function(collection: Pmongoc_collection_t): Pmongoc_read_concern_t; cdecl;
+    mongoc_collection_set_read_concern: procedure(collection: Pmongoc_collection_t; read_concern: Pmongoc_read_concern_t); cdecl;
+    mongoc_collection_get_write_concern: function(collection: Pmongoc_collection_t): Pmongoc_write_concern_t; cdecl;
+    mongoc_collection_set_write_concern: procedure(collection: Pmongoc_collection_t; write_concern: Pmongoc_write_concern_t); cdecl;
+    mongoc_collection_get_name: function(collection: Pmongoc_collection_t): PAnsiChar; cdecl;
+    mongoc_collection_keys_to_index_string: function(keys: Pbson_t): PAnsiChar; cdecl;
+    mongoc_collection_watch: function(coll: Pmongoc_collection_t; pipeline: Pbson_t; opts: Pbson_t): Pmongoc_change_stream_t; cdecl;
+    mongoc_collection_count_documents: function(coll: Pmongoc_collection_t; filter: Pbson_t; opts: Pbson_t; read_prefs: Pmongoc_read_prefs_t; reply: Pbson_t; error: Pbson_error_t): int64_t; cdecl;
+    mongoc_collection_estimated_document_count: function(coll: Pmongoc_collection_t; opts: Pbson_t; read_prefs: Pmongoc_read_prefs_t; reply: Pbson_t; error: Pbson_error_t): int64_t; cdecl;
+    mongoc_database_get_name: function(database: Pmongoc_database_t): PAnsiChar; cdecl;
+    mongoc_database_remove_user: function(database: Pmongoc_database_t; username: PAnsiChar; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_database_remove_all_users: function(database: Pmongoc_database_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_database_add_user: function(database: Pmongoc_database_t; username: PAnsiChar; password: PAnsiChar; roles: Pbson_t; custom_data: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_database_destroy: procedure(database: Pmongoc_database_t); cdecl;
+    mongoc_database_aggregate: function(db: Pmongoc_database_t; pipeline: Pbson_t; opts: Pbson_t; read_prefs: Pmongoc_read_prefs_t): Pmongoc_cursor_t; cdecl;
+    mongoc_database_copy: function(database: Pmongoc_database_t): Pmongoc_database_t; cdecl;
+    mongoc_database_read_command_with_opts: function(database: Pmongoc_database_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_database_write_command_with_opts: function(database: Pmongoc_database_t; command: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_database_read_write_command_with_opts: function(database: Pmongoc_database_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_database_command_with_opts: function(database: Pmongoc_database_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_database_command_simple: function(database: Pmongoc_database_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_database_drop: function(database: Pmongoc_database_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_database_drop_with_opts: function(database: Pmongoc_database_t; opts: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_database_has_collection: function(database: Pmongoc_database_t; name: PAnsiChar; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_database_create_collection: function(database: Pmongoc_database_t; name: PAnsiChar; options: Pbson_t; error: Pbson_error_t): Pmongoc_collection_t; cdecl;
+    mongoc_database_get_read_prefs: function(database: Pmongoc_database_t): Pmongoc_read_prefs_t; cdecl;
+    mongoc_database_set_read_prefs: procedure(database: Pmongoc_database_t; read_prefs: Pmongoc_read_prefs_t); cdecl;
+    mongoc_database_get_write_concern: function(database: Pmongoc_database_t): Pmongoc_write_concern_t; cdecl;
+    mongoc_database_set_write_concern: procedure(database: Pmongoc_database_t; write_concern: Pmongoc_write_concern_t); cdecl;
+    mongoc_database_get_read_concern: function(database: Pmongoc_database_t): Pmongoc_read_concern_t; cdecl;
+    mongoc_database_set_read_concern: procedure(database: Pmongoc_database_t; read_concern: Pmongoc_read_concern_t); cdecl;
+    mongoc_database_find_collections_with_opts: function(database: Pmongoc_database_t; opts: Pbson_t): Pmongoc_cursor_t; cdecl;
+    mongoc_database_get_collection_names_with_opts: function(database: Pmongoc_database_t; opts: Pbson_t; error: Pbson_error_t): PPAnsiChar; cdecl;
+    mongoc_database_get_collection: function(database: Pmongoc_database_t; name: PAnsiChar): Pmongoc_collection_t; cdecl;
+    mongoc_database_watch: function(db: Pmongoc_database_t; pipeline: Pbson_t; opts: Pbson_t): Pmongoc_change_stream_t; cdecl;
+    mongoc_gridfs_file_get_id: function(&file: Pmongoc_gridfs_file_t): Pbson_value_t; cdecl;
+    mongoc_gridfs_file_get_length: function(&file: Pmongoc_gridfs_file_t): int64_t; cdecl;
+    mongoc_gridfs_file_get_chunk_size: function(&file: Pmongoc_gridfs_file_t): int32_t; cdecl;
+    mongoc_gridfs_file_get_upload_date: function(&file: Pmongoc_gridfs_file_t): int64_t; cdecl;
+    mongoc_gridfs_file_writev: function(&file: Pmongoc_gridfs_file_t; iov: Pmongoc_iovec_t; iovcnt: size_t; timeout_msec: uint32_t): ssize_t; cdecl;
+    mongoc_gridfs_file_readv: function(&file: Pmongoc_gridfs_file_t; iov: Pmongoc_iovec_t; iovcnt: size_t; min_bytes: size_t; timeout_msec: uint32_t): ssize_t; cdecl;
+    mongoc_gridfs_file_seek: function(&file: Pmongoc_gridfs_file_t; delta: int64_t; whence: Integer): Integer; cdecl;
+    mongoc_gridfs_file_tell: function(&file: Pmongoc_gridfs_file_t): uint64_t; cdecl;
+    mongoc_gridfs_file_set_id: function(&file: Pmongoc_gridfs_file_t; id: Pbson_value_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_gridfs_file_save: function(&file: Pmongoc_gridfs_file_t): ByteBool; cdecl;
+    mongoc_gridfs_file_destroy: procedure(&file: Pmongoc_gridfs_file_t); cdecl;
+    mongoc_gridfs_file_error: function(&file: Pmongoc_gridfs_file_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_gridfs_file_remove: function(&file: Pmongoc_gridfs_file_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_gridfs_file_list_next: function(list: Pmongoc_gridfs_file_list_t): Pmongoc_gridfs_file_t; cdecl;
+    mongoc_gridfs_file_list_destroy: procedure(list: Pmongoc_gridfs_file_list_t); cdecl;
+    mongoc_gridfs_file_list_error: function(list: Pmongoc_gridfs_file_list_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_gridfs_bucket_new: function(db: Pmongoc_database_t; opts: Pbson_t; read_prefs: Pmongoc_read_prefs_t; error: Pbson_error_t): Pmongoc_gridfs_bucket_t; cdecl;
+    mongoc_gridfs_bucket_open_upload_stream: function(bucket: Pmongoc_gridfs_bucket_t; filename: PAnsiChar; opts: Pbson_t; file_id: Pbson_value_t; error: Pbson_error_t): Pmongoc_stream_t; cdecl;
+    mongoc_gridfs_bucket_open_upload_stream_with_id: function(bucket: Pmongoc_gridfs_bucket_t; file_id: Pbson_value_t; filename: PAnsiChar; opts: Pbson_t; error: Pbson_error_t): Pmongoc_stream_t; cdecl;
+    mongoc_gridfs_bucket_upload_from_stream: function(bucket: Pmongoc_gridfs_bucket_t; filename: PAnsiChar; source: Pmongoc_stream_t; opts: Pbson_t; file_id: Pbson_value_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_gridfs_bucket_upload_from_stream_with_id: function(bucket: Pmongoc_gridfs_bucket_t; file_id: Pbson_value_t; filename: PAnsiChar; source: Pmongoc_stream_t; opts: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_gridfs_bucket_open_download_stream: function(bucket: Pmongoc_gridfs_bucket_t; file_id: Pbson_value_t; error: Pbson_error_t): Pmongoc_stream_t; cdecl;
+    mongoc_gridfs_bucket_download_to_stream: function(bucket: Pmongoc_gridfs_bucket_t; file_id: Pbson_value_t; destination: Pmongoc_stream_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_gridfs_bucket_delete_by_id: function(bucket: Pmongoc_gridfs_bucket_t; file_id: Pbson_value_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_gridfs_bucket_find: function(bucket: Pmongoc_gridfs_bucket_t; filter: Pbson_t; opts: Pbson_t): Pmongoc_cursor_t; cdecl;
+    mongoc_gridfs_bucket_stream_error: function(stream: Pmongoc_stream_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_gridfs_bucket_destroy: procedure(bucket: Pmongoc_gridfs_bucket_t); cdecl;
+    mongoc_gridfs_bucket_abort_upload: function(stream: Pmongoc_stream_t): ByteBool; cdecl;
+    mongoc_gridfs_create_file_from_stream: function(gridfs: Pmongoc_gridfs_t; stream: Pmongoc_stream_t; opt: Pmongoc_gridfs_file_opt_t): Pmongoc_gridfs_file_t; cdecl;
+    mongoc_gridfs_create_file: function(gridfs: Pmongoc_gridfs_t; opt: Pmongoc_gridfs_file_opt_t): Pmongoc_gridfs_file_t; cdecl;
+    mongoc_gridfs_find_with_opts: function(gridfs: Pmongoc_gridfs_t; filter: Pbson_t; opts: Pbson_t): Pmongoc_gridfs_file_list_t; cdecl;
+    mongoc_gridfs_find_one_with_opts: function(gridfs: Pmongoc_gridfs_t; filter: Pbson_t; opts: Pbson_t; error: Pbson_error_t): Pmongoc_gridfs_file_t; cdecl;
+    mongoc_gridfs_find_one_by_filename: function(gridfs: Pmongoc_gridfs_t; filename: PAnsiChar; error: Pbson_error_t): Pmongoc_gridfs_file_t; cdecl;
+    mongoc_gridfs_drop: function(gridfs: Pmongoc_gridfs_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_gridfs_destroy: procedure(gridfs: Pmongoc_gridfs_t); cdecl;
+    mongoc_gridfs_get_files: function(gridfs: Pmongoc_gridfs_t): Pmongoc_collection_t; cdecl;
+    mongoc_gridfs_get_chunks: function(gridfs: Pmongoc_gridfs_t): Pmongoc_collection_t; cdecl;
+    mongoc_gridfs_remove_by_filename: function(gridfs: Pmongoc_gridfs_t; filename: PAnsiChar; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_stream_gridfs_new: function(&file: Pmongoc_gridfs_file_t): Pmongoc_stream_t; cdecl;
+    mongoc_client_new: function(uri_string: PAnsiChar): Pmongoc_client_t; cdecl;
+    mongoc_client_new_from_uri: function(uri: Pmongoc_uri_t): Pmongoc_client_t; cdecl;
+    mongoc_client_new_from_uri_with_error: function(uri: Pmongoc_uri_t; error: Pbson_error_t): Pmongoc_client_t; cdecl;
+    mongoc_client_set_sockettimeoutms: procedure(client: Pmongoc_client_t; timeoutms: int32_t); cdecl;
+    mongoc_client_get_uri: function(client: Pmongoc_client_t): Pmongoc_uri_t; cdecl;
+    mongoc_client_set_stream_initiator: procedure(client: Pmongoc_client_t; initiator: mongoc_stream_initiator_t; user_data: Pvoid); cdecl;
+    mongoc_client_command_simple: function(client: Pmongoc_client_t; db_name: PAnsiChar; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_read_command_with_opts: function(client: Pmongoc_client_t; db_name: PAnsiChar; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_write_command_with_opts: function(client: Pmongoc_client_t; db_name: PAnsiChar; command: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_read_write_command_with_opts: function(client: Pmongoc_client_t; db_name: PAnsiChar; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_command_with_opts: function(client: Pmongoc_client_t; db_name: PAnsiChar; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_command_simple_with_server_id: function(client: Pmongoc_client_t; db_name: PAnsiChar; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; server_id: uint32_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_destroy: procedure(client: Pmongoc_client_t); cdecl;
+    mongoc_client_start_session: function(client: Pmongoc_client_t; opts: Pmongoc_session_opt_t; error: Pbson_error_t): Pmongoc_client_session_t; cdecl;
+    mongoc_client_get_database: function(client: Pmongoc_client_t; name: PAnsiChar): Pmongoc_database_t; cdecl;
+    mongoc_client_get_default_database: function(client: Pmongoc_client_t): Pmongoc_database_t; cdecl;
+    mongoc_client_get_gridfs: function(client: Pmongoc_client_t; db: PAnsiChar; prefix: PAnsiChar; error: Pbson_error_t): Pmongoc_gridfs_t; cdecl;
+    mongoc_client_get_collection: function(client: Pmongoc_client_t; db: PAnsiChar; collection: PAnsiChar): Pmongoc_collection_t; cdecl;
+    mongoc_client_get_database_names: function(client: Pmongoc_client_t; error: Pbson_error_t): PPAnsiChar; cdecl;
+    mongoc_client_get_database_names_with_opts: function(client: Pmongoc_client_t; opts: Pbson_t; error: Pbson_error_t): PPAnsiChar; cdecl;
+    mongoc_client_find_databases: function(client: Pmongoc_client_t; error: Pbson_error_t): Pmongoc_cursor_t; cdecl;
+    mongoc_client_find_databases_with_opts: function(client: Pmongoc_client_t; opts: Pbson_t): Pmongoc_cursor_t; cdecl;
+    mongoc_client_get_write_concern: function(client: Pmongoc_client_t): Pmongoc_write_concern_t; cdecl;
+    mongoc_client_set_write_concern: procedure(client: Pmongoc_client_t; write_concern: Pmongoc_write_concern_t); cdecl;
+    mongoc_client_get_read_concern: function(client: Pmongoc_client_t): Pmongoc_read_concern_t; cdecl;
+    mongoc_client_set_read_concern: procedure(client: Pmongoc_client_t; read_concern: Pmongoc_read_concern_t); cdecl;
+    mongoc_client_get_read_prefs: function(client: Pmongoc_client_t): Pmongoc_read_prefs_t; cdecl;
+    mongoc_client_set_read_prefs: procedure(client: Pmongoc_client_t; read_prefs: Pmongoc_read_prefs_t); cdecl;
+    mongoc_client_set_ssl_opts: procedure(client: Pmongoc_client_t; opts: Pmongoc_ssl_opt_t); cdecl;
+    mongoc_client_set_apm_callbacks: function(client: Pmongoc_client_t; callbacks: Pmongoc_apm_callbacks_t; context: Pvoid): ByteBool; cdecl;
+    mongoc_client_set_structured_log_opts: function(client: Pmongoc_client_t; opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl;
+    mongoc_client_get_server_description: function(client: Pmongoc_client_t; server_id: uint32_t): Pmongoc_server_description_t; cdecl;
+    mongoc_client_get_server_descriptions: function(client: Pmongoc_client_t; n: Psize_t): PPmongoc_server_description_t; cdecl;
+    mongoc_server_descriptions_destroy_all: procedure(sds: PPmongoc_server_description_t; n: size_t); cdecl;
+    mongoc_client_select_server: function(client: Pmongoc_client_t; for_writes: ByteBool; prefs: Pmongoc_read_prefs_t; error: Pbson_error_t): Pmongoc_server_description_t; cdecl;
+    mongoc_client_set_error_api: function(client: Pmongoc_client_t; version: int32_t): ByteBool; cdecl;
+    mongoc_client_set_appname: function(client: Pmongoc_client_t; appname: PAnsiChar): ByteBool; cdecl;
+    mongoc_client_watch: function(client: Pmongoc_client_t; pipeline: Pbson_t; opts: Pbson_t): Pmongoc_change_stream_t; cdecl;
+    mongoc_client_reset: procedure(client: Pmongoc_client_t); cdecl;
+    mongoc_client_enable_auto_encryption: function(client: Pmongoc_client_t; opts: Pmongoc_auto_encryption_opts_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_get_crypt_shared_version: function(client: Pmongoc_client_t): PAnsiChar; cdecl;
+    mongoc_client_set_server_api: function(client: Pmongoc_client_t; api: Pmongoc_server_api_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_get_handshake_description: function(client: Pmongoc_client_t; server_id: uint32_t; opts: Pbson_t; error: Pbson_error_t): Pmongoc_server_description_t; cdecl;
+    mongoc_client_set_oidc_callback: function(client: Pmongoc_client_t; callback: Pmongoc_oidc_callback_t): ByteBool; cdecl;
+    mongoc_client_pool_new: function(uri: Pmongoc_uri_t): Pmongoc_client_pool_t; cdecl;
+    mongoc_client_pool_new_with_error: function(uri: Pmongoc_uri_t; error: Pbson_error_t): Pmongoc_client_pool_t; cdecl;
+    mongoc_client_pool_destroy: procedure(pool: Pmongoc_client_pool_t); cdecl;
+    mongoc_client_pool_pop: function(pool: Pmongoc_client_pool_t): Pmongoc_client_t; cdecl;
+    mongoc_client_pool_push: procedure(pool: Pmongoc_client_pool_t; client: Pmongoc_client_t); cdecl;
+    mongoc_client_pool_try_pop: function(pool: Pmongoc_client_pool_t): Pmongoc_client_t; cdecl;
+    mongoc_client_pool_max_size: procedure(pool: Pmongoc_client_pool_t; max_pool_size: uint32_t); cdecl;
+    mongoc_client_pool_set_ssl_opts: procedure(pool: Pmongoc_client_pool_t; opts: Pmongoc_ssl_opt_t); cdecl;
+    mongoc_client_pool_set_apm_callbacks: function(pool: Pmongoc_client_pool_t; callbacks: Pmongoc_apm_callbacks_t; context: Pvoid): ByteBool; cdecl;
+    mongoc_client_pool_set_error_api: function(pool: Pmongoc_client_pool_t; version: int32_t): ByteBool; cdecl;
+    mongoc_client_pool_set_appname: function(pool: Pmongoc_client_pool_t; appname: PAnsiChar): ByteBool; cdecl;
+    mongoc_client_pool_enable_auto_encryption: function(pool: Pmongoc_client_pool_t; opts: Pmongoc_auto_encryption_opts_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_pool_set_server_api: function(pool: Pmongoc_client_pool_t; api: Pmongoc_server_api_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_pool_set_structured_log_opts: function(pool: Pmongoc_client_pool_t; opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl;
+    mongoc_client_pool_set_oidc_callback: function(pool: Pmongoc_client_pool_t; callback: Pmongoc_oidc_callback_t): ByteBool; cdecl;
+    mongoc_transaction_opts_new: function(): Pmongoc_transaction_opt_t; cdecl;
+    mongoc_transaction_opts_clone: function(opts: Pmongoc_transaction_opt_t): Pmongoc_transaction_opt_t; cdecl;
+    mongoc_transaction_opts_destroy: procedure(opts: Pmongoc_transaction_opt_t); cdecl;
+    mongoc_transaction_opts_set_max_commit_time_ms: procedure(opts: Pmongoc_transaction_opt_t; max_commit_time_ms: int64_t); cdecl;
+    mongoc_transaction_opts_get_max_commit_time_ms: function(opts: Pmongoc_transaction_opt_t): int64_t; cdecl;
+    mongoc_transaction_opts_set_read_concern: procedure(opts: Pmongoc_transaction_opt_t; read_concern: Pmongoc_read_concern_t); cdecl;
+    mongoc_transaction_opts_get_read_concern: function(opts: Pmongoc_transaction_opt_t): Pmongoc_read_concern_t; cdecl;
+    mongoc_transaction_opts_set_write_concern: procedure(opts: Pmongoc_transaction_opt_t; write_concern: Pmongoc_write_concern_t); cdecl;
+    mongoc_transaction_opts_get_write_concern: function(opts: Pmongoc_transaction_opt_t): Pmongoc_write_concern_t; cdecl;
+    mongoc_transaction_opts_set_read_prefs: procedure(opts: Pmongoc_transaction_opt_t; read_prefs: Pmongoc_read_prefs_t); cdecl;
+    mongoc_transaction_opts_get_read_prefs: function(opts: Pmongoc_transaction_opt_t): Pmongoc_read_prefs_t; cdecl;
+    mongoc_session_opts_new: function(): Pmongoc_session_opt_t; cdecl;
+    mongoc_session_opts_set_causal_consistency: procedure(opts: Pmongoc_session_opt_t; causal_consistency: ByteBool); cdecl;
+    mongoc_session_opts_get_causal_consistency: function(opts: Pmongoc_session_opt_t): ByteBool; cdecl;
+    mongoc_session_opts_set_snapshot: procedure(opts: Pmongoc_session_opt_t; snapshot: ByteBool); cdecl;
+    mongoc_session_opts_get_snapshot: function(opts: Pmongoc_session_opt_t): ByteBool; cdecl;
+    mongoc_session_opts_set_default_transaction_opts: procedure(opts: Pmongoc_session_opt_t; txn_opts: Pmongoc_transaction_opt_t); cdecl;
+    mongoc_session_opts_get_default_transaction_opts: function(opts: Pmongoc_session_opt_t): Pmongoc_transaction_opt_t; cdecl;
+    mongoc_session_opts_get_transaction_opts: function(session: Pmongoc_client_session_t): Pmongoc_transaction_opt_t; cdecl;
+    mongoc_session_opts_clone: function(opts: Pmongoc_session_opt_t): Pmongoc_session_opt_t; cdecl;
+    mongoc_session_opts_destroy: procedure(opts: Pmongoc_session_opt_t); cdecl;
+    mongoc_client_session_get_client: function(session: Pmongoc_client_session_t): Pmongoc_client_t; cdecl;
+    mongoc_client_session_get_opts: function(session: Pmongoc_client_session_t): Pmongoc_session_opt_t; cdecl;
+    mongoc_client_session_get_lsid: function(session: Pmongoc_client_session_t): Pbson_t; cdecl;
+    mongoc_client_session_get_cluster_time: function(session: Pmongoc_client_session_t): Pbson_t; cdecl;
+    mongoc_client_session_advance_cluster_time: procedure(session: Pmongoc_client_session_t; cluster_time: Pbson_t); cdecl;
+    mongoc_client_session_get_operation_time: procedure(session: Pmongoc_client_session_t; timestamp: Puint32_t; increment: Puint32_t); cdecl;
+    mongoc_client_session_get_server_id: function(session: Pmongoc_client_session_t): uint32_t; cdecl;
+    mongoc_client_session_advance_operation_time: procedure(session: Pmongoc_client_session_t; timestamp: uint32_t; increment: uint32_t); cdecl;
+    mongoc_client_session_with_transaction: function(session: Pmongoc_client_session_t; cb: mongoc_client_session_with_transaction_cb_t; opts: Pmongoc_transaction_opt_t; ctx: Pvoid; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_session_start_transaction: function(session: Pmongoc_client_session_t; opts: Pmongoc_transaction_opt_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_session_in_transaction: function(session: Pmongoc_client_session_t): ByteBool; cdecl;
+    mongoc_client_session_get_transaction_state: function(session: Pmongoc_client_session_t): mongoc_transaction_state_t; cdecl;
+    mongoc_client_session_commit_transaction: function(session: Pmongoc_client_session_t; reply: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_session_abort_transaction: function(session: Pmongoc_client_session_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_session_append: function(client_session: Pmongoc_client_session_t; opts: Pbson_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_client_session_destroy: procedure(session: Pmongoc_client_session_t); cdecl;
+    mongoc_client_session_get_dirty: function(session: Pmongoc_client_session_t): ByteBool; cdecl;
+    mongoc_bulkwriteopts_new: function(): Pmongoc_bulkwriteopts_t; cdecl;
+    mongoc_bulkwriteopts_set_ordered: procedure(self: Pmongoc_bulkwriteopts_t; ordered: ByteBool); cdecl;
+    mongoc_bulkwriteopts_set_bypassdocumentvalidation: procedure(self: Pmongoc_bulkwriteopts_t; bypassdocumentvalidation: ByteBool); cdecl;
+    mongoc_bulkwriteopts_set_let: procedure(self: Pmongoc_bulkwriteopts_t; let: Pbson_t); cdecl;
+    mongoc_bulkwriteopts_set_writeconcern: procedure(self: Pmongoc_bulkwriteopts_t; writeconcern: Pmongoc_write_concern_t); cdecl;
+    mongoc_bulkwriteopts_set_comment: procedure(self: Pmongoc_bulkwriteopts_t; comment: Pbson_value_t); cdecl;
+    mongoc_bulkwriteopts_set_verboseresults: procedure(self: Pmongoc_bulkwriteopts_t; verboseresults: ByteBool); cdecl;
+    mongoc_bulkwriteopts_set_extra: procedure(self: Pmongoc_bulkwriteopts_t; extra: Pbson_t); cdecl;
+    mongoc_bulkwriteopts_set_serverid: procedure(self: Pmongoc_bulkwriteopts_t; serverid: uint32_t); cdecl;
+    mongoc_bulkwriteopts_destroy: procedure(self: Pmongoc_bulkwriteopts_t); cdecl;
+    mongoc_bulkwriteresult_insertedcount: function(self: Pmongoc_bulkwriteresult_t): int64_t; cdecl;
+    mongoc_bulkwriteresult_upsertedcount: function(self: Pmongoc_bulkwriteresult_t): int64_t; cdecl;
+    mongoc_bulkwriteresult_matchedcount: function(self: Pmongoc_bulkwriteresult_t): int64_t; cdecl;
+    mongoc_bulkwriteresult_modifiedcount: function(self: Pmongoc_bulkwriteresult_t): int64_t; cdecl;
+    mongoc_bulkwriteresult_deletedcount: function(self: Pmongoc_bulkwriteresult_t): int64_t; cdecl;
+    mongoc_bulkwriteresult_insertresults: function(self: Pmongoc_bulkwriteresult_t): Pbson_t; cdecl;
+    mongoc_bulkwriteresult_updateresults: function(self: Pmongoc_bulkwriteresult_t): Pbson_t; cdecl;
+    mongoc_bulkwriteresult_deleteresults: function(self: Pmongoc_bulkwriteresult_t): Pbson_t; cdecl;
+    mongoc_bulkwriteresult_serverid: function(self: Pmongoc_bulkwriteresult_t): uint32_t; cdecl;
+    mongoc_bulkwriteresult_destroy: procedure(self: Pmongoc_bulkwriteresult_t); cdecl;
+    mongoc_bulkwriteexception_error: function(self: Pmongoc_bulkwriteexception_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulkwriteexception_writeerrors: function(self: Pmongoc_bulkwriteexception_t): Pbson_t; cdecl;
+    mongoc_bulkwriteexception_writeconcernerrors: function(self: Pmongoc_bulkwriteexception_t): Pbson_t; cdecl;
+    mongoc_bulkwriteexception_errorreply: function(self: Pmongoc_bulkwriteexception_t): Pbson_t; cdecl;
+    mongoc_bulkwriteexception_destroy: procedure(self: Pmongoc_bulkwriteexception_t); cdecl;
+    mongoc_client_bulkwrite_new: function(self: Pmongoc_client_t): Pmongoc_bulkwrite_t; cdecl;
+    mongoc_bulkwrite_insertoneopts_new: function(): Pmongoc_bulkwrite_insertoneopts_t; cdecl;
+    mongoc_bulkwrite_insertoneopts_destroy: procedure(self: Pmongoc_bulkwrite_insertoneopts_t); cdecl;
+    mongoc_bulkwrite_append_insertone: function(self: Pmongoc_bulkwrite_t; ns: PAnsiChar; document: Pbson_t; opts: Pmongoc_bulkwrite_insertoneopts_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulkwrite_updateoneopts_new: function(): Pmongoc_bulkwrite_updateoneopts_t; cdecl;
+    mongoc_bulkwrite_updateoneopts_set_arrayfilters: procedure(self: Pmongoc_bulkwrite_updateoneopts_t; arrayfilters: Pbson_t); cdecl;
+    mongoc_bulkwrite_updateoneopts_set_collation: procedure(self: Pmongoc_bulkwrite_updateoneopts_t; collation: Pbson_t); cdecl;
+    mongoc_bulkwrite_updateoneopts_set_hint: procedure(self: Pmongoc_bulkwrite_updateoneopts_t; hint: Pbson_value_t); cdecl;
+    mongoc_bulkwrite_updateoneopts_set_upsert: procedure(self: Pmongoc_bulkwrite_updateoneopts_t; upsert: ByteBool); cdecl;
+    mongoc_bulkwrite_updateoneopts_set_sort: procedure(self: Pmongoc_bulkwrite_updateoneopts_t; sort: Pbson_t); cdecl;
+    mongoc_bulkwrite_updateoneopts_destroy: procedure(self: Pmongoc_bulkwrite_updateoneopts_t); cdecl;
+    mongoc_bulkwrite_append_updateone: function(self: Pmongoc_bulkwrite_t; ns: PAnsiChar; filter: Pbson_t; update: Pbson_t; opts: Pmongoc_bulkwrite_updateoneopts_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulkwrite_updatemanyopts_new: function(): Pmongoc_bulkwrite_updatemanyopts_t; cdecl;
+    mongoc_bulkwrite_updatemanyopts_set_arrayfilters: procedure(self: Pmongoc_bulkwrite_updatemanyopts_t; arrayfilters: Pbson_t); cdecl;
+    mongoc_bulkwrite_updatemanyopts_set_collation: procedure(self: Pmongoc_bulkwrite_updatemanyopts_t; collation: Pbson_t); cdecl;
+    mongoc_bulkwrite_updatemanyopts_set_hint: procedure(self: Pmongoc_bulkwrite_updatemanyopts_t; hint: Pbson_value_t); cdecl;
+    mongoc_bulkwrite_updatemanyopts_set_upsert: procedure(self: Pmongoc_bulkwrite_updatemanyopts_t; upsert: ByteBool); cdecl;
+    mongoc_bulkwrite_updatemanyopts_destroy: procedure(self: Pmongoc_bulkwrite_updatemanyopts_t); cdecl;
+    mongoc_bulkwrite_append_updatemany: function(self: Pmongoc_bulkwrite_t; ns: PAnsiChar; filter: Pbson_t; update: Pbson_t; opts: Pmongoc_bulkwrite_updatemanyopts_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulkwrite_replaceoneopts_new: function(): Pmongoc_bulkwrite_replaceoneopts_t; cdecl;
+    mongoc_bulkwrite_replaceoneopts_set_collation: procedure(self: Pmongoc_bulkwrite_replaceoneopts_t; collation: Pbson_t); cdecl;
+    mongoc_bulkwrite_replaceoneopts_set_hint: procedure(self: Pmongoc_bulkwrite_replaceoneopts_t; hint: Pbson_value_t); cdecl;
+    mongoc_bulkwrite_replaceoneopts_set_upsert: procedure(self: Pmongoc_bulkwrite_replaceoneopts_t; upsert: ByteBool); cdecl;
+    mongoc_bulkwrite_replaceoneopts_set_sort: procedure(self: Pmongoc_bulkwrite_replaceoneopts_t; sort: Pbson_t); cdecl;
+    mongoc_bulkwrite_replaceoneopts_destroy: procedure(self: Pmongoc_bulkwrite_replaceoneopts_t); cdecl;
+    mongoc_bulkwrite_append_replaceone: function(self: Pmongoc_bulkwrite_t; ns: PAnsiChar; filter: Pbson_t; replacement: Pbson_t; opts: Pmongoc_bulkwrite_replaceoneopts_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulkwrite_deleteoneopts_new: function(): Pmongoc_bulkwrite_deleteoneopts_t; cdecl;
+    mongoc_bulkwrite_deleteoneopts_set_collation: procedure(self: Pmongoc_bulkwrite_deleteoneopts_t; collation: Pbson_t); cdecl;
+    mongoc_bulkwrite_deleteoneopts_set_hint: procedure(self: Pmongoc_bulkwrite_deleteoneopts_t; hint: Pbson_value_t); cdecl;
+    mongoc_bulkwrite_deleteoneopts_destroy: procedure(self: Pmongoc_bulkwrite_deleteoneopts_t); cdecl;
+    mongoc_bulkwrite_append_deleteone: function(self: Pmongoc_bulkwrite_t; ns: PAnsiChar; filter: Pbson_t; opts: Pmongoc_bulkwrite_deleteoneopts_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulkwrite_deletemanyopts_new: function(): Pmongoc_bulkwrite_deletemanyopts_t; cdecl;
+    mongoc_bulkwrite_deletemanyopts_set_collation: procedure(self: Pmongoc_bulkwrite_deletemanyopts_t; collation: Pbson_t); cdecl;
+    mongoc_bulkwrite_deletemanyopts_set_hint: procedure(self: Pmongoc_bulkwrite_deletemanyopts_t; hint: Pbson_value_t); cdecl;
+    mongoc_bulkwrite_deletemanyopts_destroy: procedure(self: Pmongoc_bulkwrite_deletemanyopts_t); cdecl;
+    mongoc_bulkwrite_append_deletemany: function(self: Pmongoc_bulkwrite_t; ns: PAnsiChar; filter: Pbson_t; opts: Pmongoc_bulkwrite_deletemanyopts_t; error: Pbson_error_t): ByteBool; cdecl;
+    mongoc_bulkwrite_new: function(): Pmongoc_bulkwrite_t; cdecl;
+    mongoc_bulkwrite_set_client: procedure(self: Pmongoc_bulkwrite_t; client: Pmongoc_client_t); cdecl;
+    mongoc_bulkwrite_set_session: procedure(self: Pmongoc_bulkwrite_t; session: Pmongoc_client_session_t); cdecl;
+    mongoc_bulkwrite_execute: function(self: Pmongoc_bulkwrite_t; opts: Pmongoc_bulkwriteopts_t): mongoc_bulkwritereturn_t; cdecl;
+    mongoc_bulkwrite_check_acknowledged: function(self: Pmongoc_bulkwrite_t; error: Pbson_error_t): mongoc_bulkwrite_check_acknowledged_t; cdecl;
+    mongoc_bulkwrite_serverid: function(self: Pmongoc_bulkwrite_t; error: Pbson_error_t): mongoc_bulkwrite_serverid_t; cdecl;
+    mongoc_bulkwrite_destroy: procedure(self: Pmongoc_bulkwrite_t); cdecl;
+    mongoc_client_set_usleep_impl: procedure(client: Pmongoc_client_t; usleep_func: mongoc_usleep_func_t; user_data: Pvoid); cdecl;
+    mongoc_usleep_default_impl: procedure(usec: int64_t; user_data: Pvoid); cdecl;
+  public
+    constructor Create(const ALibraryDir: String); virtual;
+    destructor Destroy; override;
+  end;
+
+var
+  ALMongoDBLibrary: TALMongoDBLibrary;
+
+procedure ALCreateALMongoDBLibrary(const ALibraryDir: String);
+procedure ALFreeALMongoDBLibrary;
+
 implementation
+
+uses
+  System.SysUtils,
+  System.IOUtils,
+  Alcinoe.Common;
+
+{**************************************************************}
+constructor TALMongoDBLibrary.Create(const ALibraryDir: String);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function GetProcAddress(const AModule: HMODULE; const AProcName: PAnsiChar): Pointer;
+  begin
+    Result := Winapi.Windows.GetProcAddress(AModule, AProcName);
+    if Result = nil then
+      raise Exception.CreateFmt('Function "%s" was not found in the given DLL', [AProcName]);
+  end;
+
+begin
+
+  inherited Create;
+
+  Fbson2Lib := LoadLibrary(PChar(TPath.Combine(ALibraryDir, 'bson2.dll')));
+  if Fbson2Lib = 0 then raiseLastOsError;
+
+  Fmongoc2Lib := LoadLibrary(PChar(TPath.Combine(ALibraryDir, 'mongoc2.dll')));
+  if Fmongoc2Lib = 0 then raiseLastOsError;
+
+  bson_set_error := GetProcAddress(Fbson2Lib,'bson_set_error');
+  bson_strerror_r := GetProcAddress(Fbson2Lib,'bson_strerror_r');
+  bson_mem_set_vtable := GetProcAddress(Fbson2Lib,'bson_mem_set_vtable');
+  bson_mem_restore_vtable := GetProcAddress(Fbson2Lib,'bson_mem_restore_vtable');
+  bson_malloc := GetProcAddress(Fbson2Lib,'bson_malloc');
+  bson_malloc0 := GetProcAddress(Fbson2Lib,'bson_malloc0');
+  bson_aligned_alloc := GetProcAddress(Fbson2Lib,'bson_aligned_alloc');
+  bson_aligned_alloc0 := GetProcAddress(Fbson2Lib,'bson_aligned_alloc0');
+  bson_array_alloc := GetProcAddress(Fbson2Lib,'bson_array_alloc');
+  bson_array_alloc0 := GetProcAddress(Fbson2Lib,'bson_array_alloc0');
+  bson_realloc := GetProcAddress(Fbson2Lib,'bson_realloc');
+  bson_realloc_ctx := GetProcAddress(Fbson2Lib,'bson_realloc_ctx');
+  bson_free := GetProcAddress(Fbson2Lib,'bson_free');
+  bson_zero_free := GetProcAddress(Fbson2Lib,'bson_zero_free');
+  bson_writer_new := GetProcAddress(Fbson2Lib,'bson_writer_new');
+  bson_writer_destroy := GetProcAddress(Fbson2Lib,'bson_writer_destroy');
+  bson_writer_get_length := GetProcAddress(Fbson2Lib,'bson_writer_get_length');
+  bson_writer_begin := GetProcAddress(Fbson2Lib,'bson_writer_begin');
+  bson_writer_end := GetProcAddress(Fbson2Lib,'bson_writer_end');
+  bson_writer_rollback := GetProcAddress(Fbson2Lib,'bson_writer_rollback');
+  bson_context_new := GetProcAddress(Fbson2Lib,'bson_context_new');
+  bson_context_destroy := GetProcAddress(Fbson2Lib,'bson_context_destroy');
+  bson_context_get_default := GetProcAddress(Fbson2Lib,'bson_context_get_default');
+  bson_get_monotonic_time := GetProcAddress(Fbson2Lib,'bson_get_monotonic_time');
+  bson_gettimeofday := GetProcAddress(Fbson2Lib,'bson_gettimeofday');
+  bson_decimal128_to_string := GetProcAddress(Fbson2Lib,'bson_decimal128_to_string');
+  bson_decimal128_from_string := GetProcAddress(Fbson2Lib,'bson_decimal128_from_string');
+  bson_decimal128_from_string_w_len := GetProcAddress(Fbson2Lib,'bson_decimal128_from_string_w_len');
+  bson_json_opts_new := GetProcAddress(Fbson2Lib,'bson_json_opts_new');
+  bson_json_opts_destroy := GetProcAddress(Fbson2Lib,'bson_json_opts_destroy');
+  bson_json_opts_set_outermost_array := GetProcAddress(Fbson2Lib,'bson_json_opts_set_outermost_array');
+  bson_json_reader_new := GetProcAddress(Fbson2Lib,'bson_json_reader_new');
+  bson_json_reader_new_from_fd := GetProcAddress(Fbson2Lib,'bson_json_reader_new_from_fd');
+  bson_json_reader_new_from_file := GetProcAddress(Fbson2Lib,'bson_json_reader_new_from_file');
+  bson_json_reader_destroy := GetProcAddress(Fbson2Lib,'bson_json_reader_destroy');
+  bson_json_reader_read := GetProcAddress(Fbson2Lib,'bson_json_reader_read');
+  bson_json_data_reader_new := GetProcAddress(Fbson2Lib,'bson_json_data_reader_new');
+  bson_json_data_reader_ingest := GetProcAddress(Fbson2Lib,'bson_json_data_reader_ingest');
+  bson_uint32_to_string := GetProcAddress(Fbson2Lib,'bson_uint32_to_string');
+  bson_strdup := GetProcAddress(Fbson2Lib,'bson_strdup');
+  bson_strdup_printf := GetProcAddress(Fbson2Lib,'bson_strdup_printf');
+  bson_strdupv_printf := GetProcAddress(Fbson2Lib,'bson_strdupv_printf');
+  bson_strndup := GetProcAddress(Fbson2Lib,'bson_strndup');
+  bson_strncpy := GetProcAddress(Fbson2Lib,'bson_strncpy');
+  bson_vsnprintf := GetProcAddress(Fbson2Lib,'bson_vsnprintf');
+  bson_snprintf := GetProcAddress(Fbson2Lib,'bson_snprintf');
+  bson_strfreev := GetProcAddress(Fbson2Lib,'bson_strfreev');
+  bson_strnlen := GetProcAddress(Fbson2Lib,'bson_strnlen');
+  bson_ascii_strtoll := GetProcAddress(Fbson2Lib,'bson_ascii_strtoll');
+  bson_strcasecmp := GetProcAddress(Fbson2Lib,'bson_strcasecmp');
+  bson_isspace := GetProcAddress(Fbson2Lib,'bson_isspace');
+  bson_utf8_validate := GetProcAddress(Fbson2Lib,'bson_utf8_validate');
+  bson_utf8_escape_for_json := GetProcAddress(Fbson2Lib,'bson_utf8_escape_for_json');
+  bson_utf8_get_char := GetProcAddress(Fbson2Lib,'bson_utf8_get_char');
+  bson_utf8_next_char := GetProcAddress(Fbson2Lib,'bson_utf8_next_char');
+  bson_utf8_from_unichar := GetProcAddress(Fbson2Lib,'bson_utf8_from_unichar');
+  bson_value_copy := GetProcAddress(Fbson2Lib,'bson_value_copy');
+  bson_value_destroy := GetProcAddress(Fbson2Lib,'bson_value_destroy');
+  bson_get_major_version := GetProcAddress(Fbson2Lib,'bson_get_major_version');
+  bson_get_minor_version := GetProcAddress(Fbson2Lib,'bson_get_minor_version');
+  bson_get_micro_version := GetProcAddress(Fbson2Lib,'bson_get_micro_version');
+  bson_get_version := GetProcAddress(Fbson2Lib,'bson_get_version');
+  bson_check_version := GetProcAddress(Fbson2Lib,'bson_check_version');
+  bcon_append := GetProcAddress(Fbson2Lib,'bcon_append');
+  bcon_append_ctx := GetProcAddress(Fbson2Lib,'bcon_append_ctx');
+  bcon_append_ctx_va := GetProcAddress(Fbson2Lib,'bcon_append_ctx_va');
+  bcon_append_ctx_init := GetProcAddress(Fbson2Lib,'bcon_append_ctx_init');
+  bcon_extract_ctx_init := GetProcAddress(Fbson2Lib,'bcon_extract_ctx_init');
+  bcon_extract_ctx := GetProcAddress(Fbson2Lib,'bcon_extract_ctx');
+  bcon_extract_ctx_va := GetProcAddress(Fbson2Lib,'bcon_extract_ctx_va');
+  bcon_extract := GetProcAddress(Fbson2Lib,'bcon_extract');
+  bcon_new := GetProcAddress(Fbson2Lib,'bcon_new');
+  bson_bcon_magic := GetProcAddress(Fbson2Lib,'bson_bcon_magic');
+  bson_bcone_magic := GetProcAddress(Fbson2Lib,'bson_bcone_magic');
+  bson_reader_new_from_handle := GetProcAddress(Fbson2Lib,'bson_reader_new_from_handle');
+  bson_reader_new_from_fd := GetProcAddress(Fbson2Lib,'bson_reader_new_from_fd');
+  bson_reader_new_from_file := GetProcAddress(Fbson2Lib,'bson_reader_new_from_file');
+  bson_reader_new_from_data := GetProcAddress(Fbson2Lib,'bson_reader_new_from_data');
+  bson_reader_destroy := GetProcAddress(Fbson2Lib,'bson_reader_destroy');
+  bson_reader_set_read_func := GetProcAddress(Fbson2Lib,'bson_reader_set_read_func');
+  bson_reader_set_destroy_func := GetProcAddress(Fbson2Lib,'bson_reader_set_destroy_func');
+  bson_reader_read := GetProcAddress(Fbson2Lib,'bson_reader_read');
+  bson_reader_tell := GetProcAddress(Fbson2Lib,'bson_reader_tell');
+  bson_reader_reset := GetProcAddress(Fbson2Lib,'bson_reader_reset');
+  bson_oid_compare := GetProcAddress(Fbson2Lib,'bson_oid_compare');
+  bson_oid_copy := GetProcAddress(Fbson2Lib,'bson_oid_copy');
+  bson_oid_equal := GetProcAddress(Fbson2Lib,'bson_oid_equal');
+  bson_oid_is_valid := GetProcAddress(Fbson2Lib,'bson_oid_is_valid');
+  bson_oid_get_time_t := GetProcAddress(Fbson2Lib,'bson_oid_get_time_t');
+  bson_oid_hash := GetProcAddress(Fbson2Lib,'bson_oid_hash');
+  bson_oid_init := GetProcAddress(Fbson2Lib,'bson_oid_init');
+  bson_oid_init_from_data := GetProcAddress(Fbson2Lib,'bson_oid_init_from_data');
+  bson_oid_init_from_string := GetProcAddress(Fbson2Lib,'bson_oid_init_from_string');
+  bson_oid_to_string := GetProcAddress(Fbson2Lib,'bson_oid_to_string');
+  bson_iter_value := GetProcAddress(Fbson2Lib,'bson_iter_value');
+  bson_iter_array := GetProcAddress(Fbson2Lib,'bson_iter_array');
+  bson_iter_binary := GetProcAddress(Fbson2Lib,'bson_iter_binary');
+  bson_iter_overwrite_binary := GetProcAddress(Fbson2Lib,'bson_iter_overwrite_binary');
+  bson_iter_binary_subtype := GetProcAddress(Fbson2Lib,'bson_iter_binary_subtype');
+  bson_iter_binary_equal := GetProcAddress(Fbson2Lib,'bson_iter_binary_equal');
+  bson_iter_code := GetProcAddress(Fbson2Lib,'bson_iter_code');
+  bson_iter_codewscope := GetProcAddress(Fbson2Lib,'bson_iter_codewscope');
+  bson_iter_dbpointer := GetProcAddress(Fbson2Lib,'bson_iter_dbpointer');
+  bson_iter_document := GetProcAddress(Fbson2Lib,'bson_iter_document');
+  bson_iter_double := GetProcAddress(Fbson2Lib,'bson_iter_double');
+  bson_iter_as_double := GetProcAddress(Fbson2Lib,'bson_iter_as_double');
+  bson_iter_init := GetProcAddress(Fbson2Lib,'bson_iter_init');
+  bson_iter_init_from_data := GetProcAddress(Fbson2Lib,'bson_iter_init_from_data');
+  bson_iter_init_find := GetProcAddress(Fbson2Lib,'bson_iter_init_find');
+  bson_iter_init_find_w_len := GetProcAddress(Fbson2Lib,'bson_iter_init_find_w_len');
+  bson_iter_init_find_case := GetProcAddress(Fbson2Lib,'bson_iter_init_find_case');
+  bson_iter_init_from_data_at_offset := GetProcAddress(Fbson2Lib,'bson_iter_init_from_data_at_offset');
+  bson_iter_int32 := GetProcAddress(Fbson2Lib,'bson_iter_int32');
+  bson_iter_int64 := GetProcAddress(Fbson2Lib,'bson_iter_int64');
+  bson_iter_as_int64 := GetProcAddress(Fbson2Lib,'bson_iter_as_int64');
+  bson_iter_find := GetProcAddress(Fbson2Lib,'bson_iter_find');
+  bson_iter_find_w_len := GetProcAddress(Fbson2Lib,'bson_iter_find_w_len');
+  bson_iter_find_case := GetProcAddress(Fbson2Lib,'bson_iter_find_case');
+  bson_iter_find_descendant := GetProcAddress(Fbson2Lib,'bson_iter_find_descendant');
+  bson_iter_next := GetProcAddress(Fbson2Lib,'bson_iter_next');
+  bson_iter_oid := GetProcAddress(Fbson2Lib,'bson_iter_oid');
+  bson_iter_decimal128 := GetProcAddress(Fbson2Lib,'bson_iter_decimal128');
+  bson_iter_key := GetProcAddress(Fbson2Lib,'bson_iter_key');
+  bson_iter_key_len := GetProcAddress(Fbson2Lib,'bson_iter_key_len');
+  bson_iter_utf8 := GetProcAddress(Fbson2Lib,'bson_iter_utf8');
+  bson_iter_dup_utf8 := GetProcAddress(Fbson2Lib,'bson_iter_dup_utf8');
+  bson_iter_date_time := GetProcAddress(Fbson2Lib,'bson_iter_date_time');
+  bson_iter_time_t := GetProcAddress(Fbson2Lib,'bson_iter_time_t');
+  bson_iter_timeval := GetProcAddress(Fbson2Lib,'bson_iter_timeval');
+  bson_iter_timestamp := GetProcAddress(Fbson2Lib,'bson_iter_timestamp');
+  bson_iter_bool := GetProcAddress(Fbson2Lib,'bson_iter_bool');
+  bson_iter_as_bool := GetProcAddress(Fbson2Lib,'bson_iter_as_bool');
+  bson_iter_regex := GetProcAddress(Fbson2Lib,'bson_iter_regex');
+  bson_iter_symbol := GetProcAddress(Fbson2Lib,'bson_iter_symbol');
+  bson_iter_type := GetProcAddress(Fbson2Lib,'bson_iter_type');
+  bson_iter_recurse := GetProcAddress(Fbson2Lib,'bson_iter_recurse');
+  bson_iter_overwrite_int32 := GetProcAddress(Fbson2Lib,'bson_iter_overwrite_int32');
+  bson_iter_overwrite_int64 := GetProcAddress(Fbson2Lib,'bson_iter_overwrite_int64');
+  bson_iter_overwrite_double := GetProcAddress(Fbson2Lib,'bson_iter_overwrite_double');
+  bson_iter_overwrite_decimal128 := GetProcAddress(Fbson2Lib,'bson_iter_overwrite_decimal128');
+  bson_iter_overwrite_bool := GetProcAddress(Fbson2Lib,'bson_iter_overwrite_bool');
+  bson_iter_overwrite_oid := GetProcAddress(Fbson2Lib,'bson_iter_overwrite_oid');
+  bson_iter_overwrite_timestamp := GetProcAddress(Fbson2Lib,'bson_iter_overwrite_timestamp');
+  bson_iter_overwrite_date_time := GetProcAddress(Fbson2Lib,'bson_iter_overwrite_date_time');
+  bson_iter_visit_all := GetProcAddress(Fbson2Lib,'bson_iter_visit_all');
+  bson_iter_offset := GetProcAddress(Fbson2Lib,'bson_iter_offset');
+  bson_vector_int8_view_init := GetProcAddress(Fbson2Lib,'bson_vector_int8_view_init');
+  bson_vector_int8_const_view_init := GetProcAddress(Fbson2Lib,'bson_vector_int8_const_view_init');
+  bson_vector_float32_view_init := GetProcAddress(Fbson2Lib,'bson_vector_float32_view_init');
+  bson_vector_float32_const_view_init := GetProcAddress(Fbson2Lib,'bson_vector_float32_const_view_init');
+  bson_vector_packed_bit_view_init := GetProcAddress(Fbson2Lib,'bson_vector_packed_bit_view_init');
+  bson_vector_packed_bit_const_view_init := GetProcAddress(Fbson2Lib,'bson_vector_packed_bit_const_view_init');
+  bson_vector_int8_view_from_iter := GetProcAddress(Fbson2Lib,'bson_vector_int8_view_from_iter');
+  bson_vector_int8_const_view_from_iter := GetProcAddress(Fbson2Lib,'bson_vector_int8_const_view_from_iter');
+  bson_vector_float32_view_from_iter := GetProcAddress(Fbson2Lib,'bson_vector_float32_view_from_iter');
+  bson_vector_float32_const_view_from_iter := GetProcAddress(Fbson2Lib,'bson_vector_float32_const_view_from_iter');
+  bson_vector_packed_bit_view_from_iter := GetProcAddress(Fbson2Lib,'bson_vector_packed_bit_view_from_iter');
+  bson_vector_packed_bit_const_view_from_iter := GetProcAddress(Fbson2Lib,'bson_vector_packed_bit_const_view_from_iter');
+  bson_array_builder_append_vector_int8_elements := GetProcAddress(Fbson2Lib,'bson_array_builder_append_vector_int8_elements');
+  bson_array_builder_append_vector_float32_elements := GetProcAddress(Fbson2Lib,'bson_array_builder_append_vector_float32_elements');
+  bson_array_builder_append_vector_packed_bit_elements := GetProcAddress(Fbson2Lib,'bson_array_builder_append_vector_packed_bit_elements');
+  bson_array_builder_append_vector_elements := GetProcAddress(Fbson2Lib,'bson_array_builder_append_vector_elements');
+  bson_append_vector_int8_uninit := GetProcAddress(Fbson2Lib,'bson_append_vector_int8_uninit');
+  bson_append_vector_float32_uninit := GetProcAddress(Fbson2Lib,'bson_append_vector_float32_uninit');
+  bson_append_vector_packed_bit_uninit := GetProcAddress(Fbson2Lib,'bson_append_vector_packed_bit_uninit');
+  bson_append_vector_int8_from_array := GetProcAddress(Fbson2Lib,'bson_append_vector_int8_from_array');
+  bson_append_vector_float32_from_array := GetProcAddress(Fbson2Lib,'bson_append_vector_float32_from_array');
+  bson_append_vector_packed_bit_from_array := GetProcAddress(Fbson2Lib,'bson_append_vector_packed_bit_from_array');
+  bson_append_array_from_vector_int8 := GetProcAddress(Fbson2Lib,'bson_append_array_from_vector_int8');
+  bson_append_array_from_vector_float32 := GetProcAddress(Fbson2Lib,'bson_append_array_from_vector_float32');
+  bson_append_array_from_vector_packed_bit := GetProcAddress(Fbson2Lib,'bson_append_array_from_vector_packed_bit');
+  bson_new := GetProcAddress(Fbson2Lib,'bson_new');
+  bson_new_from_json := GetProcAddress(Fbson2Lib,'bson_new_from_json');
+  bson_init_from_json := GetProcAddress(Fbson2Lib,'bson_init_from_json');
+  bson_init_static := GetProcAddress(Fbson2Lib,'bson_init_static');
+  bson_init := GetProcAddress(Fbson2Lib,'bson_init');
+  bson_reinit := GetProcAddress(Fbson2Lib,'bson_reinit');
+  bson_new_from_data := GetProcAddress(Fbson2Lib,'bson_new_from_data');
+  bson_new_from_buffer := GetProcAddress(Fbson2Lib,'bson_new_from_buffer');
+  bson_sized_new := GetProcAddress(Fbson2Lib,'bson_sized_new');
+  bson_copy := GetProcAddress(Fbson2Lib,'bson_copy');
+  bson_copy_to := GetProcAddress(Fbson2Lib,'bson_copy_to');
+  bson_copy_to_excluding_noinit := GetProcAddress(Fbson2Lib,'bson_copy_to_excluding_noinit');
+  bson_copy_to_excluding_noinit_va := GetProcAddress(Fbson2Lib,'bson_copy_to_excluding_noinit_va');
+  bson_destroy := GetProcAddress(Fbson2Lib,'bson_destroy');
+  bson_reserve_buffer := GetProcAddress(Fbson2Lib,'bson_reserve_buffer');
+  bson_steal := GetProcAddress(Fbson2Lib,'bson_steal');
+  bson_destroy_with_steal := GetProcAddress(Fbson2Lib,'bson_destroy_with_steal');
+  bson_get_data := GetProcAddress(Fbson2Lib,'bson_get_data');
+  bson_count_keys := GetProcAddress(Fbson2Lib,'bson_count_keys');
+  bson_has_field := GetProcAddress(Fbson2Lib,'bson_has_field');
+  bson_compare := GetProcAddress(Fbson2Lib,'bson_compare');
+  bson_equal := GetProcAddress(Fbson2Lib,'bson_equal');
+  bson_validate := GetProcAddress(Fbson2Lib,'bson_validate');
+  bson_validate_with_error := GetProcAddress(Fbson2Lib,'bson_validate_with_error');
+  bson_validate_with_error_and_offset := GetProcAddress(Fbson2Lib,'bson_validate_with_error_and_offset');
+  bson_as_json_with_opts := GetProcAddress(Fbson2Lib,'bson_as_json_with_opts');
+  bson_as_canonical_extended_json := GetProcAddress(Fbson2Lib,'bson_as_canonical_extended_json');
+  bson_as_legacy_extended_json := GetProcAddress(Fbson2Lib,'bson_as_legacy_extended_json');
+  bson_as_relaxed_extended_json := GetProcAddress(Fbson2Lib,'bson_as_relaxed_extended_json');
+  bson_array_as_legacy_extended_json := GetProcAddress(Fbson2Lib,'bson_array_as_legacy_extended_json');
+  bson_array_as_relaxed_extended_json := GetProcAddress(Fbson2Lib,'bson_array_as_relaxed_extended_json');
+  bson_array_as_canonical_extended_json := GetProcAddress(Fbson2Lib,'bson_array_as_canonical_extended_json');
+  bson_array_builder_new := GetProcAddress(Fbson2Lib,'bson_array_builder_new');
+  bson_array_builder_build := GetProcAddress(Fbson2Lib,'bson_array_builder_build');
+  bson_array_builder_destroy := GetProcAddress(Fbson2Lib,'bson_array_builder_destroy');
+  bson_append_value := GetProcAddress(Fbson2Lib,'bson_append_value');
+  bson_array_builder_append_value := GetProcAddress(Fbson2Lib,'bson_array_builder_append_value');
+  bson_append_array := GetProcAddress(Fbson2Lib,'bson_append_array');
+  bson_array_builder_append_array := GetProcAddress(Fbson2Lib,'bson_array_builder_append_array');
+  bson_append_array_from_vector := GetProcAddress(Fbson2Lib,'bson_append_array_from_vector');
+  bson_array_builder_append_array_from_vector := GetProcAddress(Fbson2Lib,'bson_array_builder_append_array_from_vector');
+  bson_append_binary := GetProcAddress(Fbson2Lib,'bson_append_binary');
+  bson_array_builder_append_binary := GetProcAddress(Fbson2Lib,'bson_array_builder_append_binary');
+  bson_append_binary_uninit := GetProcAddress(Fbson2Lib,'bson_append_binary_uninit');
+  bson_array_builder_append_binary_uninit := GetProcAddress(Fbson2Lib,'bson_array_builder_append_binary_uninit');
+  bson_append_bool := GetProcAddress(Fbson2Lib,'bson_append_bool');
+  bson_array_builder_append_bool := GetProcAddress(Fbson2Lib,'bson_array_builder_append_bool');
+  bson_append_code := GetProcAddress(Fbson2Lib,'bson_append_code');
+  bson_array_builder_append_code := GetProcAddress(Fbson2Lib,'bson_array_builder_append_code');
+  bson_append_code_with_scope := GetProcAddress(Fbson2Lib,'bson_append_code_with_scope');
+  bson_array_builder_append_code_with_scope := GetProcAddress(Fbson2Lib,'bson_array_builder_append_code_with_scope');
+  bson_append_dbpointer := GetProcAddress(Fbson2Lib,'bson_append_dbpointer');
+  bson_array_builder_append_dbpointer := GetProcAddress(Fbson2Lib,'bson_array_builder_append_dbpointer');
+  bson_append_double := GetProcAddress(Fbson2Lib,'bson_append_double');
+  bson_array_builder_append_double := GetProcAddress(Fbson2Lib,'bson_array_builder_append_double');
+  bson_append_document := GetProcAddress(Fbson2Lib,'bson_append_document');
+  bson_array_builder_append_document := GetProcAddress(Fbson2Lib,'bson_array_builder_append_document');
+  bson_append_document_begin := GetProcAddress(Fbson2Lib,'bson_append_document_begin');
+  bson_array_builder_append_document_begin := GetProcAddress(Fbson2Lib,'bson_array_builder_append_document_begin');
+  bson_append_document_end := GetProcAddress(Fbson2Lib,'bson_append_document_end');
+  bson_array_builder_append_document_end := GetProcAddress(Fbson2Lib,'bson_array_builder_append_document_end');
+  bson_append_array_begin := GetProcAddress(Fbson2Lib,'bson_append_array_begin');
+  bson_append_array_end := GetProcAddress(Fbson2Lib,'bson_append_array_end');
+  bson_append_int32 := GetProcAddress(Fbson2Lib,'bson_append_int32');
+  bson_array_builder_append_int32 := GetProcAddress(Fbson2Lib,'bson_array_builder_append_int32');
+  bson_append_int64 := GetProcAddress(Fbson2Lib,'bson_append_int64');
+  bson_array_builder_append_int64 := GetProcAddress(Fbson2Lib,'bson_array_builder_append_int64');
+  bson_append_decimal128 := GetProcAddress(Fbson2Lib,'bson_append_decimal128');
+  bson_array_builder_append_decimal128 := GetProcAddress(Fbson2Lib,'bson_array_builder_append_decimal128');
+  bson_append_iter := GetProcAddress(Fbson2Lib,'bson_append_iter');
+  bson_array_builder_append_iter := GetProcAddress(Fbson2Lib,'bson_array_builder_append_iter');
+  bson_append_minkey := GetProcAddress(Fbson2Lib,'bson_append_minkey');
+  bson_array_builder_append_minkey := GetProcAddress(Fbson2Lib,'bson_array_builder_append_minkey');
+  bson_append_maxkey := GetProcAddress(Fbson2Lib,'bson_append_maxkey');
+  bson_array_builder_append_maxkey := GetProcAddress(Fbson2Lib,'bson_array_builder_append_maxkey');
+  bson_append_null := GetProcAddress(Fbson2Lib,'bson_append_null');
+  bson_array_builder_append_null := GetProcAddress(Fbson2Lib,'bson_array_builder_append_null');
+  bson_append_oid := GetProcAddress(Fbson2Lib,'bson_append_oid');
+  bson_array_builder_append_oid := GetProcAddress(Fbson2Lib,'bson_array_builder_append_oid');
+  bson_append_regex := GetProcAddress(Fbson2Lib,'bson_append_regex');
+  bson_array_builder_append_regex := GetProcAddress(Fbson2Lib,'bson_array_builder_append_regex');
+  bson_append_regex_w_len := GetProcAddress(Fbson2Lib,'bson_append_regex_w_len');
+  bson_array_builder_append_regex_w_len := GetProcAddress(Fbson2Lib,'bson_array_builder_append_regex_w_len');
+  bson_append_utf8 := GetProcAddress(Fbson2Lib,'bson_append_utf8');
+  bson_array_builder_append_utf8 := GetProcAddress(Fbson2Lib,'bson_array_builder_append_utf8');
+  bson_append_symbol := GetProcAddress(Fbson2Lib,'bson_append_symbol');
+  bson_array_builder_append_symbol := GetProcAddress(Fbson2Lib,'bson_array_builder_append_symbol');
+  bson_append_time_t := GetProcAddress(Fbson2Lib,'bson_append_time_t');
+  bson_array_builder_append_time_t := GetProcAddress(Fbson2Lib,'bson_array_builder_append_time_t');
+  bson_append_timeval := GetProcAddress(Fbson2Lib,'bson_append_timeval');
+  bson_array_builder_append_timeval := GetProcAddress(Fbson2Lib,'bson_array_builder_append_timeval');
+  bson_append_date_time := GetProcAddress(Fbson2Lib,'bson_append_date_time');
+  bson_array_builder_append_date_time := GetProcAddress(Fbson2Lib,'bson_array_builder_append_date_time');
+  bson_append_now_utc := GetProcAddress(Fbson2Lib,'bson_append_now_utc');
+  bson_array_builder_append_now_utc := GetProcAddress(Fbson2Lib,'bson_array_builder_append_now_utc');
+  bson_append_timestamp := GetProcAddress(Fbson2Lib,'bson_append_timestamp');
+  bson_array_builder_append_timestamp := GetProcAddress(Fbson2Lib,'bson_array_builder_append_timestamp');
+  bson_append_undefined := GetProcAddress(Fbson2Lib,'bson_append_undefined');
+  bson_array_builder_append_undefined := GetProcAddress(Fbson2Lib,'bson_array_builder_append_undefined');
+  bson_concat := GetProcAddress(Fbson2Lib,'bson_concat');
+  bson_append_array_builder_begin := GetProcAddress(Fbson2Lib,'bson_append_array_builder_begin');
+  bson_array_builder_append_array_builder_begin := GetProcAddress(Fbson2Lib,'bson_array_builder_append_array_builder_begin');
+  bson_append_array_builder_end := GetProcAddress(Fbson2Lib,'bson_append_array_builder_end');
+  bson_array_builder_append_array_builder_end := GetProcAddress(Fbson2Lib,'bson_array_builder_append_array_builder_end');
+  mongoc_write_concern_new := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_new');
+  mongoc_write_concern_copy := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_copy');
+  mongoc_write_concern_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_destroy');
+  mongoc_write_concern_get_journal := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_get_journal');
+  mongoc_write_concern_journal_is_set := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_journal_is_set');
+  mongoc_write_concern_set_journal := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_set_journal');
+  mongoc_write_concern_get_w := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_get_w');
+  mongoc_write_concern_set_w := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_set_w');
+  mongoc_write_concern_get_wtag := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_get_wtag');
+  mongoc_write_concern_set_wtag := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_set_wtag');
+  mongoc_write_concern_get_wtimeout := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_get_wtimeout');
+  mongoc_write_concern_get_wtimeout_int64 := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_get_wtimeout_int64');
+  mongoc_write_concern_set_wtimeout := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_set_wtimeout');
+  mongoc_write_concern_set_wtimeout_int64 := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_set_wtimeout_int64');
+  mongoc_write_concern_get_wmajority := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_get_wmajority');
+  mongoc_write_concern_set_wmajority := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_set_wmajority');
+  mongoc_write_concern_is_acknowledged := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_is_acknowledged');
+  mongoc_write_concern_is_valid := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_is_valid');
+  mongoc_write_concern_append := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_append');
+  mongoc_write_concern_is_default := GetProcAddress(Fmongoc2Lib,'mongoc_write_concern_is_default');
+  mongoc_read_concern_new := GetProcAddress(Fmongoc2Lib,'mongoc_read_concern_new');
+  mongoc_read_concern_copy := GetProcAddress(Fmongoc2Lib,'mongoc_read_concern_copy');
+  mongoc_read_concern_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_read_concern_destroy');
+  mongoc_read_concern_get_level := GetProcAddress(Fmongoc2Lib,'mongoc_read_concern_get_level');
+  mongoc_read_concern_set_level := GetProcAddress(Fmongoc2Lib,'mongoc_read_concern_set_level');
+  mongoc_read_concern_append := GetProcAddress(Fmongoc2Lib,'mongoc_read_concern_append');
+  mongoc_read_concern_is_default := GetProcAddress(Fmongoc2Lib,'mongoc_read_concern_is_default');
+  mongoc_optional_init := GetProcAddress(Fmongoc2Lib,'mongoc_optional_init');
+  mongoc_optional_is_set := GetProcAddress(Fmongoc2Lib,'mongoc_optional_is_set');
+  mongoc_optional_value := GetProcAddress(Fmongoc2Lib,'mongoc_optional_value');
+  mongoc_optional_set_value := GetProcAddress(Fmongoc2Lib,'mongoc_optional_set_value');
+  mongoc_optional_copy := GetProcAddress(Fmongoc2Lib,'mongoc_optional_copy');
+  mongoc_error_has_label := GetProcAddress(Fmongoc2Lib,'mongoc_error_has_label');
+  mongoc_find_and_modify_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_new');
+  mongoc_find_and_modify_opts_set_sort := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_set_sort');
+  mongoc_find_and_modify_opts_get_sort := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_get_sort');
+  mongoc_find_and_modify_opts_set_update := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_set_update');
+  mongoc_find_and_modify_opts_get_update := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_get_update');
+  mongoc_find_and_modify_opts_set_fields := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_set_fields');
+  mongoc_find_and_modify_opts_get_fields := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_get_fields');
+  mongoc_find_and_modify_opts_set_flags := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_set_flags');
+  mongoc_find_and_modify_opts_get_flags := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_get_flags');
+  mongoc_find_and_modify_opts_set_bypass_document_validation := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_set_bypass_document_validation');
+  mongoc_find_and_modify_opts_get_bypass_document_validation := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_get_bypass_document_validation');
+  mongoc_find_and_modify_opts_set_max_time_ms := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_set_max_time_ms');
+  mongoc_find_and_modify_opts_get_max_time_ms := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_get_max_time_ms');
+  mongoc_find_and_modify_opts_append := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_append');
+  mongoc_find_and_modify_opts_get_extra := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_get_extra');
+  mongoc_find_and_modify_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_find_and_modify_opts_destroy');
+  mongoc_handshake_data_append := GetProcAddress(Fmongoc2Lib,'mongoc_handshake_data_append');
+  mongoc_init := GetProcAddress(Fmongoc2Lib,'mongoc_init');
+  mongoc_cleanup := GetProcAddress(Fmongoc2Lib,'mongoc_cleanup');
+  mongoc_log_set_handler := GetProcAddress(Fmongoc2Lib,'mongoc_log_set_handler');
+  mongoc_log := GetProcAddress(Fmongoc2Lib,'mongoc_log');
+  mongoc_log_default_handler := GetProcAddress(Fmongoc2Lib,'mongoc_log_default_handler');
+  mongoc_log_level_str := GetProcAddress(Fmongoc2Lib,'mongoc_log_level_str');
+  mongoc_log_trace_enable := GetProcAddress(Fmongoc2Lib,'mongoc_log_trace_enable');
+  mongoc_log_trace_disable := GetProcAddress(Fmongoc2Lib,'mongoc_log_trace_disable');
+  mongoc_oidc_callback_new := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_callback_new');
+  mongoc_oidc_callback_new_with_user_data := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_callback_new_with_user_data');
+  mongoc_oidc_callback_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_callback_destroy');
+  mongoc_oidc_callback_get_fn := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_callback_get_fn');
+  mongoc_oidc_callback_get_user_data := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_callback_get_user_data');
+  mongoc_oidc_callback_set_user_data := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_callback_set_user_data');
+  mongoc_oidc_callback_params_get_version := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_callback_params_get_version');
+  mongoc_oidc_callback_params_get_user_data := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_callback_params_get_user_data');
+  mongoc_oidc_callback_params_get_timeout := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_callback_params_get_timeout');
+  mongoc_oidc_callback_params_get_username := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_callback_params_get_username');
+  mongoc_oidc_callback_params_cancel_with_timeout := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_callback_params_cancel_with_timeout');
+  mongoc_oidc_credential_new := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_credential_new');
+  mongoc_oidc_credential_new_with_expires_in := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_credential_new_with_expires_in');
+  mongoc_oidc_credential_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_credential_destroy');
+  mongoc_oidc_credential_get_access_token := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_credential_get_access_token');
+  mongoc_oidc_credential_get_expires_in := GetProcAddress(Fmongoc2Lib,'mongoc_oidc_credential_get_expires_in');
+  mongoc_rand_seed := GetProcAddress(Fmongoc2Lib,'mongoc_rand_seed');
+  mongoc_rand_add := GetProcAddress(Fmongoc2Lib,'mongoc_rand_add');
+  mongoc_rand_status := GetProcAddress(Fmongoc2Lib,'mongoc_rand_status');
+  mongoc_read_prefs_new := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_new');
+  mongoc_read_prefs_copy := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_copy');
+  mongoc_read_prefs_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_destroy');
+  mongoc_read_prefs_get_mode := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_get_mode');
+  mongoc_read_prefs_set_mode := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_set_mode');
+  mongoc_read_prefs_get_tags := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_get_tags');
+  mongoc_read_prefs_set_tags := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_set_tags');
+  mongoc_read_prefs_add_tag := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_add_tag');
+  mongoc_read_prefs_get_max_staleness_seconds := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_get_max_staleness_seconds');
+  mongoc_read_prefs_set_max_staleness_seconds := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_set_max_staleness_seconds');
+  mongoc_read_prefs_get_hedge := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_get_hedge');
+  mongoc_read_prefs_set_hedge := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_set_hedge');
+  mongoc_read_prefs_is_valid := GetProcAddress(Fmongoc2Lib,'mongoc_read_prefs_is_valid');
+  mongoc_server_api_version_to_string := GetProcAddress(Fmongoc2Lib,'mongoc_server_api_version_to_string');
+  mongoc_server_api_version_from_string := GetProcAddress(Fmongoc2Lib,'mongoc_server_api_version_from_string');
+  mongoc_server_api_new := GetProcAddress(Fmongoc2Lib,'mongoc_server_api_new');
+  mongoc_server_api_copy := GetProcAddress(Fmongoc2Lib,'mongoc_server_api_copy');
+  mongoc_server_api_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_server_api_destroy');
+  mongoc_server_api_strict := GetProcAddress(Fmongoc2Lib,'mongoc_server_api_strict');
+  mongoc_server_api_deprecation_errors := GetProcAddress(Fmongoc2Lib,'mongoc_server_api_deprecation_errors');
+  mongoc_server_api_get_deprecation_errors := GetProcAddress(Fmongoc2Lib,'mongoc_server_api_get_deprecation_errors');
+  mongoc_server_api_get_strict := GetProcAddress(Fmongoc2Lib,'mongoc_server_api_get_strict');
+  mongoc_server_api_get_version := GetProcAddress(Fmongoc2Lib,'mongoc_server_api_get_version');
+  mongoc_server_description_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_server_description_destroy');
+  mongoc_server_description_new_copy := GetProcAddress(Fmongoc2Lib,'mongoc_server_description_new_copy');
+  mongoc_server_description_id := GetProcAddress(Fmongoc2Lib,'mongoc_server_description_id');
+  mongoc_server_description_host := GetProcAddress(Fmongoc2Lib,'mongoc_server_description_host');
+  mongoc_server_description_last_update_time := GetProcAddress(Fmongoc2Lib,'mongoc_server_description_last_update_time');
+  mongoc_server_description_round_trip_time := GetProcAddress(Fmongoc2Lib,'mongoc_server_description_round_trip_time');
+  mongoc_server_description_type := GetProcAddress(Fmongoc2Lib,'mongoc_server_description_type');
+  mongoc_server_description_hello_response := GetProcAddress(Fmongoc2Lib,'mongoc_server_description_hello_response');
+  mongoc_server_description_compressor_id := GetProcAddress(Fmongoc2Lib,'mongoc_server_description_compressor_id');
+  mongoc_ssl_opt_get_default := GetProcAddress(Fmongoc2Lib,'mongoc_ssl_opt_get_default');
+  mongoc_socket_accept := GetProcAddress(Fmongoc2Lib,'mongoc_socket_accept');
+  mongoc_socket_bind := GetProcAddress(Fmongoc2Lib,'mongoc_socket_bind');
+  mongoc_socket_close := GetProcAddress(Fmongoc2Lib,'mongoc_socket_close');
+  mongoc_socket_connect := GetProcAddress(Fmongoc2Lib,'mongoc_socket_connect');
+  mongoc_socket_getnameinfo := GetProcAddress(Fmongoc2Lib,'mongoc_socket_getnameinfo');
+  mongoc_socket_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_socket_destroy');
+  mongoc_socket_errno := GetProcAddress(Fmongoc2Lib,'mongoc_socket_errno');
+  mongoc_socket_getsockname := GetProcAddress(Fmongoc2Lib,'mongoc_socket_getsockname');
+  mongoc_socket_listen := GetProcAddress(Fmongoc2Lib,'mongoc_socket_listen');
+  mongoc_socket_new := GetProcAddress(Fmongoc2Lib,'mongoc_socket_new');
+  mongoc_socket_recv := GetProcAddress(Fmongoc2Lib,'mongoc_socket_recv');
+  mongoc_socket_setsockopt := GetProcAddress(Fmongoc2Lib,'mongoc_socket_setsockopt');
+  mongoc_socket_send := GetProcAddress(Fmongoc2Lib,'mongoc_socket_send');
+  mongoc_socket_sendv := GetProcAddress(Fmongoc2Lib,'mongoc_socket_sendv');
+  mongoc_socket_check_closed := GetProcAddress(Fmongoc2Lib,'mongoc_socket_check_closed');
+  mongoc_socket_inet_ntop := GetProcAddress(Fmongoc2Lib,'mongoc_socket_inet_ntop');
+  mongoc_socket_poll := GetProcAddress(Fmongoc2Lib,'mongoc_socket_poll');
+  mongoc_stream_get_base_stream := GetProcAddress(Fmongoc2Lib,'mongoc_stream_get_base_stream');
+  mongoc_stream_get_tls_stream := GetProcAddress(Fmongoc2Lib,'mongoc_stream_get_tls_stream');
+  mongoc_stream_close := GetProcAddress(Fmongoc2Lib,'mongoc_stream_close');
+  mongoc_stream_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_stream_destroy');
+  mongoc_stream_failed := GetProcAddress(Fmongoc2Lib,'mongoc_stream_failed');
+  mongoc_stream_flush := GetProcAddress(Fmongoc2Lib,'mongoc_stream_flush');
+  mongoc_stream_writev := GetProcAddress(Fmongoc2Lib,'mongoc_stream_writev');
+  mongoc_stream_write := GetProcAddress(Fmongoc2Lib,'mongoc_stream_write');
+  mongoc_stream_readv := GetProcAddress(Fmongoc2Lib,'mongoc_stream_readv');
+  mongoc_stream_read := GetProcAddress(Fmongoc2Lib,'mongoc_stream_read');
+  mongoc_stream_setsockopt := GetProcAddress(Fmongoc2Lib,'mongoc_stream_setsockopt');
+  mongoc_stream_check_closed := GetProcAddress(Fmongoc2Lib,'mongoc_stream_check_closed');
+  mongoc_stream_timed_out := GetProcAddress(Fmongoc2Lib,'mongoc_stream_timed_out');
+  mongoc_stream_should_retry := GetProcAddress(Fmongoc2Lib,'mongoc_stream_should_retry');
+  mongoc_stream_poll := GetProcAddress(Fmongoc2Lib,'mongoc_stream_poll');
+  mongoc_stream_buffered_new := GetProcAddress(Fmongoc2Lib,'mongoc_stream_buffered_new');
+  mongoc_stream_file_new := GetProcAddress(Fmongoc2Lib,'mongoc_stream_file_new');
+  mongoc_stream_file_new_for_path := GetProcAddress(Fmongoc2Lib,'mongoc_stream_file_new_for_path');
+  mongoc_stream_file_get_fd := GetProcAddress(Fmongoc2Lib,'mongoc_stream_file_get_fd');
+  mongoc_stream_socket_new := GetProcAddress(Fmongoc2Lib,'mongoc_stream_socket_new');
+  mongoc_stream_socket_get_socket := GetProcAddress(Fmongoc2Lib,'mongoc_stream_socket_get_socket');
+  mongoc_structured_log_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_opts_new');
+  mongoc_structured_log_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_opts_destroy');
+  mongoc_structured_log_opts_set_handler := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_opts_set_handler');
+  mongoc_structured_log_opts_set_max_level_for_component := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_opts_set_max_level_for_component');
+  mongoc_structured_log_opts_set_max_level_for_all_components := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_opts_set_max_level_for_all_components');
+  mongoc_structured_log_opts_set_max_levels_from_env := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_opts_set_max_levels_from_env');
+  mongoc_structured_log_opts_get_max_level_for_component := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_opts_get_max_level_for_component');
+  mongoc_structured_log_opts_get_max_document_length := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_opts_get_max_document_length');
+  mongoc_structured_log_opts_set_max_document_length_from_env := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_opts_set_max_document_length_from_env');
+  mongoc_structured_log_opts_set_max_document_length := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_opts_set_max_document_length');
+  mongoc_structured_log_entry_message_as_bson := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_entry_message_as_bson');
+  mongoc_structured_log_entry_get_level := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_entry_get_level');
+  mongoc_structured_log_entry_get_component := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_entry_get_component');
+  mongoc_structured_log_entry_get_message_string := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_entry_get_message_string');
+  mongoc_structured_log_get_level_name := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_get_level_name');
+  mongoc_structured_log_get_named_level := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_get_named_level');
+  mongoc_structured_log_get_component_name := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_get_component_name');
+  mongoc_structured_log_get_named_component := GetProcAddress(Fmongoc2Lib,'mongoc_structured_log_get_named_component');
+  mongoc_get_major_version := GetProcAddress(Fmongoc2Lib,'mongoc_get_major_version');
+  mongoc_get_minor_version := GetProcAddress(Fmongoc2Lib,'mongoc_get_minor_version');
+  mongoc_get_micro_version := GetProcAddress(Fmongoc2Lib,'mongoc_get_micro_version');
+  mongoc_get_version := GetProcAddress(Fmongoc2Lib,'mongoc_get_version');
+  mongoc_check_version := GetProcAddress(Fmongoc2Lib,'mongoc_check_version');
+  mongoc_cursor_clone := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_clone');
+  mongoc_cursor_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_destroy');
+  mongoc_cursor_more := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_more');
+  mongoc_cursor_next := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_next');
+  mongoc_cursor_error := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_error');
+  mongoc_cursor_error_document := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_error_document');
+  mongoc_cursor_get_host := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_get_host');
+  mongoc_cursor_current := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_current');
+  mongoc_cursor_set_batch_size := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_set_batch_size');
+  mongoc_cursor_get_batch_size := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_get_batch_size');
+  mongoc_cursor_set_limit := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_set_limit');
+  mongoc_cursor_get_limit := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_get_limit');
+  mongoc_cursor_set_server_id := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_set_server_id');
+  mongoc_cursor_get_server_id := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_get_server_id');
+  mongoc_cursor_get_id := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_get_id');
+  mongoc_cursor_set_max_await_time_ms := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_set_max_await_time_ms');
+  mongoc_cursor_get_max_await_time_ms := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_get_max_await_time_ms');
+  mongoc_cursor_new_from_command_reply_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_cursor_new_from_command_reply_with_opts');
+  mongoc_change_stream_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_change_stream_destroy');
+  mongoc_change_stream_get_resume_token := GetProcAddress(Fmongoc2Lib,'mongoc_change_stream_get_resume_token');
+  mongoc_change_stream_next := GetProcAddress(Fmongoc2Lib,'mongoc_change_stream_next');
+  mongoc_change_stream_error_document := GetProcAddress(Fmongoc2Lib,'mongoc_change_stream_error_document');
+  mongoc_bulk_operation_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_destroy');
+  mongoc_bulk_operation_execute := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_execute');
+  mongoc_bulk_operation_insert := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_insert');
+  mongoc_bulk_operation_insert_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_insert_with_opts');
+  mongoc_bulk_operation_remove := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_remove');
+  mongoc_bulk_operation_remove_many_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_remove_many_with_opts');
+  mongoc_bulk_operation_remove_one := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_remove_one');
+  mongoc_bulk_operation_remove_one_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_remove_one_with_opts');
+  mongoc_bulk_operation_replace_one := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_replace_one');
+  mongoc_bulk_operation_replace_one_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_replace_one_with_opts');
+  mongoc_bulk_operation_update := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_update');
+  mongoc_bulk_operation_update_many_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_update_many_with_opts');
+  mongoc_bulk_operation_update_one := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_update_one');
+  mongoc_bulk_operation_update_one_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_update_one_with_opts');
+  mongoc_bulk_operation_set_bypass_document_validation := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_set_bypass_document_validation');
+  mongoc_bulk_operation_set_comment := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_set_comment');
+  mongoc_bulk_operation_set_let := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_set_let');
+  mongoc_bulk_operation_new := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_new');
+  mongoc_bulk_operation_set_write_concern := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_set_write_concern');
+  mongoc_bulk_operation_set_database := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_set_database');
+  mongoc_bulk_operation_set_collection := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_set_collection');
+  mongoc_bulk_operation_set_client := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_set_client');
+  mongoc_bulk_operation_set_client_session := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_set_client_session');
+  mongoc_bulk_operation_set_server_id := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_set_server_id');
+  mongoc_bulk_operation_get_server_id := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_get_server_id');
+  mongoc_bulk_operation_get_write_concern := GetProcAddress(Fmongoc2Lib,'mongoc_bulk_operation_get_write_concern');
+  mongoc_auto_encryption_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_new');
+  mongoc_auto_encryption_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_destroy');
+  mongoc_auto_encryption_opts_set_keyvault_client := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_set_keyvault_client');
+  mongoc_auto_encryption_opts_set_keyvault_client_pool := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_set_keyvault_client_pool');
+  mongoc_auto_encryption_opts_set_keyvault_namespace := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_set_keyvault_namespace');
+  mongoc_auto_encryption_opts_set_kms_providers := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_set_kms_providers');
+  mongoc_auto_encryption_opts_set_key_expiration := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_set_key_expiration');
+  mongoc_auto_encryption_opts_set_tls_opts := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_set_tls_opts');
+  mongoc_auto_encryption_opts_set_schema_map := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_set_schema_map');
+  mongoc_auto_encryption_opts_set_encrypted_fields_map := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_set_encrypted_fields_map');
+  mongoc_auto_encryption_opts_set_bypass_auto_encryption := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_set_bypass_auto_encryption');
+  mongoc_auto_encryption_opts_set_bypass_query_analysis := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_set_bypass_query_analysis');
+  mongoc_auto_encryption_opts_set_extra := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_set_extra');
+  mongoc_auto_encryption_opts_set_kms_credential_provider_callback := GetProcAddress(Fmongoc2Lib,'mongoc_auto_encryption_opts_set_kms_credential_provider_callback');
+  mongoc_client_encryption_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_opts_new');
+  mongoc_client_encryption_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_opts_destroy');
+  mongoc_client_encryption_opts_set_keyvault_client := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_opts_set_keyvault_client');
+  mongoc_client_encryption_opts_set_keyvault_namespace := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_opts_set_keyvault_namespace');
+  mongoc_client_encryption_opts_set_kms_providers := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_opts_set_kms_providers');
+  mongoc_client_encryption_opts_set_tls_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_opts_set_tls_opts');
+  mongoc_client_encryption_opts_set_kms_credential_provider_callback := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_opts_set_kms_credential_provider_callback');
+  mongoc_client_encryption_opts_set_key_expiration := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_opts_set_key_expiration');
+  mongoc_client_encryption_rewrap_many_datakey_result_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_rewrap_many_datakey_result_new');
+  mongoc_client_encryption_rewrap_many_datakey_result_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_rewrap_many_datakey_result_destroy');
+  mongoc_client_encryption_rewrap_many_datakey_result_get_bulk_write_result := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_rewrap_many_datakey_result_get_bulk_write_result');
+  mongoc_client_encryption_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_new');
+  mongoc_client_encryption_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_destroy');
+  mongoc_client_encryption_create_datakey := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_create_datakey');
+  mongoc_client_encryption_rewrap_many_datakey := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_rewrap_many_datakey');
+  mongoc_client_encryption_delete_key := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_delete_key');
+  mongoc_client_encryption_get_key := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_get_key');
+  mongoc_client_encryption_encrypt_text_prefix_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_prefix_opts_new');
+  mongoc_client_encryption_encrypt_text_suffix_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_suffix_opts_new');
+  mongoc_client_encryption_encrypt_text_substring_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_substring_opts_new');
+  mongoc_client_encryption_encrypt_text_prefix_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_prefix_opts_destroy');
+  mongoc_client_encryption_encrypt_text_suffix_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_suffix_opts_destroy');
+  mongoc_client_encryption_encrypt_text_substring_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_substring_opts_destroy');
+  mongoc_client_encryption_encrypt_text_prefix_opts_set_str_max_query_length := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_prefix_opts_set_str_max_query_length');
+  mongoc_client_encryption_encrypt_text_prefix_opts_set_str_min_query_length := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_prefix_opts_set_str_min_query_length');
+  mongoc_client_encryption_encrypt_text_suffix_opts_set_str_max_query_length := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_suffix_opts_set_str_max_query_length');
+  mongoc_client_encryption_encrypt_text_suffix_opts_set_str_min_query_length := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_suffix_opts_set_str_min_query_length');
+  mongoc_client_encryption_encrypt_text_substring_opts_set_str_max_length := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_substring_opts_set_str_max_length');
+  mongoc_client_encryption_encrypt_text_substring_opts_set_str_max_query_length := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_substring_opts_set_str_max_query_length');
+  mongoc_client_encryption_encrypt_text_substring_opts_set_str_min_query_length := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_substring_opts_set_str_min_query_length');
+  mongoc_client_encryption_encrypt_text_opts_set_prefix := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_opts_set_prefix');
+  mongoc_client_encryption_encrypt_text_opts_set_suffix := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_opts_set_suffix');
+  mongoc_client_encryption_encrypt_text_opts_set_substring := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_opts_set_substring');
+  mongoc_client_encryption_encrypt_text_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_opts_new');
+  mongoc_client_encryption_encrypt_text_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_opts_destroy');
+  mongoc_client_encryption_get_keys := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_get_keys');
+  mongoc_client_encryption_add_key_alt_name := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_add_key_alt_name');
+  mongoc_client_encryption_remove_key_alt_name := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_remove_key_alt_name');
+  mongoc_client_encryption_get_key_by_alt_name := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_get_key_by_alt_name');
+  mongoc_client_encryption_encrypt := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt');
+  mongoc_client_encryption_encrypt_expression := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_expression');
+  mongoc_client_encryption_decrypt := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_decrypt');
+  mongoc_client_encryption_encrypt_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_opts_new');
+  mongoc_client_encryption_encrypt_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_opts_destroy');
+  mongoc_client_encryption_encrypt_opts_set_keyid := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_opts_set_keyid');
+  mongoc_client_encryption_encrypt_opts_set_keyaltname := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_opts_set_keyaltname');
+  mongoc_client_encryption_encrypt_opts_set_algorithm := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_opts_set_algorithm');
+  mongoc_client_encryption_encrypt_opts_set_contention_factor := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_opts_set_contention_factor');
+  mongoc_client_encryption_encrypt_opts_set_text_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_opts_set_text_opts');
+  mongoc_client_encryption_encrypt_text_opts_set_case_sensitive := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_opts_set_case_sensitive');
+  mongoc_client_encryption_encrypt_text_opts_set_diacritic_sensitive := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_text_opts_set_diacritic_sensitive');
+  mongoc_client_encryption_encrypt_opts_set_query_type := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_opts_set_query_type');
+  mongoc_client_encryption_encrypt_range_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_range_opts_new');
+  mongoc_client_encryption_encrypt_range_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_range_opts_destroy');
+  mongoc_client_encryption_encrypt_range_opts_set_trim_factor := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_range_opts_set_trim_factor');
+  mongoc_client_encryption_encrypt_range_opts_set_sparsity := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_range_opts_set_sparsity');
+  mongoc_client_encryption_encrypt_range_opts_set_min := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_range_opts_set_min');
+  mongoc_client_encryption_encrypt_range_opts_set_max := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_range_opts_set_max');
+  mongoc_client_encryption_encrypt_range_opts_set_precision := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_range_opts_set_precision');
+  mongoc_client_encryption_encrypt_opts_set_range_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_encrypt_opts_set_range_opts');
+  mongoc_client_encryption_datakey_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_datakey_opts_new');
+  mongoc_client_encryption_datakey_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_datakey_opts_destroy');
+  mongoc_client_encryption_datakey_opts_set_masterkey := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_datakey_opts_set_masterkey');
+  mongoc_client_encryption_datakey_opts_set_keyaltnames := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_datakey_opts_set_keyaltnames');
+  mongoc_client_encryption_datakey_opts_set_keymaterial := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_datakey_opts_set_keymaterial');
+  mongoc_client_encryption_get_crypt_shared_version := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_get_crypt_shared_version');
+  mongoc_client_encryption_create_encrypted_collection := GetProcAddress(Fmongoc2Lib,'mongoc_client_encryption_create_encrypted_collection');
+  mongoc_stream_tls_handshake := GetProcAddress(Fmongoc2Lib,'mongoc_stream_tls_handshake');
+  mongoc_stream_tls_handshake_block := GetProcAddress(Fmongoc2Lib,'mongoc_stream_tls_handshake_block');
+  mongoc_stream_tls_new_with_hostname := GetProcAddress(Fmongoc2Lib,'mongoc_stream_tls_new_with_hostname');
+  mongoc_topology_description_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_topology_description_destroy');
+  mongoc_topology_description_new_copy := GetProcAddress(Fmongoc2Lib,'mongoc_topology_description_new_copy');
+  mongoc_topology_description_has_readable_server := GetProcAddress(Fmongoc2Lib,'mongoc_topology_description_has_readable_server');
+  mongoc_topology_description_has_writable_server := GetProcAddress(Fmongoc2Lib,'mongoc_topology_description_has_writable_server');
+  mongoc_topology_description_type := GetProcAddress(Fmongoc2Lib,'mongoc_topology_description_type');
+  mongoc_topology_description_get_servers := GetProcAddress(Fmongoc2Lib,'mongoc_topology_description_get_servers');
+  mongoc_apm_command_started_get_command := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_started_get_command');
+  mongoc_apm_command_started_get_database_name := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_started_get_database_name');
+  mongoc_apm_command_started_get_command_name := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_started_get_command_name');
+  mongoc_apm_command_started_get_request_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_started_get_request_id');
+  mongoc_apm_command_started_get_operation_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_started_get_operation_id');
+  mongoc_apm_command_started_get_host := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_started_get_host');
+  mongoc_apm_command_started_get_server_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_started_get_server_id');
+  mongoc_apm_command_started_get_service_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_started_get_service_id');
+  mongoc_apm_command_started_get_server_connection_id_int64 := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_started_get_server_connection_id_int64');
+  mongoc_apm_command_started_get_context := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_started_get_context');
+  mongoc_apm_command_succeeded_get_duration := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_succeeded_get_duration');
+  mongoc_apm_command_succeeded_get_reply := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_succeeded_get_reply');
+  mongoc_apm_command_succeeded_get_command_name := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_succeeded_get_command_name');
+  mongoc_apm_command_succeeded_get_database_name := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_succeeded_get_database_name');
+  mongoc_apm_command_succeeded_get_request_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_succeeded_get_request_id');
+  mongoc_apm_command_succeeded_get_operation_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_succeeded_get_operation_id');
+  mongoc_apm_command_succeeded_get_host := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_succeeded_get_host');
+  mongoc_apm_command_succeeded_get_server_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_succeeded_get_server_id');
+  mongoc_apm_command_succeeded_get_service_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_succeeded_get_service_id');
+  mongoc_apm_command_succeeded_get_server_connection_id_int64 := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_succeeded_get_server_connection_id_int64');
+  mongoc_apm_command_succeeded_get_context := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_succeeded_get_context');
+  mongoc_apm_command_failed_get_duration := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_failed_get_duration');
+  mongoc_apm_command_failed_get_command_name := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_failed_get_command_name');
+  mongoc_apm_command_failed_get_database_name := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_failed_get_database_name');
+  mongoc_apm_command_failed_get_error := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_failed_get_error');
+  mongoc_apm_command_failed_get_reply := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_failed_get_reply');
+  mongoc_apm_command_failed_get_request_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_failed_get_request_id');
+  mongoc_apm_command_failed_get_operation_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_failed_get_operation_id');
+  mongoc_apm_command_failed_get_host := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_failed_get_host');
+  mongoc_apm_command_failed_get_server_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_failed_get_server_id');
+  mongoc_apm_command_failed_get_service_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_failed_get_service_id');
+  mongoc_apm_command_failed_get_server_connection_id_int64 := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_failed_get_server_connection_id_int64');
+  mongoc_apm_command_failed_get_context := GetProcAddress(Fmongoc2Lib,'mongoc_apm_command_failed_get_context');
+  mongoc_apm_server_changed_get_host := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_changed_get_host');
+  mongoc_apm_server_changed_get_topology_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_changed_get_topology_id');
+  mongoc_apm_server_changed_get_previous_description := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_changed_get_previous_description');
+  mongoc_apm_server_changed_get_new_description := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_changed_get_new_description');
+  mongoc_apm_server_changed_get_context := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_changed_get_context');
+  mongoc_apm_server_opening_get_host := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_opening_get_host');
+  mongoc_apm_server_opening_get_topology_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_opening_get_topology_id');
+  mongoc_apm_server_opening_get_context := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_opening_get_context');
+  mongoc_apm_server_closed_get_host := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_closed_get_host');
+  mongoc_apm_server_closed_get_topology_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_closed_get_topology_id');
+  mongoc_apm_server_closed_get_context := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_closed_get_context');
+  mongoc_apm_topology_changed_get_topology_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_topology_changed_get_topology_id');
+  mongoc_apm_topology_changed_get_previous_description := GetProcAddress(Fmongoc2Lib,'mongoc_apm_topology_changed_get_previous_description');
+  mongoc_apm_topology_changed_get_new_description := GetProcAddress(Fmongoc2Lib,'mongoc_apm_topology_changed_get_new_description');
+  mongoc_apm_topology_changed_get_context := GetProcAddress(Fmongoc2Lib,'mongoc_apm_topology_changed_get_context');
+  mongoc_apm_topology_opening_get_topology_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_topology_opening_get_topology_id');
+  mongoc_apm_topology_opening_get_context := GetProcAddress(Fmongoc2Lib,'mongoc_apm_topology_opening_get_context');
+  mongoc_apm_topology_closed_get_topology_id := GetProcAddress(Fmongoc2Lib,'mongoc_apm_topology_closed_get_topology_id');
+  mongoc_apm_topology_closed_get_context := GetProcAddress(Fmongoc2Lib,'mongoc_apm_topology_closed_get_context');
+  mongoc_apm_server_heartbeat_started_get_host := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_started_get_host');
+  mongoc_apm_server_heartbeat_started_get_context := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_started_get_context');
+  mongoc_apm_server_heartbeat_started_get_awaited := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_started_get_awaited');
+  mongoc_apm_server_heartbeat_succeeded_get_duration := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_succeeded_get_duration');
+  mongoc_apm_server_heartbeat_succeeded_get_reply := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_succeeded_get_reply');
+  mongoc_apm_server_heartbeat_succeeded_get_host := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_succeeded_get_host');
+  mongoc_apm_server_heartbeat_succeeded_get_context := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_succeeded_get_context');
+  mongoc_apm_server_heartbeat_succeeded_get_awaited := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_succeeded_get_awaited');
+  mongoc_apm_server_heartbeat_failed_get_duration := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_failed_get_duration');
+  mongoc_apm_server_heartbeat_failed_get_error := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_failed_get_error');
+  mongoc_apm_server_heartbeat_failed_get_host := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_failed_get_host');
+  mongoc_apm_server_heartbeat_failed_get_context := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_failed_get_context');
+  mongoc_apm_server_heartbeat_failed_get_awaited := GetProcAddress(Fmongoc2Lib,'mongoc_apm_server_heartbeat_failed_get_awaited');
+  mongoc_apm_callbacks_new := GetProcAddress(Fmongoc2Lib,'mongoc_apm_callbacks_new');
+  mongoc_apm_callbacks_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_apm_callbacks_destroy');
+  mongoc_apm_set_command_started_cb := GetProcAddress(Fmongoc2Lib,'mongoc_apm_set_command_started_cb');
+  mongoc_apm_set_command_succeeded_cb := GetProcAddress(Fmongoc2Lib,'mongoc_apm_set_command_succeeded_cb');
+  mongoc_apm_set_command_failed_cb := GetProcAddress(Fmongoc2Lib,'mongoc_apm_set_command_failed_cb');
+  mongoc_apm_set_server_changed_cb := GetProcAddress(Fmongoc2Lib,'mongoc_apm_set_server_changed_cb');
+  mongoc_apm_set_server_opening_cb := GetProcAddress(Fmongoc2Lib,'mongoc_apm_set_server_opening_cb');
+  mongoc_apm_set_server_closed_cb := GetProcAddress(Fmongoc2Lib,'mongoc_apm_set_server_closed_cb');
+  mongoc_apm_set_topology_changed_cb := GetProcAddress(Fmongoc2Lib,'mongoc_apm_set_topology_changed_cb');
+  mongoc_apm_set_topology_opening_cb := GetProcAddress(Fmongoc2Lib,'mongoc_apm_set_topology_opening_cb');
+  mongoc_apm_set_topology_closed_cb := GetProcAddress(Fmongoc2Lib,'mongoc_apm_set_topology_closed_cb');
+  mongoc_apm_set_server_heartbeat_started_cb := GetProcAddress(Fmongoc2Lib,'mongoc_apm_set_server_heartbeat_started_cb');
+  mongoc_apm_set_server_heartbeat_succeeded_cb := GetProcAddress(Fmongoc2Lib,'mongoc_apm_set_server_heartbeat_succeeded_cb');
+  mongoc_apm_set_server_heartbeat_failed_cb := GetProcAddress(Fmongoc2Lib,'mongoc_apm_set_server_heartbeat_failed_cb');
+  mongoc_uri_copy := GetProcAddress(Fmongoc2Lib,'mongoc_uri_copy');
+  mongoc_uri_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_uri_destroy');
+  mongoc_uri_new := GetProcAddress(Fmongoc2Lib,'mongoc_uri_new');
+  mongoc_uri_new_with_error := GetProcAddress(Fmongoc2Lib,'mongoc_uri_new_with_error');
+  mongoc_uri_new_for_host_port := GetProcAddress(Fmongoc2Lib,'mongoc_uri_new_for_host_port');
+  mongoc_uri_get_hosts := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_hosts');
+  mongoc_uri_get_srv_hostname := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_srv_hostname');
+  mongoc_uri_get_srv_service_name := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_srv_service_name');
+  mongoc_uri_get_database := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_database');
+  mongoc_uri_set_database := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_database');
+  mongoc_uri_get_compressors := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_compressors');
+  mongoc_uri_get_options := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_options');
+  mongoc_uri_get_password := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_password');
+  mongoc_uri_set_password := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_password');
+  mongoc_uri_has_option := GetProcAddress(Fmongoc2Lib,'mongoc_uri_has_option');
+  mongoc_uri_option_is_int32 := GetProcAddress(Fmongoc2Lib,'mongoc_uri_option_is_int32');
+  mongoc_uri_option_is_int64 := GetProcAddress(Fmongoc2Lib,'mongoc_uri_option_is_int64');
+  mongoc_uri_option_is_bool := GetProcAddress(Fmongoc2Lib,'mongoc_uri_option_is_bool');
+  mongoc_uri_option_is_utf8 := GetProcAddress(Fmongoc2Lib,'mongoc_uri_option_is_utf8');
+  mongoc_uri_get_option_as_int32 := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_option_as_int32');
+  mongoc_uri_get_option_as_int64 := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_option_as_int64');
+  mongoc_uri_get_option_as_bool := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_option_as_bool');
+  mongoc_uri_get_option_as_utf8 := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_option_as_utf8');
+  mongoc_uri_set_option_as_int32 := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_option_as_int32');
+  mongoc_uri_set_option_as_int64 := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_option_as_int64');
+  mongoc_uri_set_option_as_bool := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_option_as_bool');
+  mongoc_uri_set_option_as_utf8 := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_option_as_utf8');
+  mongoc_uri_get_replica_set := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_replica_set');
+  mongoc_uri_get_string := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_string');
+  mongoc_uri_get_username := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_username');
+  mongoc_uri_set_username := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_username');
+  mongoc_uri_get_credentials := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_credentials');
+  mongoc_uri_get_auth_source := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_auth_source');
+  mongoc_uri_set_auth_source := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_auth_source');
+  mongoc_uri_get_appname := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_appname');
+  mongoc_uri_set_appname := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_appname');
+  mongoc_uri_set_compressors := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_compressors');
+  mongoc_uri_get_auth_mechanism := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_auth_mechanism');
+  mongoc_uri_set_auth_mechanism := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_auth_mechanism');
+  mongoc_uri_get_mechanism_properties := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_mechanism_properties');
+  mongoc_uri_set_mechanism_properties := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_mechanism_properties');
+  mongoc_uri_get_tls := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_tls');
+  mongoc_uri_unescape := GetProcAddress(Fmongoc2Lib,'mongoc_uri_unescape');
+  mongoc_uri_get_read_prefs_t := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_read_prefs_t');
+  mongoc_uri_set_read_prefs_t := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_read_prefs_t');
+  mongoc_uri_get_write_concern := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_write_concern');
+  mongoc_uri_set_write_concern := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_write_concern');
+  mongoc_uri_get_read_concern := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_read_concern');
+  mongoc_uri_set_read_concern := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_read_concern');
+  mongoc_uri_get_server_monitoring_mode := GetProcAddress(Fmongoc2Lib,'mongoc_uri_get_server_monitoring_mode');
+  mongoc_uri_set_server_monitoring_mode := GetProcAddress(Fmongoc2Lib,'mongoc_uri_set_server_monitoring_mode');
+  mongoc_collection_aggregate := GetProcAddress(Fmongoc2Lib,'mongoc_collection_aggregate');
+  mongoc_collection_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_collection_destroy');
+  mongoc_collection_copy := GetProcAddress(Fmongoc2Lib,'mongoc_collection_copy');
+  mongoc_collection_read_command_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_collection_read_command_with_opts');
+  mongoc_collection_write_command_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_collection_write_command_with_opts');
+  mongoc_collection_read_write_command_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_collection_read_write_command_with_opts');
+  mongoc_collection_command_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_collection_command_with_opts');
+  mongoc_collection_command_simple := GetProcAddress(Fmongoc2Lib,'mongoc_collection_command_simple');
+  mongoc_collection_drop := GetProcAddress(Fmongoc2Lib,'mongoc_collection_drop');
+  mongoc_collection_drop_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_collection_drop_with_opts');
+  mongoc_collection_drop_index := GetProcAddress(Fmongoc2Lib,'mongoc_collection_drop_index');
+  mongoc_collection_drop_index_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_collection_drop_index_with_opts');
+  mongoc_collection_find_indexes_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_collection_find_indexes_with_opts');
+  mongoc_index_model_new := GetProcAddress(Fmongoc2Lib,'mongoc_index_model_new');
+  mongoc_index_model_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_index_model_destroy');
+  mongoc_collection_create_indexes_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_collection_create_indexes_with_opts');
+  mongoc_collection_find_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_collection_find_with_opts');
+  mongoc_collection_insert := GetProcAddress(Fmongoc2Lib,'mongoc_collection_insert');
+  mongoc_collection_insert_one := GetProcAddress(Fmongoc2Lib,'mongoc_collection_insert_one');
+  mongoc_collection_insert_many := GetProcAddress(Fmongoc2Lib,'mongoc_collection_insert_many');
+  mongoc_collection_update := GetProcAddress(Fmongoc2Lib,'mongoc_collection_update');
+  mongoc_collection_update_one := GetProcAddress(Fmongoc2Lib,'mongoc_collection_update_one');
+  mongoc_collection_update_many := GetProcAddress(Fmongoc2Lib,'mongoc_collection_update_many');
+  mongoc_collection_replace_one := GetProcAddress(Fmongoc2Lib,'mongoc_collection_replace_one');
+  mongoc_collection_remove := GetProcAddress(Fmongoc2Lib,'mongoc_collection_remove');
+  mongoc_collection_delete_one := GetProcAddress(Fmongoc2Lib,'mongoc_collection_delete_one');
+  mongoc_collection_delete_many := GetProcAddress(Fmongoc2Lib,'mongoc_collection_delete_many');
+  mongoc_collection_rename := GetProcAddress(Fmongoc2Lib,'mongoc_collection_rename');
+  mongoc_collection_rename_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_collection_rename_with_opts');
+  mongoc_collection_find_and_modify_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_collection_find_and_modify_with_opts');
+  mongoc_collection_find_and_modify := GetProcAddress(Fmongoc2Lib,'mongoc_collection_find_and_modify');
+  mongoc_collection_create_bulk_operation_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_collection_create_bulk_operation_with_opts');
+  mongoc_collection_get_read_prefs := GetProcAddress(Fmongoc2Lib,'mongoc_collection_get_read_prefs');
+  mongoc_collection_set_read_prefs := GetProcAddress(Fmongoc2Lib,'mongoc_collection_set_read_prefs');
+  mongoc_collection_get_read_concern := GetProcAddress(Fmongoc2Lib,'mongoc_collection_get_read_concern');
+  mongoc_collection_set_read_concern := GetProcAddress(Fmongoc2Lib,'mongoc_collection_set_read_concern');
+  mongoc_collection_get_write_concern := GetProcAddress(Fmongoc2Lib,'mongoc_collection_get_write_concern');
+  mongoc_collection_set_write_concern := GetProcAddress(Fmongoc2Lib,'mongoc_collection_set_write_concern');
+  mongoc_collection_get_name := GetProcAddress(Fmongoc2Lib,'mongoc_collection_get_name');
+  mongoc_collection_keys_to_index_string := GetProcAddress(Fmongoc2Lib,'mongoc_collection_keys_to_index_string');
+  mongoc_collection_watch := GetProcAddress(Fmongoc2Lib,'mongoc_collection_watch');
+  mongoc_collection_count_documents := GetProcAddress(Fmongoc2Lib,'mongoc_collection_count_documents');
+  mongoc_collection_estimated_document_count := GetProcAddress(Fmongoc2Lib,'mongoc_collection_estimated_document_count');
+  mongoc_database_get_name := GetProcAddress(Fmongoc2Lib,'mongoc_database_get_name');
+  mongoc_database_remove_user := GetProcAddress(Fmongoc2Lib,'mongoc_database_remove_user');
+  mongoc_database_remove_all_users := GetProcAddress(Fmongoc2Lib,'mongoc_database_remove_all_users');
+  mongoc_database_add_user := GetProcAddress(Fmongoc2Lib,'mongoc_database_add_user');
+  mongoc_database_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_database_destroy');
+  mongoc_database_aggregate := GetProcAddress(Fmongoc2Lib,'mongoc_database_aggregate');
+  mongoc_database_copy := GetProcAddress(Fmongoc2Lib,'mongoc_database_copy');
+  mongoc_database_read_command_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_database_read_command_with_opts');
+  mongoc_database_write_command_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_database_write_command_with_opts');
+  mongoc_database_read_write_command_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_database_read_write_command_with_opts');
+  mongoc_database_command_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_database_command_with_opts');
+  mongoc_database_command_simple := GetProcAddress(Fmongoc2Lib,'mongoc_database_command_simple');
+  mongoc_database_drop := GetProcAddress(Fmongoc2Lib,'mongoc_database_drop');
+  mongoc_database_drop_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_database_drop_with_opts');
+  mongoc_database_has_collection := GetProcAddress(Fmongoc2Lib,'mongoc_database_has_collection');
+  mongoc_database_create_collection := GetProcAddress(Fmongoc2Lib,'mongoc_database_create_collection');
+  mongoc_database_get_read_prefs := GetProcAddress(Fmongoc2Lib,'mongoc_database_get_read_prefs');
+  mongoc_database_set_read_prefs := GetProcAddress(Fmongoc2Lib,'mongoc_database_set_read_prefs');
+  mongoc_database_get_write_concern := GetProcAddress(Fmongoc2Lib,'mongoc_database_get_write_concern');
+  mongoc_database_set_write_concern := GetProcAddress(Fmongoc2Lib,'mongoc_database_set_write_concern');
+  mongoc_database_get_read_concern := GetProcAddress(Fmongoc2Lib,'mongoc_database_get_read_concern');
+  mongoc_database_set_read_concern := GetProcAddress(Fmongoc2Lib,'mongoc_database_set_read_concern');
+  mongoc_database_find_collections_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_database_find_collections_with_opts');
+  mongoc_database_get_collection_names_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_database_get_collection_names_with_opts');
+  mongoc_database_get_collection := GetProcAddress(Fmongoc2Lib,'mongoc_database_get_collection');
+  mongoc_database_watch := GetProcAddress(Fmongoc2Lib,'mongoc_database_watch');
+  mongoc_gridfs_file_get_id := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_get_id');
+  mongoc_gridfs_file_get_length := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_get_length');
+  mongoc_gridfs_file_get_chunk_size := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_get_chunk_size');
+  mongoc_gridfs_file_get_upload_date := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_get_upload_date');
+  mongoc_gridfs_file_writev := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_writev');
+  mongoc_gridfs_file_readv := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_readv');
+  mongoc_gridfs_file_seek := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_seek');
+  mongoc_gridfs_file_tell := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_tell');
+  mongoc_gridfs_file_set_id := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_set_id');
+  mongoc_gridfs_file_save := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_save');
+  mongoc_gridfs_file_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_destroy');
+  mongoc_gridfs_file_error := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_error');
+  mongoc_gridfs_file_remove := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_remove');
+  mongoc_gridfs_file_list_next := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_list_next');
+  mongoc_gridfs_file_list_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_list_destroy');
+  mongoc_gridfs_file_list_error := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_file_list_error');
+  mongoc_gridfs_bucket_new := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_bucket_new');
+  mongoc_gridfs_bucket_open_upload_stream := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_bucket_open_upload_stream');
+  mongoc_gridfs_bucket_open_upload_stream_with_id := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_bucket_open_upload_stream_with_id');
+  mongoc_gridfs_bucket_upload_from_stream := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_bucket_upload_from_stream');
+  mongoc_gridfs_bucket_upload_from_stream_with_id := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_bucket_upload_from_stream_with_id');
+  mongoc_gridfs_bucket_open_download_stream := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_bucket_open_download_stream');
+  mongoc_gridfs_bucket_download_to_stream := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_bucket_download_to_stream');
+  mongoc_gridfs_bucket_delete_by_id := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_bucket_delete_by_id');
+  mongoc_gridfs_bucket_find := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_bucket_find');
+  mongoc_gridfs_bucket_stream_error := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_bucket_stream_error');
+  mongoc_gridfs_bucket_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_bucket_destroy');
+  mongoc_gridfs_bucket_abort_upload := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_bucket_abort_upload');
+  mongoc_gridfs_create_file_from_stream := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_create_file_from_stream');
+  mongoc_gridfs_create_file := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_create_file');
+  mongoc_gridfs_find_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_find_with_opts');
+  mongoc_gridfs_find_one_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_find_one_with_opts');
+  mongoc_gridfs_find_one_by_filename := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_find_one_by_filename');
+  mongoc_gridfs_drop := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_drop');
+  mongoc_gridfs_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_destroy');
+  mongoc_gridfs_get_files := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_get_files');
+  mongoc_gridfs_get_chunks := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_get_chunks');
+  mongoc_gridfs_remove_by_filename := GetProcAddress(Fmongoc2Lib,'mongoc_gridfs_remove_by_filename');
+  mongoc_stream_gridfs_new := GetProcAddress(Fmongoc2Lib,'mongoc_stream_gridfs_new');
+  mongoc_client_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_new');
+  mongoc_client_new_from_uri := GetProcAddress(Fmongoc2Lib,'mongoc_client_new_from_uri');
+  mongoc_client_new_from_uri_with_error := GetProcAddress(Fmongoc2Lib,'mongoc_client_new_from_uri_with_error');
+  mongoc_client_set_sockettimeoutms := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_sockettimeoutms');
+  mongoc_client_get_uri := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_uri');
+  mongoc_client_set_stream_initiator := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_stream_initiator');
+  mongoc_client_command_simple := GetProcAddress(Fmongoc2Lib,'mongoc_client_command_simple');
+  mongoc_client_read_command_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_read_command_with_opts');
+  mongoc_client_write_command_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_write_command_with_opts');
+  mongoc_client_read_write_command_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_read_write_command_with_opts');
+  mongoc_client_command_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_command_with_opts');
+  mongoc_client_command_simple_with_server_id := GetProcAddress(Fmongoc2Lib,'mongoc_client_command_simple_with_server_id');
+  mongoc_client_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_destroy');
+  mongoc_client_start_session := GetProcAddress(Fmongoc2Lib,'mongoc_client_start_session');
+  mongoc_client_get_database := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_database');
+  mongoc_client_get_default_database := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_default_database');
+  mongoc_client_get_gridfs := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_gridfs');
+  mongoc_client_get_collection := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_collection');
+  mongoc_client_get_database_names := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_database_names');
+  mongoc_client_get_database_names_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_database_names_with_opts');
+  mongoc_client_find_databases := GetProcAddress(Fmongoc2Lib,'mongoc_client_find_databases');
+  mongoc_client_find_databases_with_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_find_databases_with_opts');
+  mongoc_client_get_write_concern := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_write_concern');
+  mongoc_client_set_write_concern := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_write_concern');
+  mongoc_client_get_read_concern := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_read_concern');
+  mongoc_client_set_read_concern := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_read_concern');
+  mongoc_client_get_read_prefs := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_read_prefs');
+  mongoc_client_set_read_prefs := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_read_prefs');
+  mongoc_client_set_ssl_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_ssl_opts');
+  mongoc_client_set_apm_callbacks := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_apm_callbacks');
+  mongoc_client_set_structured_log_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_structured_log_opts');
+  mongoc_client_get_server_description := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_server_description');
+  mongoc_client_get_server_descriptions := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_server_descriptions');
+  mongoc_server_descriptions_destroy_all := GetProcAddress(Fmongoc2Lib,'mongoc_server_descriptions_destroy_all');
+  mongoc_client_select_server := GetProcAddress(Fmongoc2Lib,'mongoc_client_select_server');
+  mongoc_client_set_error_api := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_error_api');
+  mongoc_client_set_appname := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_appname');
+  mongoc_client_watch := GetProcAddress(Fmongoc2Lib,'mongoc_client_watch');
+  mongoc_client_reset := GetProcAddress(Fmongoc2Lib,'mongoc_client_reset');
+  mongoc_client_enable_auto_encryption := GetProcAddress(Fmongoc2Lib,'mongoc_client_enable_auto_encryption');
+  mongoc_client_get_crypt_shared_version := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_crypt_shared_version');
+  mongoc_client_set_server_api := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_server_api');
+  mongoc_client_get_handshake_description := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_handshake_description');
+  mongoc_client_set_oidc_callback := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_oidc_callback');
+  mongoc_client_pool_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_new');
+  mongoc_client_pool_new_with_error := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_new_with_error');
+  mongoc_client_pool_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_destroy');
+  mongoc_client_pool_pop := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_pop');
+  mongoc_client_pool_push := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_push');
+  mongoc_client_pool_try_pop := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_try_pop');
+  mongoc_client_pool_max_size := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_max_size');
+  mongoc_client_pool_set_ssl_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_set_ssl_opts');
+  mongoc_client_pool_set_apm_callbacks := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_set_apm_callbacks');
+  mongoc_client_pool_set_error_api := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_set_error_api');
+  mongoc_client_pool_set_appname := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_set_appname');
+  mongoc_client_pool_enable_auto_encryption := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_enable_auto_encryption');
+  mongoc_client_pool_set_server_api := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_set_server_api');
+  mongoc_client_pool_set_structured_log_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_set_structured_log_opts');
+  mongoc_client_pool_set_oidc_callback := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_set_oidc_callback');
+  mongoc_transaction_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_new');
+  mongoc_transaction_opts_clone := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_clone');
+  mongoc_transaction_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_destroy');
+  mongoc_transaction_opts_set_max_commit_time_ms := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_set_max_commit_time_ms');
+  mongoc_transaction_opts_get_max_commit_time_ms := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_get_max_commit_time_ms');
+  mongoc_transaction_opts_set_read_concern := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_set_read_concern');
+  mongoc_transaction_opts_get_read_concern := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_get_read_concern');
+  mongoc_transaction_opts_set_write_concern := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_set_write_concern');
+  mongoc_transaction_opts_get_write_concern := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_get_write_concern');
+  mongoc_transaction_opts_set_read_prefs := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_set_read_prefs');
+  mongoc_transaction_opts_get_read_prefs := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_get_read_prefs');
+  mongoc_session_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_session_opts_new');
+  mongoc_session_opts_set_causal_consistency := GetProcAddress(Fmongoc2Lib,'mongoc_session_opts_set_causal_consistency');
+  mongoc_session_opts_get_causal_consistency := GetProcAddress(Fmongoc2Lib,'mongoc_session_opts_get_causal_consistency');
+  mongoc_session_opts_set_snapshot := GetProcAddress(Fmongoc2Lib,'mongoc_session_opts_set_snapshot');
+  mongoc_session_opts_get_snapshot := GetProcAddress(Fmongoc2Lib,'mongoc_session_opts_get_snapshot');
+  mongoc_session_opts_set_default_transaction_opts := GetProcAddress(Fmongoc2Lib,'mongoc_session_opts_set_default_transaction_opts');
+  mongoc_session_opts_get_default_transaction_opts := GetProcAddress(Fmongoc2Lib,'mongoc_session_opts_get_default_transaction_opts');
+  mongoc_session_opts_get_transaction_opts := GetProcAddress(Fmongoc2Lib,'mongoc_session_opts_get_transaction_opts');
+  mongoc_session_opts_clone := GetProcAddress(Fmongoc2Lib,'mongoc_session_opts_clone');
+  mongoc_session_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_session_opts_destroy');
+  mongoc_client_session_get_client := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_get_client');
+  mongoc_client_session_get_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_get_opts');
+  mongoc_client_session_get_lsid := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_get_lsid');
+  mongoc_client_session_get_cluster_time := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_get_cluster_time');
+  mongoc_client_session_advance_cluster_time := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_advance_cluster_time');
+  mongoc_client_session_get_operation_time := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_get_operation_time');
+  mongoc_client_session_get_server_id := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_get_server_id');
+  mongoc_client_session_advance_operation_time := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_advance_operation_time');
+  mongoc_client_session_with_transaction := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_with_transaction');
+  mongoc_client_session_start_transaction := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_start_transaction');
+  mongoc_client_session_in_transaction := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_in_transaction');
+  mongoc_client_session_get_transaction_state := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_get_transaction_state');
+  mongoc_client_session_commit_transaction := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_commit_transaction');
+  mongoc_client_session_abort_transaction := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_abort_transaction');
+  mongoc_client_session_append := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_append');
+  mongoc_client_session_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_destroy');
+  mongoc_client_session_get_dirty := GetProcAddress(Fmongoc2Lib,'mongoc_client_session_get_dirty');
+  mongoc_bulkwriteopts_new := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteopts_new');
+  mongoc_bulkwriteopts_set_ordered := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteopts_set_ordered');
+  mongoc_bulkwriteopts_set_bypassdocumentvalidation := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteopts_set_bypassdocumentvalidation');
+  mongoc_bulkwriteopts_set_let := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteopts_set_let');
+  mongoc_bulkwriteopts_set_writeconcern := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteopts_set_writeconcern');
+  mongoc_bulkwriteopts_set_comment := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteopts_set_comment');
+  mongoc_bulkwriteopts_set_verboseresults := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteopts_set_verboseresults');
+  mongoc_bulkwriteopts_set_extra := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteopts_set_extra');
+  mongoc_bulkwriteopts_set_serverid := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteopts_set_serverid');
+  mongoc_bulkwriteopts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteopts_destroy');
+  mongoc_bulkwriteresult_insertedcount := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteresult_insertedcount');
+  mongoc_bulkwriteresult_upsertedcount := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteresult_upsertedcount');
+  mongoc_bulkwriteresult_matchedcount := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteresult_matchedcount');
+  mongoc_bulkwriteresult_modifiedcount := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteresult_modifiedcount');
+  mongoc_bulkwriteresult_deletedcount := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteresult_deletedcount');
+  mongoc_bulkwriteresult_insertresults := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteresult_insertresults');
+  mongoc_bulkwriteresult_updateresults := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteresult_updateresults');
+  mongoc_bulkwriteresult_deleteresults := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteresult_deleteresults');
+  mongoc_bulkwriteresult_serverid := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteresult_serverid');
+  mongoc_bulkwriteresult_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteresult_destroy');
+  mongoc_bulkwriteexception_error := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteexception_error');
+  mongoc_bulkwriteexception_writeerrors := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteexception_writeerrors');
+  mongoc_bulkwriteexception_writeconcernerrors := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteexception_writeconcernerrors');
+  mongoc_bulkwriteexception_errorreply := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteexception_errorreply');
+  mongoc_bulkwriteexception_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwriteexception_destroy');
+  mongoc_client_bulkwrite_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_bulkwrite_new');
+  mongoc_bulkwrite_insertoneopts_new := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_insertoneopts_new');
+  mongoc_bulkwrite_insertoneopts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_insertoneopts_destroy');
+  mongoc_bulkwrite_append_insertone := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_append_insertone');
+  mongoc_bulkwrite_updateoneopts_new := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updateoneopts_new');
+  mongoc_bulkwrite_updateoneopts_set_arrayfilters := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updateoneopts_set_arrayfilters');
+  mongoc_bulkwrite_updateoneopts_set_collation := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updateoneopts_set_collation');
+  mongoc_bulkwrite_updateoneopts_set_hint := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updateoneopts_set_hint');
+  mongoc_bulkwrite_updateoneopts_set_upsert := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updateoneopts_set_upsert');
+  mongoc_bulkwrite_updateoneopts_set_sort := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updateoneopts_set_sort');
+  mongoc_bulkwrite_updateoneopts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updateoneopts_destroy');
+  mongoc_bulkwrite_append_updateone := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_append_updateone');
+  mongoc_bulkwrite_updatemanyopts_new := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updatemanyopts_new');
+  mongoc_bulkwrite_updatemanyopts_set_arrayfilters := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updatemanyopts_set_arrayfilters');
+  mongoc_bulkwrite_updatemanyopts_set_collation := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updatemanyopts_set_collation');
+  mongoc_bulkwrite_updatemanyopts_set_hint := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updatemanyopts_set_hint');
+  mongoc_bulkwrite_updatemanyopts_set_upsert := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updatemanyopts_set_upsert');
+  mongoc_bulkwrite_updatemanyopts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_updatemanyopts_destroy');
+  mongoc_bulkwrite_append_updatemany := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_append_updatemany');
+  mongoc_bulkwrite_replaceoneopts_new := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_replaceoneopts_new');
+  mongoc_bulkwrite_replaceoneopts_set_collation := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_replaceoneopts_set_collation');
+  mongoc_bulkwrite_replaceoneopts_set_hint := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_replaceoneopts_set_hint');
+  mongoc_bulkwrite_replaceoneopts_set_upsert := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_replaceoneopts_set_upsert');
+  mongoc_bulkwrite_replaceoneopts_set_sort := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_replaceoneopts_set_sort');
+  mongoc_bulkwrite_replaceoneopts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_replaceoneopts_destroy');
+  mongoc_bulkwrite_append_replaceone := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_append_replaceone');
+  mongoc_bulkwrite_deleteoneopts_new := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_deleteoneopts_new');
+  mongoc_bulkwrite_deleteoneopts_set_collation := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_deleteoneopts_set_collation');
+  mongoc_bulkwrite_deleteoneopts_set_hint := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_deleteoneopts_set_hint');
+  mongoc_bulkwrite_deleteoneopts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_deleteoneopts_destroy');
+  mongoc_bulkwrite_append_deleteone := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_append_deleteone');
+  mongoc_bulkwrite_deletemanyopts_new := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_deletemanyopts_new');
+  mongoc_bulkwrite_deletemanyopts_set_collation := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_deletemanyopts_set_collation');
+  mongoc_bulkwrite_deletemanyopts_set_hint := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_deletemanyopts_set_hint');
+  mongoc_bulkwrite_deletemanyopts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_deletemanyopts_destroy');
+  mongoc_bulkwrite_append_deletemany := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_append_deletemany');
+  mongoc_bulkwrite_new := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_new');
+  mongoc_bulkwrite_set_client := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_set_client');
+  mongoc_bulkwrite_set_session := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_set_session');
+  mongoc_bulkwrite_execute := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_execute');
+  mongoc_bulkwrite_check_acknowledged := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_check_acknowledged');
+  mongoc_bulkwrite_serverid := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_serverid');
+  mongoc_bulkwrite_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_bulkwrite_destroy');
+  mongoc_client_set_usleep_impl := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_usleep_impl');
+  mongoc_usleep_default_impl := GetProcAddress(Fmongoc2Lib,'mongoc_usleep_default_impl');
+
+  mongoc_init;
+
+end;
+
+{***********************************}
+destructor TALMongoDBLibrary.Destroy;
+begin
+
+  mongoc_cleanup;
+
+  if (Fbson2Lib <> 0) and
+     (not FreeLibrary(Fbson2Lib)) then
+    raiseLastOsError;
+
+  if (Fmongoc2Lib <> 0) and
+     (not FreeLibrary(Fmongoc2Lib)) then
+    raiseLastOsError;
+
+  inherited Destroy;
+
+end;
+
+{**************************************************************************************************}
+procedure bson_set_error(error: Pbson_error_t; domain: uint32_t; code: uint32_t; format: PAnsiChar);
+begin
+  ALMongoDBLibrary.bson_set_error(error, domain, code, format);
+end;
+
+{*************************************************************************************}
+function bson_strerror_r(err_code: Integer; buf: PAnsiChar; buflen: size_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_strerror_r(err_code, buf, buflen);
+end;
+
+{********************************************************}
+procedure bson_mem_set_vtable(vtable: Pbson_mem_vtable_t);
+begin
+  ALMongoDBLibrary.bson_mem_set_vtable(vtable);
+end;
+
+{**********************************}
+procedure bson_mem_restore_vtable();
+begin
+  ALMongoDBLibrary.bson_mem_restore_vtable();
+end;
+
+{*********************************************}
+function bson_malloc(num_bytes: size_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.bson_malloc(num_bytes);
+end;
+
+{**********************************************}
+function bson_malloc0(num_bytes: size_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.bson_malloc0(num_bytes);
+end;
+
+{***********************************************************************}
+function bson_aligned_alloc(alignment: size_t; num_bytes: size_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.bson_aligned_alloc(alignment, num_bytes);
+end;
+
+{************************************************************************}
+function bson_aligned_alloc0(alignment: size_t; num_bytes: size_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.bson_aligned_alloc0(alignment, num_bytes);
+end;
+
+{*********************************************************************}
+function bson_array_alloc(num_elems: size_t; elem_size: size_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.bson_array_alloc(num_elems, elem_size);
+end;
+
+{**********************************************************************}
+function bson_array_alloc0(num_elems: size_t; elem_size: size_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.bson_array_alloc0(num_elems, elem_size);
+end;
+
+{**********************************************************}
+function bson_realloc(mem: Pvoid; num_bytes: size_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.bson_realloc(mem, num_bytes);
+end;
+
+{**************************************************************************}
+function bson_realloc_ctx(mem: Pvoid; num_bytes: size_t; ctx: Pvoid): Pvoid;
+begin
+  Result := ALMongoDBLibrary.bson_realloc_ctx(mem, num_bytes, ctx);
+end;
+
+{******************************}
+procedure bson_free(mem: Pvoid);
+begin
+  ALMongoDBLibrary.bson_free(mem);
+end;
+
+{*************************************************}
+procedure bson_zero_free(mem: Pvoid; size: size_t);
+begin
+  ALMongoDBLibrary.bson_zero_free(mem, size);
+end;
+
+{**************************************************************************************************************************************************}
+function bson_writer_new(buf: PPuint8_t; buflen: Psize_t; offset: size_t; realloc_func: bson_realloc_func; realloc_func_ctx: Pvoid): Pbson_writer_t;
+begin
+  Result := ALMongoDBLibrary.bson_writer_new(buf, buflen, offset, realloc_func, realloc_func_ctx);
+end;
+
+{****************************************************}
+procedure bson_writer_destroy(writer: Pbson_writer_t);
+begin
+  ALMongoDBLibrary.bson_writer_destroy(writer);
+end;
+
+{**************************************************************}
+function bson_writer_get_length(writer: Pbson_writer_t): size_t;
+begin
+  Result := ALMongoDBLibrary.bson_writer_get_length(writer);
+end;
+
+{***************************************************************************}
+function bson_writer_begin(writer: Pbson_writer_t; bson: PPbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_writer_begin(writer, bson);
+end;
+
+{************************************************}
+procedure bson_writer_end(writer: Pbson_writer_t);
+begin
+  ALMongoDBLibrary.bson_writer_end(writer);
+end;
+
+{*****************************************************}
+procedure bson_writer_rollback(writer: Pbson_writer_t);
+begin
+  ALMongoDBLibrary.bson_writer_rollback(writer);
+end;
+
+{**********************************************************************}
+function bson_context_new(flags: bson_context_flags_t): Pbson_context_t;
+begin
+  Result := ALMongoDBLibrary.bson_context_new(flags);
+end;
+
+{*******************************************************}
+procedure bson_context_destroy(context: Pbson_context_t);
+begin
+  ALMongoDBLibrary.bson_context_destroy(context);
+end;
+
+{***************************************************}
+function bson_context_get_default(): Pbson_context_t;
+begin
+  Result := ALMongoDBLibrary.bson_context_get_default();
+end;
+
+{******************************************}
+function bson_get_monotonic_time(): int64_t;
+begin
+  Result := ALMongoDBLibrary.bson_get_monotonic_time();
+end;
+
+{************************************************}
+function bson_gettimeofday(tv: Ptimeval): Integer;
+begin
+  Result := ALMongoDBLibrary.bson_gettimeofday(tv);
+end;
+
+{***************************************************************************}
+procedure bson_decimal128_to_string(dec: Pbson_decimal128_t; str: PAnsiChar);
+begin
+  ALMongoDBLibrary.bson_decimal128_to_string(dec, str);
+end;
+
+{******************************************************************************************}
+function bson_decimal128_from_string(&string: PAnsiChar; dec: Pbson_decimal128_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_decimal128_from_string(&string, dec);
+end;
+
+{**************************************************************************************************************}
+function bson_decimal128_from_string_w_len(&string: PAnsiChar; len: Integer; dec: Pbson_decimal128_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_decimal128_from_string_w_len(&string, len, dec);
+end;
+
+{***************************************************************************************}
+function bson_json_opts_new(mode: bson_json_mode_t; max_len: int32_t): Pbson_json_opts_t;
+begin
+  Result := ALMongoDBLibrary.bson_json_opts_new(mode, max_len);
+end;
+
+{********************************************************}
+procedure bson_json_opts_destroy(opts: Pbson_json_opts_t);
+begin
+  ALMongoDBLibrary.bson_json_opts_destroy(opts);
+end;
+
+{**************************************************************************************************}
+procedure bson_json_opts_set_outermost_array(opts: Pbson_json_opts_t; is_outermost_array: ByteBool);
+begin
+  ALMongoDBLibrary.bson_json_opts_set_outermost_array(opts, is_outermost_array);
+end;
+
+{**************************************************************************************************************************************************************}
+function bson_json_reader_new(data: Pvoid; cb: bson_json_reader_cb; dcb: bson_json_destroy_cb; allow_multiple: ByteBool; buf_size: size_t): Pbson_json_reader_t;
+begin
+  Result := ALMongoDBLibrary.bson_json_reader_new(data, cb, dcb, allow_multiple, buf_size);
+end;
+
+{**************************************************************************************************}
+function bson_json_reader_new_from_fd(fd: Integer; close_on_destroy: ByteBool): Pbson_json_reader_t;
+begin
+  Result := ALMongoDBLibrary.bson_json_reader_new_from_fd(fd, close_on_destroy);
+end;
+
+{******************************************************************************************************}
+function bson_json_reader_new_from_file(filename: PAnsiChar; error: Pbson_error_t): Pbson_json_reader_t;
+begin
+  Result := ALMongoDBLibrary.bson_json_reader_new_from_file(filename, error);
+end;
+
+{**************************************************************}
+procedure bson_json_reader_destroy(reader: Pbson_json_reader_t);
+begin
+  ALMongoDBLibrary.bson_json_reader_destroy(reader);
+end;
+
+{********************************************************************************************************}
+function bson_json_reader_read(reader: Pbson_json_reader_t; bson: Pbson_t; error: Pbson_error_t): Integer;
+begin
+  Result := ALMongoDBLibrary.bson_json_reader_read(reader, bson, error);
+end;
+
+{**********************************************************************************************}
+function bson_json_data_reader_new(allow_multiple: ByteBool; size: size_t): Pbson_json_reader_t;
+begin
+  Result := ALMongoDBLibrary.bson_json_data_reader_new(allow_multiple, size);
+end;
+
+{***********************************************************************************************}
+procedure bson_json_data_reader_ingest(reader: Pbson_json_reader_t; data: Puint8_t; len: size_t);
+begin
+  ALMongoDBLibrary.bson_json_data_reader_ingest(reader, data, len);
+end;
+
+{********************************************************************************************************}
+function bson_uint32_to_string(value: uint32_t; strptr: PPAnsiChar; str: PAnsiChar; size: size_t): size_t;
+begin
+  Result := ALMongoDBLibrary.bson_uint32_to_string(value, strptr, str, size);
+end;
+
+{**********************************************}
+function bson_strdup(str: PAnsiChar): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_strdup(str);
+end;
+
+{********************************************************}
+function bson_strdup_printf(format: PAnsiChar): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_strdup_printf(format);
+end;
+
+{************************************************************************}
+function bson_strdupv_printf(format: PAnsiChar; args: va_list): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_strdupv_printf(format, args);
+end;
+
+{****************************************************************}
+function bson_strndup(str: PAnsiChar; n_bytes: size_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_strndup(str, n_bytes);
+end;
+
+{*******************************************************************}
+procedure bson_strncpy(dst: PAnsiChar; src: PAnsiChar; size: size_t);
+begin
+  ALMongoDBLibrary.bson_strncpy(dst, src, size);
+end;
+
+{*********************************************************************************************}
+function bson_vsnprintf(str: PAnsiChar; size: size_t; format: PAnsiChar; ap: va_list): Integer;
+begin
+  Result := ALMongoDBLibrary.bson_vsnprintf(str, size, format, ap);
+end;
+
+{*******************************************************************************}
+function bson_snprintf(str: PAnsiChar; size: size_t; format: PAnsiChar): Integer;
+begin
+  Result := ALMongoDBLibrary.bson_snprintf(str, size, format);
+end;
+
+{****************************************}
+procedure bson_strfreev(strv: PPAnsiChar);
+begin
+  ALMongoDBLibrary.bson_strfreev(strv);
+end;
+
+{**********************************************************}
+function bson_strnlen(s: PAnsiChar; maxlen: size_t): size_t;
+begin
+  Result := ALMongoDBLibrary.bson_strnlen(s, maxlen);
+end;
+
+{**************************************************************************************}
+function bson_ascii_strtoll(str: PAnsiChar; endptr: PPAnsiChar; base: Integer): int64_t;
+begin
+  Result := ALMongoDBLibrary.bson_ascii_strtoll(str, endptr, base);
+end;
+
+{**************************************************************}
+function bson_strcasecmp(s1: PAnsiChar; s2: PAnsiChar): Integer;
+begin
+  Result := ALMongoDBLibrary.bson_strcasecmp(s1, s2);
+end;
+
+{******************************************}
+function bson_isspace(c: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_isspace(c);
+end;
+
+{*********************************************************************************************}
+function bson_utf8_validate(utf8: PAnsiChar; utf8_len: size_t; allow_null: ByteBool): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_utf8_validate(utf8, utf8_len, allow_null);
+end;
+
+{********************************************************************************}
+function bson_utf8_escape_for_json(utf8: PAnsiChar; utf8_len: ssize_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_utf8_escape_for_json(utf8, utf8_len);
+end;
+
+{***********************************************************}
+function bson_utf8_get_char(utf8: PAnsiChar): bson_unichar_t;
+begin
+  Result := ALMongoDBLibrary.bson_utf8_get_char(utf8);
+end;
+
+{*******************************************************}
+function bson_utf8_next_char(utf8: PAnsiChar): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_utf8_next_char(utf8);
+end;
+
+{*******************************************************************************************}
+procedure bson_utf8_from_unichar(unichar: bson_unichar_t; utf8: TCharArray6; len: Puint32_t);
+begin
+  ALMongoDBLibrary.bson_utf8_from_unichar(unichar, utf8, len);
+end;
+
+{****************************************************************}
+procedure bson_value_copy(src: Pbson_value_t; dst: Pbson_value_t);
+begin
+  ALMongoDBLibrary.bson_value_copy(src, dst);
+end;
+
+{*************************************************}
+procedure bson_value_destroy(value: Pbson_value_t);
+begin
+  ALMongoDBLibrary.bson_value_destroy(value);
+end;
+
+{*****************************************}
+function bson_get_major_version(): Integer;
+begin
+  Result := ALMongoDBLibrary.bson_get_major_version();
+end;
+
+{*****************************************}
+function bson_get_minor_version(): Integer;
+begin
+  Result := ALMongoDBLibrary.bson_get_minor_version();
+end;
+
+{*****************************************}
+function bson_get_micro_version(): Integer;
+begin
+  Result := ALMongoDBLibrary.bson_get_micro_version();
+end;
+
+{*************************************}
+function bson_get_version(): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_get_version();
+end;
+
+{***************************************************************************************************************}
+function bson_check_version(required_major: Integer; required_minor: Integer; required_micro: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_check_version(required_major, required_minor, required_micro);
+end;
+
+{***********************************}
+procedure bcon_append(bson: Pbson_t);
+begin
+  ALMongoDBLibrary.bcon_append(bson);
+end;
+
+{****************************************************************}
+procedure bcon_append_ctx(bson: Pbson_t; ctx: Pbcon_append_ctx_t);
+begin
+  ALMongoDBLibrary.bcon_append_ctx(bson, ctx);
+end;
+
+{*********************************************************************************}
+procedure bcon_append_ctx_va(bson: Pbson_t; ctx: Pbcon_append_ctx_t; va: Pva_list);
+begin
+  ALMongoDBLibrary.bcon_append_ctx_va(bson, ctx, va);
+end;
+
+{******************************************************}
+procedure bcon_append_ctx_init(ctx: Pbcon_append_ctx_t);
+begin
+  ALMongoDBLibrary.bcon_append_ctx_init(ctx);
+end;
+
+{********************************************************}
+procedure bcon_extract_ctx_init(ctx: Pbcon_extract_ctx_t);
+begin
+  ALMongoDBLibrary.bcon_extract_ctx_init(ctx);
+end;
+
+{******************************************************************}
+procedure bcon_extract_ctx(bson: Pbson_t; ctx: Pbcon_extract_ctx_t);
+begin
+  ALMongoDBLibrary.bcon_extract_ctx(bson, ctx);
+end;
+
+{********************************************************************************************}
+function bcon_extract_ctx_va(bson: Pbson_t; ctx: Pbcon_extract_ctx_t; ap: Pva_list): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bcon_extract_ctx_va(bson, ctx, ap);
+end;
+
+{*********************************************}
+function bcon_extract(bson: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bcon_extract(bson);
+end;
+
+{****************************************}
+function bcon_new(unused: Pvoid): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.bcon_new(unused);
+end;
+
+{************************************}
+function bson_bcon_magic(): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_bcon_magic();
+end;
+
+{*************************************}
+function bson_bcone_magic(): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_bcone_magic();
+end;
+
+{*******************************************************************************************************************************}
+function bson_reader_new_from_handle(handle: Pvoid; rf: bson_reader_read_func_t; df: bson_reader_destroy_func_t): Pbson_reader_t;
+begin
+  Result := ALMongoDBLibrary.bson_reader_new_from_handle(handle, rf, df);
+end;
+
+{****************************************************************************************}
+function bson_reader_new_from_fd(fd: Integer; close_on_destroy: ByteBool): Pbson_reader_t;
+begin
+  Result := ALMongoDBLibrary.bson_reader_new_from_fd(fd, close_on_destroy);
+end;
+
+{****************************************************************************************}
+function bson_reader_new_from_file(path: PAnsiChar; error: Pbson_error_t): Pbson_reader_t;
+begin
+  Result := ALMongoDBLibrary.bson_reader_new_from_file(path, error);
+end;
+
+{*********************************************************************************}
+function bson_reader_new_from_data(data: Puint8_t; length: size_t): Pbson_reader_t;
+begin
+  Result := ALMongoDBLibrary.bson_reader_new_from_data(data, length);
+end;
+
+{****************************************************}
+procedure bson_reader_destroy(reader: Pbson_reader_t);
+begin
+  ALMongoDBLibrary.bson_reader_destroy(reader);
+end;
+
+{*****************************************************************************************}
+procedure bson_reader_set_read_func(reader: Pbson_reader_t; func: bson_reader_read_func_t);
+begin
+  ALMongoDBLibrary.bson_reader_set_read_func(reader, func);
+end;
+
+{***********************************************************************************************}
+procedure bson_reader_set_destroy_func(reader: Pbson_reader_t; func: bson_reader_destroy_func_t);
+begin
+  ALMongoDBLibrary.bson_reader_set_destroy_func(reader, func);
+end;
+
+{*********************************************************************************}
+function bson_reader_read(reader: Pbson_reader_t; reached_eof: PByteBool): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.bson_reader_read(reader, reached_eof);
+end;
+
+{*******************************************************}
+function bson_reader_tell(reader: Pbson_reader_t): off_t;
+begin
+  Result := ALMongoDBLibrary.bson_reader_tell(reader);
+end;
+
+{**************************************************}
+procedure bson_reader_reset(reader: Pbson_reader_t);
+begin
+  ALMongoDBLibrary.bson_reader_reset(reader);
+end;
+
+{***********************************************************************}
+function bson_oid_compare(oid1: Pbson_oid_t; oid2: Pbson_oid_t): Integer;
+begin
+  Result := ALMongoDBLibrary.bson_oid_compare(oid1, oid2);
+end;
+
+{**********************************************************}
+procedure bson_oid_copy(src: Pbson_oid_t; dst: Pbson_oid_t);
+begin
+  ALMongoDBLibrary.bson_oid_copy(src, dst);
+end;
+
+{**********************************************************************}
+function bson_oid_equal(oid1: Pbson_oid_t; oid2: Pbson_oid_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_oid_equal(oid1, oid2);
+end;
+
+{*******************************************************************}
+function bson_oid_is_valid(str: PAnsiChar; length: size_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_oid_is_valid(str, length);
+end;
+
+{*****************************************************}
+function bson_oid_get_time_t(oid: Pbson_oid_t): time_t;
+begin
+  Result := ALMongoDBLibrary.bson_oid_get_time_t(oid);
+end;
+
+{*************************************************}
+function bson_oid_hash(oid: Pbson_oid_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.bson_oid_hash(oid);
+end;
+
+{******************************************************************}
+procedure bson_oid_init(oid: Pbson_oid_t; context: Pbson_context_t);
+begin
+  ALMongoDBLibrary.bson_oid_init(oid, context);
+end;
+
+{******************************************************************}
+procedure bson_oid_init_from_data(oid: Pbson_oid_t; data: Puint8_t);
+begin
+  ALMongoDBLibrary.bson_oid_init_from_data(oid, data);
+end;
+
+{********************************************************************}
+procedure bson_oid_init_from_string(oid: Pbson_oid_t; str: PAnsiChar);
+begin
+  ALMongoDBLibrary.bson_oid_init_from_string(oid, str);
+end;
+
+{****************************************************************}
+procedure bson_oid_to_string(oid: Pbson_oid_t; str: TCharArray25);
+begin
+  ALMongoDBLibrary.bson_oid_to_string(oid, str);
+end;
+
+{**********************************************************}
+function bson_iter_value(iter: Pbson_iter_t): Pbson_value_t;
+begin
+  Result := ALMongoDBLibrary.bson_iter_value(iter);
+end;
+
+{*************************************************************************************}
+procedure bson_iter_array(iter: Pbson_iter_t; array_len: Puint32_t; &array: PPuint8_t);
+begin
+  ALMongoDBLibrary.bson_iter_array(iter, array_len, &array);
+end;
+
+{*****************************************************************************************************************}
+procedure bson_iter_binary(iter: Pbson_iter_t; subtype: Pbson_subtype_t; binary_len: Puint32_t; binary: PPuint8_t);
+begin
+  ALMongoDBLibrary.bson_iter_binary(iter, subtype, binary_len, binary);
+end;
+
+{**************************************************************************************************************************}
+procedure bson_iter_overwrite_binary(iter: Pbson_iter_t; subtype: bson_subtype_t; binary_len: Puint32_t; binary: PPuint8_t);
+begin
+  ALMongoDBLibrary.bson_iter_overwrite_binary(iter, subtype, binary_len, binary);
+end;
+
+{********************************************************************}
+function bson_iter_binary_subtype(iter: Pbson_iter_t): bson_subtype_t;
+begin
+  Result := ALMongoDBLibrary.bson_iter_binary_subtype(iter);
+end;
+
+{************************************************************************************}
+function bson_iter_binary_equal(iter_a: Pbson_iter_t; iter_b: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_binary_equal(iter_a, iter_b);
+end;
+
+{************************************************************************}
+function bson_iter_code(iter: Pbson_iter_t; length: Puint32_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_iter_code(iter, length);
+end;
+
+{**********************************************************************************************************************}
+function bson_iter_codewscope(iter: Pbson_iter_t; length: Puint32_t; scope_len: Puint32_t; scope: PPuint8_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_iter_codewscope(iter, length, scope_len, scope);
+end;
+
+{**********************************************************************************************************************}
+procedure bson_iter_dbpointer(iter: Pbson_iter_t; collection_len: Puint32_t; collection: PPAnsiChar; oid: PPbson_oid_t);
+begin
+  ALMongoDBLibrary.bson_iter_dbpointer(iter, collection_len, collection, oid);
+end;
+
+{*********************************************************************************************}
+procedure bson_iter_document(iter: Pbson_iter_t; document_len: Puint32_t; document: PPuint8_t);
+begin
+  ALMongoDBLibrary.bson_iter_document(iter, document_len, document);
+end;
+
+{****************************************************}
+function bson_iter_double(iter: Pbson_iter_t): double;
+begin
+  Result := ALMongoDBLibrary.bson_iter_double(iter);
+end;
+
+{*******************************************************}
+function bson_iter_as_double(iter: Pbson_iter_t): double;
+begin
+  Result := ALMongoDBLibrary.bson_iter_as_double(iter);
+end;
+
+{*******************************************************************}
+function bson_iter_init(iter: Pbson_iter_t; bson: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_init(iter, bson);
+end;
+
+{**********************************************************************************************}
+function bson_iter_init_from_data(iter: Pbson_iter_t; data: Puint8_t; length: size_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_init_from_data(iter, data, length);
+end;
+
+{****************************************************************************************}
+function bson_iter_init_find(iter: Pbson_iter_t; bson: Pbson_t; key: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_init_find(iter, bson, key);
+end;
+
+{***************************************************************************************************************}
+function bson_iter_init_find_w_len(iter: Pbson_iter_t; bson: Pbson_t; key: PAnsiChar; keylen: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_init_find_w_len(iter, bson, key, keylen);
+end;
+
+{*********************************************************************************************}
+function bson_iter_init_find_case(iter: Pbson_iter_t; bson: Pbson_t; key: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_init_find_case(iter, bson, key);
+end;
+
+{********************************************************************************************************************************************}
+function bson_iter_init_from_data_at_offset(iter: Pbson_iter_t; data: Puint8_t; length: size_t; offset: uint32_t; keylen: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_init_from_data_at_offset(iter, data, length, offset, keylen);
+end;
+
+{****************************************************}
+function bson_iter_int32(iter: Pbson_iter_t): int32_t;
+begin
+  Result := ALMongoDBLibrary.bson_iter_int32(iter);
+end;
+
+{****************************************************}
+function bson_iter_int64(iter: Pbson_iter_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.bson_iter_int64(iter);
+end;
+
+{*******************************************************}
+function bson_iter_as_int64(iter: Pbson_iter_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.bson_iter_as_int64(iter);
+end;
+
+{********************************************************************}
+function bson_iter_find(iter: Pbson_iter_t; key: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_find(iter, key);
+end;
+
+{*******************************************************************************************}
+function bson_iter_find_w_len(iter: Pbson_iter_t; key: PAnsiChar; keylen: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_find_w_len(iter, key, keylen);
+end;
+
+{*************************************************************************}
+function bson_iter_find_case(iter: Pbson_iter_t; key: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_find_case(iter, key);
+end;
+
+{************************************************************************************************************}
+function bson_iter_find_descendant(iter: Pbson_iter_t; dotkey: PAnsiChar; descendant: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_find_descendant(iter, dotkey, descendant);
+end;
+
+{****************************************************}
+function bson_iter_next(iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_next(iter);
+end;
+
+{******************************************************}
+function bson_iter_oid(iter: Pbson_iter_t): Pbson_oid_t;
+begin
+  Result := ALMongoDBLibrary.bson_iter_oid(iter);
+end;
+
+{***********************************************************************************}
+function bson_iter_decimal128(iter: Pbson_iter_t; dec: Pbson_decimal128_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_decimal128(iter, dec);
+end;
+
+{****************************************************}
+function bson_iter_key(iter: Pbson_iter_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_iter_key(iter);
+end;
+
+{*******************************************************}
+function bson_iter_key_len(iter: Pbson_iter_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.bson_iter_key_len(iter);
+end;
+
+{************************************************************************}
+function bson_iter_utf8(iter: Pbson_iter_t; length: Puint32_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_iter_utf8(iter, length);
+end;
+
+{****************************************************************************}
+function bson_iter_dup_utf8(iter: Pbson_iter_t; length: Puint32_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_iter_dup_utf8(iter, length);
+end;
+
+{********************************************************}
+function bson_iter_date_time(iter: Pbson_iter_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.bson_iter_date_time(iter);
+end;
+
+{****************************************************}
+function bson_iter_time_t(iter: Pbson_iter_t): time_t;
+begin
+  Result := ALMongoDBLibrary.bson_iter_time_t(iter);
+end;
+
+{************************************************************}
+procedure bson_iter_timeval(iter: Pbson_iter_t; tv: Ptimeval);
+begin
+  ALMongoDBLibrary.bson_iter_timeval(iter, tv);
+end;
+
+{********************************************************************************************}
+procedure bson_iter_timestamp(iter: Pbson_iter_t; timestamp: Puint32_t; increment: Puint32_t);
+begin
+  ALMongoDBLibrary.bson_iter_timestamp(iter, timestamp, increment);
+end;
+
+{****************************************************}
+function bson_iter_bool(iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_bool(iter);
+end;
+
+{*******************************************************}
+function bson_iter_as_bool(iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_as_bool(iter);
+end;
+
+{***************************************************************************}
+function bson_iter_regex(iter: Pbson_iter_t; options: PPAnsiChar): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_iter_regex(iter, options);
+end;
+
+{**************************************************************************}
+function bson_iter_symbol(iter: Pbson_iter_t; length: Puint32_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_iter_symbol(iter, length);
+end;
+
+{*******************************************************}
+function bson_iter_type(iter: Pbson_iter_t): bson_type_t;
+begin
+  Result := ALMongoDBLibrary.bson_iter_type(iter);
+end;
+
+{****************************************************************************}
+function bson_iter_recurse(iter: Pbson_iter_t; child: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_recurse(iter, child);
+end;
+
+{**********************************************************************}
+procedure bson_iter_overwrite_int32(iter: Pbson_iter_t; value: int32_t);
+begin
+  ALMongoDBLibrary.bson_iter_overwrite_int32(iter, value);
+end;
+
+{**********************************************************************}
+procedure bson_iter_overwrite_int64(iter: Pbson_iter_t; value: int64_t);
+begin
+  ALMongoDBLibrary.bson_iter_overwrite_int64(iter, value);
+end;
+
+{**********************************************************************}
+procedure bson_iter_overwrite_double(iter: Pbson_iter_t; value: double);
+begin
+  ALMongoDBLibrary.bson_iter_overwrite_double(iter, value);
+end;
+
+{**************************************************************************************}
+procedure bson_iter_overwrite_decimal128(iter: Pbson_iter_t; value: Pbson_decimal128_t);
+begin
+  ALMongoDBLibrary.bson_iter_overwrite_decimal128(iter, value);
+end;
+
+{**********************************************************************}
+procedure bson_iter_overwrite_bool(iter: Pbson_iter_t; value: ByteBool);
+begin
+  ALMongoDBLibrary.bson_iter_overwrite_bool(iter, value);
+end;
+
+{************************************************************************}
+procedure bson_iter_overwrite_oid(iter: Pbson_iter_t; value: Pbson_oid_t);
+begin
+  ALMongoDBLibrary.bson_iter_overwrite_oid(iter, value);
+end;
+
+{****************************************************************************************************}
+procedure bson_iter_overwrite_timestamp(iter: Pbson_iter_t; timestamp: uint32_t; increment: uint32_t);
+begin
+  ALMongoDBLibrary.bson_iter_overwrite_timestamp(iter, timestamp, increment);
+end;
+
+{**************************************************************************}
+procedure bson_iter_overwrite_date_time(iter: Pbson_iter_t; value: int64_t);
+begin
+  ALMongoDBLibrary.bson_iter_overwrite_date_time(iter, value);
+end;
+
+{************************************************************************************************}
+function bson_iter_visit_all(iter: Pbson_iter_t; visitor: Pbson_visitor_t; data: Pvoid): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_iter_visit_all(iter, visitor, data);
+end;
+
+{******************************************************}
+function bson_iter_offset(iter: Pbson_iter_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.bson_iter_offset(iter);
+end;
+
+{**********************************************************************************************************************************}
+function bson_vector_int8_view_init(view_out: Pbson_vector_int8_view_t; binary_data: Puint8_t; binary_data_len: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_vector_int8_view_init(view_out, binary_data, binary_data_len);
+end;
+
+{**********************************************************************************************************************************************}
+function bson_vector_int8_const_view_init(view_out: Pbson_vector_int8_const_view_t; binary_data: Puint8_t; binary_data_len: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_vector_int8_const_view_init(view_out, binary_data, binary_data_len);
+end;
+
+{****************************************************************************************************************************************}
+function bson_vector_float32_view_init(view_out: Pbson_vector_float32_view_t; binary_data: Puint8_t; binary_data_len: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_vector_float32_view_init(view_out, binary_data, binary_data_len);
+end;
+
+{****************************************************************************************************************************************************}
+function bson_vector_float32_const_view_init(view_out: Pbson_vector_float32_const_view_t; binary_data: Puint8_t; binary_data_len: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_vector_float32_const_view_init(view_out, binary_data, binary_data_len);
+end;
+
+{**********************************************************************************************************************************************}
+function bson_vector_packed_bit_view_init(view_out: Pbson_vector_packed_bit_view_t; binary_data: Puint8_t; binary_data_len: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_vector_packed_bit_view_init(view_out, binary_data, binary_data_len);
+end;
+
+{**********************************************************************************************************************************************************}
+function bson_vector_packed_bit_const_view_init(view_out: Pbson_vector_packed_bit_const_view_t; binary_data: Puint8_t; binary_data_len: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_vector_packed_bit_const_view_init(view_out, binary_data, binary_data_len);
+end;
+
+{*********************************************************************************************************}
+function bson_vector_int8_view_from_iter(view_out: Pbson_vector_int8_view_t; iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_vector_int8_view_from_iter(view_out, iter);
+end;
+
+{*********************************************************************************************************************}
+function bson_vector_int8_const_view_from_iter(view_out: Pbson_vector_int8_const_view_t; iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_vector_int8_const_view_from_iter(view_out, iter);
+end;
+
+{***************************************************************************************************************}
+function bson_vector_float32_view_from_iter(view_out: Pbson_vector_float32_view_t; iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_vector_float32_view_from_iter(view_out, iter);
+end;
+
+{***************************************************************************************************************************}
+function bson_vector_float32_const_view_from_iter(view_out: Pbson_vector_float32_const_view_t; iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_vector_float32_const_view_from_iter(view_out, iter);
+end;
+
+{*********************************************************************************************************************}
+function bson_vector_packed_bit_view_from_iter(view_out: Pbson_vector_packed_bit_view_t; iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_vector_packed_bit_view_from_iter(view_out, iter);
+end;
+
+{*********************************************************************************************************************************}
+function bson_vector_packed_bit_const_view_from_iter(view_out: Pbson_vector_packed_bit_const_view_t; iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_vector_packed_bit_const_view_from_iter(view_out, iter);
+end;
+
+{**************************************************************************************************************************************}
+function bson_array_builder_append_vector_int8_elements(builder: P_bson_array_builder_t; view: bson_vector_int8_const_view_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_vector_int8_elements(builder, view);
+end;
+
+{********************************************************************************************************************************************}
+function bson_array_builder_append_vector_float32_elements(builder: P_bson_array_builder_t; view: bson_vector_float32_const_view_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_vector_float32_elements(builder, view);
+end;
+
+{**************************************************************************************************************************************************}
+function bson_array_builder_append_vector_packed_bit_elements(builder: P_bson_array_builder_t; view: bson_vector_packed_bit_const_view_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_vector_packed_bit_elements(builder, view);
+end;
+
+{****************************************************************************************************************}
+function bson_array_builder_append_vector_elements(builder: P_bson_array_builder_t; iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_vector_elements(builder, iter);
+end;
+
+{***************************************************************************************************************************************************************}
+function bson_append_vector_int8_uninit(bson: Pbson_t; key: PAnsiChar; key_length: Integer; element_count: size_t; view_out: Pbson_vector_int8_view_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_vector_int8_uninit(bson, key, key_length, element_count, view_out);
+end;
+
+{*********************************************************************************************************************************************************************}
+function bson_append_vector_float32_uninit(bson: Pbson_t; key: PAnsiChar; key_length: Integer; element_count: size_t; view_out: Pbson_vector_float32_view_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_vector_float32_uninit(bson, key, key_length, element_count, view_out);
+end;
+
+{***************************************************************************************************************************************************************************}
+function bson_append_vector_packed_bit_uninit(bson: Pbson_t; key: PAnsiChar; key_length: Integer; element_count: size_t; view_out: Pbson_vector_packed_bit_view_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_vector_packed_bit_uninit(bson, key, key_length, element_count, view_out);
+end;
+
+{**************************************************************************************************************************************************}
+function bson_append_vector_int8_from_array(bson: Pbson_t; key: PAnsiChar; key_length: Integer; iter: Pbson_iter_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_vector_int8_from_array(bson, key, key_length, iter, error);
+end;
+
+{*****************************************************************************************************************************************************}
+function bson_append_vector_float32_from_array(bson: Pbson_t; key: PAnsiChar; key_length: Integer; iter: Pbson_iter_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_vector_float32_from_array(bson, key, key_length, iter, error);
+end;
+
+{********************************************************************************************************************************************************}
+function bson_append_vector_packed_bit_from_array(bson: Pbson_t; key: PAnsiChar; key_length: Integer; iter: Pbson_iter_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_vector_packed_bit_from_array(bson, key, key_length, iter, error);
+end;
+
+{*********************************************************************************************************************************************}
+function bson_append_array_from_vector_int8(bson: Pbson_t; key: PAnsiChar; key_length: Integer; view: bson_vector_int8_const_view_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_array_from_vector_int8(bson, key, key_length, view);
+end;
+
+{***************************************************************************************************************************************************}
+function bson_append_array_from_vector_float32(bson: Pbson_t; key: PAnsiChar; key_length: Integer; view: bson_vector_float32_const_view_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_array_from_vector_float32(bson, key, key_length, view);
+end;
+
+{*********************************************************************************************************************************************************}
+function bson_append_array_from_vector_packed_bit(bson: Pbson_t; key: PAnsiChar; key_length: Integer; view: bson_vector_packed_bit_const_view_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_array_from_vector_packed_bit(bson, key, key_length, view);
+end;
+
+{***************************}
+function bson_new(): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.bson_new();
+end;
+
+{***************************************************************************************}
+function bson_new_from_json(data: Puint8_t; len: ssize_t; error: Pbson_error_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.bson_new_from_json(data, len, error);
+end;
+
+{*********************************************************************************************************}
+function bson_init_from_json(bson: Pbson_t; data: PAnsiChar; len: ssize_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_init_from_json(bson, data, len, error);
+end;
+
+{******************************************************************************}
+function bson_init_static(b: Pbson_t; data: Puint8_t; length: size_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_init_static(b, data, length);
+end;
+
+{******************************}
+procedure bson_init(b: Pbson_t);
+begin
+  ALMongoDBLibrary.bson_init(b);
+end;
+
+{********************************}
+procedure bson_reinit(b: Pbson_t);
+begin
+  ALMongoDBLibrary.bson_reinit(b);
+end;
+
+{*******************************************************************}
+function bson_new_from_data(data: Puint8_t; length: size_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.bson_new_from_data(data, length);
+end;
+
+{*********************************************************************************************************************************}
+function bson_new_from_buffer(buf: PPuint8_t; buf_len: Psize_t; realloc_func: bson_realloc_func; realloc_func_ctx: Pvoid): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.bson_new_from_buffer(buf, buf_len, realloc_func, realloc_func_ctx);
+end;
+
+{*********************************************}
+function bson_sized_new(size: size_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.bson_sized_new(size);
+end;
+
+{*****************************************}
+function bson_copy(bson: Pbson_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.bson_copy(bson);
+end;
+
+{*************************************************}
+procedure bson_copy_to(src: Pbson_t; dst: Pbson_t);
+begin
+  ALMongoDBLibrary.bson_copy_to(src, dst);
+end;
+
+{********************************************************************************************}
+procedure bson_copy_to_excluding_noinit(src: Pbson_t; dst: Pbson_t; first_exclude: PAnsiChar);
+begin
+  ALMongoDBLibrary.bson_copy_to_excluding_noinit(src, dst, first_exclude);
+end;
+
+{**************************************************************************************************************}
+procedure bson_copy_to_excluding_noinit_va(src: Pbson_t; dst: Pbson_t; first_exclude: PAnsiChar; args: va_list);
+begin
+  ALMongoDBLibrary.bson_copy_to_excluding_noinit_va(src, dst, first_exclude, args);
+end;
+
+{************************************}
+procedure bson_destroy(bson: Pbson_t);
+begin
+  ALMongoDBLibrary.bson_destroy(bson);
+end;
+
+{**************************************************************************}
+function bson_reserve_buffer(bson: Pbson_t; total_size: uint32_t): Puint8_t;
+begin
+  Result := ALMongoDBLibrary.bson_reserve_buffer(bson, total_size);
+end;
+
+{********************************************************}
+function bson_steal(dst: Pbson_t; src: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_steal(dst, src);
+end;
+
+{********************************************************************************************}
+function bson_destroy_with_steal(bson: Pbson_t; steal: ByteBool; length: Puint32_t): Puint8_t;
+begin
+  Result := ALMongoDBLibrary.bson_destroy_with_steal(bson, steal, length);
+end;
+
+{**********************************************}
+function bson_get_data(bson: Pbson_t): Puint8_t;
+begin
+  Result := ALMongoDBLibrary.bson_get_data(bson);
+end;
+
+{************************************************}
+function bson_count_keys(bson: Pbson_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.bson_count_keys(bson);
+end;
+
+{***************************************************************}
+function bson_has_field(bson: Pbson_t; key: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_has_field(bson, key);
+end;
+
+{************************************************************}
+function bson_compare(bson: Pbson_t; other: Pbson_t): Integer;
+begin
+  Result := ALMongoDBLibrary.bson_compare(bson, other);
+end;
+
+{***********************************************************}
+function bson_equal(bson: Pbson_t; other: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_equal(bson, other);
+end;
+
+{*********************************************************************************************}
+function bson_validate(bson: Pbson_t; flags: bson_validate_flags_t; offset: Psize_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_validate(bson, flags, offset);
+end;
+
+{*************************************************************************************************************}
+function bson_validate_with_error(bson: Pbson_t; flags: bson_validate_flags_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_validate_with_error(bson, flags, error);
+end;
+
+{*****************************************************************************************************************************************}
+function bson_validate_with_error_and_offset(bson: Pbson_t; flags: bson_validate_flags_t; offset: Psize_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_validate_with_error_and_offset(bson, flags, offset, error);
+end;
+
+{**************************************************************************************************}
+function bson_as_json_with_opts(bson: Pbson_t; length: Psize_t; opts: Pbson_json_opts_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_as_json_with_opts(bson, length, opts);
+end;
+
+{**********************************************************************************}
+function bson_as_canonical_extended_json(bson: Pbson_t; length: Psize_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_as_canonical_extended_json(bson, length);
+end;
+
+{*******************************************************************************}
+function bson_as_legacy_extended_json(bson: Pbson_t; length: Psize_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_as_legacy_extended_json(bson, length);
+end;
+
+{********************************************************************************}
+function bson_as_relaxed_extended_json(bson: Pbson_t; length: Psize_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_as_relaxed_extended_json(bson, length);
+end;
+
+{*************************************************************************************}
+function bson_array_as_legacy_extended_json(bson: Pbson_t; length: Psize_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_array_as_legacy_extended_json(bson, length);
+end;
+
+{**************************************************************************************}
+function bson_array_as_relaxed_extended_json(bson: Pbson_t; length: Psize_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_array_as_relaxed_extended_json(bson, length);
+end;
+
+{****************************************************************************************}
+function bson_array_as_canonical_extended_json(bson: Pbson_t; length: Psize_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.bson_array_as_canonical_extended_json(bson, length);
+end;
+
+{*******************************************************}
+function bson_array_builder_new(): Pbson_array_builder_t;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_new();
+end;
+
+{***************************************************************************************}
+function bson_array_builder_build(bab: Pbson_array_builder_t; param1: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_build(bab, param1);
+end;
+
+{***************************************************************}
+procedure bson_array_builder_destroy(bab: Pbson_array_builder_t);
+begin
+  ALMongoDBLibrary.bson_array_builder_destroy(bab);
+end;
+
+{*************************************************************************************************************}
+function bson_append_value(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: Pbson_value_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_value(bson, key, key_length, value);
+end;
+
+{***************************************************************************************************}
+function bson_array_builder_append_value(bab: Pbson_array_builder_t; value: Pbson_value_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_value(bab, value);
+end;
+
+{********************************************************************************************************}
+function bson_append_array(bson: Pbson_t; key: PAnsiChar; key_length: Integer; &array: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_array(bson, key, key_length, &array);
+end;
+
+{**********************************************************************************************}
+function bson_array_builder_append_array(bab: Pbson_array_builder_t; &array: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_array(bab, &array);
+end;
+
+{***********************************************************************************************************************}
+function bson_append_array_from_vector(bson: Pbson_t; key: PAnsiChar; key_length: Integer; iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_array_from_vector(bson, key, key_length, iter);
+end;
+
+{*************************************************************************************************************}
+function bson_array_builder_append_array_from_vector(bab: Pbson_array_builder_t; iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_array_from_vector(bab, iter);
+end;
+
+{*****************************************************************************************************************************************************}
+function bson_append_binary(bson: Pbson_t; key: PAnsiChar; key_length: Integer; subtype: bson_subtype_t; binary: Puint8_t; length: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_binary(bson, key, key_length, subtype, binary, length);
+end;
+
+{*******************************************************************************************************************************************}
+function bson_array_builder_append_binary(bab: Pbson_array_builder_t; subtype: bson_subtype_t; binary: Puint8_t; length: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_binary(bab, subtype, binary, length);
+end;
+
+{*************************************************************************************************************************************************************}
+function bson_append_binary_uninit(bson: Pbson_t; key: PAnsiChar; key_length: Integer; subtype: bson_subtype_t; binary: PPuint8_t; length: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_binary_uninit(bson, key, key_length, subtype, binary, length);
+end;
+
+{***************************************************************************************************************************************************}
+function bson_array_builder_append_binary_uninit(bab: Pbson_array_builder_t; subtype: bson_subtype_t; binary: PPuint8_t; length: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_binary_uninit(bab, subtype, binary, length);
+end;
+
+{*******************************************************************************************************}
+function bson_append_bool(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: ByteBool): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_bool(bson, key, key_length, value);
+end;
+
+{*********************************************************************************************}
+function bson_array_builder_append_bool(bab: Pbson_array_builder_t; value: ByteBool): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_bool(bab, value);
+end;
+
+{*************************************************************************************************************}
+function bson_append_code(bson: Pbson_t; key: PAnsiChar; key_length: Integer; javascript: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_code(bson, key, key_length, javascript);
+end;
+
+{***************************************************************************************************}
+function bson_array_builder_append_code(bab: Pbson_array_builder_t; javascript: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_code(bab, javascript);
+end;
+
+{****************************************************************************************************************************************}
+function bson_append_code_with_scope(bson: Pbson_t; key: PAnsiChar; key_length: Integer; javascript: PAnsiChar; scope: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_code_with_scope(bson, key, key_length, javascript, scope);
+end;
+
+{******************************************************************************************************************************}
+function bson_array_builder_append_code_with_scope(bab: Pbson_array_builder_t; javascript: PAnsiChar; scope: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_code_with_scope(bab, javascript, scope);
+end;
+
+{************************************************************************************************************************************}
+function bson_append_dbpointer(bson: Pbson_t; key: PAnsiChar; key_length: Integer; collection: PAnsiChar; oid: Pbson_oid_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_dbpointer(bson, key, key_length, collection, oid);
+end;
+
+{**************************************************************************************************************************}
+function bson_array_builder_append_dbpointer(bab: Pbson_array_builder_t; collection: PAnsiChar; oid: Pbson_oid_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_dbpointer(bab, collection, oid);
+end;
+
+{*******************************************************************************************************}
+function bson_append_double(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: double): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_double(bson, key, key_length, value);
+end;
+
+{*********************************************************************************************}
+function bson_array_builder_append_double(bab: Pbson_array_builder_t; value: double): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_double(bab, value);
+end;
+
+{**********************************************************************************************************}
+function bson_append_document(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_document(bson, key, key_length, value);
+end;
+
+{************************************************************************************************}
+function bson_array_builder_append_document(bab: Pbson_array_builder_t; value: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_document(bab, value);
+end;
+
+{****************************************************************************************************************}
+function bson_append_document_begin(bson: Pbson_t; key: PAnsiChar; key_length: Integer; child: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_document_begin(bson, key, key_length, child);
+end;
+
+{******************************************************************************************************}
+function bson_array_builder_append_document_begin(bab: Pbson_array_builder_t; child: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_document_begin(bab, child);
+end;
+
+{*************************************************************************}
+function bson_append_document_end(bson: Pbson_t; child: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_document_end(bson, child);
+end;
+
+{****************************************************************************************************}
+function bson_array_builder_append_document_end(bab: Pbson_array_builder_t; child: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_document_end(bab, child);
+end;
+
+{*************************************************************************************************************}
+function bson_append_array_begin(bson: Pbson_t; key: PAnsiChar; key_length: Integer; child: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_array_begin(bson, key, key_length, child);
+end;
+
+{**********************************************************************}
+function bson_append_array_end(bson: Pbson_t; child: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_array_end(bson, child);
+end;
+
+{*******************************************************************************************************}
+function bson_append_int32(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: int32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_int32(bson, key, key_length, value);
+end;
+
+{*********************************************************************************************}
+function bson_array_builder_append_int32(bab: Pbson_array_builder_t; value: int32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_int32(bab, value);
+end;
+
+{*******************************************************************************************************}
+function bson_append_int64(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: int64_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_int64(bson, key, key_length, value);
+end;
+
+{*********************************************************************************************}
+function bson_array_builder_append_int64(bab: Pbson_array_builder_t; value: int64_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_int64(bab, value);
+end;
+
+{***********************************************************************************************************************}
+function bson_append_decimal128(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: Pbson_decimal128_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_decimal128(bson, key, key_length, value);
+end;
+
+{*************************************************************************************************************}
+function bson_array_builder_append_decimal128(bab: Pbson_array_builder_t; value: Pbson_decimal128_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_decimal128(bab, value);
+end;
+
+{**********************************************************************************************************}
+function bson_append_iter(bson: Pbson_t; key: PAnsiChar; key_length: Integer; iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_iter(bson, key, key_length, iter);
+end;
+
+{************************************************************************************************}
+function bson_array_builder_append_iter(bab: Pbson_array_builder_t; iter: Pbson_iter_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_iter(bab, iter);
+end;
+
+{****************************************************************************************}
+function bson_append_minkey(bson: Pbson_t; key: PAnsiChar; key_length: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_minkey(bson, key, key_length);
+end;
+
+{******************************************************************************}
+function bson_array_builder_append_minkey(bab: Pbson_array_builder_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_minkey(bab);
+end;
+
+{****************************************************************************************}
+function bson_append_maxkey(bson: Pbson_t; key: PAnsiChar; key_length: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_maxkey(bson, key, key_length);
+end;
+
+{******************************************************************************}
+function bson_array_builder_append_maxkey(bab: Pbson_array_builder_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_maxkey(bab);
+end;
+
+{**************************************************************************************}
+function bson_append_null(bson: Pbson_t; key: PAnsiChar; key_length: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_null(bson, key, key_length);
+end;
+
+{****************************************************************************}
+function bson_array_builder_append_null(bab: Pbson_array_builder_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_null(bab);
+end;
+
+{*******************************************************************************************************}
+function bson_append_oid(bson: Pbson_t; key: PAnsiChar; key_length: Integer; oid: Pbson_oid_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_oid(bson, key, key_length, oid);
+end;
+
+{*********************************************************************************************}
+function bson_array_builder_append_oid(bab: Pbson_array_builder_t; oid: Pbson_oid_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_oid(bab, oid);
+end;
+
+{*****************************************************************************************************************************}
+function bson_append_regex(bson: Pbson_t; key: PAnsiChar; key_length: Integer; regex: PAnsiChar; options: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_regex(bson, key, key_length, regex, options);
+end;
+
+{*******************************************************************************************************************}
+function bson_array_builder_append_regex(bab: Pbson_array_builder_t; regex: PAnsiChar; options: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_regex(bab, regex, options);
+end;
+
+{**********************************************************************************************************************************************************}
+function bson_append_regex_w_len(bson: Pbson_t; key: PAnsiChar; key_length: Integer; regex: PAnsiChar; regex_length: Integer; options: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_regex_w_len(bson, key, key_length, regex, regex_length, options);
+end;
+
+{************************************************************************************************************************************************}
+function bson_array_builder_append_regex_w_len(bab: Pbson_array_builder_t; regex: PAnsiChar; regex_length: Integer; options: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_regex_w_len(bab, regex, regex_length, options);
+end;
+
+{*************************************************************************************************************************}
+function bson_append_utf8(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: PAnsiChar; length: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_utf8(bson, key, key_length, value, length);
+end;
+
+{***************************************************************************************************************}
+function bson_array_builder_append_utf8(bab: Pbson_array_builder_t; value: PAnsiChar; length: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_utf8(bab, value, length);
+end;
+
+{***************************************************************************************************************************}
+function bson_append_symbol(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: PAnsiChar; length: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_symbol(bson, key, key_length, value, length);
+end;
+
+{*****************************************************************************************************************}
+function bson_array_builder_append_symbol(bab: Pbson_array_builder_t; value: PAnsiChar; length: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_symbol(bab, value, length);
+end;
+
+{*******************************************************************************************************}
+function bson_append_time_t(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: time_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_time_t(bson, key, key_length, value);
+end;
+
+{*********************************************************************************************}
+function bson_array_builder_append_time_t(bab: Pbson_array_builder_t; value: time_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_time_t(bab, value);
+end;
+
+{**********************************************************************************************************}
+function bson_append_timeval(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: Ptimeval): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_timeval(bson, key, key_length, value);
+end;
+
+{************************************************************************************************}
+function bson_array_builder_append_timeval(bab: Pbson_array_builder_t; value: Ptimeval): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_timeval(bab, value);
+end;
+
+{***********************************************************************************************************}
+function bson_append_date_time(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: int64_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_date_time(bson, key, key_length, value);
+end;
+
+{*************************************************************************************************}
+function bson_array_builder_append_date_time(bab: Pbson_array_builder_t; value: int64_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_date_time(bab, value);
+end;
+
+{*****************************************************************************************}
+function bson_append_now_utc(bson: Pbson_t; key: PAnsiChar; key_length: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_now_utc(bson, key, key_length);
+end;
+
+{*******************************************************************************}
+function bson_array_builder_append_now_utc(bab: Pbson_array_builder_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_now_utc(bab);
+end;
+
+{*************************************************************************************************************************************}
+function bson_append_timestamp(bson: Pbson_t; key: PAnsiChar; key_length: Integer; timestamp: uint32_t; increment: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_timestamp(bson, key, key_length, timestamp, increment);
+end;
+
+{***************************************************************************************************************************}
+function bson_array_builder_append_timestamp(bab: Pbson_array_builder_t; timestamp: uint32_t; increment: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_timestamp(bab, timestamp, increment);
+end;
+
+{*******************************************************************************************}
+function bson_append_undefined(bson: Pbson_t; key: PAnsiChar; key_length: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_undefined(bson, key, key_length);
+end;
+
+{*********************************************************************************}
+function bson_array_builder_append_undefined(bab: Pbson_array_builder_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_undefined(bab);
+end;
+
+{*********************************************************}
+function bson_concat(dst: Pbson_t; src: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_concat(dst, src);
+end;
+
+{************************************************************************************************************************************}
+function bson_append_array_builder_begin(bson: Pbson_t; key: PAnsiChar; key_length: Integer; child: PPbson_array_builder_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_array_builder_begin(bson, key, key_length, child);
+end;
+
+{**************************************************************************************************************************}
+function bson_array_builder_append_array_builder_begin(bab: Pbson_array_builder_t; child: PPbson_array_builder_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_array_builder_begin(bab, child);
+end;
+
+{********************************************************************************************}
+function bson_append_array_builder_end(bson: Pbson_t; child: Pbson_array_builder_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_array_builder_end(bson, child);
+end;
+
+{***********************************************************************************************************************}
+function bson_array_builder_append_array_builder_end(bab: Pbson_array_builder_t; child: Pbson_array_builder_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_array_builder_append_array_builder_end(bab, child);
+end;
+
+{***********************************************************}
+function mongoc_write_concern_new(): Pmongoc_write_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_new();
+end;
+
+{**************************************************************************************************}
+function mongoc_write_concern_copy(write_concern: Pmongoc_write_concern_t): Pmongoc_write_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_copy(write_concern);
+end;
+
+{*****************************************************************************}
+procedure mongoc_write_concern_destroy(write_concern: Pmongoc_write_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_write_concern_destroy(write_concern);
+end;
+
+{******************************************************************************************}
+function mongoc_write_concern_get_journal(write_concern: Pmongoc_write_concern_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_get_journal(write_concern);
+end;
+
+{*********************************************************************************************}
+function mongoc_write_concern_journal_is_set(write_concern: Pmongoc_write_concern_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_journal_is_set(write_concern);
+end;
+
+{****************************************************************************************************}
+procedure mongoc_write_concern_set_journal(write_concern: Pmongoc_write_concern_t; journal: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_write_concern_set_journal(write_concern, journal);
+end;
+
+{***********************************************************************************}
+function mongoc_write_concern_get_w(write_concern: Pmongoc_write_concern_t): int32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_get_w(write_concern);
+end;
+
+{***************************************************************************************}
+procedure mongoc_write_concern_set_w(write_concern: Pmongoc_write_concern_t; w: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_write_concern_set_w(write_concern, w);
+end;
+
+{****************************************************************************************}
+function mongoc_write_concern_get_wtag(write_concern: Pmongoc_write_concern_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_get_wtag(write_concern);
+end;
+
+{**********************************************************************************************}
+procedure mongoc_write_concern_set_wtag(write_concern: Pmongoc_write_concern_t; tag: PAnsiChar);
+begin
+  ALMongoDBLibrary.mongoc_write_concern_set_wtag(write_concern, tag);
+end;
+
+{******************************************************************************************}
+function mongoc_write_concern_get_wtimeout(write_concern: Pmongoc_write_concern_t): int32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_get_wtimeout(write_concern);
+end;
+
+{************************************************************************************************}
+function mongoc_write_concern_get_wtimeout_int64(write_concern: Pmongoc_write_concern_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_get_wtimeout_int64(write_concern);
+end;
+
+{**********************************************************************************************************}
+procedure mongoc_write_concern_set_wtimeout(write_concern: Pmongoc_write_concern_t; wtimeout_msec: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_write_concern_set_wtimeout(write_concern, wtimeout_msec);
+end;
+
+{****************************************************************************************************************}
+procedure mongoc_write_concern_set_wtimeout_int64(write_concern: Pmongoc_write_concern_t; wtimeout_msec: int64_t);
+begin
+  ALMongoDBLibrary.mongoc_write_concern_set_wtimeout_int64(write_concern, wtimeout_msec);
+end;
+
+{********************************************************************************************}
+function mongoc_write_concern_get_wmajority(write_concern: Pmongoc_write_concern_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_get_wmajority(write_concern);
+end;
+
+{***********************************************************************************************************}
+procedure mongoc_write_concern_set_wmajority(write_concern: Pmongoc_write_concern_t; wtimeout_msec: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_write_concern_set_wmajority(write_concern, wtimeout_msec);
+end;
+
+{**********************************************************************************************}
+function mongoc_write_concern_is_acknowledged(write_concern: Pmongoc_write_concern_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_is_acknowledged(write_concern);
+end;
+
+{***************************************************************************************}
+function mongoc_write_concern_is_valid(write_concern: Pmongoc_write_concern_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_is_valid(write_concern);
+end;
+
+{***************************************************************************************************}
+function mongoc_write_concern_append(write_concern: Pmongoc_write_concern_t; doc: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_append(write_concern, doc);
+end;
+
+{*****************************************************************************************}
+function mongoc_write_concern_is_default(write_concern: Pmongoc_write_concern_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_write_concern_is_default(write_concern);
+end;
+
+{*********************************************************}
+function mongoc_read_concern_new(): Pmongoc_read_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_concern_new();
+end;
+
+{**********************************************************************************************}
+function mongoc_read_concern_copy(read_concern: Pmongoc_read_concern_t): Pmongoc_read_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_concern_copy(read_concern);
+end;
+
+{**************************************************************************}
+procedure mongoc_read_concern_destroy(read_concern: Pmongoc_read_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_read_concern_destroy(read_concern);
+end;
+
+{**************************************************************************************}
+function mongoc_read_concern_get_level(read_concern: Pmongoc_read_concern_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_concern_get_level(read_concern);
+end;
+
+{*******************************************************************************************************}
+function mongoc_read_concern_set_level(read_concern: Pmongoc_read_concern_t; level: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_concern_set_level(read_concern, level);
+end;
+
+{************************************************************************************************}
+function mongoc_read_concern_append(read_concern: Pmongoc_read_concern_t; doc: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_concern_append(read_concern, doc);
+end;
+
+{**************************************************************************************}
+function mongoc_read_concern_is_default(read_concern: Pmongoc_read_concern_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_concern_is_default(read_concern);
+end;
+
+{******************************************************}
+procedure mongoc_optional_init(opt: Pmongoc_optional_t);
+begin
+  ALMongoDBLibrary.mongoc_optional_init(opt);
+end;
+
+{*****************************************************************}
+function mongoc_optional_is_set(opt: Pmongoc_optional_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_optional_is_set(opt);
+end;
+
+{****************************************************************}
+function mongoc_optional_value(opt: Pmongoc_optional_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_optional_value(opt);
+end;
+
+{**************************************************************************}
+procedure mongoc_optional_set_value(opt: Pmongoc_optional_t; val: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_optional_set_value(opt, val);
+end;
+
+{***********************************************************************************}
+procedure mongoc_optional_copy(source: Pmongoc_optional_t; copy: Pmongoc_optional_t);
+begin
+  ALMongoDBLibrary.mongoc_optional_copy(source, copy);
+end;
+
+{***************************************************************************}
+function mongoc_error_has_label(reply: Pbson_t; &label: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_error_has_label(reply, &label);
+end;
+
+{*************************************************************************}
+function mongoc_find_and_modify_opts_new(): Pmongoc_find_and_modify_opts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_find_and_modify_opts_new();
+end;
+
+{***********************************************************************************************************}
+function mongoc_find_and_modify_opts_set_sort(opts: Pmongoc_find_and_modify_opts_t; sort: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_find_and_modify_opts_set_sort(opts, sort);
+end;
+
+{**************************************************************************************************}
+procedure mongoc_find_and_modify_opts_get_sort(opts: Pmongoc_find_and_modify_opts_t; sort: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_find_and_modify_opts_get_sort(opts, sort);
+end;
+
+{***************************************************************************************************************}
+function mongoc_find_and_modify_opts_set_update(opts: Pmongoc_find_and_modify_opts_t; update: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_find_and_modify_opts_set_update(opts, update);
+end;
+
+{******************************************************************************************************}
+procedure mongoc_find_and_modify_opts_get_update(opts: Pmongoc_find_and_modify_opts_t; update: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_find_and_modify_opts_get_update(opts, update);
+end;
+
+{***************************************************************************************************************}
+function mongoc_find_and_modify_opts_set_fields(opts: Pmongoc_find_and_modify_opts_t; fields: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_find_and_modify_opts_set_fields(opts, fields);
+end;
+
+{******************************************************************************************************}
+procedure mongoc_find_and_modify_opts_get_fields(opts: Pmongoc_find_and_modify_opts_t; fields: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_find_and_modify_opts_get_fields(opts, fields);
+end;
+
+{************************************************************************************************************}
+function mongoc_find_and_modify_opts_set_flags(opts: Pmongoc_find_and_modify_opts_t; flags: UInt32): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_find_and_modify_opts_set_flags(opts, flags);
+end;
+
+{*******************************************************************************************************************}
+function mongoc_find_and_modify_opts_get_flags(opts: Pmongoc_find_and_modify_opts_t): mongoc_find_and_modify_flags_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_find_and_modify_opts_get_flags(opts);
+end;
+
+{************************************************************************************************************************************}
+function mongoc_find_and_modify_opts_set_bypass_document_validation(opts: Pmongoc_find_and_modify_opts_t; bypass: ByteBool): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_find_and_modify_opts_set_bypass_document_validation(opts, bypass);
+end;
+
+{******************************************************************************************************************}
+function mongoc_find_and_modify_opts_get_bypass_document_validation(opts: Pmongoc_find_and_modify_opts_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_find_and_modify_opts_get_bypass_document_validation(opts);
+end;
+
+{**************************************************************************************************************************}
+function mongoc_find_and_modify_opts_set_max_time_ms(opts: Pmongoc_find_and_modify_opts_t; max_time_ms: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_find_and_modify_opts_set_max_time_ms(opts, max_time_ms);
+end;
+
+{***************************************************************************************************}
+function mongoc_find_and_modify_opts_get_max_time_ms(opts: Pmongoc_find_and_modify_opts_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_find_and_modify_opts_get_max_time_ms(opts);
+end;
+
+{**********************************************************************************************************}
+function mongoc_find_and_modify_opts_append(opts: Pmongoc_find_and_modify_opts_t; extra: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_find_and_modify_opts_append(opts, extra);
+end;
+
+{****************************************************************************************************}
+procedure mongoc_find_and_modify_opts_get_extra(opts: Pmongoc_find_and_modify_opts_t; extra: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_find_and_modify_opts_get_extra(opts, extra);
+end;
+
+{**********************************************************************************}
+procedure mongoc_find_and_modify_opts_destroy(opts: Pmongoc_find_and_modify_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_find_and_modify_opts_destroy(opts);
+end;
+
+{**********************************************************************************************************************}
+function mongoc_handshake_data_append(driver_name: PAnsiChar; driver_version: PAnsiChar; platform: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_handshake_data_append(driver_name, driver_version, platform);
+end;
+
+{**********************}
+procedure mongoc_init();
+begin
+  ALMongoDBLibrary.mongoc_init();
+end;
+
+{*************************}
+procedure mongoc_cleanup();
+begin
+  ALMongoDBLibrary.mongoc_cleanup();
+end;
+
+{******************************************************************************}
+procedure mongoc_log_set_handler(log_func: mongoc_log_func_t; user_data: Pvoid);
+begin
+  ALMongoDBLibrary.mongoc_log_set_handler(log_func, user_data);
+end;
+
+{********************************************************************************************}
+procedure mongoc_log(log_level: mongoc_log_level_t; log_domain: PAnsiChar; format: PAnsiChar);
+begin
+  ALMongoDBLibrary.mongoc_log(log_level, log_domain, format);
+end;
+
+{*******************************************************************************************************************************}
+procedure mongoc_log_default_handler(log_level: mongoc_log_level_t; log_domain: PAnsiChar; message: PAnsiChar; user_data: Pvoid);
+begin
+  ALMongoDBLibrary.mongoc_log_default_handler(log_level, log_domain, message, user_data);
+end;
+
+{**********************************************************************}
+function mongoc_log_level_str(log_level: mongoc_log_level_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_log_level_str(log_level);
+end;
+
+{**********************************}
+procedure mongoc_log_trace_enable();
+begin
+  ALMongoDBLibrary.mongoc_log_trace_enable();
+end;
+
+{***********************************}
+procedure mongoc_log_trace_disable();
+begin
+  ALMongoDBLibrary.mongoc_log_trace_disable();
+end;
+
+{****************************************************************************************}
+function mongoc_oidc_callback_new(fn: mongoc_oidc_callback_fn_t): Pmongoc_oidc_callback_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_callback_new(fn);
+end;
+
+{*************************************************************************************************************************}
+function mongoc_oidc_callback_new_with_user_data(fn: mongoc_oidc_callback_fn_t; user_data: Pvoid): Pmongoc_oidc_callback_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_callback_new_with_user_data(fn, user_data);
+end;
+
+{************************************************************************}
+procedure mongoc_oidc_callback_destroy(callback: Pmongoc_oidc_callback_t);
+begin
+  ALMongoDBLibrary.mongoc_oidc_callback_destroy(callback);
+end;
+
+{*************************************************************************************************}
+function mongoc_oidc_callback_get_fn(callback: Pmongoc_oidc_callback_t): mongoc_oidc_callback_fn_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_callback_get_fn(callback);
+end;
+
+{************************************************************************************}
+function mongoc_oidc_callback_get_user_data(callback: Pmongoc_oidc_callback_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_callback_get_user_data(callback);
+end;
+
+{************************************************************************************************}
+procedure mongoc_oidc_callback_set_user_data(callback: Pmongoc_oidc_callback_t; user_data: Pvoid);
+begin
+  ALMongoDBLibrary.mongoc_oidc_callback_set_user_data(callback, user_data);
+end;
+
+{************************************************************************************************}
+function mongoc_oidc_callback_params_get_version(params: Pmongoc_oidc_callback_params_t): int32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_callback_params_get_version(params);
+end;
+
+{************************************************************************************************}
+function mongoc_oidc_callback_params_get_user_data(params: Pmongoc_oidc_callback_params_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_callback_params_get_user_data(params);
+end;
+
+{*************************************************************************************************}
+function mongoc_oidc_callback_params_get_timeout(params: Pmongoc_oidc_callback_params_t): Pint64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_callback_params_get_timeout(params);
+end;
+
+{***************************************************************************************************}
+function mongoc_oidc_callback_params_get_username(params: Pmongoc_oidc_callback_params_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_callback_params_get_username(params);
+end;
+
+{**************************************************************************************************************************}
+function mongoc_oidc_callback_params_cancel_with_timeout(params: Pmongoc_oidc_callback_params_t): Pmongoc_oidc_credential_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_callback_params_cancel_with_timeout(params);
+end;
+
+{**************************************************************************************}
+function mongoc_oidc_credential_new(access_token: PAnsiChar): Pmongoc_oidc_credential_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_credential_new(access_token);
+end;
+
+{***************************************************************************************************************************}
+function mongoc_oidc_credential_new_with_expires_in(access_token: PAnsiChar; expires_in: int64_t): Pmongoc_oidc_credential_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_credential_new_with_expires_in(access_token, expires_in);
+end;
+
+{************************************************************************}
+procedure mongoc_oidc_credential_destroy(cred: Pmongoc_oidc_credential_t);
+begin
+  ALMongoDBLibrary.mongoc_oidc_credential_destroy(cred);
+end;
+
+{*******************************************************************************************}
+function mongoc_oidc_credential_get_access_token(cred: Pmongoc_oidc_credential_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_credential_get_access_token(cred);
+end;
+
+{****************************************************************************************}
+function mongoc_oidc_credential_get_expires_in(cred: Pmongoc_oidc_credential_t): Pint64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_oidc_credential_get_expires_in(cred);
+end;
+
+{***************************************************}
+procedure mongoc_rand_seed(buf: Pvoid; num: Integer);
+begin
+  ALMongoDBLibrary.mongoc_rand_seed(buf, num);
+end;
+
+{*******************************************************************}
+procedure mongoc_rand_add(buf: Pvoid; num: Integer; entropy: double);
+begin
+  ALMongoDBLibrary.mongoc_rand_add(buf, num, entropy);
+end;
+
+{*************************************}
+function mongoc_rand_status(): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_rand_status();
+end;
+
+{**********************************************************************************}
+function mongoc_read_prefs_new(read_mode: mongoc_read_mode_t): Pmongoc_read_prefs_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_prefs_new(read_mode);
+end;
+
+{**************************************************************************************}
+function mongoc_read_prefs_copy(read_prefs: Pmongoc_read_prefs_t): Pmongoc_read_prefs_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_prefs_copy(read_prefs);
+end;
+
+{********************************************************************}
+procedure mongoc_read_prefs_destroy(read_prefs: Pmongoc_read_prefs_t);
+begin
+  ALMongoDBLibrary.mongoc_read_prefs_destroy(read_prefs);
+end;
+
+{****************************************************************************************}
+function mongoc_read_prefs_get_mode(read_prefs: Pmongoc_read_prefs_t): mongoc_read_mode_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_prefs_get_mode(read_prefs);
+end;
+
+{***********************************************************************************************}
+procedure mongoc_read_prefs_set_mode(read_prefs: Pmongoc_read_prefs_t; mode: mongoc_read_mode_t);
+begin
+  ALMongoDBLibrary.mongoc_read_prefs_set_mode(read_prefs, mode);
+end;
+
+{*****************************************************************************}
+function mongoc_read_prefs_get_tags(read_prefs: Pmongoc_read_prefs_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_prefs_get_tags(read_prefs);
+end;
+
+{************************************************************************************}
+procedure mongoc_read_prefs_set_tags(read_prefs: Pmongoc_read_prefs_t; tags: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_read_prefs_set_tags(read_prefs, tags);
+end;
+
+{**********************************************************************************}
+procedure mongoc_read_prefs_add_tag(read_prefs: Pmongoc_read_prefs_t; tag: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_read_prefs_add_tag(read_prefs, tag);
+end;
+
+{**********************************************************************************************}
+function mongoc_read_prefs_get_max_staleness_seconds(read_prefs: Pmongoc_read_prefs_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_prefs_get_max_staleness_seconds(read_prefs);
+end;
+
+{**********************************************************************************************************************}
+procedure mongoc_read_prefs_set_max_staleness_seconds(read_prefs: Pmongoc_read_prefs_t; max_staleness_seconds: int64_t);
+begin
+  ALMongoDBLibrary.mongoc_read_prefs_set_max_staleness_seconds(read_prefs, max_staleness_seconds);
+end;
+
+{******************************************************************************}
+function mongoc_read_prefs_get_hedge(read_prefs: Pmongoc_read_prefs_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_prefs_get_hedge(read_prefs);
+end;
+
+{**************************************************************************************}
+procedure mongoc_read_prefs_set_hedge(read_prefs: Pmongoc_read_prefs_t; hedge: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_read_prefs_set_hedge(read_prefs, hedge);
+end;
+
+{******************************************************************************}
+function mongoc_read_prefs_is_valid(read_prefs: Pmongoc_read_prefs_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_read_prefs_is_valid(read_prefs);
+end;
+
+{********************************************************************************************}
+function mongoc_server_api_version_to_string(version: mongoc_server_api_version_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_api_version_to_string(version);
+end;
+
+{*****************************************************************************************************************}
+function mongoc_server_api_version_from_string(version: PAnsiChar; param1: Pmongoc_server_api_version_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_api_version_from_string(version, param1);
+end;
+
+{*****************************************************************************************}
+function mongoc_server_api_new(version: mongoc_server_api_version_t): Pmongoc_server_api_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_api_new(version);
+end;
+
+{*******************************************************************************}
+function mongoc_server_api_copy(api: Pmongoc_server_api_t): Pmongoc_server_api_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_api_copy(api);
+end;
+
+{*************************************************************}
+procedure mongoc_server_api_destroy(api: Pmongoc_server_api_t);
+begin
+  ALMongoDBLibrary.mongoc_server_api_destroy(api);
+end;
+
+{******************************************************************************}
+procedure mongoc_server_api_strict(api: Pmongoc_server_api_t; strict: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_server_api_strict(api, strict);
+end;
+
+{******************************************************************************************************}
+procedure mongoc_server_api_deprecation_errors(api: Pmongoc_server_api_t; deprecation_errors: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_server_api_deprecation_errors(api, deprecation_errors);
+end;
+
+{***********************************************************************************************}
+function mongoc_server_api_get_deprecation_errors(api: Pmongoc_server_api_t): Pmongoc_optional_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_api_get_deprecation_errors(api);
+end;
+
+{***********************************************************************************}
+function mongoc_server_api_get_strict(api: Pmongoc_server_api_t): Pmongoc_optional_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_api_get_strict(api);
+end;
+
+{*********************************************************************************************}
+function mongoc_server_api_get_version(api: Pmongoc_server_api_t): mongoc_server_api_version_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_api_get_version(api);
+end;
+
+{*************************************************************************************}
+procedure mongoc_server_description_destroy(description: Pmongoc_server_description_t);
+begin
+  ALMongoDBLibrary.mongoc_server_description_destroy(description);
+end;
+
+{*******************************************************************************************************************}
+function mongoc_server_description_new_copy(description: Pmongoc_server_description_t): Pmongoc_server_description_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_description_new_copy(description);
+end;
+
+{*****************************************************************************************}
+function mongoc_server_description_id(description: Pmongoc_server_description_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_description_id(description);
+end;
+
+{******************************************************************************************************}
+function mongoc_server_description_host(description: Pmongoc_server_description_t): Pmongoc_host_list_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_description_host(description);
+end;
+
+{******************************************************************************************************}
+function mongoc_server_description_last_update_time(description: Pmongoc_server_description_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_description_last_update_time(description);
+end;
+
+{*****************************************************************************************************}
+function mongoc_server_description_round_trip_time(description: Pmongoc_server_description_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_description_round_trip_time(description);
+end;
+
+{********************************************************************************************}
+function mongoc_server_description_type(description: Pmongoc_server_description_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_description_type(description);
+end;
+
+{****************************************************************************************************}
+function mongoc_server_description_hello_response(description: Pmongoc_server_description_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_description_hello_response(description);
+end;
+
+{***************************************************************************************************}
+function mongoc_server_description_compressor_id(description: Pmongoc_server_description_t): int32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_server_description_compressor_id(description);
+end;
+
+{*******************************************************}
+function mongoc_ssl_opt_get_default(): Pmongoc_ssl_opt_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_ssl_opt_get_default();
+end;
+
+{******************************************************************************************}
+function mongoc_socket_accept(sock: Pmongoc_socket_t; expire_at: int64_t): Pmongoc_socket_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_accept(sock, expire_at);
+end;
+
+{*******************************************************************************************************}
+function mongoc_socket_bind(sock: Pmongoc_socket_t; addr: Psockaddr; addrlen: mongoc_socklen_t): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_bind(sock, addr, addrlen);
+end;
+
+{**************************************************************}
+function mongoc_socket_close(socket: Pmongoc_socket_t): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_close(socket);
+end;
+
+{******************************************************************************************************************************}
+function mongoc_socket_connect(sock: Pmongoc_socket_t; addr: Psockaddr; addrlen: mongoc_socklen_t; expire_at: int64_t): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_connect(sock, addr, addrlen, expire_at);
+end;
+
+{********************************************************************}
+function mongoc_socket_getnameinfo(sock: Pmongoc_socket_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_getnameinfo(sock);
+end;
+
+{******************************************************}
+procedure mongoc_socket_destroy(sock: Pmongoc_socket_t);
+begin
+  ALMongoDBLibrary.mongoc_socket_destroy(sock);
+end;
+
+{************************************************************}
+function mongoc_socket_errno(sock: Pmongoc_socket_t): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_errno(sock);
+end;
+
+{***************************************************************************************************************}
+function mongoc_socket_getsockname(sock: Pmongoc_socket_t; addr: Psockaddr; addrlen: Pmongoc_socklen_t): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_getsockname(sock, addr, addrlen);
+end;
+
+{****************************************************************************}
+function mongoc_socket_listen(sock: Pmongoc_socket_t; backlog: UINT): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_listen(sock, backlog);
+end;
+
+{***********************************************************************************************}
+function mongoc_socket_new(domain: Integer; &type: Integer; protocol: Integer): Pmongoc_socket_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_new(domain, &type, protocol);
+end;
+
+{***************************************************************************************************************************}
+function mongoc_socket_recv(sock: Pmongoc_socket_t; buf: Pvoid; buflen: size_t; flags: Integer; expire_at: int64_t): ssize_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_recv(sock, buf, buflen, flags, expire_at);
+end;
+
+{********************************************************************************************************************************************}
+function mongoc_socket_setsockopt(sock: Pmongoc_socket_t; level: Integer; optname: Integer; optval: Pvoid; optlen: mongoc_socklen_t): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_setsockopt(sock, level, optname, optval, optlen);
+end;
+
+{***********************************************************************************************************}
+function mongoc_socket_send(sock: Pmongoc_socket_t; buf: Pvoid; buflen: size_t; expire_at: int64_t): ssize_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_send(sock, buf, buflen, expire_at);
+end;
+
+{**********************************************************************************************************************}
+function mongoc_socket_sendv(sock: Pmongoc_socket_t; iov: Pmongoc_iovec_t; iovcnt: size_t; expire_at: int64_t): ssize_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_sendv(sock, iov, iovcnt, expire_at);
+end;
+
+{********************************************************************}
+function mongoc_socket_check_closed(sock: Pmongoc_socket_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_check_closed(sock);
+end;
+
+{*******************************************************************************}
+procedure mongoc_socket_inet_ntop(rp: Paddrinfo; buf: PAnsiChar; buflen: size_t);
+begin
+  ALMongoDBLibrary.mongoc_socket_inet_ntop(rp, buf, buflen);
+end;
+
+{***********************************************************************************************}
+function mongoc_socket_poll(sds: Pmongoc_socket_poll_t; nsds: size_t; timeout: int32_t): ssize_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_socket_poll(sds, nsds, timeout);
+end;
+
+{*********************************************************************************}
+function mongoc_stream_get_base_stream(stream: Pmongoc_stream_t): Pmongoc_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_get_base_stream(stream);
+end;
+
+{********************************************************************************}
+function mongoc_stream_get_tls_stream(stream: Pmongoc_stream_t): Pmongoc_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_get_tls_stream(stream);
+end;
+
+{**************************************************************}
+function mongoc_stream_close(stream: Pmongoc_stream_t): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_close(stream);
+end;
+
+{********************************************************}
+procedure mongoc_stream_destroy(stream: Pmongoc_stream_t);
+begin
+  ALMongoDBLibrary.mongoc_stream_destroy(stream);
+end;
+
+{*******************************************************}
+procedure mongoc_stream_failed(stream: Pmongoc_stream_t);
+begin
+  ALMongoDBLibrary.mongoc_stream_failed(stream);
+end;
+
+{**************************************************************}
+function mongoc_stream_flush(stream: Pmongoc_stream_t): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_flush(stream);
+end;
+
+{****************************************************************************************************************************}
+function mongoc_stream_writev(stream: Pmongoc_stream_t; iov: Pmongoc_iovec_t; iovcnt: size_t; timeout_msec: int32_t): ssize_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_writev(stream, iov, iovcnt, timeout_msec);
+end;
+
+{****************************************************************************************************************}
+function mongoc_stream_write(stream: Pmongoc_stream_t; buf: Pvoid; count: size_t; timeout_msec: int32_t): ssize_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_write(stream, buf, count, timeout_msec);
+end;
+
+{**********************************************************************************************************************************************}
+function mongoc_stream_readv(stream: Pmongoc_stream_t; iov: Pmongoc_iovec_t; iovcnt: size_t; min_bytes: size_t; timeout_msec: int32_t): ssize_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_readv(stream, iov, iovcnt, min_bytes, timeout_msec);
+end;
+
+{**********************************************************************************************************************************}
+function mongoc_stream_read(stream: Pmongoc_stream_t; buf: Pvoid; count: size_t; min_bytes: size_t; timeout_msec: int32_t): ssize_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_read(stream, buf, count, min_bytes, timeout_msec);
+end;
+
+{**********************************************************************************************************************************************}
+function mongoc_stream_setsockopt(stream: Pmongoc_stream_t; level: Integer; optname: Integer; optval: Pvoid; optlen: mongoc_socklen_t): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_setsockopt(stream, level, optname, optval, optlen);
+end;
+
+{**********************************************************************}
+function mongoc_stream_check_closed(stream: Pmongoc_stream_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_check_closed(stream);
+end;
+
+{*******************************************************************}
+function mongoc_stream_timed_out(stream: Pmongoc_stream_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_timed_out(stream);
+end;
+
+{**********************************************************************}
+function mongoc_stream_should_retry(stream: Pmongoc_stream_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_should_retry(stream);
+end;
+
+{**********************************************************************************************************}
+function mongoc_stream_poll(streams: Pmongoc_stream_poll_t; nstreams: size_t; timeout_ms: int32_t): ssize_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_poll(streams, nstreams, timeout_ms);
+end;
+
+{********************************************************************************************************}
+function mongoc_stream_buffered_new(base_stream: Pmongoc_stream_t; buffer_size: size_t): Pmongoc_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_buffered_new(base_stream, buffer_size);
+end;
+
+{*************************************************************}
+function mongoc_stream_file_new(fd: Integer): Pmongoc_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_file_new(fd);
+end;
+
+{*********************************************************************************************************}
+function mongoc_stream_file_new_for_path(path: PAnsiChar; flags: Integer; mode: Integer): Pmongoc_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_file_new_for_path(path, flags, mode);
+end;
+
+{*************************************************************************}
+function mongoc_stream_file_get_fd(stream: Pmongoc_stream_file_t): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_file_get_fd(stream);
+end;
+
+{****************************************************************************}
+function mongoc_stream_socket_new(socket: Pmongoc_socket_t): Pmongoc_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_socket_new(socket);
+end;
+
+{******************************************************************************************}
+function mongoc_stream_socket_get_socket(stream: Pmongoc_stream_socket_t): Pmongoc_socket_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_socket_get_socket(stream);
+end;
+
+{***********************************************************************}
+function mongoc_structured_log_opts_new(): Pmongoc_structured_log_opts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_opts_new();
+end;
+
+{********************************************************************************}
+procedure mongoc_structured_log_opts_destroy(opts: Pmongoc_structured_log_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_structured_log_opts_destroy(opts);
+end;
+
+{**********************************************************************************************************************************************}
+procedure mongoc_structured_log_opts_set_handler(opts: Pmongoc_structured_log_opts_t; log_func: mongoc_structured_log_func_t; user_data: Pvoid);
+begin
+  ALMongoDBLibrary.mongoc_structured_log_opts_set_handler(opts, log_func, user_data);
+end;
+
+{*************************************************************************************************************************************************************************************************}
+function mongoc_structured_log_opts_set_max_level_for_component(opts: Pmongoc_structured_log_opts_t; component: mongoc_structured_log_component_t; level: mongoc_structured_log_level_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_opts_set_max_level_for_component(opts, component, level);
+end;
+
+{********************************************************************************************************************************************************}
+function mongoc_structured_log_opts_set_max_level_for_all_components(opts: Pmongoc_structured_log_opts_t; level: mongoc_structured_log_level_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_opts_set_max_level_for_all_components(opts, level);
+end;
+
+{*********************************************************************************************************}
+function mongoc_structured_log_opts_set_max_levels_from_env(opts: Pmongoc_structured_log_opts_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_opts_set_max_levels_from_env(opts);
+end;
+
+{********************************************************************************************************************************************************************************}
+function mongoc_structured_log_opts_get_max_level_for_component(opts: Pmongoc_structured_log_opts_t; component: mongoc_structured_log_component_t): mongoc_structured_log_level_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_opts_get_max_level_for_component(opts, component);
+end;
+
+{*******************************************************************************************************}
+function mongoc_structured_log_opts_get_max_document_length(opts: Pmongoc_structured_log_opts_t): size_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_opts_get_max_document_length(opts);
+end;
+
+{******************************************************************************************************************}
+function mongoc_structured_log_opts_set_max_document_length_from_env(opts: Pmongoc_structured_log_opts_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_opts_set_max_document_length_from_env(opts);
+end;
+
+{**************************************************************************************************************************************}
+function mongoc_structured_log_opts_set_max_document_length(opts: Pmongoc_structured_log_opts_t; max_document_length: size_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_opts_set_max_document_length(opts, max_document_length);
+end;
+
+{***************************************************************************************************}
+function mongoc_structured_log_entry_message_as_bson(entry: Pmongoc_structured_log_entry_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_entry_message_as_bson(entry);
+end;
+
+{*******************************************************************************************************************}
+function mongoc_structured_log_entry_get_level(entry: Pmongoc_structured_log_entry_t): mongoc_structured_log_level_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_entry_get_level(entry);
+end;
+
+{***************************************************************************************************************************}
+function mongoc_structured_log_entry_get_component(entry: Pmongoc_structured_log_entry_t): mongoc_structured_log_component_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_entry_get_component(entry);
+end;
+
+{********************************************************************************************************}
+function mongoc_structured_log_entry_get_message_string(entry: Pmongoc_structured_log_entry_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_entry_get_message_string(entry);
+end;
+
+{*********************************************************************************************}
+function mongoc_structured_log_get_level_name(level: mongoc_structured_log_level_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_get_level_name(level);
+end;
+
+{****************************************************************************************************************}
+function mongoc_structured_log_get_named_level(name: PAnsiChar; param1: Pmongoc_structured_log_level_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_get_named_level(name, param1);
+end;
+
+{*********************************************************************************************************}
+function mongoc_structured_log_get_component_name(component: mongoc_structured_log_component_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_get_component_name(component);
+end;
+
+{************************************************************************************************************************}
+function mongoc_structured_log_get_named_component(name: PAnsiChar; param1: Pmongoc_structured_log_component_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_structured_log_get_named_component(name, param1);
+end;
+
+{*******************************************}
+function mongoc_get_major_version(): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_get_major_version();
+end;
+
+{*******************************************}
+function mongoc_get_minor_version(): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_get_minor_version();
+end;
+
+{*******************************************}
+function mongoc_get_micro_version(): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_get_micro_version();
+end;
+
+{***************************************}
+function mongoc_get_version(): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_get_version();
+end;
+
+{*****************************************************************************************************************}
+function mongoc_check_version(required_major: Integer; required_minor: Integer; required_micro: Integer): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_check_version(required_major, required_minor, required_micro);
+end;
+
+{***********************************************************************}
+function mongoc_cursor_clone(cursor: Pmongoc_cursor_t): Pmongoc_cursor_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_clone(cursor);
+end;
+
+{********************************************************}
+procedure mongoc_cursor_destroy(cursor: Pmongoc_cursor_t);
+begin
+  ALMongoDBLibrary.mongoc_cursor_destroy(cursor);
+end;
+
+{**************************************************************}
+function mongoc_cursor_more(cursor: Pmongoc_cursor_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_more(cursor);
+end;
+
+{******************************************************************************}
+function mongoc_cursor_next(cursor: Pmongoc_cursor_t; bson: PPbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_next(cursor, bson);
+end;
+
+{*************************************************************************************}
+function mongoc_cursor_error(cursor: Pmongoc_cursor_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_error(cursor, error);
+end;
+
+{*************************************************************************************************************}
+function mongoc_cursor_error_document(cursor: Pmongoc_cursor_t; error: Pbson_error_t; doc: PPbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_error_document(cursor, error, doc);
+end;
+
+{************************************************************************************}
+procedure mongoc_cursor_get_host(cursor: Pmongoc_cursor_t; host: Pmongoc_host_list_t);
+begin
+  ALMongoDBLibrary.mongoc_cursor_get_host(cursor, host);
+end;
+
+{****************************************************************}
+function mongoc_cursor_current(cursor: Pmongoc_cursor_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_current(cursor);
+end;
+
+{*************************************************************************************}
+procedure mongoc_cursor_set_batch_size(cursor: Pmongoc_cursor_t; batch_size: uint32_t);
+begin
+  ALMongoDBLibrary.mongoc_cursor_set_batch_size(cursor, batch_size);
+end;
+
+{************************************************************************}
+function mongoc_cursor_get_batch_size(cursor: Pmongoc_cursor_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_get_batch_size(cursor);
+end;
+
+{***********************************************************************************}
+function mongoc_cursor_set_limit(cursor: Pmongoc_cursor_t; limit: int64_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_set_limit(cursor, limit);
+end;
+
+{******************************************************************}
+function mongoc_cursor_get_limit(cursor: Pmongoc_cursor_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_get_limit(cursor);
+end;
+
+{********************************************************************************************}
+function mongoc_cursor_set_server_id(cursor: Pmongoc_cursor_t; server_id: uint32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_set_server_id(cursor, server_id);
+end;
+
+{***********************************************************************}
+function mongoc_cursor_get_server_id(cursor: Pmongoc_cursor_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_get_server_id(cursor);
+end;
+
+{***************************************************************}
+function mongoc_cursor_get_id(cursor: Pmongoc_cursor_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_get_id(cursor);
+end;
+
+{***************************************************************************************************}
+procedure mongoc_cursor_set_max_await_time_ms(cursor: Pmongoc_cursor_t; max_await_time_ms: uint32_t);
+begin
+  ALMongoDBLibrary.mongoc_cursor_set_max_await_time_ms(cursor, max_await_time_ms);
+end;
+
+{*******************************************************************************}
+function mongoc_cursor_get_max_await_time_ms(cursor: Pmongoc_cursor_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_get_max_await_time_ms(cursor);
+end;
+
+{**********************************************************************************************************************************}
+function mongoc_cursor_new_from_command_reply_with_opts(client: P_mongoc_client_t; reply: Pbson_t; opts: Pbson_t): Pmongoc_cursor_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_cursor_new_from_command_reply_with_opts(client, reply, opts);
+end;
+
+{**********************************************************************}
+procedure mongoc_change_stream_destroy(stream: Pmongoc_change_stream_t);
+begin
+  ALMongoDBLibrary.mongoc_change_stream_destroy(stream);
+end;
+
+{***************************************************************************************}
+function mongoc_change_stream_get_resume_token(stream: Pmongoc_change_stream_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_change_stream_get_resume_token(stream);
+end;
+
+{********************************************************************************************}
+function mongoc_change_stream_next(stream: Pmongoc_change_stream_t; bson: PPbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_change_stream_next(stream, bson);
+end;
+
+{**************************************************************************************************************************}
+function mongoc_change_stream_error_document(stream: Pmongoc_change_stream_t; err: Pbson_error_t; bson: PPbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_change_stream_error_document(stream, err, bson);
+end;
+
+{**********************************************************************}
+procedure mongoc_bulk_operation_destroy(bulk: Pmongoc_bulk_operation_t);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_destroy(bulk);
+end;
+
+{*********************************************************************************************************************}
+function mongoc_bulk_operation_execute(bulk: Pmongoc_bulk_operation_t; reply: Pbson_t; error: Pbson_error_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulk_operation_execute(bulk, reply, error);
+end;
+
+{****************************************************************************************}
+procedure mongoc_bulk_operation_insert(bulk: Pmongoc_bulk_operation_t; document: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_insert(bulk, document);
+end;
+
+{************************************************************************************************************************************************}
+function mongoc_bulk_operation_insert_with_opts(bulk: Pmongoc_bulk_operation_t; document: Pbson_t; opts: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulk_operation_insert_with_opts(bulk, document, opts, error);
+end;
+
+{****************************************************************************************}
+procedure mongoc_bulk_operation_remove(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_remove(bulk, selector);
+end;
+
+{*****************************************************************************************************************************************************}
+function mongoc_bulk_operation_remove_many_with_opts(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; opts: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulk_operation_remove_many_with_opts(bulk, selector, opts, error);
+end;
+
+{********************************************************************************************}
+procedure mongoc_bulk_operation_remove_one(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_remove_one(bulk, selector);
+end;
+
+{****************************************************************************************************************************************************}
+function mongoc_bulk_operation_remove_one_with_opts(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; opts: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulk_operation_remove_one_with_opts(bulk, selector, opts, error);
+end;
+
+{**********************************************************************************************************************************}
+procedure mongoc_bulk_operation_replace_one(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; document: Pbson_t; upsert: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_replace_one(bulk, selector, document, upsert);
+end;
+
+{************************************************************************************************************************************************************************}
+function mongoc_bulk_operation_replace_one_with_opts(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; document: Pbson_t; opts: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulk_operation_replace_one_with_opts(bulk, selector, document, opts, error);
+end;
+
+{*****************************************************************************************************************************}
+procedure mongoc_bulk_operation_update(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; document: Pbson_t; upsert: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_update(bulk, selector, document, upsert);
+end;
+
+{************************************************************************************************************************************************************************}
+function mongoc_bulk_operation_update_many_with_opts(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; document: Pbson_t; opts: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulk_operation_update_many_with_opts(bulk, selector, document, opts, error);
+end;
+
+{*********************************************************************************************************************************}
+procedure mongoc_bulk_operation_update_one(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; document: Pbson_t; upsert: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_update_one(bulk, selector, document, upsert);
+end;
+
+{***********************************************************************************************************************************************************************}
+function mongoc_bulk_operation_update_one_with_opts(bulk: Pmongoc_bulk_operation_t; selector: Pbson_t; document: Pbson_t; opts: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulk_operation_update_one_with_opts(bulk, selector, document, opts, error);
+end;
+
+{***************************************************************************************************************}
+procedure mongoc_bulk_operation_set_bypass_document_validation(bulk: Pmongoc_bulk_operation_t; bypass: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_set_bypass_document_validation(bulk, bypass);
+end;
+
+{**************************************************************************************************}
+procedure mongoc_bulk_operation_set_comment(bulk: Pmongoc_bulk_operation_t; comment: Pbson_value_t);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_set_comment(bulk, comment);
+end;
+
+{************************************************************************************}
+procedure mongoc_bulk_operation_set_let(bulk: Pmongoc_bulk_operation_t; let: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_set_let(bulk, let);
+end;
+
+{******************************************************************************}
+function mongoc_bulk_operation_new(ordered: ByteBool): Pmongoc_bulk_operation_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulk_operation_new(ordered);
+end;
+
+{************************************************************************************************************************}
+procedure mongoc_bulk_operation_set_write_concern(bulk: Pmongoc_bulk_operation_t; write_concern: Pmongoc_write_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_set_write_concern(bulk, write_concern);
+end;
+
+{************************************************************************************************}
+procedure mongoc_bulk_operation_set_database(bulk: Pmongoc_bulk_operation_t; database: PAnsiChar);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_set_database(bulk, database);
+end;
+
+{****************************************************************************************************}
+procedure mongoc_bulk_operation_set_collection(bulk: Pmongoc_bulk_operation_t; collection: PAnsiChar);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_set_collection(bulk, collection);
+end;
+
+{****************************************************************************************}
+procedure mongoc_bulk_operation_set_client(bulk: Pmongoc_bulk_operation_t; client: Pvoid);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_set_client(bulk, client);
+end;
+
+{****************************************************************************************************************************}
+procedure mongoc_bulk_operation_set_client_session(bulk: Pmongoc_bulk_operation_t; client_session: P_mongoc_client_session_t);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_set_client_session(bulk, client_session);
+end;
+
+{*************************************************************************************************}
+procedure mongoc_bulk_operation_set_server_id(bulk: Pmongoc_bulk_operation_t; server_id: uint32_t);
+begin
+  ALMongoDBLibrary.mongoc_bulk_operation_set_server_id(bulk, server_id);
+end;
+
+{*************************************************************************************}
+function mongoc_bulk_operation_get_server_id(bulk: Pmongoc_bulk_operation_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulk_operation_get_server_id(bulk);
+end;
+
+{********************************************************************************************************}
+function mongoc_bulk_operation_get_write_concern(bulk: Pmongoc_bulk_operation_t): Pmongoc_write_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulk_operation_get_write_concern(bulk);
+end;
+
+{*************************************************************************}
+function mongoc_auto_encryption_opts_new(): Pmongoc_auto_encryption_opts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_auto_encryption_opts_new();
+end;
+
+{**********************************************************************************}
+procedure mongoc_auto_encryption_opts_destroy(opts: Pmongoc_auto_encryption_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_destroy(opts);
+end;
+
+{*************************************************************************************************************************}
+procedure mongoc_auto_encryption_opts_set_keyvault_client(opts: Pmongoc_auto_encryption_opts_t; client: P_mongoc_client_t);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_set_keyvault_client(opts, client);
+end;
+
+{*********************************************************************************************************************************}
+procedure mongoc_auto_encryption_opts_set_keyvault_client_pool(opts: Pmongoc_auto_encryption_opts_t; pool: P_mongoc_client_pool_t);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_set_keyvault_client_pool(opts, pool);
+end;
+
+{*********************************************************************************************************************************}
+procedure mongoc_auto_encryption_opts_set_keyvault_namespace(opts: Pmongoc_auto_encryption_opts_t; db: PAnsiChar; coll: PAnsiChar);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_set_keyvault_namespace(opts, db, coll);
+end;
+
+{********************************************************************************************************************}
+procedure mongoc_auto_encryption_opts_set_kms_providers(opts: Pmongoc_auto_encryption_opts_t; kms_providers: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_set_kms_providers(opts, kms_providers);
+end;
+
+{*******************************************************************************************************************}
+procedure mongoc_auto_encryption_opts_set_key_expiration(opts: Pmongoc_auto_encryption_opts_t; expiration: uint64_t);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_set_key_expiration(opts, expiration);
+end;
+
+{**********************************************************************************************************}
+procedure mongoc_auto_encryption_opts_set_tls_opts(opts: Pmongoc_auto_encryption_opts_t; tls_opts: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_set_tls_opts(opts, tls_opts);
+end;
+
+{**************************************************************************************************************}
+procedure mongoc_auto_encryption_opts_set_schema_map(opts: Pmongoc_auto_encryption_opts_t; schema_map: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_set_schema_map(opts, schema_map);
+end;
+
+{**********************************************************************************************************************************}
+procedure mongoc_auto_encryption_opts_set_encrypted_fields_map(opts: Pmongoc_auto_encryption_opts_t; encrypted_fields_map: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_set_encrypted_fields_map(opts, encrypted_fields_map);
+end;
+
+{***************************************************************************************************************************************}
+procedure mongoc_auto_encryption_opts_set_bypass_auto_encryption(opts: Pmongoc_auto_encryption_opts_t; bypass_auto_encryption: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_set_bypass_auto_encryption(opts, bypass_auto_encryption);
+end;
+
+{*************************************************************************************************************************************}
+procedure mongoc_auto_encryption_opts_set_bypass_query_analysis(opts: Pmongoc_auto_encryption_opts_t; bypass_query_analysis: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_set_bypass_query_analysis(opts, bypass_query_analysis);
+end;
+
+{****************************************************************************************************}
+procedure mongoc_auto_encryption_opts_set_extra(opts: Pmongoc_auto_encryption_opts_t; extra: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_set_extra(opts, extra);
+end;
+
+{*********************************************************************************************************************************************************************************}
+procedure mongoc_auto_encryption_opts_set_kms_credential_provider_callback(opts: Pmongoc_auto_encryption_opts_t; fn: mongoc_kms_credentials_provider_callback_fn; userdata: Pvoid);
+begin
+  ALMongoDBLibrary.mongoc_auto_encryption_opts_set_kms_credential_provider_callback(opts, fn, userdata);
+end;
+
+{*****************************************************************************}
+function mongoc_client_encryption_opts_new(): Pmongoc_client_encryption_opts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_opts_new();
+end;
+
+{**************************************************************************************}
+procedure mongoc_client_encryption_opts_destroy(opts: Pmongoc_client_encryption_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_opts_destroy(opts);
+end;
+
+{**************************************************************************************************************************************}
+procedure mongoc_client_encryption_opts_set_keyvault_client(opts: Pmongoc_client_encryption_opts_t; keyvault_client: P_mongoc_client_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_opts_set_keyvault_client(opts, keyvault_client);
+end;
+
+{*************************************************************************************************************************************}
+procedure mongoc_client_encryption_opts_set_keyvault_namespace(opts: Pmongoc_client_encryption_opts_t; db: PAnsiChar; coll: PAnsiChar);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_opts_set_keyvault_namespace(opts, db, coll);
+end;
+
+{************************************************************************************************************************}
+procedure mongoc_client_encryption_opts_set_kms_providers(opts: Pmongoc_client_encryption_opts_t; kms_providers: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_opts_set_kms_providers(opts, kms_providers);
+end;
+
+{**************************************************************************************************************}
+procedure mongoc_client_encryption_opts_set_tls_opts(opts: Pmongoc_client_encryption_opts_t; tls_opts: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_opts_set_tls_opts(opts, tls_opts);
+end;
+
+{*************************************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_opts_set_kms_credential_provider_callback(opts: Pmongoc_client_encryption_opts_t; fn: mongoc_kms_credentials_provider_callback_fn; userdata: Pvoid);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_opts_set_kms_credential_provider_callback(opts, fn, userdata);
+end;
+
+{********************************************************************************************************************************}
+procedure mongoc_client_encryption_opts_set_key_expiration(opts: Pmongoc_client_encryption_opts_t; cache_expiration_ms: uint64_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_opts_set_key_expiration(opts, cache_expiration_ms);
+end;
+
+{*************************************************************************************************************************}
+function mongoc_client_encryption_rewrap_many_datakey_result_new(): Pmongoc_client_encryption_rewrap_many_datakey_result_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_rewrap_many_datakey_result_new();
+end;
+
+{*************************************************************************************************************************************}
+procedure mongoc_client_encryption_rewrap_many_datakey_result_destroy(_result: Pmongoc_client_encryption_rewrap_many_datakey_result_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_rewrap_many_datakey_result_destroy(_result);
+end;
+
+{***********************************************************************************************************************************************************}
+function mongoc_client_encryption_rewrap_many_datakey_result_get_bulk_write_result(_result: Pmongoc_client_encryption_rewrap_many_datakey_result_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_rewrap_many_datakey_result_get_bulk_write_result(_result);
+end;
+
+{*******************************************************************************************************************************}
+function mongoc_client_encryption_new(opts: Pmongoc_client_encryption_opts_t; error: Pbson_error_t): Pmongoc_client_encryption_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_new(opts, error);
+end;
+
+{*****************************************************************************************}
+procedure mongoc_client_encryption_destroy(client_encryption: Pmongoc_client_encryption_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_destroy(client_encryption);
+end;
+
+{******************************************************************************************************************************************************************************************************************************}
+function mongoc_client_encryption_create_datakey(client_encryption: Pmongoc_client_encryption_t; kms_provider: PAnsiChar; opts: Pmongoc_client_encryption_datakey_opts_t; keyid: Pbson_value_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_create_datakey(client_encryption, kms_provider, opts, keyid, error);
+end;
+
+{****************************************************************************************************************************************************************************************************************************************************************}
+function mongoc_client_encryption_rewrap_many_datakey(client_encryption: Pmongoc_client_encryption_t; filter: Pbson_t; provider: PAnsiChar; master_key: Pbson_t; _result: Pmongoc_client_encryption_rewrap_many_datakey_result_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_rewrap_many_datakey(client_encryption, filter, provider, master_key, _result, error);
+end;
+
+{*****************************************************************************************************************************************************************}
+function mongoc_client_encryption_delete_key(client_encryption: Pmongoc_client_encryption_t; keyid: Pbson_value_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_delete_key(client_encryption, keyid, reply, error);
+end;
+
+{****************************************************************************************************************************************************************}
+function mongoc_client_encryption_get_key(client_encryption: Pmongoc_client_encryption_t; keyid: Pbson_value_t; key_doc: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_get_key(client_encryption, keyid, key_doc, error);
+end;
+
+{*********************************************************************************************************************}
+function mongoc_client_encryption_encrypt_text_prefix_opts_new(): Pmongoc_client_encryption_encrypt_text_prefix_opts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_prefix_opts_new();
+end;
+
+{*********************************************************************************************************************}
+function mongoc_client_encryption_encrypt_text_suffix_opts_new(): Pmongoc_client_encryption_encrypt_text_suffix_opts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_suffix_opts_new();
+end;
+
+{***************************************************************************************************************************}
+function mongoc_client_encryption_encrypt_text_substring_opts_new(): Pmongoc_client_encryption_encrypt_text_substring_opts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_substring_opts_new();
+end;
+
+{******************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_prefix_opts_destroy(opts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_prefix_opts_destroy(opts);
+end;
+
+{******************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_suffix_opts_destroy(opts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_suffix_opts_destroy(opts);
+end;
+
+{************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_substring_opts_destroy(opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_substring_opts_destroy(opts);
+end;
+
+{******************************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_prefix_opts_set_str_max_query_length(opts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t; str_max_query_length: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_prefix_opts_set_str_max_query_length(opts, str_max_query_length);
+end;
+
+{******************************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_prefix_opts_set_str_min_query_length(opts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t; str_min_query_length: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_prefix_opts_set_str_min_query_length(opts, str_min_query_length);
+end;
+
+{******************************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_suffix_opts_set_str_max_query_length(opts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t; str_max_query_length: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_suffix_opts_set_str_max_query_length(opts, str_max_query_length);
+end;
+
+{******************************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_suffix_opts_set_str_min_query_length(opts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t; str_min_query_length: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_suffix_opts_set_str_min_query_length(opts, str_min_query_length);
+end;
+
+{************************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_substring_opts_set_str_max_length(opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t; str_max_length: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_substring_opts_set_str_max_length(opts, str_max_length);
+end;
+
+{************************************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_substring_opts_set_str_max_query_length(opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t; str_max_query_length: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_substring_opts_set_str_max_query_length(opts, str_max_query_length);
+end;
+
+{************************************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_substring_opts_set_str_min_query_length(opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t; str_min_query_length: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_substring_opts_set_str_min_query_length(opts, str_min_query_length);
+end;
+
+{********************************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_opts_set_prefix(opts: Pmongoc_client_encryption_encrypt_text_opts_t; popts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_opts_set_prefix(opts, popts);
+end;
+
+{********************************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_opts_set_suffix(opts: Pmongoc_client_encryption_encrypt_text_opts_t; sopts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_opts_set_suffix(opts, sopts);
+end;
+
+{***************************************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_opts_set_substring(opts: Pmongoc_client_encryption_encrypt_text_opts_t; ssopts: Pmongoc_client_encryption_encrypt_text_substring_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_opts_set_substring(opts, ssopts);
+end;
+
+{*******************************************************************************************************}
+function mongoc_client_encryption_encrypt_text_opts_new(): Pmongoc_client_encryption_encrypt_text_opts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_opts_new();
+end;
+
+{*****************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_opts_destroy(topts: Pmongoc_client_encryption_encrypt_text_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_opts_destroy(topts);
+end;
+
+{**********************************************************************************************************************************}
+function mongoc_client_encryption_get_keys(client_encryption: Pmongoc_client_encryption_t; error: Pbson_error_t): P_mongoc_cursor_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_get_keys(client_encryption, error);
+end;
+
+{************************************************************************************************************************************************************************************************}
+function mongoc_client_encryption_add_key_alt_name(client_encryption: Pmongoc_client_encryption_t; keyid: Pbson_value_t; keyaltname: PAnsiChar; key_doc: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_add_key_alt_name(client_encryption, keyid, keyaltname, key_doc, error);
+end;
+
+{***************************************************************************************************************************************************************************************************}
+function mongoc_client_encryption_remove_key_alt_name(client_encryption: Pmongoc_client_encryption_t; keyid: Pbson_value_t; keyaltname: PAnsiChar; key_doc: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_remove_key_alt_name(client_encryption, keyid, keyaltname, key_doc, error);
+end;
+
+{*****************************************************************************************************************************************************************************}
+function mongoc_client_encryption_get_key_by_alt_name(client_encryption: Pmongoc_client_encryption_t; keyaltname: PAnsiChar; key_doc: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_get_key_by_alt_name(client_encryption, keyaltname, key_doc, error);
+end;
+
+{*************************************************************************************************************************************************************************************************************************}
+function mongoc_client_encryption_encrypt(client_encryption: Pmongoc_client_encryption_t; value: Pbson_value_t; opts: Pmongoc_client_encryption_encrypt_opts_t; ciphertext: Pbson_value_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_encrypt(client_encryption, value, opts, ciphertext, error);
+end;
+
+{*********************************************************************************************************************************************************************************************************************}
+function mongoc_client_encryption_encrypt_expression(client_encryption: Pmongoc_client_encryption_t; expr: Pbson_t; opts: Pmongoc_client_encryption_encrypt_opts_t; expr_out: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_encrypt_expression(client_encryption, expr, opts, expr_out, error);
+end;
+
+{*************************************************************************************************************************************************************************}
+function mongoc_client_encryption_decrypt(client_encryption: Pmongoc_client_encryption_t; ciphertext: Pbson_value_t; value: Pbson_value_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_decrypt(client_encryption, ciphertext, value, error);
+end;
+
+{*********************************************************************************************}
+function mongoc_client_encryption_encrypt_opts_new(): Pmongoc_client_encryption_encrypt_opts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_encrypt_opts_new();
+end;
+
+{******************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_opts_destroy(opts: Pmongoc_client_encryption_encrypt_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_opts_destroy(opts);
+end;
+
+{******************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_opts_set_keyid(opts: Pmongoc_client_encryption_encrypt_opts_t; keyid: Pbson_value_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_opts_set_keyid(opts, keyid);
+end;
+
+{************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_opts_set_keyaltname(opts: Pmongoc_client_encryption_encrypt_opts_t; keyaltname: PAnsiChar);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_opts_set_keyaltname(opts, keyaltname);
+end;
+
+{**********************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_opts_set_algorithm(opts: Pmongoc_client_encryption_encrypt_opts_t; algorithm: PAnsiChar);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_opts_set_algorithm(opts, algorithm);
+end;
+
+{************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_opts_set_contention_factor(opts: Pmongoc_client_encryption_encrypt_opts_t; contention_factor: int64_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_opts_set_contention_factor(opts, contention_factor);
+end;
+
+{**********************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_opts_set_text_opts(opts: Pmongoc_client_encryption_encrypt_opts_t; text_opts: Pmongoc_client_encryption_encrypt_text_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_opts_set_text_opts(opts, text_opts);
+end;
+
+{*****************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_opts_set_case_sensitive(opts: Pmongoc_client_encryption_encrypt_text_opts_t; case_sensitive: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_opts_set_case_sensitive(opts, case_sensitive);
+end;
+
+{***************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_text_opts_set_diacritic_sensitive(opts: Pmongoc_client_encryption_encrypt_text_opts_t; diacritic_sensitive: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_text_opts_set_diacritic_sensitive(opts, diacritic_sensitive);
+end;
+
+{************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_opts_set_query_type(opts: Pmongoc_client_encryption_encrypt_opts_t; query_type: PAnsiChar);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_opts_set_query_type(opts, query_type);
+end;
+
+{*********************************************************************************************************}
+function mongoc_client_encryption_encrypt_range_opts_new(): Pmongoc_client_encryption_encrypt_range_opts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_encrypt_range_opts_new();
+end;
+
+{************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_range_opts_destroy(range_opts: Pmongoc_client_encryption_encrypt_range_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_range_opts_destroy(range_opts);
+end;
+
+{******************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_range_opts_set_trim_factor(range_opts: Pmongoc_client_encryption_encrypt_range_opts_t; trim_factor: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_range_opts_set_trim_factor(range_opts, trim_factor);
+end;
+
+{************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_range_opts_set_sparsity(range_opts: Pmongoc_client_encryption_encrypt_range_opts_t; sparsity: int64_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_range_opts_set_sparsity(range_opts, sparsity);
+end;
+
+{********************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_range_opts_set_min(range_opts: Pmongoc_client_encryption_encrypt_range_opts_t; min: Pbson_value_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_range_opts_set_min(range_opts, min);
+end;
+
+{********************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_range_opts_set_max(range_opts: Pmongoc_client_encryption_encrypt_range_opts_t; max: Pbson_value_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_range_opts_set_max(range_opts, max);
+end;
+
+{**************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_range_opts_set_precision(range_opts: Pmongoc_client_encryption_encrypt_range_opts_t; precision: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_range_opts_set_precision(range_opts, precision);
+end;
+
+{*************************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_encrypt_opts_set_range_opts(opts: Pmongoc_client_encryption_encrypt_opts_t; range_opts: Pmongoc_client_encryption_encrypt_range_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_encrypt_opts_set_range_opts(opts, range_opts);
+end;
+
+{*********************************************************************************************}
+function mongoc_client_encryption_datakey_opts_new(): Pmongoc_client_encryption_datakey_opts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_datakey_opts_new();
+end;
+
+{******************************************************************************************************}
+procedure mongoc_client_encryption_datakey_opts_destroy(opts: Pmongoc_client_encryption_datakey_opts_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_datakey_opts_destroy(opts);
+end;
+
+{********************************************************************************************************************************}
+procedure mongoc_client_encryption_datakey_opts_set_masterkey(opts: Pmongoc_client_encryption_datakey_opts_t; masterkey: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_datakey_opts_set_masterkey(opts, masterkey);
+end;
+
+{********************************************************************************************************************************************************************}
+procedure mongoc_client_encryption_datakey_opts_set_keyaltnames(opts: Pmongoc_client_encryption_datakey_opts_t; keyaltnames: PPAnsiChar; keyaltnames_count: uint32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_datakey_opts_set_keyaltnames(opts, keyaltnames, keyaltnames_count);
+end;
+
+{*********************************************************************************************************************************************}
+procedure mongoc_client_encryption_datakey_opts_set_keymaterial(opts: Pmongoc_client_encryption_datakey_opts_t; data: Puint8_t; len: uint32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_encryption_datakey_opts_set_keymaterial(opts, data, len);
+end;
+
+{******************************************************************************************************}
+function mongoc_client_encryption_get_crypt_shared_version(enc: Pmongoc_client_encryption_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_get_crypt_shared_version(enc);
+end;
+
+{*******************************************************************************************************************************************************************************************************************************************************************************************}
+function mongoc_client_encryption_create_encrypted_collection(enc: Pmongoc_client_encryption_t; database: P_mongoc_database_t; name: PAnsiChar; in_options: Pbson_t; opt_out_options: Pbson_t; kms_provider: PAnsiChar; opt_masterkey: Pbson_t; error: Pbson_error_t): P_mongoc_collection_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_encryption_create_encrypted_collection(enc, database, name, in_options, opt_out_options, kms_provider, opt_masterkey, error);
+end;
+
+{*******************************************************************************************************************************************************}
+function mongoc_stream_tls_handshake(stream: Pmongoc_stream_t; host: PAnsiChar; timeout_msec: int32_t; events: PInteger; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_tls_handshake(stream, host, timeout_msec, events, error);
+end;
+
+{*******************************************************************************************************************************************}
+function mongoc_stream_tls_handshake_block(stream: Pmongoc_stream_t; host: PAnsiChar; timeout_msec: int32_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_tls_handshake_block(stream, host, timeout_msec, error);
+end;
+
+{******************************************************************************************************************************************************}
+function mongoc_stream_tls_new_with_hostname(base_stream: Pmongoc_stream_t; host: PAnsiChar; opt: Pmongoc_ssl_opt_t; client: Integer): Pmongoc_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_tls_new_with_hostname(base_stream, host, opt, client);
+end;
+
+{*****************************************************************************************}
+procedure mongoc_topology_description_destroy(description: Pmongoc_topology_description_t);
+begin
+  ALMongoDBLibrary.mongoc_topology_description_destroy(description);
+end;
+
+{*************************************************************************************************************************}
+function mongoc_topology_description_new_copy(description: Pmongoc_topology_description_t): Pmongoc_topology_description_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_topology_description_new_copy(description);
+end;
+
+{**********************************************************************************************************************************}
+function mongoc_topology_description_has_readable_server(td: Pmongoc_topology_description_t; prefs: Pmongoc_read_prefs_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_topology_description_has_readable_server(td, prefs);
+end;
+
+{*****************************************************************************************************}
+function mongoc_topology_description_has_writable_server(td: Pmongoc_topology_description_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_topology_description_has_writable_server(td);
+end;
+
+{***************************************************************************************}
+function mongoc_topology_description_type(td: Pmongoc_topology_description_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_topology_description_type(td);
+end;
+
+{******************************************************************************************************************************}
+function mongoc_topology_description_get_servers(td: Pmongoc_topology_description_t; n: Psize_t): PPmongoc_server_description_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_topology_description_get_servers(td, n);
+end;
+
+{*********************************************************************************************}
+function mongoc_apm_command_started_get_command(event: Pmongoc_apm_command_started_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_started_get_command(event);
+end;
+
+{*****************************************************************************************************}
+function mongoc_apm_command_started_get_database_name(event: Pmongoc_apm_command_started_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_started_get_database_name(event);
+end;
+
+{****************************************************************************************************}
+function mongoc_apm_command_started_get_command_name(event: Pmongoc_apm_command_started_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_started_get_command_name(event);
+end;
+
+{************************************************************************************************}
+function mongoc_apm_command_started_get_request_id(event: Pmongoc_apm_command_started_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_started_get_request_id(event);
+end;
+
+{**************************************************************************************************}
+function mongoc_apm_command_started_get_operation_id(event: Pmongoc_apm_command_started_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_started_get_operation_id(event);
+end;
+
+{******************************************************************************************************}
+function mongoc_apm_command_started_get_host(event: Pmongoc_apm_command_started_t): Pmongoc_host_list_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_started_get_host(event);
+end;
+
+{************************************************************************************************}
+function mongoc_apm_command_started_get_server_id(event: Pmongoc_apm_command_started_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_started_get_server_id(event);
+end;
+
+{****************************************************************************************************}
+function mongoc_apm_command_started_get_service_id(event: Pmongoc_apm_command_started_t): Pbson_oid_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_started_get_service_id(event);
+end;
+
+{****************************************************************************************************************}
+function mongoc_apm_command_started_get_server_connection_id_int64(event: Pmongoc_apm_command_started_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_started_get_server_connection_id_int64(event);
+end;
+
+{*******************************************************************************************}
+function mongoc_apm_command_started_get_context(event: Pmongoc_apm_command_started_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_started_get_context(event);
+end;
+
+{**************************************************************************************************}
+function mongoc_apm_command_succeeded_get_duration(event: Pmongoc_apm_command_succeeded_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_succeeded_get_duration(event);
+end;
+
+{***********************************************************************************************}
+function mongoc_apm_command_succeeded_get_reply(event: Pmongoc_apm_command_succeeded_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_succeeded_get_reply(event);
+end;
+
+{********************************************************************************************************}
+function mongoc_apm_command_succeeded_get_command_name(event: Pmongoc_apm_command_succeeded_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_succeeded_get_command_name(event);
+end;
+
+{*********************************************************************************************************}
+function mongoc_apm_command_succeeded_get_database_name(event: Pmongoc_apm_command_succeeded_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_succeeded_get_database_name(event);
+end;
+
+{****************************************************************************************************}
+function mongoc_apm_command_succeeded_get_request_id(event: Pmongoc_apm_command_succeeded_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_succeeded_get_request_id(event);
+end;
+
+{******************************************************************************************************}
+function mongoc_apm_command_succeeded_get_operation_id(event: Pmongoc_apm_command_succeeded_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_succeeded_get_operation_id(event);
+end;
+
+{**********************************************************************************************************}
+function mongoc_apm_command_succeeded_get_host(event: Pmongoc_apm_command_succeeded_t): Pmongoc_host_list_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_succeeded_get_host(event);
+end;
+
+{****************************************************************************************************}
+function mongoc_apm_command_succeeded_get_server_id(event: Pmongoc_apm_command_succeeded_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_succeeded_get_server_id(event);
+end;
+
+{********************************************************************************************************}
+function mongoc_apm_command_succeeded_get_service_id(event: Pmongoc_apm_command_succeeded_t): Pbson_oid_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_succeeded_get_service_id(event);
+end;
+
+{********************************************************************************************************************}
+function mongoc_apm_command_succeeded_get_server_connection_id_int64(event: Pmongoc_apm_command_succeeded_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_succeeded_get_server_connection_id_int64(event);
+end;
+
+{***********************************************************************************************}
+function mongoc_apm_command_succeeded_get_context(event: Pmongoc_apm_command_succeeded_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_succeeded_get_context(event);
+end;
+
+{********************************************************************************************}
+function mongoc_apm_command_failed_get_duration(event: Pmongoc_apm_command_failed_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_failed_get_duration(event);
+end;
+
+{**************************************************************************************************}
+function mongoc_apm_command_failed_get_command_name(event: Pmongoc_apm_command_failed_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_failed_get_command_name(event);
+end;
+
+{***************************************************************************************************}
+function mongoc_apm_command_failed_get_database_name(event: Pmongoc_apm_command_failed_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_failed_get_database_name(event);
+end;
+
+{*******************************************************************************************************}
+procedure mongoc_apm_command_failed_get_error(event: Pmongoc_apm_command_failed_t; error: Pbson_error_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_command_failed_get_error(event, error);
+end;
+
+{*****************************************************************************************}
+function mongoc_apm_command_failed_get_reply(event: Pmongoc_apm_command_failed_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_failed_get_reply(event);
+end;
+
+{**********************************************************************************************}
+function mongoc_apm_command_failed_get_request_id(event: Pmongoc_apm_command_failed_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_failed_get_request_id(event);
+end;
+
+{************************************************************************************************}
+function mongoc_apm_command_failed_get_operation_id(event: Pmongoc_apm_command_failed_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_failed_get_operation_id(event);
+end;
+
+{****************************************************************************************************}
+function mongoc_apm_command_failed_get_host(event: Pmongoc_apm_command_failed_t): Pmongoc_host_list_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_failed_get_host(event);
+end;
+
+{**********************************************************************************************}
+function mongoc_apm_command_failed_get_server_id(event: Pmongoc_apm_command_failed_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_failed_get_server_id(event);
+end;
+
+{**************************************************************************************************}
+function mongoc_apm_command_failed_get_service_id(event: Pmongoc_apm_command_failed_t): Pbson_oid_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_failed_get_service_id(event);
+end;
+
+{**************************************************************************************************************}
+function mongoc_apm_command_failed_get_server_connection_id_int64(event: Pmongoc_apm_command_failed_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_failed_get_server_connection_id_int64(event);
+end;
+
+{*****************************************************************************************}
+function mongoc_apm_command_failed_get_context(event: Pmongoc_apm_command_failed_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_command_failed_get_context(event);
+end;
+
+{****************************************************************************************************}
+function mongoc_apm_server_changed_get_host(event: Pmongoc_apm_server_changed_t): Pmongoc_host_list_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_changed_get_host(event);
+end;
+
+{*****************************************************************************************************************}
+procedure mongoc_apm_server_changed_get_topology_id(event: Pmongoc_apm_server_changed_t; topology_id: Pbson_oid_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_server_changed_get_topology_id(event, topology_id);
+end;
+
+{*****************************************************************************************************************************}
+function mongoc_apm_server_changed_get_previous_description(event: Pmongoc_apm_server_changed_t): Pmongoc_server_description_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_changed_get_previous_description(event);
+end;
+
+{************************************************************************************************************************}
+function mongoc_apm_server_changed_get_new_description(event: Pmongoc_apm_server_changed_t): Pmongoc_server_description_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_changed_get_new_description(event);
+end;
+
+{*****************************************************************************************}
+function mongoc_apm_server_changed_get_context(event: Pmongoc_apm_server_changed_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_changed_get_context(event);
+end;
+
+{****************************************************************************************************}
+function mongoc_apm_server_opening_get_host(event: Pmongoc_apm_server_opening_t): Pmongoc_host_list_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_opening_get_host(event);
+end;
+
+{*****************************************************************************************************************}
+procedure mongoc_apm_server_opening_get_topology_id(event: Pmongoc_apm_server_opening_t; topology_id: Pbson_oid_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_server_opening_get_topology_id(event, topology_id);
+end;
+
+{*****************************************************************************************}
+function mongoc_apm_server_opening_get_context(event: Pmongoc_apm_server_opening_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_opening_get_context(event);
+end;
+
+{**************************************************************************************************}
+function mongoc_apm_server_closed_get_host(event: Pmongoc_apm_server_closed_t): Pmongoc_host_list_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_closed_get_host(event);
+end;
+
+{***************************************************************************************************************}
+procedure mongoc_apm_server_closed_get_topology_id(event: Pmongoc_apm_server_closed_t; topology_id: Pbson_oid_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_server_closed_get_topology_id(event, topology_id);
+end;
+
+{***************************************************************************************}
+function mongoc_apm_server_closed_get_context(event: Pmongoc_apm_server_closed_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_closed_get_context(event);
+end;
+
+{*********************************************************************************************************************}
+procedure mongoc_apm_topology_changed_get_topology_id(event: Pmongoc_apm_topology_changed_t; topology_id: Pbson_oid_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_topology_changed_get_topology_id(event, topology_id);
+end;
+
+{***********************************************************************************************************************************}
+function mongoc_apm_topology_changed_get_previous_description(event: Pmongoc_apm_topology_changed_t): Pmongoc_topology_description_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_topology_changed_get_previous_description(event);
+end;
+
+{******************************************************************************************************************************}
+function mongoc_apm_topology_changed_get_new_description(event: Pmongoc_apm_topology_changed_t): Pmongoc_topology_description_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_topology_changed_get_new_description(event);
+end;
+
+{*********************************************************************************************}
+function mongoc_apm_topology_changed_get_context(event: Pmongoc_apm_topology_changed_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_topology_changed_get_context(event);
+end;
+
+{*********************************************************************************************************************}
+procedure mongoc_apm_topology_opening_get_topology_id(event: Pmongoc_apm_topology_opening_t; topology_id: Pbson_oid_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_topology_opening_get_topology_id(event, topology_id);
+end;
+
+{*********************************************************************************************}
+function mongoc_apm_topology_opening_get_context(event: Pmongoc_apm_topology_opening_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_topology_opening_get_context(event);
+end;
+
+{*******************************************************************************************************************}
+procedure mongoc_apm_topology_closed_get_topology_id(event: Pmongoc_apm_topology_closed_t; topology_id: Pbson_oid_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_topology_closed_get_topology_id(event, topology_id);
+end;
+
+{*******************************************************************************************}
+function mongoc_apm_topology_closed_get_context(event: Pmongoc_apm_topology_closed_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_topology_closed_get_context(event);
+end;
+
+{************************************************************************************************************************}
+function mongoc_apm_server_heartbeat_started_get_host(event: Pmongoc_apm_server_heartbeat_started_t): Pmongoc_host_list_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_heartbeat_started_get_host(event);
+end;
+
+{*************************************************************************************************************}
+function mongoc_apm_server_heartbeat_started_get_context(event: Pmongoc_apm_server_heartbeat_started_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_heartbeat_started_get_context(event);
+end;
+
+{****************************************************************************************************************}
+function mongoc_apm_server_heartbeat_started_get_awaited(event: Pmongoc_apm_server_heartbeat_started_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_heartbeat_started_get_awaited(event);
+end;
+
+{********************************************************************************************************************}
+function mongoc_apm_server_heartbeat_succeeded_get_duration(event: Pmongoc_apm_server_heartbeat_succeeded_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_heartbeat_succeeded_get_duration(event);
+end;
+
+{*****************************************************************************************************************}
+function mongoc_apm_server_heartbeat_succeeded_get_reply(event: Pmongoc_apm_server_heartbeat_succeeded_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_heartbeat_succeeded_get_reply(event);
+end;
+
+{****************************************************************************************************************************}
+function mongoc_apm_server_heartbeat_succeeded_get_host(event: Pmongoc_apm_server_heartbeat_succeeded_t): Pmongoc_host_list_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_heartbeat_succeeded_get_host(event);
+end;
+
+{*****************************************************************************************************************}
+function mongoc_apm_server_heartbeat_succeeded_get_context(event: Pmongoc_apm_server_heartbeat_succeeded_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_heartbeat_succeeded_get_context(event);
+end;
+
+{********************************************************************************************************************}
+function mongoc_apm_server_heartbeat_succeeded_get_awaited(event: Pmongoc_apm_server_heartbeat_succeeded_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_heartbeat_succeeded_get_awaited(event);
+end;
+
+{**************************************************************************************************************}
+function mongoc_apm_server_heartbeat_failed_get_duration(event: Pmongoc_apm_server_heartbeat_failed_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_heartbeat_failed_get_duration(event);
+end;
+
+{*************************************************************************************************************************}
+procedure mongoc_apm_server_heartbeat_failed_get_error(event: Pmongoc_apm_server_heartbeat_failed_t; error: Pbson_error_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_server_heartbeat_failed_get_error(event, error);
+end;
+
+{**********************************************************************************************************************}
+function mongoc_apm_server_heartbeat_failed_get_host(event: Pmongoc_apm_server_heartbeat_failed_t): Pmongoc_host_list_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_heartbeat_failed_get_host(event);
+end;
+
+{***********************************************************************************************************}
+function mongoc_apm_server_heartbeat_failed_get_context(event: Pmongoc_apm_server_heartbeat_failed_t): Pvoid;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_heartbeat_failed_get_context(event);
+end;
+
+{**************************************************************************************************************}
+function mongoc_apm_server_heartbeat_failed_get_awaited(event: Pmongoc_apm_server_heartbeat_failed_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_server_heartbeat_failed_get_awaited(event);
+end;
+
+{***********************************************************}
+function mongoc_apm_callbacks_new(): Pmongoc_apm_callbacks_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_apm_callbacks_new();
+end;
+
+{*************************************************************************}
+procedure mongoc_apm_callbacks_destroy(callbacks: Pmongoc_apm_callbacks_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_callbacks_destroy(callbacks);
+end;
+
+{*******************************************************************************************************************}
+procedure mongoc_apm_set_command_started_cb(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_command_started_cb_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_set_command_started_cb(callbacks, cb);
+end;
+
+{***********************************************************************************************************************}
+procedure mongoc_apm_set_command_succeeded_cb(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_command_succeeded_cb_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_set_command_succeeded_cb(callbacks, cb);
+end;
+
+{*****************************************************************************************************************}
+procedure mongoc_apm_set_command_failed_cb(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_command_failed_cb_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_set_command_failed_cb(callbacks, cb);
+end;
+
+{*****************************************************************************************************************}
+procedure mongoc_apm_set_server_changed_cb(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_server_changed_cb_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_set_server_changed_cb(callbacks, cb);
+end;
+
+{*****************************************************************************************************************}
+procedure mongoc_apm_set_server_opening_cb(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_server_opening_cb_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_set_server_opening_cb(callbacks, cb);
+end;
+
+{***************************************************************************************************************}
+procedure mongoc_apm_set_server_closed_cb(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_server_closed_cb_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_set_server_closed_cb(callbacks, cb);
+end;
+
+{*********************************************************************************************************************}
+procedure mongoc_apm_set_topology_changed_cb(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_topology_changed_cb_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_set_topology_changed_cb(callbacks, cb);
+end;
+
+{*********************************************************************************************************************}
+procedure mongoc_apm_set_topology_opening_cb(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_topology_opening_cb_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_set_topology_opening_cb(callbacks, cb);
+end;
+
+{*******************************************************************************************************************}
+procedure mongoc_apm_set_topology_closed_cb(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_topology_closed_cb_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_set_topology_closed_cb(callbacks, cb);
+end;
+
+{*************************************************************************************************************************************}
+procedure mongoc_apm_set_server_heartbeat_started_cb(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_server_heartbeat_started_cb_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_set_server_heartbeat_started_cb(callbacks, cb);
+end;
+
+{*****************************************************************************************************************************************}
+procedure mongoc_apm_set_server_heartbeat_succeeded_cb(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_server_heartbeat_succeeded_cb_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_set_server_heartbeat_succeeded_cb(callbacks, cb);
+end;
+
+{***********************************************************************************************************************************}
+procedure mongoc_apm_set_server_heartbeat_failed_cb(callbacks: Pmongoc_apm_callbacks_t; cb: mongoc_apm_server_heartbeat_failed_cb_t);
+begin
+  ALMongoDBLibrary.mongoc_apm_set_server_heartbeat_failed_cb(callbacks, cb);
+end;
+
+{**********************************************************}
+function mongoc_uri_copy(uri: Pmongoc_uri_t): Pmongoc_uri_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_copy(uri);
+end;
+
+{***********************************************}
+procedure mongoc_uri_destroy(uri: Pmongoc_uri_t);
+begin
+  ALMongoDBLibrary.mongoc_uri_destroy(uri);
+end;
+
+{************************************************************}
+function mongoc_uri_new(uri_string: PAnsiChar): Pmongoc_uri_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_new(uri_string);
+end;
+
+{*********************************************************************************************}
+function mongoc_uri_new_with_error(uri_string: PAnsiChar; error: Pbson_error_t): Pmongoc_uri_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_new_with_error(uri_string, error);
+end;
+
+{****************************************************************************************}
+function mongoc_uri_new_for_host_port(hostname: PAnsiChar; port: uint16_t): Pmongoc_uri_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_new_for_host_port(hostname, port);
+end;
+
+{*********************************************************************}
+function mongoc_uri_get_hosts(uri: Pmongoc_uri_t): Pmongoc_host_list_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_hosts(uri);
+end;
+
+{******************************************************************}
+function mongoc_uri_get_srv_hostname(uri: Pmongoc_uri_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_srv_hostname(uri);
+end;
+
+{**********************************************************************}
+function mongoc_uri_get_srv_service_name(uri: Pmongoc_uri_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_srv_service_name(uri);
+end;
+
+{**************************************************************}
+function mongoc_uri_get_database(uri: Pmongoc_uri_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_database(uri);
+end;
+
+{**********************************************************************************}
+function mongoc_uri_set_database(uri: Pmongoc_uri_t; database: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_database(uri, database);
+end;
+
+{***************************************************************}
+function mongoc_uri_get_compressors(uri: Pmongoc_uri_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_compressors(uri);
+end;
+
+{***********************************************************}
+function mongoc_uri_get_options(uri: Pmongoc_uri_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_options(uri);
+end;
+
+{**************************************************************}
+function mongoc_uri_get_password(uri: Pmongoc_uri_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_password(uri);
+end;
+
+{**********************************************************************************}
+function mongoc_uri_set_password(uri: Pmongoc_uri_t; password: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_password(uri, password);
+end;
+
+{***************************************************************************}
+function mongoc_uri_has_option(uri: Pmongoc_uri_t; key: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_has_option(uri, key);
+end;
+
+{************************************************************}
+function mongoc_uri_option_is_int32(key: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_option_is_int32(key);
+end;
+
+{************************************************************}
+function mongoc_uri_option_is_int64(key: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_option_is_int64(key);
+end;
+
+{***********************************************************}
+function mongoc_uri_option_is_bool(key: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_option_is_bool(key);
+end;
+
+{***********************************************************}
+function mongoc_uri_option_is_utf8(key: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_option_is_utf8(key);
+end;
+
+{*********************************************************************************************************}
+function mongoc_uri_get_option_as_int32(uri: Pmongoc_uri_t; option: PAnsiChar; fallback: int32_t): int32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_option_as_int32(uri, option, fallback);
+end;
+
+{*********************************************************************************************************}
+function mongoc_uri_get_option_as_int64(uri: Pmongoc_uri_t; option: PAnsiChar; fallback: int64_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_option_as_int64(uri, option, fallback);
+end;
+
+{**********************************************************************************************************}
+function mongoc_uri_get_option_as_bool(uri: Pmongoc_uri_t; option: PAnsiChar; fallback: ByteBool): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_option_as_bool(uri, option, fallback);
+end;
+
+{************************************************************************************************************}
+function mongoc_uri_get_option_as_utf8(uri: Pmongoc_uri_t; option: PAnsiChar; fallback: PAnsiChar): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_option_as_utf8(uri, option, fallback);
+end;
+
+{*******************************************************************************************************}
+function mongoc_uri_set_option_as_int32(uri: Pmongoc_uri_t; option: PAnsiChar; value: int32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_option_as_int32(uri, option, value);
+end;
+
+{*******************************************************************************************************}
+function mongoc_uri_set_option_as_int64(uri: Pmongoc_uri_t; option: PAnsiChar; value: int64_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_option_as_int64(uri, option, value);
+end;
+
+{*******************************************************************************************************}
+function mongoc_uri_set_option_as_bool(uri: Pmongoc_uri_t; option: PAnsiChar; value: ByteBool): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_option_as_bool(uri, option, value);
+end;
+
+{********************************************************************************************************}
+function mongoc_uri_set_option_as_utf8(uri: Pmongoc_uri_t; option: PAnsiChar; value: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_option_as_utf8(uri, option, value);
+end;
+
+{*****************************************************************}
+function mongoc_uri_get_replica_set(uri: Pmongoc_uri_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_replica_set(uri);
+end;
+
+{************************************************************}
+function mongoc_uri_get_string(uri: Pmongoc_uri_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_string(uri);
+end;
+
+{**************************************************************}
+function mongoc_uri_get_username(uri: Pmongoc_uri_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_username(uri);
+end;
+
+{**********************************************************************************}
+function mongoc_uri_set_username(uri: Pmongoc_uri_t; username: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_username(uri, username);
+end;
+
+{***************************************************************}
+function mongoc_uri_get_credentials(uri: Pmongoc_uri_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_credentials(uri);
+end;
+
+{*****************************************************************}
+function mongoc_uri_get_auth_source(uri: Pmongoc_uri_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_auth_source(uri);
+end;
+
+{**********************************************************************************}
+function mongoc_uri_set_auth_source(uri: Pmongoc_uri_t; value: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_auth_source(uri, value);
+end;
+
+{*************************************************************}
+function mongoc_uri_get_appname(uri: Pmongoc_uri_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_appname(uri);
+end;
+
+{******************************************************************************}
+function mongoc_uri_set_appname(uri: Pmongoc_uri_t; value: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_appname(uri, value);
+end;
+
+{**********************************************************************************}
+function mongoc_uri_set_compressors(uri: Pmongoc_uri_t; value: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_compressors(uri, value);
+end;
+
+{********************************************************************}
+function mongoc_uri_get_auth_mechanism(uri: Pmongoc_uri_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_auth_mechanism(uri);
+end;
+
+{*************************************************************************************}
+function mongoc_uri_set_auth_mechanism(uri: Pmongoc_uri_t; value: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_auth_mechanism(uri, value);
+end;
+
+{**********************************************************************************************}
+function mongoc_uri_get_mechanism_properties(uri: Pmongoc_uri_t; properties: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_mechanism_properties(uri, properties);
+end;
+
+{**********************************************************************************************}
+function mongoc_uri_set_mechanism_properties(uri: Pmongoc_uri_t; properties: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_mechanism_properties(uri, properties);
+end;
+
+{********************************************************}
+function mongoc_uri_get_tls(uri: Pmongoc_uri_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_tls(uri);
+end;
+
+{*****************************************************************}
+function mongoc_uri_unescape(escaped_string: PAnsiChar): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_unescape(escaped_string);
+end;
+
+{*****************************************************************************}
+function mongoc_uri_get_read_prefs_t(uri: Pmongoc_uri_t): Pmongoc_read_prefs_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_read_prefs_t(uri);
+end;
+
+{*************************************************************************************}
+procedure mongoc_uri_set_read_prefs_t(uri: Pmongoc_uri_t; prefs: Pmongoc_read_prefs_t);
+begin
+  ALMongoDBLibrary.mongoc_uri_set_read_prefs_t(uri, prefs);
+end;
+
+{*********************************************************************************}
+function mongoc_uri_get_write_concern(uri: Pmongoc_uri_t): Pmongoc_write_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_write_concern(uri);
+end;
+
+{**************************************************************************************}
+procedure mongoc_uri_set_write_concern(uri: Pmongoc_uri_t; wc: Pmongoc_write_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_uri_set_write_concern(uri, wc);
+end;
+
+{*******************************************************************************}
+function mongoc_uri_get_read_concern(uri: Pmongoc_uri_t): Pmongoc_read_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_read_concern(uri);
+end;
+
+{************************************************************************************}
+procedure mongoc_uri_set_read_concern(uri: Pmongoc_uri_t; rc: Pmongoc_read_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_uri_set_read_concern(uri, rc);
+end;
+
+{****************************************************************************}
+function mongoc_uri_get_server_monitoring_mode(uri: Pmongoc_uri_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_get_server_monitoring_mode(uri);
+end;
+
+{*********************************************************************************************}
+function mongoc_uri_set_server_monitoring_mode(uri: Pmongoc_uri_t; value: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_uri_set_server_monitoring_mode(uri, value);
+end;
+
+{****************************************************************************************************************************************************************************************}
+function mongoc_collection_aggregate(collection: Pmongoc_collection_t; flags: mongoc_query_flags_t; pipeline: Pbson_t; opts: Pbson_t; read_prefs: Pmongoc_read_prefs_t): Pmongoc_cursor_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_aggregate(collection, flags, pipeline, opts, read_prefs);
+end;
+
+{********************************************************************}
+procedure mongoc_collection_destroy(collection: Pmongoc_collection_t);
+begin
+  ALMongoDBLibrary.mongoc_collection_destroy(collection);
+end;
+
+{**************************************************************************************}
+function mongoc_collection_copy(collection: Pmongoc_collection_t): Pmongoc_collection_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_copy(collection);
+end;
+
+{*****************************************************************************************************************************************************************************************************}
+function mongoc_collection_read_command_with_opts(collection: Pmongoc_collection_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_read_command_with_opts(collection, command, read_prefs, opts, reply, error);
+end;
+
+{********************************************************************************************************************************************************************}
+function mongoc_collection_write_command_with_opts(collection: Pmongoc_collection_t; command: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_write_command_with_opts(collection, command, opts, reply, error);
+end;
+
+{***********************************************************************************************************************************************************************************************************}
+function mongoc_collection_read_write_command_with_opts(collection: Pmongoc_collection_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_read_write_command_with_opts(collection, command, read_prefs, opts, reply, error);
+end;
+
+{************************************************************************************************************************************************************************************************}
+function mongoc_collection_command_with_opts(collection: Pmongoc_collection_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_command_with_opts(collection, command, read_prefs, opts, reply, error);
+end;
+
+{******************************************************************************************************************************************************************************}
+function mongoc_collection_command_simple(collection: Pmongoc_collection_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_command_simple(collection, command, read_prefs, reply, error);
+end;
+
+{************************************************************************************************}
+function mongoc_collection_drop(collection: Pmongoc_collection_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_drop(collection, error);
+end;
+
+{*************************************************************************************************************************}
+function mongoc_collection_drop_with_opts(collection: Pmongoc_collection_t; opts: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_drop_with_opts(collection, opts, error);
+end;
+
+{*****************************************************************************************************************************}
+function mongoc_collection_drop_index(collection: Pmongoc_collection_t; index_name: PAnsiChar; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_drop_index(collection, index_name, error);
+end;
+
+{******************************************************************************************************************************************************}
+function mongoc_collection_drop_index_with_opts(collection: Pmongoc_collection_t; index_name: PAnsiChar; opts: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_drop_index_with_opts(collection, index_name, opts, error);
+end;
+
+{*******************************************************************************************************************}
+function mongoc_collection_find_indexes_with_opts(collection: Pmongoc_collection_t; opts: Pbson_t): Pmongoc_cursor_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_find_indexes_with_opts(collection, opts);
+end;
+
+{***********************************************************************************}
+function mongoc_index_model_new(keys: Pbson_t; opts: Pbson_t): Pmongoc_index_model_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_index_model_new(keys, opts);
+end;
+
+{*****************************************************************}
+procedure mongoc_index_model_destroy(model: Pmongoc_index_model_t);
+begin
+  ALMongoDBLibrary.mongoc_index_model_destroy(model);
+end;
+
+{*****************************************************************************************************************************************************************************************************}
+function mongoc_collection_create_indexes_with_opts(collection: Pmongoc_collection_t; models: PPmongoc_index_model_t; n_models: size_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_create_indexes_with_opts(collection, models, n_models, opts, reply, error);
+end;
+
+{**************************************************************************************************************************************************************}
+function mongoc_collection_find_with_opts(collection: Pmongoc_collection_t; filter: Pbson_t; opts: Pbson_t; read_prefs: Pmongoc_read_prefs_t): Pmongoc_cursor_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_find_with_opts(collection, filter, opts, read_prefs);
+end;
+
+{*******************************************************************************************************************************************************************************************}
+function mongoc_collection_insert(collection: Pmongoc_collection_t; flags: mongoc_insert_flags_t; document: Pbson_t; write_concern: Pmongoc_write_concern_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_insert(collection, flags, document, write_concern, error);
+end;
+
+{********************************************************************************************************************************************************}
+function mongoc_collection_insert_one(collection: Pmongoc_collection_t; document: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_insert_one(collection, document, opts, reply, error);
+end;
+
+{********************************************************************************************************************************************************************************}
+function mongoc_collection_insert_many(collection: Pmongoc_collection_t; documents: PPbson_t; n_documents: size_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_insert_many(collection, documents, n_documents, opts, reply, error);
+end;
+
+{************************************************************************************************************************************************************************************************************}
+function mongoc_collection_update(collection: Pmongoc_collection_t; flags: mongoc_update_flags_t; selector: Pbson_t; update: Pbson_t; write_concern: Pmongoc_write_concern_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_update(collection, flags, selector, update, write_concern, error);
+end;
+
+{*************************************************************************************************************************************************************************}
+function mongoc_collection_update_one(collection: Pmongoc_collection_t; selector: Pbson_t; update: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_update_one(collection, selector, update, opts, reply, error);
+end;
+
+{**************************************************************************************************************************************************************************}
+function mongoc_collection_update_many(collection: Pmongoc_collection_t; selector: Pbson_t; update: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_update_many(collection, selector, update, opts, reply, error);
+end;
+
+{*******************************************************************************************************************************************************************************}
+function mongoc_collection_replace_one(collection: Pmongoc_collection_t; selector: Pbson_t; replacement: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_replace_one(collection, selector, replacement, opts, reply, error);
+end;
+
+{*******************************************************************************************************************************************************************************************}
+function mongoc_collection_remove(collection: Pmongoc_collection_t; flags: mongoc_remove_flags_t; selector: Pbson_t; write_concern: Pmongoc_write_concern_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_remove(collection, flags, selector, write_concern, error);
+end;
+
+{********************************************************************************************************************************************************}
+function mongoc_collection_delete_one(collection: Pmongoc_collection_t; selector: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_delete_one(collection, selector, opts, reply, error);
+end;
+
+{*********************************************************************************************************************************************************}
+function mongoc_collection_delete_many(collection: Pmongoc_collection_t; selector: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_delete_many(collection, selector, opts, reply, error);
+end;
+
+{*******************************************************************************************************************************************************************************}
+function mongoc_collection_rename(collection: Pmongoc_collection_t; new_db: PAnsiChar; new_name: PAnsiChar; drop_target_before_rename: ByteBool; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_rename(collection, new_db, new_name, drop_target_before_rename, error);
+end;
+
+{********************************************************************************************************************************************************************************************************}
+function mongoc_collection_rename_with_opts(collection: Pmongoc_collection_t; new_db: PAnsiChar; new_name: PAnsiChar; drop_target_before_rename: ByteBool; opts: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_rename_with_opts(collection, new_db, new_name, drop_target_before_rename, opts, error);
+end;
+
+{*******************************************************************************************************************************************************************************************}
+function mongoc_collection_find_and_modify_with_opts(collection: Pmongoc_collection_t; query: Pbson_t; opts: Pmongoc_find_and_modify_opts_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_find_and_modify_with_opts(collection, query, opts, reply, error);
+end;
+
+{*************************************************************************************************************************************************************************************************************************************************}
+function mongoc_collection_find_and_modify(collection: Pmongoc_collection_t; query: Pbson_t; sort: Pbson_t; update: Pbson_t; fields: Pbson_t; _remove: ByteBool; upsert: ByteBool; _new: ByteBool; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_find_and_modify(collection, query, sort, update, fields, _remove, upsert, _new, reply, error);
+end;
+
+{************************************************************************************************************************************}
+function mongoc_collection_create_bulk_operation_with_opts(collection: Pmongoc_collection_t; opts: Pbson_t): Pmongoc_bulk_operation_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_create_bulk_operation_with_opts(collection, opts);
+end;
+
+{************************************************************************************************}
+function mongoc_collection_get_read_prefs(collection: Pmongoc_collection_t): Pmongoc_read_prefs_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_get_read_prefs(collection);
+end;
+
+{*************************************************************************************************************}
+procedure mongoc_collection_set_read_prefs(collection: Pmongoc_collection_t; read_prefs: Pmongoc_read_prefs_t);
+begin
+  ALMongoDBLibrary.mongoc_collection_set_read_prefs(collection, read_prefs);
+end;
+
+{****************************************************************************************************}
+function mongoc_collection_get_read_concern(collection: Pmongoc_collection_t): Pmongoc_read_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_get_read_concern(collection);
+end;
+
+{*******************************************************************************************************************}
+procedure mongoc_collection_set_read_concern(collection: Pmongoc_collection_t; read_concern: Pmongoc_read_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_collection_set_read_concern(collection, read_concern);
+end;
+
+{******************************************************************************************************}
+function mongoc_collection_get_write_concern(collection: Pmongoc_collection_t): Pmongoc_write_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_get_write_concern(collection);
+end;
+
+{**********************************************************************************************************************}
+procedure mongoc_collection_set_write_concern(collection: Pmongoc_collection_t; write_concern: Pmongoc_write_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_collection_set_write_concern(collection, write_concern);
+end;
+
+{*******************************************************************************}
+function mongoc_collection_get_name(collection: Pmongoc_collection_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_get_name(collection);
+end;
+
+{************************************************************************}
+function mongoc_collection_keys_to_index_string(keys: Pbson_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_keys_to_index_string(keys);
+end;
+
+{**********************************************************************************************************************}
+function mongoc_collection_watch(coll: Pmongoc_collection_t; pipeline: Pbson_t; opts: Pbson_t): Pmongoc_change_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_watch(coll, pipeline, opts);
+end;
+
+{**************************************************************************************************************************************************************************************}
+function mongoc_collection_count_documents(coll: Pmongoc_collection_t; filter: Pbson_t; opts: Pbson_t; read_prefs: Pmongoc_read_prefs_t; reply: Pbson_t; error: Pbson_error_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_count_documents(coll, filter, opts, read_prefs, reply, error);
+end;
+
+{******************************************************************************************************************************************************************************}
+function mongoc_collection_estimated_document_count(coll: Pmongoc_collection_t; opts: Pbson_t; read_prefs: Pmongoc_read_prefs_t; reply: Pbson_t; error: Pbson_error_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_collection_estimated_document_count(coll, opts, read_prefs, reply, error);
+end;
+
+{*************************************************************************}
+function mongoc_database_get_name(database: Pmongoc_database_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_get_name(database);
+end;
+
+{**********************************************************************************************************************}
+function mongoc_database_remove_user(database: Pmongoc_database_t; username: PAnsiChar; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_remove_user(database, username, error);
+end;
+
+{******************************************************************************************************}
+function mongoc_database_remove_all_users(database: Pmongoc_database_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_remove_all_users(database, error);
+end;
+
+{******************************************************************************************************************************************************************************}
+function mongoc_database_add_user(database: Pmongoc_database_t; username: PAnsiChar; password: PAnsiChar; roles: Pbson_t; custom_data: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_add_user(database, username, password, roles, custom_data, error);
+end;
+
+{**************************************************************}
+procedure mongoc_database_destroy(database: Pmongoc_database_t);
+begin
+  ALMongoDBLibrary.mongoc_database_destroy(database);
+end;
+
+{***********************************************************************************************************************************************}
+function mongoc_database_aggregate(db: Pmongoc_database_t; pipeline: Pbson_t; opts: Pbson_t; read_prefs: Pmongoc_read_prefs_t): Pmongoc_cursor_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_aggregate(db, pipeline, opts, read_prefs);
+end;
+
+{******************************************************************************}
+function mongoc_database_copy(database: Pmongoc_database_t): Pmongoc_database_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_copy(database);
+end;
+
+{***********************************************************************************************************************************************************************************************}
+function mongoc_database_read_command_with_opts(database: Pmongoc_database_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_read_command_with_opts(database, command, read_prefs, opts, reply, error);
+end;
+
+{**************************************************************************************************************************************************************}
+function mongoc_database_write_command_with_opts(database: Pmongoc_database_t; command: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_write_command_with_opts(database, command, opts, reply, error);
+end;
+
+{*****************************************************************************************************************************************************************************************************}
+function mongoc_database_read_write_command_with_opts(database: Pmongoc_database_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_read_write_command_with_opts(database, command, read_prefs, opts, reply, error);
+end;
+
+{******************************************************************************************************************************************************************************************}
+function mongoc_database_command_with_opts(database: Pmongoc_database_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_command_with_opts(database, command, read_prefs, opts, reply, error);
+end;
+
+{************************************************************************************************************************************************************************}
+function mongoc_database_command_simple(database: Pmongoc_database_t; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_command_simple(database, command, read_prefs, reply, error);
+end;
+
+{******************************************************************************************}
+function mongoc_database_drop(database: Pmongoc_database_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_drop(database, error);
+end;
+
+{*******************************************************************************************************************}
+function mongoc_database_drop_with_opts(database: Pmongoc_database_t; opts: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_drop_with_opts(database, opts, error);
+end;
+
+{*********************************************************************************************************************}
+function mongoc_database_has_collection(database: Pmongoc_database_t; name: PAnsiChar; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_has_collection(database, name, error);
+end;
+
+{******************************************************************************************************************************************************}
+function mongoc_database_create_collection(database: Pmongoc_database_t; name: PAnsiChar; options: Pbson_t; error: Pbson_error_t): Pmongoc_collection_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_create_collection(database, name, options, error);
+end;
+
+{******************************************************************************************}
+function mongoc_database_get_read_prefs(database: Pmongoc_database_t): Pmongoc_read_prefs_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_get_read_prefs(database);
+end;
+
+{*******************************************************************************************************}
+procedure mongoc_database_set_read_prefs(database: Pmongoc_database_t; read_prefs: Pmongoc_read_prefs_t);
+begin
+  ALMongoDBLibrary.mongoc_database_set_read_prefs(database, read_prefs);
+end;
+
+{************************************************************************************************}
+function mongoc_database_get_write_concern(database: Pmongoc_database_t): Pmongoc_write_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_get_write_concern(database);
+end;
+
+{****************************************************************************************************************}
+procedure mongoc_database_set_write_concern(database: Pmongoc_database_t; write_concern: Pmongoc_write_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_database_set_write_concern(database, write_concern);
+end;
+
+{**********************************************************************************************}
+function mongoc_database_get_read_concern(database: Pmongoc_database_t): Pmongoc_read_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_get_read_concern(database);
+end;
+
+{*************************************************************************************************************}
+procedure mongoc_database_set_read_concern(database: Pmongoc_database_t; read_concern: Pmongoc_read_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_database_set_read_concern(database, read_concern);
+end;
+
+{*****************************************************************************************************************}
+function mongoc_database_find_collections_with_opts(database: Pmongoc_database_t; opts: Pbson_t): Pmongoc_cursor_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_find_collections_with_opts(database, opts);
+end;
+
+{*************************************************************************************************************************************}
+function mongoc_database_get_collection_names_with_opts(database: Pmongoc_database_t; opts: Pbson_t; error: Pbson_error_t): PPAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_get_collection_names_with_opts(database, opts, error);
+end;
+
+{***********************************************************************************************************}
+function mongoc_database_get_collection(database: Pmongoc_database_t; name: PAnsiChar): Pmongoc_collection_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_get_collection(database, name);
+end;
+
+{****************************************************************************************************************}
+function mongoc_database_watch(db: Pmongoc_database_t; pipeline: Pbson_t; opts: Pbson_t): Pmongoc_change_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_database_watch(db, pipeline, opts);
+end;
+
+{******************************************************************************}
+function mongoc_gridfs_file_get_id(&file: Pmongoc_gridfs_file_t): Pbson_value_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_get_id(&file);
+end;
+
+{****************************************************************************}
+function mongoc_gridfs_file_get_length(&file: Pmongoc_gridfs_file_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_get_length(&file);
+end;
+
+{********************************************************************************}
+function mongoc_gridfs_file_get_chunk_size(&file: Pmongoc_gridfs_file_t): int32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_get_chunk_size(&file);
+end;
+
+{*********************************************************************************}
+function mongoc_gridfs_file_get_upload_date(&file: Pmongoc_gridfs_file_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_get_upload_date(&file);
+end;
+
+{**************************************************************************************************************************************}
+function mongoc_gridfs_file_writev(&file: Pmongoc_gridfs_file_t; iov: Pmongoc_iovec_t; iovcnt: size_t; timeout_msec: uint32_t): ssize_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_writev(&file, iov, iovcnt, timeout_msec);
+end;
+
+{********************************************************************************************************************************************************}
+function mongoc_gridfs_file_readv(&file: Pmongoc_gridfs_file_t; iov: Pmongoc_iovec_t; iovcnt: size_t; min_bytes: size_t; timeout_msec: uint32_t): ssize_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_readv(&file, iov, iovcnt, min_bytes, timeout_msec);
+end;
+
+{*******************************************************************************************************}
+function mongoc_gridfs_file_seek(&file: Pmongoc_gridfs_file_t; delta: int64_t; whence: Integer): Integer;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_seek(&file, delta, whence);
+end;
+
+{***********************************************************************}
+function mongoc_gridfs_file_tell(&file: Pmongoc_gridfs_file_t): uint64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_tell(&file);
+end;
+
+{******************************************************************************************************************}
+function mongoc_gridfs_file_set_id(&file: Pmongoc_gridfs_file_t; id: Pbson_value_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_set_id(&file, id, error);
+end;
+
+{***********************************************************************}
+function mongoc_gridfs_file_save(&file: Pmongoc_gridfs_file_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_save(&file);
+end;
+
+{*****************************************************************}
+procedure mongoc_gridfs_file_destroy(&file: Pmongoc_gridfs_file_t);
+begin
+  ALMongoDBLibrary.mongoc_gridfs_file_destroy(&file);
+end;
+
+{**********************************************************************************************}
+function mongoc_gridfs_file_error(&file: Pmongoc_gridfs_file_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_error(&file, error);
+end;
+
+{***********************************************************************************************}
+function mongoc_gridfs_file_remove(&file: Pmongoc_gridfs_file_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_remove(&file, error);
+end;
+
+{*********************************************************************************************}
+function mongoc_gridfs_file_list_next(list: Pmongoc_gridfs_file_list_t): Pmongoc_gridfs_file_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_list_next(list);
+end;
+
+{**************************************************************************}
+procedure mongoc_gridfs_file_list_destroy(list: Pmongoc_gridfs_file_list_t);
+begin
+  ALMongoDBLibrary.mongoc_gridfs_file_list_destroy(list);
+end;
+
+{*******************************************************************************************************}
+function mongoc_gridfs_file_list_error(list: Pmongoc_gridfs_file_list_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_file_list_error(list, error);
+end;
+
+{********************************************************************************************************************************************************}
+function mongoc_gridfs_bucket_new(db: Pmongoc_database_t; opts: Pbson_t; read_prefs: Pmongoc_read_prefs_t; error: Pbson_error_t): Pmongoc_gridfs_bucket_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_bucket_new(db, opts, read_prefs, error);
+end;
+
+{************************************************************************************************************************************************************************************}
+function mongoc_gridfs_bucket_open_upload_stream(bucket: Pmongoc_gridfs_bucket_t; filename: PAnsiChar; opts: Pbson_t; file_id: Pbson_value_t; error: Pbson_error_t): Pmongoc_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_bucket_open_upload_stream(bucket, filename, opts, file_id, error);
+end;
+
+{********************************************************************************************************************************************************************************************}
+function mongoc_gridfs_bucket_open_upload_stream_with_id(bucket: Pmongoc_gridfs_bucket_t; file_id: Pbson_value_t; filename: PAnsiChar; opts: Pbson_t; error: Pbson_error_t): Pmongoc_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_bucket_open_upload_stream_with_id(bucket, file_id, filename, opts, error);
+end;
+
+{******************************************************************************************************************************************************************************************************}
+function mongoc_gridfs_bucket_upload_from_stream(bucket: Pmongoc_gridfs_bucket_t; filename: PAnsiChar; source: Pmongoc_stream_t; opts: Pbson_t; file_id: Pbson_value_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_bucket_upload_from_stream(bucket, filename, source, opts, file_id, error);
+end;
+
+{**************************************************************************************************************************************************************************************************************}
+function mongoc_gridfs_bucket_upload_from_stream_with_id(bucket: Pmongoc_gridfs_bucket_t; file_id: Pbson_value_t; filename: PAnsiChar; source: Pmongoc_stream_t; opts: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_bucket_upload_from_stream_with_id(bucket, file_id, filename, source, opts, error);
+end;
+
+{**************************************************************************************************************************************************}
+function mongoc_gridfs_bucket_open_download_stream(bucket: Pmongoc_gridfs_bucket_t; file_id: Pbson_value_t; error: Pbson_error_t): Pmongoc_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_bucket_open_download_stream(bucket, file_id, error);
+end;
+
+{***********************************************************************************************************************************************************************}
+function mongoc_gridfs_bucket_download_to_stream(bucket: Pmongoc_gridfs_bucket_t; file_id: Pbson_value_t; destination: Pmongoc_stream_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_bucket_download_to_stream(bucket, file_id, destination, error);
+end;
+
+{**********************************************************************************************************************************}
+function mongoc_gridfs_bucket_delete_by_id(bucket: Pmongoc_gridfs_bucket_t; file_id: Pbson_value_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_bucket_delete_by_id(bucket, file_id, error);
+end;
+
+{********************************************************************************************************************}
+function mongoc_gridfs_bucket_find(bucket: Pmongoc_gridfs_bucket_t; filter: Pbson_t; opts: Pbson_t): Pmongoc_cursor_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_bucket_find(bucket, filter, opts);
+end;
+
+{***************************************************************************************************}
+function mongoc_gridfs_bucket_stream_error(stream: Pmongoc_stream_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_bucket_stream_error(stream, error);
+end;
+
+{**********************************************************************}
+procedure mongoc_gridfs_bucket_destroy(bucket: Pmongoc_gridfs_bucket_t);
+begin
+  ALMongoDBLibrary.mongoc_gridfs_bucket_destroy(bucket);
+end;
+
+{*****************************************************************************}
+function mongoc_gridfs_bucket_abort_upload(stream: Pmongoc_stream_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_bucket_abort_upload(stream);
+end;
+
+{********************************************************************************************************************************************************}
+function mongoc_gridfs_create_file_from_stream(gridfs: Pmongoc_gridfs_t; stream: Pmongoc_stream_t; opt: Pmongoc_gridfs_file_opt_t): Pmongoc_gridfs_file_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_create_file_from_stream(gridfs, stream, opt);
+end;
+
+{******************************************************************************************************************}
+function mongoc_gridfs_create_file(gridfs: Pmongoc_gridfs_t; opt: Pmongoc_gridfs_file_opt_t): Pmongoc_gridfs_file_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_create_file(gridfs, opt);
+end;
+
+{**************************************************************************************************************************}
+function mongoc_gridfs_find_with_opts(gridfs: Pmongoc_gridfs_t; filter: Pbson_t; opts: Pbson_t): Pmongoc_gridfs_file_list_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_find_with_opts(gridfs, filter, opts);
+end;
+
+{***********************************************************************************************************************************************}
+function mongoc_gridfs_find_one_with_opts(gridfs: Pmongoc_gridfs_t; filter: Pbson_t; opts: Pbson_t; error: Pbson_error_t): Pmongoc_gridfs_file_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_find_one_with_opts(gridfs, filter, opts, error);
+end;
+
+{**************************************************************************************************************************************}
+function mongoc_gridfs_find_one_by_filename(gridfs: Pmongoc_gridfs_t; filename: PAnsiChar; error: Pbson_error_t): Pmongoc_gridfs_file_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_find_one_by_filename(gridfs, filename, error);
+end;
+
+{************************************************************************************}
+function mongoc_gridfs_drop(gridfs: Pmongoc_gridfs_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_drop(gridfs, error);
+end;
+
+{********************************************************}
+procedure mongoc_gridfs_destroy(gridfs: Pmongoc_gridfs_t);
+begin
+  ALMongoDBLibrary.mongoc_gridfs_destroy(gridfs);
+end;
+
+{*******************************************************************************}
+function mongoc_gridfs_get_files(gridfs: Pmongoc_gridfs_t): Pmongoc_collection_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_get_files(gridfs);
+end;
+
+{********************************************************************************}
+function mongoc_gridfs_get_chunks(gridfs: Pmongoc_gridfs_t): Pmongoc_collection_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_get_chunks(gridfs);
+end;
+
+{***********************************************************************************************************************}
+function mongoc_gridfs_remove_by_filename(gridfs: Pmongoc_gridfs_t; filename: PAnsiChar; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_gridfs_remove_by_filename(gridfs, filename, error);
+end;
+
+{********************************************************************************}
+function mongoc_stream_gridfs_new(&file: Pmongoc_gridfs_file_t): Pmongoc_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_stream_gridfs_new(&file);
+end;
+
+{******************************************************************}
+function mongoc_client_new(uri_string: PAnsiChar): Pmongoc_client_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_new(uri_string);
+end;
+
+{************************************************************************}
+function mongoc_client_new_from_uri(uri: Pmongoc_uri_t): Pmongoc_client_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_new_from_uri(uri);
+end;
+
+{*********************************************************************************************************}
+function mongoc_client_new_from_uri_with_error(uri: Pmongoc_uri_t; error: Pbson_error_t): Pmongoc_client_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_new_from_uri_with_error(uri, error);
+end;
+
+{****************************************************************************************}
+procedure mongoc_client_set_sockettimeoutms(client: Pmongoc_client_t; timeoutms: int32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_set_sockettimeoutms(client, timeoutms);
+end;
+
+{**********************************************************************}
+function mongoc_client_get_uri(client: Pmongoc_client_t): Pmongoc_uri_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_uri(client);
+end;
+
+{*****************************************************************************************************************************}
+procedure mongoc_client_set_stream_initiator(client: Pmongoc_client_t; initiator: mongoc_stream_initiator_t; user_data: Pvoid);
+begin
+  ALMongoDBLibrary.mongoc_client_set_stream_initiator(client, initiator, user_data);
+end;
+
+{**************************************************************************************************************************************************************************************}
+function mongoc_client_command_simple(client: Pmongoc_client_t; db_name: PAnsiChar; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_command_simple(client, db_name, command, read_prefs, reply, error);
+end;
+
+{*************************************************************************************************************************************************************************************************************}
+function mongoc_client_read_command_with_opts(client: Pmongoc_client_t; db_name: PAnsiChar; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_read_command_with_opts(client, db_name, command, read_prefs, opts, reply, error);
+end;
+
+{****************************************************************************************************************************************************************************}
+function mongoc_client_write_command_with_opts(client: Pmongoc_client_t; db_name: PAnsiChar; command: Pbson_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_write_command_with_opts(client, db_name, command, opts, reply, error);
+end;
+
+{*******************************************************************************************************************************************************************************************************************}
+function mongoc_client_read_write_command_with_opts(client: Pmongoc_client_t; db_name: PAnsiChar; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_read_write_command_with_opts(client, db_name, command, read_prefs, opts, reply, error);
+end;
+
+{********************************************************************************************************************************************************************************************************}
+function mongoc_client_command_with_opts(client: Pmongoc_client_t; db_name: PAnsiChar; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; opts: Pbson_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_command_with_opts(client, db_name, command, read_prefs, opts, reply, error);
+end;
+
+{**************************************************************************************************************************************************************************************************************************}
+function mongoc_client_command_simple_with_server_id(client: Pmongoc_client_t; db_name: PAnsiChar; command: Pbson_t; read_prefs: Pmongoc_read_prefs_t; server_id: uint32_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_command_simple_with_server_id(client, db_name, command, read_prefs, server_id, reply, error);
+end;
+
+{********************************************************}
+procedure mongoc_client_destroy(client: Pmongoc_client_t);
+begin
+  ALMongoDBLibrary.mongoc_client_destroy(client);
+end;
+
+{******************************************************************************************************************************************}
+function mongoc_client_start_session(client: Pmongoc_client_t; opts: Pmongoc_session_opt_t; error: Pbson_error_t): Pmongoc_client_session_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_start_session(client, opts, error);
+end;
+
+{*************************************************************************************************}
+function mongoc_client_get_database(client: Pmongoc_client_t; name: PAnsiChar): Pmongoc_database_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_database(client, name);
+end;
+
+{****************************************************************************************}
+function mongoc_client_get_default_database(client: Pmongoc_client_t): Pmongoc_database_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_default_database(client);
+end;
+
+{************************************************************************************************************************************}
+function mongoc_client_get_gridfs(client: Pmongoc_client_t; db: PAnsiChar; prefix: PAnsiChar; error: Pbson_error_t): Pmongoc_gridfs_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_gridfs(client, db, prefix, error);
+end;
+
+{**************************************************************************************************************************}
+function mongoc_client_get_collection(client: Pmongoc_client_t; db: PAnsiChar; collection: PAnsiChar): Pmongoc_collection_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_collection(client, db, collection);
+end;
+
+{****************************************************************************************************}
+function mongoc_client_get_database_names(client: Pmongoc_client_t; error: Pbson_error_t): PPAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_database_names(client, error);
+end;
+
+{*****************************************************************************************************************************}
+function mongoc_client_get_database_names_with_opts(client: Pmongoc_client_t; opts: Pbson_t; error: Pbson_error_t): PPAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_database_names_with_opts(client, opts, error);
+end;
+
+{******************************************************************************************************}
+function mongoc_client_find_databases(client: Pmongoc_client_t; error: Pbson_error_t): Pmongoc_cursor_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_find_databases(client, error);
+end;
+
+{*********************************************************************************************************}
+function mongoc_client_find_databases_with_opts(client: Pmongoc_client_t; opts: Pbson_t): Pmongoc_cursor_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_find_databases_with_opts(client, opts);
+end;
+
+{******************************************************************************************}
+function mongoc_client_get_write_concern(client: Pmongoc_client_t): Pmongoc_write_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_write_concern(client);
+end;
+
+{**********************************************************************************************************}
+procedure mongoc_client_set_write_concern(client: Pmongoc_client_t; write_concern: Pmongoc_write_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_client_set_write_concern(client, write_concern);
+end;
+
+{****************************************************************************************}
+function mongoc_client_get_read_concern(client: Pmongoc_client_t): Pmongoc_read_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_read_concern(client);
+end;
+
+{*******************************************************************************************************}
+procedure mongoc_client_set_read_concern(client: Pmongoc_client_t; read_concern: Pmongoc_read_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_client_set_read_concern(client, read_concern);
+end;
+
+{************************************************************************************}
+function mongoc_client_get_read_prefs(client: Pmongoc_client_t): Pmongoc_read_prefs_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_read_prefs(client);
+end;
+
+{*************************************************************************************************}
+procedure mongoc_client_set_read_prefs(client: Pmongoc_client_t; read_prefs: Pmongoc_read_prefs_t);
+begin
+  ALMongoDBLibrary.mongoc_client_set_read_prefs(client, read_prefs);
+end;
+
+{**************************************************************************************}
+procedure mongoc_client_set_ssl_opts(client: Pmongoc_client_t; opts: Pmongoc_ssl_opt_t);
+begin
+  ALMongoDBLibrary.mongoc_client_set_ssl_opts(client, opts);
+end;
+
+{*******************************************************************************************************************************}
+function mongoc_client_set_apm_callbacks(client: Pmongoc_client_t; callbacks: Pmongoc_apm_callbacks_t; context: Pvoid): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_set_apm_callbacks(client, callbacks, context);
+end;
+
+{**********************************************************************************************************************}
+function mongoc_client_set_structured_log_opts(client: Pmongoc_client_t; opts: Pmongoc_structured_log_opts_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_set_structured_log_opts(client, opts);
+end;
+
+{*************************************************************************************************************************}
+function mongoc_client_get_server_description(client: Pmongoc_client_t; server_id: uint32_t): Pmongoc_server_description_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_server_description(client, server_id);
+end;
+
+{******************************************************************************************************************}
+function mongoc_client_get_server_descriptions(client: Pmongoc_client_t; n: Psize_t): PPmongoc_server_description_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_server_descriptions(client, n);
+end;
+
+{**********************************************************************************************}
+procedure mongoc_server_descriptions_destroy_all(sds: PPmongoc_server_description_t; n: size_t);
+begin
+  ALMongoDBLibrary.mongoc_server_descriptions_destroy_all(sds, n);
+end;
+
+{********************************************************************************************************************************************************************}
+function mongoc_client_select_server(client: Pmongoc_client_t; for_writes: ByteBool; prefs: Pmongoc_read_prefs_t; error: Pbson_error_t): Pmongoc_server_description_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_select_server(client, for_writes, prefs, error);
+end;
+
+{*****************************************************************************************}
+function mongoc_client_set_error_api(client: Pmongoc_client_t; version: int32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_set_error_api(client, version);
+end;
+
+{*****************************************************************************************}
+function mongoc_client_set_appname(client: Pmongoc_client_t; appname: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_set_appname(client, appname);
+end;
+
+{****************************************************************************************************************}
+function mongoc_client_watch(client: Pmongoc_client_t; pipeline: Pbson_t; opts: Pbson_t): Pmongoc_change_stream_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_watch(client, pipeline, opts);
+end;
+
+{******************************************************}
+procedure mongoc_client_reset(client: Pmongoc_client_t);
+begin
+  ALMongoDBLibrary.mongoc_client_reset(client);
+end;
+
+{********************************************************************************************************************************************}
+function mongoc_client_enable_auto_encryption(client: Pmongoc_client_t; opts: Pmongoc_auto_encryption_opts_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_enable_auto_encryption(client, opts, error);
+end;
+
+{***********************************************************************************}
+function mongoc_client_get_crypt_shared_version(client: Pmongoc_client_t): PAnsiChar;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_crypt_shared_version(client);
+end;
+
+{*************************************************************************************************************************}
+function mongoc_client_set_server_api(client: Pmongoc_client_t; api: Pmongoc_server_api_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_set_server_api(client, api, error);
+end;
+
+{*****************************************************************************************************************************************************************}
+function mongoc_client_get_handshake_description(client: Pmongoc_client_t; server_id: uint32_t; opts: Pbson_t; error: Pbson_error_t): Pmongoc_server_description_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_get_handshake_description(client, server_id, opts, error);
+end;
+
+{**************************************************************************************************************}
+function mongoc_client_set_oidc_callback(client: Pmongoc_client_t; callback: Pmongoc_oidc_callback_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_set_oidc_callback(client, callback);
+end;
+
+{*************************************************************************}
+function mongoc_client_pool_new(uri: Pmongoc_uri_t): Pmongoc_client_pool_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_pool_new(uri);
+end;
+
+{**********************************************************************************************************}
+function mongoc_client_pool_new_with_error(uri: Pmongoc_uri_t; error: Pbson_error_t): Pmongoc_client_pool_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_pool_new_with_error(uri, error);
+end;
+
+{****************************************************************}
+procedure mongoc_client_pool_destroy(pool: Pmongoc_client_pool_t);
+begin
+  ALMongoDBLibrary.mongoc_client_pool_destroy(pool);
+end;
+
+{*****************************************************************************}
+function mongoc_client_pool_pop(pool: Pmongoc_client_pool_t): Pmongoc_client_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_pool_pop(pool);
+end;
+
+{***************************************************************************************}
+procedure mongoc_client_pool_push(pool: Pmongoc_client_pool_t; client: Pmongoc_client_t);
+begin
+  ALMongoDBLibrary.mongoc_client_pool_push(pool, client);
+end;
+
+{*********************************************************************************}
+function mongoc_client_pool_try_pop(pool: Pmongoc_client_pool_t): Pmongoc_client_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_pool_try_pop(pool);
+end;
+
+{******************************************************************************************}
+procedure mongoc_client_pool_max_size(pool: Pmongoc_client_pool_t; max_pool_size: uint32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_pool_max_size(pool, max_pool_size);
+end;
+
+{**********************************************************************************************}
+procedure mongoc_client_pool_set_ssl_opts(pool: Pmongoc_client_pool_t; opts: Pmongoc_ssl_opt_t);
+begin
+  ALMongoDBLibrary.mongoc_client_pool_set_ssl_opts(pool, opts);
+end;
+
+{***************************************************************************************************************************************}
+function mongoc_client_pool_set_apm_callbacks(pool: Pmongoc_client_pool_t; callbacks: Pmongoc_apm_callbacks_t; context: Pvoid): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_pool_set_apm_callbacks(pool, callbacks, context);
+end;
+
+{*************************************************************************************************}
+function mongoc_client_pool_set_error_api(pool: Pmongoc_client_pool_t; version: int32_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_pool_set_error_api(pool, version);
+end;
+
+{*************************************************************************************************}
+function mongoc_client_pool_set_appname(pool: Pmongoc_client_pool_t; appname: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_pool_set_appname(pool, appname);
+end;
+
+{****************************************************************************************************************************************************}
+function mongoc_client_pool_enable_auto_encryption(pool: Pmongoc_client_pool_t; opts: Pmongoc_auto_encryption_opts_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_pool_enable_auto_encryption(pool, opts, error);
+end;
+
+{*********************************************************************************************************************************}
+function mongoc_client_pool_set_server_api(pool: Pmongoc_client_pool_t; api: Pmongoc_server_api_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_pool_set_server_api(pool, api, error);
+end;
+
+{******************************************************************************************************************************}
+function mongoc_client_pool_set_structured_log_opts(pool: Pmongoc_client_pool_t; opts: Pmongoc_structured_log_opts_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_pool_set_structured_log_opts(pool, opts);
+end;
+
+{**********************************************************************************************************************}
+function mongoc_client_pool_set_oidc_callback(pool: Pmongoc_client_pool_t; callback: Pmongoc_oidc_callback_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_pool_set_oidc_callback(pool, callback);
+end;
+
+{****************************************************************}
+function mongoc_transaction_opts_new(): Pmongoc_transaction_opt_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_transaction_opts_new();
+end;
+
+{*************************************************************************************************}
+function mongoc_transaction_opts_clone(opts: Pmongoc_transaction_opt_t): Pmongoc_transaction_opt_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_transaction_opts_clone(opts);
+end;
+
+{*************************************************************************}
+procedure mongoc_transaction_opts_destroy(opts: Pmongoc_transaction_opt_t);
+begin
+  ALMongoDBLibrary.mongoc_transaction_opts_destroy(opts);
+end;
+
+{*********************************************************************************************************************}
+procedure mongoc_transaction_opts_set_max_commit_time_ms(opts: Pmongoc_transaction_opt_t; max_commit_time_ms: int64_t);
+begin
+  ALMongoDBLibrary.mongoc_transaction_opts_set_max_commit_time_ms(opts, max_commit_time_ms);
+end;
+
+{************************************************************************************************}
+function mongoc_transaction_opts_get_max_commit_time_ms(opts: Pmongoc_transaction_opt_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_transaction_opts_get_max_commit_time_ms(opts);
+end;
+
+{************************************************************************************************************************}
+procedure mongoc_transaction_opts_set_read_concern(opts: Pmongoc_transaction_opt_t; read_concern: Pmongoc_read_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_transaction_opts_set_read_concern(opts, read_concern);
+end;
+
+{*********************************************************************************************************}
+function mongoc_transaction_opts_get_read_concern(opts: Pmongoc_transaction_opt_t): Pmongoc_read_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_transaction_opts_get_read_concern(opts);
+end;
+
+{***************************************************************************************************************************}
+procedure mongoc_transaction_opts_set_write_concern(opts: Pmongoc_transaction_opt_t; write_concern: Pmongoc_write_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_transaction_opts_set_write_concern(opts, write_concern);
+end;
+
+{***********************************************************************************************************}
+function mongoc_transaction_opts_get_write_concern(opts: Pmongoc_transaction_opt_t): Pmongoc_write_concern_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_transaction_opts_get_write_concern(opts);
+end;
+
+{******************************************************************************************************************}
+procedure mongoc_transaction_opts_set_read_prefs(opts: Pmongoc_transaction_opt_t; read_prefs: Pmongoc_read_prefs_t);
+begin
+  ALMongoDBLibrary.mongoc_transaction_opts_set_read_prefs(opts, read_prefs);
+end;
+
+{*****************************************************************************************************}
+function mongoc_transaction_opts_get_read_prefs(opts: Pmongoc_transaction_opt_t): Pmongoc_read_prefs_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_transaction_opts_get_read_prefs(opts);
+end;
+
+{********************************************************}
+function mongoc_session_opts_new(): Pmongoc_session_opt_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_session_opts_new();
+end;
+
+{**************************************************************************************************************}
+procedure mongoc_session_opts_set_causal_consistency(opts: Pmongoc_session_opt_t; causal_consistency: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_session_opts_set_causal_consistency(opts, causal_consistency);
+end;
+
+{*****************************************************************************************}
+function mongoc_session_opts_get_causal_consistency(opts: Pmongoc_session_opt_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_session_opts_get_causal_consistency(opts);
+end;
+
+{******************************************************************************************}
+procedure mongoc_session_opts_set_snapshot(opts: Pmongoc_session_opt_t; snapshot: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_session_opts_set_snapshot(opts, snapshot);
+end;
+
+{*******************************************************************************}
+function mongoc_session_opts_get_snapshot(opts: Pmongoc_session_opt_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_session_opts_get_snapshot(opts);
+end;
+
+{***************************************************************************************************************************}
+procedure mongoc_session_opts_set_default_transaction_opts(opts: Pmongoc_session_opt_t; txn_opts: Pmongoc_transaction_opt_t);
+begin
+  ALMongoDBLibrary.mongoc_session_opts_set_default_transaction_opts(opts, txn_opts);
+end;
+
+{****************************************************************************************************************}
+function mongoc_session_opts_get_default_transaction_opts(opts: Pmongoc_session_opt_t): Pmongoc_transaction_opt_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_session_opts_get_default_transaction_opts(opts);
+end;
+
+{**************************************************************************************************************}
+function mongoc_session_opts_get_transaction_opts(session: Pmongoc_client_session_t): Pmongoc_transaction_opt_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_session_opts_get_transaction_opts(session);
+end;
+
+{*************************************************************************************}
+function mongoc_session_opts_clone(opts: Pmongoc_session_opt_t): Pmongoc_session_opt_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_session_opts_clone(opts);
+end;
+
+{*****************************************************************}
+procedure mongoc_session_opts_destroy(opts: Pmongoc_session_opt_t);
+begin
+  ALMongoDBLibrary.mongoc_session_opts_destroy(opts);
+end;
+
+{*********************************************************************************************}
+function mongoc_client_session_get_client(session: Pmongoc_client_session_t): Pmongoc_client_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_get_client(session);
+end;
+
+{************************************************************************************************}
+function mongoc_client_session_get_opts(session: Pmongoc_client_session_t): Pmongoc_session_opt_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_get_opts(session);
+end;
+
+{**********************************************************************************}
+function mongoc_client_session_get_lsid(session: Pmongoc_client_session_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_get_lsid(session);
+end;
+
+{******************************************************************************************}
+function mongoc_client_session_get_cluster_time(session: Pmongoc_client_session_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_get_cluster_time(session);
+end;
+
+{*************************************************************************************************************}
+procedure mongoc_client_session_advance_cluster_time(session: Pmongoc_client_session_t; cluster_time: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_client_session_advance_cluster_time(session, cluster_time);
+end;
+
+{********************************************************************************************************************************}
+procedure mongoc_client_session_get_operation_time(session: Pmongoc_client_session_t; timestamp: Puint32_t; increment: Puint32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_session_get_operation_time(session, timestamp, increment);
+end;
+
+{****************************************************************************************}
+function mongoc_client_session_get_server_id(session: Pmongoc_client_session_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_get_server_id(session);
+end;
+
+{**********************************************************************************************************************************}
+procedure mongoc_client_session_advance_operation_time(session: Pmongoc_client_session_t; timestamp: uint32_t; increment: uint32_t);
+begin
+  ALMongoDBLibrary.mongoc_client_session_advance_operation_time(session, timestamp, increment);
+end;
+
+{*******************************************************************************************************************************************************************************************************************************}
+function mongoc_client_session_with_transaction(session: Pmongoc_client_session_t; cb: mongoc_client_session_with_transaction_cb_t; opts: Pmongoc_transaction_opt_t; ctx: Pvoid; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_with_transaction(session, cb, opts, ctx, reply, error);
+end;
+
+{***************************************************************************************************************************************************}
+function mongoc_client_session_start_transaction(session: Pmongoc_client_session_t; opts: Pmongoc_transaction_opt_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_start_transaction(session, opts, error);
+end;
+
+{*****************************************************************************************}
+function mongoc_client_session_in_transaction(session: Pmongoc_client_session_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_in_transaction(session);
+end;
+
+{******************************************************************************************************************}
+function mongoc_client_session_get_transaction_state(session: Pmongoc_client_session_t): mongoc_transaction_state_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_get_transaction_state(session);
+end;
+
+{***********************************************************************************************************************************}
+function mongoc_client_session_commit_transaction(session: Pmongoc_client_session_t; reply: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_commit_transaction(session, reply, error);
+end;
+
+{******************************************************************************************************************}
+function mongoc_client_session_abort_transaction(session: Pmongoc_client_session_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_abort_transaction(session, error);
+end;
+
+{*****************************************************************************************************************************}
+function mongoc_client_session_append(client_session: Pmongoc_client_session_t; opts: Pbson_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_append(client_session, opts, error);
+end;
+
+{*************************************************************************}
+procedure mongoc_client_session_destroy(session: Pmongoc_client_session_t);
+begin
+  ALMongoDBLibrary.mongoc_client_session_destroy(session);
+end;
+
+{************************************************************************************}
+function mongoc_client_session_get_dirty(session: Pmongoc_client_session_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_session_get_dirty(session);
+end;
+
+{***********************************************************}
+function mongoc_bulkwriteopts_new(): Pmongoc_bulkwriteopts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteopts_new();
+end;
+
+{*******************************************************************************************}
+procedure mongoc_bulkwriteopts_set_ordered(self: Pmongoc_bulkwriteopts_t; ordered: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_bulkwriteopts_set_ordered(self, ordered);
+end;
+
+{*****************************************************************************************************************************}
+procedure mongoc_bulkwriteopts_set_bypassdocumentvalidation(self: Pmongoc_bulkwriteopts_t; bypassdocumentvalidation: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_bulkwriteopts_set_bypassdocumentvalidation(self, bypassdocumentvalidation);
+end;
+
+{**********************************************************************************}
+procedure mongoc_bulkwriteopts_set_let(self: Pmongoc_bulkwriteopts_t; let: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwriteopts_set_let(self, let);
+end;
+
+{********************************************************************************************************************}
+procedure mongoc_bulkwriteopts_set_writeconcern(self: Pmongoc_bulkwriteopts_t; writeconcern: Pmongoc_write_concern_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwriteopts_set_writeconcern(self, writeconcern);
+end;
+
+{************************************************************************************************}
+procedure mongoc_bulkwriteopts_set_comment(self: Pmongoc_bulkwriteopts_t; comment: Pbson_value_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwriteopts_set_comment(self, comment);
+end;
+
+{*********************************************************************************************************}
+procedure mongoc_bulkwriteopts_set_verboseresults(self: Pmongoc_bulkwriteopts_t; verboseresults: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_bulkwriteopts_set_verboseresults(self, verboseresults);
+end;
+
+{**************************************************************************************}
+procedure mongoc_bulkwriteopts_set_extra(self: Pmongoc_bulkwriteopts_t; extra: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwriteopts_set_extra(self, extra);
+end;
+
+{*********************************************************************************************}
+procedure mongoc_bulkwriteopts_set_serverid(self: Pmongoc_bulkwriteopts_t; serverid: uint32_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwriteopts_set_serverid(self, serverid);
+end;
+
+{********************************************************************}
+procedure mongoc_bulkwriteopts_destroy(self: Pmongoc_bulkwriteopts_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwriteopts_destroy(self);
+end;
+
+{**************************************************************************************}
+function mongoc_bulkwriteresult_insertedcount(self: Pmongoc_bulkwriteresult_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteresult_insertedcount(self);
+end;
+
+{**************************************************************************************}
+function mongoc_bulkwriteresult_upsertedcount(self: Pmongoc_bulkwriteresult_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteresult_upsertedcount(self);
+end;
+
+{*************************************************************************************}
+function mongoc_bulkwriteresult_matchedcount(self: Pmongoc_bulkwriteresult_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteresult_matchedcount(self);
+end;
+
+{**************************************************************************************}
+function mongoc_bulkwriteresult_modifiedcount(self: Pmongoc_bulkwriteresult_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteresult_modifiedcount(self);
+end;
+
+{*************************************************************************************}
+function mongoc_bulkwriteresult_deletedcount(self: Pmongoc_bulkwriteresult_t): int64_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteresult_deletedcount(self);
+end;
+
+{**************************************************************************************}
+function mongoc_bulkwriteresult_insertresults(self: Pmongoc_bulkwriteresult_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteresult_insertresults(self);
+end;
+
+{**************************************************************************************}
+function mongoc_bulkwriteresult_updateresults(self: Pmongoc_bulkwriteresult_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteresult_updateresults(self);
+end;
+
+{**************************************************************************************}
+function mongoc_bulkwriteresult_deleteresults(self: Pmongoc_bulkwriteresult_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteresult_deleteresults(self);
+end;
+
+{**********************************************************************************}
+function mongoc_bulkwriteresult_serverid(self: Pmongoc_bulkwriteresult_t): uint32_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteresult_serverid(self);
+end;
+
+{************************************************************************}
+procedure mongoc_bulkwriteresult_destroy(self: Pmongoc_bulkwriteresult_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwriteresult_destroy(self);
+end;
+
+{***********************************************************************************************************}
+function mongoc_bulkwriteexception_error(self: Pmongoc_bulkwriteexception_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteexception_error(self, error);
+end;
+
+{******************************************************************************************}
+function mongoc_bulkwriteexception_writeerrors(self: Pmongoc_bulkwriteexception_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteexception_writeerrors(self);
+end;
+
+{*************************************************************************************************}
+function mongoc_bulkwriteexception_writeconcernerrors(self: Pmongoc_bulkwriteexception_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteexception_writeconcernerrors(self);
+end;
+
+{*****************************************************************************************}
+function mongoc_bulkwriteexception_errorreply(self: Pmongoc_bulkwriteexception_t): Pbson_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwriteexception_errorreply(self);
+end;
+
+{******************************************************************************}
+procedure mongoc_bulkwriteexception_destroy(self: Pmongoc_bulkwriteexception_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwriteexception_destroy(self);
+end;
+
+{********************************************************************************}
+function mongoc_client_bulkwrite_new(self: Pmongoc_client_t): Pmongoc_bulkwrite_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_bulkwrite_new(self);
+end;
+
+{*******************************************************************************}
+function mongoc_bulkwrite_insertoneopts_new(): Pmongoc_bulkwrite_insertoneopts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_insertoneopts_new();
+end;
+
+{****************************************************************************************}
+procedure mongoc_bulkwrite_insertoneopts_destroy(self: Pmongoc_bulkwrite_insertoneopts_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_insertoneopts_destroy(self);
+end;
+
+{*******************************************************************************************************************************************************************************}
+function mongoc_bulkwrite_append_insertone(self: Pmongoc_bulkwrite_t; ns: PAnsiChar; document: Pbson_t; opts: Pmongoc_bulkwrite_insertoneopts_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_append_insertone(self, ns, document, opts, error);
+end;
+
+{*******************************************************************************}
+function mongoc_bulkwrite_updateoneopts_new(): Pmongoc_bulkwrite_updateoneopts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_updateoneopts_new();
+end;
+
+{************************************************************************************************************************}
+procedure mongoc_bulkwrite_updateoneopts_set_arrayfilters(self: Pmongoc_bulkwrite_updateoneopts_t; arrayfilters: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_updateoneopts_set_arrayfilters(self, arrayfilters);
+end;
+
+{******************************************************************************************************************}
+procedure mongoc_bulkwrite_updateoneopts_set_collation(self: Pmongoc_bulkwrite_updateoneopts_t; collation: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_updateoneopts_set_collation(self, collation);
+end;
+
+{**************************************************************************************************************}
+procedure mongoc_bulkwrite_updateoneopts_set_hint(self: Pmongoc_bulkwrite_updateoneopts_t; hint: Pbson_value_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_updateoneopts_set_hint(self, hint);
+end;
+
+{*************************************************************************************************************}
+procedure mongoc_bulkwrite_updateoneopts_set_upsert(self: Pmongoc_bulkwrite_updateoneopts_t; upsert: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_updateoneopts_set_upsert(self, upsert);
+end;
+
+{********************************************************************************************************}
+procedure mongoc_bulkwrite_updateoneopts_set_sort(self: Pmongoc_bulkwrite_updateoneopts_t; sort: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_updateoneopts_set_sort(self, sort);
+end;
+
+{****************************************************************************************}
+procedure mongoc_bulkwrite_updateoneopts_destroy(self: Pmongoc_bulkwrite_updateoneopts_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_updateoneopts_destroy(self);
+end;
+
+{**********************************************************************************************************************************************************************************************}
+function mongoc_bulkwrite_append_updateone(self: Pmongoc_bulkwrite_t; ns: PAnsiChar; filter: Pbson_t; update: Pbson_t; opts: Pmongoc_bulkwrite_updateoneopts_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_append_updateone(self, ns, filter, update, opts, error);
+end;
+
+{*********************************************************************************}
+function mongoc_bulkwrite_updatemanyopts_new(): Pmongoc_bulkwrite_updatemanyopts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_updatemanyopts_new();
+end;
+
+{**************************************************************************************************************************}
+procedure mongoc_bulkwrite_updatemanyopts_set_arrayfilters(self: Pmongoc_bulkwrite_updatemanyopts_t; arrayfilters: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_updatemanyopts_set_arrayfilters(self, arrayfilters);
+end;
+
+{********************************************************************************************************************}
+procedure mongoc_bulkwrite_updatemanyopts_set_collation(self: Pmongoc_bulkwrite_updatemanyopts_t; collation: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_updatemanyopts_set_collation(self, collation);
+end;
+
+{****************************************************************************************************************}
+procedure mongoc_bulkwrite_updatemanyopts_set_hint(self: Pmongoc_bulkwrite_updatemanyopts_t; hint: Pbson_value_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_updatemanyopts_set_hint(self, hint);
+end;
+
+{***************************************************************************************************************}
+procedure mongoc_bulkwrite_updatemanyopts_set_upsert(self: Pmongoc_bulkwrite_updatemanyopts_t; upsert: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_updatemanyopts_set_upsert(self, upsert);
+end;
+
+{******************************************************************************************}
+procedure mongoc_bulkwrite_updatemanyopts_destroy(self: Pmongoc_bulkwrite_updatemanyopts_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_updatemanyopts_destroy(self);
+end;
+
+{************************************************************************************************************************************************************************************************}
+function mongoc_bulkwrite_append_updatemany(self: Pmongoc_bulkwrite_t; ns: PAnsiChar; filter: Pbson_t; update: Pbson_t; opts: Pmongoc_bulkwrite_updatemanyopts_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_append_updatemany(self, ns, filter, update, opts, error);
+end;
+
+{*********************************************************************************}
+function mongoc_bulkwrite_replaceoneopts_new(): Pmongoc_bulkwrite_replaceoneopts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_replaceoneopts_new();
+end;
+
+{********************************************************************************************************************}
+procedure mongoc_bulkwrite_replaceoneopts_set_collation(self: Pmongoc_bulkwrite_replaceoneopts_t; collation: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_replaceoneopts_set_collation(self, collation);
+end;
+
+{****************************************************************************************************************}
+procedure mongoc_bulkwrite_replaceoneopts_set_hint(self: Pmongoc_bulkwrite_replaceoneopts_t; hint: Pbson_value_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_replaceoneopts_set_hint(self, hint);
+end;
+
+{***************************************************************************************************************}
+procedure mongoc_bulkwrite_replaceoneopts_set_upsert(self: Pmongoc_bulkwrite_replaceoneopts_t; upsert: ByteBool);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_replaceoneopts_set_upsert(self, upsert);
+end;
+
+{**********************************************************************************************************}
+procedure mongoc_bulkwrite_replaceoneopts_set_sort(self: Pmongoc_bulkwrite_replaceoneopts_t; sort: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_replaceoneopts_set_sort(self, sort);
+end;
+
+{******************************************************************************************}
+procedure mongoc_bulkwrite_replaceoneopts_destroy(self: Pmongoc_bulkwrite_replaceoneopts_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_replaceoneopts_destroy(self);
+end;
+
+{*****************************************************************************************************************************************************************************************************}
+function mongoc_bulkwrite_append_replaceone(self: Pmongoc_bulkwrite_t; ns: PAnsiChar; filter: Pbson_t; replacement: Pbson_t; opts: Pmongoc_bulkwrite_replaceoneopts_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_append_replaceone(self, ns, filter, replacement, opts, error);
+end;
+
+{*******************************************************************************}
+function mongoc_bulkwrite_deleteoneopts_new(): Pmongoc_bulkwrite_deleteoneopts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_deleteoneopts_new();
+end;
+
+{******************************************************************************************************************}
+procedure mongoc_bulkwrite_deleteoneopts_set_collation(self: Pmongoc_bulkwrite_deleteoneopts_t; collation: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_deleteoneopts_set_collation(self, collation);
+end;
+
+{**************************************************************************************************************}
+procedure mongoc_bulkwrite_deleteoneopts_set_hint(self: Pmongoc_bulkwrite_deleteoneopts_t; hint: Pbson_value_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_deleteoneopts_set_hint(self, hint);
+end;
+
+{****************************************************************************************}
+procedure mongoc_bulkwrite_deleteoneopts_destroy(self: Pmongoc_bulkwrite_deleteoneopts_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_deleteoneopts_destroy(self);
+end;
+
+{*****************************************************************************************************************************************************************************}
+function mongoc_bulkwrite_append_deleteone(self: Pmongoc_bulkwrite_t; ns: PAnsiChar; filter: Pbson_t; opts: Pmongoc_bulkwrite_deleteoneopts_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_append_deleteone(self, ns, filter, opts, error);
+end;
+
+{*********************************************************************************}
+function mongoc_bulkwrite_deletemanyopts_new(): Pmongoc_bulkwrite_deletemanyopts_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_deletemanyopts_new();
+end;
+
+{********************************************************************************************************************}
+procedure mongoc_bulkwrite_deletemanyopts_set_collation(self: Pmongoc_bulkwrite_deletemanyopts_t; collation: Pbson_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_deletemanyopts_set_collation(self, collation);
+end;
+
+{****************************************************************************************************************}
+procedure mongoc_bulkwrite_deletemanyopts_set_hint(self: Pmongoc_bulkwrite_deletemanyopts_t; hint: Pbson_value_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_deletemanyopts_set_hint(self, hint);
+end;
+
+{******************************************************************************************}
+procedure mongoc_bulkwrite_deletemanyopts_destroy(self: Pmongoc_bulkwrite_deletemanyopts_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_deletemanyopts_destroy(self);
+end;
+
+{*******************************************************************************************************************************************************************************}
+function mongoc_bulkwrite_append_deletemany(self: Pmongoc_bulkwrite_t; ns: PAnsiChar; filter: Pbson_t; opts: Pmongoc_bulkwrite_deletemanyopts_t; error: Pbson_error_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_append_deletemany(self, ns, filter, opts, error);
+end;
+
+{***************************************************}
+function mongoc_bulkwrite_new(): Pmongoc_bulkwrite_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_new();
+end;
+
+{*****************************************************************************************}
+procedure mongoc_bulkwrite_set_client(self: Pmongoc_bulkwrite_t; client: Pmongoc_client_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_set_client(self, client);
+end;
+
+{***************************************************************************************************}
+procedure mongoc_bulkwrite_set_session(self: Pmongoc_bulkwrite_t; session: Pmongoc_client_session_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_set_session(self, session);
+end;
+
+{********************************************************************************************************************}
+function mongoc_bulkwrite_execute(self: Pmongoc_bulkwrite_t; opts: Pmongoc_bulkwriteopts_t): mongoc_bulkwritereturn_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_execute(self, opts);
+end;
+
+{***********************************************************************************************************************************}
+function mongoc_bulkwrite_check_acknowledged(self: Pmongoc_bulkwrite_t; error: Pbson_error_t): mongoc_bulkwrite_check_acknowledged_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_check_acknowledged(self, error);
+end;
+
+{***************************************************************************************************************}
+function mongoc_bulkwrite_serverid(self: Pmongoc_bulkwrite_t; error: Pbson_error_t): mongoc_bulkwrite_serverid_t;
+begin
+  Result := ALMongoDBLibrary.mongoc_bulkwrite_serverid(self, error);
+end;
+
+{************************************************************}
+procedure mongoc_bulkwrite_destroy(self: Pmongoc_bulkwrite_t);
+begin
+  ALMongoDBLibrary.mongoc_bulkwrite_destroy(self);
+end;
+
+{*********************************************************************************************************************}
+procedure mongoc_client_set_usleep_impl(client: Pmongoc_client_t; usleep_func: mongoc_usleep_func_t; user_data: Pvoid);
+begin
+  ALMongoDBLibrary.mongoc_client_set_usleep_impl(client, usleep_func, user_data);
+end;
+
+{********************************************************************}
+procedure mongoc_usleep_default_impl(usec: int64_t; user_data: Pvoid);
+begin
+  ALMongoDBLibrary.mongoc_usleep_default_impl(usec, user_data);
+end;
+
+{************************************************************}
+procedure ALCreateALMongoDBLibrary(const ALibraryDir: String);
+begin
+  if assigned(ALMongoDBLibrary) then exit;
+  ALMongoDBLibrary := TALMongoDBLibrary.Create(ALibraryDir);
+end;
+
+{*******************************}
+procedure ALFreeALMongoDBLibrary;
+begin
+  ALFreeAndNil(ALMongoDBLibrary);
+end;
+
+initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.MongoDB.Wrapper','initialization');
+  {$ENDIF}
+  ALMongoDBLibrary := nil;
 
 end.

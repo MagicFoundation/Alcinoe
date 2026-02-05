@@ -4533,7 +4533,7 @@ Type
   end;
 
 Var
-  ALImageMagickLib: TALImageMagickLibrary;
+  ALImageMagickLibrary: TALImageMagickLibrary;
 
 {$REGION ' MagickCore - animate.c - https://imagemagick.org/api/animate.html'}
 function AnimateImages(const image_info: PImageInfo; image: PImage; exception: PExceptionInfo): MagickBooleanType; inline;
@@ -6532,6 +6532,8 @@ constructor TALImageMagickLibrary.Create(AImageMagickHome: String; const AThread
   end;
 
 begin
+
+  inherited Create;
 
   // http://www.imagemagick.org/script/resources.php
   AImageMagickHome := ExcludeTrailingPathDelimiter(AImageMagickHome);
@@ -8535,7 +8537,7 @@ begin
     if not FreeLibrary(FMagickWandlib) then
       raiseLastOsError;
   end;
-  if (FMagickCorelib > 0) and
+  if (FMagickCorelib <> 0) and
      (not FreeLibrary(FMagickCorelib)) then
     raiseLastOsError;
   inherited Destroy;
@@ -8546,7 +8548,7 @@ end;
 {****************************************************************************************************************}
 function AnimateImages(const image_info: PImageInfo; image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.AnimateImages(image_info, image, exception);
+  Result := ALImageMagickLibrary.AnimateImages(image_info, image, exception);
 end;
 
 {$ENDREGION}
@@ -8556,25 +8558,25 @@ end;
 {**************************************************************************************************************}
 function AnnotateImage(image: PImage; const draw_info: PDrawInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.AnnotateImage(image, draw_info, exception);
+  Result := ALImageMagickLibrary.AnnotateImage(image, draw_info, exception);
 end;
 
 {*******************************************************************************************************************************************************************************}
 function FormatMagickCaption(image: PImage; draw_info: PDrawInfo; const split: MagickBooleanType; metrics: PTypeMetric; caption: PPAnsiChar; exception: PExceptionInfo): ssize_t;
 begin
-  Result := ALImageMagickLib.FormatMagickCaption(image, draw_info, split, metrics, caption, exception);
+  Result := ALImageMagickLibrary.FormatMagickCaption(image, draw_info, split, metrics, caption, exception);
 end;
 
 {**********************************************************************************************************************************************}
 function GetMultilineTypeMetrics(image: PImage; const draw_info: PDrawInfo; metrics: PTypeMetric; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetMultilineTypeMetrics(image, draw_info, metrics, exception);
+  Result := ALImageMagickLibrary.GetMultilineTypeMetrics(image, draw_info, metrics, exception);
 end;
 
 {*************************************************************************************************************************************}
 function GetTypeMetrics(image: PImage; const draw_info: PDrawInfo; metrics: PTypeMetric; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetTypeMetrics(image, draw_info, metrics, exception);
+  Result := ALImageMagickLibrary.GetTypeMetrics(image, draw_info, metrics, exception);
 end;
 
 {$ENDREGION}
@@ -8584,55 +8586,55 @@ end;
 {****************************************************************************************}
 function CloneImageArtifacts(image: PImage; const clone_image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CloneImageArtifacts(image, clone_image);
+  Result := ALImageMagickLibrary.CloneImageArtifacts(image, clone_image);
 end;
 
 {****************************************************************************************}
 function DefineImageArtifact(image: PImage; const artifact: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DefineImageArtifact(image, artifact);
+  Result := ALImageMagickLibrary.DefineImageArtifact(image, artifact);
 end;
 
 {****************************************************************************************}
 function DeleteImageArtifact(image: PImage; const artifact: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DeleteImageArtifact(image, artifact);
+  Result := ALImageMagickLibrary.DeleteImageArtifact(image, artifact);
 end;
 
 {*********************************************}
 procedure DestroyImageArtifacts(image: PImage);
 begin
-  ALImageMagickLib.DestroyImageArtifacts(image);
+  ALImageMagickLibrary.DestroyImageArtifacts(image);
 end;
 
 {***********************************************************************************}
 function GetImageArtifact(const image: PImage; const artifact: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetImageArtifact(image, artifact);
+  Result := ALImageMagickLibrary.GetImageArtifact(image, artifact);
 end;
 
 {************************************************************}
 function GetNextImageArtifact(const image: PImage): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetNextImageArtifact(image);
+  Result := ALImageMagickLibrary.GetNextImageArtifact(image);
 end;
 
 {********************************************************************************}
 function RemoveImageArtifact(image: PImage; const artifact: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.RemoveImageArtifact(image, artifact);
+  Result := ALImageMagickLibrary.RemoveImageArtifact(image, artifact);
 end;
 
 {********************************************************}
 procedure ResetImageArtifactIterator(const image: PImage);
 begin
-  ALImageMagickLib.ResetImageArtifactIterator(image);
+  ALImageMagickLibrary.ResetImageArtifactIterator(image);
 end;
 
 {*************************************************************************************************************}
 function SetImageArtifact(image: PImage; const artifact: PAnsiChar; const value: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageArtifact(image, artifact, value);
+  Result := ALImageMagickLibrary.SetImageArtifact(image, artifact, value);
 end;
 
 {$ENDREGION}
@@ -8642,85 +8644,85 @@ end;
 {******************************************************************************************}
 function GetImageBoundingBox(const image: PImage; exception: PExceptionInfo): RectangleInfo;
 begin
-  Result := ALImageMagickLib.GetImageBoundingBox(image, exception);
+  Result := ALImageMagickLibrary.GetImageBoundingBox(image, exception);
 end;
 
 {****************************************************************************************************************}
 function GetImageConvexHull(const image: PImage; number_vertices: PSize_t; exception: PExceptionInfo): PPointInfo;
 begin
-  Result := ALImageMagickLib.GetImageConvexHull(image, number_vertices, exception);
+  Result := ALImageMagickLibrary.GetImageConvexHull(image, number_vertices, exception);
 end;
 
 {*****************************************************************************}
 function GetImageDepth(const image: PImage; exception: PExceptionInfo): size_t;
 begin
-  Result := ALImageMagickLib.GetImageDepth(image, exception);
+  Result := ALImageMagickLibrary.GetImageDepth(image, exception);
 end;
 
 {******************************************************************************************************************}
 function GetImageMinimumBoundingBox(image: PImage; number_vertices: PSize_t; exception: PExceptionInfo): PPointInfo;
 begin
-  Result := ALImageMagickLib.GetImageMinimumBoundingBox(image, number_vertices, exception);
+  Result := ALImageMagickLibrary.GetImageMinimumBoundingBox(image, number_vertices, exception);
 end;
 
 {*********************************************************************************************}
 function GetImageQuantumDepth(const image: PImage; const constrain: MagickBooleanType): size_t;
 begin
-  Result := ALImageMagickLib.GetImageQuantumDepth(image, constrain);
+  Result := ALImageMagickLibrary.GetImageQuantumDepth(image, constrain);
 end;
 
 {****************************************************}
 function GetImageType(const image: PImage): ImageType;
 begin
-  Result := ALImageMagickLib.GetImageType(image);
+  Result := ALImageMagickLibrary.GetImageType(image);
 end;
 
 {************************************************************************************}
 function IdentifyImageGray(const image: PImage; exception: PExceptionInfo): ImageType;
 begin
-  Result := ALImageMagickLib.IdentifyImageGray(image, exception);
+  Result := ALImageMagickLibrary.IdentifyImageGray(image, exception);
 end;
 
 {**************************************************************************************************}
 function IdentifyImageMonochrome(const image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IdentifyImageMonochrome(image, exception);
+  Result := ALImageMagickLibrary.IdentifyImageMonochrome(image, exception);
 end;
 
 {************************************************************************************}
 function IdentifyImageType(const image: PImage; exception: PExceptionInfo): ImageType;
 begin
-  Result := ALImageMagickLib.IdentifyImageType(image, exception);
+  Result := ALImageMagickLibrary.IdentifyImageType(image, exception);
 end;
 
 {***********************************************************}
 function IsImageGray(const image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsImageGray(image);
+  Result := ALImageMagickLibrary.IsImageGray(image);
 end;
 
 {*****************************************************************}
 function IsImageMonochrome(const image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsImageMonochrome(image);
+  Result := ALImageMagickLibrary.IsImageMonochrome(image);
 end;
 
 {****************************************************************************************}
 function IsImageOpaque(const image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsImageOpaque(image, exception);
+  Result := ALImageMagickLibrary.IsImageOpaque(image, exception);
 end;
 
 {*******************************************************************************************************}
 function SetImageDepth(image: PImage; const depth: size_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageDepth(image, depth, exception);
+  Result := ALImageMagickLibrary.SetImageDepth(image, depth, exception);
 end;
 
 {*********************************************************************************************************}
 function SetImageType(image: PImage; const &type: ImageType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageType(image, &type, exception);
+  Result := ALImageMagickLibrary.SetImageType(image, &type, exception);
 end;
 
 {$ENDREGION}
@@ -8730,511 +8732,511 @@ end;
 {*****************************************************************************}
 function AcquireCustomStreamInfo(exception: PExceptionInfo): PCustomStreamInfo;
 begin
-  Result := ALImageMagickLib.AcquireCustomStreamInfo(exception);
+  Result := ALImageMagickLibrary.AcquireCustomStreamInfo(exception);
 end;
 
 {**********************************************************************************}
 procedure AttachBlob(blob_info: PBlobInfo; const blob: PVoid; const length: size_t);
 begin
-  ALImageMagickLib.AttachBlob(blob_info, blob, length);
+  ALImageMagickLibrary.AttachBlob(blob_info, blob, length);
 end;
 
 {***********************************************************************************}
 procedure AttachCustomStream(blob_info: PBlobInfo; custom_stream: PCustomStreamInfo);
 begin
-  ALImageMagickLib.AttachCustomStream(blob_info, custom_stream);
+  ALImageMagickLibrary.AttachCustomStream(blob_info, custom_stream);
 end;
 
 {******************************************************************************************************************************}
 function BlobToFile(filename: PAnsiChar; const blob: PVoid; const length: size_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.BlobToFile(filename, blob, length, exception);
+  Result := ALImageMagickLibrary.BlobToFile(filename, blob, length, exception);
 end;
 
 {*****************************************************************************************************************************}
 function BlobToImage(const image_info: PImageInfo; const blob: PVoid; const length: size_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.BlobToImage(image_info, blob, length, exception);
+  Result := ALImageMagickLibrary.BlobToImage(image_info, blob, length, exception);
 end;
 
 {************************************************************}
 function CloneBlobInfo(const blob_info: PBlobInfo): PBlobInfo;
 begin
-  Result := ALImageMagickLib.CloneBlobInfo(blob_info);
+  Result := ALImageMagickLibrary.CloneBlobInfo(blob_info);
 end;
 
 {***************************************************}
 function CloseBlob(image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CloseBlob(image);
+  Result := ALImageMagickLibrary.CloseBlob(image);
 end;
 
 {********************************************************************************************}
 function CustomStreamToImage(const image_info: PImageInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.CustomStreamToImage(image_info, exception);
+  Result := ALImageMagickLibrary.CustomStreamToImage(image_info, exception);
 end;
 
 {***********************************}
 procedure DestroyBlob(image: PImage);
 begin
-  ALImageMagickLib.DestroyBlob(image);
+  ALImageMagickLibrary.DestroyBlob(image);
 end;
 
 {************************************************************************************}
 function DestroyCustomStreamInfo(custom_stream: PCustomStreamInfo): PCustomStreamInfo;
 begin
-  Result := ALImageMagickLib.DestroyCustomStreamInfo(custom_stream);
+  Result := ALImageMagickLibrary.DestroyCustomStreamInfo(custom_stream);
 end;
 
 {*****************************************}
 procedure DetachBlob(blob_info: PBlobInfo);
 begin
-  ALImageMagickLib.DetachBlob(blob_info);
+  ALImageMagickLibrary.DetachBlob(blob_info);
 end;
 
 {****************************************}
 procedure DisassociateBlob(image: PImage);
 begin
-  ALImageMagickLib.DisassociateBlob(image);
+  ALImageMagickLibrary.DisassociateBlob(image);
 end;
 
 {****************************************************************************************}
 function DiscardBlobBytes(image: PImage; const length: MagickSizeType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DiscardBlobBytes(image, length);
+  Result := ALImageMagickLibrary.DiscardBlobBytes(image, length);
 end;
 
 {**************************************************************}
 procedure DuplicateBlob(image: PImage; const duplicate: PImage);
 begin
-  ALImageMagickLib.DuplicateBlob(image, duplicate);
+  ALImageMagickLibrary.DuplicateBlob(image, duplicate);
 end;
 
 {*********************************************}
 function EOFBlob(const image: PImage): Integer;
 begin
-  Result := ALImageMagickLib.EOFBlob(image);
+  Result := ALImageMagickLibrary.EOFBlob(image);
 end;
 
 {***********************************************}
 function ErrorBlob(const image: PImage): Integer;
 begin
-  Result := ALImageMagickLib.ErrorBlob(image);
+  Result := ALImageMagickLibrary.ErrorBlob(image);
 end;
 
 {****************************************************************************************************************}
 procedure FileToBlob(const filename: PAnsiChar; const extent: size_t; length: PSize_t; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.FileToBlob(filename, extent, length, exception);
+  ALImageMagickLibrary.FileToBlob(filename, extent, length, exception);
 end;
 
 {***********************************************************************************************************}
 function FileToImage(image: PImage; const filename: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.FileToImage(image, filename, exception);
+  Result := ALImageMagickLibrary.FileToImage(image, filename, exception);
 end;
 
 {************************************************************}
 function GetBlobError(const image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetBlobError(image);
+  Result := ALImageMagickLibrary.GetBlobError(image);
 end;
 
 {*****************************************************}
 function GetBlobFileHandle(const image: PImage): PFILE;
 begin
-  Result := ALImageMagickLib.GetBlobFileHandle(image);
+  Result := ALImageMagickLibrary.GetBlobFileHandle(image);
 end;
 
 {******************************************}
 procedure GetBlobInfo(blob_info: PBlobInfo);
 begin
-  ALImageMagickLib.GetBlobInfo(blob_info);
+  ALImageMagickLibrary.GetBlobInfo(blob_info);
 end;
 
 {*******************************************************}
 //function GetBlobProperties(const image: PImage): PStat;
 //begin
-//  Result := ALImageMagickLib.GetBlobProperties(image);
+//  Result := ALImageMagickLibrary.GetBlobProperties(image);
 //end;
 
 {********************************************************}
 function GetBlobSize(const image: PImage): MagickSizeType;
 begin
-  Result := ALImageMagickLib.GetBlobSize(image);
+  Result := ALImageMagickLibrary.GetBlobSize(image);
 end;
 
 {***********************************************}
 procedure GetBlobStreamData(const image: PImage);
 begin
-  ALImageMagickLib.GetBlobStreamData(image);
+  ALImageMagickLibrary.GetBlobStreamData(image);
 end;
 
 {****************************************************************}
 function GetBlobStreamHandler(const image: PImage): StreamHandler;
 begin
-  Result := ALImageMagickLib.GetBlobStreamHandler(image);
+  Result := ALImageMagickLibrary.GetBlobStreamHandler(image);
 end;
 
 {*************************************************************************************************************}
 procedure ImageToBlob(const image_info: PImageInfo; image: PImage; length: PSize_t; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.ImageToBlob(image_info, image, length, exception);
+  ALImageMagickLibrary.ImageToBlob(image_info, image, length, exception);
 end;
 
 {****************************************************************************************************}
 procedure ImageToCustomStream(const image_info: PImageInfo; image: PImage; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.ImageToCustomStream(image_info, image, exception);
+  ALImageMagickLibrary.ImageToCustomStream(image_info, image, exception);
 end;
 
 {*****************************************************************************************************}
 function ImageToFile(image: PImage; filename: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ImageToFile(image, filename, exception);
+  Result := ALImageMagickLibrary.ImageToFile(image, filename, exception);
 end;
 
 {***************************************************************************************************************}
 procedure ImagesToBlob(const image_info: PImageInfo; images: PImage; length: PSize_t; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.ImagesToBlob(image_info, images, length, exception);
+  ALImageMagickLibrary.ImagesToBlob(image_info, images, length, exception);
 end;
 
 {******************************************************************************************************}
 procedure ImagesToCustomStream(const image_info: PImageInfo; images: PImage; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.ImagesToCustomStream(image_info, images, exception);
+  ALImageMagickLibrary.ImagesToCustomStream(image_info, images, exception);
 end;
 
 {*****************************************************************************************************************************************************************}
 function InjectImageBlob(const image_info: PImageInfo; image: PImage; inject_image: PImage; const format: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.InjectImageBlob(image_info, image, inject_image, format, exception);
+  Result := ALImageMagickLibrary.InjectImageBlob(image_info, image, inject_image, format, exception);
 end;
 
 {************************************************************}
 function IsBlobExempt(const image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsBlobExempt(image);
+  Result := ALImageMagickLibrary.IsBlobExempt(image);
 end;
 
 {**************************************************************}
 function IsBlobSeekable(const image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsBlobSeekable(image);
+  Result := ALImageMagickLibrary.IsBlobSeekable(image);
 end;
 
 {***************************************************************}
 function IsBlobTemporary(const image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsBlobTemporary(image);
+  Result := ALImageMagickLibrary.IsBlobTemporary(image);
 end;
 
 {***********************************************************************************************************}
 procedure MapBlob(&file: Integer; const mode: MapMode; const offset: MagickOffsetType; const length: size_t);
 begin
-  ALImageMagickLib.MapBlob(&file, mode, offset, length);
+  ALImageMagickLibrary.MapBlob(&file, mode, offset, length);
 end;
 
 {**********************************************************}
 procedure MSBOrderLong(buffer: PByte; const length: size_t);
 begin
-  ALImageMagickLib.MSBOrderLong(buffer, length);
+  ALImageMagickLibrary.MSBOrderLong(buffer, length);
 end;
 
 {******************************************************}
 procedure MSBOrderShort(p: PByte; const length: size_t);
 begin
-  ALImageMagickLib.MSBOrderShort(p, length);
+  ALImageMagickLibrary.MSBOrderShort(p, length);
 end;
 
 {*********************************************************************************************************************************}
 function OpenBlob(const image_info: PImageInfo; image: PImage; const mode: BlobMode; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.OpenBlob(image_info, image, mode, exception);
+  Result := ALImageMagickLibrary.OpenBlob(image_info, image, mode, exception);
 end;
 
 {**************************************************************************************************************************}
 function PingBlob(const image_info: PImageInfo; const blob: PVoid; const length: size_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.PingBlob(image_info, blob, length, exception);
+  Result := ALImageMagickLibrary.PingBlob(image_info, blob, length, exception);
 end;
 
 {***************************************************************************}
 function ReadBlob(image: PImage; const length: size_t; data: PVoid): ssize_t;
 begin
-  Result := ALImageMagickLib.ReadBlob(image, length, data);
+  Result := ALImageMagickLibrary.ReadBlob(image, length, data);
 end;
 
 {********************************************}
 function ReadBlobByte(image: PImage): Integer;
 begin
-  Result := ALImageMagickLib.ReadBlobByte(image);
+  Result := ALImageMagickLibrary.ReadBlobByte(image);
 end;
 
 {*********************************************}
 function ReadBlobDouble(image: PImage): double;
 begin
-  Result := ALImageMagickLib.ReadBlobDouble(image);
+  Result := ALImageMagickLibrary.ReadBlobDouble(image);
 end;
 
 {********************************************}
 function ReadBlobFloat(image: PImage): Single;
 begin
-  Result := ALImageMagickLib.ReadBlobFloat(image);
+  Result := ALImageMagickLibrary.ReadBlobFloat(image);
 end;
 
 {*********************************************}
 function ReadBlobLong(image: PImage): Cardinal;
 begin
-  Result := ALImageMagickLib.ReadBlobLong(image);
+  Result := ALImageMagickLibrary.ReadBlobLong(image);
 end;
 
 {*******************************************************}
 function ReadBlobLongLong(image: PImage): MagickSizeType;
 begin
-  Result := ALImageMagickLib.ReadBlobLongLong(image);
+  Result := ALImageMagickLibrary.ReadBlobLongLong(image);
 end;
 
 {******************************************}
 function ReadBlobShort(image: PImage): Word;
 begin
-  Result := ALImageMagickLib.ReadBlobShort(image);
+  Result := ALImageMagickLibrary.ReadBlobShort(image);
 end;
 
 {************************************************}
 function ReadBlobLSBLong(image: PImage): Cardinal;
 begin
-  Result := ALImageMagickLib.ReadBlobLSBLong(image);
+  Result := ALImageMagickLibrary.ReadBlobLSBLong(image);
 end;
 
 {*****************************************************}
 function ReadBlobLSBSignedLong(image: PImage): Integer;
 begin
-  Result := ALImageMagickLib.ReadBlobLSBSignedLong(image);
+  Result := ALImageMagickLibrary.ReadBlobLSBSignedLong(image);
 end;
 
 {*********************************************}
 function ReadBlobLSBShort(image: PImage): Word;
 begin
-  Result := ALImageMagickLib.ReadBlobLSBShort(image);
+  Result := ALImageMagickLibrary.ReadBlobLSBShort(image);
 end;
 
 {*******************************************************}
 function ReadBlobLSBSignedShort(image: PImage): SmallInt;
 begin
-  Result := ALImageMagickLib.ReadBlobLSBSignedShort(image);
+  Result := ALImageMagickLibrary.ReadBlobLSBSignedShort(image);
 end;
 
 {************************************************}
 function ReadBlobMSBLong(image: PImage): Cardinal;
 begin
-  Result := ALImageMagickLib.ReadBlobMSBLong(image);
+  Result := ALImageMagickLibrary.ReadBlobMSBLong(image);
 end;
 
 {**********************************************************}
 function ReadBlobMSBLongLong(image: PImage): MagickSizeType;
 begin
-  Result := ALImageMagickLib.ReadBlobMSBLongLong(image);
+  Result := ALImageMagickLibrary.ReadBlobMSBLongLong(image);
 end;
 
 {*********************************************}
 function ReadBlobMSBShort(image: PImage): Word;
 begin
-  Result := ALImageMagickLib.ReadBlobMSBShort(image);
+  Result := ALImageMagickLibrary.ReadBlobMSBShort(image);
 end;
 
 {*****************************************************}
 function ReadBlobMSBSignedLong(image: PImage): Integer;
 begin
-  Result := ALImageMagickLib.ReadBlobMSBSignedLong(image);
+  Result := ALImageMagickLibrary.ReadBlobMSBSignedLong(image);
 end;
 
 {*******************************************************}
 function ReadBlobMSBSignedShort(image: PImage): SmallInt;
 begin
-  Result := ALImageMagickLib.ReadBlobMSBSignedShort(image);
+  Result := ALImageMagickLibrary.ReadBlobMSBSignedShort(image);
 end;
 
 {**************************************************}
 function ReadBlobSignedLong(image: PImage): Integer;
 begin
-  Result := ALImageMagickLib.ReadBlobSignedLong(image);
+  Result := ALImageMagickLibrary.ReadBlobSignedLong(image);
 end;
 
 {****************************************************}
 function ReadBlobSignedShort(image: PImage): SmallInt;
 begin
-  Result := ALImageMagickLib.ReadBlobSignedShort(image);
+  Result := ALImageMagickLibrary.ReadBlobSignedShort(image);
 end;
 
 {******************************************************************************************}
 procedure ReadBlobStream(image: PImage; const length: size_t; data: PVoid; count: PSsize_t);
 begin
-  ALImageMagickLib.ReadBlobStream(image, length, data, count);
+  ALImageMagickLibrary.ReadBlobStream(image, length, data, count);
 end;
 
 {********************************************************************}
 function ReadBlobString(image: PImage; &string: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.ReadBlobString(image, &string);
+  Result := ALImageMagickLibrary.ReadBlobString(image, &string);
 end;
 
 {*************************************************}
 function ReferenceBlob(blob: PBlobInfo): PBlobInfo;
 begin
-  Result := ALImageMagickLib.ReferenceBlob(blob);
+  Result := ALImageMagickLibrary.ReferenceBlob(blob);
 end;
 
 {********************************************************************************************************}
 function SeekBlob(image: PImage; const offset: MagickOffsetType; const whence: Integer): MagickOffsetType;
 begin
-  Result := ALImageMagickLib.SeekBlob(image, offset, whence);
+  Result := ALImageMagickLibrary.SeekBlob(image, offset, whence);
 end;
 
 {**********************************************************************}
 procedure SetBlobExempt(image: PImage; const exempt: MagickBooleanType);
 begin
-  ALImageMagickLib.SetBlobExempt(image, exempt);
+  ALImageMagickLibrary.SetBlobExempt(image, exempt);
 end;
 
 {*************************************************************************************}
 function SetBlobExtent(image: PImage; const extent: MagickSizeType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetBlobExtent(image, extent);
+  Result := ALImageMagickLibrary.SetBlobExtent(image, extent);
 end;
 
 {***************************************************************************}
 procedure SetCustomStreamData(custom_stream: PCustomStreamInfo; data: PVoid);
 begin
-  ALImageMagickLib.SetCustomStreamData(custom_stream, data);
+  ALImageMagickLibrary.SetCustomStreamData(custom_stream, data);
 end;
 
 {*********************************************************************************************}
 procedure SetCustomStreamReader(custom_stream: PCustomStreamInfo; reader: CustomStreamHandler);
 begin
-  ALImageMagickLib.SetCustomStreamReader(custom_stream, reader);
+  ALImageMagickLibrary.SetCustomStreamReader(custom_stream, reader);
 end;
 
 {********************************************************************************************}
 procedure SetCustomStreamSeeker(custom_stream: PCustomStreamInfo; seeker: CustomStreamSeeker);
 begin
-  ALImageMagickLib.SetCustomStreamSeeker(custom_stream, seeker);
+  ALImageMagickLibrary.SetCustomStreamSeeker(custom_stream, seeker);
 end;
 
 {********************************************************************************************}
 procedure SetCustomStreamTeller(custom_stream: PCustomStreamInfo; teller: CustomStreamTeller);
 begin
-  ALImageMagickLib.SetCustomStreamTeller(custom_stream, teller);
+  ALImageMagickLibrary.SetCustomStreamTeller(custom_stream, teller);
 end;
 
 {*********************************************************************************************}
 procedure SetCustomStreamWriter(custom_stream: PCustomStreamInfo; writer: CustomStreamHandler);
 begin
-  ALImageMagickLib.SetCustomStreamWriter(custom_stream, writer);
+  ALImageMagickLibrary.SetCustomStreamWriter(custom_stream, writer);
 end;
 
 {*******************************************************}
 function TellBlob(const image: PImage): MagickOffsetType;
 begin
-  Result := ALImageMagickLib.TellBlob(image);
+  Result := ALImageMagickLibrary.TellBlob(image);
 end;
 
 {**********************************************************************}
 function UnmapBlob(map: PVoid; const length: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.UnmapBlob(map, length);
+  Result := ALImageMagickLibrary.UnmapBlob(map, length);
 end;
 
 {**********************************************************************************}
 function WriteBlob(image: PImage; const length: size_t; const data: PVoid): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlob(image, length, data);
+  Result := ALImageMagickLibrary.WriteBlob(image, length, data);
 end;
 
 {****************************************************************}
 function WriteBlobByte(image: PImage; const value: Byte): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobByte(image, value);
+  Result := ALImageMagickLibrary.WriteBlobByte(image, value);
 end;
 
 {*******************************************************************}
 function WriteBlobFloat(image: PImage; const value: Single): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobFloat(image, value);
+  Result := ALImageMagickLibrary.WriteBlobFloat(image, value);
 end;
 
 {********************************************************************}
 function WriteBlobLong(image: PImage; const value: Cardinal): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobLong(image, value);
+  Result := ALImageMagickLibrary.WriteBlobLong(image, value);
 end;
 
 {******************************************************************************}
 function WriteBlobLongLong(image: PImage; const value: MagickSizeType): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobLongLong(image, value);
+  Result := ALImageMagickLibrary.WriteBlobLongLong(image, value);
 end;
 
 {*****************************************************************}
 function WriteBlobShort(image: PImage; const value: Word): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobShort(image, value);
+  Result := ALImageMagickLibrary.WriteBlobShort(image, value);
 end;
 
 {*************************************************************************}
 function WriteBlobSignedLong(image: PImage; const value: Integer): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobSignedLong(image, value);
+  Result := ALImageMagickLibrary.WriteBlobSignedLong(image, value);
 end;
 
 {***********************************************************************}
 function WriteBlobLSBLong(image: PImage; const value: Cardinal): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobLSBLong(image, value);
+  Result := ALImageMagickLibrary.WriteBlobLSBLong(image, value);
 end;
 
 {********************************************************************}
 function WriteBlobLSBShort(image: PImage; const value: Word): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobLSBShort(image, value);
+  Result := ALImageMagickLibrary.WriteBlobLSBShort(image, value);
 end;
 
 {****************************************************************************}
 function WriteBlobLSBSignedLong(image: PImage; const value: Integer): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobLSBSignedLong(image, value);
+  Result := ALImageMagickLibrary.WriteBlobLSBSignedLong(image, value);
 end;
 
 {******************************************************************************}
 function WriteBlobLSBSignedShort(image: PImage; const value: SmallInt): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobLSBSignedShort(image, value);
+  Result := ALImageMagickLibrary.WriteBlobLSBSignedShort(image, value);
 end;
 
 {***********************************************************************}
 function WriteBlobMSBLong(image: PImage; const value: Cardinal): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobMSBLong(image, value);
+  Result := ALImageMagickLibrary.WriteBlobMSBLong(image, value);
 end;
 
 {******************************************************************************}
 function WriteBlobMSBSignedShort(image: PImage; const value: SmallInt): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobMSBSignedShort(image, value);
+  Result := ALImageMagickLibrary.WriteBlobMSBSignedShort(image, value);
 end;
 
 {********************************************************************}
 function WriteBlobMSBShort(image: PImage; const value: Word): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobMSBShort(image, value);
+  Result := ALImageMagickLibrary.WriteBlobMSBShort(image, value);
 end;
 
 {*************************************************************************}
 function WriteBlobString(image: PImage; const &string: PAnsiChar): ssize_t;
 begin
-  Result := ALImageMagickLib.WriteBlobString(image, &string);
+  Result := ALImageMagickLibrary.WriteBlobString(image, &string);
 end;
 
 {$ENDREGION}
@@ -9244,133 +9246,133 @@ end;
 {*********************************************************************************************}
 function AcquireAuthenticCacheView(const image: PImage; exception: PExceptionInfo): PCacheView;
 begin
-  Result := ALImageMagickLib.AcquireAuthenticCacheView(image, exception);
+  Result := ALImageMagickLibrary.AcquireAuthenticCacheView(image, exception);
 end;
 
 {*******************************************************************************************}
 function AcquireVirtualCacheView(const image: PImage; exception: PExceptionInfo): PCacheView;
 begin
-  Result := ALImageMagickLib.AcquireVirtualCacheView(image, exception);
+  Result := ALImageMagickLibrary.AcquireVirtualCacheView(image, exception);
 end;
 
 {****************************************************************}
 function CloneCacheView(const cache_view: PCacheView): PCacheView;
 begin
-  Result := ALImageMagickLib.CloneCacheView(cache_view);
+  Result := ALImageMagickLibrary.CloneCacheView(cache_view);
 end;
 
 {************************************************************}
 function DestroyCacheView(cache_view: PCacheView): PCacheView;
 begin
-  Result := ALImageMagickLib.DestroyCacheView(cache_view);
+  Result := ALImageMagickLibrary.DestroyCacheView(cache_view);
 end;
 
 {*******************************************************************************************************************************************************************************}
 function GetCacheViewAuthenticPixels(cache_view: PCacheView; const x: ssize_t; const y: ssize_t; const columns: size_t; const rows: size_t; exception: PExceptionInfo): PQuantum;
 begin
-  Result := ALImageMagickLib.GetCacheViewAuthenticPixels(cache_view, x, y, columns, rows, exception);
+  Result := ALImageMagickLibrary.GetCacheViewAuthenticPixels(cache_view, x, y, columns, rows, exception);
 end;
 
 {*****************************************************************}
 procedure GetCacheViewAuthenticMetacontent(cache_view: PCacheView);
 begin
-  ALImageMagickLib.GetCacheViewAuthenticMetacontent(cache_view);
+  ALImageMagickLibrary.GetCacheViewAuthenticMetacontent(cache_view);
 end;
 
 {*************************************************************************}
 function GetCacheViewAuthenticPixelQueue(cache_view: PCacheView): PQuantum;
 begin
-  Result := ALImageMagickLib.GetCacheViewAuthenticPixelQueue(cache_view);
+  Result := ALImageMagickLibrary.GetCacheViewAuthenticPixelQueue(cache_view);
 end;
 
 {****************************************************************************}
 function GetCacheViewColorspace(const cache_view: PCacheView): ColorspaceType;
 begin
-  Result := ALImageMagickLib.GetCacheViewColorspace(cache_view);
+  Result := ALImageMagickLibrary.GetCacheViewColorspace(cache_view);
 end;
 
 {************************************************************************}
 function GetCacheViewExtent(const cache_view: PCacheView): MagickSizeType;
 begin
-  Result := ALImageMagickLib.GetCacheViewExtent(cache_view);
+  Result := ALImageMagickLibrary.GetCacheViewExtent(cache_view);
 end;
 
 {***************************************************************}
 function GetCacheViewImage(const cache_view: PCacheView): PImage;
 begin
-  Result := ALImageMagickLib.GetCacheViewImage(cache_view);
+  Result := ALImageMagickLibrary.GetCacheViewImage(cache_view);
 end;
 
 {*************************************************************************}
 function GetCacheViewStorageClass(const cache_view: PCacheView): ClassType;
 begin
-  Result := ALImageMagickLib.GetCacheViewStorageClass(cache_view);
+  Result := ALImageMagickLibrary.GetCacheViewStorageClass(cache_view);
 end;
 
 {*********************************************************************}
 procedure GetCacheViewVirtualMetacontent(const cache_view: PCacheView);
 begin
-  ALImageMagickLib.GetCacheViewVirtualMetacontent(cache_view);
+  ALImageMagickLibrary.GetCacheViewVirtualMetacontent(cache_view);
 end;
 
 {*****************************************************************************}
 function GetCacheViewVirtualPixelQueue(const cache_view: PCacheView): PQuantum;
 begin
-  Result := ALImageMagickLib.GetCacheViewVirtualPixelQueue(cache_view);
+  Result := ALImageMagickLibrary.GetCacheViewVirtualPixelQueue(cache_view);
 end;
 
 {***********************************************************************************************************************************************************************************}
 function GetCacheViewVirtualPixels(const cache_view: PCacheView; const x: ssize_t; const y: ssize_t; const columns: size_t; const rows: size_t; exception: PExceptionInfo): PQuantum;
 begin
-  Result := ALImageMagickLib.GetCacheViewVirtualPixels(cache_view, x, y, columns, rows, exception);
+  Result := ALImageMagickLibrary.GetCacheViewVirtualPixels(cache_view, x, y, columns, rows, exception);
 end;
 
 {**********************************************************************************************************************************************************************}
 function GetOneCacheViewAuthenticPixel(const cache_view: PCacheView; const x: ssize_t; const y: ssize_t; pixel: PQuantum; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetOneCacheViewAuthenticPixel(cache_view, x, y, pixel, exception);
+  Result := ALImageMagickLibrary.GetOneCacheViewAuthenticPixel(cache_view, x, y, pixel, exception);
 end;
 
 {********************************************************************************************************************************************************************}
 function GetOneCacheViewVirtualPixel(const cache_view: PCacheView; const x: ssize_t; const y: ssize_t; pixel: PQuantum; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetOneCacheViewVirtualPixel(cache_view, x, y, pixel, exception);
+  Result := ALImageMagickLibrary.GetOneCacheViewVirtualPixel(cache_view, x, y, pixel, exception);
 end;
 
 {**************************************************************************************************************************************************************************}
 function GetOneCacheViewVirtualPixelInfo(const cache_view: PCacheView; const x: ssize_t; const y: ssize_t; pixel: PPixelInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetOneCacheViewVirtualPixelInfo(cache_view, x, y, pixel, exception);
+  Result := ALImageMagickLibrary.GetOneCacheViewVirtualPixelInfo(cache_view, x, y, pixel, exception);
 end;
 
 {**************************************************************************************************************************************************************************************************************************}
 function GetOneCacheViewVirtualMethodPixel(const cache_view: PCacheView; const virtual_pixel_method: VirtualPixelMethod; const x: ssize_t; const y: ssize_t; pixel: PQuantum; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetOneCacheViewVirtualMethodPixel(cache_view, virtual_pixel_method, x, y, pixel, exception);
+  Result := ALImageMagickLibrary.GetOneCacheViewVirtualMethodPixel(cache_view, virtual_pixel_method, x, y, pixel, exception);
 end;
 
 {*********************************************************************************************************************************************************************************}
 function QueueCacheViewAuthenticPixels(cache_view: PCacheView; const x: ssize_t; const y: ssize_t; const columns: size_t; const rows: size_t; exception: PExceptionInfo): PQuantum;
 begin
-  Result := ALImageMagickLib.QueueCacheViewAuthenticPixels(cache_view, x, y, columns, rows, exception);
+  Result := ALImageMagickLibrary.QueueCacheViewAuthenticPixels(cache_view, x, y, columns, rows, exception);
 end;
 
 {**************************************************************************************************************************************}
 function SetCacheViewStorageClass(cache_view: PCacheView; const storage_class: ClassType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetCacheViewStorageClass(cache_view, storage_class, exception);
+  Result := ALImageMagickLibrary.SetCacheViewStorageClass(cache_view, storage_class, exception);
 end;
 
 {*********************************************************************************************************************************}
 function SetCacheViewVirtualPixelMethod(cache_view: PCacheView; const virtual_pixel_method: VirtualPixelMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetCacheViewVirtualPixelMethod(cache_view, virtual_pixel_method);
+  Result := ALImageMagickLibrary.SetCacheViewVirtualPixelMethod(cache_view, virtual_pixel_method);
 end;
 
 {**********************************************************************************************************}
 function SyncCacheViewAuthenticPixels(cache_view: PCacheView; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SyncCacheViewAuthenticPixels(cache_view, exception);
+  Result := ALImageMagickLibrary.SyncCacheViewAuthenticPixels(cache_view, exception);
 end;
 
 {$ENDREGION}
@@ -9380,115 +9382,115 @@ end;
 {*************************************************************************************************}
 procedure AcquirePixelCachePixels(const image: PImage; length: PSize_t; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.AcquirePixelCachePixels(image, length, exception);
+  ALImageMagickLibrary.AcquirePixelCachePixels(image, length, exception);
 end;
 
 {******************************************}
 procedure DestroyImagePixels(image: PImage);
 begin
-  ALImageMagickLib.DestroyImagePixels(image);
+  ALImageMagickLibrary.DestroyImagePixels(image);
 end;
 
 {*****************************************************}
 procedure GetAuthenticMetacontent(const image: PImage);
 begin
-  ALImageMagickLib.GetAuthenticMetacontent(image);
+  ALImageMagickLibrary.GetAuthenticMetacontent(image);
 end;
 
 {*************************************************************}
 function GetAuthenticPixelQueue(const image: PImage): PQuantum;
 begin
-  Result := ALImageMagickLib.GetAuthenticPixelQueue(image);
+  Result := ALImageMagickLibrary.GetAuthenticPixelQueue(image);
 end;
 
 {*************************************************************************************************************************************************************}
 function GetAuthenticPixels(image: PImage; const x: ssize_t; const y: ssize_t; const columns: size_t; const rows: size_t; exception: PExceptionInfo): PQuantum;
 begin
-  Result := ALImageMagickLib.GetAuthenticPixels(image, x, y, columns, rows, exception);
+  Result := ALImageMagickLibrary.GetAuthenticPixels(image, x, y, columns, rows, exception);
 end;
 
 {***********************************************************}
 function GetImageExtent(const image: PImage): MagickSizeType;
 begin
-  Result := ALImageMagickLib.GetImageExtent(image);
+  Result := ALImageMagickLibrary.GetImageExtent(image);
 end;
 
 {**************************************************************}
 function GetImagePixelCacheType(const image: PImage): CacheType;
 begin
-  Result := ALImageMagickLib.GetImagePixelCacheType(image);
+  Result := ALImageMagickLibrary.GetImagePixelCacheType(image);
 end;
 
 {**********************************************************************************************************************************************}
 function GetOneAuthenticPixel(image: PImage; const x: ssize_t; const y: ssize_t; pixel: PQuantum; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetOneAuthenticPixel(image, x, y, pixel, exception);
+  Result := ALImageMagickLibrary.GetOneAuthenticPixel(image, x, y, pixel, exception);
 end;
 
 {**************************************************************************************************************************************************}
 function GetOneVirtualPixel(const image: PImage; const x: ssize_t; const y: ssize_t; pixel: PQuantum; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetOneVirtualPixel(image, x, y, pixel, exception);
+  Result := ALImageMagickLibrary.GetOneVirtualPixel(image, x, y, pixel, exception);
 end;
 
 {********************************************************************************************************************************************************************************************************}
 function GetOneVirtualPixelInfo(const image: PImage; const virtual_pixel_method: VirtualPixelMethod; const x: ssize_t; const y: ssize_t; pixel: PPixelInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetOneVirtualPixelInfo(image, virtual_pixel_method, x, y, pixel, exception);
+  Result := ALImageMagickLibrary.GetOneVirtualPixelInfo(image, virtual_pixel_method, x, y, pixel, exception);
 end;
 
 {*************************************************************}
 function GetPixelCacheFilename(const image: PImage): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetPixelCacheFilename(image);
+  Result := ALImageMagickLibrary.GetPixelCacheFilename(image);
 end;
 
 {***********************************************************************************************}
 procedure GetPixelCachePixels(image: PImage; length: PMagickSizeType; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.GetPixelCachePixels(image, length, exception);
+  ALImageMagickLibrary.GetPixelCachePixels(image, length, exception);
 end;
 
 {***************************************************}
 procedure GetVirtualMetacontent(const image: PImage);
 begin
-  ALImageMagickLib.GetVirtualMetacontent(image);
+  ALImageMagickLibrary.GetVirtualMetacontent(image);
 end;
 
 {***********************************************************}
 function GetVirtualPixelQueue(const image: PImage): PQuantum;
 begin
-  Result := ALImageMagickLib.GetVirtualPixelQueue(image);
+  Result := ALImageMagickLibrary.GetVirtualPixelQueue(image);
 end;
 
 {*****************************************************************************************************************************************************************}
 function GetVirtualPixels(const image: PImage; const x: ssize_t; const y: ssize_t; const columns: size_t; const rows: size_t; exception: PExceptionInfo): PQuantum;
 begin
-  Result := ALImageMagickLib.GetVirtualPixels(image, x, y, columns, rows, exception);
+  Result := ALImageMagickLibrary.GetVirtualPixels(image, x, y, columns, rows, exception);
 end;
 
 {*****************************************************************************************************************************************************************************}
 function PersistPixelCache(image: PImage; const filename: PAnsiChar; const attach: MagickBooleanType; offset: PMagickOffsetType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PersistPixelCache(image, filename, attach, offset, exception);
+  Result := ALImageMagickLibrary.PersistPixelCache(image, filename, attach, offset, exception);
 end;
 
 {***************************************************************************************************************************************************************}
 function QueueAuthenticPixels(image: PImage; const x: ssize_t; const y: ssize_t; const columns: size_t; const rows: size_t; exception: PExceptionInfo): PQuantum;
 begin
-  Result := ALImageMagickLib.QueueAuthenticPixels(image, x, y, columns, rows, exception);
+  Result := ALImageMagickLibrary.QueueAuthenticPixels(image, x, y, columns, rows, exception);
 end;
 
 {*********************************************************************************************************************************}
 function ReshapePixelCache(image: PImage; const columns: size_t; const rows: size_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ReshapePixelCache(image, columns, rows, exception);
+  Result := ALImageMagickLibrary.ReshapePixelCache(image, columns, rows, exception);
 end;
 
 {****************************************************************************************}
 function SyncAuthenticPixels(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SyncAuthenticPixels(image, exception);
+  Result := ALImageMagickLibrary.SyncAuthenticPixels(image, exception);
 end;
 
 {$ENDREGION}
@@ -9498,37 +9500,37 @@ end;
 {***********************************************************************************************************}
 function ChannelFxImage(const image: PImage; const expression: PAnsiChar; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ChannelFxImage(image, expression, exception);
+  Result := ALImageMagickLibrary.ChannelFxImage(image, expression, exception);
 end;
 
 {***************************************************************************************************************}
 function CombineImages(const image: PImage; const colorspace: ColorspaceType; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.CombineImages(image, colorspace, exception);
+  Result := ALImageMagickLibrary.CombineImages(image, colorspace, exception);
 end;
 
 {********************************************************************}
 function GetImageAlphaChannel(const image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetImageAlphaChannel(image);
+  Result := ALImageMagickLibrary.GetImageAlphaChannel(image);
 end;
 
 {**************************************************************************************************************}
 function SeparateImage(const image: PImage; const channel_type: ChannelType; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SeparateImage(image, channel_type, exception);
+  Result := ALImageMagickLibrary.SeparateImage(image, channel_type, exception);
 end;
 
 {******************************************************************************}
 function SeparateImages(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SeparateImages(image, exception);
+  Result := ALImageMagickLibrary.SeparateImages(image, exception);
 end;
 
 {*******************************************************************************************************************************}
 function SetImageAlphaChannel(image: PImage; const alpha_type: AlphaChannelOption; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageAlphaChannel(image, alpha_type, exception);
+  Result := ALImageMagickLibrary.SetImageAlphaChannel(image, alpha_type, exception);
 end;
 
 {$ENDREGION}
@@ -9538,25 +9540,25 @@ end;
 {***************************************************************************************************************}
 function DecipherImage(image: PImage; const passphrase: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DecipherImage(image, passphrase, exception);
+  Result := ALImageMagickLibrary.DecipherImage(image, passphrase, exception);
 end;
 
 {*********************************************************************************************************************}
 function PasskeyDecipherImage(image: PImage; const passkey: PStringInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PasskeyDecipherImage(image, passkey, exception);
+  Result := ALImageMagickLibrary.PasskeyDecipherImage(image, passkey, exception);
 end;
 
 {***************************************************************************************************************}
 function EncipherImage(image: PImage; const passphrase: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.EncipherImage(image, passphrase, exception);
+  Result := ALImageMagickLibrary.EncipherImage(image, passphrase, exception);
 end;
 
 {*********************************************************************************************************************}
 function PasskeyEncipherImage(image: PImage; const passkey: PStringInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PasskeyEncipherImage(image, passkey, exception);
+  Result := ALImageMagickLibrary.PasskeyEncipherImage(image, passkey, exception);
 end;
 
 {$ENDREGION}
@@ -9566,25 +9568,25 @@ end;
 {**********************************}
 function GetClientName(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetClientName();
+  Result := ALImageMagickLibrary.GetClientName();
 end;
 
 {**********************************}
 function GetClientPath(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetClientPath();
+  Result := ALImageMagickLibrary.GetClientPath();
 end;
 
 {*******************************************************}
 function SetClientName(const name: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.SetClientName(name);
+  Result := ALImageMagickLibrary.SetClientName(name);
 end;
 
 {*******************************************************}
 function SetClientPath(const path: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.SetClientPath(path);
+  Result := ALImageMagickLibrary.SetClientPath(path);
 end;
 
 {$ENDREGION}
@@ -9594,25 +9596,25 @@ end;
 {**********************************************************************************}
 function GetCoderInfo(const name: PAnsiChar; exception: PExceptionInfo): PCoderInfo;
 begin
-  Result := ALImageMagickLib.GetCoderInfo(name, exception);
+  Result := ALImageMagickLibrary.GetCoderInfo(name, exception);
 end;
 
 {******************************************************************************************************************}
 function GetCoderInfoList(const pattern: PAnsiChar; number_coders: PSize_t; exception: PExceptionInfo): PPCoderInfo;
 begin
-  Result := ALImageMagickLib.GetCoderInfoList(pattern, number_coders, exception);
+  Result := ALImageMagickLibrary.GetCoderInfoList(pattern, number_coders, exception);
 end;
 
 {*************************************************************************************************************}
 function GetCoderList(const pattern: PAnsiChar; number_coders: PSize_t; exception: PExceptionInfo): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetCoderList(pattern, number_coders, exception);
+  Result := ALImageMagickLibrary.GetCoderList(pattern, number_coders, exception);
 end;
 
 {*********************************************************************************}
 function ListCoderInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListCoderInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListCoderInfo(&file, exception);
 end;
 
 {$ENDREGION}
@@ -9622,61 +9624,61 @@ end;
 {****************************************************************************************************************************}
 //function GetColorCompliance(const name: PAnsiChar; const compliance: ComplianceType; exception: PExceptionInfo): PColorInfo;
 //begin
-//  Result := ALImageMagickLib.GetColorCompliance(name, compliance, exception);
+//  Result := ALImageMagickLibrary.GetColorCompliance(name, compliance, exception);
 //end;
 
 {**********************************************************************************}
 function GetColorInfo(const name: PAnsiChar; exception: PExceptionInfo): PColorInfo;
 begin
-  Result := ALImageMagickLib.GetColorInfo(name, exception);
+  Result := ALImageMagickLibrary.GetColorInfo(name, exception);
 end;
 
 {********************************************************************************************************************************************}
 procedure ConcatenateColorComponent(const pixel: PPixelInfo; const channel: PixelChannel; const compliance: ComplianceType; tuple: PAnsiChar);
 begin
-  ALImageMagickLib.ConcatenateColorComponent(pixel, channel, compliance, tuple);
+  ALImageMagickLibrary.ConcatenateColorComponent(pixel, channel, compliance, tuple);
 end;
 
 {******************************************************************************************************************}
 function GetColorInfoList(const pattern: PAnsiChar; number_colors: PSize_t; exception: PExceptionInfo): PPColorInfo;
 begin
-  Result := ALImageMagickLib.GetColorInfoList(pattern, number_colors, exception);
+  Result := ALImageMagickLibrary.GetColorInfoList(pattern, number_colors, exception);
 end;
 
 {*************************************************************************************************************}
 function GetColorList(const pattern: PAnsiChar; number_colors: PSize_t; exception: PExceptionInfo): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetColorList(pattern, number_colors, exception);
+  Result := ALImageMagickLibrary.GetColorList(pattern, number_colors, exception);
 end;
 
 {***********************************************************************************************}
 procedure GetColorTuple(const pixel: PPixelInfo; const hex: MagickBooleanType; tuple: PAnsiChar);
 begin
-  ALImageMagickLib.GetColorTuple(pixel, hex, tuple);
+  ALImageMagickLibrary.GetColorTuple(pixel, hex, tuple);
 end;
 
 {****************************************************************************************************************************************************************}
 function IsEquivalentImage(const image: PImage; const target_image: PImage; x_offset: PSsize_t; y_offset: PSsize_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsEquivalentImage(image, target_image, x_offset, y_offset, exception);
+  Result := ALImageMagickLibrary.IsEquivalentImage(image, target_image, x_offset, y_offset, exception);
 end;
 
 {*********************************************************************************}
 function ListColorInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListColorInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListColorInfo(&file, exception);
 end;
 
 {******************************************************************************************************************************************************}
 function QueryColorCompliance(const name: PAnsiChar; const compliance: ComplianceType; color: PPixelInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.QueryColorCompliance(name, compliance, color, exception);
+  Result := ALImageMagickLibrary.QueryColorCompliance(name, compliance, color, exception);
 end;
 
 {*********************************************************************************************************************************************************************}
 function QueryColorname(const image: PImage; const color: PPixelInfo; const compliance: ComplianceType; name: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.QueryColorname(image, color, compliance, name, exception);
+  Result := ALImageMagickLibrary.QueryColorname(image, color, compliance, name, exception);
 end;
 
 {$ENDREGION}
@@ -9686,19 +9688,19 @@ end;
 {***************************************************************************************************************}
 function AcquireImageColormap(image: PImage; const colors: size_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.AcquireImageColormap(image, colors, exception);
+  Result := ALImageMagickLibrary.AcquireImageColormap(image, colors, exception);
 end;
 
 {****************************************************************************************************************}
 function CycleColormapImage(image: PImage; const displace: ssize_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CycleColormapImage(image, displace, exception);
+  Result := ALImageMagickLibrary.CycleColormapImage(image, displace, exception);
 end;
 
 {********************************************************************************************}
 function SortColormapByIntensity(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SortColormapByIntensity(image, exception);
+  Result := ALImageMagickLibrary.SortColormapByIntensity(image, exception);
 end;
 
 {$ENDREGION}
@@ -9708,43 +9710,43 @@ end;
 {*******************************************************************************************************************************************}
 procedure ConvertHSLToRGB(const hue: double; const saturation: double; const lightness: double; red: PDouble; green: PDouble; blue: PDouble);
 begin
-  ALImageMagickLib.ConvertHSLToRGB(hue, saturation, lightness, red, green, blue);
+  ALImageMagickLibrary.ConvertHSLToRGB(hue, saturation, lightness, red, green, blue);
 end;
 
 {*******************************************************************************************************************************************}
 procedure ConvertRGBToHSL(const red: double; const green: double; const blue: double; hue: PDouble; saturation: PDouble; lightness: PDouble);
 begin
-  ALImageMagickLib.ConvertRGBToHSL(red, green, blue, hue, saturation, lightness);
+  ALImageMagickLibrary.ConvertRGBToHSL(red, green, blue, hue, saturation, lightness);
 end;
 
 {**********************************************************************************************}
 function GetImageColorspaceType(const image: PImage; exception: PExceptionInfo): ColorspaceType;
 begin
-  Result := ALImageMagickLib.GetImageColorspaceType(image, exception);
+  Result := ALImageMagickLibrary.GetImageColorspaceType(image, exception);
 end;
 
 {*************************************************************************************************************************}
 function SetImageColorspace(image: PImage; const colorspace: ColorspaceType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageColorspace(image, colorspace, exception);
+  Result := ALImageMagickLibrary.SetImageColorspace(image, colorspace, exception);
 end;
 
 {*********************************************************************************}
 function SetImageGray(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageGray(image, exception);
+  Result := ALImageMagickLibrary.SetImageGray(image, exception);
 end;
 
 {***************************************************************************************}
 function SetImageMonochrome(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageMonochrome(image, exception);
+  Result := ALImageMagickLibrary.SetImageMonochrome(image, exception);
 end;
 
 {*******************************************************************************************************************************}
 function TransformImageColorspace(image: PImage; const colorspace: ColorspaceType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.TransformImageColorspace(image, colorspace, exception);
+  Result := ALImageMagickLibrary.TransformImageColorspace(image, colorspace, exception);
 end;
 
 {$ENDREGION}
@@ -9754,37 +9756,37 @@ end;
 {*******************************************************************************************************************************************************}
 function CompareImages(image: PImage; const reconstruct_image: PImage; const metric: MetricType; distortion: PDouble; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.CompareImages(image, reconstruct_image, metric, distortion, exception);
+  Result := ALImageMagickLibrary.CompareImages(image, reconstruct_image, metric, distortion, exception);
 end;
 
 {***********************************************************************************************************************************************************************}
 function GetImageDistortion(image: PImage; const reconstruct_image: PImage; const metric: MetricType; distortion: PDouble; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetImageDistortion(image, reconstruct_image, metric, distortion, exception);
+  Result := ALImageMagickLibrary.GetImageDistortion(image, reconstruct_image, metric, distortion, exception);
 end;
 
 {*****************************************************************************************************************************************}
 function GetImageDistortions(image: PImage; const reconstruct_image: PImage; const metric: MetricType; exception: PExceptionInfo): PDouble;
 begin
-  Result := ALImageMagickLib.GetImageDistortions(image, reconstruct_image, metric, exception);
+  Result := ALImageMagickLibrary.GetImageDistortions(image, reconstruct_image, metric, exception);
 end;
 
 {*************************************************************************************************************************}
 function IsImagesEqual(const image: PImage; const reconstruct_image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsImagesEqual(image, reconstruct_image, exception);
+  Result := ALImageMagickLibrary.IsImagesEqual(image, reconstruct_image, exception);
 end;
 
 {*************************************************************************************************************************}
 function SetImageColorMetric(image: PImage; const reconstruct_image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageColorMetric(image, reconstruct_image, exception);
+  Result := ALImageMagickLibrary.SetImageColorMetric(image, reconstruct_image, exception);
 end;
 
 {****************************************************************************************************************************************************************************************************************************}
 function SimilarityImage(const image: PImage; const reconstruct: PImage; const metric: MetricType; const similarity_threshold: double; offset: PRectangleInfo; similarity_metric: PDouble; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SimilarityImage(image, reconstruct, metric, similarity_threshold, offset, similarity_metric, exception);
+  Result := ALImageMagickLibrary.SimilarityImage(image, reconstruct, metric, similarity_threshold, offset, similarity_metric, exception);
 end;
 
 {$ENDREGION}
@@ -9794,13 +9796,13 @@ end;
 {***************************************************************************************************************************************************************************************************************************************}
 function CompositeImage(image: PImage; const composite: PImage; const compose: CompositeOperator; const clip_to_self: MagickBooleanType; const x_offset: ssize_t; const y_offset: ssize_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CompositeImage(image, composite, compose, clip_to_self, x_offset, y_offset, exception);
+  Result := ALImageMagickLibrary.CompositeImage(image, composite, compose, clip_to_self, x_offset, y_offset, exception);
 end;
 
 {********************************************************************************************************}
 function TextureImage(image: PImage; const texture: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.TextureImage(image, texture, exception);
+  Result := ALImageMagickLibrary.TextureImage(image, texture, exception);
 end;
 
 {$ENDREGION}
@@ -9810,49 +9812,49 @@ end;
 {*****************************************}
 procedure Ascii85Initialize(image: PImage);
 begin
-  ALImageMagickLib.Ascii85Initialize(image);
+  ALImageMagickLibrary.Ascii85Initialize(image);
 end;
 
 {************************************}
 procedure Ascii85Flush(image: PImage);
 begin
-  ALImageMagickLib.Ascii85Flush(image);
+  ALImageMagickLibrary.Ascii85Flush(image);
 end;
 
 {*******************************************************}
 procedure Ascii85Encode(image: PImage; const code: Byte);
 begin
-  ALImageMagickLib.Ascii85Encode(image, code);
+  ALImageMagickLibrary.Ascii85Encode(image, code);
 end;
 
 {***************************************************************************************}
 function HuffmanDecodeImage(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.HuffmanDecodeImage(image, exception);
+  Result := ALImageMagickLibrary.HuffmanDecodeImage(image, exception);
 end;
 
 {*******************************************************************************************************************************************}
 function HuffmanEncodeImage(const image_info: PImageInfo; image: PImage; inject_image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.HuffmanEncodeImage(image_info, image, inject_image, exception);
+  Result := ALImageMagickLibrary.HuffmanEncodeImage(image_info, image, inject_image, exception);
 end;
 
 {************************************************************************************************************************}
 function LZWEncodeImage(image: PImage; const length: size_t; pixels: PByte; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.LZWEncodeImage(image, length, pixels, exception);
+  Result := ALImageMagickLibrary.LZWEncodeImage(image, length, pixels, exception);
 end;
 
 {*****************************************************************************************************************************}
 function PackbitsEncodeImage(image: PImage; const length: size_t; pixels: PByte; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PackbitsEncodeImage(image, length, pixels, exception);
+  Result := ALImageMagickLibrary.PackbitsEncodeImage(image, length, pixels, exception);
 end;
 
 {*************************************************************************************************************************}
 function ZLIBEncodeImage(image: PImage; const length: size_t; pixels: PByte; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ZLIBEncodeImage(image, length, pixels, exception);
+  Result := ALImageMagickLibrary.ZLIBEncodeImage(image, length, pixels, exception);
 end;
 
 {$ENDREGION}
@@ -9862,55 +9864,55 @@ end;
 {**************************************************************************}
 function DestroyConfigureOptions(options: PLinkedListInfo): PLinkedListInfo;
 begin
-  Result := ALImageMagickLib.DestroyConfigureOptions(options);
+  Result := ALImageMagickLibrary.DestroyConfigureOptions(options);
 end;
 
 {******************************************************************************************}
 function GetConfigureInfo(const name: PAnsiChar; exception: PExceptionInfo): PConfigureInfo;
 begin
-  Result := ALImageMagickLib.GetConfigureInfo(name, exception);
+  Result := ALImageMagickLibrary.GetConfigureInfo(name, exception);
 end;
 
 {***************************************************************************************************************************}
 function GetConfigureInfoList(const pattern: PAnsiChar; number_options: PSize_t; exception: PExceptionInfo): PPConfigureInfo;
 begin
-  Result := ALImageMagickLib.GetConfigureInfoList(pattern, number_options, exception);
+  Result := ALImageMagickLibrary.GetConfigureInfoList(pattern, number_options, exception);
 end;
 
 {******************************************************************************************************************}
 function GetConfigureList(const pattern: PAnsiChar; number_options: PSize_t; exception: PExceptionInfo): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetConfigureList(pattern, number_options, exception);
+  Result := ALImageMagickLibrary.GetConfigureList(pattern, number_options, exception);
 end;
 
 {**************************************************************}
 function GetConfigureOption(const option: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetConfigureOption(option);
+  Result := ALImageMagickLibrary.GetConfigureOption(option);
 end;
 
 {**************************************************************************************************}
 function GetConfigureOptions(const filename: PAnsiChar; exception: PExceptionInfo): PLinkedListInfo;
 begin
-  Result := ALImageMagickLib.GetConfigureOptions(filename, exception);
+  Result := ALImageMagickLibrary.GetConfigureOptions(filename, exception);
 end;
 
 {************************************************************************************************}
 function GetConfigurePaths(const filename: PAnsiChar; exception: PExceptionInfo): PLinkedListInfo;
 begin
-  Result := ALImageMagickLib.GetConfigurePaths(filename, exception);
+  Result := ALImageMagickLibrary.GetConfigurePaths(filename, exception);
 end;
 
 {**************************************************************************}
 function GetConfigureValue(const configure_info: PConfigureInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetConfigureValue(configure_info);
+  Result := ALImageMagickLibrary.GetConfigureValue(configure_info);
 end;
 
 {*************************************************************************************}
 function ListConfigureInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListConfigureInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListConfigureInfo(&file, exception);
 end;
 
 {$ENDREGION}
@@ -9920,49 +9922,49 @@ end;
 {****************************************************************************************************************************************************************************}
 function ConstituteImage(const columns: size_t; const rows: size_t; const map: PAnsiChar; const storage: StorageType; const pixels: PVoid; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ConstituteImage(columns, rows, map, storage, pixels, exception);
+  Result := ALImageMagickLibrary.ConstituteImage(columns, rows, map, storage, pixels, exception);
 end;
 
 {**********************************************************************************}
 function PingImage(const image_info: PImageInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.PingImage(image_info, exception);
+  Result := ALImageMagickLibrary.PingImage(image_info, exception);
 end;
 
 {********************************************************************************************************}
 function PingImages(image_info: PImageInfo; const filename: PAnsiChar; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.PingImages(image_info, filename, exception);
+  Result := ALImageMagickLibrary.PingImages(image_info, filename, exception);
 end;
 
 {**********************************************************************************}
 function ReadImage(const image_info: PImageInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ReadImage(image_info, exception);
+  Result := ALImageMagickLibrary.ReadImage(image_info, exception);
 end;
 
 {********************************************************************************************************}
 function ReadImages(image_info: PImageInfo; const filename: PAnsiChar; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ReadImages(image_info, filename, exception);
+  Result := ALImageMagickLibrary.ReadImages(image_info, filename, exception);
 end;
 
 {******************************************************************************************************************}
 function ReadInlineImage(const image_info: PImageInfo; const content: PAnsiChar; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ReadInlineImage(image_info, content, exception);
+  Result := ALImageMagickLibrary.ReadInlineImage(image_info, content, exception);
 end;
 
 {*************************************************************************************************************}
 function WriteImage(const image_info: PImageInfo; image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.WriteImage(image_info, image, exception);
+  Result := ALImageMagickLibrary.WriteImage(image_info, image, exception);
 end;
 
 {******************************************************************************************************************************************}
 function WriteImages(const image_info: PImageInfo; images: PImage; const filename: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.WriteImages(image_info, images, filename, exception);
+  Result := ALImageMagickLibrary.WriteImages(image_info, images, filename, exception);
 end;
 
 {$ENDREGION}
@@ -9972,19 +9974,19 @@ end;
 {************************************************************************************************************************************************}
 function BorderImage(const image: PImage; const border_info: PRectangleInfo; const compose: CompositeOperator; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.BorderImage(image, border_info, compose, exception);
+  Result := ALImageMagickLibrary.BorderImage(image, border_info, compose, exception);
 end;
 
 {******************************************************************************************************************************************}
 function FrameImage(const image: PImage; const frame_info: PFrameInfo; const compose: CompositeOperator; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.FrameImage(image, frame_info, compose, exception);
+  Result := ALImageMagickLibrary.FrameImage(image, frame_info, compose, exception);
 end;
 
 {**************************************************************************************************************************************************}
 function RaiseImage(image: PImage; const raise_info: PRectangleInfo; const &raise: MagickBooleanType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.RaiseImage(image, raise_info, &raise, exception);
+  Result := ALImageMagickLibrary.RaiseImage(image, raise_info, &raise, exception);
 end;
 
 {$ENDREGION}
@@ -9994,61 +9996,61 @@ end;
 {******************************************************************************************************************************************************************************************}
 function ExternalDelegateCommand(const asynchronous: MagickBooleanType; const verbose: MagickBooleanType; const command: PAnsiChar; message: PAnsiChar; exception: PExceptionInfo): Integer;
 begin
-  Result := ALImageMagickLib.ExternalDelegateCommand(asynchronous, verbose, command, message, exception);
+  Result := ALImageMagickLibrary.ExternalDelegateCommand(asynchronous, verbose, command, message, exception);
 end;
 
 {***************************************************************************************************************************************************************}
 function GetDelegateCommand(const image_info: PImageInfo; image: PImage; const decode: PAnsiChar; const encode: PAnsiChar; exception: PExceptionInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetDelegateCommand(image_info, image, decode, encode, exception);
+  Result := ALImageMagickLibrary.GetDelegateCommand(image_info, image, decode, encode, exception);
 end;
 
 {**************************************************************************}
 function GetDelegateCommands(const delegate_info: PDelegateInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetDelegateCommands(delegate_info);
+  Result := ALImageMagickLibrary.GetDelegateCommands(delegate_info);
 end;
 
 {*******************************************************************************************************************}
 function GetDelegateInfo(const decode: PAnsiChar; const encode: PAnsiChar; exception: PExceptionInfo): PDelegateInfo;
 begin
-  Result := ALImageMagickLib.GetDelegateInfo(decode, encode, exception);
+  Result := ALImageMagickLibrary.GetDelegateInfo(decode, encode, exception);
 end;
 
 {***************************************************************************************************************************}
 function GetDelegateInfoList(const pattern: PAnsiChar; number_delegates: PSize_t; exception: PExceptionInfo): PPDelegateInfo;
 begin
-  Result := ALImageMagickLib.GetDelegateInfoList(pattern, number_delegates, exception);
+  Result := ALImageMagickLibrary.GetDelegateInfoList(pattern, number_delegates, exception);
 end;
 
 {*******************************************************************************************************************}
 function GetDelegateList(const pattern: PAnsiChar; number_delegates: PSize_t; exception: PExceptionInfo): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetDelegateList(pattern, number_delegates, exception);
+  Result := ALImageMagickLibrary.GetDelegateList(pattern, number_delegates, exception);
 end;
 
 {********************************************************************}
 function GetDelegateMode(const delegate_info: PDelegateInfo): ssize_t;
 begin
-  Result := ALImageMagickLib.GetDelegateMode(delegate_info);
+  Result := ALImageMagickLibrary.GetDelegateMode(delegate_info);
 end;
 
 {***************************************************************************************}
 function GetDelegateThreadSupport(const delegate_info: PDelegateInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetDelegateThreadSupport(delegate_info);
+  Result := ALImageMagickLibrary.GetDelegateThreadSupport(delegate_info);
 end;
 
 {*************************************************************************************************************************************************************}
 function InvokeDelegate(image_info: PImageInfo; image: PImage; const decode: PAnsiChar; const encode: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.InvokeDelegate(image_info, image, decode, encode, exception);
+  Result := ALImageMagickLibrary.InvokeDelegate(image_info, image, decode, encode, exception);
 end;
 
 {************************************************************************************}
 function ListDelegateInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListDelegateInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListDelegateInfo(&file, exception);
 end;
 
 {$ENDREGION}
@@ -10058,13 +10060,13 @@ end;
 {****************************************************************************************************************}
 function DisplayImages(const image_info: PImageInfo; image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DisplayImages(image_info, image, exception);
+  Result := ALImageMagickLibrary.DisplayImages(image_info, image, exception);
 end;
 
 {************************************************************************************************************************************************************}
 function RemoteDisplayCommand(const image_info: PImageInfo; const window: PAnsiChar; const filename: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.RemoteDisplayCommand(image_info, window, filename, exception);
+  Result := ALImageMagickLibrary.RemoteDisplayCommand(image_info, window, filename, exception);
 end;
 
 {$ENDREGION}
@@ -10074,31 +10076,31 @@ end;
 {************************************************************************************************************************}
 function AffineTransformImage(const image: PImage; const affine_matrix: PAffineMatrix; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.AffineTransformImage(image, affine_matrix, exception);
+  Result := ALImageMagickLibrary.AffineTransformImage(image, affine_matrix, exception);
 end;
 
 {*****************************************************************************************************************************}
 function DistortResizeImage(const image: PImage; const columns: size_t; const rows: size_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.DistortResizeImage(image, columns, rows, exception);
+  Result := ALImageMagickLibrary.DistortResizeImage(image, columns, rows, exception);
 end;
 
 {*****************************************************************************************************************************************************************************************}
 function DistortImage(const image: PImage; method: DistortMethod; const number_arguments: size_t; const arguments: PDouble; bestfit: MagickBooleanType; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.DistortImage(image, method, number_arguments, arguments, bestfit, exception);
+  Result := ALImageMagickLibrary.DistortImage(image, method, number_arguments, arguments, bestfit, exception);
 end;
 
 {**************************************************************************************************}
 function RotateImage(const image: PImage; const degrees: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.RotateImage(image, degrees, exception);
+  Result := ALImageMagickLibrary.RotateImage(image, degrees, exception);
 end;
 
 {***************************************************************************************************************************************************************************}
 function SparseColorImage(const image: PImage; const method: SparseColorMethod; const number_arguments: size_t; const arguments: PDouble; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SparseColorImage(image, method, number_arguments, arguments, exception);
+  Result := ALImageMagickLibrary.SparseColorImage(image, method, number_arguments, arguments, exception);
 end;
 
 {$ENDREGION}
@@ -10108,7 +10110,7 @@ end;
 {***********************************************************************************}
 procedure DistributePixelCacheServer(const port: Integer; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.DistributePixelCacheServer(port, exception);
+  ALImageMagickLibrary.DistributePixelCacheServer(port, exception);
 end;
 
 {$ENDREGION}
@@ -10118,67 +10120,67 @@ end;
 {************************************}
 function AcquireDrawInfo(): PDrawInfo;
 begin
-  Result := ALImageMagickLib.AcquireDrawInfo();
+  Result := ALImageMagickLibrary.AcquireDrawInfo();
 end;
 
 {******************************************************************************************}
 function CloneDrawInfo(const image_info: PImageInfo; const draw_info: PDrawInfo): PDrawInfo;
 begin
-  Result := ALImageMagickLib.CloneDrawInfo(image_info, draw_info);
+  Result := ALImageMagickLibrary.CloneDrawInfo(image_info, draw_info);
 end;
 
 {********************************************************}
 function DestroyDrawInfo(draw_info: PDrawInfo): PDrawInfo;
 begin
-  Result := ALImageMagickLib.DestroyDrawInfo(draw_info);
+  Result := ALImageMagickLibrary.DestroyDrawInfo(draw_info);
 end;
 
 {***************************************************************************************************************************************}
 function DrawAffineImage(image: PImage; const source: PImage; const affine: PAffineMatrix; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawAffineImage(image, source, affine, exception);
+  Result := ALImageMagickLibrary.DrawAffineImage(image, source, affine, exception);
 end;
 
 {**********************************************************************************************************************************}
 function DrawClipPath(image: PImage; const draw_info: PDrawInfo; const id: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawClipPath(image, draw_info, id, exception);
+  Result := ALImageMagickLibrary.DrawClipPath(image, draw_info, id, exception);
 end;
 
 {******************************************************************************************************************}
 function DrawGradientImage(image: PImage; const draw_info: PDrawInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawGradientImage(image, draw_info, exception);
+  Result := ALImageMagickLibrary.DrawGradientImage(image, draw_info, exception);
 end;
 
 {**********************************************************************************************************}
 function DrawImage(image: PImage; const draw_info: PDrawInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawImage(image, draw_info, exception);
+  Result := ALImageMagickLibrary.DrawImage(image, draw_info, exception);
 end;
 
 {*********************************************************************************************************************************************************}
 function DrawPatternPath(image: PImage; const draw_info: PDrawInfo; const name: PAnsiChar; pattern: PPImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawPatternPath(image, draw_info, name, pattern, exception);
+  Result := ALImageMagickLibrary.DrawPatternPath(image, draw_info, name, pattern, exception);
 end;
 
 {****************************************************************************************************************************************************}
 function DrawPrimitive(image: PImage; const draw_info: PDrawInfo; const primitive_info: PPrimitiveInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawPrimitive(image, draw_info, primitive_info, exception);
+  Result := ALImageMagickLibrary.DrawPrimitive(image, draw_info, primitive_info, exception);
 end;
 
 {******************************************************}
 procedure GetAffineMatrix(affine_matrix: PAffineMatrix);
 begin
-  ALImageMagickLib.GetAffineMatrix(affine_matrix);
+  ALImageMagickLibrary.GetAffineMatrix(affine_matrix);
 end;
 
 {************************************************************************}
 procedure GetDrawInfo(const image_info: PImageInfo; draw_info: PDrawInfo);
 begin
-  ALImageMagickLib.GetDrawInfo(image_info, draw_info);
+  ALImageMagickLibrary.GetDrawInfo(image_info, draw_info);
 end;
 
 {$ENDREGION}
@@ -10188,115 +10190,115 @@ end;
 {****************************************************************************************************************************}
 function AdaptiveBlurImage(const image: PImage; const radius: double; const sigma: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.AdaptiveBlurImage(image, radius, sigma, exception);
+  Result := ALImageMagickLibrary.AdaptiveBlurImage(image, radius, sigma, exception);
 end;
 
 {*******************************************************************************************************************************}
 function AdaptiveSharpenImage(const image: PImage; const radius: double; const sigma: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.AdaptiveSharpenImage(image, radius, sigma, exception);
+  Result := ALImageMagickLibrary.AdaptiveSharpenImage(image, radius, sigma, exception);
 end;
 
 {********************************************************************************************************************}
 function BlurImage(const image: PImage; const radius: double; const sigma: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.BlurImage(image, radius, sigma, exception);
+  Result := ALImageMagickLibrary.BlurImage(image, radius, sigma, exception);
 end;
 
 {*****************************************************************************************************************************************************************************************}
 function BilateralBlurImage(const image: PImage; const width: size_t; const height: size_t; const intensity_sigma: double; const spatial_sigma: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.BilateralBlurImage(image, width, height, intensity_sigma, spatial_sigma, exception);
+  Result := ALImageMagickLibrary.BilateralBlurImage(image, width, height, intensity_sigma, spatial_sigma, exception);
 end;
 
 {*************************************************************************************************************}
 function ConvolveImage(const image: PImage; const kernel_info: PKernelInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ConvolveImage(image, kernel_info, exception);
+  Result := ALImageMagickLibrary.ConvolveImage(image, kernel_info, exception);
 end;
 
 {******************************************************************************}
 function DespeckleImage(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.DespeckleImage(image, exception);
+  Result := ALImageMagickLibrary.DespeckleImage(image, exception);
 end;
 
 {***********************************************************************************************}
 function EdgeImage(const image: PImage; const radius: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.EdgeImage(image, radius, exception);
+  Result := ALImageMagickLibrary.EdgeImage(image, radius, exception);
 end;
 
 {**********************************************************************************************************************}
 function EmbossImage(const image: PImage; const radius: double; const sigma: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.EmbossImage(image, radius, sigma, exception);
+  Result := ALImageMagickLibrary.EmbossImage(image, radius, sigma, exception);
 end;
 
 {****************************************************************************************************************************}
 function GaussianBlurImage(const image: PImage; const radius: double; const sigma: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.GaussianBlurImage(image, radius, sigma, exception);
+  Result := ALImageMagickLibrary.GaussianBlurImage(image, radius, sigma, exception);
 end;
 
 {************************************************************************************************************************}
 function KuwaharaImage(const image: PImage; const radius: double; const sigma: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.KuwaharaImage(image, radius, sigma, exception);
+  Result := ALImageMagickLibrary.KuwaharaImage(image, radius, sigma, exception);
 end;
 
 {********************************************************************************************************************************}
 function LocalContrastImage(const image: PImage; const radius: double; const strength: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.LocalContrastImage(image, radius, strength, exception);
+  Result := ALImageMagickLibrary.LocalContrastImage(image, radius, strength, exception);
 end;
 
 {***********************************************************************************************************************************************}
 function MotionBlurImage(const image: PImage; const radius: double; const sigma: double; const angle: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.MotionBlurImage(image, radius, sigma, angle, exception);
+  Result := ALImageMagickLibrary.MotionBlurImage(image, radius, sigma, angle, exception);
 end;
 
 {********************************************************************************************************}
 function PreviewImage(const image: PImage; const preview: PreviewType; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.PreviewImage(image, preview, exception);
+  Result := ALImageMagickLibrary.PreviewImage(image, preview, exception);
 end;
 
 {********************************************************************************************************}
 function RotationalBlurImage(const image: PImage; const angle: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.RotationalBlurImage(image, angle, exception);
+  Result := ALImageMagickLibrary.RotationalBlurImage(image, angle, exception);
 end;
 
 {******************************************************************************************************************************************************}
 function SelectiveBlurImage(const image: PImage; const radius: double; const sigma: double; const threshold: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SelectiveBlurImage(image, radius, sigma, threshold, exception);
+  Result := ALImageMagickLibrary.SelectiveBlurImage(image, radius, sigma, threshold, exception);
 end;
 
 {*********************************************************************************************************************************************************}
 function ShadeImage(const image: PImage; const gray: MagickBooleanType; const azimuth: double; const elevation: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ShadeImage(image, gray, azimuth, elevation, exception);
+  Result := ALImageMagickLibrary.ShadeImage(image, gray, azimuth, elevation, exception);
 end;
 
 {***********************************************************************************************************************}
 function SharpenImage(const image: PImage; const radius: double; const sigma: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SharpenImage(image, radius, sigma, exception);
+  Result := ALImageMagickLibrary.SharpenImage(image, radius, sigma, exception);
 end;
 
 {***************************************************************************************************************************************}
 function SpreadImage(const image: PImage; const method: PixelInterpolateMethod; const radius: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SpreadImage(image, method, radius, exception);
+  Result := ALImageMagickLibrary.SpreadImage(image, method, radius, exception);
 end;
 
 {************************************************************************************************************************************************************************}
 function UnsharpMaskImage(const image: PImage; const radius: double; const sigma: double; const gain: double; const threshold: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.UnsharpMaskImage(image, radius, sigma, gain, threshold, exception);
+  Result := ALImageMagickLibrary.UnsharpMaskImage(image, radius, sigma, gain, threshold, exception);
 end;
 
 {$ENDREGION}
@@ -10306,133 +10308,133 @@ end;
 {***********************************************************************************}
 function AutoGammaImage(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.AutoGammaImage(image, exception);
+  Result := ALImageMagickLibrary.AutoGammaImage(image, exception);
 end;
 
 {***********************************************************************************}
 function AutoLevelImage(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.AutoLevelImage(image, exception);
+  Result := ALImageMagickLibrary.AutoLevelImage(image, exception);
 end;
 
 {**********************************************************************************************************************************************}
 function BrightnessContrastImage(image: PImage; const brightness: double; const contrast: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.BrightnessContrastImage(image, brightness, contrast, exception);
+  Result := ALImageMagickLibrary.BrightnessContrastImage(image, brightness, contrast, exception);
 end;
 
 {*******************************************************************************************************************************************************************************}
 function CLAHEImage(image: PImage; const width: size_t; const height: size_t; const number_bins: size_t; const clip_limit: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CLAHEImage(image, width, height, number_bins, clip_limit, exception);
+  Result := ALImageMagickLibrary.CLAHEImage(image, width, height, number_bins, clip_limit, exception);
 end;
 
 {**********************************************************************************************************************************************}
 function ClutImage(image: PImage; const clut_image: PImage; const method: PixelInterpolateMethod; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ClutImage(image, clut_image, method, exception);
+  Result := ALImageMagickLibrary.ClutImage(image, clut_image, method, exception);
 end;
 
 {*****************************************************************************************************************************************}
 function ColorDecisionListImage(image: PImage; const color_correction_collection: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ColorDecisionListImage(image, color_correction_collection, exception);
+  Result := ALImageMagickLibrary.ColorDecisionListImage(image, color_correction_collection, exception);
 end;
 
 {********************************************************************************************************************}
 function ContrastImage(image: PImage; const sharpen: MagickBooleanType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ContrastImage(image, sharpen, exception);
+  Result := ALImageMagickLibrary.ContrastImage(image, sharpen, exception);
 end;
 
 {***********************************************************************************************************************************************}
 function ContrastStretchImage(image: PImage; const black_point: double; const white_point: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ContrastStretchImage(image, black_point, white_point, exception);
+  Result := ALImageMagickLibrary.ContrastStretchImage(image, black_point, white_point, exception);
 end;
 
 {****************************************************************************}
 function EnhanceImage(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.EnhanceImage(image, exception);
+  Result := ALImageMagickLibrary.EnhanceImage(image, exception);
 end;
 
 {**********************************************************************************}
 function EqualizeImage(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.EqualizeImage(image, exception);
+  Result := ALImageMagickLibrary.EqualizeImage(image, exception);
 end;
 
 {****************************************************************************************************}
 function GammaImage(image: PImage; const gamma: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GammaImage(image, gamma, exception);
+  Result := ALImageMagickLibrary.GammaImage(image, gamma, exception);
 end;
 
 {***********************************************************************************************************************}
 function GrayscaleImage(image: PImage; const method: PixelIntensityMethod; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GrayscaleImage(image, method, exception);
+  Result := ALImageMagickLibrary.GrayscaleImage(image, method, exception);
 end;
 
 {************************************************************************************************************}
 function HaldClutImage(image: PImage; const hald_image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.HaldClutImage(image, hald_image, exception);
+  Result := ALImageMagickLibrary.HaldClutImage(image, hald_image, exception);
 end;
 
 {**********************************************************************************************************************************************************}
 function LevelImage(image: PImage; const black_point: double; const white_point: double; const gamma: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.LevelImage(image, black_point, white_point, gamma, exception);
+  Result := ALImageMagickLibrary.LevelImage(image, black_point, white_point, gamma, exception);
 end;
 
 {*************************************************************************************************************************************************************}
 function LevelizeImage(image: PImage; const black_point: double; const white_point: double; const gamma: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.LevelizeImage(image, black_point, white_point, gamma, exception);
+  Result := ALImageMagickLibrary.LevelizeImage(image, black_point, white_point, gamma, exception);
 end;
 
 {************************************************************************************************************************************************************************************}
 function LevelImageColors(image: PImage; const black_color: PPixelInfo; const white_color: PPixelInfo; const invert: MagickBooleanType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.LevelImageColors(image, black_color, white_color, invert, exception);
+  Result := ALImageMagickLibrary.LevelImageColors(image, black_color, white_color, invert, exception);
 end;
 
 {*********************************************************************************************************************************************}
 function LinearStretchImage(image: PImage; const black_point: double; const white_point: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.LinearStretchImage(image, black_point, white_point, exception);
+  Result := ALImageMagickLibrary.LinearStretchImage(image, black_point, white_point, exception);
 end;
 
 {*************************************************************************************************************}
 function ModulateImage(image: PImage; const modulate: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ModulateImage(image, modulate, exception);
+  Result := ALImageMagickLibrary.ModulateImage(image, modulate, exception);
 end;
 
 {********************************************************************************************************************}
 function NegateImage(image: PImage; const grayscale: MagickBooleanType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.NegateImage(image, grayscale, exception);
+  Result := ALImageMagickLibrary.NegateImage(image, grayscale, exception);
 end;
 
 {***********************************************************************************}
 function NormalizeImage(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.NormalizeImage(image, exception);
+  Result := ALImageMagickLibrary.NormalizeImage(image, exception);
 end;
 
 {*****************************************************************************************************************************************************************************}
 function SigmoidalContrastImage(image: PImage; const sharpen: MagickBooleanType; const contrast: double; const midpoint: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SigmoidalContrastImage(image, sharpen, contrast, midpoint, exception);
+  Result := ALImageMagickLibrary.SigmoidalContrastImage(image, sharpen, contrast, midpoint, exception);
 end;
 
 {**************************************************************************************}
 function WhiteBalanceImage(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.WhiteBalanceImage(image, exception);
+  Result := ALImageMagickLibrary.WhiteBalanceImage(image, exception);
 end;
 
 {$ENDREGION}
@@ -10442,103 +10444,103 @@ end;
 {**********************************************}
 function AcquireExceptionInfo(): PExceptionInfo;
 begin
-  Result := ALImageMagickLib.AcquireExceptionInfo();
+  Result := ALImageMagickLibrary.AcquireExceptionInfo();
 end;
 
 {********************************************************}
 procedure ClearMagickException(exception: PExceptionInfo);
 begin
-  ALImageMagickLib.ClearMagickException(exception);
+  ALImageMagickLibrary.ClearMagickException(exception);
 end;
 
 {**************************************************}
 procedure CatchException(exception: PExceptionInfo);
 begin
-  ALImageMagickLib.CatchException(exception);
+  ALImageMagickLibrary.CatchException(exception);
 end;
 
 {*********************************************************************}
 function CloneExceptionInfo(exception: PExceptionInfo): PExceptionInfo;
 begin
-  Result := ALImageMagickLib.CloneExceptionInfo(exception);
+  Result := ALImageMagickLibrary.CloneExceptionInfo(exception);
 end;
 
 {***********************************************************************}
 function DestroyExceptionInfo(exception: PExceptionInfo): PExceptionInfo;
 begin
-  Result := ALImageMagickLib.DestroyExceptionInfo(exception);
+  Result := ALImageMagickLibrary.DestroyExceptionInfo(exception);
 end;
 
 {************************************************************}
 function GetExceptionMessage(const error: Integer): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetExceptionMessage(error);
+  Result := ALImageMagickLibrary.GetExceptionMessage(error);
 end;
 
 {*************************************************************************************************}
 function GetLocaleExceptionMessage(const severity: ExceptionType; const tag: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetLocaleExceptionMessage(severity, tag);
+  Result := ALImageMagickLibrary.GetLocaleExceptionMessage(severity, tag);
 end;
 
 {************************************************************************************}
 procedure InheritException(exception: PExceptionInfo; const relative: PExceptionInfo);
 begin
-  ALImageMagickLib.InheritException(exception, relative);
+  ALImageMagickLibrary.InheritException(exception, relative);
 end;
 
 {*******************************************************************************************************}
 procedure MagickError(const error: ExceptionType; const reason: PAnsiChar; const description: PAnsiChar);
 begin
-  ALImageMagickLib.MagickError(error, reason, description);
+  ALImageMagickLibrary.MagickError(error, reason, description);
 end;
 
 {************************************************************************************************************}
 procedure MagickFatalError(const error: ExceptionType; const reason: PAnsiChar; const description: PAnsiChar);
 begin
-  ALImageMagickLib.MagickFatalError(error, reason, description);
+  ALImageMagickLibrary.MagickFatalError(error, reason, description);
 end;
 
 {***********************************************************************************************************}
 procedure MagickWarning(const warning: ExceptionType; const reason: PAnsiChar; const description: PAnsiChar);
 begin
-  ALImageMagickLib.MagickWarning(warning, reason, description);
+  ALImageMagickLibrary.MagickWarning(warning, reason, description);
 end;
 
 {************************************************************}
 function SetErrorHandler(handler: ErrorHandler): ErrorHandler;
 begin
-  Result := ALImageMagickLib.SetErrorHandler(handler);
+  Result := ALImageMagickLibrary.SetErrorHandler(handler);
 end;
 
 {***************************************************************************}
 function SetFatalErrorHandler(handler: FatalErrorHandler): FatalErrorHandler;
 begin
-  Result := ALImageMagickLib.SetFatalErrorHandler(handler);
+  Result := ALImageMagickLibrary.SetFatalErrorHandler(handler);
 end;
 
 {******************************************************************}
 function SetWarningHandler(handler: WarningHandler): WarningHandler;
 begin
-  Result := ALImageMagickLib.SetWarningHandler(handler);
+  Result := ALImageMagickLibrary.SetWarningHandler(handler);
 end;
 
 {**********************************************************************************************************************************************************}
 function ThrowException(exception: PExceptionInfo; const severity: ExceptionType; const reason: PAnsiChar; const description: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ThrowException(exception, severity, reason, description);
+  Result := ALImageMagickLibrary.ThrowException(exception, severity, reason, description);
 end;
 
 {********************************************************************************************************************************************************************************************************************************************************}
 function ThrowMagickExceptionList(exception: PExceptionInfo; const module: PAnsiChar; const &function: PAnsiChar; const line: size_t; const severity: ExceptionType; const tag: PAnsiChar; const format: PAnsiChar; operands: va_list): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ThrowMagickExceptionList(exception, module, &function, line, severity, tag, format, operands);
+  Result := ALImageMagickLibrary.ThrowMagickExceptionList(exception, module, &function, line, severity, tag, format, operands);
 end;
 
 {***********************************************************************************************************************************************************************************************************************************}
 //function ThrowMagickException(exception: PExceptionInfo; const module: PAnsiChar; const &function: PAnsiChar; const line: size_t; const severity: ExceptionType; const tag: PAnsiChar; const format: PAnsiChar): MagickBooleanType;
 //begin
-//  Result := ALImageMagickLib.ThrowMagickException(exception, module, &function, line, severity, tag, format);
+//  Result := ALImageMagickLibrary.ThrowMagickException(exception, module, &function, line, severity, tag, format);
 //end;
 
 {$ENDREGION}
@@ -10548,25 +10550,25 @@ end;
 {***********************************************************************************************************************************************************************************}
 function CannyEdgeImage(const image: PImage; const radius: double; const sigma: double; const lower_percent: double; const upper_percent: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.CannyEdgeImage(image, radius, sigma, lower_percent, upper_percent, exception);
+  Result := ALImageMagickLibrary.CannyEdgeImage(image, radius, sigma, lower_percent, upper_percent, exception);
 end;
 
 {******************************************************************************************************************}
 function GetImageFeatures(const image: PImage; const distance: size_t; exception: PExceptionInfo): PChannelFeatures;
 begin
-  Result := ALImageMagickLib.GetImageFeatures(image, distance, exception);
+  Result := ALImageMagickLibrary.GetImageFeatures(image, distance, exception);
 end;
 
 {**************************************************************************************************************************************************}
 function HoughLineImage(const image: PImage; const width: size_t; const height: size_t; const threshold: size_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.HoughLineImage(image, width, height, threshold, exception);
+  Result := ALImageMagickLibrary.HoughLineImage(image, width, height, threshold, exception);
 end;
 
 {*******************************************************************************************************************************************************}
 function MeanShiftImage(const image: PImage; const width: size_t; const height: size_t; const color_distance: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.MeanShiftImage(image, width, height, color_distance, exception);
+  Result := ALImageMagickLibrary.MeanShiftImage(image, width, height, color_distance, exception);
 end;
 
 {$ENDREGION}
@@ -10576,19 +10578,19 @@ end;
 {*********************************************************************************************************}
 function ComplexImages(const images: PImage; const op: ComplexOperator; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ComplexImages(images, op, exception);
+  Result := ALImageMagickLibrary.ComplexImages(images, op, exception);
 end;
 
 {******************************************************************************************************************************}
 function ForwardFourierTransformImage(const image: PImage; const modulus: MagickBooleanType; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ForwardFourierTransformImage(image, modulus, exception);
+  Result := ALImageMagickLibrary.ForwardFourierTransformImage(image, modulus, exception);
 end;
 
 {*******************************************************************************************************************************************************************}
 function InverseFourierTransformImage(const magnitude_image: PImage; const phase_image: PImage; const modulus: MagickBooleanType; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.InverseFourierTransformImage(magnitude_image, phase_image, modulus, exception);
+  Result := ALImageMagickLibrary.InverseFourierTransformImage(magnitude_image, phase_image, modulus, exception);
 end;
 
 {$ENDREGION}
@@ -10598,7 +10600,7 @@ end;
 {****************************************************************************************************}
 function FxImage(const image: PImage; const expression: PAnsiChar; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.FxImage(image, expression, exception);
+  Result := ALImageMagickLibrary.FxImage(image, expression, exception);
 end;
 
 {$ENDREGION}
@@ -10608,7 +10610,7 @@ end;
 {*********************************************************}
 function ExpandAffine(const affine: PAffineMatrix): double;
 begin
-  Result := ALImageMagickLib.ExpandAffine(affine);
+  Result := ALImageMagickLibrary.ExpandAffine(affine);
 end;
 
 {$ENDREGION}
@@ -10618,91 +10620,91 @@ end;
 {***************************************************************************************************************************}
 function GetGeometry(const geometry: PAnsiChar; x: PSsize_t; y: PSsize_t; width: PSize_t; height: PSize_t): MagickStatusType;
 begin
-  Result := ALImageMagickLib.GetGeometry(geometry, x, y, width, height);
+  Result := ALImageMagickLibrary.GetGeometry(geometry, x, y, width, height);
 end;
 
 {******************************************************************}
 function GetPageGeometry(const page_geometry: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetPageGeometry(page_geometry);
+  Result := ALImageMagickLibrary.GetPageGeometry(page_geometry);
 end;
 
 {*****************************************************************************************************************************}
 procedure GravityAdjustGeometry(const width: size_t; const height: size_t; const gravity: GravityType; region: PRectangleInfo);
 begin
-  ALImageMagickLib.GravityAdjustGeometry(width, height, gravity, region);
+  ALImageMagickLibrary.GravityAdjustGeometry(width, height, gravity, region);
 end;
 
 {****************************************************************}
 function IsGeometry(const geometry: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsGeometry(geometry);
+  Result := ALImageMagickLibrary.IsGeometry(geometry);
 end;
 
 {********************************************************************************************************}
 function IsSceneGeometry(const geometry: PAnsiChar; const pedantic: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsSceneGeometry(geometry, pedantic);
+  Result := ALImageMagickLibrary.IsSceneGeometry(geometry, pedantic);
 end;
 
 {*********************************************************************************}
 function ListPagesizes(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListPagesizes(&file, exception);
+  Result := ALImageMagickLibrary.ListPagesizes(&file, exception);
 end;
 
 {*******************************************************************************************************}
 function ParseAbsoluteGeometry(const geometry: PAnsiChar; region_info: PRectangleInfo): MagickStatusType;
 begin
-  Result := ALImageMagickLib.ParseAbsoluteGeometry(geometry, region_info);
+  Result := ALImageMagickLibrary.ParseAbsoluteGeometry(geometry, region_info);
 end;
 
 {*********************************************************************************************************************************}
 function ParseAffineGeometry(const geometry: PAnsiChar; affine_matrix: PAffineMatrix; exception: PExceptionInfo): MagickStatusType;
 begin
-  Result := ALImageMagickLib.ParseAffineGeometry(geometry, affine_matrix, exception);
+  Result := ALImageMagickLibrary.ParseAffineGeometry(geometry, affine_matrix, exception);
 end;
 
 {************************************************************************************************}
 function ParseGeometry(const geometry: PAnsiChar; geometry_info: PGeometryInfo): MagickStatusType;
 begin
-  Result := ALImageMagickLib.ParseGeometry(geometry, geometry_info);
+  Result := ALImageMagickLibrary.ParseGeometry(geometry, geometry_info);
 end;
 
 {******************************************************************************************************************************************************}
 function ParseGravityGeometry(const image: PImage; const geometry: PAnsiChar; region_info: PRectangleInfo; exception: PExceptionInfo): MagickStatusType;
 begin
-  Result := ALImageMagickLib.ParseGravityGeometry(image, geometry, region_info, exception);
+  Result := ALImageMagickLibrary.ParseGravityGeometry(image, geometry, region_info, exception);
 end;
 
 {*********************************************************************************************************************************}
 function ParseMetaGeometry(const geometry: PAnsiChar; x: PSsize_t; y: PSsize_t; width: PSize_t; height: PSize_t): MagickStatusType;
 begin
-  Result := ALImageMagickLib.ParseMetaGeometry(geometry, x, y, width, height);
+  Result := ALImageMagickLibrary.ParseMetaGeometry(geometry, x, y, width, height);
 end;
 
 {***************************************************************************************************************************************************}
 function ParsePageGeometry(const image: PImage; const geometry: PAnsiChar; region_info: PRectangleInfo; exception: PExceptionInfo): MagickStatusType;
 begin
-  Result := ALImageMagickLib.ParsePageGeometry(image, geometry, region_info, exception);
+  Result := ALImageMagickLibrary.ParsePageGeometry(image, geometry, region_info, exception);
 end;
 
 {*****************************************************************************************************************************************************}
 function ParseRegionGeometry(const image: PImage; const geometry: PAnsiChar; region_info: PRectangleInfo; exception: PExceptionInfo): MagickStatusType;
 begin
-  Result := ALImageMagickLib.ParseRegionGeometry(image, geometry, region_info, exception);
+  Result := ALImageMagickLibrary.ParseRegionGeometry(image, geometry, region_info, exception);
 end;
 
 {*******************************************************************}
 procedure SetGeometry(const image: PImage; geometry: PRectangleInfo);
 begin
-  ALImageMagickLib.SetGeometry(image, geometry);
+  ALImageMagickLibrary.SetGeometry(image, geometry);
 end;
 
 {******************************************************}
 procedure SetGeometryInfo(geometry_info: PGeometryInfo);
 begin
-  ALImageMagickLib.SetGeometryInfo(geometry_info);
+  ALImageMagickLibrary.SetGeometryInfo(geometry_info);
 end;
 
 {$ENDREGION}
@@ -10712,43 +10714,43 @@ end;
 {*************************************************************************************************************}
 function GetImageHistogram(const image: PImage; number_colors: PSize_t; exception: PExceptionInfo): PPixelInfo;
 begin
-  Result := ALImageMagickLib.GetImageHistogram(image, number_colors, exception);
+  Result := ALImageMagickLibrary.GetImageHistogram(image, number_colors, exception);
 end;
 
 {***********************************************************************************************}
 function IdentifyPaletteImage(const image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IdentifyPaletteImage(image, exception);
+  Result := ALImageMagickLibrary.IdentifyPaletteImage(image, exception);
 end;
 
 {*******************************************************************************************}
 function IsHistogramImage(const image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsHistogramImage(image, exception);
+  Result := ALImageMagickLibrary.IsHistogramImage(image, exception);
 end;
 
 {**************************************************************}
 function IsPaletteImage(const image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsPaletteImage(image);
+  Result := ALImageMagickLibrary.IsPaletteImage(image);
 end;
 
 {******************************************************************************************************************************************************}
 function MinMaxStretchImage(image: PImage; const black: double; const white: double; const gamma: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MinMaxStretchImage(image, black, white, gamma, exception);
+  Result := ALImageMagickLibrary.MinMaxStretchImage(image, black, white, gamma, exception);
 end;
 
 {*********************************************************************************************}
 function GetNumberColors(const image: PImage; &file: PFILE; exception: PExceptionInfo): size_t;
 begin
-  Result := ALImageMagickLib.GetNumberColors(image, &file, exception);
+  Result := ALImageMagickLibrary.GetNumberColors(image, &file, exception);
 end;
 
 {*********************************************************************************}
 function UniqueImageColors(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.UniqueImageColors(image, exception);
+  Result := ALImageMagickLibrary.UniqueImageColors(image, exception);
 end;
 
 {$ENDREGION}
@@ -10758,7 +10760,7 @@ end;
 {**********************************************************************************************************************************}
 function IdentifyImage(image: PImage; &file: PFILE; const verbose: MagickBooleanType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IdentifyImage(image, &file, verbose, exception);
+  Result := ALImageMagickLibrary.IdentifyImage(image, &file, verbose, exception);
 end;
 
 {$ENDREGION}
@@ -10768,109 +10770,109 @@ end;
 {****************************************************************}
 function CloneImageView(const image_view: PImageView): PImageView;
 begin
-  Result := ALImageMagickLib.CloneImageView(image_view);
+  Result := ALImageMagickLibrary.CloneImageView(image_view);
 end;
 
 {************************************************************}
 function DestroyImageView(image_view: PImageView): PImageView;
 begin
-  Result := ALImageMagickLib.DestroyImageView(image_view);
+  Result := ALImageMagickLibrary.DestroyImageView(image_view);
 end;
 
 {************************************************************************************************************************************************************************************}
 function DuplexTransferImageViewIterator(source: PImageView; duplex: PImageView; destination: PImageView; transfer: DuplexTransferImageViewMethod; context: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DuplexTransferImageViewIterator(source, duplex, destination, transfer, context);
+  Result := ALImageMagickLibrary.DuplexTransferImageViewIterator(source, duplex, destination, transfer, context);
 end;
 
 {***********************************************************************}
 procedure GetImageViewAuthenticMetacontent(const image_view: PImageView);
 begin
-  ALImageMagickLib.GetImageViewAuthenticMetacontent(image_view);
+  ALImageMagickLibrary.GetImageViewAuthenticMetacontent(image_view);
 end;
 
 {***************************************************************************}
 function GetImageViewAuthenticPixels(const image_view: PImageView): PQuantum;
 begin
-  Result := ALImageMagickLib.GetImageViewAuthenticPixels(image_view);
+  Result := ALImageMagickLibrary.GetImageViewAuthenticPixels(image_view);
 end;
 
 {************************************************************************************************}
 function GetImageViewException(const image_view: PImageView; severity: PExceptionType): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetImageViewException(image_view, severity);
+  Result := ALImageMagickLibrary.GetImageViewException(image_view, severity);
 end;
 
 {***********************************************************************}
 function GetImageViewExtent(const image_view: PImageView): RectangleInfo;
 begin
-  Result := ALImageMagickLib.GetImageViewExtent(image_view);
+  Result := ALImageMagickLibrary.GetImageViewExtent(image_view);
 end;
 
 {***************************************************************}
 function GetImageViewImage(const image_view: PImageView): PImage;
 begin
-  Result := ALImageMagickLib.GetImageViewImage(image_view);
+  Result := ALImageMagickLibrary.GetImageViewImage(image_view);
 end;
 
 {************************************************************************************************************}
 function GetImageViewIterator(source: PImageView; get: GetImageViewMethod; context: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetImageViewIterator(source, get, context);
+  Result := ALImageMagickLibrary.GetImageViewIterator(source, get, context);
 end;
 
 {*********************************************************************}
 procedure GetImageViewVirtualMetacontent(const image_view: PImageView);
 begin
-  ALImageMagickLib.GetImageViewVirtualMetacontent(image_view);
+  ALImageMagickLibrary.GetImageViewVirtualMetacontent(image_view);
 end;
 
 {*************************************************************************}
 function GetImageViewVirtualPixels(const image_view: PImageView): PQuantum;
 begin
-  Result := ALImageMagickLib.GetImageViewVirtualPixels(image_view);
+  Result := ALImageMagickLibrary.GetImageViewVirtualPixels(image_view);
 end;
 
 {********************************************************************}
 function IsImageView(const image_view: PImageView): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsImageView(image_view);
+  Result := ALImageMagickLibrary.IsImageView(image_view);
 end;
 
 {**************************************************************************}
 function NewImageView(image: PImage; exception: PExceptionInfo): PImageView;
 begin
-  Result := ALImageMagickLib.NewImageView(image, exception);
+  Result := ALImageMagickLibrary.NewImageView(image, exception);
 end;
 
 {***************************************************************************************************************************************************************}
 function NewImageViewRegion(image: PImage; const x: ssize_t; const y: ssize_t; const width: size_t; const height: size_t; exception: PExceptionInfo): PImageView;
 begin
-  Result := ALImageMagickLib.NewImageViewRegion(image, x, y, width, height, exception);
+  Result := ALImageMagickLibrary.NewImageViewRegion(image, x, y, width, height, exception);
 end;
 
 {**************************************************************************************}
 procedure SetImageViewDescription(image_view: PImageView; const description: PAnsiChar);
 begin
-  ALImageMagickLib.SetImageViewDescription(image_view, description);
+  ALImageMagickLibrary.SetImageViewDescription(image_view, description);
 end;
 
 {******************************************************************************************************************}
 function SetImageViewIterator(destination: PImageView; &set: SetImageViewMethod; context: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageViewIterator(destination, &set, context);
+  Result := ALImageMagickLibrary.SetImageViewIterator(destination, &set, context);
 end;
 
 {****************************************************************************************************************************************************}
 function TransferImageViewIterator(source: PImageView; destination: PImageView; transfer: TransferImageViewMethod; context: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.TransferImageViewIterator(source, destination, transfer, context);
+  Result := ALImageMagickLibrary.TransferImageViewIterator(source, destination, transfer, context);
 end;
 
 {*********************************************************************************************************************}
 function UpdateImageViewIterator(source: PImageView; update: UpdateImageViewMethod; context: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.UpdateImageViewIterator(source, update, context);
+  Result := ALImageMagickLibrary.UpdateImageViewIterator(source, update, context);
 end;
 
 {$ENDREGION}
@@ -10880,271 +10882,271 @@ end;
 {*************************************************************************************}
 function AcquireImage(const image_info: PImageInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.AcquireImage(image_info, exception);
+  Result := ALImageMagickLibrary.AcquireImage(image_info, exception);
 end;
 
 {**************************************}
 function AcquireImageInfo(): PImageInfo;
 begin
-  Result := ALImageMagickLib.AcquireImageInfo();
+  Result := ALImageMagickLibrary.AcquireImageInfo();
 end;
 
 {*************************************************************************************************}
 procedure AcquireNextImage(const image_info: PImageInfo; image: PImage; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.AcquireNextImage(image_info, image, exception);
+  ALImageMagickLibrary.AcquireNextImage(image_info, image, exception);
 end;
 
 {*************************************************************************************************************}
 function AppendImages(const images: PImage; const stack: MagickBooleanType; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.AppendImages(images, stack, exception);
+  Result := ALImageMagickLibrary.AppendImages(images, stack, exception);
 end;
 
 {*********************************************************}
 function CatchImageException(image: PImage): ExceptionType;
 begin
-  Result := ALImageMagickLib.CatchImageException(image);
+  Result := ALImageMagickLibrary.CatchImageException(image);
 end;
 
 {******************************************************************************}
 function ClipImage(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ClipImage(image, exception);
+  Result := ALImageMagickLibrary.ClipImage(image, exception);
 end;
 
 {**********************************************************************************************************************************************}
 function ClipImagePath(image: PImage; const pathname: PAnsiChar; const inside: MagickBooleanType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ClipImagePath(image, pathname, inside, exception);
+  Result := ALImageMagickLibrary.ClipImagePath(image, pathname, inside, exception);
 end;
 
 {******************************************************************************************************************************************************}
 function CloneImage(const image: PImage; const columns: size_t; const rows: size_t; const detach: MagickBooleanType; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.CloneImage(image, columns, rows, detach, exception);
+  Result := ALImageMagickLibrary.CloneImage(image, columns, rows, detach, exception);
 end;
 
 {****************************************************************}
 function CloneImageInfo(const image_info: PImageInfo): PImageInfo;
 begin
-  Result := ALImageMagickLib.CloneImageInfo(image_info);
+  Result := ALImageMagickLibrary.CloneImageInfo(image_info);
 end;
 
 {***************************************************************************************************************************************************************************}
 function CopyImagePixels(image: PImage; const source_image: PImage; const geometry: PRectangleInfo; const offset: POffsetInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CopyImagePixels(image, source_image, geometry, offset, exception);
+  Result := ALImageMagickLibrary.CopyImagePixels(image, source_image, geometry, offset, exception);
 end;
 
 {*******************************************}
 function DestroyImage(image: PImage): PImage;
 begin
-  Result := ALImageMagickLib.DestroyImage(image);
+  Result := ALImageMagickLibrary.DestroyImage(image);
 end;
 
 {************************************************************}
 function DestroyImageInfo(image_info: PImageInfo): PImageInfo;
 begin
-  Result := ALImageMagickLib.DestroyImageInfo(image_info);
+  Result := ALImageMagickLibrary.DestroyImageInfo(image_info);
 end;
 
 {***********************************************}
 procedure DisassociateImageStream(image: PImage);
 begin
-  ALImageMagickLib.DisassociateImageStream(image);
+  ALImageMagickLibrary.DisassociateImageStream(image);
 end;
 
 {*********************************************}
 procedure GetImageInfo(image_info: PImageInfo);
 begin
-  ALImageMagickLib.GetImageInfo(image_info);
+  ALImageMagickLibrary.GetImageInfo(image_info);
 end;
 
 {*************************************************************}
 function GetImageInfoFile(const image_info: PImageInfo): PFILE;
 begin
-  Result := ALImageMagickLib.GetImageInfoFile(image_info);
+  Result := ALImageMagickLibrary.GetImageInfoFile(image_info);
 end;
 
 {****************************************************************************************************}
 function GetImageMask(const image: PImage; const &type: PixelMask; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.GetImageMask(image, &type, exception);
+  Result := ALImageMagickLibrary.GetImageMask(image, &type, exception);
 end;
 
 {******************************************************}
 function GetImageReferenceCount(image: PImage): ssize_t;
 begin
-  Result := ALImageMagickLib.GetImageReferenceCount(image);
+  Result := ALImageMagickLibrary.GetImageReferenceCount(image);
 end;
 
 {***************************************************************************}
 function GetImageVirtualPixelMethod(const image: PImage): VirtualPixelMethod;
 begin
-  Result := ALImageMagickLib.GetImageVirtualPixelMethod(image);
+  Result := ALImageMagickLibrary.GetImageVirtualPixelMethod(image);
 end;
 
 {****************************************************************************************************************************************************************************}
 function InterpretImageFilename(const image_info: PImageInfo; image: PImage; const format: PAnsiChar; value: Integer; filename: PAnsiChar; exception: PExceptionInfo): size_t;
 begin
-  Result := ALImageMagickLib.InterpretImageFilename(image_info, image, format, value, filename, exception);
+  Result := ALImageMagickLibrary.InterpretImageFilename(image_info, image, format, value, filename, exception);
 end;
 
 {**************************************************************************************************}
 function IsHighDynamicRangeImage(const image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsHighDynamicRangeImage(image, exception);
+  Result := ALImageMagickLibrary.IsHighDynamicRangeImage(image, exception);
 end;
 
 {*************************************************************}
 function IsImageObject(const image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsImageObject(image);
+  Result := ALImageMagickLibrary.IsImageObject(image);
 end;
 
 {************************************************************}
 function IsTaintImage(const image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsTaintImage(image);
+  Result := ALImageMagickLibrary.IsTaintImage(image);
 end;
 
 {*********************************************************************************}
 function ModifyImage(image: PPImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ModifyImage(image, exception);
+  Result := ALImageMagickLibrary.ModifyImage(image, exception);
 end;
 
 {****************************************************************************************************************************************************************}
 function NewMagickImage(const image_info: PImageInfo; const width: size_t; const height: size_t; const background: PPixelInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.NewMagickImage(image_info, width, height, background, exception);
+  Result := ALImageMagickLibrary.NewMagickImage(image_info, width, height, background, exception);
 end;
 
 {*********************************************}
 function ReferenceImage(image: PImage): PImage;
 begin
-  Result := ALImageMagickLib.ReferenceImage(image);
+  Result := ALImageMagickLibrary.ReferenceImage(image);
 end;
 
 {*******************************************************************************}
 function ResetImagePage(image: PImage; const page: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ResetImagePage(image, page);
+  Result := ALImageMagickLibrary.ResetImagePage(image, page);
 end;
 
 {*************************************************************************************}
 function ResetImagePixels(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ResetImagePixels(image, exception);
+  Result := ALImageMagickLibrary.ResetImagePixels(image, exception);
 end;
 
 {********************************************************************************************************}
 function SetImageAlpha(image: PImage; const alpha: Quantum; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageAlpha(image, alpha, exception);
+  Result := ALImageMagickLibrary.SetImageAlpha(image, alpha, exception);
 end;
 
 {********************************************************************************************}
 function SetImageBackgroundColor(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageBackgroundColor(image, exception);
+  Result := ALImageMagickLibrary.SetImageBackgroundColor(image, exception);
 end;
 
 {****************************************************************************************}
 function SetImageChannelMask(image: PImage; const channel_mask: ChannelType): ChannelType;
 begin
-  Result := ALImageMagickLib.SetImageChannelMask(image, channel_mask);
+  Result := ALImageMagickLibrary.SetImageChannelMask(image, channel_mask);
 end;
 
 {***********************************************************************************************************}
 function SetImageColor(image: PImage; const color: PPixelInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageColor(image, color, exception);
+  Result := ALImageMagickLibrary.SetImageColor(image, color, exception);
 end;
 
 {*************************************************************************************************************************}
 function SetImageStorageClass(image: PImage; const storage_class: ClassType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageStorageClass(image, storage_class, exception);
+  Result := ALImageMagickLibrary.SetImageStorageClass(image, storage_class, exception);
 end;
 
 {******************************************************************************************************************************}
 function SetImageExtent(image: PImage; const columns: size_t; const rows: size_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageExtent(image, columns, rows, exception);
+  Result := ALImageMagickLibrary.SetImageExtent(image, columns, rows, exception);
 end;
 
 {******************************************************************************************************************}
 function SetImageInfo(image_info: PImageInfo; const frames: Cardinal; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageInfo(image_info, frames, exception);
+  Result := ALImageMagickLibrary.SetImageInfo(image_info, frames, exception);
 end;
 
 {******************************************************************************************}
 procedure SetImageInfoBlob(image_info: PImageInfo; const blob: PVoid; const length: size_t);
 begin
-  ALImageMagickLib.SetImageInfoBlob(image_info, blob, length);
+  ALImageMagickLibrary.SetImageInfoBlob(image_info, blob, length);
 end;
 
 {*******************************************************************************************}
 procedure SetImageInfoCustomStream(image_info: PImageInfo; custom_stream: PCustomStreamInfo);
 begin
-  ALImageMagickLib.SetImageInfoCustomStream(image_info, custom_stream);
+  ALImageMagickLibrary.SetImageInfoCustomStream(image_info, custom_stream);
 end;
 
 {***************************************************************}
 procedure SetImageInfoFile(image_info: PImageInfo; &file: PFILE);
 begin
-  ALImageMagickLib.SetImageInfoFile(image_info, &file);
+  ALImageMagickLibrary.SetImageInfoFile(image_info, &file);
 end;
 
 {*****************************************************************************************************************************}
 function SetImageMask(image: PImage; const &type: PixelMask; const mask: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageMask(image, &type, mask, exception);
+  Result := ALImageMagickLibrary.SetImageMask(image, &type, mask, exception);
 end;
 
 {*********************************************************************************************************************************************}
 function SetImageRegionMask(image: PImage; const &type: PixelMask; const region: PRectangleInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageRegionMask(image, &type, region, exception);
+  Result := ALImageMagickLibrary.SetImageRegionMask(image, &type, region, exception);
 end;
 
 {************************************************************************************************************************************************}
 function SetImageVirtualPixelMethod(image: PImage; const virtual_pixel_method: VirtualPixelMethod; exception: PExceptionInfo): VirtualPixelMethod;
 begin
-  Result := ALImageMagickLib.SetImageVirtualPixelMethod(image, virtual_pixel_method, exception);
+  Result := ALImageMagickLibrary.SetImageVirtualPixelMethod(image, virtual_pixel_method, exception);
 end;
 
 {***********************************************************************************************************************************}
 function SmushImages(const images: PImage; const stack: MagickBooleanType; const offset: ssize_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SmushImages(images, stack, offset, exception);
+  Result := ALImageMagickLibrary.SmushImages(images, stack, offset, exception);
 end;
 
 {*******************************************************************************}
 function StripImage(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.StripImage(image, exception);
+  Result := ALImageMagickLibrary.StripImage(image, exception);
 end;
 
 {******************************************************************************}
 function SyncImage(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SyncImage(image, exception);
+  Result := ALImageMagickLibrary.SyncImage(image, exception);
 end;
 
 {****************************************************************************************************************}
 function SyncImagesSettings(image_info: PImageInfo; images: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SyncImagesSettings(image_info, images, exception);
+  Result := ALImageMagickLibrary.SyncImagesSettings(image_info, images, exception);
 end;
 
 {********************************************************************************************************************}
 function SyncImageSettings(const image_info: PImageInfo; image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SyncImageSettings(image_info, image, exception);
+  Result := ALImageMagickLibrary.SyncImageSettings(image_info, image, exception);
 end;
 
 {$ENDREGION}
@@ -11154,61 +11156,61 @@ end;
 {******************************************************************************}
 function CoalesceImages(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.CoalesceImages(image, exception);
+  Result := ALImageMagickLibrary.CoalesceImages(image, exception);
 end;
 
 {******************************************************************************}
 function DisposeImages(const images: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.DisposeImages(images, exception);
+  Result := ALImageMagickLibrary.DisposeImages(images, exception);
 end;
 
 {**************************************************************************************************************}
 function CompareImagesLayers(const image: PImage; const method: LayerMethod; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.CompareImagesLayers(image, method, exception);
+  Result := ALImageMagickLibrary.CompareImagesLayers(image, method, exception);
 end;
 
 {***********************************************************************************}
 function OptimizeImageLayers(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.OptimizeImageLayers(image, exception);
+  Result := ALImageMagickLibrary.OptimizeImageLayers(image, exception);
 end;
 
 {***************************************************************************************}
 function OptimizePlusImageLayers(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.OptimizePlusImageLayers(image, exception);
+  Result := ALImageMagickLibrary.OptimizePlusImageLayers(image, exception);
 end;
 
 {**********************************************************************************}
 procedure OptimizeImageTransparency(const image: PImage; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.OptimizeImageTransparency(image, exception);
+  ALImageMagickLibrary.OptimizeImageTransparency(image, exception);
 end;
 
 {**************************************************************************}
 procedure RemoveDuplicateLayers(images: PPImage; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.RemoveDuplicateLayers(images, exception);
+  ALImageMagickLibrary.RemoveDuplicateLayers(images, exception);
 end;
 
 {**************************************************************************}
 procedure RemoveZeroDelayLayers(images: PPImage; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.RemoveZeroDelayLayers(images, exception);
+  ALImageMagickLibrary.RemoveZeroDelayLayers(images, exception);
 end;
 
 {****************************************************************************************************************************************************************************}
 procedure CompositeLayers(destination: PImage; const compose: CompositeOperator; source: PImage; const x_offset: ssize_t; const y_offset: ssize_t; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.CompositeLayers(destination, compose, source, x_offset, y_offset, exception);
+  ALImageMagickLibrary.CompositeLayers(destination, compose, source, x_offset, y_offset, exception);
 end;
 
 {*****************************************************************************************************}
 function MergeImageLayers(image: PImage; const method: LayerMethod; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.MergeImageLayers(image, method, exception);
+  Result := ALImageMagickLibrary.MergeImageLayers(image, method, exception);
 end;
 
 {$ENDREGION}
@@ -11218,97 +11220,97 @@ end;
 {**************************************************************************************************}
 function AppendValueToLinkedList(list_info: PLinkedListInfo; const value: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.AppendValueToLinkedList(list_info, value);
+  Result := ALImageMagickLibrary.AppendValueToLinkedList(list_info, value);
 end;
 
 {*******************************************************************************************}
 procedure ClearLinkedList(list_info: PLinkedListInfo; relinquish_value: RelinquishValueFunc);
 begin
-  ALImageMagickLib.ClearLinkedList(list_info, relinquish_value);
+  ALImageMagickLibrary.ClearLinkedList(list_info, relinquish_value);
 end;
 
 {*************************************************************************************************************}
 function DestroyLinkedList(list_info: PLinkedListInfo; relinquish_value: RelinquishValueFunc): PLinkedListInfo;
 begin
-  Result := ALImageMagickLib.DestroyLinkedList(list_info, relinquish_value);
+  Result := ALImageMagickLibrary.DestroyLinkedList(list_info, relinquish_value);
 end;
 
 {*************************************************************}
 procedure GetLastValueInLinkedList(list_info: PLinkedListInfo);
 begin
-  ALImageMagickLib.GetLastValueInLinkedList(list_info);
+  ALImageMagickLibrary.GetLastValueInLinkedList(list_info);
 end;
 
 {*************************************************************}
 procedure GetNextValueInLinkedList(list_info: PLinkedListInfo);
 begin
-  ALImageMagickLib.GetNextValueInLinkedList(list_info);
+  ALImageMagickLibrary.GetNextValueInLinkedList(list_info);
 end;
 
 {*********************************************************************************}
 function GetNumberOfElementsInLinkedList(const list_info: PLinkedListInfo): size_t;
 begin
-  Result := ALImageMagickLib.GetNumberOfElementsInLinkedList(list_info);
+  Result := ALImageMagickLibrary.GetNumberOfElementsInLinkedList(list_info);
 end;
 
 {********************************************************************************}
 procedure GetValueFromLinkedList(list_info: PLinkedListInfo; const index: size_t);
 begin
-  ALImageMagickLib.GetValueFromLinkedList(list_info, index);
+  ALImageMagickLibrary.GetValueFromLinkedList(list_info, index);
 end;
 
 {***********************************************************************************************************************}
 function InsertValueInLinkedList(list_info: PLinkedListInfo; const index: size_t; const value: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.InsertValueInLinkedList(list_info, index, value);
+  Result := ALImageMagickLibrary.InsertValueInLinkedList(list_info, index, value);
 end;
 
 {********************************************************************************************************************************************************}
 function InsertValueInSortedLinkedList(list_info: PLinkedListInfo; compare: SplayTreeCompareFunc; replace: PPVoid; const value: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.InsertValueInSortedLinkedList(list_info, compare, replace, value);
+  Result := ALImageMagickLibrary.InsertValueInSortedLinkedList(list_info, compare, replace, value);
 end;
 
 {******************************************************************************}
 function IsLinkedListEmpty(const list_info: PLinkedListInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsLinkedListEmpty(list_info);
+  Result := ALImageMagickLibrary.IsLinkedListEmpty(list_info);
 end;
 
 {****************************************************************************************}
 function LinkedListToArray(list_info: PLinkedListInfo; &array: PPVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.LinkedListToArray(list_info, &array);
+  Result := ALImageMagickLibrary.LinkedListToArray(list_info, &array);
 end;
 
 {**************************************************************}
 function NewLinkedList(const capacity: size_t): PLinkedListInfo;
 begin
-  Result := ALImageMagickLib.NewLinkedList(capacity);
+  Result := ALImageMagickLibrary.NewLinkedList(capacity);
 end;
 
 {*******************************************************************************************}
 procedure RemoveElementByValueFromLinkedList(list_info: PLinkedListInfo; const value: PVoid);
 begin
-  ALImageMagickLib.RemoveElementByValueFromLinkedList(list_info, value);
+  ALImageMagickLibrary.RemoveElementByValueFromLinkedList(list_info, value);
 end;
 
 {*************************************************************************************}
 procedure RemoveElementFromLinkedList(list_info: PLinkedListInfo; const index: size_t);
 begin
-  ALImageMagickLib.RemoveElementFromLinkedList(list_info, index);
+  ALImageMagickLibrary.RemoveElementFromLinkedList(list_info, index);
 end;
 
 {********************************************************************}
 procedure RemoveLastElementFromLinkedList(list_info: PLinkedListInfo);
 begin
-  ALImageMagickLib.RemoveLastElementFromLinkedList(list_info);
+  ALImageMagickLibrary.RemoveLastElementFromLinkedList(list_info);
 end;
 
 {************************************************************}
 procedure ResetLinkedListIterator(list_info: PLinkedListInfo);
 begin
-  ALImageMagickLib.ResetLinkedListIterator(list_info);
+  ALImageMagickLibrary.ResetLinkedListIterator(list_info);
 end;
 
 {$ENDREGION}
@@ -11318,169 +11320,169 @@ end;
 {*****************************************************************}
 procedure AppendImageToList(images: PPImage; const append: PImage);
 begin
-  ALImageMagickLib.AppendImageToList(images, append);
+  ALImageMagickLibrary.AppendImageToList(images, append);
 end;
 
 {*******************************************************************************}
 function CloneImageList(const images: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.CloneImageList(images, exception);
+  Result := ALImageMagickLibrary.CloneImageList(images, exception);
 end;
 
 {*****************************************************************************************************}
 function CloneImages(const images: PImage; const scenes: PAnsiChar; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.CloneImages(images, scenes, exception);
+  Result := ALImageMagickLibrary.CloneImages(images, scenes, exception);
 end;
 
 {*********************************************}
 procedure DeleteImageFromList(images: PPImage);
 begin
-  ALImageMagickLib.DeleteImageFromList(images);
+  ALImageMagickLibrary.DeleteImageFromList(images);
 end;
 
 {******************************************************************************************}
 procedure DeleteImages(images: PPImage; const scenes: PAnsiChar; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.DeleteImages(images, scenes, exception);
+  ALImageMagickLibrary.DeleteImages(images, scenes, exception);
 end;
 
 {************************************************}
 function DestroyImageList(images: PImage): PImage;
 begin
-  Result := ALImageMagickLib.DestroyImageList(images);
+  Result := ALImageMagickLibrary.DestroyImageList(images);
 end;
 
 {************************************************************************************************************************************}
 function DuplicateImages(images: PImage; const number_duplicates: size_t; const scenes: PAnsiChar; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.DuplicateImages(images, number_duplicates, scenes, exception);
+  Result := ALImageMagickLibrary.DuplicateImages(images, number_duplicates, scenes, exception);
 end;
 
 {*********************************************************}
 function GetFirstImageInList(const images: PImage): PImage;
 begin
-  Result := ALImageMagickLib.GetFirstImageInList(images);
+  Result := ALImageMagickLibrary.GetFirstImageInList(images);
 end;
 
 {****************************************************************************}
 function GetImageFromList(const images: PImage; const index: ssize_t): PImage;
 begin
-  Result := ALImageMagickLib.GetImageFromList(images, index);
+  Result := ALImageMagickLibrary.GetImageFromList(images, index);
 end;
 
 {**********************************************************}
 function GetImageIndexInList(const images: PImage): ssize_t;
 begin
-  Result := ALImageMagickLib.GetImageIndexInList(images);
+  Result := ALImageMagickLibrary.GetImageIndexInList(images);
 end;
 
 {********************************************************}
 function GetImageListLength(const images: PImage): size_t;
 begin
-  Result := ALImageMagickLib.GetImageListLength(images);
+  Result := ALImageMagickLibrary.GetImageListLength(images);
 end;
 
 {********************************************************}
 function GetLastImageInList(const images: PImage): PImage;
 begin
-  Result := ALImageMagickLib.GetLastImageInList(images);
+  Result := ALImageMagickLibrary.GetLastImageInList(images);
 end;
 
 {********************************************************}
 function GetNextImageInList(const images: PImage): PImage;
 begin
-  Result := ALImageMagickLib.GetNextImageInList(images);
+  Result := ALImageMagickLibrary.GetNextImageInList(images);
 end;
 
 {************************************************************}
 function GetPreviousImageInList(const images: PImage): PImage;
 begin
-  Result := ALImageMagickLib.GetPreviousImageInList(images);
+  Result := ALImageMagickLibrary.GetPreviousImageInList(images);
 end;
 
 {**********************************************************************************}
 function ImageListToArray(const images: PImage; exception: PExceptionInfo): PPImage;
 begin
-  Result := ALImageMagickLib.ImageListToArray(images, exception);
+  Result := ALImageMagickLibrary.ImageListToArray(images, exception);
 end;
 
 {***********************************************************}
 procedure InsertImageInList(images: PPImage; insert: PImage);
 begin
-  ALImageMagickLib.InsertImageInList(images, insert);
+  ALImageMagickLibrary.InsertImageInList(images, insert);
 end;
 
 {******************************}
 function NewImageList(): PImage;
 begin
-  Result := ALImageMagickLib.NewImageList();
+  Result := ALImageMagickLibrary.NewImageList();
 end;
 
 {*************************************************************}
 procedure PrependImageToList(images: PPImage; prepend: PImage);
 begin
-  ALImageMagickLib.PrependImageToList(images, prepend);
+  ALImageMagickLibrary.PrependImageToList(images, prepend);
 end;
 
 {****************************************************}
 function RemoveImageFromList(images: PPImage): PImage;
 begin
-  Result := ALImageMagickLib.RemoveImageFromList(images);
+  Result := ALImageMagickLibrary.RemoveImageFromList(images);
 end;
 
 {*********************************************************}
 function RemoveFirstImageFromList(images: PPImage): PImage;
 begin
-  Result := ALImageMagickLib.RemoveFirstImageFromList(images);
+  Result := ALImageMagickLibrary.RemoveFirstImageFromList(images);
 end;
 
 {********************************************************}
 function RemoveLastImageFromList(images: PPImage): PImage;
 begin
-  Result := ALImageMagickLib.RemoveLastImageFromList(images);
+  Result := ALImageMagickLibrary.RemoveLastImageFromList(images);
 end;
 
 {*************************************************************}
 procedure ReplaceImageInList(images: PPImage; replace: PImage);
 begin
-  ALImageMagickLib.ReplaceImageInList(images, replace);
+  ALImageMagickLibrary.ReplaceImageInList(images, replace);
 end;
 
 {***********************************************************************}
 procedure ReplaceImageInListReturnLast(images: PPImage; replace: PImage);
 begin
-  ALImageMagickLib.ReplaceImageInListReturnLast(images, replace);
+  ALImageMagickLibrary.ReplaceImageInListReturnLast(images, replace);
 end;
 
 {******************************************}
 procedure ReverseImageList(images: PPImage);
 begin
-  ALImageMagickLib.ReverseImageList(images);
+  ALImageMagickLibrary.ReverseImageList(images);
 end;
 
 {************************************************************************************************}
 function SpliceImageIntoList(images: PPImage; const length: size_t; const splice: PImage): PImage;
 begin
-  Result := ALImageMagickLib.SpliceImageIntoList(images, length, splice);
+  Result := ALImageMagickLibrary.SpliceImageIntoList(images, length, splice);
 end;
 
 {**********************************************}
 function SplitImageList(images: PImage): PImage;
 begin
-  Result := ALImageMagickLib.SplitImageList(images);
+  Result := ALImageMagickLibrary.SplitImageList(images);
 end;
 
 {**************************************}
 procedure SyncImageList(images: PImage);
 begin
-  ALImageMagickLib.SyncImageList(images);
+  ALImageMagickLibrary.SyncImageList(images);
 end;
 
 {*********************************************************}
 function SyncNextImageInList(const images: PImage): PImage;
 begin
-  Result := ALImageMagickLib.SyncNextImageInList(images);
+  Result := ALImageMagickLibrary.SyncNextImageInList(images);
 end;
 
 {$ENDREGION}
@@ -11490,103 +11492,103 @@ end;
 {************************************************************************}
 function DestroyLocaleOptions(messages: PLinkedListInfo): PLinkedListInfo;
 begin
-  Result := ALImageMagickLib.DestroyLocaleOptions(messages);
+  Result := ALImageMagickLibrary.DestroyLocaleOptions(messages);
 end;
 
 {**************************************************************************}
 //function FormatLocaleFile(&file: PFILE; const format: PAnsiChar): ssize_t;
 //begin
-//  Result := ALImageMagickLib.FormatLocaleFile(&file, format);
+//  Result := ALImageMagickLibrary.FormatLocaleFile(&file, format);
 //end;
 
 {********************************************************************************************************}
 //function FormatLocaleString(&string: PAnsiChar; const length: size_t; const format: PAnsiChar): ssize_t;
 //begin
-//  Result := ALImageMagickLib.FormatLocaleString(&string, length, format);
+//  Result := ALImageMagickLibrary.FormatLocaleString(&string, length, format);
 //end;
 
 {************************************************************************************}
 function GetLocaleInfo_(const tag: PAnsiChar; exception: PExceptionInfo): PLocaleInfo;
 begin
-  Result := ALImageMagickLib.GetLocaleInfo_(tag, exception);
+  Result := ALImageMagickLibrary.GetLocaleInfo_(tag, exception);
 end;
 
 {**********************************************************************************************************************}
 function GetLocaleInfoList(const pattern: PAnsiChar; number_messages: PSize_t; exception: PExceptionInfo): PPLocaleInfo;
 begin
-  Result := ALImageMagickLib.GetLocaleInfoList(pattern, number_messages, exception);
+  Result := ALImageMagickLibrary.GetLocaleInfoList(pattern, number_messages, exception);
 end;
 
 {****************************************************************************************************************}
 function GetLocaleList(const pattern: PAnsiChar; number_messages: PSize_t; exception: PExceptionInfo): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetLocaleList(pattern, number_messages, exception);
+  Result := ALImageMagickLibrary.GetLocaleList(pattern, number_messages, exception);
 end;
 
 {*********************************************************}
 function GetLocaleMessage(const tag: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetLocaleMessage(tag);
+  Result := ALImageMagickLibrary.GetLocaleMessage(tag);
 end;
 
 {***********************************************************************************************}
 function GetLocaleOptions(const filename: PAnsiChar; exception: PExceptionInfo): PLinkedListInfo;
 begin
-  Result := ALImageMagickLib.GetLocaleOptions(filename, exception);
+  Result := ALImageMagickLibrary.GetLocaleOptions(filename, exception);
 end;
 
 {*******************************************************************}
 //function GetLocaleValue(const locale_info: PLocaleInfo): PAnsiChar;
 //begin
-//  Result := ALImageMagickLib.GetLocaleValue(locale_info);
+//  Result := ALImageMagickLibrary.GetLocaleValue(locale_info);
 //end;
 
 {************************************************************************************}
 function InterpretLocaleValue(const &string: PAnsiChar; sentinel: PPAnsiChar): double;
 begin
-  Result := ALImageMagickLib.InterpretLocaleValue(&string, sentinel);
+  Result := ALImageMagickLibrary.InterpretLocaleValue(&string, sentinel);
 end;
 
 {**********************************************************************************}
 function ListLocaleInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListLocaleInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListLocaleInfo(&file, exception);
 end;
 
 {**********************************************************************}
 function LocaleCompare(const p: PAnsiChar; const q: PAnsiChar): Integer;
 begin
-  Result := ALImageMagickLib.LocaleCompare(p, q);
+  Result := ALImageMagickLibrary.LocaleCompare(p, q);
 end;
 
 {****************************************}
 procedure LocaleLower(&string: PAnsiChar);
 begin
-  ALImageMagickLib.LocaleLower(&string);
+  ALImageMagickLibrary.LocaleLower(&string);
 end;
 
 {**************************************************}
 function LocaleLowercase(const c: Integer): Integer;
 begin
-  Result := ALImageMagickLib.LocaleLowercase(c);
+  Result := ALImageMagickLibrary.LocaleLowercase(c);
 end;
 
 {*********************************************************************************************}
 function LocaleNCompare(const p: PAnsiChar; const q: PAnsiChar; const length: size_t): Integer;
 begin
-  Result := ALImageMagickLib.LocaleNCompare(p, q, length);
+  Result := ALImageMagickLibrary.LocaleNCompare(p, q, length);
 end;
 
 {****************************************}
 procedure LocaleUpper(&string: PAnsiChar);
 begin
-  ALImageMagickLib.LocaleUpper(&string);
+  ALImageMagickLibrary.LocaleUpper(&string);
 end;
 
 {**************************************************}
 function LocaleUppercase(const c: Integer): Integer;
 begin
-  Result := ALImageMagickLib.LocaleUppercase(c);
+  Result := ALImageMagickLibrary.LocaleUppercase(c);
 end;
 
 {$ENDREGION}
@@ -11596,79 +11598,79 @@ end;
 {*************************}
 procedure CloseMagickLog();
 begin
-  ALImageMagickLib.CloseMagickLog();
+  ALImageMagickLibrary.CloseMagickLog();
 end;
 
 {***************************************}
 function GetLogEventMask(): LogEventType;
 begin
-  Result := ALImageMagickLib.GetLogEventMask();
+  Result := ALImageMagickLibrary.GetLogEventMask();
 end;
 
 {*******************************************************************************************************************}
 function GetLogInfoList(const pattern: PAnsiChar; number_preferences: PSize_t; exception: PExceptionInfo): PPLogInfo;
 begin
-  Result := ALImageMagickLib.GetLogInfoList(pattern, number_preferences, exception);
+  Result := ALImageMagickLibrary.GetLogInfoList(pattern, number_preferences, exception);
 end;
 
 {****************************************************************************************************************}
 function GetLogList(const pattern: PAnsiChar; number_preferences: PSize_t; exception: PExceptionInfo): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetLogList(pattern, number_preferences, exception);
+  Result := ALImageMagickLibrary.GetLogList(pattern, number_preferences, exception);
 end;
 
 {*******************************}
 function GetLogName(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetLogName();
+  Result := ALImageMagickLibrary.GetLogName();
 end;
 
 {*******************************************}
 function IsEventLogging(): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsEventLogging();
+  Result := ALImageMagickLibrary.IsEventLogging();
 end;
 
 {*******************************************************************************}
 function ListLogInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListLogInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListLogInfo(&file, exception);
 end;
 
 {*********************************************************************************************************************************************************************************************}
 function LogMagickEventList(const &type: LogEventType; const module: PAnsiChar; const &function: PAnsiChar; const line: size_t; const format: PAnsiChar; operands: va_list): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.LogMagickEventList(&type, module, &function, line, format, operands);
+  Result := ALImageMagickLibrary.LogMagickEventList(&type, module, &function, line, format, operands);
 end;
 
 {************************************************************************************************************************************************************************}
 //function LogMagickEvent(const &type: LogEventType; const module: PAnsiChar; const &function: PAnsiChar; const line: size_t; const format: PAnsiChar): MagickBooleanType;
 //begin
-//  Result := ALImageMagickLib.LogMagickEvent(&type, module, &function, line, format);
+//  Result := ALImageMagickLibrary.LogMagickEvent(&type, module, &function, line, format);
 //end;
 
 {**************************************************************}
 function SetLogEventMask(const events: PAnsiChar): LogEventType;
 begin
-  Result := ALImageMagickLib.SetLogEventMask(events);
+  Result := ALImageMagickLibrary.SetLogEventMask(events);
 end;
 
 {**********************************************}
 procedure SetLogFormat(const format: PAnsiChar);
 begin
-  ALImageMagickLib.SetLogFormat(format);
+  ALImageMagickLibrary.SetLogFormat(format);
 end;
 
 {**********************************************}
 procedure SetLogMethod(method: MagickLogMethod);
 begin
-  ALImageMagickLib.SetLogMethod(method);
+  ALImageMagickLibrary.SetLogMethod(method);
 end;
 
 {****************************************************}
 function SetLogName(const name: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.SetLogName(name);
+  Result := ALImageMagickLibrary.SetLogName(name);
 end;
 
 {$ENDREGION}
@@ -11678,37 +11680,37 @@ end;
 {*****************************************************************************************************}
 function GetMagicInfo(const magic: PByte; const length: size_t; exception: PExceptionInfo): PMagicInfo;
 begin
-  Result := ALImageMagickLib.GetMagicInfo(magic, length, exception);
+  Result := ALImageMagickLibrary.GetMagicInfo(magic, length, exception);
 end;
 
 {****************************************************************}
 function GetMagicPatternExtent(exception: PExceptionInfo): size_t;
 begin
-  Result := ALImageMagickLib.GetMagicPatternExtent(exception);
+  Result := ALImageMagickLibrary.GetMagicPatternExtent(exception);
 end;
 
 {*******************************************************************************************************************}
 function GetMagicInfoList(const pattern: PAnsiChar; number_aliases: PSize_t; exception: PExceptionInfo): PPMagicInfo;
 begin
-  Result := ALImageMagickLib.GetMagicInfoList(pattern, number_aliases, exception);
+  Result := ALImageMagickLibrary.GetMagicInfoList(pattern, number_aliases, exception);
 end;
 
 {**************************************************************************************************************}
 function GetMagicList(const pattern: PAnsiChar; number_aliases: PSize_t; exception: PExceptionInfo): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagicList(pattern, number_aliases, exception);
+  Result := ALImageMagickLibrary.GetMagicList(pattern, number_aliases, exception);
 end;
 
 {*************************************************************}
 function GetMagicName(const magic_info: PMagicInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagicName(magic_info);
+  Result := ALImageMagickLibrary.GetMagicName(magic_info);
 end;
 
 {*********************************************************************************}
 function ListMagicInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListMagicInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListMagicInfo(&file, exception);
 end;
 
 {$ENDREGION}
@@ -11718,175 +11720,175 @@ end;
 {***************************************************************************************************************************}
 function AcquireMagickInfo(const magick_module: PAnsiChar; const name: PAnsiChar; const description: PAnsiChar): PMagickInfo;
 begin
-  Result := ALImageMagickLib.AcquireMagickInfo(magick_module, name, description);
+  Result := ALImageMagickLibrary.AcquireMagickInfo(magick_module, name, description);
 end;
 
 {***************************************************************************}
 function GetImageDecoder(const magick_info: PMagickInfo): DecodeImageHandler;
 begin
-  Result := ALImageMagickLib.GetImageDecoder(magick_info);
+  Result := ALImageMagickLibrary.GetImageDecoder(magick_info);
 end;
 
 {***************************************************************************}
 function GetImageEncoder(const magick_info: PMagickInfo): EncodeImageHandler;
 begin
-  Result := ALImageMagickLib.GetImageEncoder(magick_info);
+  Result := ALImageMagickLibrary.GetImageEncoder(magick_info);
 end;
 
 {*******************************************************************************************************}
 function GetImageMagick(const magick: PByte; const length: size_t; format: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetImageMagick(magick, length, format);
+  Result := ALImageMagickLibrary.GetImageMagick(magick, length, format);
 end;
 
 {**************************************************************************}
 function GetMagickAdjoin(const magick_info: PMagickInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetMagickAdjoin(magick_info);
+  Result := ALImageMagickLibrary.GetMagickAdjoin(magick_info);
 end;
 
 {*******************************************************************************}
 function GetMagickBlobSupport(const magick_info: PMagickInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetMagickBlobSupport(magick_info);
+  Result := ALImageMagickLibrary.GetMagickBlobSupport(magick_info);
 end;
 
 {*****************************************************************************************}
 function GetMagickDecoderSeekableStream(const magick_info: PMagickInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetMagickDecoderSeekableStream(magick_info);
+  Result := ALImageMagickLibrary.GetMagickDecoderSeekableStream(magick_info);
 end;
 
 {****************************************************************************************}
 function GetMagickDecoderThreadSupport(const magick_info: PMagickInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetMagickDecoderThreadSupport(magick_info);
+  Result := ALImageMagickLibrary.GetMagickDecoderThreadSupport(magick_info);
 end;
 
 {***********************************************************************}
 function GetMagickDescription(const magick_info: PMagickInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickDescription(magick_info);
+  Result := ALImageMagickLibrary.GetMagickDescription(magick_info);
 end;
 
 {*****************************************************************************************}
 function GetMagickEncoderSeekableStream(const magick_info: PMagickInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetMagickEncoderSeekableStream(magick_info);
+  Result := ALImageMagickLibrary.GetMagickEncoderSeekableStream(magick_info);
 end;
 
 {****************************************************************************************}
 function GetMagickEncoderThreadSupport(const magick_info: PMagickInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetMagickEncoderThreadSupport(magick_info);
+  Result := ALImageMagickLibrary.GetMagickEncoderThreadSupport(magick_info);
 end;
 
 {*********************************************************************************}
 function GetMagickEndianSupport(const magick_info: PMagickInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetMagickEndianSupport(magick_info);
+  Result := ALImageMagickLibrary.GetMagickEndianSupport(magick_info);
 end;
 
 {************************************************************************************}
 function GetMagickInfo(const name: PAnsiChar; exception: PExceptionInfo): PMagickInfo;
 begin
-  Result := ALImageMagickLib.GetMagickInfo(name, exception);
+  Result := ALImageMagickLibrary.GetMagickInfo(name, exception);
 end;
 
 {*********************************************************************************************************************}
 function GetMagickInfoList(const pattern: PAnsiChar; number_formats: PSize_t; exception: PExceptionInfo): PPMagickInfo;
 begin
-  Result := ALImageMagickLib.GetMagickInfoList(pattern, number_formats, exception);
+  Result := ALImageMagickLibrary.GetMagickInfoList(pattern, number_formats, exception);
 end;
 
 {***************************************************************************************************************}
 function GetMagickList(const pattern: PAnsiChar; number_formats: PSize_t; exception: PExceptionInfo): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickList(pattern, number_formats, exception);
+  Result := ALImageMagickLibrary.GetMagickList(pattern, number_formats, exception);
 end;
 
 {********************************************************************}
 function GetMagickMimeType(const magick_info: PMagickInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickMimeType(magick_info);
+  Result := ALImageMagickLibrary.GetMagickMimeType(magick_info);
 end;
 
 {**********************************************************************}
 function GetMagickModuleName(const magick_info: PMagickInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickModuleName(magick_info);
+  Result := ALImageMagickLibrary.GetMagickModuleName(magick_info);
 end;
 
 {****************************************************************}
 function GetMagickName(const magick_info: PMagickInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickName(magick_info);
+  Result := ALImageMagickLibrary.GetMagickName(magick_info);
 end;
 
 {*************************************}
 function GetMagickPrecision(): Integer;
 begin
-  Result := ALImageMagickLib.GetMagickPrecision();
+  Result := ALImageMagickLibrary.GetMagickPrecision();
 end;
 
 {******************************************************************************}
 function GetMagickRawSupport(const magick_info: PMagickInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetMagickRawSupport(magick_info);
+  Result := ALImageMagickLibrary.GetMagickRawSupport(magick_info);
 end;
 
 {***************************************************************************}
 function GetMagickStealth(const magick_info: PMagickInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetMagickStealth(magick_info);
+  Result := ALImageMagickLibrary.GetMagickStealth(magick_info);
 end;
 
 {********************************************************************************}
 function GetMagickUseExtension(const magick_info: PMagickInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetMagickUseExtension(magick_info);
+  Result := ALImageMagickLibrary.GetMagickUseExtension(magick_info);
 end;
 
 {**********************************************************************************}
 function ListMagickInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListMagickInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListMagickInfo(&file, exception);
 end;
 
 {*****************************************************}
 function IsMagickCoreInstantiated(): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsMagickCoreInstantiated();
+  Result := ALImageMagickLibrary.IsMagickCoreInstantiated();
 end;
 
 {*****************************************************************************************************}
 procedure MagickCoreGenesis(const path: PAnsiChar; const establish_signal_handlers: MagickBooleanType);
 begin
-  ALImageMagickLib.MagickCoreGenesis(path, establish_signal_handlers);
+  ALImageMagickLibrary.MagickCoreGenesis(path, establish_signal_handlers);
 end;
 
 {*****************************}
 procedure MagickCoreTerminus();
 begin
-  ALImageMagickLib.MagickCoreTerminus();
+  ALImageMagickLibrary.MagickCoreTerminus();
 end;
 
 {***********************************************************************}
 function RegisterMagickInfo(magick_info: PMagickInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.RegisterMagickInfo(magick_info);
+  Result := ALImageMagickLibrary.RegisterMagickInfo(magick_info);
 end;
 
 {*************************************************************}
 function SetMagickPrecision(const precision: Integer): Integer;
 begin
-  Result := ALImageMagickLib.SetMagickPrecision(precision);
+  Result := ALImageMagickLibrary.SetMagickPrecision(precision);
 end;
 
 {**********************************************************************}
 function UnregisterMagickInfo(const name: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.UnregisterMagickInfo(name);
+  Result := ALImageMagickLibrary.UnregisterMagickInfo(name);
 end;
 
 {$ENDREGION}
@@ -11896,61 +11898,61 @@ end;
 {**********************************************************************************************************************************}
 function AcquireMatrixInfo(const columns: size_t; const rows: size_t; const stride: size_t; exception: PExceptionInfo): PMatrixInfo;
 begin
-  Result := ALImageMagickLib.AcquireMatrixInfo(columns, rows, stride, exception);
+  Result := ALImageMagickLibrary.AcquireMatrixInfo(columns, rows, stride, exception);
 end;
 
 {************************************************************************************}
 function AcquireMagickMatrix(const number_rows: size_t; const size: size_t): PPDouble;
 begin
-  Result := ALImageMagickLib.AcquireMagickMatrix(number_rows, size);
+  Result := ALImageMagickLibrary.AcquireMagickMatrix(number_rows, size);
 end;
 
 {****************************************************************}
 function DestroyMatrixInfo(matrix_info: PMatrixInfo): PMatrixInfo;
 begin
-  Result := ALImageMagickLib.DestroyMatrixInfo(matrix_info);
+  Result := ALImageMagickLibrary.DestroyMatrixInfo(matrix_info);
 end;
 
 {****************************************************************}
 function GetMatrixColumns(const matrix_info: PMatrixInfo): size_t;
 begin
-  Result := ALImageMagickLib.GetMatrixColumns(matrix_info);
+  Result := ALImageMagickLibrary.GetMatrixColumns(matrix_info);
 end;
 
 {*****************************************************************************************************************************}
 function GetMatrixElement(const matrix_info: PMatrixInfo; const x: ssize_t; const y: ssize_t; value: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetMatrixElement(matrix_info, x, y, value);
+  Result := ALImageMagickLibrary.GetMatrixElement(matrix_info, x, y, value);
 end;
 
 {*************************************************************}
 function GetMatrixRows(const matrix_info: PMatrixInfo): size_t;
 begin
-  Result := ALImageMagickLib.GetMatrixRows(matrix_info);
+  Result := ALImageMagickLibrary.GetMatrixRows(matrix_info);
 end;
 
 {****************************************************************************************}
 function MatrixToImage(const matrix_info: PMatrixInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.MatrixToImage(matrix_info, exception);
+  Result := ALImageMagickLibrary.MatrixToImage(matrix_info, exception);
 end;
 
 {***************************************************************}
 function NullMatrix(matrix_info: PMatrixInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.NullMatrix(matrix_info);
+  Result := ALImageMagickLibrary.NullMatrix(matrix_info);
 end;
 
 {*************************************************************************************}
 function RelinquishMagickMatrix(matrix: PPDouble; const number_rows: size_t): PPDouble;
 begin
-  Result := ALImageMagickLib.RelinquishMagickMatrix(matrix, number_rows);
+  Result := ALImageMagickLibrary.RelinquishMagickMatrix(matrix, number_rows);
 end;
 
 {***********************************************************************************************************************************}
 function SetMatrixElement(const matrix_info: PMatrixInfo; const x: ssize_t; const y: ssize_t; const value: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetMatrixElement(matrix_info, x, y, value);
+  Result := ALImageMagickLibrary.SetMatrixElement(matrix_info, x, y, value);
 end;
 
 {$ENDREGION}
@@ -11960,115 +11962,115 @@ end;
 {*************************************************************************}
 procedure AcquireAlignedMemory(const count: size_t; const quantum: size_t);
 begin
-  ALImageMagickLib.AcquireAlignedMemory(count, quantum);
+  ALImageMagickLibrary.AcquireAlignedMemory(count, quantum);
 end;
 
 {************************************************}
 procedure AcquireMagickMemory(const size: size_t);
 begin
-  ALImageMagickLib.AcquireMagickMemory(size);
+  ALImageMagickLibrary.AcquireMagickMemory(size);
 end;
 
 {**************************************************}
 procedure AcquireCriticalMemory(const size: size_t);
 begin
-  ALImageMagickLib.AcquireCriticalMemory(size);
+  ALImageMagickLibrary.AcquireCriticalMemory(size);
 end;
 
 {*************************************************************************}
 procedure AcquireQuantumMemory(const count: size_t; const quantum: size_t);
 begin
-  ALImageMagickLib.AcquireQuantumMemory(count, quantum);
+  ALImageMagickLibrary.AcquireQuantumMemory(count, quantum);
 end;
 
 {*************************************************************************************}
 function AcquireVirtualMemory(const count: size_t; const quantum: size_t): PMemoryInfo;
 begin
-  Result := ALImageMagickLib.AcquireVirtualMemory(count, quantum);
+  Result := ALImageMagickLibrary.AcquireVirtualMemory(count, quantum);
 end;
 
 {**************************************************************************************}
 procedure CopyMagickMemory(destination: PVoid; const source: PVoid; const size: size_t);
 begin
-  ALImageMagickLib.CopyMagickMemory(destination, source, size);
+  ALImageMagickLibrary.CopyMagickMemory(destination, source, size);
 end;
 
 {******************************}
 procedure DestroyMagickMemory();
 begin
-  ALImageMagickLib.DestroyMagickMemory();
+  ALImageMagickLibrary.DestroyMagickMemory();
 end;
 
 {***********************************************************************************************************************************************************************}
 procedure GetMagickMemoryMethods(acquire_memory_handler: AcquireMemoryHandler; resize_memory_handler: ResizeMemoryHandler; destroy_memory_handler: DestroyMemoryHandler);
 begin
-  ALImageMagickLib.GetMagickMemoryMethods(acquire_memory_handler, resize_memory_handler, destroy_memory_handler);
+  ALImageMagickLibrary.GetMagickMemoryMethods(acquire_memory_handler, resize_memory_handler, destroy_memory_handler);
 end;
 
 {*************************************}
 function GetMaxMemoryRequest(): size_t;
 begin
-  Result := ALImageMagickLib.GetMaxMemoryRequest();
+  Result := ALImageMagickLibrary.GetMaxMemoryRequest();
 end;
 
 {***********************************}
 function GetMaxProfileSize(): size_t;
 begin
-  Result := ALImageMagickLib.GetMaxProfileSize();
+  Result := ALImageMagickLibrary.GetMaxProfileSize();
 end;
 
 {*************************************************************}
 procedure GetVirtualMemoryBlob(const memory_info: PMemoryInfo);
 begin
-  ALImageMagickLib.GetVirtualMemoryBlob(memory_info);
+  ALImageMagickLibrary.GetVirtualMemoryBlob(memory_info);
 end;
 
 {***********************************************}
 procedure RelinquishAlignedMemory(memory: PVoid);
 begin
-  ALImageMagickLib.RelinquishAlignedMemory(memory);
+  ALImageMagickLibrary.RelinquishAlignedMemory(memory);
 end;
 
 {**********************************************}
 procedure RelinquishMagickMemory(memory: PVoid);
 begin
-  ALImageMagickLib.RelinquishMagickMemory(memory);
+  ALImageMagickLibrary.RelinquishMagickMemory(memory);
 end;
 
 {**********************************************************************}
 function RelinquishVirtualMemory(memory_info: PMemoryInfo): PMemoryInfo;
 begin
-  Result := ALImageMagickLib.RelinquishVirtualMemory(memory_info);
+  Result := ALImageMagickLibrary.RelinquishVirtualMemory(memory_info);
 end;
 
 {*************************************************************************}
 procedure ResetMagickMemory(memory: PVoid; c: Integer; const size: size_t);
 begin
-  ALImageMagickLib.ResetMagickMemory(memory, c, size);
+  ALImageMagickLibrary.ResetMagickMemory(memory, c, size);
 end;
 
 {**************************************************************}
 procedure ResizeMagickMemory(memory: PVoid; const size: size_t);
 begin
-  ALImageMagickLib.ResizeMagickMemory(memory, size);
+  ALImageMagickLibrary.ResizeMagickMemory(memory, size);
 end;
 
 {***************************************************************************************}
 procedure ResizeQuantumMemory(memory: PVoid; const count: size_t; const quantum: size_t);
 begin
-  ALImageMagickLib.ResizeQuantumMemory(memory, count, quantum);
+  ALImageMagickLibrary.ResizeQuantumMemory(memory, count, quantum);
 end;
 
 {**********************************************************************************************************************************************************************}
 procedure SetMagickAlignedMemoryMethods(acquire_aligned_memory_handler: AcquireAlignedMemoryHandler; relinquish_aligned_memory_handler: RelinquishAlignedMemoryHandler);
 begin
-  ALImageMagickLib.SetMagickAlignedMemoryMethods(acquire_aligned_memory_handler, relinquish_aligned_memory_handler);
+  ALImageMagickLibrary.SetMagickAlignedMemoryMethods(acquire_aligned_memory_handler, relinquish_aligned_memory_handler);
 end;
 
 {***********************************************************************************************************************************************************************}
 procedure SetMagickMemoryMethods(acquire_memory_handler: AcquireMemoryHandler; resize_memory_handler: ResizeMemoryHandler; destroy_memory_handler: DestroyMemoryHandler);
 begin
-  ALImageMagickLib.SetMagickMemoryMethods(acquire_memory_handler, resize_memory_handler, destroy_memory_handler);
+  ALImageMagickLibrary.SetMagickMemoryMethods(acquire_memory_handler, resize_memory_handler, destroy_memory_handler);
 end;
 
 {$ENDREGION}
@@ -12078,49 +12080,49 @@ end;
 {*************************************************************************************************}
 //function AcquireMimeCache(const filename: PAnsiChar; exception: PExceptionInfo): PLinkedListInfo;
 //begin
-//  Result := ALImageMagickLib.AcquireMimeCache(filename, exception);
+//  Result := ALImageMagickLibrary.AcquireMimeCache(filename, exception);
 //end;
 
 {******************************************************************************************************************************}
 function GetMimeInfo(const filename: PAnsiChar; const magic: PByte; const length: size_t; exception: PExceptionInfo): PMimeInfo;
 begin
-  Result := ALImageMagickLib.GetMimeInfo(filename, magic, length, exception);
+  Result := ALImageMagickLibrary.GetMimeInfo(filename, magic, length, exception);
 end;
 
 {*****************************************************************************************************************}
 function GetMimeInfoList(const pattern: PAnsiChar; number_aliases: PSize_t; exception: PExceptionInfo): PPMimeInfo;
 begin
-  Result := ALImageMagickLib.GetMimeInfoList(pattern, number_aliases, exception);
+  Result := ALImageMagickLibrary.GetMimeInfoList(pattern, number_aliases, exception);
 end;
 
 {*************************************************************************************************************}
 function GetMimeList(const pattern: PAnsiChar; number_aliases: PSize_t; exception: PExceptionInfo): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMimeList(pattern, number_aliases, exception);
+  Result := ALImageMagickLibrary.GetMimeList(pattern, number_aliases, exception);
 end;
 
 {*****************************************************************}
 function GetMimeDescription(const mime_info: PMimeInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMimeDescription(mime_info);
+  Result := ALImageMagickLibrary.GetMimeDescription(mime_info);
 end;
 
 {**********************************************************}
 function GetMimeType(const mime_info: PMimeInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMimeType(mime_info);
+  Result := ALImageMagickLibrary.GetMimeType(mime_info);
 end;
 
 {********************************************************************************}
 function ListMimeInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListMimeInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListMimeInfo(&file, exception);
 end;
 
 {********************************************************}
 function MagickToMime(const magick: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickToMime(magick);
+  Result := ALImageMagickLibrary.MagickToMime(magick);
 end;
 
 {$ENDREGION}
@@ -12130,43 +12132,43 @@ end;
 {*************************************************************************************}
 //function AcquireModuleInfo(const path: PAnsiChar; const tag: PAnsiChar): PModuleInfo;
 //begin
-//  Result := ALImageMagickLib.AcquireModuleInfo(path, tag);
+//  Result := ALImageMagickLibrary.AcquireModuleInfo(path, tag);
 //end;
 
 {****************************}
 procedure DestroyModuleList();
 begin
-  ALImageMagickLib.DestroyModuleList();
+  ALImageMagickLibrary.DestroyModuleList();
 end;
 
 {***********************************************************************************}
 function GetModuleInfo(const tag: PAnsiChar; exception: PExceptionInfo): PModuleInfo;
 begin
-  Result := ALImageMagickLib.GetModuleInfo(tag, exception);
+  Result := ALImageMagickLibrary.GetModuleInfo(tag, exception);
 end;
 
 {*********************************************************************************************************************}
 function GetModuleInfoList(const pattern: PAnsiChar; number_modules: PSize_t; exception: PExceptionInfo): PPModuleInfo;
 begin
-  Result := ALImageMagickLib.GetModuleInfoList(pattern, number_modules, exception);
+  Result := ALImageMagickLibrary.GetModuleInfoList(pattern, number_modules, exception);
 end;
 
 {**********************************************************************************************************************************************}
 function GetModuleList(const pattern: PAnsiChar; const &type: MagickModuleType; number_modules: PSize_t; exception: PExceptionInfo): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetModuleList(pattern, &type, number_modules, exception);
+  Result := ALImageMagickLibrary.GetModuleList(pattern, &type, number_modules, exception);
 end;
 
 {******************************************************************************************************************************************************************}
 function InvokeDynamicImageFilter(const tag: PAnsiChar; images: PPImage; const argc: Integer; const argv: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.InvokeDynamicImageFilter(tag, images, argc, argv, exception);
+  Result := ALImageMagickLibrary.InvokeDynamicImageFilter(tag, images, argc, argv, exception);
 end;
 
 {**********************************************************************************}
 function ListModuleInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListModuleInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListModuleInfo(&file, exception);
 end;
 
 {$ENDREGION}
@@ -12176,19 +12178,19 @@ end;
 {****************************************************************************************************************************************************}
 function SetImageProgress(const image: PImage; const tag: PAnsiChar; const offset: MagickOffsetType; const extent: MagickSizeType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageProgress(image, tag, offset, extent);
+  Result := ALImageMagickLibrary.SetImageProgress(image, tag, offset, extent);
 end;
 
 {****************************************************************************************************************************************}
 function SetImageProgressMonitor(image: PImage; const progress_monitor: MagickProgressMonitor; client_data: PVoid): MagickProgressMonitor;
 begin
-  Result := ALImageMagickLib.SetImageProgressMonitor(image, progress_monitor, client_data);
+  Result := ALImageMagickLibrary.SetImageProgressMonitor(image, progress_monitor, client_data);
 end;
 
 {*****************************************************************************************************************************************************}
 function SetImageInfoProgressMonitor(image_info: PImageInfo; const progress_monitor: MagickProgressMonitor; client_data: PVoid): MagickProgressMonitor;
 begin
-  Result := ALImageMagickLib.SetImageInfoProgressMonitor(image_info, progress_monitor, client_data);
+  Result := ALImageMagickLibrary.SetImageInfoProgressMonitor(image_info, progress_monitor, client_data);
 end;
 
 {$ENDREGION}
@@ -12198,31 +12200,31 @@ end;
 {******************************************************************************************************}
 function CloneMontageInfo(const image_info: PImageInfo; const montage_info: PMontageInfo): PMontageInfo;
 begin
-  Result := ALImageMagickLib.CloneMontageInfo(image_info, montage_info);
+  Result := ALImageMagickLibrary.CloneMontageInfo(image_info, montage_info);
 end;
 
 {********************************************************************}
 function DestroyMontageInfo(montage_info: PMontageInfo): PMontageInfo;
 begin
-  Result := ALImageMagickLib.DestroyMontageInfo(montage_info);
+  Result := ALImageMagickLibrary.DestroyMontageInfo(montage_info);
 end;
 
 {*********************************************************************************}
 procedure GetMontageInfo(const image_info: PImageInfo; montage_info: PMontageInfo);
 begin
-  ALImageMagickLib.GetMontageInfo(image_info, montage_info);
+  ALImageMagickLibrary.GetMontageInfo(image_info, montage_info);
 end;
 
 {****************************************************************************************************************}
 function MontageImages(const images: PImage; const montage_info: PMontageInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.MontageImages(images, montage_info, exception);
+  Result := ALImageMagickLibrary.MontageImages(images, montage_info, exception);
 end;
 
 {*************************************************************************************************************************************************}
 function MontageImageList(const image_info: PImageInfo; const montage_info: PMontageInfo; const images: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.MontageImageList(image_info, montage_info, images, exception);
+  Result := ALImageMagickLibrary.MontageImageList(image_info, montage_info, images, exception);
 end;
 
 {$ENDREGION}
@@ -12232,49 +12234,49 @@ end;
 {*************************************************************************************************}
 function AcquireKernelInfo(const kernel_string: PAnsiChar; exception: PExceptionInfo): PKernelInfo;
 begin
-  Result := ALImageMagickLib.AcquireKernelInfo(kernel_string, exception);
+  Result := ALImageMagickLibrary.AcquireKernelInfo(kernel_string, exception);
 end;
 
 {****************************************************************************************************************************}
 function AcquireKernelBuiltIn(const &type: KernelInfoType; const args: PGeometryInfo; exception: PExceptionInfo): PKernelInfo;
 begin
-  Result := ALImageMagickLib.AcquireKernelBuiltIn(&type, args, exception);
+  Result := ALImageMagickLibrary.AcquireKernelBuiltIn(&type, args, exception);
 end;
 
 {***************************************************************}
 function CloneKernelInfo(const kernel: PKernelInfo): PKernelInfo;
 begin
-  Result := ALImageMagickLib.CloneKernelInfo(kernel);
+  Result := ALImageMagickLibrary.CloneKernelInfo(kernel);
 end;
 
 {***********************************************************}
 function DestroyKernelInfo(kernel: PKernelInfo): PKernelInfo;
 begin
-  Result := ALImageMagickLib.DestroyKernelInfo(kernel);
+  Result := ALImageMagickLibrary.DestroyKernelInfo(kernel);
 end;
 
 {*********************************************************************************************************************************************************************}
 function MorphologyImage(const image: PImage; const method: MorphologyMethod; const iterations: ssize_t; const kernel: PKernelInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.MorphologyImage(image, method, iterations, kernel, exception);
+  Result := ALImageMagickLibrary.MorphologyImage(image, method, iterations, kernel, exception);
 end;
 
 {********************************************************************************}
 procedure ScaleGeometryKernelInfo(kernel: PKernelInfo; const geometry: PAnsiChar);
 begin
-  ALImageMagickLib.ScaleGeometryKernelInfo(kernel, geometry);
+  ALImageMagickLibrary.ScaleGeometryKernelInfo(kernel, geometry);
 end;
 
 {*****************************************************************************************************************}
 procedure ScaleKernelInfo(kernel: PKernelInfo; const scaling_factor: double; const normalize_flags: GeometryFlags);
 begin
-  ALImageMagickLib.ScaleKernelInfo(kernel, scaling_factor, normalize_flags);
+  ALImageMagickLibrary.ScaleKernelInfo(kernel, scaling_factor, normalize_flags);
 end;
 
 {*********************************************************************}
 procedure UnityAddKernelInfo(kernel: PKernelInfo; const scale: double);
 begin
-  ALImageMagickLib.UnityAddKernelInfo(kernel, scale);
+  ALImageMagickLibrary.UnityAddKernelInfo(kernel, scale);
 end;
 
 {$ENDREGION}
@@ -12284,7 +12286,7 @@ end;
 {***********************************************}
 function NTLongPathsEnabled(): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.NTLongPathsEnabled();
+  Result := ALImageMagickLibrary.NTLongPathsEnabled();
 end;
 
 {$ENDREGION}
@@ -12294,13 +12296,13 @@ end;
 {**********************************************************************}
 function NTIsMagickConflict(const magick: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.NTIsMagickConflict(magick);
+  Result := ALImageMagickLibrary.NTIsMagickConflict(magick);
 end;
 
 {****************************************************************************************************}
 function NTAcquireTypeCache(type_cache: PSplayTreeInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.NTAcquireTypeCache(type_cache, exception);
+  Result := ALImageMagickLibrary.NTAcquireTypeCache(type_cache, exception);
 end;
 
 {$ENDREGION}
@@ -12310,73 +12312,73 @@ end;
 {***************************************************************************}
 function GetOpenCLDeviceBenchmarkScore(const device: MagickCLDevice): double;
 begin
-  Result := ALImageMagickLib.GetOpenCLDeviceBenchmarkScore(device);
+  Result := ALImageMagickLibrary.GetOpenCLDeviceBenchmarkScore(device);
 end;
 
 {*******************************************************************************}
 function GetOpenCLDeviceEnabled(const device: MagickCLDevice): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetOpenCLDeviceEnabled(device);
+  Result := ALImageMagickLibrary.GetOpenCLDeviceEnabled(device);
 end;
 
 {********************************************************************}
 function GetOpenCLDeviceName(const device: MagickCLDevice): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetOpenCLDeviceName(device);
+  Result := ALImageMagickLibrary.GetOpenCLDeviceName(device);
 end;
 
 {**************************************************************************}
 function GetOpenCLDeviceVendorName(const device: MagickCLDevice): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetOpenCLDeviceVendorName(device);
+  Result := ALImageMagickLibrary.GetOpenCLDeviceVendorName(device);
 end;
 
 {*************************************************************************************}
 function GetOpenCLDevices(length: PSize_t; exception: PExceptionInfo): PMagickCLDevice;
 begin
-  Result := ALImageMagickLib.GetOpenCLDevices(length, exception);
+  Result := ALImageMagickLibrary.GetOpenCLDevices(length, exception);
 end;
 
 {*****************************************************************************}
 function GetOpenCLDeviceType(const device: MagickCLDevice): MagickCLDeviceType;
 begin
-  Result := ALImageMagickLib.GetOpenCLDeviceType(device);
+  Result := ALImageMagickLibrary.GetOpenCLDeviceType(device);
 end;
 
 {***********************************************************************}
 function GetOpenCLDeviceVersion(const device: MagickCLDevice): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetOpenCLDeviceVersion(device);
+  Result := ALImageMagickLibrary.GetOpenCLDeviceVersion(device);
 end;
 
 {*********************************************}
 function GetOpenCLEnabled(): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetOpenCLEnabled();
+  Result := ALImageMagickLibrary.GetOpenCLEnabled();
 end;
 
 {**********************************************************************************************************}
 function GetOpenCLKernelProfileRecords(const device: MagickCLDevice; length: PSize_t): PKernelProfileRecord;
 begin
-  Result := ALImageMagickLib.GetOpenCLKernelProfileRecords(device, length);
+  Result := ALImageMagickLibrary.GetOpenCLKernelProfileRecords(device, length);
 end;
 
 {***************************************************************************************}
 procedure SetOpenCLDeviceEnabled(device: MagickCLDevice; const value: MagickBooleanType);
 begin
-  ALImageMagickLib.SetOpenCLDeviceEnabled(device, value);
+  ALImageMagickLibrary.SetOpenCLDeviceEnabled(device, value);
 end;
 
 {**********************************************************************************************}
 procedure SetOpenCLKernelProfileEnabled(device: MagickCLDevice; const value: MagickBooleanType);
 begin
-  ALImageMagickLib.SetOpenCLKernelProfileEnabled(device, value);
+  ALImageMagickLibrary.SetOpenCLKernelProfileEnabled(device, value);
 end;
 
 {***************************************************************************}
 function SetOpenCLEnabled(const value: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetOpenCLEnabled(value);
+  Result := ALImageMagickLibrary.SetOpenCLEnabled(value);
 end;
 
 {$ENDREGION}
@@ -12386,121 +12388,121 @@ end;
 {**************************************************************************************************}
 function CloneImageOptions(image_info: PImageInfo; const clone_info: PImageInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CloneImageOptions(image_info, clone_info);
+  Result := ALImageMagickLibrary.CloneImageOptions(image_info, clone_info);
 end;
 
 {*********************************************************************************************}
 function DefineImageOption(image_info: PImageInfo; const option: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DefineImageOption(image_info, option);
+  Result := ALImageMagickLibrary.DefineImageOption(image_info, option);
 end;
 
 {*********************************************************************************************}
 function DeleteImageOption(image_info: PImageInfo; const option: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DeleteImageOption(image_info, option);
+  Result := ALImageMagickLibrary.DeleteImageOption(image_info, option);
 end;
 
 {****************************************************}
 procedure DestroyImageOptions(image_info: PImageInfo);
 begin
-  ALImageMagickLib.DestroyImageOptions(image_info);
+  ALImageMagickLibrary.DestroyImageOptions(image_info);
 end;
 
 {****************************************************************************************}
 function GetImageOption(const image_info: PImageInfo; const option: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetImageOption(image_info, option);
+  Result := ALImageMagickLibrary.GetImageOption(image_info, option);
 end;
 
 {****************************************************************************************************************************}
 function GetCommandOptionFlags(const option: CommandOption; const list: MagickBooleanType; const options: PAnsiChar): ssize_t;
 begin
-  Result := ALImageMagickLib.GetCommandOptionFlags(option, list, options);
+  Result := ALImageMagickLibrary.GetCommandOptionFlags(option, list, options);
 end;
 
 {******************************************************************}
 function GetCommandOptionInfo(const option: PAnsiChar): POptionInfo;
 begin
-  Result := ALImageMagickLib.GetCommandOptionInfo(option);
+  Result := ALImageMagickLibrary.GetCommandOptionInfo(option);
 end;
 
 {******************************************************************}
 function GetCommandOptions(const option: CommandOption): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetCommandOptions(option);
+  Result := ALImageMagickLibrary.GetCommandOptions(option);
 end;
 
 {*******************************************************************}
 function GetNextImageOption(const image_info: PImageInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetNextImageOption(image_info);
+  Result := ALImageMagickLibrary.GetNextImageOption(image_info);
 end;
 
 {*******************************************************************}
 function IsCommandOption(const option: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsCommandOption(option);
+  Result := ALImageMagickLibrary.IsCommandOption(option);
 end;
 
 {*********************************************************************************************}
 function CommandOptionToMnemonic(const option: CommandOption; const &type: ssize_t): PAnsiChar;
 begin
-  Result := ALImageMagickLib.CommandOptionToMnemonic(option, &type);
+  Result := ALImageMagickLibrary.CommandOptionToMnemonic(option, &type);
 end;
 
 {********************************************************************************************}
 function IsOptionMember(const option: PAnsiChar; const options: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsOptionMember(option, options);
+  Result := ALImageMagickLibrary.IsOptionMember(option, options);
 end;
 
 {*******************************************************************************************************************}
 function ListCommandOptions(&file: PFILE; const option: CommandOption; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListCommandOptions(&file, option, exception);
+  Result := ALImageMagickLibrary.ListCommandOptions(&file, option, exception);
 end;
 
 {**************************************************************}
 function ParseChannelOption(const channels: PAnsiChar): ssize_t;
 begin
-  Result := ALImageMagickLib.ParseChannelOption(channels);
+  Result := ALImageMagickLibrary.ParseChannelOption(channels);
 end;
 
 {*************************************************************************************************************************}
 function ParseCommandOption(const option: CommandOption; const list: MagickBooleanType; const options: PAnsiChar): ssize_t;
 begin
-  Result := ALImageMagickLib.ParseCommandOption(option, list, options);
+  Result := ALImageMagickLibrary.ParseCommandOption(option, list, options);
 end;
 
 {*******************************************************************}
 function ParsePixelChannelOption(const channels: PAnsiChar): ssize_t;
 begin
-  Result := ALImageMagickLib.ParsePixelChannelOption(channels);
+  Result := ALImageMagickLibrary.ParsePixelChannelOption(channels);
 end;
 
 {*************************************************************************************}
 function RemoveImageOption(image_info: PImageInfo; const option: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.RemoveImageOption(image_info, option);
+  Result := ALImageMagickLibrary.RemoveImageOption(image_info, option);
 end;
 
 {********************************************************}
 procedure ResetImageOptions(const image_info: PImageInfo);
 begin
-  ALImageMagickLib.ResetImageOptions(image_info);
+  ALImageMagickLibrary.ResetImageOptions(image_info);
 end;
 
 {***************************************************************}
 procedure ResetImageOptionIterator(const image_info: PImageInfo);
 begin
-  ALImageMagickLib.ResetImageOptionIterator(image_info);
+  ALImageMagickLibrary.ResetImageOptionIterator(image_info);
 end;
 
 {******************************************************************************************************************}
 function SetImageOption(image_info: PImageInfo; const option: PAnsiChar; const value: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageOption(image_info, option, value);
+  Result := ALImageMagickLibrary.SetImageOption(image_info, option, value);
 end;
 
 {$ENDREGION}
@@ -12510,37 +12512,37 @@ end;
 {*********************************************************************************************************************************************************************************************************************************}
 function FloodfillPaintImage(image: PImage; const draw_info: PDrawInfo; const target: PPixelInfo; const x_offset: ssize_t; const y_offset: ssize_t; const invert: MagickBooleanType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.FloodfillPaintImage(image, draw_info, target, x_offset, y_offset, invert, exception);
+  Result := ALImageMagickLibrary.FloodfillPaintImage(image, draw_info, target, x_offset, y_offset, invert, exception);
 end;
 
 {*********************************************************************************************************************************************************************************************}
 function GradientImage(image: PImage; const &type: GradientType; const method: SpreadMethod; const stops: PStopInfo; const number_stops: size_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GradientImage(image, &type, method, stops, number_stops, exception);
+  Result := ALImageMagickLibrary.GradientImage(image, &type, method, stops, number_stops, exception);
 end;
 
 {************************************************************************************************************************}
 function OilPaintImage(const image: PImage; const radius: double; const sigma: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.OilPaintImage(image, radius, sigma, exception);
+  Result := ALImageMagickLibrary.OilPaintImage(image, radius, sigma, exception);
 end;
 
 {************************************************************************************************************************************************************************}
 function OpaquePaintImage(image: PImage; const target: PPixelInfo; const fill: PPixelInfo; const invert: MagickBooleanType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.OpaquePaintImage(image, target, fill, invert, exception);
+  Result := ALImageMagickLibrary.OpaquePaintImage(image, target, fill, invert, exception);
 end;
 
 {*****************************************************************************************************************************************************************************}
 function TransparentPaintImage(image: PImage; const target: PPixelInfo; const opacity: Quantum; const invert: MagickBooleanType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.TransparentPaintImage(image, target, opacity, invert, exception);
+  Result := ALImageMagickLibrary.TransparentPaintImage(image, target, opacity, invert, exception);
 end;
 
 {********************************************************************************************************************************************************************************************************}
 function TransparentPaintImageChroma(image: PImage; const low: PPixelInfo; const high: PPixelInfo; const opacity: Quantum; const invert: MagickBooleanType; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.TransparentPaintImageChroma(image, low, high, opacity, invert, exception);
+  Result := ALImageMagickLibrary.TransparentPaintImageChroma(image, low, high, opacity, invert, exception);
 end;
 
 {$ENDREGION}
@@ -12550,121 +12552,121 @@ end;
 {**************************************************}
 function AcquirePixelChannelMap(): PPixelChannelMap;
 begin
-  Result := ALImageMagickLib.AcquirePixelChannelMap();
+  Result := ALImageMagickLibrary.AcquirePixelChannelMap();
 end;
 
 {*****************************************************************************}
 function ClonePixelChannelMap(channel_map: PPixelChannelMap): PPixelChannelMap;
 begin
-  Result := ALImageMagickLib.ClonePixelChannelMap(channel_map);
+  Result := ALImageMagickLibrary.ClonePixelChannelMap(channel_map);
 end;
 
 {***********************************************************}
 function ClonePixelInfo(const pixel: PPixelInfo): PPixelInfo;
 begin
-  Result := ALImageMagickLib.ClonePixelInfo(pixel);
+  Result := ALImageMagickLibrary.ClonePixelInfo(pixel);
 end;
 
 {**********************************************************************************************************************}
 procedure ConformPixelInfo(image: PImage; const source: PPixelInfo; destination: PPixelInfo; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.ConformPixelInfo(image, source, destination, exception);
+  ALImageMagickLibrary.ConformPixelInfo(image, source, destination, exception);
 end;
 
 {*********************************************************************}
 function DecodePixelGamma(const pixel: MagickRealType): MagickRealType;
 begin
-  Result := ALImageMagickLib.DecodePixelGamma(pixel);
+  Result := ALImageMagickLibrary.DecodePixelGamma(pixel);
 end;
 
 {*******************************************************************************}
 function DestroyPixelChannelMap(channel_map: PPixelChannelMap): PPixelChannelMap;
 begin
-  Result := ALImageMagickLib.DestroyPixelChannelMap(channel_map);
+  Result := ALImageMagickLibrary.DestroyPixelChannelMap(channel_map);
 end;
 
 {*********************************************************************}
 function EncodePixelGamma(const pixel: MagickRealType): MagickRealType;
 begin
-  Result := ALImageMagickLib.EncodePixelGamma(pixel);
+  Result := ALImageMagickLibrary.EncodePixelGamma(pixel);
 end;
 
 {******************************************************************************************************************************************************************************************************************************************}
 function ExportImagePixels(const image: PImage; const x: ssize_t; const y: ssize_t; const width: size_t; const height: size_t; const map: PAnsiChar; const &type: StorageType; pixels: PVoid; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ExportImagePixels(image, x, y, width, height, map, &type, pixels, exception);
+  Result := ALImageMagickLibrary.ExportImagePixels(image, x, y, width, height, map, &type, pixels, exception);
 end;
 
 {*************************************************************}
 procedure GetPixelInfo(const image: PImage; pixel: PPixelInfo);
 begin
-  ALImageMagickLib.GetPixelInfo(image, pixel);
+  ALImageMagickLibrary.GetPixelInfo(image, pixel);
 end;
 
 {*******************************************************************************************}
 function GetPixelInfoIntensity(const image: PImage; const pixel: PPixelInfo): MagickRealType;
 begin
-  Result := ALImageMagickLib.GetPixelInfoIntensity(image, pixel);
+  Result := ALImageMagickLibrary.GetPixelInfoIntensity(image, pixel);
 end;
 
 {*************************************************************************************}
 function GetPixelIntensity(const image: PImage; const pixel: PQuantum): MagickRealType;
 begin
-  Result := ALImageMagickLib.GetPixelIntensity(image, pixel);
+  Result := ALImageMagickLibrary.GetPixelIntensity(image, pixel);
 end;
 
 {******************************************************************************************************************************************************************************************************************************************}
 function ImportImagePixels(image: PImage; const x: ssize_t; const y: ssize_t; const width: size_t; const height: size_t; const map: PAnsiChar; const &type: StorageType; const pixels: PVoid; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ImportImagePixels(image, x, y, width, height, map, &type, pixels, exception);
+  Result := ALImageMagickLibrary.ImportImagePixels(image, x, y, width, height, map, &type, pixels, exception);
 end;
 
 {******************************************************************************************************************************************************************************************************************************************************}
 function InterpolatePixelChannel(const image: PImage; const image_view: PCacheView_; const channel: PixelChannel; const method: PixelInterpolateMethod; const x: double; const y: double; pixel: PDouble; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.InterpolatePixelChannel(image, image_view, channel, method, x, y, pixel, exception);
+  Result := ALImageMagickLibrary.InterpolatePixelChannel(image, image_view, channel, method, x, y, pixel, exception);
 end;
 
 {********************************************************************************************************************************************************************************************************************************************************}
 function InterpolatePixelChannels(const source: PImage; const source_view: PCacheView_; const destination: PImage; const method: PixelInterpolateMethod; const x: double; const y: double; pixel: PQuantum; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.InterpolatePixelChannels(source, source_view, destination, method, x, y, pixel, exception);
+  Result := ALImageMagickLibrary.InterpolatePixelChannels(source, source_view, destination, method, x, y, pixel, exception);
 end;
 
 {*************************************************************************************************************************************************************************************************************************}
 function InterpolatePixelInfo(const image: PImage; const image_view: PCacheView_; const method: PixelInterpolateMethod; const x: double; const y: double; pixel: PPixelInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.InterpolatePixelInfo(image, image_view, method, x, y, pixel, exception);
+  Result := ALImageMagickLibrary.InterpolatePixelInfo(image, image_view, method, x, y, pixel, exception);
 end;
 
 {*****************************************************************************************************************************************}
 function IsFuzzyEquivalencePixel(const image: PImage; const p: PQuantum; const target_image: PImage; const q: PQuantum): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsFuzzyEquivalencePixel(image, p, target_image, q);
+  Result := ALImageMagickLibrary.IsFuzzyEquivalencePixel(image, p, target_image, q);
 end;
 
 {************************************************************************************************}
 function IsFuzzyEquivalencePixelInfo(const p: PPixelInfo; const q: PPixelInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsFuzzyEquivalencePixelInfo(p, q);
+  Result := ALImageMagickLibrary.IsFuzzyEquivalencePixelInfo(p, q);
 end;
 
 {****************************************************************************************}
 function SetPixelChannelMask(image: PImage; const channel_mask: ChannelType): ChannelType;
 begin
-  Result := ALImageMagickLib.SetPixelChannelMask(image, channel_mask);
+  Result := ALImageMagickLibrary.SetPixelChannelMask(image, channel_mask);
 end;
 
 {*****************************************************************************************************************************}
 function SetPixelMetaChannels(image: PImage; const number_meta_channels: size_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetPixelMetaChannels(image, number_meta_channels, exception);
+  Result := ALImageMagickLibrary.SetPixelMetaChannels(image, number_meta_channels, exception);
 end;
 
 {************************************************************************************}
 function SortImagePixels(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SortImagePixels(image, exception);
+  Result := ALImageMagickLibrary.SortImagePixels(image, exception);
 end;
 
 {$ENDREGION}
@@ -12674,43 +12676,43 @@ end;
 {**********************************************************************************************************************}
 function GetPolicyInfoList(const pattern: PAnsiChar; number_policies: PSize_t; exception: PExceptionInfo): PPPolicyInfo;
 begin
-  Result := ALImageMagickLib.GetPolicyInfoList(pattern, number_policies, exception);
+  Result := ALImageMagickLibrary.GetPolicyInfoList(pattern, number_policies, exception);
 end;
 
 {****************************************************************************************************************}
 function GetPolicyList(const pattern: PAnsiChar; number_policies: PSize_t; exception: PExceptionInfo): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetPolicyList(pattern, number_policies, exception);
+  Result := ALImageMagickLibrary.GetPolicyList(pattern, number_policies, exception);
 end;
 
 {********************************************************}
 function GetPolicyValue(const name: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetPolicyValue(name);
+  Result := ALImageMagickLibrary.GetPolicyValue(name);
 end;
 
 {*******************************************************************************************************************************}
 function IsRightsAuthorized(const domain: PolicyDomain; const rights: PolicyRights; const pattern: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsRightsAuthorized(domain, rights, pattern);
+  Result := ALImageMagickLibrary.IsRightsAuthorized(domain, rights, pattern);
 end;
 
 {**********************************************************************************}
 function ListPolicyInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListPolicyInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListPolicyInfo(&file, exception);
 end;
 
 {******************************************************************************************************}
 function SetMagickSecurityPolicy(const policy: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetMagickSecurityPolicy(policy, exception);
+  Result := ALImageMagickLibrary.SetMagickSecurityPolicy(policy, exception);
 end;
 
 {*************************************************************************************************************************************************************}
 function SetMagickSecurityPolicyValue(const domain: PolicyDomain; const name: PAnsiChar; const value: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetMagickSecurityPolicyValue(domain, name, value, exception);
+  Result := ALImageMagickLibrary.SetMagickSecurityPolicyValue(domain, name, value, exception);
 end;
 
 {$ENDREGION}
@@ -12720,7 +12722,7 @@ end;
 {*********************************************************************************}
 function GetImageTotalInkDensity(image: PImage; exception: PExceptionInfo): double;
 begin
-  Result := ALImageMagickLib.GetImageTotalInkDensity(image, exception);
+  Result := ALImageMagickLibrary.GetImageTotalInkDensity(image, exception);
 end;
 
 {$ENDREGION}
@@ -12730,73 +12732,73 @@ end;
 {***************************************************************************************}
 function CloneImageProfiles(image: PImage; const clone_image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CloneImageProfiles(image, clone_image);
+  Result := ALImageMagickLibrary.CloneImageProfiles(image, clone_image);
 end;
 
 {***********************************************************************************}
 function DeleteImageProfile(image: PImage; const name: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DeleteImageProfile(image, name);
+  Result := ALImageMagickLibrary.DeleteImageProfile(image, name);
 end;
 
 {********************************************}
 procedure DestroyImageProfiles(image: PImage);
 begin
-  ALImageMagickLib.DestroyImageProfiles(image);
+  ALImageMagickLibrary.DestroyImageProfiles(image);
 end;
 
 {********************************************************************************}
 function GetImageProfile(const image: PImage; const name: PAnsiChar): PStringInfo;
 begin
-  Result := ALImageMagickLib.GetImageProfile(image, name);
+  Result := ALImageMagickLibrary.GetImageProfile(image, name);
 end;
 
 {***********************************************************}
 function GetNextImageProfile(const image: PImage): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetNextImageProfile(image);
+  Result := ALImageMagickLibrary.GetNextImageProfile(image);
 end;
 
 {**************************************************************************************************************************************************}
 function ProfileImage(image: PImage; const name: PAnsiChar; const datum: PVoid; const length: size_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ProfileImage(image, name, datum, length, exception);
+  Result := ALImageMagickLibrary.ProfileImage(image, name, datum, length, exception);
 end;
 
 {*****************************************************************************}
 function RemoveImageProfile(image: PImage; const name: PAnsiChar): PStringInfo;
 begin
-  Result := ALImageMagickLib.RemoveImageProfile(image, name);
+  Result := ALImageMagickLibrary.RemoveImageProfile(image, name);
 end;
 
 {*******************************************************}
 procedure ResetImageProfileIterator(const image: PImage);
 begin
-  ALImageMagickLib.ResetImageProfileIterator(image);
+  ALImageMagickLibrary.ResetImageProfileIterator(image);
 end;
 
 {*********************************************************************************************************************}
 function AcquireProfileStringInfo(const name: PAnsiChar; const length: size_t; exception: PExceptionInfo): PStringInfo;
 begin
-  Result := ALImageMagickLib.AcquireProfileStringInfo(name, length, exception);
+  Result := ALImageMagickLibrary.AcquireProfileStringInfo(name, length, exception);
 end;
 
 {***************************************************************************************************************************************}
 function BlobToProfileStringInfo(const name: PAnsiChar; const blob: PVoid; const length: size_t; exception: PExceptionInfo): PStringInfo;
 begin
-  Result := ALImageMagickLib.BlobToProfileStringInfo(name, blob, length, exception);
+  Result := ALImageMagickLibrary.BlobToProfileStringInfo(name, blob, length, exception);
 end;
 
 {***************************************************************************************************************************************}
 function SetImageProfile(image: PImage; const name: PAnsiChar; const profile: PStringInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageProfile(image, name, profile, exception);
+  Result := ALImageMagickLibrary.SetImageProfile(image, name, profile, exception);
 end;
 
 {*****************************************************************************************************************}
 function SetImageProfilePrivate(image: PImage; profile: PStringInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageProfilePrivate(image, profile, exception);
+  Result := ALImageMagickLibrary.SetImageProfilePrivate(image, profile, exception);
 end;
 
 {$ENDREGION}
@@ -12806,73 +12808,73 @@ end;
 {*****************************************************************************************}
 function CloneImageProperties(image: PImage; const clone_image: PImage): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CloneImageProperties(image, clone_image);
+  Result := ALImageMagickLibrary.CloneImageProperties(image, clone_image);
 end;
 
 {********************************************************************************************************************}
 function DefineImageProperty(image: PImage; const &property: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DefineImageProperty(image, &property, exception);
+  Result := ALImageMagickLibrary.DefineImageProperty(image, &property, exception);
 end;
 
 {*****************************************************************************************}
 function DeleteImageProperty(image: PImage; const &property: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DeleteImageProperty(image, &property);
+  Result := ALImageMagickLibrary.DeleteImageProperty(image, &property);
 end;
 
 {**********************************************}
 procedure DestroyImageProperties(image: PImage);
 begin
-  ALImageMagickLib.DestroyImageProperties(image);
+  ALImageMagickLibrary.DestroyImageProperties(image);
 end;
 
 {********************************************************************************************************************}
 //function FormatImageProperty(image: PImage; const &property: PAnsiChar; const format: PAnsiChar): MagickBooleanType;
 //begin
-//  Result := ALImageMagickLib.FormatImageProperty(image, &property, format);
+//  Result := ALImageMagickLibrary.FormatImageProperty(image, &property, format);
 //end;
 
 {***************************************************************************************************************}
 function GetImageProperty(const image: PImage; const &property: PAnsiChar; exception: PExceptionInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetImageProperty(image, &property, exception);
+  Result := ALImageMagickLibrary.GetImageProperty(image, &property, exception);
 end;
 
 {**********************************************************************************************************************************}
 function GetMagickProperty(image_info: PImageInfo; image: PImage; const &property: PAnsiChar; exception: PExceptionInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickProperty(image_info, image, &property, exception);
+  Result := ALImageMagickLibrary.GetMagickProperty(image_info, image, &property, exception);
 end;
 
 {************************************************************}
 function GetNextImageProperty(const image: PImage): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetNextImageProperty(image);
+  Result := ALImageMagickLibrary.GetNextImageProperty(image);
 end;
 
 {******************************************************************************************************************************************}
 function InterpretImageProperties(image_info: PImageInfo; image: PImage; const embed_text: PAnsiChar; exception: PExceptionInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.InterpretImageProperties(image_info, image, embed_text, exception);
+  Result := ALImageMagickLibrary.InterpretImageProperties(image_info, image, embed_text, exception);
 end;
 
 {*********************************************************************************}
 function RemoveImageProperty(image: PImage; const &property: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.RemoveImageProperty(image, &property);
+  Result := ALImageMagickLibrary.RemoveImageProperty(image, &property);
 end;
 
 {********************************************************}
 procedure ResetImagePropertyIterator(const image: PImage);
 begin
-  ALImageMagickLib.ResetImagePropertyIterator(image);
+  ALImageMagickLibrary.ResetImagePropertyIterator(image);
 end;
 
 {*****************************************************************************************************************************************}
 function SetImageProperty(image: PImage; const &property: PAnsiChar; const value: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageProperty(image, &property, value, exception);
+  Result := ALImageMagickLibrary.SetImageProperty(image, &property, value, exception);
 end;
 
 {$ENDREGION}
@@ -12882,73 +12884,73 @@ end;
 {************************************************************************}
 function AcquireQuantizeInfo(const image_info: PImageInfo): PQuantizeInfo;
 begin
-  Result := ALImageMagickLib.AcquireQuantizeInfo(image_info);
+  Result := ALImageMagickLibrary.AcquireQuantizeInfo(image_info);
 end;
 
 {****************************************************************************}
 function CloneQuantizeInfo(const quantize_info: PQuantizeInfo): PQuantizeInfo;
 begin
-  Result := ALImageMagickLib.CloneQuantizeInfo(quantize_info);
+  Result := ALImageMagickLibrary.CloneQuantizeInfo(quantize_info);
 end;
 
 {******************************************************************************************}
 function CompressImageColormap(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CompressImageColormap(image, exception);
+  Result := ALImageMagickLibrary.CompressImageColormap(image, exception);
 end;
 
 {************************************************************************}
 function DestroyQuantizeInfo(quantize_info: PQuantizeInfo): PQuantizeInfo;
 begin
-  Result := ALImageMagickLib.DestroyQuantizeInfo(quantize_info);
+  Result := ALImageMagickLibrary.DestroyQuantizeInfo(quantize_info);
 end;
 
 {******************************************************************************************}
 function GetImageQuantizeError(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetImageQuantizeError(image, exception);
+  Result := ALImageMagickLibrary.GetImageQuantizeError(image, exception);
 end;
 
 {******************************************************}
 procedure GetQuantizeInfo(quantize_info: PQuantizeInfo);
 begin
-  ALImageMagickLib.GetQuantizeInfo(quantize_info);
+  ALImageMagickLibrary.GetQuantizeInfo(quantize_info);
 end;
 
 {********************************************************************************************************************************************************************}
 function KmeansImage(image: PImage; const number_colors: size_t; const max_iterations: size_t; const tolerance: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.KmeansImage(image, number_colors, max_iterations, tolerance, exception);
+  Result := ALImageMagickLibrary.KmeansImage(image, number_colors, max_iterations, tolerance, exception);
 end;
 
 {********************************************************************************************************************************************}
 function PosterizeImage(image: PImage; const levels: size_t; const dither_method: DitherMethod; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PosterizeImage(image, levels, dither_method, exception);
+  Result := ALImageMagickLibrary.PosterizeImage(image, levels, dither_method, exception);
 end;
 
 {**********************************************************************************************************************}
 function QuantizeImage(const quantize_info: PQuantizeInfo; image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.QuantizeImage(quantize_info, image, exception);
+  Result := ALImageMagickLibrary.QuantizeImage(quantize_info, image, exception);
 end;
 
 {************************************************************************************************************************}
 function QuantizeImages(const quantize_info: PQuantizeInfo; images: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.QuantizeImages(quantize_info, images, exception);
+  Result := ALImageMagickLibrary.QuantizeImages(quantize_info, images, exception);
 end;
 
 {**********************************************************************************************************************************************}
 function RemapImage(const quantize_info: PQuantizeInfo; image: PImage; const remap_image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.RemapImage(quantize_info, image, remap_image, exception);
+  Result := ALImageMagickLibrary.RemapImage(quantize_info, image, remap_image, exception);
 end;
 
 {************************************************************************************************************************************************}
 function RemapImages(const quantize_info: PQuantizeInfo; images: PImage; const remap_image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.RemapImages(quantize_info, images, remap_image, exception);
+  Result := ALImageMagickLibrary.RemapImages(quantize_info, images, remap_image, exception);
 end;
 
 {$ENDREGION}
@@ -12958,7 +12960,7 @@ end;
 {***************************************************************************************************************************************************************************************}
 function ExportQuantumPixels(const image: PImage; image_view: PCacheView; quantum_info: PQuantumInfo; const quantum_type: QuantumType; pixels: PByte; exception: PExceptionInfo): size_t;
 begin
-  Result := ALImageMagickLib.ExportQuantumPixels(image, image_view, quantum_info, quantum_type, pixels, exception);
+  Result := ALImageMagickLibrary.ExportQuantumPixels(image, image_view, quantum_info, quantum_type, pixels, exception);
 end;
 
 {$ENDREGION}
@@ -12968,7 +12970,7 @@ end;
 {*********************************************************************************************************************************************************************************************}
 function ImportQuantumPixels(const image: PImage; image_view: PCacheView; quantum_info: PQuantumInfo; const quantum_type: QuantumType; const pixels: PByte; exception: PExceptionInfo): size_t;
 begin
-  Result := ALImageMagickLib.ImportQuantumPixels(image, image_view, quantum_info, quantum_type, pixels, exception);
+  Result := ALImageMagickLibrary.ImportQuantumPixels(image, image_view, quantum_info, quantum_type, pixels, exception);
 end;
 
 {$ENDREGION}
@@ -12978,115 +12980,115 @@ end;
 {*************************************************************************************}
 function AcquireQuantumInfo(const image_info: PImageInfo; image: PImage): PQuantumInfo;
 begin
-  Result := ALImageMagickLib.AcquireQuantumInfo(image_info, image);
+  Result := ALImageMagickLibrary.AcquireQuantumInfo(image_info, image);
 end;
 
 {********************************************************************}
 function DestroyQuantumInfo(quantum_info: PQuantumInfo): PQuantumInfo;
 begin
-  Result := ALImageMagickLib.DestroyQuantumInfo(quantum_info);
+  Result := ALImageMagickLibrary.DestroyQuantumInfo(quantum_info);
 end;
 
 {************************************************************************************************************************}
 function GetQuantumExtent(const image: PImage; const quantum_info: PQuantumInfo; const quantum_type: QuantumType): size_t;
 begin
-  Result := ALImageMagickLib.GetQuantumExtent(image, quantum_info, quantum_type);
+  Result := ALImageMagickLibrary.GetQuantumExtent(image, quantum_info, quantum_type);
 end;
 
 {**********************************************************************}
 function GetQuantumEndian(const quantum_info: PQuantumInfo): EndianType;
 begin
-  Result := ALImageMagickLib.GetQuantumEndian(quantum_info);
+  Result := ALImageMagickLibrary.GetQuantumEndian(quantum_info);
 end;
 
 {*****************************************************************************}
 function GetQuantumFormat(const quantum_info: PQuantumInfo): QuantumFormatType;
 begin
-  Result := ALImageMagickLib.GetQuantumFormat(quantum_info);
+  Result := ALImageMagickLibrary.GetQuantumFormat(quantum_info);
 end;
 
 {*********************************************************************************}
 procedure GetQuantumInfo(const image_info: PImageInfo; quantum_info: PQuantumInfo);
 begin
-  ALImageMagickLib.GetQuantumInfo(image_info, quantum_info);
+  ALImageMagickLibrary.GetQuantumInfo(image_info, quantum_info);
 end;
 
 {*****************************************************************}
 function GetQuantumPixels(const quantum_info: PQuantumInfo): PByte;
 begin
-  Result := ALImageMagickLib.GetQuantumPixels(quantum_info);
+  Result := ALImageMagickLibrary.GetQuantumPixels(quantum_info);
 end;
 
 {*****************************************************************************}
 function GetQuantumType(image: PImage; exception: PExceptionInfo): QuantumType;
 begin
-  Result := ALImageMagickLib.GetQuantumType(image, exception);
+  Result := ALImageMagickLibrary.GetQuantumType(image, exception);
 end;
 
 {***************************************************************************************}
 procedure SetQuantumAlphaType(quantum_info: PQuantumInfo; const &type: QuantumAlphaType);
 begin
-  ALImageMagickLib.SetQuantumAlphaType(quantum_info, &type);
+  ALImageMagickLibrary.SetQuantumAlphaType(quantum_info, &type);
 end;
 
 {****************************************************************************************************************}
 function SetQuantumDepth(const image: PImage; quantum_info: PQuantumInfo; const depth: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetQuantumDepth(image, quantum_info, depth);
+  Result := ALImageMagickLibrary.SetQuantumDepth(image, quantum_info, depth);
 end;
 
 {**********************************************************************************************************************}
 function SetQuantumEndian(const image: PImage; quantum_info: PQuantumInfo; const endian: EndianType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetQuantumEndian(image, quantum_info, endian);
+  Result := ALImageMagickLibrary.SetQuantumEndian(image, quantum_info, endian);
 end;
 
 {*****************************************************************************************************************************}
 function SetQuantumFormat(const image: PImage; quantum_info: PQuantumInfo; const format: QuantumFormatType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetQuantumFormat(image, quantum_info, format);
+  Result := ALImageMagickLibrary.SetQuantumFormat(image, quantum_info, format);
 end;
 
 {****************************************************************************}
 procedure SetQuantumImageType(image: PImage; const quantum_type: QuantumType);
 begin
-  ALImageMagickLib.SetQuantumImageType(image, quantum_type);
+  ALImageMagickLibrary.SetQuantumImageType(image, quantum_type);
 end;
 
 {******************************************************************************************************************************}
 function SetQuantumMetaChannel(const image: PImage; quantum_info: PQuantumInfo; const meta_channel: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetQuantumMetaChannel(image, quantum_info, meta_channel);
+  Result := ALImageMagickLibrary.SetQuantumMetaChannel(image, quantum_info, meta_channel);
 end;
 
 {**********************************************************************************}
 procedure SetQuantumPack(quantum_info: PQuantumInfo; const pack: MagickBooleanType);
 begin
-  ALImageMagickLib.SetQuantumPack(quantum_info, pack);
+  ALImageMagickLibrary.SetQuantumPack(quantum_info, pack);
 end;
 
 {************************************************************************************************************}
 function SetQuantumPad(const image: PImage; quantum_info: PQuantumInfo; const pad: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetQuantumPad(image, quantum_info, pad);
+  Result := ALImageMagickLibrary.SetQuantumPad(image, quantum_info, pad);
 end;
 
 {************************************************************************************************}
 procedure SetQuantumMinIsWhite(quantum_info: PQuantumInfo; const min_is_white: MagickBooleanType);
 begin
-  ALImageMagickLib.SetQuantumMinIsWhite(quantum_info, min_is_white);
+  ALImageMagickLibrary.SetQuantumMinIsWhite(quantum_info, min_is_white);
 end;
 
 {*****************************************************************************}
 procedure SetQuantumQuantum(quantum_info: PQuantumInfo; const quantum: size_t);
 begin
-  ALImageMagickLib.SetQuantumQuantum(quantum_info, quantum);
+  ALImageMagickLibrary.SetQuantumQuantum(quantum_info, quantum);
 end;
 
 {*************************************************************************}
 procedure SetQuantumScale(quantum_info: PQuantumInfo; const scale: double);
 begin
-  ALImageMagickLib.SetQuantumScale(quantum_info, scale);
+  ALImageMagickLibrary.SetQuantumScale(quantum_info, scale);
 end;
 
 {$ENDREGION}
@@ -13096,55 +13098,55 @@ end;
 {****************************************}
 function AcquireRandomInfo(): PRandomInfo;
 begin
-  Result := ALImageMagickLib.AcquireRandomInfo();
+  Result := ALImageMagickLibrary.AcquireRandomInfo();
 end;
 
 {****************************************************************}
 function DestroyRandomInfo(random_info: PRandomInfo): PRandomInfo;
 begin
-  Result := ALImageMagickLib.DestroyRandomInfo(random_info);
+  Result := ALImageMagickLibrary.DestroyRandomInfo(random_info);
 end;
 
 {**************************************************************}
 function GetPseudoRandomValue(random_info: PRandomInfo): double;
 begin
-  Result := ALImageMagickLib.GetPseudoRandomValue(random_info);
+  Result := ALImageMagickLibrary.GetPseudoRandomValue(random_info);
 end;
 
 {*********************************************************************************}
 function GetRandomKey(random_info: PRandomInfo; const length: size_t): PStringInfo;
 begin
-  Result := ALImageMagickLib.GetRandomKey(random_info, length);
+  Result := ALImageMagickLibrary.GetRandomKey(random_info, length);
 end;
 
 {********************************************************************}
 function GetRandomSecretKey(const random_info: PRandomInfo): LongWord;
 begin
-  Result := ALImageMagickLib.GetRandomSecretKey(random_info);
+  Result := ALImageMagickLibrary.GetRandomSecretKey(random_info);
 end;
 
 {********************************************************}
 function GetRandomValue(random_info: PRandomInfo): double;
 begin
-  Result := ALImageMagickLib.GetRandomValue(random_info);
+  Result := ALImageMagickLibrary.GetRandomValue(random_info);
 end;
 
 {*********************************************************************************}
 procedure SetRandomKey(random_info: PRandomInfo; const length: size_t; key: PByte);
 begin
-  ALImageMagickLib.SetRandomKey(random_info, length, key);
+  ALImageMagickLibrary.SetRandomKey(random_info, length, key);
 end;
 
 {************************************************}
 procedure SetRandomSecretKey(const key: LongWord);
 begin
-  ALImageMagickLib.SetRandomSecretKey(key);
+  ALImageMagickLibrary.SetRandomSecretKey(key);
 end;
 
 {******************************************************************}
 procedure SetRandomTrueRandom(const true_random: MagickBooleanType);
 begin
-  ALImageMagickLib.SetRandomTrueRandom(true_random);
+  ALImageMagickLibrary.SetRandomTrueRandom(true_random);
 end;
 
 {$ENDREGION}
@@ -13154,43 +13156,43 @@ end;
 {*****************************************************************************************************************************}
 function DefineImageRegistry(const &type: RegistryType; const option: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DefineImageRegistry(&type, option, exception);
+  Result := ALImageMagickLibrary.DefineImageRegistry(&type, option, exception);
 end;
 
 {********************************************************************}
 function DeleteImageRegistry(const key: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DeleteImageRegistry(key);
+  Result := ALImageMagickLibrary.DeleteImageRegistry(key);
 end;
 
 {*****************************************************************************************************}
 procedure GetImageRegistry(const &type: RegistryType; const key: PAnsiChar; exception: PExceptionInfo);
 begin
-  ALImageMagickLib.GetImageRegistry(&type, key, exception);
+  ALImageMagickLibrary.GetImageRegistry(&type, key, exception);
 end;
 
 {*****************************************}
 function GetNextImageRegistry(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetNextImageRegistry();
+  Result := ALImageMagickLibrary.GetNextImageRegistry();
 end;
 
 {**************************************************}
 procedure RemoveImageRegistry(const key: PAnsiChar);
 begin
-  ALImageMagickLib.RemoveImageRegistry(key);
+  ALImageMagickLibrary.RemoveImageRegistry(key);
 end;
 
 {*************************************}
 procedure ResetImageRegistryIterator();
 begin
-  ALImageMagickLib.ResetImageRegistryIterator();
+  ALImageMagickLibrary.ResetImageRegistryIterator();
 end;
 
 {*******************************************************************************************************************************************}
 function SetImageRegistry(const &type: RegistryType; const key: PAnsiChar; const value: PVoid; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetImageRegistry(&type, key, value, exception);
+  Result := ALImageMagickLibrary.SetImageRegistry(&type, key, value, exception);
 end;
 
 {$ENDREGION}
@@ -13200,43 +13202,43 @@ end;
 {**********************************************************************************************}
 function AcquireResampleFilter(const image: PImage; exception: PExceptionInfo): PResampleFilter;
 begin
-  Result := ALImageMagickLib.AcquireResampleFilter(image, exception);
+  Result := ALImageMagickLibrary.AcquireResampleFilter(image, exception);
 end;
 
 {********************************************************************************}
 function DestroyResampleFilter(resample_filter: PResampleFilter): PResampleFilter;
 begin
-  Result := ALImageMagickLib.DestroyResampleFilter(resample_filter);
+  Result := ALImageMagickLibrary.DestroyResampleFilter(resample_filter);
 end;
 
 {*****************************************************************************************************************************************************************}
 function ResamplePixelColor(resample_filter: PResampleFilter; const u0: double; const v0: double; pixel: PPixelInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ResamplePixelColor(resample_filter, u0, v0, pixel, exception);
+  Result := ALImageMagickLibrary.ResamplePixelColor(resample_filter, u0, v0, pixel, exception);
 end;
 
 {******************************************************************************************************************************************}
 procedure ScaleResampleFilter(resample_filter: PResampleFilter; const dux: double; const duy: double; const dvx: double; const dvy: double);
 begin
-  ALImageMagickLib.ScaleResampleFilter(resample_filter, dux, duy, dvx, dvy);
+  ALImageMagickLibrary.ScaleResampleFilter(resample_filter, dux, duy, dvx, dvy);
 end;
 
 {**************************************************************************************}
 procedure SetResampleFilter(resample_filter: PResampleFilter; const filter: FilterType);
 begin
-  ALImageMagickLib.SetResampleFilter(resample_filter, filter);
+  ALImageMagickLibrary.SetResampleFilter(resample_filter, filter);
 end;
 
 {*************************************************************************************************************************************}
 function SetResampleFilterInterpolateMethod(resample_filter: PResampleFilter; const method: PixelInterpolateMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetResampleFilterInterpolateMethod(resample_filter, method);
+  Result := ALImageMagickLibrary.SetResampleFilterInterpolateMethod(resample_filter, method);
 end;
 
 {**********************************************************************************************************************************}
 function SetResampleFilterVirtualPixelMethod(resample_filter: PResampleFilter; const method: VirtualPixelMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetResampleFilterVirtualPixelMethod(resample_filter, method);
+  Result := ALImageMagickLibrary.SetResampleFilterVirtualPixelMethod(resample_filter, method);
 end;
 
 {$ENDREGION}
@@ -13246,61 +13248,61 @@ end;
 {******************************************************************************************************************************}
 function AdaptiveResizeImage(const image: PImage; const columns: size_t; const rows: size_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.AdaptiveResizeImage(image, columns, rows, exception);
+  Result := ALImageMagickLibrary.AdaptiveResizeImage(image, columns, rows, exception);
 end;
 
 {*************************************************************************************************************************************************************************}
 function InterpolativeResizeImage(const image: PImage; const columns: size_t; const rows: size_t; const method: PixelInterpolateMethod; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.InterpolativeResizeImage(image, columns, rows, method, exception);
+  Result := ALImageMagickLibrary.InterpolativeResizeImage(image, columns, rows, method, exception);
 end;
 
 {****************************************************************************************************************************************************************************}
 function LiquidRescaleImage(const image: PImage; const columns: size_t; const rows: size_t; const delta_x: double; const rigidity: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.LiquidRescaleImage(image, columns, rows, delta_x, rigidity, exception);
+  Result := ALImageMagickLibrary.LiquidRescaleImage(image, columns, rows, delta_x, rigidity, exception);
 end;
 
 {****************************************************************************}
 function MagnifyImage(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.MagnifyImage(image, exception);
+  Result := ALImageMagickLibrary.MagnifyImage(image, exception);
 end;
 
 {***************************************************************************}
 function MinifyImage(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.MinifyImage(image, exception);
+  Result := ALImageMagickLibrary.MinifyImage(image, exception);
 end;
 
 {***************************************************************************************************************************************************************}
 function ResampleImage(const image: PImage; const x_resolution: double; const y_resolution: double; const filter: FilterType; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ResampleImage(image, x_resolution, y_resolution, filter, exception);
+  Result := ALImageMagickLibrary.ResampleImage(image, x_resolution, y_resolution, filter, exception);
 end;
 
 {************************************************************************************************************************************************}
 function ResizeImage(const image: PImage; const columns: size_t; const rows: size_t; const filter: FilterType; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ResizeImage(image, columns, rows, filter, exception);
+  Result := ALImageMagickLibrary.ResizeImage(image, columns, rows, filter, exception);
 end;
 
 {**********************************************************************************************************************}
 function SampleImage(const image: PImage; const columns: size_t; const rows: size_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SampleImage(image, columns, rows, exception);
+  Result := ALImageMagickLibrary.SampleImage(image, columns, rows, exception);
 end;
 
 {*********************************************************************************************************************}
 function ScaleImage(const image: PImage; const columns: size_t; const rows: size_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ScaleImage(image, columns, rows, exception);
+  Result := ALImageMagickLibrary.ScaleImage(image, columns, rows, exception);
 end;
 
 {*************************************************************************************************************************}
 function ThumbnailImage(const image: PImage; const columns: size_t; const rows: size_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ThumbnailImage(image, columns, rows, exception);
+  Result := ALImageMagickLibrary.ThumbnailImage(image, columns, rows, exception);
 end;
 
 {$ENDREGION}
@@ -13310,61 +13312,61 @@ end;
 {*******************************************************************************************************}
 function AcquireMagickResource(const &type: ResourceType; const size: MagickSizeType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.AcquireMagickResource(&type, size);
+  Result := ALImageMagickLibrary.AcquireMagickResource(&type, size);
 end;
 
 {************************************************}
 procedure AsynchronousResourceComponentTerminus();
 begin
-  ALImageMagickLib.AsynchronousResourceComponentTerminus();
+  ALImageMagickLibrary.AsynchronousResourceComponentTerminus();
 end;
 
 {***********************************************************}
 function GetPathTemplate(path: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetPathTemplate(path);
+  Result := ALImageMagickLibrary.GetPathTemplate(path);
 end;
 
 {***********************************************************}
 function AcquireUniqueFileResource(path: PAnsiChar): Integer;
 begin
-  Result := ALImageMagickLib.AcquireUniqueFileResource(path);
+  Result := ALImageMagickLibrary.AcquireUniqueFileResource(path);
 end;
 
 {********************************************************************}
 function GetMagickResource(const &type: ResourceType): MagickSizeType;
 begin
-  Result := ALImageMagickLib.GetMagickResource(&type);
+  Result := ALImageMagickLibrary.GetMagickResource(&type);
 end;
 
 {*************************************************************************}
 function GetMagickResourceLimit(const &type: ResourceType): MagickSizeType;
 begin
-  Result := ALImageMagickLib.GetMagickResourceLimit(&type);
+  Result := ALImageMagickLibrary.GetMagickResourceLimit(&type);
 end;
 
 {******************************************************************************************}
 function ListMagickResourceInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListMagickResourceInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListMagickResourceInfo(&file, exception);
 end;
 
 {****************************************************************************************}
 procedure RelinquishMagickResource(const &type: ResourceType; const size: MagickSizeType);
 begin
-  ALImageMagickLib.RelinquishMagickResource(&type, size);
+  ALImageMagickLibrary.RelinquishMagickResource(&type, size);
 end;
 
 {******************************************************************************}
 function RelinquishUniqueFileResource(const path: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.RelinquishUniqueFileResource(path);
+  Result := ALImageMagickLibrary.RelinquishUniqueFileResource(path);
 end;
 
 {*********************************************************************************************************}
 function SetMagickResourceLimit(const &type: ResourceType; const limit: MagickSizeType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetMagickResourceLimit(&type, limit);
+  Result := ALImageMagickLibrary.SetMagickResourceLimit(&type, limit);
 end;
 
 {$ENDREGION}
@@ -13374,13 +13376,13 @@ end;
 {***************************************************************************************************************************************************************************************}
 function GetImageDynamicThreshold(const image: PImage; const cluster_threshold: double; const smooth_threshold: double; pixel: PPixelInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetImageDynamicThreshold(image, cluster_threshold, smooth_threshold, pixel, exception);
+  Result := ALImageMagickLibrary.GetImageDynamicThreshold(image, cluster_threshold, smooth_threshold, pixel, exception);
 end;
 
 {**********************************************************************************************************************************************************************************************************************}
 function SegmentImage(image: PImage; const colorspace: ColorspaceType; const verbose: MagickBooleanType; const cluster_threshold: double; const smooth_threshold: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SegmentImage(image, colorspace, verbose, cluster_threshold, smooth_threshold, exception);
+  Result := ALImageMagickLibrary.SegmentImage(image, colorspace, verbose, cluster_threshold, smooth_threshold, exception);
 end;
 
 {$ENDREGION}
@@ -13390,31 +13392,31 @@ end;
 {***************************************************************}
 procedure ActivateSemaphoreInfo(semaphore_info: PPSemaphoreInfo);
 begin
-  ALImageMagickLib.ActivateSemaphoreInfo(semaphore_info);
+  ALImageMagickLibrary.ActivateSemaphoreInfo(semaphore_info);
 end;
 
 {**********************************************}
 function AcquireSemaphoreInfo(): PSemaphoreInfo;
 begin
-  Result := ALImageMagickLib.AcquireSemaphoreInfo();
+  Result := ALImageMagickLibrary.AcquireSemaphoreInfo();
 end;
 
 {**********************************************************}
 procedure LockSemaphoreInfo(semaphore_info: PSemaphoreInfo);
 begin
-  ALImageMagickLib.LockSemaphoreInfo(semaphore_info);
+  ALImageMagickLibrary.LockSemaphoreInfo(semaphore_info);
 end;
 
 {*****************************************************************}
 procedure RelinquishSemaphoreInfo(semaphore_info: PPSemaphoreInfo);
 begin
-  ALImageMagickLib.RelinquishSemaphoreInfo(semaphore_info);
+  ALImageMagickLibrary.RelinquishSemaphoreInfo(semaphore_info);
 end;
 
 {************************************************************}
 procedure UnlockSemaphoreInfo(semaphore_info: PSemaphoreInfo);
 begin
-  ALImageMagickLib.UnlockSemaphoreInfo(semaphore_info);
+  ALImageMagickLibrary.UnlockSemaphoreInfo(semaphore_info);
 end;
 
 {$ENDREGION}
@@ -13424,25 +13426,25 @@ end;
 {****************************************************************************************************}
 function DeskewImage(const image: PImage; const threshold: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.DeskewImage(image, threshold, exception);
+  Result := ALImageMagickLibrary.DeskewImage(image, threshold, exception);
 end;
 
 {******************************************************************************************************}
 function IntegralRotateImage(const image: PImage; rotations: size_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.IntegralRotateImage(image, rotations, exception);
+  Result := ALImageMagickLibrary.IntegralRotateImage(image, rotations, exception);
 end;
 
 {************************************************************************************************************************}
 function ShearImage(const image: PImage; const x_shear: double; const y_shear: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ShearImage(image, x_shear, y_shear, exception);
+  Result := ALImageMagickLibrary.ShearImage(image, x_shear, y_shear, exception);
 end;
 
 {*******************************************************************************************************}
 function ShearRotateImage(const image: PImage; const degrees: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ShearRotateImage(image, degrees, exception);
+  Result := ALImageMagickLibrary.ShearRotateImage(image, degrees, exception);
 end;
 
 {$ENDREGION}
@@ -13452,7 +13454,7 @@ end;
 {***********************************************************************************}
 function SignatureImage(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SignatureImage(image, exception);
+  Result := ALImageMagickLibrary.SignatureImage(image, exception);
 end;
 
 {$ENDREGION}
@@ -13462,103 +13464,103 @@ end;
 {****************************************************************************************************************}
 function AddValueToSplayTree(splay_tree: PSplayTreeInfo; const key: PVoid; const value: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.AddValueToSplayTree(splay_tree, key, value);
+  Result := ALImageMagickLibrary.AddValueToSplayTree(splay_tree, key, value);
 end;
 
 {************************************************************************************************************************}
 function CloneSplayTree(splay_tree: PSplayTreeInfo; clone_key: CloneKeyFunc; clone_value: CloneValueFunc): PSplayTreeInfo;
 begin
-  Result := ALImageMagickLib.CloneSplayTree(splay_tree, clone_key, clone_value);
+  Result := ALImageMagickLibrary.CloneSplayTree(splay_tree, clone_key, clone_value);
 end;
 
 {*********************************************************************************}
 function CompareSplayTreeString(const target: PVoid; const source: PVoid): Integer;
 begin
-  Result := ALImageMagickLib.CompareSplayTreeString(target, source);
+  Result := ALImageMagickLibrary.CompareSplayTreeString(target, source);
 end;
 
 {*************************************************************************************}
 function CompareSplayTreeStringInfo(const target: PVoid; const source: PVoid): Integer;
 begin
-  Result := ALImageMagickLib.CompareSplayTreeStringInfo(target, source);
+  Result := ALImageMagickLibrary.CompareSplayTreeStringInfo(target, source);
 end;
 
 {*********************************************************************************************************}
 function DeleteNodeByValueFromSplayTree(splay_tree: PSplayTreeInfo; const value: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DeleteNodeByValueFromSplayTree(splay_tree, value);
+  Result := ALImageMagickLibrary.DeleteNodeByValueFromSplayTree(splay_tree, value);
 end;
 
 {************************************************************************************************}
 function DeleteNodeFromSplayTree(splay_tree: PSplayTreeInfo; const key: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DeleteNodeFromSplayTree(splay_tree, key);
+  Result := ALImageMagickLibrary.DeleteNodeFromSplayTree(splay_tree, key);
 end;
 
 {********************************************************************}
 function DestroySplayTree(splay_tree: PSplayTreeInfo): PSplayTreeInfo;
 begin
-  Result := ALImageMagickLib.DestroySplayTree(splay_tree);
+  Result := ALImageMagickLibrary.DestroySplayTree(splay_tree);
 end;
 
 {**********************************************************}
 procedure GetNextKeyInSplayTree(splay_tree: PSplayTreeInfo);
 begin
-  ALImageMagickLib.GetNextKeyInSplayTree(splay_tree);
+  ALImageMagickLibrary.GetNextKeyInSplayTree(splay_tree);
 end;
 
 {************************************************************}
 procedure GetNextValueInSplayTree(splay_tree: PSplayTreeInfo);
 begin
-  ALImageMagickLib.GetNextValueInSplayTree(splay_tree);
+  ALImageMagickLibrary.GetNextValueInSplayTree(splay_tree);
 end;
 
 {**************************************************************}
 procedure GetRootValueFromSplayTree(splay_tree: PSplayTreeInfo);
 begin
-  ALImageMagickLib.GetRootValueFromSplayTree(splay_tree);
+  ALImageMagickLibrary.GetRootValueFromSplayTree(splay_tree);
 end;
 
 {****************************************************************************}
 procedure GetValueFromSplayTree(splay_tree: PSplayTreeInfo; const key: PVoid);
 begin
-  ALImageMagickLib.GetValueFromSplayTree(splay_tree, key);
+  ALImageMagickLibrary.GetValueFromSplayTree(splay_tree, key);
 end;
 
 {*****************************************************************************}
 function GetNumberOfNodesInSplayTree(const splay_tree: PSplayTreeInfo): size_t;
 begin
-  Result := ALImageMagickLib.GetNumberOfNodesInSplayTree(splay_tree);
+  Result := ALImageMagickLibrary.GetNumberOfNodesInSplayTree(splay_tree);
 end;
 
 {*********************************************************************************************************************************************}
 function NewSplayTree(compare: SplayTreeCompareFunc; relinquish_key: RelinquishKeyFunc; relinquish_value: RelinquishValueFunc): PSplayTreeInfo;
 begin
-  Result := ALImageMagickLib.NewSplayTree(compare, relinquish_key, relinquish_value);
+  Result := ALImageMagickLibrary.NewSplayTree(compare, relinquish_key, relinquish_value);
 end;
 
 {***************************************************************************************}
 procedure RemoveNodeByValueFromSplayTree(splay_tree: PSplayTreeInfo; const value: PVoid);
 begin
-  ALImageMagickLib.RemoveNodeByValueFromSplayTree(splay_tree, value);
+  ALImageMagickLibrary.RemoveNodeByValueFromSplayTree(splay_tree, value);
 end;
 
 {******************************************************************************}
 procedure RemoveNodeFromSplayTree(splay_tree: PSplayTreeInfo; const key: PVoid);
 begin
-  ALImageMagickLib.RemoveNodeFromSplayTree(splay_tree, key);
+  ALImageMagickLibrary.RemoveNodeFromSplayTree(splay_tree, key);
 end;
 
 {***************************************************}
 procedure ResetSplayTree(splay_tree: PSplayTreeInfo);
 begin
-  ALImageMagickLib.ResetSplayTree(splay_tree);
+  ALImageMagickLibrary.ResetSplayTree(splay_tree);
 end;
 
 {***********************************************************}
 procedure ResetSplayTreeIterator(splay_tree: PSplayTreeInfo);
 begin
-  ALImageMagickLib.ResetSplayTreeIterator(splay_tree);
+  ALImageMagickLibrary.ResetSplayTreeIterator(splay_tree);
 end;
 
 {$ENDREGION}
@@ -13568,31 +13570,31 @@ end;
 {****************************************************************************************************************************************************************}
 function InvokeStaticImageFilter(const tag: PAnsiChar; image: PPImage; const argc: Integer; const argv: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.InvokeStaticImageFilter(tag, image, argc, argv, exception);
+  Result := ALImageMagickLibrary.InvokeStaticImageFilter(tag, image, argc, argv, exception);
 end;
 
 {***************************************************************************************************}
 function RegisterStaticModule(const module: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.RegisterStaticModule(module, exception);
+  Result := ALImageMagickLibrary.RegisterStaticModule(module, exception);
 end;
 
 {********************************}
 procedure RegisterStaticModules();
 begin
-  ALImageMagickLib.RegisterStaticModules();
+  ALImageMagickLibrary.RegisterStaticModules();
 end;
 
 {**************************************************************************}
 function UnregisterStaticModule(const module: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.UnregisterStaticModule(module);
+  Result := ALImageMagickLibrary.UnregisterStaticModule(module);
 end;
 
 {**********************************}
 procedure UnregisterStaticModules();
 begin
-  ALImageMagickLib.UnregisterStaticModules();
+  ALImageMagickLibrary.UnregisterStaticModules();
 end;
 
 {$ENDREGION}
@@ -13602,85 +13604,85 @@ end;
 {*****************************************************************************************************************}
 function EvaluateImages(const images: PImage; const op: MagickEvaluateOperator; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.EvaluateImages(images, op, exception);
+  Result := ALImageMagickLibrary.EvaluateImages(images, op, exception);
 end;
 
 {*****************************************************************************************************************************************}
 function EvaluateImage(image: PImage; const op: MagickEvaluateOperator; const value: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.EvaluateImage(image, op, value, exception);
+  Result := ALImageMagickLibrary.EvaluateImage(image, op, value, exception);
 end;
 
 {*******************************************************************************************************************************************************************************}
 function FunctionImage(image: PImage; const &function: MagickFunction; const number_parameters: size_t; const parameters: PDouble; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.FunctionImage(image, &function, number_parameters, parameters, exception);
+  Result := ALImageMagickLibrary.FunctionImage(image, &function, number_parameters, parameters, exception);
 end;
 
 {************************************************************************************************************}
 function GetImageEntropy(const image: PImage; entropy: PDouble; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetImageEntropy(image, entropy, exception);
+  Result := ALImageMagickLibrary.GetImageEntropy(image, entropy, exception);
 end;
 
 {****************************************************************************************************************************}
 function GetImageExtrema(const image: PImage; minima: PSize_t; maxima: PSize_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetImageExtrema(image, minima, maxima, exception);
+  Result := ALImageMagickLibrary.GetImageExtrema(image, minima, maxima, exception);
 end;
 
 {*********************************************************************************************************************************}
 function GetImageKurtosis(const image: PImage; kurtosis: PDouble; skewness: PDouble; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetImageKurtosis(image, kurtosis, skewness, exception);
+  Result := ALImageMagickLibrary.GetImageKurtosis(image, kurtosis, skewness, exception);
 end;
 
 {***********************************************************************************************************************************}
 function GetImageMean(const image: PImage; mean: PDouble; standard_deviation: PDouble; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetImageMean(image, mean, standard_deviation, exception);
+  Result := ALImageMagickLibrary.GetImageMean(image, mean, standard_deviation, exception);
 end;
 
 {**********************************************************************************************************}
 function GetImageMedian(const image: PImage; median: PDouble; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetImageMedian(image, median, exception);
+  Result := ALImageMagickLibrary.GetImageMedian(image, median, exception);
 end;
 
 {****************************************************************************************}
 function GetImageMoments(const image: PImage; exception: PExceptionInfo): PChannelMoments;
 begin
-  Result := ALImageMagickLib.GetImageMoments(image, exception);
+  Result := ALImageMagickLibrary.GetImageMoments(image, exception);
 end;
 
 {******************************************************************************************************}
 function GetImagePerceptualHash(const image: PImage; exception: PExceptionInfo): PChannelPerceptualHash;
 begin
-  Result := ALImageMagickLib.GetImagePerceptualHash(image, exception);
+  Result := ALImageMagickLibrary.GetImagePerceptualHash(image, exception);
 end;
 
 {**************************************************************************************************************************}
 function GetImageRange(const image: PImage; minima: PDouble; maxima: PDouble; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetImageRange(image, minima, maxima, exception);
+  Result := ALImageMagickLibrary.GetImageRange(image, minima, maxima, exception);
 end;
 
 {**********************************************************************************************}
 function GetImageStatistics(const image: PImage; exception: PExceptionInfo): PChannelStatistics;
 begin
-  Result := ALImageMagickLib.GetImageStatistics(image, exception);
+  Result := ALImageMagickLibrary.GetImageStatistics(image, exception);
 end;
 
 {**********************************************************************************************************************************}
 function PolynomialImage(const images: PImage; const number_terms: size_t; const terms: PDouble; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.PolynomialImage(images, number_terms, terms, exception);
+  Result := ALImageMagickLibrary.PolynomialImage(images, number_terms, terms, exception);
 end;
 
 {*****************************************************************************************************************************************************}
 function StatisticImage(const image: PImage; const &type: StatisticType; const width: size_t; const height: size_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.StatisticImage(image, &type, width, height, exception);
+  Result := ALImageMagickLibrary.StatisticImage(image, &type, width, height, exception);
 end;
 
 {$ENDREGION}
@@ -13690,49 +13692,49 @@ end;
 {***********************************************************************************************}
 function AcquireStreamInfo(const image_info: PImageInfo; exception: PExceptionInfo): PStreamInfo;
 begin
-  Result := ALImageMagickLib.AcquireStreamInfo(image_info, exception);
+  Result := ALImageMagickLibrary.AcquireStreamInfo(image_info, exception);
 end;
 
 {****************************************************************}
 function DestroyStreamInfo(stream_info: PStreamInfo): PStreamInfo;
 begin
-  Result := ALImageMagickLib.DestroyStreamInfo(stream_info);
+  Result := ALImageMagickLibrary.DestroyStreamInfo(stream_info);
 end;
 
 {***************************************************************************************************************************************************}
 function OpenStream(const image_info: PImageInfo; stream_info: PStreamInfo; const filename: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.OpenStream(image_info, stream_info, filename, exception);
+  Result := ALImageMagickLibrary.OpenStream(image_info, stream_info, filename, exception);
 end;
 
 {**********************************************************************************************************}
 function ReadStream(const image_info: PImageInfo; stream: StreamHandler; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ReadStream(image_info, stream, exception);
+  Result := ALImageMagickLibrary.ReadStream(image_info, stream, exception);
 end;
 
 {*************************************************************************}
 procedure SetStreamInfoMap(stream_info: PStreamInfo; const map: PAnsiChar);
 begin
-  ALImageMagickLib.SetStreamInfoMap(stream_info, map);
+  ALImageMagickLibrary.SetStreamInfoMap(stream_info, map);
 end;
 
 {********************************************************************************************}
 procedure SetStreamInfoStorageType(stream_info: PStreamInfo; const storage_type: StorageType);
 begin
-  ALImageMagickLib.SetStreamInfoStorageType(stream_info, storage_type);
+  ALImageMagickLibrary.SetStreamInfoStorageType(stream_info, storage_type);
 end;
 
 {**************************************************************************************************************}
 function StreamImage(const image_info: PImageInfo; stream_info: PStreamInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.StreamImage(image_info, stream_info, exception);
+  Result := ALImageMagickLibrary.StreamImage(image_info, stream_info, exception);
 end;
 
 {*************************************************************************************************************************************}
 function WriteStream(const image_info: PImageInfo; image: PImage; stream: StreamHandler; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.WriteStream(image_info, image, stream, exception);
+  Result := ALImageMagickLibrary.WriteStream(image_info, image, stream, exception);
 end;
 
 {$ENDREGION}
@@ -13742,289 +13744,289 @@ end;
 {*********************************************************}
 function AcquireString(const source: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.AcquireString(source);
+  Result := ALImageMagickLibrary.AcquireString(source);
 end;
 
 {************************************************************}
 function AcquireStringInfo(const length: size_t): PStringInfo;
 begin
-  Result := ALImageMagickLib.AcquireStringInfo(length);
+  Result := ALImageMagickLibrary.AcquireStringInfo(length);
 end;
 
 {******************************************************************************}
 function BlobToStringInfo(const blob: PVoid; const length: size_t): PStringInfo;
 begin
-  Result := ALImageMagickLib.BlobToStringInfo(blob, length);
+  Result := ALImageMagickLibrary.BlobToStringInfo(blob, length);
 end;
 
 {********************************************************************************}
 function CloneString(destination: PPAnsiChar; const source: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.CloneString(destination, source);
+  Result := ALImageMagickLibrary.CloneString(destination, source);
 end;
 
 {********************************************************************}
 function CloneStringInfo(const string_info: PStringInfo): PStringInfo;
 begin
-  Result := ALImageMagickLib.CloneStringInfo(string_info);
+  Result := ALImageMagickLibrary.CloneStringInfo(string_info);
 end;
 
 {****************************************************************************************}
 function CompareStringInfo(const target: PStringInfo; const source: PStringInfo): Integer;
 begin
-  Result := ALImageMagickLib.CompareStringInfo(target, source);
+  Result := ALImageMagickLibrary.CompareStringInfo(target, source);
 end;
 
 {**************************************************************************************************************}
 function ConcatenateMagickString(destination: PAnsiChar; const source: PAnsiChar; const length: size_t): size_t;
 begin
-  Result := ALImageMagickLib.ConcatenateMagickString(destination, source, length);
+  Result := ALImageMagickLibrary.ConcatenateMagickString(destination, source, length);
 end;
 
 {**********************************************************************************************}
 function ConcatenateString(destination: PPAnsiChar; const source: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ConcatenateString(destination, source);
+  Result := ALImageMagickLibrary.ConcatenateString(destination, source);
 end;
 
 {***********************************************************************************}
 procedure ConcatenateStringInfo(string_info: PStringInfo; const source: PStringInfo);
 begin
-  ALImageMagickLib.ConcatenateStringInfo(string_info, source);
+  ALImageMagickLibrary.ConcatenateStringInfo(string_info, source);
 end;
 
 {*************************************************************************}
 function ConfigureFileToStringInfo(const filename: PAnsiChar): PStringInfo;
 begin
-  Result := ALImageMagickLib.ConfigureFileToStringInfo(filename);
+  Result := ALImageMagickLibrary.ConfigureFileToStringInfo(filename);
 end;
 
 {**********************************************************}
 function ConstantString(const source: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.ConstantString(source);
+  Result := ALImageMagickLibrary.ConstantString(source);
 end;
 
 {*******************************************************************************************************}
 function CopyMagickString(destination: PAnsiChar; const source: PAnsiChar; const length: size_t): size_t;
 begin
-  Result := ALImageMagickLib.CopyMagickString(destination, source, length);
+  Result := ALImageMagickLibrary.CopyMagickString(destination, source, length);
 end;
 
 {****************************************************}
 function DestroyString(&string: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.DestroyString(&string);
+  Result := ALImageMagickLibrary.DestroyString(&string);
 end;
 
 {****************************************************************}
 function DestroyStringInfo(string_info: PStringInfo): PStringInfo;
 begin
-  Result := ALImageMagickLib.DestroyStringInfo(string_info);
+  Result := ALImageMagickLibrary.DestroyStringInfo(string_info);
 end;
 
 {*******************************************************}
 function DestroyStringList(list: PPAnsiChar): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.DestroyStringList(list);
+  Result := ALImageMagickLibrary.DestroyStringList(list);
 end;
 
 {********************************************************************************}
 function EscapeString(const source: PAnsiChar; const escape: AnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.EscapeString(source, escape);
+  Result := ALImageMagickLibrary.EscapeString(source, escape);
 end;
 
 {***********************************************************************************************************}
 function FileToString(const filename: PAnsiChar; const extent: size_t; exception: PExceptionInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.FileToString(filename, extent, exception);
+  Result := ALImageMagickLibrary.FileToString(filename, extent, exception);
 end;
 
 {*****************************************************************************************************************}
 function FileToStringInfo(const filename: PAnsiChar; const extent: size_t; exception: PExceptionInfo): PStringInfo;
 begin
-  Result := ALImageMagickLib.FileToStringInfo(filename, extent, exception);
+  Result := ALImageMagickLibrary.FileToStringInfo(filename, extent, exception);
 end;
 
 {************************************************************************************************************************************************************}
 function FormatMagickSize(const size: MagickSizeType; const bi: MagickBooleanType; const suffix: PAnsiChar; const length: size_t; format: PAnsiChar): ssize_t;
 begin
-  Result := ALImageMagickLib.FormatMagickSize(size, bi, suffix, length, format);
+  Result := ALImageMagickLibrary.FormatMagickSize(size, bi, suffix, length, format);
 end;
 
 {*************************************************************}
 function GetEnvironmentValue(const name: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetEnvironmentValue(name);
+  Result := ALImageMagickLibrary.GetEnvironmentValue(name);
 end;
 
 {*****************************************************************}
 function GetStringInfoDatum(const string_info: PStringInfo): PByte;
 begin
-  Result := ALImageMagickLib.GetStringInfoDatum(string_info);
+  Result := ALImageMagickLibrary.GetStringInfoDatum(string_info);
 end;
 
 {*******************************************************************}
 function GetStringInfoLength(const string_info: PStringInfo): size_t;
 begin
-  Result := ALImageMagickLib.GetStringInfoLength(string_info);
+  Result := ALImageMagickLibrary.GetStringInfoLength(string_info);
 end;
 
 {********************************************************************}
 function GetStringInfoName(const string_info: PStringInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetStringInfoName(string_info);
+  Result := ALImageMagickLibrary.GetStringInfoName(string_info);
 end;
 
 {********************************************************************}
 function GetStringInfoPath(const string_info: PStringInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetStringInfoPath(string_info);
+  Result := ALImageMagickLibrary.GetStringInfoPath(string_info);
 end;
 
 {**************************************************************************************}
 function InterpretSiPrefixValue(const &string: PAnsiChar; sentinel: PPAnsiChar): double;
 begin
-  Result := ALImageMagickLib.InterpretSiPrefixValue(&string, sentinel);
+  Result := ALImageMagickLibrary.InterpretSiPrefixValue(&string, sentinel);
 end;
 
 {***************************************************************}
 function IsStringTrue(const value: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsStringTrue(value);
+  Result := ALImageMagickLibrary.IsStringTrue(value);
 end;
 
 {****************************************************************}
 function IsStringFalse(const value: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsStringFalse(value);
+  Result := ALImageMagickLibrary.IsStringFalse(value);
 end;
 
 {*******************************************************************************************}
 procedure PrintStringInfo(&file: PFILE; const id: PAnsiChar; const string_info: PStringInfo);
 begin
-  ALImageMagickLib.PrintStringInfo(&file, id, string_info);
+  ALImageMagickLibrary.PrintStringInfo(&file, id, string_info);
 end;
 
 {**************************************************}
 procedure ResetStringInfo(string_info: PStringInfo);
 begin
-  ALImageMagickLib.ResetStringInfo(string_info);
+  ALImageMagickLibrary.ResetStringInfo(string_info);
 end;
 
 {**********************************************************}
 function SanitizeString(const source: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.SanitizeString(source);
+  Result := ALImageMagickLibrary.SanitizeString(source);
 end;
 
 {***************************************************************************}
 procedure SetStringInfo(string_info: PStringInfo; const source: PStringInfo);
 begin
-  ALImageMagickLib.SetStringInfo(string_info, source);
+  ALImageMagickLibrary.SetStringInfo(string_info, source);
 end;
 
 {**************************************************************************}
 procedure SetStringInfoDatum(string_info: PStringInfo; const source: PByte);
 begin
-  ALImageMagickLib.SetStringInfoDatum(string_info, source);
+  ALImageMagickLibrary.SetStringInfoDatum(string_info, source);
 end;
 
 {****************************************************************************}
 procedure SetStringInfoLength(string_info: PStringInfo; const length: size_t);
 begin
-  ALImageMagickLib.SetStringInfoLength(string_info, length);
+  ALImageMagickLibrary.SetStringInfoLength(string_info, length);
 end;
 
 {***************************************************************************}
 procedure SetStringInfoName(string_info: PStringInfo; const name: PAnsiChar);
 begin
-  ALImageMagickLib.SetStringInfoName(string_info, name);
+  ALImageMagickLibrary.SetStringInfoName(string_info, name);
 end;
 
 {***************************************************************************}
 procedure SetStringInfoPath(string_info: PStringInfo; const path: PAnsiChar);
 begin
-  ALImageMagickLib.SetStringInfoPath(string_info, path);
+  ALImageMagickLibrary.SetStringInfoPath(string_info, path);
 end;
 
 {************************************************************************************}
 function SplitStringInfo(string_info: PStringInfo; const offset: size_t): PStringInfo;
 begin
-  Result := ALImageMagickLib.SplitStringInfo(string_info, offset);
+  Result := ALImageMagickLibrary.SplitStringInfo(string_info, offset);
 end;
 
 {*******************************************************************}
 function StringInfoToDigest(const signature: PStringInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.StringInfoToDigest(signature);
+  Result := ALImageMagickLibrary.StringInfoToDigest(signature);
 end;
 
 {************************************************************************}
 function StringInfoToHexString(const string_info: PStringInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.StringInfoToHexString(string_info);
+  Result := ALImageMagickLibrary.StringInfoToHexString(string_info);
 end;
 
 {*********************************************************************}
 function StringInfoToString(const string_info: PStringInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.StringInfoToString(string_info);
+  Result := ALImageMagickLibrary.StringInfoToString(string_info);
 end;
 
 {***********************************************************************}
 function StringToArgv(const text: PAnsiChar; argc: PInteger): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.StringToArgv(text, argc);
+  Result := ALImageMagickLibrary.StringToArgv(text, argc);
 end;
 
 {*************************************************************************************************************}
 function StringToArrayOfDoubles(const &string: PAnsiChar; count: PSsize_t; exception: PExceptionInfo): PDouble;
 begin
-  Result := ALImageMagickLib.StringToArrayOfDoubles(&string, count, exception);
+  Result := ALImageMagickLibrary.StringToArrayOfDoubles(&string, count, exception);
 end;
 
 {********************************************************************************}
 function StringToken(const delimiters: PAnsiChar; &string: PPAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.StringToken(delimiters, &string);
+  Result := ALImageMagickLibrary.StringToken(delimiters, &string);
 end;
 
 {*******************************************************}
 function StringToList(const text: PAnsiChar): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.StringToList(text);
+  Result := ALImageMagickLibrary.StringToList(text);
 end;
 
 {**************************************************************************}
 function StringToStrings(const text: PAnsiChar; count: PSize_t): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.StringToStrings(text, count);
+  Result := ALImageMagickLibrary.StringToStrings(text, count);
 end;
 
 {*****************************************************************}
 function StringToStringInfo(const &string: PAnsiChar): PStringInfo;
 begin
-  Result := ALImageMagickLib.StringToStringInfo(&string);
+  Result := ALImageMagickLibrary.StringToStringInfo(&string);
 end;
 
 {****************************************}
 procedure StripString(message: PAnsiChar);
 begin
-  ALImageMagickLib.StripString(message);
+  ALImageMagickLibrary.StripString(message);
 end;
 
 {*****************************************************}
 function StripMagickString(message: PAnsiChar): size_t;
 begin
-  Result := ALImageMagickLib.StripMagickString(message);
+  Result := ALImageMagickLibrary.StripMagickString(message);
 end;
 
 {*******************************************************************************************************************}
 function SubstituteString(&string: PPAnsiChar; const search: PAnsiChar; const replace: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SubstituteString(&string, search, replace);
+  Result := ALImageMagickLibrary.SubstituteString(&string, search, replace);
 end;
 
 {$ENDREGION}
@@ -14034,25 +14036,25 @@ end;
 {************************************************************************************************************}
 function CreateMagickThreadKey(key: PMagickThreadKey; &destructor: MagickThreadDestructor): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CreateMagickThreadKey(key, &destructor);
+  Result := ALImageMagickLibrary.CreateMagickThreadKey(key, &destructor);
 end;
 
 {**********************************************************************}
 function DeleteMagickThreadKey(key: MagickThreadKey): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DeleteMagickThreadKey(key);
+  Result := ALImageMagickLibrary.DeleteMagickThreadKey(key);
 end;
 
 {***************************************************}
 procedure GetMagickThreadValue(key: MagickThreadKey);
 begin
-  ALImageMagickLib.GetMagickThreadValue(key);
+  ALImageMagickLibrary.GetMagickThreadValue(key);
 end;
 
 {*****************************************************************************************}
 function SetMagickThreadValue(key: MagickThreadKey; const value: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetMagickThreadValue(key, value);
+  Result := ALImageMagickLibrary.SetMagickThreadValue(key, value);
 end;
 
 {$ENDREGION}
@@ -14062,85 +14064,85 @@ end;
 {*****************************************************************************************************************************************************}
 function AdaptiveThresholdImage(const image: PImage; const width: size_t; const height: size_t; const bias: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.AdaptiveThresholdImage(image, width, height, bias, exception);
+  Result := ALImageMagickLibrary.AdaptiveThresholdImage(image, width, height, bias, exception);
 end;
 
 {**************************************************************************************************************************}
 function AutoThresholdImage(image: PImage; const method: AutoThresholdMethod; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.AutoThresholdImage(image, method, exception);
+  Result := ALImageMagickLibrary.AutoThresholdImage(image, method, exception);
 end;
 
 {**********************************************************************************************************}
 function BilevelImage(image: PImage; const threshold: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.BilevelImage(image, threshold, exception);
+  Result := ALImageMagickLibrary.BilevelImage(image, threshold, exception);
 end;
 
 {*********************************************************************************************************************}
 function BlackThresholdImage(image: PImage; const thresholds: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.BlackThresholdImage(image, thresholds, exception);
+  Result := ALImageMagickLibrary.BlackThresholdImage(image, thresholds, exception);
 end;
 
 {*******************************************************************************}
 function ClampImage(image: PImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ClampImage(image, exception);
+  Result := ALImageMagickLibrary.ClampImage(image, exception);
 end;
 
 {*****************************************************************************************************************************************************}
 function ColorThresholdImage(image: PImage; const start_color: PPixelInfo; const stop_color: PPixelInfo; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ColorThresholdImage(image, start_color, stop_color, exception);
+  Result := ALImageMagickLibrary.ColorThresholdImage(image, start_color, stop_color, exception);
 end;
 
 {**************************************************************}
 function DestroyThresholdMap(map: PThresholdMap): PThresholdMap;
 begin
-  Result := ALImageMagickLib.DestroyThresholdMap(map);
+  Result := ALImageMagickLibrary.DestroyThresholdMap(map);
 end;
 
 {******************************************************************************************}
 function GetThresholdMap(const map_id: PAnsiChar; exception: PExceptionInfo): PThresholdMap;
 begin
-  Result := ALImageMagickLib.GetThresholdMap(map_id, exception);
+  Result := ALImageMagickLibrary.GetThresholdMap(map_id, exception);
 end;
 
 {*************************************************************************************}
 function ListThresholdMaps(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListThresholdMaps(&file, exception);
+  Result := ALImageMagickLibrary.ListThresholdMaps(&file, exception);
 end;
 
 {***********************************************************************************************************************}
 function OrderedDitherImage(image: PImage; const threshold_map: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.OrderedDitherImage(image, threshold_map, exception);
+  Result := ALImageMagickLibrary.OrderedDitherImage(image, threshold_map, exception);
 end;
 
 {************************************************************************************************************}
 function PerceptibleImage(image: PImage; const epsilon: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PerceptibleImage(image, epsilon, exception);
+  Result := ALImageMagickLibrary.PerceptibleImage(image, epsilon, exception);
 end;
 
 {***************************************************************************************************************************************************}
 function RandomThresholdImage(image: PImage; const min_threshold: double; const max_threshold: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.RandomThresholdImage(image, min_threshold, max_threshold, exception);
+  Result := ALImageMagickLibrary.RandomThresholdImage(image, min_threshold, max_threshold, exception);
 end;
 
 {**********************************************************************************************************************************************************************************************}
 function RangeThresholdImage(image: PImage; const low_black: double; const low_white: double; const high_white: double; const high_black: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.RangeThresholdImage(image, low_black, low_white, high_white, high_black, exception);
+  Result := ALImageMagickLibrary.RangeThresholdImage(image, low_black, low_white, high_white, high_black, exception);
 end;
 
 {*********************************************************************************************************************}
 function WhiteThresholdImage(image: PImage; const thresholds: PAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.WhiteThresholdImage(image, thresholds, exception);
+  Result := ALImageMagickLibrary.WhiteThresholdImage(image, thresholds, exception);
 end;
 
 {$ENDREGION}
@@ -14150,67 +14152,67 @@ end;
 {**************************************}
 function AcquireTimerInfo(): PTimerInfo;
 begin
-  Result := ALImageMagickLib.AcquireTimerInfo();
+  Result := ALImageMagickLibrary.AcquireTimerInfo();
 end;
 
 {***************************************************************}
 function ContinueTimer(time_info: PTimerInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ContinueTimer(time_info);
+  Result := ALImageMagickLibrary.ContinueTimer(time_info);
 end;
 
 {************************************************************}
 function DestroyTimerInfo(timer_info: PTimerInfo): PTimerInfo;
 begin
-  Result := ALImageMagickLib.DestroyTimerInfo(timer_info);
+  Result := ALImageMagickLibrary.DestroyTimerInfo(timer_info);
 end;
 
 {*************************************************************************************************}
 function FormatMagickTime(const time: time_t; const length: size_t; timestamp: PAnsiChar): ssize_t;
 begin
-  Result := ALImageMagickLib.FormatMagickTime(time, length, timestamp);
+  Result := ALImageMagickLibrary.FormatMagickTime(time, length, timestamp);
 end;
 
 {*****************************************************}
 function GetElapsedTime(time_info: PTimerInfo): double;
 begin
-  Result := ALImageMagickLib.GetElapsedTime(time_info);
+  Result := ALImageMagickLibrary.GetElapsedTime(time_info);
 end;
 
 {*******************************}
 function GetMagickTime(): time_t;
 begin
-  Result := ALImageMagickLib.GetMagickTime();
+  Result := ALImageMagickLibrary.GetMagickTime();
 end;
 
 {********************************************}
 procedure GetTimerInfo(time_info: PTimerInfo);
 begin
-  ALImageMagickLib.GetTimerInfo(time_info);
+  ALImageMagickLibrary.GetTimerInfo(time_info);
 end;
 
 {**************************************************}
 function GetUserTime(time_info: PTimerInfo): double;
 begin
-  Result := ALImageMagickLib.GetUserTime(time_info);
+  Result := ALImageMagickLibrary.GetUserTime(time_info);
 end;
 
 {*************************************************}
 function IsSourceDataEpochSet(): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsSourceDataEpochSet();
+  Result := ALImageMagickLibrary.IsSourceDataEpochSet();
 end;
 
 {******************************************}
 procedure ResetTimer(time_info: PTimerInfo);
 begin
-  ALImageMagickLib.ResetTimer(time_info);
+  ALImageMagickLibrary.ResetTimer(time_info);
 end;
 
 {**************************************************************************}
 procedure StartTimer(time_info: PTimerInfo; const reset: MagickBooleanType);
 begin
-  ALImageMagickLib.StartTimer(time_info, reset);
+  ALImageMagickLibrary.StartTimer(time_info, reset);
 end;
 
 {$ENDREGION}
@@ -14220,31 +14222,31 @@ end;
 {**************************************}
 function AcquireTokenInfo(): PTokenInfo;
 begin
-  Result := ALImageMagickLib.AcquireTokenInfo();
+  Result := ALImageMagickLibrary.AcquireTokenInfo();
 end;
 
 {************************************************************}
 function DestroyTokenInfo(token_info: PTokenInfo): PTokenInfo;
 begin
-  Result := ALImageMagickLib.DestroyTokenInfo(token_info);
+  Result := ALImageMagickLibrary.DestroyTokenInfo(token_info);
 end;
 
 {********************************************************************************************************************}
 function GetNextToken(const start: PAnsiChar; const &end: PPAnsiChar; const extent: size_t; token: PAnsiChar): size_t;
 begin
-  Result := ALImageMagickLib.GetNextToken(start, &end, extent, token);
+  Result := ALImageMagickLibrary.GetNextToken(start, &end, extent, token);
 end;
 
 {*******************************************************************************************************************************************}
 function GlobExpression(const expression: PAnsiChar; const pattern: PAnsiChar; const case_insensitive: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GlobExpression(expression, pattern, case_insensitive);
+  Result := ALImageMagickLibrary.GlobExpression(expression, pattern, case_insensitive);
 end;
 
 {************************************************************************************************************************************************************************************************************************************************************************************************************}
 function Tokenizer(token_info: PTokenInfo; const flag: Cardinal; token: PAnsiChar; const max_token_length: size_t; const line: PAnsiChar; const white: PAnsiChar; const break_set: PAnsiChar; const quote: PAnsiChar; const escape: AnsiChar; breaker: PAnsiChar; next: PInteger; quoted: PAnsiChar): Integer;
 begin
-  Result := ALImageMagickLib.Tokenizer(token_info, flag, token, max_token_length, line, white, break_set, quote, escape, breaker, next, quoted);
+  Result := ALImageMagickLibrary.Tokenizer(token_info, flag, token, max_token_length, line, white, break_set, quote, escape, breaker, next, quoted);
 end;
 
 {$ENDREGION}
@@ -14254,91 +14256,91 @@ end;
 {*******************************************************************************************************************}
 function AutoOrientImage(const image: PImage; const orientation: OrientationType; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.AutoOrientImage(image, orientation, exception);
+  Result := ALImageMagickLibrary.AutoOrientImage(image, orientation, exception);
 end;
 
 {**********************************************************************************************************}
 function ChopImage(const image: PImage; const chop_info: PRectangleInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ChopImage(image, chop_info, exception);
+  Result := ALImageMagickLibrary.ChopImage(image, chop_info, exception);
 end;
 
 {**************************************************************************************}
 function ConsolidateCMYKImages(const images: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ConsolidateCMYKImages(images, exception);
+  Result := ALImageMagickLibrary.ConsolidateCMYKImages(images, exception);
 end;
 
 {*********************************************************************************************************}
 function CropImage(const image: PImage; const geometry: PRectangleInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.CropImage(image, geometry, exception);
+  Result := ALImageMagickLibrary.CropImage(image, geometry, exception);
 end;
 
 {****************************************************************************************************************}
 function CropImageToTiles(const image: PImage; const crop_geometry: PAnsiChar; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.CropImageToTiles(image, crop_geometry, exception);
+  Result := ALImageMagickLibrary.CropImageToTiles(image, crop_geometry, exception);
 end;
 
 {************************************************************************************************************}
 function ExcerptImage(const image: PImage; const geometry: PRectangleInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ExcerptImage(image, geometry, exception);
+  Result := ALImageMagickLibrary.ExcerptImage(image, geometry, exception);
 end;
 
 {***********************************************************************************************************}
 function ExtentImage(const image: PImage; const geometry: PRectangleInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ExtentImage(image, geometry, exception);
+  Result := ALImageMagickLibrary.ExtentImage(image, geometry, exception);
 end;
 
 {*************************************************************************}
 function FlipImage(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.FlipImage(image, exception);
+  Result := ALImageMagickLibrary.FlipImage(image, exception);
 end;
 
 {*************************************************************************}
 function FlopImage(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.FlopImage(image, exception);
+  Result := ALImageMagickLibrary.FlopImage(image, exception);
 end;
 
 {***************************************************************************************************************************}
 function RollImage(const image: PImage; const x_offset: ssize_t; const y_offset: ssize_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.RollImage(image, x_offset, y_offset, exception);
+  Result := ALImageMagickLibrary.RollImage(image, x_offset, y_offset, exception);
 end;
 
 {************************************************************************************************************}
 function ShaveImage(const image: PImage; const shave_info: PRectangleInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ShaveImage(image, shave_info, exception);
+  Result := ALImageMagickLibrary.ShaveImage(image, shave_info, exception);
 end;
 
 {***********************************************************************************************************}
 function SpliceImage(const image: PImage; const geometry: PRectangleInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SpliceImage(image, geometry, exception);
+  Result := ALImageMagickLibrary.SpliceImage(image, geometry, exception);
 end;
 
 {******************************************************************************}
 function TransposeImage(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.TransposeImage(image, exception);
+  Result := ALImageMagickLibrary.TransposeImage(image, exception);
 end;
 
 {*******************************************************************************}
 function TransverseImage(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.TransverseImage(image, exception);
+  Result := ALImageMagickLibrary.TransverseImage(image, exception);
 end;
 
 {*************************************************************************}
 function TrimImage(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.TrimImage(image, exception);
+  Result := ALImageMagickLibrary.TrimImage(image, exception);
 end;
 
 {$ENDREGION}
@@ -14348,37 +14350,37 @@ end;
 {********************************************************************************}
 function GetTypeInfo(const name: PAnsiChar; exception: PExceptionInfo): PTypeInfo;
 begin
-  Result := ALImageMagickLib.GetTypeInfo(name, exception);
+  Result := ALImageMagickLibrary.GetTypeInfo(name, exception);
 end;
 
 {********************************************************************************************************************************************************************}
 function GetTypeInfoByFamily(const family: PAnsiChar; const style: StyleType; const stretch: StretchType; const weight: size_t; exception: PExceptionInfo): PTypeInfo;
 begin
-  Result := ALImageMagickLib.GetTypeInfoByFamily(family, style, stretch, weight, exception);
+  Result := ALImageMagickLibrary.GetTypeInfoByFamily(family, style, stretch, weight, exception);
 end;
 
 {***************************************************************************************************************}
 function GetTypeInfoList(const pattern: PAnsiChar; number_fonts: PSize_t; exception: PExceptionInfo): PPTypeInfo;
 begin
-  Result := ALImageMagickLib.GetTypeInfoList(pattern, number_fonts, exception);
+  Result := ALImageMagickLibrary.GetTypeInfoList(pattern, number_fonts, exception);
 end;
 
 {***********************************************************************************************************}
 function GetTypeList(const pattern: PAnsiChar; number_fonts: PSize_t; exception: PExceptionInfo): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.GetTypeList(pattern, number_fonts, exception);
+  Result := ALImageMagickLibrary.GetTypeList(pattern, number_fonts, exception);
 end;
 
 {*******************************************************************************************************}
 //function LoadFontConfigFonts(type_cache: PSplayTreeInfo; exception: PExceptionInfo): MagickBooleanType;
 //begin
-//  Result := ALImageMagickLib.LoadFontConfigFonts(type_cache, exception);
+//  Result := ALImageMagickLibrary.LoadFontConfigFonts(type_cache, exception);
 //end;
 
 {********************************************************************************}
 function ListTypeInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ListTypeInfo(&file, exception);
+  Result := ALImageMagickLibrary.ListTypeInfo(&file, exception);
 end;
 
 {$ENDREGION}
@@ -14388,67 +14390,67 @@ end;
 {*****************************************************************}
 function AcquireUniqueFilename(path: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.AcquireUniqueFilename(path);
+  Result := ALImageMagickLibrary.AcquireUniqueFilename(path);
 end;
 
 {*****************************************************************************************************}
 function AcquireUniqueSymbolicLink(const source: PAnsiChar; destination: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.AcquireUniqueSymbolicLink(source, destination);
+  Result := ALImageMagickLibrary.AcquireUniqueSymbolicLink(source, destination);
 end;
 
 {************************************************************************}
 procedure AppendImageFormat(const format: PAnsiChar; filename: PAnsiChar);
 begin
-  ALImageMagickLib.AppendImageFormat(format, filename);
+  ALImageMagickLibrary.AppendImageFormat(format, filename);
 end;
 
 {*********************************************************************}
 function Base64Decode(const source: PAnsiChar; length: PSize_t): PByte;
 begin
-  Result := ALImageMagickLib.Base64Decode(source, length);
+  Result := ALImageMagickLibrary.Base64Decode(source, length);
 end;
 
 {*****************************************************************************************************}
 function Base64Encode(const blob: PByte; const blob_length: size_t; encode_length: PSize_t): PAnsiChar;
 begin
-  Result := ALImageMagickLib.Base64Encode(blob, blob_length, encode_length);
+  Result := ALImageMagickLibrary.Base64Encode(blob, blob_length, encode_length);
 end;
 
 {**********************************************************************************************}
 function ExpandFilenames(number_arguments: PInteger; arguments: PPPAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ExpandFilenames(number_arguments, arguments);
+  Result := ALImageMagickLibrary.ExpandFilenames(number_arguments, arguments);
 end;
 
 {**************************************************************************************}
 function GetPathAttributes(const path: PAnsiChar; attributes: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetPathAttributes(path, attributes);
+  Result := ALImageMagickLibrary.GetPathAttributes(path, attributes);
 end;
 
 {***************************************************************************************}
 procedure GetPathComponent(const path: PAnsiChar; &type: PathType; component: PAnsiChar);
 begin
-  ALImageMagickLib.GetPathComponent(path, &type, component);
+  ALImageMagickLibrary.GetPathComponent(path, &type, component);
 end;
 
 {******************************************************************}
 function IsPathAccessible(const path: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsPathAccessible(path);
+  Result := ALImageMagickLibrary.IsPathAccessible(path);
 end;
 
 {********************************************************}
 procedure MagickDelay(const milliseconds: MagickSizeType);
 begin
-  ALImageMagickLib.MagickDelay(milliseconds);
+  ALImageMagickLibrary.MagickDelay(milliseconds);
 end;
 
 {********************************************************}
 function MultilineCensus(const &label: PAnsiChar): size_t;
 begin
-  Result := ALImageMagickLib.MultilineCensus(&label);
+  Result := ALImageMagickLibrary.MultilineCensus(&label);
 end;
 
 {$ENDREGION}
@@ -14458,73 +14460,73 @@ end;
 {***************************************}
 function GetMagickCopyright(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickCopyright();
+  Result := ALImageMagickLibrary.GetMagickCopyright();
 end;
 
 {***************************************}
 function GetMagickDelegates(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickDelegates();
+  Result := ALImageMagickLibrary.GetMagickDelegates();
 end;
 
 {**************************************}
 function GetMagickFeatures(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickFeatures();
+  Result := ALImageMagickLibrary.GetMagickFeatures();
 end;
 
 {*************************************}
 function GetMagickHomeURL(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickHomeURL();
+  Result := ALImageMagickLibrary.GetMagickHomeURL();
 end;
 
 {*************************************}
 function GetMagickLicense(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickLicense();
+  Result := ALImageMagickLibrary.GetMagickLicense();
 end;
 
 {*****************************************}
 function GetMagickPackageName(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickPackageName();
+  Result := ALImageMagickLibrary.GetMagickPackageName();
 end;
 
 {********************************************************}
 function GetMagickQuantumDepth(depth: PSize_t): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickQuantumDepth(depth);
+  Result := ALImageMagickLibrary.GetMagickQuantumDepth(depth);
 end;
 
 {********************************************************}
 function GetMagickQuantumRange(range: PSize_t): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickQuantumRange(range);
+  Result := ALImageMagickLibrary.GetMagickQuantumRange(range);
 end;
 
 {*****************************************}
 function GetMagickReleaseDate(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickReleaseDate();
+  Result := ALImageMagickLibrary.GetMagickReleaseDate();
 end;
 
 {**************************************************************}
 function GetMagickSignature(const nonce: PStringInfo): Cardinal;
 begin
-  Result := ALImageMagickLib.GetMagickSignature(nonce);
+  Result := ALImageMagickLibrary.GetMagickSignature(nonce);
 end;
 
 {*****************************************************}
 function GetMagickVersion(version: PSize_t): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetMagickVersion(version);
+  Result := ALImageMagickLibrary.GetMagickVersion(version);
 end;
 
 {****************************************}
 procedure ListMagickVersion(&file: PFILE);
 begin
-  ALImageMagickLib.ListMagickVersion(&file);
+  ALImageMagickLibrary.ListMagickVersion(&file);
 end;
 
 {$ENDREGION}
@@ -14534,13 +14536,13 @@ end;
 {*********************************************************************************************************************************************}
 function ConnectedComponentsImage(const image: PImage; const connectivity: size_t; objects: PPCCObjectInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ConnectedComponentsImage(image, connectivity, objects, exception);
+  Result := ALImageMagickLibrary.ConnectedComponentsImage(image, connectivity, objects, exception);
 end;
 
 {*****************************************************************************}
 function IntegralImage(const image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.IntegralImage(image, exception);
+  Result := ALImageMagickLibrary.IntegralImage(image, exception);
 end;
 
 {$ENDREGION}
@@ -14550,127 +14552,127 @@ end;
 {***********************************************************************************************************************************}
 function AddNoiseImage(const image: PImage; const noise_type: NoiseType; const attenuate: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.AddNoiseImage(image, noise_type, attenuate, exception);
+  Result := ALImageMagickLibrary.AddNoiseImage(image, noise_type, attenuate, exception);
 end;
 
 {****************************************************************************************************}
 function BlueShiftImage(const image: PImage; const factor: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.BlueShiftImage(image, factor, exception);
+  Result := ALImageMagickLibrary.BlueShiftImage(image, factor, exception);
 end;
 
 {************************************************************************************************************************}
 function CharcoalImage(const image: PImage; const radius: double; const sigma: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.CharcoalImage(image, radius, sigma, exception);
+  Result := ALImageMagickLibrary.CharcoalImage(image, radius, sigma, exception);
 end;
 
 {*********************************************************************************************************************************}
 function ColorizeImage(const image: PImage; const blend: PAnsiChar; const colorize: PPixelInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ColorizeImage(image, blend, colorize, exception);
+  Result := ALImageMagickLibrary.ColorizeImage(image, blend, colorize, exception);
 end;
 
 {*****************************************************************************************************************}
 function ColorMatrixImage(const image: PImage; const color_matrix: PKernelInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ColorMatrixImage(image, color_matrix, exception);
+  Result := ALImageMagickLibrary.ColorMatrixImage(image, color_matrix, exception);
 end;
 
 {****************************************************************************************************************************************}
 function ImplodeImage(const image: PImage; const amount: double; const method: PixelInterpolateMethod; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ImplodeImage(image, amount, method, exception);
+  Result := ALImageMagickLibrary.ImplodeImage(image, amount, method, exception);
 end;
 
 {********************************************************************************************************}
 function MorphImages(const image: PImage; const number_frames: size_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.MorphImages(image, number_frames, exception);
+  Result := ALImageMagickLibrary.MorphImages(image, number_frames, exception);
 end;
 
 {***********************************************************************************************************************************************}
 function PlasmaImage(image: PImage; const segment: PSegmentInfo; attenuate: size_t; depth: size_t; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PlasmaImage(image, segment, attenuate, depth, exception);
+  Result := ALImageMagickLibrary.PlasmaImage(image, segment, attenuate, depth, exception);
 end;
 
 {**********************************************************************************************************************************************************************************************}
 function PolaroidImage(const image: PImage; const draw_info: PDrawInfo; const caption: PAnsiChar; const angle: double; const method: PixelInterpolateMethod; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.PolaroidImage(image, draw_info, caption, angle, method, exception);
+  Result := ALImageMagickLibrary.PolaroidImage(image, draw_info, caption, angle, method, exception);
 end;
 
 {*******************************************************************************************************}
 function SepiaToneImage(const image: PImage; const threshold: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SepiaToneImage(image, threshold, exception);
+  Result := ALImageMagickLibrary.SepiaToneImage(image, threshold, exception);
 end;
 
 {***********************************************************************************************************************************************************************}
 function ShadowImage(const image: PImage; const alpha: double; const sigma: double; const x_offset: ssize_t; const y_offset: ssize_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.ShadowImage(image, alpha, sigma, x_offset, y_offset, exception);
+  Result := ALImageMagickLibrary.ShadowImage(image, alpha, sigma, x_offset, y_offset, exception);
 end;
 
 {*******************************************************************************************************************************************}
 function SketchImage(const image: PImage; const radius: double; const sigma: double; const angle: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SketchImage(image, radius, sigma, angle, exception);
+  Result := ALImageMagickLibrary.SketchImage(image, radius, sigma, angle, exception);
 end;
 
 {***********************************************************************************************************}
 function SolarizeImage(image: PImage; const threshold: double; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SolarizeImage(image, threshold, exception);
+  Result := ALImageMagickLibrary.SolarizeImage(image, threshold, exception);
 end;
 
 {*****************************************************************************************************}
 function SteganoImage(const image: PImage; const watermark: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SteganoImage(image, watermark, exception);
+  Result := ALImageMagickLibrary.SteganoImage(image, watermark, exception);
 end;
 
 {***********************************************************************************************************}
 function StereoImage(const left_image: PImage; const right_image: PImage; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.StereoImage(left_image, right_image, exception);
+  Result := ALImageMagickLibrary.StereoImage(left_image, right_image, exception);
 end;
 
 {*********************************************************************************************************************************************************************}
 function StereoAnaglyphImage(const left_image: PImage; const right_image: PImage; const x_offset: ssize_t; const y_offset: ssize_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.StereoAnaglyphImage(left_image, right_image, x_offset, y_offset, exception);
+  Result := ALImageMagickLibrary.StereoAnaglyphImage(left_image, right_image, x_offset, y_offset, exception);
 end;
 
 {*********************************************************************************************************************************}
 function SwirlImage(const image: PImage; degrees: double; const method: PixelInterpolateMethod; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.SwirlImage(image, degrees, method, exception);
+  Result := ALImageMagickLibrary.SwirlImage(image, degrees, method, exception);
 end;
 
 {*************************************************************************************************************************}
 function TintImage(const image: PImage; const blend: PAnsiChar; const tint: PPixelInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.TintImage(image, blend, tint, exception);
+  Result := ALImageMagickLibrary.TintImage(image, blend, tint, exception);
 end;
 
 {************************************************************************************************************************************************************}
 function VignetteImage(const image: PImage; const radius: double; const sigma: double; const x: ssize_t; const y: ssize_t; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.VignetteImage(image, radius, sigma, x, y, exception);
+  Result := ALImageMagickLibrary.VignetteImage(image, radius, sigma, x, y, exception);
 end;
 
 {*******************************************************************************************************************************************************************}
 function WaveImage(const image: PImage; const amplitude: double; const wave_length: double; const method: PixelInterpolateMethod; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.WaveImage(image, amplitude, wave_length, method, exception);
+  Result := ALImageMagickLibrary.WaveImage(image, amplitude, wave_length, method, exception);
 end;
 
 {************************************************************************************************************************************}
 function WaveletDenoiseImage(const image: PImage; const threshold: double; const softness: double; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.WaveletDenoiseImage(image, threshold, softness, exception);
+  Result := ALImageMagickLibrary.WaveletDenoiseImage(image, threshold, softness, exception);
 end;
 
 {$ENDREGION}
@@ -14680,73 +14682,73 @@ end;
 {***********************************************************************************************************}
 function AddChildToXMLTree(xml_info: PXMLTreeInfo; const tag: PAnsiChar; const offset: size_t): PXMLTreeInfo;
 begin
-  Result := ALImageMagickLib.AddChildToXMLTree(xml_info, tag, offset);
+  Result := ALImageMagickLibrary.AddChildToXMLTree(xml_info, tag, offset);
 end;
 
 {************************************************************}
 function DestroyXMLTree(xml_info: PXMLTreeInfo): PXMLTreeInfo;
 begin
-  Result := ALImageMagickLib.DestroyXMLTree(xml_info);
+  Result := ALImageMagickLibrary.DestroyXMLTree(xml_info);
 end;
 
 {***************************************************************}
 function GetNextXMLTreeTag(xml_info: PXMLTreeInfo): PXMLTreeInfo;
 begin
-  Result := ALImageMagickLib.GetNextXMLTreeTag(xml_info);
+  Result := ALImageMagickLibrary.GetNextXMLTreeTag(xml_info);
 end;
 
 {************************************************************************************}
 function GetXMLTreeAttribute(xml_info: PXMLTreeInfo; const tag: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetXMLTreeAttribute(xml_info, tag);
+  Result := ALImageMagickLibrary.GetXMLTreeAttribute(xml_info, tag);
 end;
 
 {***********************************************************************************}
 function GetXMLTreeChild(xml_info: PXMLTreeInfo; const tag: PAnsiChar): PXMLTreeInfo;
 begin
-  Result := ALImageMagickLib.GetXMLTreeChild(xml_info, tag);
+  Result := ALImageMagickLibrary.GetXMLTreeChild(xml_info, tag);
 end;
 
 {************************************************************}
 function GetXMLTreeContent(xml_info: PXMLTreeInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetXMLTreeContent(xml_info);
+  Result := ALImageMagickLibrary.GetXMLTreeContent(xml_info);
 end;
 
 {***************************************************************}
 function GetXMLTreeSibling(xml_info: PXMLTreeInfo): PXMLTreeInfo;
 begin
-  Result := ALImageMagickLib.GetXMLTreeSibling(xml_info);
+  Result := ALImageMagickLibrary.GetXMLTreeSibling(xml_info);
 end;
 
 {********************************************************}
 function GetXMLTreeTag(xml_info: PXMLTreeInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetXMLTreeTag(xml_info);
+  Result := ALImageMagickLibrary.GetXMLTreeTag(xml_info);
 end;
 
 {*********************************************************************************}
 function NewXMLTree(const xml: PAnsiChar; exception: PExceptionInfo): PXMLTreeInfo;
 begin
-  Result := ALImageMagickLib.NewXMLTree(xml, exception);
+  Result := ALImageMagickLibrary.NewXMLTree(xml, exception);
 end;
 
 {*********************************************************}
 function NewXMLTreeTag(const tag: PAnsiChar): PXMLTreeInfo;
 begin
-  Result := ALImageMagickLib.NewXMLTreeTag(tag);
+  Result := ALImageMagickLibrary.NewXMLTreeTag(tag);
 end;
 
 {*****************************************************************************************}
 function SetXMLTreeContent(xml_info: PXMLTreeInfo; const content: PAnsiChar): PXMLTreeInfo;
 begin
-  Result := ALImageMagickLib.SetXMLTreeContent(xml_info, content);
+  Result := ALImageMagickLibrary.SetXMLTreeContent(xml_info, content);
 end;
 
 {***********************************************************}
 function XMLTreeInfoToXML(xml_info: PXMLTreeInfo): PAnsiChar;
 begin
-  Result := ALImageMagickLib.XMLTreeInfoToXML(xml_info);
+  Result := ALImageMagickLibrary.XMLTreeInfoToXML(xml_info);
 end;
 
 {$ENDREGION}
@@ -14756,13 +14758,13 @@ end;
 {****************************************************************************************************************}
 function XImportImage(const image_info: PImageInfo; ximage_info: PXImportInfo; exception: PExceptionInfo): PImage;
 begin
-  Result := ALImageMagickLib.XImportImage(image_info, ximage_info, exception);
+  Result := ALImageMagickLibrary.XImportImage(image_info, ximage_info, exception);
 end;
 
 {**************************************************}
 procedure XGetImportInfo(ximage_info: PXImportInfo);
 begin
-  ALImageMagickLib.XGetImportInfo(ximage_info);
+  ALImageMagickLibrary.XGetImportInfo(ximage_info);
 end;
 
 {$ENDREGION}
@@ -14772,7 +14774,7 @@ end;
 {********************************************************************************************************************************************************}
 function AnimateImageCommand(image_info: PImageInfo; argc: Integer; argv: PPAnsiChar; metadata: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.AnimateImageCommand(image_info, argc, argv, metadata, exception);
+  Result := ALImageMagickLibrary.AnimateImageCommand(image_info, argc, argv, metadata, exception);
 end;
 
 {$ENDREGION}
@@ -14782,7 +14784,7 @@ end;
 {*********************************************************************************************************************************************************}
 function CompareImagesCommand(image_info: PImageInfo; argc: Integer; argv: PPAnsiChar; metadata: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CompareImagesCommand(image_info, argc, argv, metadata, exception);
+  Result := ALImageMagickLibrary.CompareImagesCommand(image_info, argc, argv, metadata, exception);
 end;
 
 {$ENDREGION}
@@ -14792,7 +14794,7 @@ end;
 {**********************************************************************************************************************************************************}
 function CompositeImageCommand(image_info: PImageInfo; argc: Integer; argv: PPAnsiChar; metadata: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CompositeImageCommand(image_info, argc, argv, metadata, exception);
+  Result := ALImageMagickLibrary.CompositeImageCommand(image_info, argc, argv, metadata, exception);
 end;
 
 {$ENDREGION}
@@ -14802,7 +14804,7 @@ end;
 {********************************************************************************************************************************************************}
 function ConjureImageCommand(image_info: PImageInfo; argc: Integer; argv: PPAnsiChar; metadata: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ConjureImageCommand(image_info, argc, argv, metadata, exception);
+  Result := ALImageMagickLibrary.ConjureImageCommand(image_info, argc, argv, metadata, exception);
 end;
 
 {$ENDREGION}
@@ -14812,7 +14814,7 @@ end;
 {********************************************************************************************************************************************************}
 function DisplayImageCommand(image_info: PImageInfo; argc: Integer; argv: PPAnsiChar; metadata: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DisplayImageCommand(image_info, argc, argv, metadata, exception);
+  Result := ALImageMagickLibrary.DisplayImageCommand(image_info, argc, argv, metadata, exception);
 end;
 
 {$ENDREGION}
@@ -14822,835 +14824,835 @@ end;
 {***********************************************************************************}
 function AcquireDrawingWand(const draw_info: PDrawInfo; image: PImage): PDrawingWand;
 begin
-  Result := ALImageMagickLib.AcquireDrawingWand(draw_info, image);
+  Result := ALImageMagickLibrary.AcquireDrawingWand(draw_info, image);
 end;
 
 {*********************************************}
 procedure ClearDrawingWand(wand: PDrawingWand);
 begin
-  ALImageMagickLib.ClearDrawingWand(wand);
+  ALImageMagickLibrary.ClearDrawingWand(wand);
 end;
 
 {****************************************************************}
 function CloneDrawingWand(const wand: PDrawingWand): PDrawingWand;
 begin
-  Result := ALImageMagickLib.CloneDrawingWand(wand);
+  Result := ALImageMagickLibrary.CloneDrawingWand(wand);
 end;
 
 {************************************************************}
 function DestroyDrawingWand(wand: PDrawingWand): PDrawingWand;
 begin
-  Result := ALImageMagickLib.DestroyDrawingWand(wand);
+  Result := ALImageMagickLibrary.DestroyDrawingWand(wand);
 end;
 
 {********************************************************************}
 procedure DrawAffine(wand: PDrawingWand; const affine: PAffineMatrix);
 begin
-  ALImageMagickLib.DrawAffine(wand, affine);
+  ALImageMagickLibrary.DrawAffine(wand, affine);
 end;
 
 {*********************************************************************************************************}
 procedure DrawAlpha(wand: PDrawingWand; const x: double; const y: double; const paint_method: PaintMethod);
 begin
-  ALImageMagickLib.DrawAlpha(wand, x, y, paint_method);
+  ALImageMagickLibrary.DrawAlpha(wand, x, y, paint_method);
 end;
 
 {************************************************************************************************}
 procedure DrawAnnotation(wand: PDrawingWand; const x: double; const y: double; const text: PByte);
 begin
-  ALImageMagickLib.DrawAnnotation(wand, x, y, text);
+  ALImageMagickLibrary.DrawAnnotation(wand, x, y, text);
 end;
 
 {************************************************************************************************************************************************}
 procedure DrawArc(wand: PDrawingWand; const sx: double; const sy: double; const ex: double; const ey: double; const sd: double; const ed: double);
 begin
-  ALImageMagickLib.DrawArc(wand, sx, sy, ex, ey, sd, ed);
+  ALImageMagickLibrary.DrawArc(wand, sx, sy, ex, ey, sd, ed);
 end;
 
 {********************************************************************************************************}
 procedure DrawBezier(wand: PDrawingWand; const number_coordinates: size_t; const coordinates: PPointInfo);
 begin
-  ALImageMagickLib.DrawBezier(wand, number_coordinates, coordinates);
+  ALImageMagickLibrary.DrawBezier(wand, number_coordinates, coordinates);
 end;
 
 {***************************************************************************************************************}
 procedure DrawCircle(wand: PDrawingWand; const ox: double; const oy: double; const px: double; const py: double);
 begin
-  ALImageMagickLib.DrawCircle(wand, ox, oy, px, py);
+  ALImageMagickLibrary.DrawCircle(wand, ox, oy, px, py);
 end;
 
 {*****************************************************************}
 function DrawClearException(wand: PDrawingWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawClearException(wand);
+  Result := ALImageMagickLibrary.DrawClearException(wand);
 end;
 
 {************************************************************************}
 function DrawCloneExceptionInfo(const wand: PDrawingWand): PExceptionInfo;
 begin
-  Result := ALImageMagickLib.DrawCloneExceptionInfo(wand);
+  Result := ALImageMagickLibrary.DrawCloneExceptionInfo(wand);
 end;
 
 {*********************************************************************************************************}
 procedure DrawColor(wand: PDrawingWand; const x: double; const y: double; const paint_method: PaintMethod);
 begin
-  ALImageMagickLib.DrawColor(wand, x, y, paint_method);
+  ALImageMagickLibrary.DrawColor(wand, x, y, paint_method);
 end;
 
 {*****************************************************************************************************************************************************************************************************}
 function DrawComposite(wand: PDrawingWand; const compose: CompositeOperator; const x: double; const y: double; const width: double; const height: double; magick_wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawComposite(wand, compose, x, y, width, height, magick_wand);
+  Result := ALImageMagickLibrary.DrawComposite(wand, compose, x, y, width, height, magick_wand);
 end;
 
 {******************************************************************}
 procedure DrawComment(wand: PDrawingWand; const comment: PAnsiChar);
 begin
-  ALImageMagickLib.DrawComment(wand, comment);
+  ALImageMagickLibrary.DrawComment(wand, comment);
 end;
 
 {*********************************************************************************************************************************************************}
 procedure DrawEllipse(wand: PDrawingWand; const ox: double; const oy: double; const rx: double; const ry: double; const start: double; const &end: double);
 begin
-  ALImageMagickLib.DrawEllipse(wand, ox, oy, rx, ry, start, &end);
+  ALImageMagickLibrary.DrawEllipse(wand, ox, oy, rx, ry, start, &end);
 end;
 
 {*******************************************************************************}
 procedure DrawGetBorderColor(const wand: PDrawingWand; border_color: PPixelWand);
 begin
-  ALImageMagickLib.DrawGetBorderColor(wand, border_color);
+  ALImageMagickLibrary.DrawGetBorderColor(wand, border_color);
 end;
 
 {************************************************************}
 function DrawGetClipPath(const wand: PDrawingWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.DrawGetClipPath(wand);
+  Result := ALImageMagickLibrary.DrawGetClipPath(wand);
 end;
 
 {***********************************************************}
 function DrawGetClipRule(const wand: PDrawingWand): FillRule;
 begin
-  Result := ALImageMagickLib.DrawGetClipRule(wand);
+  Result := ALImageMagickLibrary.DrawGetClipRule(wand);
 end;
 
 {*****************************************************************}
 function DrawGetClipUnits(const wand: PDrawingWand): ClipPathUnits;
 begin
-  Result := ALImageMagickLib.DrawGetClipUnits(wand);
+  Result := ALImageMagickLibrary.DrawGetClipUnits(wand);
 end;
 
 {***********************************************************}
 function DrawGetDensity(const wand: PDrawingWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.DrawGetDensity(wand);
+  Result := ALImageMagickLibrary.DrawGetDensity(wand);
 end;
 
 {***************************************************************************************}
 function DrawGetException(const wand: PDrawingWand; severity: PExceptionType): PAnsiChar;
 begin
-  Result := ALImageMagickLib.DrawGetException(wand, severity);
+  Result := ALImageMagickLibrary.DrawGetException(wand, severity);
 end;
 
 {*********************************************************************}
 function DrawGetExceptionType(const wand: PDrawingWand): ExceptionType;
 begin
-  Result := ALImageMagickLib.DrawGetExceptionType(wand);
+  Result := ALImageMagickLibrary.DrawGetExceptionType(wand);
 end;
 
 {***************************************************************************}
 procedure DrawGetFillColor(const wand: PDrawingWand; fill_color: PPixelWand);
 begin
-  ALImageMagickLib.DrawGetFillColor(wand, fill_color);
+  ALImageMagickLibrary.DrawGetFillColor(wand, fill_color);
 end;
 
 {************************************************************}
 function DrawGetFillOpacity(const wand: PDrawingWand): double;
 begin
-  Result := ALImageMagickLib.DrawGetFillOpacity(wand);
+  Result := ALImageMagickLibrary.DrawGetFillOpacity(wand);
 end;
 
 {***********************************************************}
 function DrawGetFillRule(const wand: PDrawingWand): FillRule;
 begin
-  Result := ALImageMagickLib.DrawGetFillRule(wand);
+  Result := ALImageMagickLibrary.DrawGetFillRule(wand);
 end;
 
 {********************************************************}
 function DrawGetFont(const wand: PDrawingWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.DrawGetFont(wand);
+  Result := ALImageMagickLibrary.DrawGetFont(wand);
 end;
 
 {**************************************************************}
 function DrawGetFontFamily(const wand: PDrawingWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.DrawGetFontFamily(wand);
+  Result := ALImageMagickLibrary.DrawGetFontFamily(wand);
 end;
 
 {**************************************************************************************************}
 function DrawGetFontResolution(const wand: PDrawingWand; x: PDouble; y: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawGetFontResolution(wand, x, y);
+  Result := ALImageMagickLibrary.DrawGetFontResolution(wand, x, y);
 end;
 
 {*********************************************************}
 function DrawGetFontSize(const wand: PDrawingWand): double;
 begin
-  Result := ALImageMagickLib.DrawGetFontSize(wand);
+  Result := ALImageMagickLibrary.DrawGetFontSize(wand);
 end;
 
 {*****************************************************************}
 function DrawGetFontStretch(const wand: PDrawingWand): StretchType;
 begin
-  Result := ALImageMagickLib.DrawGetFontStretch(wand);
+  Result := ALImageMagickLibrary.DrawGetFontStretch(wand);
 end;
 
 {*************************************************************}
 function DrawGetFontStyle(const wand: PDrawingWand): StyleType;
 begin
-  Result := ALImageMagickLib.DrawGetFontStyle(wand);
+  Result := ALImageMagickLibrary.DrawGetFontStyle(wand);
 end;
 
 {***********************************************************}
 function DrawGetFontWeight(const wand: PDrawingWand): size_t;
 begin
-  Result := ALImageMagickLib.DrawGetFontWeight(wand);
+  Result := ALImageMagickLibrary.DrawGetFontWeight(wand);
 end;
 
 {*************************************************************}
 function DrawGetGravity(const wand: PDrawingWand): GravityType;
 begin
-  Result := ALImageMagickLib.DrawGetGravity(wand);
+  Result := ALImageMagickLibrary.DrawGetGravity(wand);
 end;
 
 {********************************************************}
 function DrawGetOpacity(const wand: PDrawingWand): double;
 begin
-  Result := ALImageMagickLib.DrawGetOpacity(wand);
+  Result := ALImageMagickLibrary.DrawGetOpacity(wand);
 end;
 
 {***************************************************************************}
 function DrawGetStrokeAntialias(const wand: PDrawingWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawGetStrokeAntialias(wand);
+  Result := ALImageMagickLibrary.DrawGetStrokeAntialias(wand);
 end;
 
 {*******************************************************************************}
 procedure DrawGetStrokeColor(const wand: PDrawingWand; stroke_color: PPixelWand);
 begin
-  ALImageMagickLib.DrawGetStrokeColor(wand, stroke_color);
+  ALImageMagickLibrary.DrawGetStrokeColor(wand, stroke_color);
 end;
 
 {*******************************************************************************************}
 function DrawGetStrokeDashArray(const wand: PDrawingWand; number_elements: PSize_t): PDouble;
 begin
-  Result := ALImageMagickLib.DrawGetStrokeDashArray(wand, number_elements);
+  Result := ALImageMagickLibrary.DrawGetStrokeDashArray(wand, number_elements);
 end;
 
 {*****************************************************************}
 function DrawGetStrokeDashOffset(const wand: PDrawingWand): double;
 begin
-  Result := ALImageMagickLib.DrawGetStrokeDashOffset(wand);
+  Result := ALImageMagickLibrary.DrawGetStrokeDashOffset(wand);
 end;
 
 {***************************************************************}
 function DrawGetStrokeLineCap(const wand: PDrawingWand): LineCap;
 begin
-  Result := ALImageMagickLib.DrawGetStrokeLineCap(wand);
+  Result := ALImageMagickLibrary.DrawGetStrokeLineCap(wand);
 end;
 
 {*****************************************************************}
 function DrawGetStrokeLineJoin(const wand: PDrawingWand): LineJoin;
 begin
-  Result := ALImageMagickLib.DrawGetStrokeLineJoin(wand);
+  Result := ALImageMagickLibrary.DrawGetStrokeLineJoin(wand);
 end;
 
 {*****************************************************************}
 function DrawGetStrokeMiterLimit(const wand: PDrawingWand): size_t;
 begin
-  Result := ALImageMagickLib.DrawGetStrokeMiterLimit(wand);
+  Result := ALImageMagickLibrary.DrawGetStrokeMiterLimit(wand);
 end;
 
 {**************************************************************}
 function DrawGetStrokeOpacity(const wand: PDrawingWand): double;
 begin
-  Result := ALImageMagickLib.DrawGetStrokeOpacity(wand);
+  Result := ALImageMagickLibrary.DrawGetStrokeOpacity(wand);
 end;
 
 {************************************************************}
 function DrawGetStrokeWidth(const wand: PDrawingWand): double;
 begin
-  Result := ALImageMagickLib.DrawGetStrokeWidth(wand);
+  Result := ALImageMagickLibrary.DrawGetStrokeWidth(wand);
 end;
 
 {*****************************************************************}
 function DrawGetTextAlignment(const wand: PDrawingWand): AlignType;
 begin
-  Result := ALImageMagickLib.DrawGetTextAlignment(wand);
+  Result := ALImageMagickLibrary.DrawGetTextAlignment(wand);
 end;
 
 {*************************************************************************}
 function DrawGetTextAntialias(const wand: PDrawingWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawGetTextAntialias(wand);
+  Result := ALImageMagickLibrary.DrawGetTextAntialias(wand);
 end;
 
 {***********************************************************************}
 function DrawGetTextDecoration(const wand: PDrawingWand): DecorationType;
 begin
-  Result := ALImageMagickLib.DrawGetTextDecoration(wand);
+  Result := ALImageMagickLibrary.DrawGetTextDecoration(wand);
 end;
 
 {*********************************************************************}
 function DrawGetTextDirection(const wand: PDrawingWand): DirectionType;
 begin
-  Result := ALImageMagickLib.DrawGetTextDirection(wand);
+  Result := ALImageMagickLibrary.DrawGetTextDirection(wand);
 end;
 
 {****************************************************************}
 function DrawGetTextEncoding(const wand: PDrawingWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.DrawGetTextEncoding(wand);
+  Result := ALImageMagickLibrary.DrawGetTextEncoding(wand);
 end;
 
 {******************************************************}
 function DrawGetTextKerning(wand: PDrawingWand): double;
 begin
-  Result := ALImageMagickLib.DrawGetTextKerning(wand);
+  Result := ALImageMagickLibrary.DrawGetTextKerning(wand);
 end;
 
 {***************************************************************}
 function DrawGetTextInterlineSpacing(wand: PDrawingWand): double;
 begin
-  Result := ALImageMagickLib.DrawGetTextInterlineSpacing(wand);
+  Result := ALImageMagickLibrary.DrawGetTextInterlineSpacing(wand);
 end;
 
 {***************************************************************}
 function DrawGetTextInterwordSpacing(wand: PDrawingWand): double;
 begin
-  Result := ALImageMagickLib.DrawGetTextInterwordSpacing(wand);
+  Result := ALImageMagickLibrary.DrawGetTextInterwordSpacing(wand);
 end;
 
 {********************************************************************************************************************************************************}
 function DrawGetTypeMetrics(const wand: PDrawingWand; const text: PAnsiChar; ignore_newlines: MagickBooleanType; metrics: PTypeMetric): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawGetTypeMetrics(wand, text, ignore_newlines, metrics);
+  Result := ALImageMagickLibrary.DrawGetTypeMetrics(wand, text, ignore_newlines, metrics);
 end;
 
 {************************************************************}
 function DrawGetVectorGraphics(wand: PDrawingWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.DrawGetVectorGraphics(wand);
+  Result := ALImageMagickLibrary.DrawGetVectorGraphics(wand);
 end;
 
 {*********************************************************************************}
 procedure DrawGetTextUnderColor(const wand: PDrawingWand; under_color: PPixelWand);
 begin
-  ALImageMagickLib.DrawGetTextUnderColor(wand, under_color);
+  ALImageMagickLibrary.DrawGetTextUnderColor(wand, under_color);
 end;
 
 {*************************************************************************************************************}
 procedure DrawLine(wand: PDrawingWand; const sx: double; const sy: double; const ex: double; const ey: double);
 begin
-  ALImageMagickLib.DrawLine(wand, sx, sy, ex, ey);
+  ALImageMagickLibrary.DrawLine(wand, sx, sy, ex, ey);
 end;
 
 {******************************************}
 procedure DrawPathClose(wand: PDrawingWand);
 begin
-  ALImageMagickLib.DrawPathClose(wand);
+  ALImageMagickLibrary.DrawPathClose(wand);
 end;
 
 {**************************************************************************************************************************************************************}
 procedure DrawPathCurveToAbsolute(wand: PDrawingWand; const x1: double; const y1: double; const x2: double; const y2: double; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathCurveToAbsolute(wand, x1, y1, x2, y2, x, y);
+  ALImageMagickLibrary.DrawPathCurveToAbsolute(wand, x1, y1, x2, y2, x, y);
 end;
 
 {**************************************************************************************************************************************************************}
 procedure DrawPathCurveToRelative(wand: PDrawingWand; const x1: double; const y1: double; const x2: double; const y2: double; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathCurveToRelative(wand, x1, y1, x2, y2, x, y);
+  ALImageMagickLibrary.DrawPathCurveToRelative(wand, x1, y1, x2, y2, x, y);
 end;
 
 {*****************************************************************************************************************************************}
 procedure DrawPathCurveToQuadraticBezierAbsolute(wand: PDrawingWand; const x1: double; const y1: double; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathCurveToQuadraticBezierAbsolute(wand, x1, y1, x, y);
+  ALImageMagickLibrary.DrawPathCurveToQuadraticBezierAbsolute(wand, x1, y1, x, y);
 end;
 
 {*****************************************************************************************************************************************}
 procedure DrawPathCurveToQuadraticBezierRelative(wand: PDrawingWand; const x1: double; const y1: double; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathCurveToQuadraticBezierRelative(wand, x1, y1, x, y);
+  ALImageMagickLibrary.DrawPathCurveToQuadraticBezierRelative(wand, x1, y1, x, y);
 end;
 
 {***********************************************************************************************************}
 procedure DrawPathCurveToQuadraticBezierSmoothAbsolute(wand: PDrawingWand; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathCurveToQuadraticBezierSmoothAbsolute(wand, x, y);
+  ALImageMagickLibrary.DrawPathCurveToQuadraticBezierSmoothAbsolute(wand, x, y);
 end;
 
 {***********************************************************************************************************}
 procedure DrawPathCurveToQuadraticBezierSmoothRelative(wand: PDrawingWand; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathCurveToQuadraticBezierSmoothRelative(wand, x, y);
+  ALImageMagickLibrary.DrawPathCurveToQuadraticBezierSmoothRelative(wand, x, y);
 end;
 
 {********************************************************************************************************************************}
 procedure DrawPathCurveToSmoothAbsolute(wand: PDrawingWand; const x2: double; const y2: double; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathCurveToSmoothAbsolute(wand, x2, y2, x, y);
+  ALImageMagickLibrary.DrawPathCurveToSmoothAbsolute(wand, x2, y2, x, y);
 end;
 
 {********************************************************************************************************************************}
 procedure DrawPathCurveToSmoothRelative(wand: PDrawingWand; const x2: double; const y2: double; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathCurveToSmoothRelative(wand, x2, y2, x, y);
+  ALImageMagickLibrary.DrawPathCurveToSmoothRelative(wand, x2, y2, x, y);
 end;
 
 {*******************************************************************************************************************************************************************************************************************************************}
 procedure DrawPathEllipticArcAbsolute(wand: PDrawingWand; const rx: double; const ry: double; const x_axis_rotation: double; const large_arc_flag: MagickBooleanType; const sweep_flag: MagickBooleanType; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathEllipticArcAbsolute(wand, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, x, y);
+  ALImageMagickLibrary.DrawPathEllipticArcAbsolute(wand, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, x, y);
 end;
 
 {*******************************************************************************************************************************************************************************************************************************************}
 procedure DrawPathEllipticArcRelative(wand: PDrawingWand; const rx: double; const ry: double; const x_axis_rotation: double; const large_arc_flag: MagickBooleanType; const sweep_flag: MagickBooleanType; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathEllipticArcRelative(wand, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, x, y);
+  ALImageMagickLibrary.DrawPathEllipticArcRelative(wand, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, x, y);
 end;
 
 {*******************************************}
 procedure DrawPathFinish(wand: PDrawingWand);
 begin
-  ALImageMagickLib.DrawPathFinish(wand);
+  ALImageMagickLibrary.DrawPathFinish(wand);
 end;
 
 {*************************************************************************************}
 procedure DrawPathLineToAbsolute(wand: PDrawingWand; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathLineToAbsolute(wand, x, y);
+  ALImageMagickLibrary.DrawPathLineToAbsolute(wand, x, y);
 end;
 
 {*************************************************************************************}
 procedure DrawPathLineToRelative(wand: PDrawingWand; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathLineToRelative(wand, x, y);
+  ALImageMagickLibrary.DrawPathLineToRelative(wand, x, y);
 end;
 
 {******************************************************************************}
 procedure DrawPathLineToHorizontalAbsolute(wand: PDrawingWand; const x: double);
 begin
-  ALImageMagickLib.DrawPathLineToHorizontalAbsolute(wand, x);
+  ALImageMagickLibrary.DrawPathLineToHorizontalAbsolute(wand, x);
 end;
 
 {******************************************************************************}
 procedure DrawPathLineToHorizontalRelative(wand: PDrawingWand; const x: double);
 begin
-  ALImageMagickLib.DrawPathLineToHorizontalRelative(wand, x);
+  ALImageMagickLibrary.DrawPathLineToHorizontalRelative(wand, x);
 end;
 
 {****************************************************************************}
 procedure DrawPathLineToVerticalAbsolute(wand: PDrawingWand; const y: double);
 begin
-  ALImageMagickLib.DrawPathLineToVerticalAbsolute(wand, y);
+  ALImageMagickLibrary.DrawPathLineToVerticalAbsolute(wand, y);
 end;
 
 {****************************************************************************}
 procedure DrawPathLineToVerticalRelative(wand: PDrawingWand; const y: double);
 begin
-  ALImageMagickLib.DrawPathLineToVerticalRelative(wand, y);
+  ALImageMagickLibrary.DrawPathLineToVerticalRelative(wand, y);
 end;
 
 {*************************************************************************************}
 procedure DrawPathMoveToAbsolute(wand: PDrawingWand; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathMoveToAbsolute(wand, x, y);
+  ALImageMagickLibrary.DrawPathMoveToAbsolute(wand, x, y);
 end;
 
 {*************************************************************************************}
 procedure DrawPathMoveToRelative(wand: PDrawingWand; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPathMoveToRelative(wand, x, y);
+  ALImageMagickLibrary.DrawPathMoveToRelative(wand, x, y);
 end;
 
 {******************************************}
 procedure DrawPathStart(wand: PDrawingWand);
 begin
-  ALImageMagickLib.DrawPathStart(wand);
+  ALImageMagickLibrary.DrawPathStart(wand);
 end;
 
 {************************************************************************}
 procedure DrawPoint(wand: PDrawingWand; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawPoint(wand, x, y);
+  ALImageMagickLibrary.DrawPoint(wand, x, y);
 end;
 
 {*********************************************************************************************************}
 procedure DrawPolygon(wand: PDrawingWand; const number_coordinates: size_t; const coordinates: PPointInfo);
 begin
-  ALImageMagickLib.DrawPolygon(wand, number_coordinates, coordinates);
+  ALImageMagickLibrary.DrawPolygon(wand, number_coordinates, coordinates);
 end;
 
 {**********************************************************************************************************}
 procedure DrawPolyline(wand: PDrawingWand; const number_coordinates: size_t; const coordinates: PPointInfo);
 begin
-  ALImageMagickLib.DrawPolyline(wand, number_coordinates, coordinates);
+  ALImageMagickLibrary.DrawPolyline(wand, number_coordinates, coordinates);
 end;
 
 {********************************************}
 procedure DrawPopClipPath(wand: PDrawingWand);
 begin
-  ALImageMagickLib.DrawPopClipPath(wand);
+  ALImageMagickLibrary.DrawPopClipPath(wand);
 end;
 
 {****************************************}
 procedure DrawPopDefs(wand: PDrawingWand);
 begin
-  ALImageMagickLib.DrawPopDefs(wand);
+  ALImageMagickLibrary.DrawPopDefs(wand);
 end;
 
 {*************************************************************}
 function DrawPopPattern(wand: PDrawingWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawPopPattern(wand);
+  Result := ALImageMagickLibrary.DrawPopPattern(wand);
 end;
 
 {****************************************************************************}
 procedure DrawPushClipPath(wand: PDrawingWand; const clip_mask_id: PAnsiChar);
 begin
-  ALImageMagickLib.DrawPushClipPath(wand, clip_mask_id);
+  ALImageMagickLibrary.DrawPushClipPath(wand, clip_mask_id);
 end;
 
 {*****************************************}
 procedure DrawPushDefs(wand: PDrawingWand);
 begin
-  ALImageMagickLib.DrawPushDefs(wand);
+  ALImageMagickLibrary.DrawPushDefs(wand);
 end;
 
 {************************************************************************************************************************************************************************}
 function DrawPushPattern(wand: PDrawingWand; const pattern_id: PAnsiChar; const x: double; const y: double; const width: double; const height: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawPushPattern(wand, pattern_id, x, y, width, height);
+  Result := ALImageMagickLibrary.DrawPushPattern(wand, pattern_id, x, y, width, height);
 end;
 
 {******************************************************************************************************************}
 procedure DrawRectangle(wand: PDrawingWand; const x1: double; const y1: double; const x2: double; const y2: double);
 begin
-  ALImageMagickLib.DrawRectangle(wand, x1, y1, x2, y2);
+  ALImageMagickLibrary.DrawRectangle(wand, x1, y1, x2, y2);
 end;
 
 {*********************************************************}
 function DrawRender(wand: PDrawingWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawRender(wand);
+  Result := ALImageMagickLibrary.DrawRender(wand);
 end;
 
 {****************************************************}
 procedure DrawResetVectorGraphics(wand: PDrawingWand);
 begin
-  ALImageMagickLib.DrawResetVectorGraphics(wand);
+  ALImageMagickLibrary.DrawResetVectorGraphics(wand);
 end;
 
 {**************************************************************}
 procedure DrawRotate(wand: PDrawingWand; const degrees: double);
 begin
-  ALImageMagickLib.DrawRotate(wand, degrees);
+  ALImageMagickLibrary.DrawRotate(wand, degrees);
 end;
 
 {***********************************************************************************************************************}
 procedure DrawRoundRectangle(wand: PDrawingWand; x1: double; y1: double; x2: double; y2: double; rx: double; ry: double);
 begin
-  ALImageMagickLib.DrawRoundRectangle(wand, x1, y1, x2, y2, rx, ry);
+  ALImageMagickLibrary.DrawRoundRectangle(wand, x1, y1, x2, y2, rx, ry);
 end;
 
 {************************************************************************}
 procedure DrawScale(wand: PDrawingWand; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawScale(wand, x, y);
+  ALImageMagickLibrary.DrawScale(wand, x, y);
 end;
 
 {******************************************************************************}
 procedure DrawSetBorderColor(wand: PDrawingWand; const border_wand: PPixelWand);
 begin
-  ALImageMagickLib.DrawSetBorderColor(wand, border_wand);
+  ALImageMagickLibrary.DrawSetBorderColor(wand, border_wand);
 end;
 
 {******************************************************************************************}
 function DrawSetClipPath(wand: PDrawingWand; const clip_mask: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawSetClipPath(wand, clip_mask);
+  Result := ALImageMagickLibrary.DrawSetClipPath(wand, clip_mask);
 end;
 
 {***********************************************************************}
 procedure DrawSetClipRule(wand: PDrawingWand; const fill_rule: FillRule);
 begin
-  ALImageMagickLib.DrawSetClipRule(wand, fill_rule);
+  ALImageMagickLibrary.DrawSetClipRule(wand, fill_rule);
 end;
 
 {******************************************************************************}
 procedure DrawSetClipUnits(wand: PDrawingWand; const clip_units: ClipPathUnits);
 begin
-  ALImageMagickLib.DrawSetClipUnits(wand, clip_units);
+  ALImageMagickLibrary.DrawSetClipUnits(wand, clip_units);
 end;
 
 {***************************************************************************************}
 function DrawSetDensity(wand: PDrawingWand; const density: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawSetDensity(wand, density);
+  Result := ALImageMagickLibrary.DrawSetDensity(wand, density);
 end;
 
 {**************************************************************************}
 procedure DrawSetFillColor(wand: PDrawingWand; const fill_wand: PPixelWand);
 begin
-  ALImageMagickLib.DrawSetFillColor(wand, fill_wand);
+  ALImageMagickLibrary.DrawSetFillColor(wand, fill_wand);
 end;
 
 {***************************************************************************}
 procedure DrawSetFillOpacity(wand: PDrawingWand; const fill_opacity: double);
 begin
-  ALImageMagickLib.DrawSetFillOpacity(wand, fill_opacity);
+  ALImageMagickLibrary.DrawSetFillOpacity(wand, fill_opacity);
 end;
 
 {****************************************************************************************************************************}
 function DrawSetFontResolution(wand: PDrawingWand; const x_resolution: double; const y_resolution: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawSetFontResolution(wand, x_resolution, y_resolution);
+  Result := ALImageMagickLibrary.DrawSetFontResolution(wand, x_resolution, y_resolution);
 end;
 
 {******************************************************************}
 procedure DrawSetOpacity(wand: PDrawingWand; const opacity: double);
 begin
-  ALImageMagickLib.DrawSetOpacity(wand, opacity);
+  ALImageMagickLibrary.DrawSetOpacity(wand, opacity);
 end;
 
 {***********************************************************************************************}
 function DrawSetFillPatternURL(wand: PDrawingWand; const fill_url: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawSetFillPatternURL(wand, fill_url);
+  Result := ALImageMagickLibrary.DrawSetFillPatternURL(wand, fill_url);
 end;
 
 {***********************************************************************}
 procedure DrawSetFillRule(wand: PDrawingWand; const fill_rule: FillRule);
 begin
-  ALImageMagickLib.DrawSetFillRule(wand, fill_rule);
+  ALImageMagickLibrary.DrawSetFillRule(wand, fill_rule);
 end;
 
 {**************************************************************************************}
 function DrawSetFont(wand: PDrawingWand; const font_name: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawSetFont(wand, font_name);
+  Result := ALImageMagickLibrary.DrawSetFont(wand, font_name);
 end;
 
 {**********************************************************************************************}
 function DrawSetFontFamily(wand: PDrawingWand; const font_family: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawSetFontFamily(wand, font_family);
+  Result := ALImageMagickLibrary.DrawSetFontFamily(wand, font_family);
 end;
 
 {*********************************************************************}
 procedure DrawSetFontSize(wand: PDrawingWand; const pointsize: double);
 begin
-  ALImageMagickLib.DrawSetFontSize(wand, pointsize);
+  ALImageMagickLibrary.DrawSetFontSize(wand, pointsize);
 end;
 
 {********************************************************************************}
 procedure DrawSetFontStretch(wand: PDrawingWand; const font_stretch: StretchType);
 begin
-  ALImageMagickLib.DrawSetFontStretch(wand, font_stretch);
+  ALImageMagickLibrary.DrawSetFontStretch(wand, font_stretch);
 end;
 
 {*********************************************************************}
 procedure DrawSetFontStyle(wand: PDrawingWand; const style: StyleType);
 begin
-  ALImageMagickLib.DrawSetFontStyle(wand, style);
+  ALImageMagickLibrary.DrawSetFontStyle(wand, style);
 end;
 
 {*************************************************************************}
 procedure DrawSetFontWeight(wand: PDrawingWand; const font_weight: size_t);
 begin
-  ALImageMagickLib.DrawSetFontWeight(wand, font_weight);
+  ALImageMagickLibrary.DrawSetFontWeight(wand, font_weight);
 end;
 
 {***********************************************************************}
 procedure DrawSetGravity(wand: PDrawingWand; const gravity: GravityType);
 begin
-  ALImageMagickLib.DrawSetGravity(wand, gravity);
+  ALImageMagickLibrary.DrawSetGravity(wand, gravity);
 end;
 
 {******************************************************************************}
 procedure DrawSetStrokeColor(wand: PDrawingWand; const stroke_wand: PPixelWand);
 begin
-  ALImageMagickLib.DrawSetStrokeColor(wand, stroke_wand);
+  ALImageMagickLibrary.DrawSetStrokeColor(wand, stroke_wand);
 end;
 
 {***************************************************************************************************}
 function DrawSetStrokePatternURL(wand: PDrawingWand; const stroke_url: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawSetStrokePatternURL(wand, stroke_url);
+  Result := ALImageMagickLibrary.DrawSetStrokePatternURL(wand, stroke_url);
 end;
 
 {**********************************************************************************************}
 procedure DrawSetStrokeAntialias(wand: PDrawingWand; const stroke_antialias: MagickBooleanType);
 begin
-  ALImageMagickLib.DrawSetStrokeAntialias(wand, stroke_antialias);
+  ALImageMagickLibrary.DrawSetStrokeAntialias(wand, stroke_antialias);
 end;
 
 {******************************************************************************************************************************}
 function DrawSetStrokeDashArray(wand: PDrawingWand; const number_elements: size_t; const dasharray: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawSetStrokeDashArray(wand, number_elements, dasharray);
+  Result := ALImageMagickLibrary.DrawSetStrokeDashArray(wand, number_elements, dasharray);
 end;
 
 {*******************************************************************************}
 procedure DrawSetStrokeDashOffset(wand: PDrawingWand; const dash_offset: double);
 begin
-  ALImageMagickLib.DrawSetStrokeDashOffset(wand, dash_offset);
+  ALImageMagickLibrary.DrawSetStrokeDashOffset(wand, dash_offset);
 end;
 
 {*************************************************************************}
 procedure DrawSetStrokeLineCap(wand: PDrawingWand; const linecap: LineCap);
 begin
-  ALImageMagickLib.DrawSetStrokeLineCap(wand, linecap);
+  ALImageMagickLibrary.DrawSetStrokeLineCap(wand, linecap);
 end;
 
 {****************************************************************************}
 procedure DrawSetStrokeLineJoin(wand: PDrawingWand; const linejoin: LineJoin);
 begin
-  ALImageMagickLib.DrawSetStrokeLineJoin(wand, linejoin);
+  ALImageMagickLibrary.DrawSetStrokeLineJoin(wand, linejoin);
 end;
 
 {******************************************************************************}
 procedure DrawSetStrokeMiterLimit(wand: PDrawingWand; const miterlimit: size_t);
 begin
-  ALImageMagickLib.DrawSetStrokeMiterLimit(wand, miterlimit);
+  ALImageMagickLibrary.DrawSetStrokeMiterLimit(wand, miterlimit);
 end;
 
 {************************************************************************}
 procedure DrawSetStrokeOpacity(wand: PDrawingWand; const opacity: double);
 begin
-  ALImageMagickLib.DrawSetStrokeOpacity(wand, opacity);
+  ALImageMagickLibrary.DrawSetStrokeOpacity(wand, opacity);
 end;
 
 {***************************************************************************}
 procedure DrawSetStrokeWidth(wand: PDrawingWand; const stroke_width: double);
 begin
-  ALImageMagickLib.DrawSetStrokeWidth(wand, stroke_width);
+  ALImageMagickLibrary.DrawSetStrokeWidth(wand, stroke_width);
 end;
 
 {*****************************************************************************}
 procedure DrawSetTextAlignment(wand: PDrawingWand; const alignment: AlignType);
 begin
-  ALImageMagickLib.DrawSetTextAlignment(wand, alignment);
+  ALImageMagickLibrary.DrawSetTextAlignment(wand, alignment);
 end;
 
 {******************************************************************************************}
 procedure DrawSetTextAntialias(wand: PDrawingWand; const text_antialias: MagickBooleanType);
 begin
-  ALImageMagickLib.DrawSetTextAntialias(wand, text_antialias);
+  ALImageMagickLibrary.DrawSetTextAntialias(wand, text_antialias);
 end;
 
 {************************************************************************************}
 procedure DrawSetTextDecoration(wand: PDrawingWand; const decoration: DecorationType);
 begin
-  ALImageMagickLib.DrawSetTextDecoration(wand, decoration);
+  ALImageMagickLibrary.DrawSetTextDecoration(wand, decoration);
 end;
 
 {*********************************************************************************}
 procedure DrawSetTextDirection(wand: PDrawingWand; const direction: DirectionType);
 begin
-  ALImageMagickLib.DrawSetTextDirection(wand, direction);
+  ALImageMagickLibrary.DrawSetTextDirection(wand, direction);
 end;
 
 {***************************************************************************}
 procedure DrawSetTextEncoding(wand: PDrawingWand; const encoding: PAnsiChar);
 begin
-  ALImageMagickLib.DrawSetTextEncoding(wand, encoding);
+  ALImageMagickLibrary.DrawSetTextEncoding(wand, encoding);
 end;
 
 {**********************************************************************}
 procedure DrawSetTextKerning(wand: PDrawingWand; const kerning: double);
 begin
-  ALImageMagickLib.DrawSetTextKerning(wand, kerning);
+  ALImageMagickLibrary.DrawSetTextKerning(wand, kerning);
 end;
 
 {*****************************************************************************************}
 procedure DrawSetTextInterlineSpacing(wand: PDrawingWand; const interline_spacing: double);
 begin
-  ALImageMagickLib.DrawSetTextInterlineSpacing(wand, interline_spacing);
+  ALImageMagickLibrary.DrawSetTextInterlineSpacing(wand, interline_spacing);
 end;
 
 {*****************************************************************************************}
 procedure DrawSetTextInterwordSpacing(wand: PDrawingWand; const interword_spacing: double);
 begin
-  ALImageMagickLib.DrawSetTextInterwordSpacing(wand, interword_spacing);
+  ALImageMagickLibrary.DrawSetTextInterwordSpacing(wand, interword_spacing);
 end;
 
 {********************************************************************************}
 procedure DrawSetTextUnderColor(wand: PDrawingWand; const under_wand: PPixelWand);
 begin
-  ALImageMagickLib.DrawSetTextUnderColor(wand, under_wand);
+  ALImageMagickLibrary.DrawSetTextUnderColor(wand, under_wand);
 end;
 
 {******************************************************************************************}
 function DrawSetVectorGraphics(wand: PDrawingWand; const xml: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DrawSetVectorGraphics(wand, xml);
+  Result := ALImageMagickLibrary.DrawSetVectorGraphics(wand, xml);
 end;
 
 {*************************************************************}
 procedure DrawSkewX(wand: PDrawingWand; const degrees: double);
 begin
-  ALImageMagickLib.DrawSkewX(wand, degrees);
+  ALImageMagickLibrary.DrawSkewX(wand, degrees);
 end;
 
 {*************************************************************}
 procedure DrawSkewY(wand: PDrawingWand; const degrees: double);
 begin
-  ALImageMagickLib.DrawSkewY(wand, degrees);
+  ALImageMagickLibrary.DrawSkewY(wand, degrees);
 end;
 
 {****************************************************************************}
 procedure DrawTranslate(wand: PDrawingWand; const x: double; const y: double);
 begin
-  ALImageMagickLib.DrawTranslate(wand, x, y);
+  ALImageMagickLibrary.DrawTranslate(wand, x, y);
 end;
 
 {*******************************************************************************************************************}
 procedure DrawSetViewbox(wand: PDrawingWand; const x1: double; const y1: double; const x2: double; const y2: double);
 begin
-  ALImageMagickLib.DrawSetViewbox(wand, x1, y1, x2, y2);
+  ALImageMagickLibrary.DrawSetViewbox(wand, x1, y1, x2, y2);
 end;
 
 {******************************************************************}
 function IsDrawingWand(const wand: PDrawingWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsDrawingWand(wand);
+  Result := ALImageMagickLibrary.IsDrawingWand(wand);
 end;
 
 {**************************************}
 function NewDrawingWand(): PDrawingWand;
 begin
-  Result := ALImageMagickLib.NewDrawingWand();
+  Result := ALImageMagickLibrary.NewDrawingWand();
 end;
 
 {************************************************************}
 function PeekDrawingWand(const wand: PDrawingWand): PDrawInfo;
 begin
-  Result := ALImageMagickLib.PeekDrawingWand(wand);
+  Result := ALImageMagickLibrary.PeekDrawingWand(wand);
 end;
 
 {*************************************************************}
 function PopDrawingWand(wand: PDrawingWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PopDrawingWand(wand);
+  Result := ALImageMagickLibrary.PopDrawingWand(wand);
 end;
 
 {**************************************************************}
 function PushDrawingWand(wand: PDrawingWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PushDrawingWand(wand);
+  Result := ALImageMagickLibrary.PushDrawingWand(wand);
 end;
 
 {$ENDREGION}
@@ -15660,7 +15662,7 @@ end;
 {*********************************************************************************************************************************************************}
 function IdentifyImageCommand(image_info: PImageInfo; argc: Integer; argv: PPAnsiChar; metadata: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IdentifyImageCommand(image_info, argc, argv, metadata, exception);
+  Result := ALImageMagickLibrary.IdentifyImageCommand(image_info, argc, argv, metadata, exception);
 end;
 
 {$ENDREGION}
@@ -15670,7 +15672,7 @@ end;
 {*******************************************************************************************************************************************************}
 function ImportImageCommand(image_info: PImageInfo; argc: Integer; argv: PPAnsiChar; metadata: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.ImportImageCommand(image_info, argc, argv, metadata, exception);
+  Result := ALImageMagickLibrary.ImportImageCommand(image_info, argc, argv, metadata, exception);
 end;
 
 {$ENDREGION}
@@ -15680,25 +15682,25 @@ end;
 {*********************************************************************************************************************************************************************************}
 function MagickCommandGenesis(image_info: PImageInfo; command: MagickCommand; argc: Integer; argv: PPAnsiChar; metadata: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickCommandGenesis(image_info, command, argc, argv, metadata, exception);
+  Result := ALImageMagickLibrary.MagickCommandGenesis(image_info, command, argc, argv, metadata, exception);
 end;
 
 {*******************************************************************************************************************************}
 procedure ProcessScriptOptions(cli_wand: PMagickCLI; const filename: PAnsiChar; argc: Integer; argv: PPAnsiChar; index: Integer);
 begin
-  ALImageMagickLib.ProcessScriptOptions(cli_wand, filename, argc, argv, index);
+  ALImageMagickLibrary.ProcessScriptOptions(cli_wand, filename, argc, argv, index);
 end;
 
 {*************************************************************************************************************}
 function ProcessCommandOptions(cli_wand: PMagickCLI; argc: Integer; argv: PPAnsiChar; index: Integer): Integer;
 begin
-  Result := ALImageMagickLib.ProcessCommandOptions(cli_wand, argc, argv, index);
+  Result := ALImageMagickLibrary.ProcessCommandOptions(cli_wand, argc, argv, index);
 end;
 
 {*******************************************************************************************************************************************************}
 function MagickImageCommand(image_info: PImageInfo; argc: Integer; argv: PPAnsiChar; metadata: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickImageCommand(image_info, argc, argv, metadata, exception);
+  Result := ALImageMagickLibrary.MagickImageCommand(image_info, argc, argv, metadata, exception);
 end;
 
 {$ENDREGION}
@@ -15708,1705 +15710,1705 @@ end;
 {***************************************************************}
 function GetImageFromMagickWand(const wand: PMagickWand): PImage;
 begin
-  Result := ALImageMagickLib.GetImageFromMagickWand(wand);
+  Result := ALImageMagickLibrary.GetImageFromMagickWand(wand);
 end;
 
 {****************************************************************************************************************}
 function MagickAdaptiveBlurImage(wand: PMagickWand; const radius: double; const sigma: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAdaptiveBlurImage(wand, radius, sigma);
+  Result := ALImageMagickLibrary.MagickAdaptiveBlurImage(wand, radius, sigma);
 end;
 
 {******************************************************************************************************************}
 function MagickAdaptiveResizeImage(wand: PMagickWand; const columns: size_t; const rows: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAdaptiveResizeImage(wand, columns, rows);
+  Result := ALImageMagickLibrary.MagickAdaptiveResizeImage(wand, columns, rows);
 end;
 
 {*******************************************************************************************************************}
 function MagickAdaptiveSharpenImage(wand: PMagickWand; const radius: double; const sigma: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAdaptiveSharpenImage(wand, radius, sigma);
+  Result := ALImageMagickLibrary.MagickAdaptiveSharpenImage(wand, radius, sigma);
 end;
 
 {*****************************************************************************************************************************************}
 function MagickAdaptiveThresholdImage(wand: PMagickWand; const width: size_t; const height: size_t; const bias: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAdaptiveThresholdImage(wand, width, height, bias);
+  Result := ALImageMagickLibrary.MagickAdaptiveThresholdImage(wand, width, height, bias);
 end;
 
 {*****************************************************************************************}
 function MagickAddImage(wand: PMagickWand; const add_wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAddImage(wand, add_wand);
+  Result := ALImageMagickLibrary.MagickAddImage(wand, add_wand);
 end;
 
 {***********************************************************************************************************************}
 function MagickAddNoiseImage(wand: PMagickWand; const noise_type: NoiseType; const attenuate: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAddNoiseImage(wand, noise_type, attenuate);
+  Result := ALImageMagickLibrary.MagickAddNoiseImage(wand, noise_type, attenuate);
 end;
 
 {**********************************************************************************************************}
 function MagickAffineTransformImage(wand: PMagickWand; const drawing_wand: PDrawingWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAffineTransformImage(wand, drawing_wand);
+  Result := ALImageMagickLibrary.MagickAffineTransformImage(wand, drawing_wand);
 end;
 
 {*********************************************************************************************************************************************************************************}
 function MagickAnnotateImage(wand: PMagickWand; const drawing_wand: PDrawingWand; const x: double; const y: double; const angle: double; const text: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAnnotateImage(wand, drawing_wand, x, y, angle, text);
+  Result := ALImageMagickLibrary.MagickAnnotateImage(wand, drawing_wand, x, y, angle, text);
 end;
 
 {***********************************************************************************************}
 function MagickAnimateImages(wand: PMagickWand; const server_name: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAnimateImages(wand, server_name);
+  Result := ALImageMagickLibrary.MagickAnimateImages(wand, server_name);
 end;
 
 {******************************************************************************************}
 function MagickAppendImages(wand: PMagickWand; const stack: MagickBooleanType): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickAppendImages(wand, stack);
+  Result := ALImageMagickLibrary.MagickAppendImages(wand, stack);
 end;
 
 {******************************************************************}
 function MagickAutoGammaImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAutoGammaImage(wand);
+  Result := ALImageMagickLibrary.MagickAutoGammaImage(wand);
 end;
 
 {******************************************************************}
 function MagickAutoLevelImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAutoLevelImage(wand);
+  Result := ALImageMagickLibrary.MagickAutoLevelImage(wand);
 end;
 
 {*******************************************************************}
 function MagickAutoOrientImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAutoOrientImage(wand);
+  Result := ALImageMagickLibrary.MagickAutoOrientImage(wand);
 end;
 
 {*********************************************************************************************************}
 function MagickAutoThresholdImage(wand: PMagickWand; const method: AutoThresholdMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickAutoThresholdImage(wand, method);
+  Result := ALImageMagickLibrary.MagickAutoThresholdImage(wand, method);
 end;
 
 {*****************************************************************************************************************************************************************************}
 function MagickBilateralBlurImage(wand: PMagickWand; const radius: double; const sigma: double; const intensity_sigma: double; const spatial_sigma: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickBilateralBlurImage(wand, radius, sigma, intensity_sigma, spatial_sigma);
+  Result := ALImageMagickLibrary.MagickBilateralBlurImage(wand, radius, sigma, intensity_sigma, spatial_sigma);
 end;
 
 {****************************************************************************************************}
 function MagickBlackThresholdImage(wand: PMagickWand; const threshold: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickBlackThresholdImage(wand, threshold);
+  Result := ALImageMagickLibrary.MagickBlackThresholdImage(wand, threshold);
 end;
 
 {****************************************************************************************}
 function MagickBlueShiftImage(wand: PMagickWand; const factor: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickBlueShiftImage(wand, factor);
+  Result := ALImageMagickLibrary.MagickBlueShiftImage(wand, factor);
 end;
 
 {********************************************************************************************************}
 function MagickBlurImage(wand: PMagickWand; const radius: double; const sigma: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickBlurImage(wand, radius, sigma);
+  Result := ALImageMagickLibrary.MagickBlurImage(wand, radius, sigma);
 end;
 
 {***************************************************************************************************************************************************************************}
 function MagickBorderImage(wand: PMagickWand; const bordercolor: PPixelWand; const width: size_t; const height: size_t; const compose: CompositeOperator): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickBorderImage(wand, bordercolor, width, height, compose);
+  Result := ALImageMagickLibrary.MagickBorderImage(wand, bordercolor, width, height, compose);
 end;
 
 {*****************************************************************************************************************************}
 function MagickBrightnessContrastImage(wand: PMagickWand; const brightness: double; const contrast: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickBrightnessContrastImage(wand, brightness, contrast);
+  Result := ALImageMagickLibrary.MagickBrightnessContrastImage(wand, brightness, contrast);
 end;
 
 {***********************************************************************************************************************************************************************}
 function MagickCannyEdgeImage(wand: PMagickWand; const radius: double; const sigma: double; const lower_percent: double; const upper_percent: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickCannyEdgeImage(wand, radius, sigma, lower_percent, upper_percent);
+  Result := ALImageMagickLibrary.MagickCannyEdgeImage(wand, radius, sigma, lower_percent, upper_percent);
 end;
 
 {*****************************************************************************************}
 function MagickChannelFxImage(wand: PMagickWand; const expression: PAnsiChar): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickChannelFxImage(wand, expression);
+  Result := ALImageMagickLibrary.MagickChannelFxImage(wand, expression);
 end;
 
 {************************************************************************************************************}
 function MagickCharcoalImage(wand: PMagickWand; const radius: double; const sigma: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickCharcoalImage(wand, radius, sigma);
+  Result := ALImageMagickLibrary.MagickCharcoalImage(wand, radius, sigma);
 end;
 
 {********************************************************************************************************************************************}
 function MagickChopImage(wand: PMagickWand; const width: size_t; const height: size_t; const x: ssize_t; const y: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickChopImage(wand, width, height, x, y);
+  Result := ALImageMagickLibrary.MagickChopImage(wand, width, height, x, y);
 end;
 
 {**************************************************************************************************************************************************************}
 function MagickCLAHEImage(wand: PMagickWand; const width: size_t; const height: size_t; const number_bins: double; const clip_limit: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickCLAHEImage(wand, width, height, number_bins, clip_limit);
+  Result := ALImageMagickLibrary.MagickCLAHEImage(wand, width, height, number_bins, clip_limit);
 end;
 
 {**************************************************************}
 function MagickClampImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickClampImage(wand);
+  Result := ALImageMagickLibrary.MagickClampImage(wand);
 end;
 
 {*************************************************************}
 function MagickClipImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickClipImage(wand);
+  Result := ALImageMagickLibrary.MagickClipImage(wand);
 end;
 
 {*****************************************************************************************************************************}
 function MagickClipImagePath(wand: PMagickWand; const pathname: PAnsiChar; const inside: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickClipImagePath(wand, pathname, inside);
+  Result := ALImageMagickLibrary.MagickClipImagePath(wand, pathname, inside);
 end;
 
 {*********************************************************************************************************************************}
 function MagickClutImage(wand: PMagickWand; const clut_wand: PMagickWand; const method: PixelInterpolateMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickClutImage(wand, clut_wand, method);
+  Result := ALImageMagickLibrary.MagickClutImage(wand, clut_wand, method);
 end;
 
 {************************************************************}
 function MagickCoalesceImages(wand: PMagickWand): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickCoalesceImages(wand);
+  Result := ALImageMagickLibrary.MagickCoalesceImages(wand);
 end;
 
 {************************************************************************************************************************}
 function MagickColorDecisionListImage(wand: PMagickWand; const color_correction_collection: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickColorDecisionListImage(wand, color_correction_collection);
+  Result := ALImageMagickLibrary.MagickColorDecisionListImage(wand, color_correction_collection);
 end;
 
 {**********************************************************************************************************************}
 function MagickColorizeImage(wand: PMagickWand; const colorize: PPixelWand; const blend: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickColorizeImage(wand, colorize, blend);
+  Result := ALImageMagickLibrary.MagickColorizeImage(wand, colorize, blend);
 end;
 
 {*****************************************************************************************************}
 function MagickColorMatrixImage(wand: PMagickWand; const color_matrix: PKernelInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickColorMatrixImage(wand, color_matrix);
+  Result := ALImageMagickLibrary.MagickColorMatrixImage(wand, color_matrix);
 end;
 
 {************************************************************************************************************************************}
 function MagickColorThresholdImage(wand: PMagickWand; const start_color: PPixelWand; const stop_color: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickColorThresholdImage(wand, start_color, stop_color);
+  Result := ALImageMagickLibrary.MagickColorThresholdImage(wand, start_color, stop_color);
 end;
 
 {*********************************************************************************************}
 function MagickCombineImages(wand: PMagickWand; const colorspace: ColorspaceType): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickCombineImages(wand, colorspace);
+  Result := ALImageMagickLibrary.MagickCombineImages(wand, colorspace);
 end;
 
 {******************************************************************************************}
 function MagickCommentImage(wand: PMagickWand; const comment: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickCommentImage(wand, comment);
+  Result := ALImageMagickLibrary.MagickCommentImage(wand, comment);
 end;
 
 {********************************************************************************************}
 function MagickCompareImagesLayers(wand: PMagickWand; const method: LayerMethod): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickCompareImagesLayers(wand, method);
+  Result := ALImageMagickLibrary.MagickCompareImagesLayers(wand, method);
 end;
 
 {****************************************************************************************************************************************}
 function MagickCompareImages(wand: PMagickWand; const reference: PMagickWand; const metric: MetricType; distortion: PDouble): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickCompareImages(wand, reference, metric, distortion);
+  Result := ALImageMagickLibrary.MagickCompareImages(wand, reference, metric, distortion);
 end;
 
 {**************************************************************************************}
 function MagickComplexImages(wand: PMagickWand; const op: ComplexOperator): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickComplexImages(wand, op);
+  Result := ALImageMagickLibrary.MagickComplexImages(wand, op);
 end;
 
 {***************************************************************************************************************************************************************************************************************}
 function MagickCompositeImage(wand: PMagickWand; const source_wand: PMagickWand; const compose: CompositeOperator; const clip_to_self: MagickBooleanType; const x: ssize_t; const y: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickCompositeImage(wand, source_wand, compose, clip_to_self, x, y);
+  Result := ALImageMagickLibrary.MagickCompositeImage(wand, source_wand, compose, clip_to_self, x, y);
 end;
 
 {***********************************************************************************************************************************************************************}
 function MagickCompositeImageGravity(wand: PMagickWand; const source_wand: PMagickWand; const compose: CompositeOperator; const gravity: GravityType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickCompositeImageGravity(wand, source_wand, compose, gravity);
+  Result := ALImageMagickLibrary.MagickCompositeImageGravity(wand, source_wand, compose, gravity);
 end;
 
 {*************************************************************************************************************************************************************************}
 function MagickCompositeLayers(wand: PMagickWand; const source_wand: PMagickWand; const compose: CompositeOperator; const x: ssize_t; const y: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickCompositeLayers(wand, source_wand, compose, x, y);
+  Result := ALImageMagickLibrary.MagickCompositeLayers(wand, source_wand, compose, x, y);
 end;
 
 {*********************************************************************************************************************************}
 function MagickConnectedComponentsImage(wand: PMagickWand; const connectivity: size_t; objects: PPCCObjectInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickConnectedComponentsImage(wand, connectivity, objects);
+  Result := ALImageMagickLibrary.MagickConnectedComponentsImage(wand, connectivity, objects);
 end;
 
 {***************************************************************************************************}
 function MagickContrastImage(wand: PMagickWand; const sharpen: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickContrastImage(wand, sharpen);
+  Result := ALImageMagickLibrary.MagickContrastImage(wand, sharpen);
 end;
 
 {******************************************************************************************************************************}
 function MagickContrastStretchImage(wand: PMagickWand; const black_point: double; const white_point: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickContrastStretchImage(wand, black_point, white_point);
+  Result := ALImageMagickLibrary.MagickContrastStretchImage(wand, black_point, white_point);
 end;
 
 {********************************************************************************************}
 function MagickConvolveImage(wand: PMagickWand; const kernel: PKernelInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickConvolveImage(wand, kernel);
+  Result := ALImageMagickLibrary.MagickConvolveImage(wand, kernel);
 end;
 
 {********************************************************************************************************************************************}
 function MagickCropImage(wand: PMagickWand; const width: size_t; const height: size_t; const x: ssize_t; const y: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickCropImage(wand, width, height, x, y);
+  Result := ALImageMagickLibrary.MagickCropImage(wand, width, height, x, y);
 end;
 
 {***********************************************************************************************}
 function MagickCycleColormapImage(wand: PMagickWand; const displace: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickCycleColormapImage(wand, displace);
+  Result := ALImageMagickLibrary.MagickCycleColormapImage(wand, displace);
 end;
 
 {*************************************************************************************************************************************************************************************}
 function MagickConstituteImage(wand: PMagickWand; const columns: size_t; const rows: size_t; const map: PAnsiChar; const storage: StorageType; const pixels: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickConstituteImage(wand, columns, rows, map, storage, pixels);
+  Result := ALImageMagickLibrary.MagickConstituteImage(wand, columns, rows, map, storage, pixels);
 end;
 
 {**********************************************************************************************}
 function MagickDecipherImage(wand: PMagickWand; const passphrase: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickDecipherImage(wand, passphrase);
+  Result := ALImageMagickLibrary.MagickDecipherImage(wand, passphrase);
 end;
 
 {***************************************************************}
 function MagickDeconstructImages(wand: PMagickWand): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickDeconstructImages(wand);
+  Result := ALImageMagickLibrary.MagickDeconstructImages(wand);
 end;
 
 {****************************************************************************************}
 function MagickDeskewImage(wand: PMagickWand; const threshold: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickDeskewImage(wand, threshold);
+  Result := ALImageMagickLibrary.MagickDeskewImage(wand, threshold);
 end;
 
 {******************************************************************}
 function MagickDespeckleImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickDespeckleImage(wand);
+  Result := ALImageMagickLibrary.MagickDespeckleImage(wand);
 end;
 
 {*************************************************}
 function MagickDestroyImage(image: PImage): PImage;
 begin
-  Result := ALImageMagickLib.MagickDestroyImage(image);
+  Result := ALImageMagickLibrary.MagickDestroyImage(image);
 end;
 
 {**********************************************************************************************}
 function MagickDisplayImage(wand: PMagickWand; const server_name: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickDisplayImage(wand, server_name);
+  Result := ALImageMagickLibrary.MagickDisplayImage(wand, server_name);
 end;
 
 {***********************************************************************************************}
 function MagickDisplayImages(wand: PMagickWand; const server_name: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickDisplayImages(wand, server_name);
+  Result := ALImageMagickLibrary.MagickDisplayImages(wand, server_name);
 end;
 
 {*****************************************************************************************************************************************************************************************}
 function MagickDistortImage(wand: PMagickWand; const method: DistortMethod; const number_arguments: size_t; const arguments: PDouble; const bestfit: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickDistortImage(wand, method, number_arguments, arguments, bestfit);
+  Result := ALImageMagickLibrary.MagickDistortImage(wand, method, number_arguments, arguments, bestfit);
 end;
 
 {***********************************************************************************************}
 function MagickDrawImage(wand: PMagickWand; const drawing_wand: PDrawingWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickDrawImage(wand, drawing_wand);
+  Result := ALImageMagickLibrary.MagickDrawImage(wand, drawing_wand);
 end;
 
 {***********************************************************************************}
 function MagickEdgeImage(wand: PMagickWand; const radius: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickEdgeImage(wand, radius);
+  Result := ALImageMagickLibrary.MagickEdgeImage(wand, radius);
 end;
 
 {**********************************************************************************************************}
 function MagickEmbossImage(wand: PMagickWand; const radius: double; const sigma: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickEmbossImage(wand, radius, sigma);
+  Result := ALImageMagickLibrary.MagickEmbossImage(wand, radius, sigma);
 end;
 
 {**********************************************************************************************}
 function MagickEncipherImage(wand: PMagickWand; const passphrase: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickEncipherImage(wand, passphrase);
+  Result := ALImageMagickLibrary.MagickEncipherImage(wand, passphrase);
 end;
 
 {****************************************************************}
 function MagickEnhanceImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickEnhanceImage(wand);
+  Result := ALImageMagickLibrary.MagickEnhanceImage(wand);
 end;
 
 {*****************************************************************}
 function MagickEqualizeImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickEqualizeImage(wand);
+  Result := ALImageMagickLibrary.MagickEqualizeImage(wand);
 end;
 
 {**********************************************************************************************}
 function MagickEvaluateImages(wand: PMagickWand; const op: MagickEvaluateOperator): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickEvaluateImages(wand, op);
+  Result := ALImageMagickLibrary.MagickEvaluateImages(wand, op);
 end;
 
 {************************************************************************************************************************}
 function MagickEvaluateImage(wand: PMagickWand; const op: MagickEvaluateOperator; const value: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickEvaluateImage(wand, op, value);
+  Result := ALImageMagickLibrary.MagickEvaluateImage(wand, op, value);
 end;
 
 {*********************************************************************************************************************************************************************************************************************}
 function MagickExportImagePixels(wand: PMagickWand; const x: ssize_t; const y: ssize_t; const columns: size_t; const rows: size_t; const map: PAnsiChar; const storage: StorageType; pixels: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickExportImagePixels(wand, x, y, columns, rows, map, storage, pixels);
+  Result := ALImageMagickLibrary.MagickExportImagePixels(wand, x, y, columns, rows, map, storage, pixels);
 end;
 
 {**********************************************************************************************************************************************}
 function MagickExtentImage(wand: PMagickWand; const width: size_t; const height: size_t; const x: ssize_t; const y: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickExtentImage(wand, width, height, x, y);
+  Result := ALImageMagickLibrary.MagickExtentImage(wand, width, height, x, y);
 end;
 
 {*************************************************************}
 function MagickFlipImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickFlipImage(wand);
+  Result := ALImageMagickLibrary.MagickFlipImage(wand);
 end;
 
 {***********************************************************************************************************************************************************************************************************************}
 function MagickFloodfillPaintImage(wand: PMagickWand; const fill: PPixelWand; const fuzz: double; const bordercolor: PPixelWand; const x: ssize_t; const y: ssize_t; const invert: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickFloodfillPaintImage(wand, fill, fuzz, bordercolor, x, y, invert);
+  Result := ALImageMagickLibrary.MagickFloodfillPaintImage(wand, fill, fuzz, bordercolor, x, y, invert);
 end;
 
 {*************************************************************}
 function MagickFlopImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickFlopImage(wand);
+  Result := ALImageMagickLibrary.MagickFlopImage(wand);
 end;
 
 {********************************************************************************************************************}
 function MagickForwardFourierTransformImage(wand: PMagickWand; const magnitude: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickForwardFourierTransformImage(wand, magnitude);
+  Result := ALImageMagickLibrary.MagickForwardFourierTransformImage(wand, magnitude);
 end;
 
 {**********************************************************************************************************************************************************************************************************************************}
 function MagickFrameImage(wand: PMagickWand; const matte_color: PPixelWand; const width: size_t; const height: size_t; const inner_bevel: ssize_t; const outer_bevel: ssize_t; const compose: CompositeOperator): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickFrameImage(wand, matte_color, width, height, inner_bevel, outer_bevel, compose);
+  Result := ALImageMagickLibrary.MagickFrameImage(wand, matte_color, width, height, inner_bevel, outer_bevel, compose);
 end;
 
 {************************************************************************************************************************************************************}
 function MagickFunctionImage(wand: PMagickWand; const &function: MagickFunction; const number_arguments: size_t; const arguments: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickFunctionImage(wand, &function, number_arguments, arguments);
+  Result := ALImageMagickLibrary.MagickFunctionImage(wand, &function, number_arguments, arguments);
 end;
 
 {**********************************************************************************}
 function MagickFxImage(wand: PMagickWand; const expression: PAnsiChar): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickFxImage(wand, expression);
+  Result := ALImageMagickLibrary.MagickFxImage(wand, expression);
 end;
 
 {***********************************************************************************}
 function MagickGammaImage(wand: PMagickWand; const gamma: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGammaImage(wand, gamma);
+  Result := ALImageMagickLibrary.MagickGammaImage(wand, gamma);
 end;
 
 {****************************************************************************************************************}
 function MagickGaussianBlurImage(wand: PMagickWand; const radius: double; const sigma: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGaussianBlurImage(wand, radius, sigma);
+  Result := ALImageMagickLibrary.MagickGaussianBlurImage(wand, radius, sigma);
 end;
 
 {******************************************************}
 function MagickGetImage(wand: PMagickWand): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickGetImage(wand);
+  Result := ALImageMagickLibrary.MagickGetImage(wand);
 end;
 
 {************************************************************************}
 function MagickGetImageAlphaChannel(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageAlphaChannel(wand);
+  Result := ALImageMagickLibrary.MagickGetImageAlphaChannel(wand);
 end;
 
 {**********************************************************************************}
 function MagickGetImageMask(wand: PMagickWand; const &type: PixelMask): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickGetImageMask(wand, &type);
+  Result := ALImageMagickLibrary.MagickGetImageMask(wand, &type);
 end;
 
 {*********************************************************************************************************}
 function MagickGetImageBackgroundColor(wand: PMagickWand; background_color: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageBackgroundColor(wand, background_color);
+  Result := ALImageMagickLibrary.MagickGetImageBackgroundColor(wand, background_color);
 end;
 
 {*********************************************************************}
 function MagickGetImageBlob(wand: PMagickWand; length: PSize_t): PByte;
 begin
-  Result := ALImageMagickLib.MagickGetImageBlob(wand, length);
+  Result := ALImageMagickLibrary.MagickGetImageBlob(wand, length);
 end;
 
 {**********************************************************************}
 function MagickGetImagesBlob(wand: PMagickWand; length: PSize_t): PByte;
 begin
-  Result := ALImageMagickLib.MagickGetImagesBlob(wand, length);
+  Result := ALImageMagickLibrary.MagickGetImagesBlob(wand, length);
 end;
 
 {***********************************************************************************************************}
 function MagickGetImageBluePrimary(wand: PMagickWand; x: PDouble; y: PDouble; z: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageBluePrimary(wand, x, y, z);
+  Result := ALImageMagickLibrary.MagickGetImageBluePrimary(wand, x, y, z);
 end;
 
 {*************************************************************************************************}
 function MagickGetImageBorderColor(wand: PMagickWand; border_color: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageBorderColor(wand, border_color);
+  Result := ALImageMagickLibrary.MagickGetImageBorderColor(wand, border_color);
 end;
 
 {*******************************************************************************************}
 function MagickGetImageFeatures(wand: PMagickWand; const distance: size_t): PChannelFeatures;
 begin
-  Result := ALImageMagickLib.MagickGetImageFeatures(wand, distance);
+  Result := ALImageMagickLibrary.MagickGetImageFeatures(wand, distance);
 end;
 
 {**********************************************************************************************************}
 function MagickGetImageKurtosis(wand: PMagickWand; kurtosis: PDouble; skewness: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageKurtosis(wand, kurtosis, skewness);
+  Result := ALImageMagickLibrary.MagickGetImageKurtosis(wand, kurtosis, skewness);
 end;
 
 {************************************************************************************************************}
 function MagickGetImageMean(wand: PMagickWand; mean: PDouble; standard_deviation: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageMean(wand, mean, standard_deviation);
+  Result := ALImageMagickLibrary.MagickGetImageMean(wand, mean, standard_deviation);
 end;
 
 {***************************************************************************************************}
 function MagickGetImageRange(wand: PMagickWand; minima: PDouble; maxima: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageRange(wand, minima, maxima);
+  Result := ALImageMagickLibrary.MagickGetImageRange(wand, minima, maxima);
 end;
 
 {***********************************************************************}
 function MagickGetImageStatistics(wand: PMagickWand): PChannelStatistics;
 begin
-  Result := ALImageMagickLib.MagickGetImageStatistics(wand);
+  Result := ALImageMagickLibrary.MagickGetImageStatistics(wand);
 end;
 
 {*****************************************************************************************************************}
 function MagickGetImageColormapColor(wand: PMagickWand; const index: size_t; color: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageColormapColor(wand, index, color);
+  Result := ALImageMagickLibrary.MagickGetImageColormapColor(wand, index, color);
 end;
 
 {*******************************************************}
 function MagickGetImageColors(wand: PMagickWand): size_t;
 begin
-  Result := ALImageMagickLib.MagickGetImageColors(wand);
+  Result := ALImageMagickLibrary.MagickGetImageColors(wand);
 end;
 
 {*******************************************************************}
 function MagickGetImageColorspace(wand: PMagickWand): ColorspaceType;
 begin
-  Result := ALImageMagickLib.MagickGetImageColorspace(wand);
+  Result := ALImageMagickLibrary.MagickGetImageColorspace(wand);
 end;
 
 {*******************************************************************}
 function MagickGetImageCompose(wand: PMagickWand): CompositeOperator;
 begin
-  Result := ALImageMagickLib.MagickGetImageCompose(wand);
+  Result := ALImageMagickLibrary.MagickGetImageCompose(wand);
 end;
 
 {*********************************************************************}
 function MagickGetImageCompression(wand: PMagickWand): CompressionType;
 begin
-  Result := ALImageMagickLib.MagickGetImageCompression(wand);
+  Result := ALImageMagickLibrary.MagickGetImageCompression(wand);
 end;
 
 {*******************************************************************}
 function MagickGetImageCompressionQuality(wand: PMagickWand): size_t;
 begin
-  Result := ALImageMagickLib.MagickGetImageCompressionQuality(wand);
+  Result := ALImageMagickLibrary.MagickGetImageCompressionQuality(wand);
 end;
 
 {******************************************************}
 function MagickGetImageDelay(wand: PMagickWand): size_t;
 begin
-  Result := ALImageMagickLib.MagickGetImageDelay(wand);
+  Result := ALImageMagickLibrary.MagickGetImageDelay(wand);
 end;
 
 {******************************************************}
 function MagickGetImageDepth(wand: PMagickWand): size_t;
 begin
-  Result := ALImageMagickLib.MagickGetImageDepth(wand);
+  Result := ALImageMagickLibrary.MagickGetImageDepth(wand);
 end;
 
 {*************************************************************}
 function MagickGetImageDispose(wand: PMagickWand): DisposeType;
 begin
-  Result := ALImageMagickLib.MagickGetImageDispose(wand);
+  Result := ALImageMagickLibrary.MagickGetImageDispose(wand);
 end;
 
 {***************************************************************************************************************************************************}
 function MagickGetImageDistortion(wand: PMagickWand; const reference: PMagickWand; const metric: MetricType; distortion: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageDistortion(wand, reference, metric, distortion);
+  Result := ALImageMagickLibrary.MagickGetImageDistortion(wand, reference, metric, distortion);
 end;
 
 {*********************************************************************************************************************}
 function MagickGetImageDistortions(wand: PMagickWand; const reference: PMagickWand; const metric: MetricType): PDouble;
 begin
-  Result := ALImageMagickLib.MagickGetImageDistortions(wand, reference, metric);
+  Result := ALImageMagickLibrary.MagickGetImageDistortions(wand, reference, metric);
 end;
 
 {***********************************************************}
 function MagickGetImageEndian(wand: PMagickWand): EndianType;
 begin
-  Result := ALImageMagickLib.MagickGetImageEndian(wand);
+  Result := ALImageMagickLibrary.MagickGetImageEndian(wand);
 end;
 
 {************************************************************}
 function MagickGetImageFilename(wand: PMagickWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetImageFilename(wand);
+  Result := ALImageMagickLibrary.MagickGetImageFilename(wand);
 end;
 
 {***********************************************************}
 function MagickGetImageFilter(wand: PMagickWand): FilterType;
 begin
-  Result := ALImageMagickLib.MagickGetImageFilter(wand);
+  Result := ALImageMagickLibrary.MagickGetImageFilter(wand);
 end;
 
 {**********************************************************}
 function MagickGetImageFormat(wand: PMagickWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetImageFormat(wand);
+  Result := ALImageMagickLibrary.MagickGetImageFormat(wand);
 end;
 
 {*****************************************************}
 function MagickGetImageFuzz(wand: PMagickWand): double;
 begin
-  Result := ALImageMagickLib.MagickGetImageFuzz(wand);
+  Result := ALImageMagickLibrary.MagickGetImageFuzz(wand);
 end;
 
 {******************************************************}
 function MagickGetImageGamma(wand: PMagickWand): double;
 begin
-  Result := ALImageMagickLib.MagickGetImageGamma(wand);
+  Result := ALImageMagickLibrary.MagickGetImageGamma(wand);
 end;
 
 {*************************************************************}
 function MagickGetImageGravity(wand: PMagickWand): GravityType;
 begin
-  Result := ALImageMagickLib.MagickGetImageGravity(wand);
+  Result := ALImageMagickLibrary.MagickGetImageGravity(wand);
 end;
 
 {************************************************************************************************************}
 function MagickGetImageGreenPrimary(wand: PMagickWand; x: PDouble; y: PDouble; z: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageGreenPrimary(wand, x, y, z);
+  Result := ALImageMagickLibrary.MagickGetImageGreenPrimary(wand, x, y, z);
 end;
 
 {*******************************************************}
 function MagickGetImageHeight(wand: PMagickWand): size_t;
 begin
-  Result := ALImageMagickLib.MagickGetImageHeight(wand);
+  Result := ALImageMagickLibrary.MagickGetImageHeight(wand);
 end;
 
 {***************************************************************************************}
 function MagickGetImageHistogram(wand: PMagickWand; number_colors: PSize_t): PPPixelWand;
 begin
-  Result := ALImageMagickLib.MagickGetImageHistogram(wand, number_colors);
+  Result := ALImageMagickLibrary.MagickGetImageHistogram(wand, number_colors);
 end;
 
 {***********************************************************************}
 function MagickGetImageInterlaceScheme(wand: PMagickWand): InterlaceType;
 begin
-  Result := ALImageMagickLib.MagickGetImageInterlaceScheme(wand);
+  Result := ALImageMagickLibrary.MagickGetImageInterlaceScheme(wand);
 end;
 
 {**********************************************************************************}
 function MagickGetImageInterpolateMethod(wand: PMagickWand): PixelInterpolateMethod;
 begin
-  Result := ALImageMagickLib.MagickGetImageInterpolateMethod(wand);
+  Result := ALImageMagickLibrary.MagickGetImageInterpolateMethod(wand);
 end;
 
 {***********************************************************}
 function MagickGetImageIterations(wand: PMagickWand): size_t;
 begin
-  Result := ALImageMagickLib.MagickGetImageIterations(wand);
+  Result := ALImageMagickLibrary.MagickGetImageIterations(wand);
 end;
 
 {*******************************************************************************************}
 function MagickGetImageLength(wand: PMagickWand; length: PMagickSizeType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageLength(wand, length);
+  Result := ALImageMagickLibrary.MagickGetImageLength(wand, length);
 end;
 
 {***********************************************************************************************}
 function MagickGetImageMatteColor(wand: PMagickWand; matte_color: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageMatteColor(wand, matte_color);
+  Result := ALImageMagickLibrary.MagickGetImageMatteColor(wand, matte_color);
 end;
 
 {*********************************************************************}
 function MagickGetImageOrientation(wand: PMagickWand): OrientationType;
 begin
-  Result := ALImageMagickLib.MagickGetImageOrientation(wand);
+  Result := ALImageMagickLibrary.MagickGetImageOrientation(wand);
 end;
 
 {***************************************************************************************************************************}
 function MagickGetImagePage(wand: PMagickWand; width: PSize_t; height: PSize_t; x: PSsize_t; y: PSsize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImagePage(wand, width, height, x, y);
+  Result := ALImageMagickLibrary.MagickGetImagePage(wand, width, height, x, y);
 end;
 
 {*****************************************************************************************************************************}
 function MagickGetImagePixelColor(wand: PMagickWand; const x: ssize_t; const y: ssize_t; color: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImagePixelColor(wand, x, y, color);
+  Result := ALImageMagickLibrary.MagickGetImagePixelColor(wand, x, y, color);
 end;
 
 {**********************************************************************************************************}
 function MagickGetImageRedPrimary(wand: PMagickWand; x: PDouble; y: PDouble; z: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageRedPrimary(wand, x, y, z);
+  Result := ALImageMagickLibrary.MagickGetImageRedPrimary(wand, x, y, z);
 end;
 
 {*******************************************************************************************************************************************}
 function MagickGetImageRegion(wand: PMagickWand; const width: size_t; const height: size_t; const x: ssize_t; const y: ssize_t): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickGetImageRegion(wand, width, height, x, y);
+  Result := ALImageMagickLibrary.MagickGetImageRegion(wand, width, height, x, y);
 end;
 
 {*************************************************************************}
 function MagickGetImageRenderingIntent(wand: PMagickWand): RenderingIntent;
 begin
-  Result := ALImageMagickLib.MagickGetImageRenderingIntent(wand);
+  Result := ALImageMagickLibrary.MagickGetImageRenderingIntent(wand);
 end;
 
 {**********************************************************************************************}
 function MagickGetImageResolution(wand: PMagickWand; x: PDouble; y: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageResolution(wand, x, y);
+  Result := ALImageMagickLibrary.MagickGetImageResolution(wand, x, y);
 end;
 
 {******************************************************}
 function MagickGetImageScene(wand: PMagickWand): size_t;
 begin
-  Result := ALImageMagickLib.MagickGetImageScene(wand);
+  Result := ALImageMagickLibrary.MagickGetImageScene(wand);
 end;
 
 {*************************************************************}
 function MagickGetImageSignature(wand: PMagickWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetImageSignature(wand);
+  Result := ALImageMagickLibrary.MagickGetImageSignature(wand);
 end;
 
 {***************************************************************}
 function MagickGetImageTicksPerSecond(wand: PMagickWand): size_t;
 begin
-  Result := ALImageMagickLib.MagickGetImageTicksPerSecond(wand);
+  Result := ALImageMagickLibrary.MagickGetImageTicksPerSecond(wand);
 end;
 
 {********************************************************}
 function MagickGetImageType(wand: PMagickWand): ImageType;
 begin
-  Result := ALImageMagickLib.MagickGetImageType(wand);
+  Result := ALImageMagickLibrary.MagickGetImageType(wand);
 end;
 
 {**************************************************************}
 function MagickGetImageUnits(wand: PMagickWand): ResolutionType;
 begin
-  Result := ALImageMagickLib.MagickGetImageUnits(wand);
+  Result := ALImageMagickLibrary.MagickGetImageUnits(wand);
 end;
 
 {*******************************************************************************}
 function MagickGetImageVirtualPixelMethod(wand: PMagickWand): VirtualPixelMethod;
 begin
-  Result := ALImageMagickLib.MagickGetImageVirtualPixelMethod(wand);
+  Result := ALImageMagickLibrary.MagickGetImageVirtualPixelMethod(wand);
 end;
 
 {**********************************************************************************************************}
 function MagickGetImageWhitePoint(wand: PMagickWand; x: PDouble; y: PDouble; z: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetImageWhitePoint(wand, x, y, z);
+  Result := ALImageMagickLibrary.MagickGetImageWhitePoint(wand, x, y, z);
 end;
 
 {******************************************************}
 function MagickGetImageWidth(wand: PMagickWand): size_t;
 begin
-  Result := ALImageMagickLib.MagickGetImageWidth(wand);
+  Result := ALImageMagickLibrary.MagickGetImageWidth(wand);
 end;
 
 {********************************************************}
 function MagickGetNumberImages(wand: PMagickWand): size_t;
 begin
-  Result := ALImageMagickLib.MagickGetNumberImages(wand);
+  Result := ALImageMagickLibrary.MagickGetNumberImages(wand);
 end;
 
 {****************************************************************}
 function MagickGetImageTotalInkDensity(wand: PMagickWand): double;
 begin
-  Result := ALImageMagickLib.MagickGetImageTotalInkDensity(wand);
+  Result := ALImageMagickLibrary.MagickGetImageTotalInkDensity(wand);
 end;
 
 {***********************************************************************************************}
 function MagickHaldClutImage(wand: PMagickWand; const hald_wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickHaldClutImage(wand, hald_wand);
+  Result := ALImageMagickLibrary.MagickHaldClutImage(wand, hald_wand);
 end;
 
 {****************************************************************}
 function MagickHasNextImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickHasNextImage(wand);
+  Result := ALImageMagickLibrary.MagickHasNextImage(wand);
 end;
 
 {********************************************************************}
 function MagickHasPreviousImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickHasPreviousImage(wand);
+  Result := ALImageMagickLibrary.MagickHasPreviousImage(wand);
 end;
 
 {**************************************************************************************************************************************}
 function MagickHoughLineImage(wand: PMagickWand; const width: size_t; const height: size_t; const threshold: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickHoughLineImage(wand, width, height, threshold);
+  Result := ALImageMagickLibrary.MagickHoughLineImage(wand, width, height, threshold);
 end;
 
 {*********************************************************}
 function MagickIdentifyImage(wand: PMagickWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickIdentifyImage(wand);
+  Result := ALImageMagickLibrary.MagickIdentifyImage(wand);
 end;
 
 {*************************************************************}
 function MagickIdentifyImageType(wand: PMagickWand): ImageType;
 begin
-  Result := ALImageMagickLib.MagickIdentifyImageType(wand);
+  Result := ALImageMagickLibrary.MagickIdentifyImageType(wand);
 end;
 
 {****************************************************************************************************************************}
 function MagickImplodeImage(wand: PMagickWand; const amount: double; const method: PixelInterpolateMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickImplodeImage(wand, amount, method);
+  Result := ALImageMagickLibrary.MagickImplodeImage(wand, amount, method);
 end;
 
 {***************************************************************************************************************************************************************************************************************************}
 function MagickImportImagePixels(wand: PMagickWand; const x: ssize_t; const y: ssize_t; const columns: size_t; const rows: size_t; const map: PAnsiChar; const storage: StorageType; const pixels: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickImportImagePixels(wand, x, y, columns, rows, map, storage, pixels);
+  Result := ALImageMagickLibrary.MagickImportImagePixels(wand, x, y, columns, rows, map, storage, pixels);
 end;
 
 {*************************************************************************************************************************************************************}
 function MagickInterpolativeResizeImage(wand: PMagickWand; const columns: size_t; const rows: size_t; const method: PixelInterpolateMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickInterpolativeResizeImage(wand, columns, rows, method);
+  Result := ALImageMagickLibrary.MagickInterpolativeResizeImage(wand, columns, rows, method);
 end;
 
 {*******************************************************************************************************************************************************}
 function MagickInverseFourierTransformImage(magnitude_wand: PMagickWand; phase_wand: PMagickWand; const magnitude: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickInverseFourierTransformImage(magnitude_wand, phase_wand, magnitude);
+  Result := ALImageMagickLibrary.MagickInverseFourierTransformImage(magnitude_wand, phase_wand, magnitude);
 end;
 
 {***************************************************************************************************************************************************}
 function MagickKmeansImage(wand: PMagickWand; const number_colors: size_t; const max_iterations: size_t; const tolerance: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickKmeansImage(wand, number_colors, max_iterations, tolerance);
+  Result := ALImageMagickLibrary.MagickKmeansImage(wand, number_colors, max_iterations, tolerance);
 end;
 
 {************************************************************************************************************}
 function MagickKuwaharaImage(wand: PMagickWand; const radius: double; const sigma: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickKuwaharaImage(wand, radius, sigma);
+  Result := ALImageMagickLibrary.MagickKuwaharaImage(wand, radius, sigma);
 end;
 
 {***************************************************************************************}
 function MagickLabelImage(wand: PMagickWand; const &label: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickLabelImage(wand, &label);
+  Result := ALImageMagickLibrary.MagickLabelImage(wand, &label);
 end;
 
 {*****************************************************************************************************************************************}
 function MagickLevelImage(wand: PMagickWand; const black_point: double; const gamma: double; const white_point: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickLevelImage(wand, black_point, gamma, white_point);
+  Result := ALImageMagickLibrary.MagickLevelImage(wand, black_point, gamma, white_point);
 end;
 
 {*******************************************************************************************************************************************************************}
 function MagickLevelImageColors(wand: PMagickWand; const black_color: PPixelWand; const white_color: PPixelWand; const invert: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickLevelImageColors(wand, black_color, white_color, invert);
+  Result := ALImageMagickLibrary.MagickLevelImageColors(wand, black_color, white_color, invert);
 end;
 
 {********************************************************************************************************************************************}
 function MagickLevelizeImage(wand: PMagickWand; const black_point: double; const gamma: double; const white_point: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickLevelizeImage(wand, black_point, gamma, white_point);
+  Result := ALImageMagickLibrary.MagickLevelizeImage(wand, black_point, gamma, white_point);
 end;
 
 {****************************************************************************************************************************}
 function MagickLinearStretchImage(wand: PMagickWand; const black_point: double; const white_point: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickLinearStretchImage(wand, black_point, white_point);
+  Result := ALImageMagickLibrary.MagickLinearStretchImage(wand, black_point, white_point);
 end;
 
 {****************************************************************************************************************************************************************}
 function MagickLiquidRescaleImage(wand: PMagickWand; const columns: size_t; const rows: size_t; const delta_x: double; const rigidity: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickLiquidRescaleImage(wand, columns, rows, delta_x, rigidity);
+  Result := ALImageMagickLibrary.MagickLiquidRescaleImage(wand, columns, rows, delta_x, rigidity);
 end;
 
 {********************************************************************************************************************}
 function MagickLocalContrastImage(wand: PMagickWand; const radius: double; const strength: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickLocalContrastImage(wand, radius, strength);
+  Result := ALImageMagickLibrary.MagickLocalContrastImage(wand, radius, strength);
 end;
 
 {****************************************************************}
 function MagickMagnifyImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickMagnifyImage(wand);
+  Result := ALImageMagickLibrary.MagickMagnifyImage(wand);
 end;
 
 {*******************************************************************************************************************************************}
 function MagickMeanShiftImage(wand: PMagickWand; const width: size_t; const height: size_t; const color_distance: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickMeanShiftImage(wand, width, height, color_distance);
+  Result := ALImageMagickLibrary.MagickMeanShiftImage(wand, width, height, color_distance);
 end;
 
 {*****************************************************************************************}
 function MagickMergeImageLayers(wand: PMagickWand; const method: LayerMethod): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickMergeImageLayers(wand, method);
+  Result := ALImageMagickLibrary.MagickMergeImageLayers(wand, method);
 end;
 
 {***************************************************************}
 function MagickMinifyImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickMinifyImage(wand);
+  Result := ALImageMagickLibrary.MagickMinifyImage(wand);
 end;
 
 {****************************************************************************************************************************************}
 function MagickModulateImage(wand: PMagickWand; const brightness: double; const saturation: double; const hue: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickModulateImage(wand, brightness, saturation, hue);
+  Result := ALImageMagickLibrary.MagickModulateImage(wand, brightness, saturation, hue);
 end;
 
 {******************************************************************************************************************************************************************************************************************}
 function MagickMontageImage(wand: PMagickWand; const drawing_wand: PDrawingWand; const tile_geometry: PAnsiChar; const thumbnail_geometry: PAnsiChar; const mode: MontageMode; const frame: PAnsiChar): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickMontageImage(wand, drawing_wand, tile_geometry, thumbnail_geometry, mode, frame);
+  Result := ALImageMagickLibrary.MagickMontageImage(wand, drawing_wand, tile_geometry, thumbnail_geometry, mode, frame);
 end;
 
 {**************************************************************************************}
 function MagickMorphImages(wand: PMagickWand; const number_frames: size_t): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickMorphImages(wand, number_frames);
+  Result := ALImageMagickLibrary.MagickMorphImages(wand, number_frames);
 end;
 
 {*********************************************************************************************************************************************************}
 function MagickMorphologyImage(wand: PMagickWand; const method: MorphologyMethod; const iterations: ssize_t; const kernel: PKernelInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickMorphologyImage(wand, method, iterations, kernel);
+  Result := ALImageMagickLibrary.MagickMorphologyImage(wand, method, iterations, kernel);
 end;
 
 {***********************************************************************************************************************************}
 function MagickMotionBlurImage(wand: PMagickWand; const radius: double; const sigma: double; const angle: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickMotionBlurImage(wand, radius, sigma, angle);
+  Result := ALImageMagickLibrary.MagickMotionBlurImage(wand, radius, sigma, angle);
 end;
 
 {**********************************************************************************************}
 function MagickNegateImage(wand: PMagickWand; const gray: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickNegateImage(wand, gray);
+  Result := ALImageMagickLibrary.MagickNegateImage(wand, gray);
 end;
 
 {*************************************************************************************************************************************}
 function MagickNewImage(wand: PMagickWand; const width: size_t; const height: size_t; const background: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickNewImage(wand, width, height, background);
+  Result := ALImageMagickLibrary.MagickNewImage(wand, width, height, background);
 end;
 
 {*************************************************************}
 function MagickNextImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickNextImage(wand);
+  Result := ALImageMagickLibrary.MagickNextImage(wand);
 end;
 
 {******************************************************************}
 function MagickNormalizeImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickNormalizeImage(wand);
+  Result := ALImageMagickLibrary.MagickNormalizeImage(wand);
 end;
 
 {************************************************************************************************************}
 function MagickOilPaintImage(wand: PMagickWand; const radius: double; const sigma: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickOilPaintImage(wand, radius, sigma);
+  Result := ALImageMagickLibrary.MagickOilPaintImage(wand, radius, sigma);
 end;
 
 {***************************************************************************************************************************************************************************}
 function MagickOpaquePaintImage(wand: PMagickWand; const target: PPixelWand; const fill: PPixelWand; const fuzz: double; const invert: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickOpaquePaintImage(wand, target, fill, fuzz, invert);
+  Result := ALImageMagickLibrary.MagickOpaquePaintImage(wand, target, fill, fuzz, invert);
 end;
 
 {*****************************************************************}
 function MagickOptimizeImageLayers(wand: PMagickWand): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickOptimizeImageLayers(wand);
+  Result := ALImageMagickLibrary.MagickOptimizeImageLayers(wand);
 end;
 
 {*****************************************************************************}
 function MagickOptimizeImageTransparency(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickOptimizeImageTransparency(wand);
+  Result := ALImageMagickLibrary.MagickOptimizeImageTransparency(wand);
 end;
 
 {******************************************************************************************************}
 function MagickOrderedDitherImage(wand: PMagickWand; const threshold_map: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickOrderedDitherImage(wand, threshold_map);
+  Result := ALImageMagickLibrary.MagickOrderedDitherImage(wand, threshold_map);
 end;
 
 {****************************************************************************************}
 function MagickPingImage(wand: PMagickWand; const filename: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickPingImage(wand, filename);
+  Result := ALImageMagickLibrary.MagickPingImage(wand, filename);
 end;
 
 {**********************************************************************************************************}
 function MagickPingImageBlob(wand: PMagickWand; const blob: PVoid; const length: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickPingImageBlob(wand, blob, length);
+  Result := ALImageMagickLibrary.MagickPingImageBlob(wand, blob, length);
 end;
 
 {*******************************************************************************}
 function MagickPingImageFile(wand: PMagickWand; &file: PFILE): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickPingImageFile(wand, &file);
+  Result := ALImageMagickLibrary.MagickPingImageFile(wand, &file);
 end;
 
 {****************************************************************************************************************************************************************************************}
 function MagickPolaroidImage(wand: PMagickWand; const drawing_wand: PDrawingWand; const caption: PAnsiChar; const angle: double; const method: PixelInterpolateMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickPolaroidImage(wand, drawing_wand, caption, angle, method);
+  Result := ALImageMagickLibrary.MagickPolaroidImage(wand, drawing_wand, caption, angle, method);
 end;
 
 {*********************************************************************************************************************}
 function MagickPolynomialImage(wand: PMagickWand; const number_terms: size_t; const terms: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickPolynomialImage(wand, number_terms, terms);
+  Result := ALImageMagickLibrary.MagickPolynomialImage(wand, number_terms, terms);
 end;
 
 {********************************************************************************************************************}
 function MagickPosterizeImage(wand: PMagickWand; const levels: size_t; const dither: DitherMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickPosterizeImage(wand, levels, dither);
+  Result := ALImageMagickLibrary.MagickPosterizeImage(wand, levels, dither);
 end;
 
 {***************************************************************************************}
 function MagickPreviewImages(wand: PMagickWand; const preview: PreviewType): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickPreviewImages(wand, preview);
+  Result := ALImageMagickLibrary.MagickPreviewImages(wand, preview);
 end;
 
 {*****************************************************************}
 function MagickPreviousImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickPreviousImage(wand);
+  Result := ALImageMagickLibrary.MagickPreviousImage(wand);
 end;
 
 {************************************************************************************************************************************************************************************************************************************}
 function MagickQuantizeImage(wand: PMagickWand; const number_colors: size_t; const colorspace: ColorspaceType; const treedepth: size_t; const dither_method: DitherMethod; const measure_error: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickQuantizeImage(wand, number_colors, colorspace, treedepth, dither_method, measure_error);
+  Result := ALImageMagickLibrary.MagickQuantizeImage(wand, number_colors, colorspace, treedepth, dither_method, measure_error);
 end;
 
 {*************************************************************************************************************************************************************************************************************************************}
 function MagickQuantizeImages(wand: PMagickWand; const number_colors: size_t; const colorspace: ColorspaceType; const treedepth: size_t; const dither_method: DitherMethod; const measure_error: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickQuantizeImages(wand, number_colors, colorspace, treedepth, dither_method, measure_error);
+  Result := ALImageMagickLibrary.MagickQuantizeImages(wand, number_colors, colorspace, treedepth, dither_method, measure_error);
 end;
 
 {*****************************************************************************************************************************************************************************}
 function MagickRangeThresholdImage(wand: PMagickWand; const low_black: double; const low_white: double; const high_white: double; const high_black: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickRangeThresholdImage(wand, low_black, low_white, high_white, high_black);
+  Result := ALImageMagickLibrary.MagickRangeThresholdImage(wand, low_black, low_white, high_white, high_black);
 end;
 
 {********************************************************************************************}
 function MagickRotationalBlurImage(wand: PMagickWand; const angle: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickRotationalBlurImage(wand, angle);
+  Result := ALImageMagickLibrary.MagickRotationalBlurImage(wand, angle);
 end;
 
 {******************************************************************************************************************************************************************************}
 function MagickRaiseImage(wand: PMagickWand; const width: size_t; const height: size_t; const x: ssize_t; const y: ssize_t; const &raise: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickRaiseImage(wand, width, height, x, y, &raise);
+  Result := ALImageMagickLibrary.MagickRaiseImage(wand, width, height, x, y, &raise);
 end;
 
 {***************************************************************************************************************}
 function MagickRandomThresholdImage(wand: PMagickWand; const low: double; const high: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickRandomThresholdImage(wand, low, high);
+  Result := ALImageMagickLibrary.MagickRandomThresholdImage(wand, low, high);
 end;
 
 {****************************************************************************************}
 function MagickReadImage(wand: PMagickWand; const filename: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickReadImage(wand, filename);
+  Result := ALImageMagickLibrary.MagickReadImage(wand, filename);
 end;
 
 {**********************************************************************************************************}
 function MagickReadImageBlob(wand: PMagickWand; const blob: PVoid; const length: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickReadImageBlob(wand, blob, length);
+  Result := ALImageMagickLibrary.MagickReadImageBlob(wand, blob, length);
 end;
 
 {*******************************************************************************}
 function MagickReadImageFile(wand: PMagickWand; &file: PFILE): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickReadImageFile(wand, &file);
+  Result := ALImageMagickLibrary.MagickReadImageFile(wand, &file);
 end;
 
 {********************************************************************************************************************************}
 function MagickRemapImage(wand: PMagickWand; const remap_wand: PMagickWand; const dither_method: DitherMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickRemapImage(wand, remap_wand, dither_method);
+  Result := ALImageMagickLibrary.MagickRemapImage(wand, remap_wand, dither_method);
 end;
 
 {***************************************************************}
 function MagickRemoveImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickRemoveImage(wand);
+  Result := ALImageMagickLibrary.MagickRemoveImage(wand);
 end;
 
 {***************************************************************************************************************************************************}
 function MagickResampleImage(wand: PMagickWand; const x_resolution: double; const y_resolution: double; const filter: FilterType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickResampleImage(wand, x_resolution, y_resolution, filter);
+  Result := ALImageMagickLibrary.MagickResampleImage(wand, x_resolution, y_resolution, filter);
 end;
 
 {*****************************************************************************************}
 function MagickResetImagePage(wand: PMagickWand; const page: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickResetImagePage(wand, page);
+  Result := ALImageMagickLibrary.MagickResetImagePage(wand, page);
 end;
 
 {************************************************************************************************************************************}
 function MagickResizeImage(wand: PMagickWand; const columns: size_t; const rows: size_t; const filter: FilterType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickResizeImage(wand, columns, rows, filter);
+  Result := ALImageMagickLibrary.MagickResizeImage(wand, columns, rows, filter);
 end;
 
 {*************************************************************************************************}
 function MagickRollImage(wand: PMagickWand; const x: ssize_t; const y: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickRollImage(wand, x, y);
+  Result := ALImageMagickLibrary.MagickRollImage(wand, x, y);
 end;
 
 {********************************************************************************************************************}
 function MagickRotateImage(wand: PMagickWand; const background: PPixelWand; const degrees: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickRotateImage(wand, background, degrees);
+  Result := ALImageMagickLibrary.MagickRotateImage(wand, background, degrees);
 end;
 
 {**********************************************************************************************************}
 function MagickSampleImage(wand: PMagickWand; const columns: size_t; const rows: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSampleImage(wand, columns, rows);
+  Result := ALImageMagickLibrary.MagickSampleImage(wand, columns, rows);
 end;
 
 {*********************************************************************************************************}
 function MagickScaleImage(wand: PMagickWand; const columns: size_t; const rows: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickScaleImage(wand, columns, rows);
+  Result := ALImageMagickLibrary.MagickScaleImage(wand, columns, rows);
 end;
 
 {*****************************************************************************************************************************************************************************************************}
 function MagickSegmentImage(wand: PMagickWand; const colorspace: ColorspaceType; const verbose: MagickBooleanType; const cluster_threshold: double; const smooth_threshold: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSegmentImage(wand, colorspace, verbose, cluster_threshold, smooth_threshold);
+  Result := ALImageMagickLibrary.MagickSegmentImage(wand, colorspace, verbose, cluster_threshold, smooth_threshold);
 end;
 
 {******************************************************************************************************************************************}
 function MagickSelectiveBlurImage(wand: PMagickWand; const radius: double; const sigma: double; const threshold: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSelectiveBlurImage(wand, radius, sigma, threshold);
+  Result := ALImageMagickLibrary.MagickSelectiveBlurImage(wand, radius, sigma, threshold);
 end;
 
 {*********************************************************************************************}
 function MagickSeparateImage(wand: PMagickWand; const channel: ChannelType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSeparateImage(wand, channel);
+  Result := ALImageMagickLibrary.MagickSeparateImage(wand, channel);
 end;
 
 {*******************************************************************************************}
 function MagickSepiaToneImage(wand: PMagickWand; const threshold: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSepiaToneImage(wand, threshold);
+  Result := ALImageMagickLibrary.MagickSepiaToneImage(wand, threshold);
 end;
 
 {*****************************************************************************************}
 function MagickSetImage(wand: PMagickWand; const set_wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImage(wand, set_wand);
+  Result := ALImageMagickLibrary.MagickSetImage(wand, set_wand);
 end;
 
 {**************************************************************************************************************}
 function MagickSetImageAlphaChannel(wand: PMagickWand; const alpha_type: AlphaChannelOption): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageAlphaChannel(wand, alpha_type);
+  Result := ALImageMagickLibrary.MagickSetImageAlphaChannel(wand, alpha_type);
 end;
 
 {*********************************************************************************************************}
 function MagickSetImageBackgroundColor(wand: PMagickWand; const background: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageBackgroundColor(wand, background);
+  Result := ALImageMagickLibrary.MagickSetImageBackgroundColor(wand, background);
 end;
 
 {**************************************************************************************************************************}
 function MagickSetImageBluePrimary(wand: PMagickWand; const x: double; const y: double; const z: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageBluePrimary(wand, x, y, z);
+  Result := ALImageMagickLibrary.MagickSetImageBluePrimary(wand, x, y, z);
 end;
 
 {*************************************************************************************************}
 function MagickSetImageBorderColor(wand: PMagickWand; const border: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageBorderColor(wand, border);
+  Result := ALImageMagickLibrary.MagickSetImageBorderColor(wand, border);
 end;
 
 {**************************************************************************************************}
 function MagickSetImageChannelMask(wand: PMagickWand; const channel_mask: ChannelType): ChannelType;
 begin
-  Result := ALImageMagickLib.MagickSetImageChannelMask(wand, channel_mask);
+  Result := ALImageMagickLibrary.MagickSetImageChannelMask(wand, channel_mask);
 end;
 
 {**********************************************************************************************************************}
 function MagickSetImageMask(wand: PMagickWand; const &type: PixelMask; const clip_mask: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageMask(wand, &type, clip_mask);
+  Result := ALImageMagickLibrary.MagickSetImageMask(wand, &type, clip_mask);
 end;
 
 {******************************************************************************************}
 function MagickSetImageColor(wand: PMagickWand; const color: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageColor(wand, color);
+  Result := ALImageMagickLibrary.MagickSetImageColor(wand, color);
 end;
 
 {***********************************************************************************************************************}
 function MagickSetImageColormapColor(wand: PMagickWand; const index: size_t; const color: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageColormapColor(wand, index, color);
+  Result := ALImageMagickLibrary.MagickSetImageColormapColor(wand, index, color);
 end;
 
 {********************************************************************************************************}
 function MagickSetImageColorspace(wand: PMagickWand; const colorspace: ColorspaceType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageColorspace(wand, colorspace);
+  Result := ALImageMagickLibrary.MagickSetImageColorspace(wand, colorspace);
 end;
 
 {*****************************************************************************************************}
 function MagickSetImageCompose(wand: PMagickWand; const compose: CompositeOperator): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageCompose(wand, compose);
+  Result := ALImageMagickLibrary.MagickSetImageCompose(wand, compose);
 end;
 
 {***********************************************************************************************************}
 function MagickSetImageCompression(wand: PMagickWand; const compression: CompressionType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageCompression(wand, compression);
+  Result := ALImageMagickLibrary.MagickSetImageCompression(wand, compression);
 end;
 
 {*****************************************************************************************************}
 function MagickSetImageCompressionQuality(wand: PMagickWand; const quality: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageCompressionQuality(wand, quality);
+  Result := ALImageMagickLibrary.MagickSetImageCompressionQuality(wand, quality);
 end;
 
 {**************************************************************************************}
 function MagickSetImageDelay(wand: PMagickWand; const delay: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageDelay(wand, delay);
+  Result := ALImageMagickLibrary.MagickSetImageDelay(wand, delay);
 end;
 
 {**************************************************************************************}
 function MagickSetImageDepth(wand: PMagickWand; const depth: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageDepth(wand, depth);
+  Result := ALImageMagickLibrary.MagickSetImageDepth(wand, depth);
 end;
 
 {***********************************************************************************************}
 function MagickSetImageDispose(wand: PMagickWand; const dispose: DisposeType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageDispose(wand, dispose);
+  Result := ALImageMagickLibrary.MagickSetImageDispose(wand, dispose);
 end;
 
 {********************************************************************************************}
 function MagickSetImageEndian(wand: PMagickWand; const endian: EndianType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageEndian(wand, endian);
+  Result := ALImageMagickLibrary.MagickSetImageEndian(wand, endian);
 end;
 
 {*************************************************************************************************************}
 function MagickSetImageExtent(wand: PMagickWand; const columns: size_t; const rows: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageExtent(wand, columns, rows);
+  Result := ALImageMagickLibrary.MagickSetImageExtent(wand, columns, rows);
 end;
 
 {***********************************************************************************************}
 function MagickSetImageFilename(wand: PMagickWand; const filename: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageFilename(wand, filename);
+  Result := ALImageMagickLibrary.MagickSetImageFilename(wand, filename);
 end;
 
 {********************************************************************************************}
 function MagickSetImageFilter(wand: PMagickWand; const filter: FilterType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageFilter(wand, filter);
+  Result := ALImageMagickLibrary.MagickSetImageFilter(wand, filter);
 end;
 
 {*******************************************************************************************}
 function MagickSetImageFormat(wand: PMagickWand; const format: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageFormat(wand, format);
+  Result := ALImageMagickLibrary.MagickSetImageFormat(wand, format);
 end;
 
 {************************************************************************************}
 function MagickSetImageFuzz(wand: PMagickWand; const fuzz: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageFuzz(wand, fuzz);
+  Result := ALImageMagickLibrary.MagickSetImageFuzz(wand, fuzz);
 end;
 
 {**************************************************************************************}
 function MagickSetImageGamma(wand: PMagickWand; const gamma: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageGamma(wand, gamma);
+  Result := ALImageMagickLibrary.MagickSetImageGamma(wand, gamma);
 end;
 
 {***********************************************************************************************}
 function MagickSetImageGravity(wand: PMagickWand; const gravity: GravityType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageGravity(wand, gravity);
+  Result := ALImageMagickLibrary.MagickSetImageGravity(wand, gravity);
 end;
 
 {***************************************************************************************************************************}
 function MagickSetImageGreenPrimary(wand: PMagickWand; const x: double; const y: double; const z: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageGreenPrimary(wand, x, y, z);
+  Result := ALImageMagickLibrary.MagickSetImageGreenPrimary(wand, x, y, z);
 end;
 
 {***********************************************************************************************************}
 function MagickSetImageInterlaceScheme(wand: PMagickWand; const interlace: InterlaceType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageInterlaceScheme(wand, interlace);
+  Result := ALImageMagickLibrary.MagickSetImageInterlaceScheme(wand, interlace);
 end;
 
 {**************************************************************************************************************************}
 //function MagickSetImagePixelInterpolateMethod(wand: PMagickWand; const method: PixelInterpolateMethod): MagickBooleanType;
 //begin
-//  Result := ALImageMagickLib.MagickSetImagePixelInterpolateMethod(wand, method);
+//  Result := ALImageMagickLibrary.MagickSetImagePixelInterpolateMethod(wand, method);
 //end;
 
 {*******************************************************************************************************************}
 function MagickSetImageInterpolateMethod(wand: PMagickWand; const method: PixelInterpolateMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageInterpolateMethod(wand, method);
+  Result := ALImageMagickLibrary.MagickSetImageInterpolateMethod(wand, method);
 end;
 
 {************************************************************************************************}
 function MagickSetImageIterations(wand: PMagickWand; const iterations: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageIterations(wand, iterations);
+  Result := ALImageMagickLibrary.MagickSetImageIterations(wand, iterations);
 end;
 
 {*************************************************************************************************}
 function MagickSetImageMatte(wand: PMagickWand; const matte: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageMatte(wand, matte);
+  Result := ALImageMagickLibrary.MagickSetImageMatte(wand, matte);
 end;
 
 {***********************************************************************************************}
 function MagickSetImageMatteColor(wand: PMagickWand; const alpha: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageMatteColor(wand, alpha);
+  Result := ALImageMagickLibrary.MagickSetImageMatteColor(wand, alpha);
 end;
 
 {**************************************************************************************}
 function MagickSetImageAlpha(wand: PMagickWand; const alpha: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageAlpha(wand, alpha);
+  Result := ALImageMagickLibrary.MagickSetImageAlpha(wand, alpha);
 end;
 
 {***********************************************************************************************************}
 function MagickSetImageOrientation(wand: PMagickWand; const orientation: OrientationType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageOrientation(wand, orientation);
+  Result := ALImageMagickLibrary.MagickSetImageOrientation(wand, orientation);
 end;
 
 {***********************************************************************************************************************************************}
 function MagickSetImagePage(wand: PMagickWand; const width: size_t; const height: size_t; const x: ssize_t; const y: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImagePage(wand, width, height, x, y);
+  Result := ALImageMagickLibrary.MagickSetImagePage(wand, width, height, x, y);
 end;
 
 {***********************************************************************************************************************************}
 function MagickSetImagePixelColor(wand: PMagickWand; const x: ssize_t; const y: ssize_t; const color: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImagePixelColor(wand, x, y, color);
+  Result := ALImageMagickLibrary.MagickSetImagePixelColor(wand, x, y, color);
 end;
 
 {**************************************************************************************************************************************************}
 function MagickSetImageProgressMonitor(wand: PMagickWand; const progress_monitor: MagickProgressMonitor; client_data: PVoid): MagickProgressMonitor;
 begin
-  Result := ALImageMagickLib.MagickSetImageProgressMonitor(wand, progress_monitor, client_data);
+  Result := ALImageMagickLibrary.MagickSetImageProgressMonitor(wand, progress_monitor, client_data);
 end;
 
 {*************************************************************************************************************************}
 function MagickSetImageRedPrimary(wand: PMagickWand; const x: double; const y: double; const z: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageRedPrimary(wand, x, y, z);
+  Result := ALImageMagickLibrary.MagickSetImageRedPrimary(wand, x, y, z);
 end;
 
 {********************************************************************************************************************}
 function MagickSetImageRenderingIntent(wand: PMagickWand; const rendering_intent: RenderingIntent): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageRenderingIntent(wand, rendering_intent);
+  Result := ALImageMagickLibrary.MagickSetImageRenderingIntent(wand, rendering_intent);
 end;
 
 {******************************************************************************************************************************}
 function MagickSetImageResolution(wand: PMagickWand; const x_resolution: double; const y_resolution: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageResolution(wand, x_resolution, y_resolution);
+  Result := ALImageMagickLibrary.MagickSetImageResolution(wand, x_resolution, y_resolution);
 end;
 
 {**************************************************************************************}
 function MagickSetImageScene(wand: PMagickWand; const scene: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageScene(wand, scene);
+  Result := ALImageMagickLibrary.MagickSetImageScene(wand, scene);
 end;
 
 {***********************************************************************************************************}
 function MagickSetImageTicksPerSecond(wand: PMagickWand; const ticks_per_second: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageTicksPerSecond(wand, ticks_per_second);
+  Result := ALImageMagickLibrary.MagickSetImageTicksPerSecond(wand, ticks_per_second);
 end;
 
 {*********************************************************************************************}
 function MagickSetImageType(wand: PMagickWand; const image_type: ImageType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageType(wand, image_type);
+  Result := ALImageMagickLibrary.MagickSetImageType(wand, image_type);
 end;
 
 {**********************************************************************************************}
 function MagickSetImageUnits(wand: PMagickWand; const units: ResolutionType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageUnits(wand, units);
+  Result := ALImageMagickLibrary.MagickSetImageUnits(wand, units);
 end;
 
 {*****************************************************************************************************************}
 function MagickSetImageVirtualPixelMethod(wand: PMagickWand; const method: VirtualPixelMethod): VirtualPixelMethod;
 begin
-  Result := ALImageMagickLib.MagickSetImageVirtualPixelMethod(wand, method);
+  Result := ALImageMagickLibrary.MagickSetImageVirtualPixelMethod(wand, method);
 end;
 
 {*************************************************************************************************************************}
 function MagickSetImageWhitePoint(wand: PMagickWand; const x: double; const y: double; const z: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageWhitePoint(wand, x, y, z);
+  Result := ALImageMagickLibrary.MagickSetImageWhitePoint(wand, x, y, z);
 end;
 
 {*********************************************************************************************************************************************}
 function MagickShadeImage(wand: PMagickWand; const gray: MagickBooleanType; const azimuth: double; const elevation: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickShadeImage(wand, gray, azimuth, elevation);
+  Result := ALImageMagickLibrary.MagickShadeImage(wand, gray, azimuth, elevation);
 end;
 
 {*********************************************************************************************************************************************}
 function MagickShadowImage(wand: PMagickWand; const alpha: double; const sigma: double; const x: ssize_t; const y: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickShadowImage(wand, alpha, sigma, x, y);
+  Result := ALImageMagickLibrary.MagickShadowImage(wand, alpha, sigma, x, y);
 end;
 
 {***********************************************************************************************************}
 function MagickSharpenImage(wand: PMagickWand; const radius: double; const sigma: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSharpenImage(wand, radius, sigma);
+  Result := ALImageMagickLibrary.MagickSharpenImage(wand, radius, sigma);
 end;
 
 {*********************************************************************************************************}
 function MagickShaveImage(wand: PMagickWand; const columns: size_t; const rows: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickShaveImage(wand, columns, rows);
+  Result := ALImageMagickLibrary.MagickShaveImage(wand, columns, rows);
 end;
 
 {******************************************************************************************************************************************}
 function MagickShearImage(wand: PMagickWand; const background: PPixelWand; const x_shear: double; const y_shear: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickShearImage(wand, background, x_shear, y_shear);
+  Result := ALImageMagickLibrary.MagickShearImage(wand, background, x_shear, y_shear);
 end;
 
 {*****************************************************************************************************************************************************}
 function MagickSigmoidalContrastImage(wand: PMagickWand; const sharpen: MagickBooleanType; const alpha: double; const beta: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSigmoidalContrastImage(wand, sharpen, alpha, beta);
+  Result := ALImageMagickLibrary.MagickSigmoidalContrastImage(wand, sharpen, alpha, beta);
 end;
 
 {******************************************************************************************************************************************************************************************************}
 function MagickSimilarityImage(wand: PMagickWand; const reference: PMagickWand; const metric: MetricType; const similarity_threshold: double; offset: PRectangleInfo; similarity: PDouble): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickSimilarityImage(wand, reference, metric, similarity_threshold, offset, similarity);
+  Result := ALImageMagickLibrary.MagickSimilarityImage(wand, reference, metric, similarity_threshold, offset, similarity);
 end;
 
 {*******************************************************************************************************************************}
 function MagickSketchImage(wand: PMagickWand; const radius: double; const sigma: double; const angle: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSketchImage(wand, radius, sigma, angle);
+  Result := ALImageMagickLibrary.MagickSketchImage(wand, radius, sigma, angle);
 end;
 
 {****************************************************************************************************************}
 function MagickSmushImages(wand: PMagickWand; const stack: MagickBooleanType; const offset: ssize_t): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickSmushImages(wand, stack, offset);
+  Result := ALImageMagickLibrary.MagickSmushImages(wand, stack, offset);
 end;
 
 {******************************************************************************************}
 function MagickSolarizeImage(wand: PMagickWand; const threshold: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSolarizeImage(wand, threshold);
+  Result := ALImageMagickLibrary.MagickSolarizeImage(wand, threshold);
 end;
 
 {***************************************************************************************************************************************************************}
 function MagickSparseColorImage(wand: PMagickWand; const method: SparseColorMethod; const number_arguments: size_t; const arguments: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSparseColorImage(wand, method, number_arguments, arguments);
+  Result := ALImageMagickLibrary.MagickSparseColorImage(wand, method, number_arguments, arguments);
 end;
 
 {**********************************************************************************************************************************************}
 function MagickSpliceImage(wand: PMagickWand; const width: size_t; const height: size_t; const x: ssize_t; const y: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSpliceImage(wand, width, height, x, y);
+  Result := ALImageMagickLibrary.MagickSpliceImage(wand, width, height, x, y);
 end;
 
 {***************************************************************************************************************************}
 function MagickSpreadImage(wand: PMagickWand; const method: PixelInterpolateMethod; const radius: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSpreadImage(wand, method, radius);
+  Result := ALImageMagickLibrary.MagickSpreadImage(wand, method, radius);
 end;
 
 {*****************************************************************************************************************************************}
 function MagickStatisticImage(wand: PMagickWand; const &type: StatisticType; const width: size_t; const height: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickStatisticImage(wand, &type, width, height);
+  Result := ALImageMagickLibrary.MagickStatisticImage(wand, &type, width, height);
 end;
 
 {********************************************************************************************************************}
 function MagickSteganoImage(wand: PMagickWand; const watermark_wand: PMagickWand; const offset: ssize_t): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickSteganoImage(wand, watermark_wand, offset);
+  Result := ALImageMagickLibrary.MagickSteganoImage(wand, watermark_wand, offset);
 end;
 
 {*****************************************************************************************}
 function MagickStereoImage(wand: PMagickWand; const offset_wand: PMagickWand): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickStereoImage(wand, offset_wand);
+  Result := ALImageMagickLibrary.MagickStereoImage(wand, offset_wand);
 end;
 
 {**************************************************************}
 function MagickStripImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickStripImage(wand);
+  Result := ALImageMagickLibrary.MagickStripImage(wand);
 end;
 
 {***************************************************************************************************************************}
 function MagickSwirlImage(wand: PMagickWand; const degrees: double; const method: PixelInterpolateMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSwirlImage(wand, degrees, method);
+  Result := ALImageMagickLibrary.MagickSwirlImage(wand, degrees, method);
 end;
 
 {*******************************************************************************************}
 function MagickTextureImage(wand: PMagickWand; const texture_wand: PMagickWand): PMagickWand;
 begin
-  Result := ALImageMagickLib.MagickTextureImage(wand, texture_wand);
+  Result := ALImageMagickLibrary.MagickTextureImage(wand, texture_wand);
 end;
 
 {*******************************************************************************************}
 function MagickThresholdImage(wand: PMagickWand; const threshold: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickThresholdImage(wand, threshold);
+  Result := ALImageMagickLibrary.MagickThresholdImage(wand, threshold);
 end;
 
 {******************************************************************************************************************************}
 function MagickThresholdImageChannel(wand: PMagickWand; const channel: ChannelType; const threshold: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickThresholdImageChannel(wand, channel, threshold);
+  Result := ALImageMagickLibrary.MagickThresholdImageChannel(wand, channel, threshold);
 end;
 
 {*************************************************************************************************************}
 function MagickThumbnailImage(wand: PMagickWand; const columns: size_t; const rows: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickThumbnailImage(wand, columns, rows);
+  Result := ALImageMagickLibrary.MagickThumbnailImage(wand, columns, rows);
 end;
 
 {**************************************************************************************************************}
 function MagickTintImage(wand: PMagickWand; const tint: PPixelWand; const blend: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickTintImage(wand, tint, blend);
+  Result := ALImageMagickLibrary.MagickTintImage(wand, tint, blend);
 end;
 
 {**************************************************************************************************************}
 function MagickTransformImageColorspace(wand: PMagickWand; const colorspace: ColorspaceType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickTransformImageColorspace(wand, colorspace);
+  Result := ALImageMagickLibrary.MagickTransformImageColorspace(wand, colorspace);
 end;
 
 {*****************************************************************************************************************************************************************************}
 function MagickTransparentPaintImage(wand: PMagickWand; const target: PPixelWand; const alpha: double; const fuzz: double; const invert: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickTransparentPaintImage(wand, target, alpha, fuzz, invert);
+  Result := ALImageMagickLibrary.MagickTransparentPaintImage(wand, target, alpha, fuzz, invert);
 end;
 
 {******************************************************************}
 function MagickTransposeImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickTransposeImage(wand);
+  Result := ALImageMagickLibrary.MagickTransposeImage(wand);
 end;
 
 {*******************************************************************}
 function MagickTransverseImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickTransverseImage(wand);
+  Result := ALImageMagickLibrary.MagickTransverseImage(wand);
 end;
 
 {*********************************************************************************}
 function MagickTrimImage(wand: PMagickWand; const fuzz: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickTrimImage(wand, fuzz);
+  Result := ALImageMagickLibrary.MagickTrimImage(wand, fuzz);
 end;
 
 {*********************************************************************}
 function MagickUniqueImageColors(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickUniqueImageColors(wand);
+  Result := ALImageMagickLibrary.MagickUniqueImageColors(wand);
 end;
 
 {************************************************************************************************************************************************************}
 function MagickUnsharpMaskImage(wand: PMagickWand; const radius: double; const sigma: double; const gain: double; const threshold: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickUnsharpMaskImage(wand, radius, sigma, gain, threshold);
+  Result := ALImageMagickLibrary.MagickUnsharpMaskImage(wand, radius, sigma, gain, threshold);
 end;
 
 {************************************************************************************************************************************************}
 function MagickVignetteImage(wand: PMagickWand; const radius: double; const sigma: double; const x: ssize_t; const y: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickVignetteImage(wand, radius, sigma, x, y);
+  Result := ALImageMagickLibrary.MagickVignetteImage(wand, radius, sigma, x, y);
 end;
 
 {*******************************************************************************************************************************************************}
 function MagickWaveImage(wand: PMagickWand; const amplitude: double; const wave_length: double; const method: PixelInterpolateMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickWaveImage(wand, amplitude, wave_length, method);
+  Result := ALImageMagickLibrary.MagickWaveImage(wand, amplitude, wave_length, method);
 end;
 
 {************************************************************************************************************************}
 function MagickWaveletDenoiseImage(wand: PMagickWand; const threshold: double; const softness: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickWaveletDenoiseImage(wand, threshold, softness);
+  Result := ALImageMagickLibrary.MagickWaveletDenoiseImage(wand, threshold, softness);
 end;
 
 {*********************************************************************}
 function MagickWhiteBalanceImage(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickWhiteBalanceImage(wand);
+  Result := ALImageMagickLibrary.MagickWhiteBalanceImage(wand);
 end;
 
 {****************************************************************************************************}
 function MagickWhiteThresholdImage(wand: PMagickWand; const threshold: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickWhiteThresholdImage(wand, threshold);
+  Result := ALImageMagickLibrary.MagickWhiteThresholdImage(wand, threshold);
 end;
 
 {*****************************************************************************************}
 function MagickWriteImage(wand: PMagickWand; const filename: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickWriteImage(wand, filename);
+  Result := ALImageMagickLibrary.MagickWriteImage(wand, filename);
 end;
 
 {********************************************************************************}
 function MagickWriteImageFile(wand: PMagickWand; &file: PFILE): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickWriteImageFile(wand, &file);
+  Result := ALImageMagickLibrary.MagickWriteImageFile(wand, &file);
 end;
 
 {***************************************************************************************************************************}
 function MagickWriteImages(wand: PMagickWand; const filename: PAnsiChar; const adjoin: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickWriteImages(wand, filename, adjoin);
+  Result := ALImageMagickLibrary.MagickWriteImages(wand, filename, adjoin);
 end;
 
 {*********************************************************************************}
 function MagickWriteImagesFile(wand: PMagickWand; &file: PFILE): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickWriteImagesFile(wand, &file);
+  Result := ALImageMagickLibrary.MagickWriteImagesFile(wand, &file);
 end;
 
 {$ENDREGION}
@@ -17416,439 +17418,439 @@ end;
 {**************************************************************************************************}
 function MagickDeleteImageArtifact(wand: PMagickWand; const artifact: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickDeleteImageArtifact(wand, artifact);
+  Result := ALImageMagickLibrary.MagickDeleteImageArtifact(wand, artifact);
 end;
 
 {***************************************************************************************************}
 function MagickDeleteImageProperty(wand: PMagickWand; const &property: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickDeleteImageProperty(wand, &property);
+  Result := ALImageMagickLibrary.MagickDeleteImageProperty(wand, &property);
 end;
 
 {*****************************************************************************************}
 function MagickDeleteOption(wand: PMagickWand; const option: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickDeleteOption(wand, option);
+  Result := ALImageMagickLibrary.MagickDeleteOption(wand, option);
 end;
 
 {**********************************************************************}
 function MagickGetAntialias(const wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetAntialias(wand);
+  Result := ALImageMagickLibrary.MagickGetAntialias(wand);
 end;
 
 {***************************************************************}
 function MagickGetBackgroundColor(wand: PMagickWand): PPixelWand;
 begin
-  Result := ALImageMagickLib.MagickGetBackgroundColor(wand);
+  Result := ALImageMagickLibrary.MagickGetBackgroundColor(wand);
 end;
 
 {**************************************************************}
 function MagickGetColorspace(wand: PMagickWand): ColorspaceType;
 begin
-  Result := ALImageMagickLib.MagickGetColorspace(wand);
+  Result := ALImageMagickLibrary.MagickGetColorspace(wand);
 end;
 
 {****************************************************************}
 function MagickGetCompression(wand: PMagickWand): CompressionType;
 begin
-  Result := ALImageMagickLib.MagickGetCompression(wand);
+  Result := ALImageMagickLibrary.MagickGetCompression(wand);
 end;
 
 {**************************************************************}
 function MagickGetCompressionQuality(wand: PMagickWand): size_t;
 begin
-  Result := ALImageMagickLib.MagickGetCompressionQuality(wand);
+  Result := ALImageMagickLibrary.MagickGetCompressionQuality(wand);
 end;
 
 {***************************************}
 function MagickGetCopyright(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetCopyright();
+  Result := ALImageMagickLibrary.MagickGetCopyright();
 end;
 
 {*************************************************************}
 function MagickGetFilename(const wand: PMagickWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetFilename(wand);
+  Result := ALImageMagickLibrary.MagickGetFilename(wand);
 end;
 
 {***************************************************}
 function MagickGetFont(wand: PMagickWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetFont(wand);
+  Result := ALImageMagickLibrary.MagickGetFont(wand);
 end;
 
 {*****************************************************}
 function MagickGetFormat(wand: PMagickWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetFormat(wand);
+  Result := ALImageMagickLibrary.MagickGetFormat(wand);
 end;
 
 {******************************************************}
 function MagickGetFilter(wand: PMagickWand): FilterType;
 begin
-  Result := ALImageMagickLib.MagickGetFilter(wand);
+  Result := ALImageMagickLibrary.MagickGetFilter(wand);
 end;
 
 {********************************************************}
 function MagickGetGravity(wand: PMagickWand): GravityType;
 begin
-  Result := ALImageMagickLib.MagickGetGravity(wand);
+  Result := ALImageMagickLibrary.MagickGetGravity(wand);
 end;
 
 {*************************************}
 function MagickGetHomeURL(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetHomeURL();
+  Result := ALImageMagickLibrary.MagickGetHomeURL();
 end;
 
 {***************************************************************************************}
 function MagickGetImageArtifact(wand: PMagickWand; const artifact: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetImageArtifact(wand, artifact);
+  Result := ALImageMagickLibrary.MagickGetImageArtifact(wand, artifact);
 end;
 
 {*******************************************************************************************************************}
 function MagickGetImageArtifacts(wand: PMagickWand; const pattern: PAnsiChar; number_artifacts: PSize_t): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetImageArtifacts(wand, pattern, number_artifacts);
+  Result := ALImageMagickLibrary.MagickGetImageArtifacts(wand, pattern, number_artifacts);
 end;
 
 {***********************************************************************************************}
 function MagickGetImageProfile(wand: PMagickWand; const name: PAnsiChar; length: PSize_t): PByte;
 begin
-  Result := ALImageMagickLib.MagickGetImageProfile(wand, name, length);
+  Result := ALImageMagickLibrary.MagickGetImageProfile(wand, name, length);
 end;
 
 {*****************************************************************************************************************}
 function MagickGetImageProfiles(wand: PMagickWand; const pattern: PAnsiChar; number_profiles: PSize_t): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetImageProfiles(wand, pattern, number_profiles);
+  Result := ALImageMagickLibrary.MagickGetImageProfiles(wand, pattern, number_profiles);
 end;
 
 {****************************************************************************************}
 function MagickGetImageProperty(wand: PMagickWand; const &property: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetImageProperty(wand, &property);
+  Result := ALImageMagickLibrary.MagickGetImageProperty(wand, &property);
 end;
 
 {*********************************************************************************************************************}
 function MagickGetImageProperties(wand: PMagickWand; const pattern: PAnsiChar; number_properties: PSize_t): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetImageProperties(wand, pattern, number_properties);
+  Result := ALImageMagickLibrary.MagickGetImageProperties(wand, pattern, number_properties);
 end;
 
 {******************************************************************}
 function MagickGetInterlaceScheme(wand: PMagickWand): InterlaceType;
 begin
-  Result := ALImageMagickLib.MagickGetInterlaceScheme(wand);
+  Result := ALImageMagickLibrary.MagickGetInterlaceScheme(wand);
 end;
 
 {*****************************************************************************}
 function MagickGetInterpolateMethod(wand: PMagickWand): PixelInterpolateMethod;
 begin
-  Result := ALImageMagickLib.MagickGetInterpolateMethod(wand);
+  Result := ALImageMagickLibrary.MagickGetInterpolateMethod(wand);
 end;
 
 {***************************************************************************}
 function MagickGetOption(wand: PMagickWand; const key: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetOption(wand, key);
+  Result := ALImageMagickLibrary.MagickGetOption(wand, key);
 end;
 
 {**********************************************************************************************************}
 function MagickGetOptions(wand: PMagickWand; const pattern: PAnsiChar; number_options: PSize_t): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetOptions(wand, pattern, number_options);
+  Result := ALImageMagickLibrary.MagickGetOptions(wand, pattern, number_options);
 end;
 
 {****************************************************************}
 function MagickGetOrientation(wand: PMagickWand): OrientationType;
 begin
-  Result := ALImageMagickLib.MagickGetOrientation(wand);
+  Result := ALImageMagickLibrary.MagickGetOrientation(wand);
 end;
 
 {*****************************************}
 function MagickGetPackageName(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetPackageName();
+  Result := ALImageMagickLibrary.MagickGetPackageName();
 end;
 
 {****************************************************************************************************************************}
 function MagickGetPage(const wand: PMagickWand; width: PSize_t; height: PSize_t; x: PSsize_t; y: PSsize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetPage(wand, width, height, x, y);
+  Result := ALImageMagickLibrary.MagickGetPage(wand, width, height, x, y);
 end;
 
 {*****************************************************}
 function MagickGetPointsize(wand: PMagickWand): double;
 begin
-  Result := ALImageMagickLib.MagickGetPointsize(wand);
+  Result := ALImageMagickLibrary.MagickGetPointsize(wand);
 end;
 
 {********************************************************}
 function MagickGetQuantumDepth(depth: PSize_t): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetQuantumDepth(depth);
+  Result := ALImageMagickLibrary.MagickGetQuantumDepth(depth);
 end;
 
 {********************************************************}
 function MagickGetQuantumRange(range: PSize_t): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetQuantumRange(range);
+  Result := ALImageMagickLibrary.MagickGetQuantumRange(range);
 end;
 
 {*****************************************}
 function MagickGetReleaseDate(): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetReleaseDate();
+  Result := ALImageMagickLibrary.MagickGetReleaseDate();
 end;
 
 {***********************************************************************************************}
 function MagickGetResolution(const wand: PMagickWand; x: PDouble; y: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetResolution(wand, x, y);
+  Result := ALImageMagickLibrary.MagickGetResolution(wand, x, y);
 end;
 
 {********************************************************************}
 function MagickGetResource(const &type: ResourceType): MagickSizeType;
 begin
-  Result := ALImageMagickLib.MagickGetResource(&type);
+  Result := ALImageMagickLibrary.MagickGetResource(&type);
 end;
 
 {*************************************************************************}
 function MagickGetResourceLimit(const &type: ResourceType): MagickSizeType;
 begin
-  Result := ALImageMagickLib.MagickGetResourceLimit(&type);
+  Result := ALImageMagickLibrary.MagickGetResourceLimit(&type);
 end;
 
 {*************************************************************************************}
 function MagickGetSamplingFactors(wand: PMagickWand; number_factors: PSize_t): PDouble;
 begin
-  Result := ALImageMagickLib.MagickGetSamplingFactors(wand, number_factors);
+  Result := ALImageMagickLibrary.MagickGetSamplingFactors(wand, number_factors);
 end;
 
 {**************************************************************************************************}
 function MagickGetSize(const wand: PMagickWand; columns: PSize_t; rows: PSize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetSize(wand, columns, rows);
+  Result := ALImageMagickLibrary.MagickGetSize(wand, columns, rows);
 end;
 
 {*****************************************************************************************}
 function MagickGetSizeOffset(const wand: PMagickWand; offset: PSsize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickGetSizeOffset(wand, offset);
+  Result := ALImageMagickLibrary.MagickGetSizeOffset(wand, offset);
 end;
 
 {***************************************************}
 function MagickGetType(wand: PMagickWand): ImageType;
 begin
-  Result := ALImageMagickLib.MagickGetType(wand);
+  Result := ALImageMagickLibrary.MagickGetType(wand);
 end;
 
 {*****************************************************}
 function MagickGetVersion(version: PSize_t): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetVersion(version);
+  Result := ALImageMagickLibrary.MagickGetVersion(version);
 end;
 
 {***********************************************************************************************************************************}
 function MagickProfileImage(wand: PMagickWand; const name: PAnsiChar; const profile: PVoid; const length: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickProfileImage(wand, name, profile, length);
+  Result := ALImageMagickLibrary.MagickProfileImage(wand, name, profile, length);
 end;
 
 {**************************************************************************************************}
 function MagickRemoveImageProfile(wand: PMagickWand; const name: PAnsiChar; length: PSize_t): PByte;
 begin
-  Result := ALImageMagickLib.MagickRemoveImageProfile(wand, name, length);
+  Result := ALImageMagickLibrary.MagickRemoveImageProfile(wand, name, length);
 end;
 
 {****************************************************************************************************}
 function MagickSetAntialias(wand: PMagickWand; const antialias: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetAntialias(wand, antialias);
+  Result := ALImageMagickLibrary.MagickSetAntialias(wand, antialias);
 end;
 
 {****************************************************************************************************}
 function MagickSetBackgroundColor(wand: PMagickWand; const background: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetBackgroundColor(wand, background);
+  Result := ALImageMagickLibrary.MagickSetBackgroundColor(wand, background);
 end;
 
 {***************************************************************************************************}
 function MagickSetColorspace(wand: PMagickWand; const colorspace: ColorspaceType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetColorspace(wand, colorspace);
+  Result := ALImageMagickLibrary.MagickSetColorspace(wand, colorspace);
 end;
 
 {******************************************************************************************************}
 function MagickSetCompression(wand: PMagickWand; const compression: CompressionType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetCompression(wand, compression);
+  Result := ALImageMagickLibrary.MagickSetCompression(wand, compression);
 end;
 
 {************************************************************************************************}
 function MagickSetCompressionQuality(wand: PMagickWand; const quality: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetCompressionQuality(wand, quality);
+  Result := ALImageMagickLibrary.MagickSetCompressionQuality(wand, quality);
 end;
 
 {*********************************************************************************}
 function MagickSetDepth(wand: PMagickWand; const depth: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetDepth(wand, depth);
+  Result := ALImageMagickLibrary.MagickSetDepth(wand, depth);
 end;
 
 {*****************************************************************************************}
 function MagickSetExtract(wand: PMagickWand; const geometry: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetExtract(wand, geometry);
+  Result := ALImageMagickLibrary.MagickSetExtract(wand, geometry);
 end;
 
 {******************************************************************************************}
 function MagickSetFilename(wand: PMagickWand; const filename: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetFilename(wand, filename);
+  Result := ALImageMagickLibrary.MagickSetFilename(wand, filename);
 end;
 
 {**********************************************************************************}
 function MagickSetFont(wand: PMagickWand; const font: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetFont(wand, font);
+  Result := ALImageMagickLibrary.MagickSetFont(wand, font);
 end;
 
 {**************************************************************************************}
 function MagickSetFormat(wand: PMagickWand; const format: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetFormat(wand, format);
+  Result := ALImageMagickLibrary.MagickSetFormat(wand, format);
 end;
 
 {**************************************************************************************}
 function MagickSetFilter(wand: PMagickWand; const &type: FilterType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetFilter(wand, &type);
+  Result := ALImageMagickLibrary.MagickSetFilter(wand, &type);
 end;
 
 {****************************************************************************************}
 function MagickSetGravity(wand: PMagickWand; const &type: GravityType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetGravity(wand, &type);
+  Result := ALImageMagickLibrary.MagickSetGravity(wand, &type);
 end;
 
 {***********************************************************************************************************************}
 function MagickSetImageArtifact(wand: PMagickWand; const artifact: PAnsiChar; const value: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageArtifact(wand, artifact, value);
+  Result := ALImageMagickLibrary.MagickSetImageArtifact(wand, artifact, value);
 end;
 
 {**************************************************************************************************************************************}
 function MagickSetImageProfile(wand: PMagickWand; const name: PAnsiChar; const profile: PVoid; const length: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageProfile(wand, name, profile, length);
+  Result := ALImageMagickLibrary.MagickSetImageProfile(wand, name, profile, length);
 end;
 
 {************************************************************************************************************************}
 function MagickSetImageProperty(wand: PMagickWand; const &property: PAnsiChar; const value: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetImageProperty(wand, &property, value);
+  Result := ALImageMagickLibrary.MagickSetImageProperty(wand, &property, value);
 end;
 
 {*************************************************************************************************************}
 function MagickSetInterlaceScheme(wand: PMagickWand; const interlace_scheme: InterlaceType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetInterlaceScheme(wand, interlace_scheme);
+  Result := ALImageMagickLibrary.MagickSetInterlaceScheme(wand, interlace_scheme);
 end;
 
 {**************************************************************************************************************}
 function MagickSetInterpolateMethod(wand: PMagickWand; const method: PixelInterpolateMethod): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetInterpolateMethod(wand, method);
+  Result := ALImageMagickLibrary.MagickSetInterpolateMethod(wand, method);
 end;
 
 {***********************************************************************************************************}
 function MagickSetOption(wand: PMagickWand; const key: PAnsiChar; const value: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetOption(wand, key, value);
+  Result := ALImageMagickLibrary.MagickSetOption(wand, key, value);
 end;
 
 {******************************************************************************************************}
 function MagickSetOrientation(wand: PMagickWand; const orientation: OrientationType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetOrientation(wand, orientation);
+  Result := ALImageMagickLibrary.MagickSetOrientation(wand, orientation);
 end;
 
 {******************************************************************************************************************************************}
 function MagickSetPage(wand: PMagickWand; const width: size_t; const height: size_t; const x: ssize_t; const y: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetPage(wand, width, height, x, y);
+  Result := ALImageMagickLibrary.MagickSetPage(wand, width, height, x, y);
 end;
 
 {**********************************************************************************************}
 function MagickSetPassphrase(wand: PMagickWand; const passphrase: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetPassphrase(wand, passphrase);
+  Result := ALImageMagickLibrary.MagickSetPassphrase(wand, passphrase);
 end;
 
 {*****************************************************************************************}
 function MagickSetPointsize(wand: PMagickWand; const pointsize: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetPointsize(wand, pointsize);
+  Result := ALImageMagickLibrary.MagickSetPointsize(wand, pointsize);
 end;
 
 {*********************************************************************************************************************************************}
 function MagickSetProgressMonitor(wand: PMagickWand; const progress_monitor: MagickProgressMonitor; client_data: PVoid): MagickProgressMonitor;
 begin
-  Result := ALImageMagickLib.MagickSetProgressMonitor(wand, progress_monitor, client_data);
+  Result := ALImageMagickLibrary.MagickSetProgressMonitor(wand, progress_monitor, client_data);
 end;
 
 {*********************************************************************************************************}
 function MagickSetResourceLimit(const &type: ResourceType; const limit: MagickSizeType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetResourceLimit(&type, limit);
+  Result := ALImageMagickLibrary.MagickSetResourceLimit(&type, limit);
 end;
 
 {*************************************************************************************************************************}
 function MagickSetResolution(wand: PMagickWand; const x_resolution: double; const y_resolution: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetResolution(wand, x_resolution, y_resolution);
+  Result := ALImageMagickLibrary.MagickSetResolution(wand, x_resolution, y_resolution);
 end;
 
 {*************************************************************************************************************************************}
 function MagickSetSamplingFactors(wand: PMagickWand; const number_factors: size_t; const sampling_factors: PDouble): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetSamplingFactors(wand, number_factors, sampling_factors);
+  Result := ALImageMagickLibrary.MagickSetSamplingFactors(wand, number_factors, sampling_factors);
 end;
 
 {********************************************}
 procedure MagickSetSeed(const seed: LongWord);
 begin
-  ALImageMagickLib.MagickSetSeed(seed);
+  ALImageMagickLibrary.MagickSetSeed(seed);
 end;
 
 {**********************************************************************************************}
 function MagickSetSecurityPolicy(wand: PMagickWand; const policy: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetSecurityPolicy(wand, policy);
+  Result := ALImageMagickLibrary.MagickSetSecurityPolicy(wand, policy);
 end;
 
 {******************************************************************************************************}
 function MagickSetSize(wand: PMagickWand; const columns: size_t; const rows: size_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetSize(wand, columns, rows);
+  Result := ALImageMagickLibrary.MagickSetSize(wand, columns, rows);
 end;
 
 {***********************************************************************************************************************************}
 function MagickSetSizeOffset(wand: PMagickWand; const columns: size_t; const rows: size_t; const offset: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetSizeOffset(wand, columns, rows, offset);
+  Result := ALImageMagickLibrary.MagickSetSizeOffset(wand, columns, rows, offset);
 end;
 
 {****************************************************************************************}
 function MagickSetType(wand: PMagickWand; const image_type: ImageType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetType(wand, image_type);
+  Result := ALImageMagickLibrary.MagickSetType(wand, image_type);
 end;
 
 {$ENDREGION}
@@ -17858,145 +17860,145 @@ end;
 {*******************************************}
 procedure ClearMagickWand(wand: PMagickWand);
 begin
-  ALImageMagickLib.ClearMagickWand(wand);
+  ALImageMagickLibrary.ClearMagickWand(wand);
 end;
 
 {*************************************************************}
 function CloneMagickWand(const wand: PMagickWand): PMagickWand;
 begin
-  Result := ALImageMagickLib.CloneMagickWand(wand);
+  Result := ALImageMagickLibrary.CloneMagickWand(wand);
 end;
 
 {*********************************************************}
 function DestroyMagickWand(wand: PMagickWand): PMagickWand;
 begin
-  Result := ALImageMagickLib.DestroyMagickWand(wand);
+  Result := ALImageMagickLibrary.DestroyMagickWand(wand);
 end;
 
 {****************************************************************}
 function IsMagickWand(const wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsMagickWand(wand);
+  Result := ALImageMagickLibrary.IsMagickWand(wand);
 end;
 
 {******************************************************************}
 function MagickClearException(wand: PMagickWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickClearException(wand);
+  Result := ALImageMagickLibrary.MagickClearException(wand);
 end;
 
 {****************************************************************************************}
 function MagickGetException(const wand: PMagickWand; severity: PExceptionType): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickGetException(wand, severity);
+  Result := ALImageMagickLibrary.MagickGetException(wand, severity);
 end;
 
 {**********************************************************************}
 function MagickGetExceptionType(const wand: PMagickWand): ExceptionType;
 begin
-  Result := ALImageMagickLib.MagickGetExceptionType(wand);
+  Result := ALImageMagickLibrary.MagickGetExceptionType(wand);
 end;
 
 {**********************************************************}
 function MagickGetIteratorIndex(wand: PMagickWand): ssize_t;
 begin
-  Result := ALImageMagickLib.MagickGetIteratorIndex(wand);
+  Result := ALImageMagickLibrary.MagickGetIteratorIndex(wand);
 end;
 
 {**********************************************************************}
 function MagickQueryConfigureOption(const option: PAnsiChar): PAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickQueryConfigureOption(option);
+  Result := ALImageMagickLibrary.MagickQueryConfigureOption(option);
 end;
 
 {**************************************************************************************************}
 function MagickQueryConfigureOptions(const pattern: PAnsiChar; number_options: PSize_t): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickQueryConfigureOptions(pattern, number_options);
+  Result := ALImageMagickLibrary.MagickQueryConfigureOptions(pattern, number_options);
 end;
 
 {*******************************************************************************************************************}
 function MagickQueryFontMetrics(wand: PMagickWand; const drawing_wand: PDrawingWand; const text: PAnsiChar): PDouble;
 begin
-  Result := ALImageMagickLib.MagickQueryFontMetrics(wand, drawing_wand, text);
+  Result := ALImageMagickLibrary.MagickQueryFontMetrics(wand, drawing_wand, text);
 end;
 
 {****************************************************************************************************************************}
 function MagickQueryMultilineFontMetrics(wand: PMagickWand; const drawing_wand: PDrawingWand; const text: PAnsiChar): PDouble;
 begin
-  Result := ALImageMagickLib.MagickQueryMultilineFontMetrics(wand, drawing_wand, text);
+  Result := ALImageMagickLibrary.MagickQueryMultilineFontMetrics(wand, drawing_wand, text);
 end;
 
 {*************************************************************************************}
 function MagickQueryFonts(const pattern: PAnsiChar; number_fonts: PSize_t): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickQueryFonts(pattern, number_fonts);
+  Result := ALImageMagickLibrary.MagickQueryFonts(pattern, number_fonts);
 end;
 
 {*****************************************************************************************}
 function MagickQueryFormats(const pattern: PAnsiChar; number_formats: PSize_t): PPAnsiChar;
 begin
-  Result := ALImageMagickLib.MagickQueryFormats(pattern, number_formats);
+  Result := ALImageMagickLibrary.MagickQueryFormats(pattern, number_formats);
 end;
 
 {**********************************************}
 procedure MagickRelinquishMemory(memory: PVoid);
 begin
-  ALImageMagickLib.MagickRelinquishMemory(memory);
+  ALImageMagickLibrary.MagickRelinquishMemory(memory);
 end;
 
 {***********************************************}
 procedure MagickResetIterator(wand: PMagickWand);
 begin
-  ALImageMagickLib.MagickResetIterator(wand);
+  ALImageMagickLibrary.MagickResetIterator(wand);
 end;
 
 {**************************************************}
 procedure MagickSetFirstIterator(wand: PMagickWand);
 begin
-  ALImageMagickLib.MagickSetFirstIterator(wand);
+  ALImageMagickLibrary.MagickSetFirstIterator(wand);
 end;
 
 {******************************************************************************************}
 function MagickSetIteratorIndex(wand: PMagickWand; const index: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MagickSetIteratorIndex(wand, index);
+  Result := ALImageMagickLibrary.MagickSetIteratorIndex(wand, index);
 end;
 
 {*************************************************}
 procedure MagickSetLastIterator(wand: PMagickWand);
 begin
-  ALImageMagickLib.MagickSetLastIterator(wand);
+  ALImageMagickLibrary.MagickSetLastIterator(wand);
 end;
 
 {****************************}
 procedure MagickWandGenesis();
 begin
-  ALImageMagickLib.MagickWandGenesis();
+  ALImageMagickLibrary.MagickWandGenesis();
 end;
 
 {*****************************}
 procedure MagickWandTerminus();
 begin
-  ALImageMagickLib.MagickWandTerminus();
+  ALImageMagickLibrary.MagickWandTerminus();
 end;
 
 {************************************}
 function NewMagickWand(): PMagickWand;
 begin
-  Result := ALImageMagickLib.NewMagickWand();
+  Result := ALImageMagickLibrary.NewMagickWand();
 end;
 
 {****************************************************************}
 function NewMagickWandFromImage(const image: PImage): PMagickWand;
 begin
-  Result := ALImageMagickLib.NewMagickWandFromImage(image);
+  Result := ALImageMagickLibrary.NewMagickWandFromImage(image);
 end;
 
 {*****************************************************}
 function IsMagickWandInstantiated(): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsMagickWandInstantiated();
+  Result := ALImageMagickLibrary.IsMagickWandInstantiated();
 end;
 
 {$ENDREGION}
@@ -18006,31 +18008,31 @@ end;
 {*******************************************************************************************************************************************************}
 function MogrifyImage(image_info: PImageInfo; const argc: Integer; const argv: PPAnsiChar; image: PPImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MogrifyImage(image_info, argc, argv, image, exception);
+  Result := ALImageMagickLibrary.MogrifyImage(image_info, argc, argv, image, exception);
 end;
 
 {********************************************************************************************************************************************************}
 function MogrifyImageCommand(image_info: PImageInfo; argc: Integer; argv: PPAnsiChar; metadata: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MogrifyImageCommand(image_info, argc, argv, metadata, exception);
+  Result := ALImageMagickLibrary.MogrifyImageCommand(image_info, argc, argv, metadata, exception);
 end;
 
 {*******************************************************************************************************************************************}
 function MogrifyImageInfo(image_info: PImageInfo; const argc: Integer; const argv: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MogrifyImageInfo(image_info, argc, argv, exception);
+  Result := ALImageMagickLibrary.MogrifyImageInfo(image_info, argc, argv, exception);
 end;
 
 {************************************************************************************************************************************************************}
 function MogrifyImageList(image_info: PImageInfo; const argc: Integer; const argv: PPAnsiChar; images: PPImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MogrifyImageList(image_info, argc, argv, images, exception);
+  Result := ALImageMagickLibrary.MogrifyImageList(image_info, argc, argv, images, exception);
 end;
 
 {****************************************************************************************************************************************************************************************}
 function MogrifyImages(image_info: PImageInfo; const post: MagickBooleanType; const argc: Integer; const argv: PPAnsiChar; images: PPImage; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MogrifyImages(image_info, post, argc, argv, images, exception);
+  Result := ALImageMagickLibrary.MogrifyImages(image_info, post, argc, argv, images, exception);
 end;
 
 {$ENDREGION}
@@ -18040,7 +18042,7 @@ end;
 {********************************************************************************************************************************************************}
 function MontageImageCommand(image_info: PImageInfo; argc: Integer; argv: PPAnsiChar; metadata: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.MontageImageCommand(image_info, argc, argv, metadata, exception);
+  Result := ALImageMagickLibrary.MontageImageCommand(image_info, argc, argv, metadata, exception);
 end;
 
 {$ENDREGION}
@@ -18050,7 +18052,7 @@ end;
 {*******************************************************************}
 //procedure CLIOption(cli_wand: PMagickCLI; const option: PAnsiChar);
 //begin
-//  ALImageMagickLib.CLIOption(cli_wand, option);
+//  ALImageMagickLibrary.CLIOption(cli_wand, option);
 //end;
 
 {$ENDREGION}
@@ -18060,109 +18062,109 @@ end;
 {*****************************************************}
 procedure ClearPixelIterator(iterator: PPixelIterator);
 begin
-  ALImageMagickLib.ClearPixelIterator(iterator);
+  ALImageMagickLibrary.ClearPixelIterator(iterator);
 end;
 
 {**************************************************************************}
 function ClonePixelIterator(const iterator: PPixelIterator): PPixelIterator;
 begin
-  Result := ALImageMagickLib.ClonePixelIterator(iterator);
+  Result := ALImageMagickLibrary.ClonePixelIterator(iterator);
 end;
 
 {**********************************************************************}
 function DestroyPixelIterator(iterator: PPixelIterator): PPixelIterator;
 begin
-  Result := ALImageMagickLib.DestroyPixelIterator(iterator);
+  Result := ALImageMagickLibrary.DestroyPixelIterator(iterator);
 end;
 
 {**************************************************************************}
 function IsPixelIterator(const iterator: PPixelIterator): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsPixelIterator(iterator);
+  Result := ALImageMagickLibrary.IsPixelIterator(iterator);
 end;
 
 {***********************************************************}
 function NewPixelIterator(wand: PMagickWand): PPixelIterator;
 begin
-  Result := ALImageMagickLib.NewPixelIterator(wand);
+  Result := ALImageMagickLibrary.NewPixelIterator(wand);
 end;
 
 {********************************************************************************}
 function PixelClearIteratorException(iterator: PPixelIterator): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PixelClearIteratorException(iterator);
+  Result := ALImageMagickLibrary.PixelClearIteratorException(iterator);
 end;
 
 {************************************************************************************************************************************************}
 function NewPixelRegionIterator(wand: PMagickWand; const x: ssize_t; const y: ssize_t; const width: size_t; const height: size_t): PPixelIterator;
 begin
-  Result := ALImageMagickLib.NewPixelRegionIterator(wand, x, y, width, height);
+  Result := ALImageMagickLibrary.NewPixelRegionIterator(wand, x, y, width, height);
 end;
 
 {************************************************************************************************}
 function PixelGetCurrentIteratorRow(iterator: PPixelIterator; number_wands: PSize_t): PPPixelWand;
 begin
-  Result := ALImageMagickLib.PixelGetCurrentIteratorRow(iterator, number_wands);
+  Result := ALImageMagickLibrary.PixelGetCurrentIteratorRow(iterator, number_wands);
 end;
 
 {******************************************************************************************************}
 function PixelGetIteratorException(const iterator: PPixelIterator; severity: PExceptionType): PAnsiChar;
 begin
-  Result := ALImageMagickLib.PixelGetIteratorException(iterator, severity);
+  Result := ALImageMagickLibrary.PixelGetIteratorException(iterator, severity);
 end;
 
 {************************************************************************************}
 function PixelGetIteratorExceptionType(const iterator: PPixelIterator): ExceptionType;
 begin
-  Result := ALImageMagickLib.PixelGetIteratorExceptionType(iterator);
+  Result := ALImageMagickLibrary.PixelGetIteratorExceptionType(iterator);
 end;
 
 {**************************************************************}
 function PixelGetIteratorRow(iterator: PPixelIterator): ssize_t;
 begin
-  Result := ALImageMagickLib.PixelGetIteratorRow(iterator);
+  Result := ALImageMagickLibrary.PixelGetIteratorRow(iterator);
 end;
 
 {*********************************************************************************************}
 function PixelGetNextIteratorRow(iterator: PPixelIterator; number_wands: PSize_t): PPPixelWand;
 begin
-  Result := ALImageMagickLib.PixelGetNextIteratorRow(iterator, number_wands);
+  Result := ALImageMagickLibrary.PixelGetNextIteratorRow(iterator, number_wands);
 end;
 
 {*************************************************************************************************}
 function PixelGetPreviousIteratorRow(iterator: PPixelIterator; number_wands: PSize_t): PPPixelWand;
 begin
-  Result := ALImageMagickLib.PixelGetPreviousIteratorRow(iterator, number_wands);
+  Result := ALImageMagickLibrary.PixelGetPreviousIteratorRow(iterator, number_wands);
 end;
 
 {*****************************************************}
 procedure PixelResetIterator(iterator: PPixelIterator);
 begin
-  ALImageMagickLib.PixelResetIterator(iterator);
+  ALImageMagickLibrary.PixelResetIterator(iterator);
 end;
 
 {***********************************************************}
 procedure PixelSetFirstIteratorRow(iterator: PPixelIterator);
 begin
-  ALImageMagickLib.PixelSetFirstIteratorRow(iterator);
+  ALImageMagickLibrary.PixelSetFirstIteratorRow(iterator);
 end;
 
 {********************************************************************************************}
 function PixelSetIteratorRow(iterator: PPixelIterator; const row: ssize_t): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PixelSetIteratorRow(iterator, row);
+  Result := ALImageMagickLibrary.PixelSetIteratorRow(iterator, row);
 end;
 
 {**********************************************************}
 procedure PixelSetLastIteratorRow(iterator: PPixelIterator);
 begin
-  ALImageMagickLib.PixelSetLastIteratorRow(iterator);
+  ALImageMagickLibrary.PixelSetLastIteratorRow(iterator);
 end;
 
 {**********************************************************************}
 function PixelSyncIterator(iterator: PPixelIterator): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PixelSyncIterator(iterator);
+  Result := ALImageMagickLibrary.PixelSyncIterator(iterator);
 end;
 
 {$ENDREGION}
@@ -18172,373 +18174,373 @@ end;
 {*****************************************}
 procedure ClearPixelWand(wand: PPixelWand);
 begin
-  ALImageMagickLib.ClearPixelWand(wand);
+  ALImageMagickLibrary.ClearPixelWand(wand);
 end;
 
 {**********************************************************}
 function ClonePixelWand(const wand: PPixelWand): PPixelWand;
 begin
-  Result := ALImageMagickLib.ClonePixelWand(wand);
+  Result := ALImageMagickLibrary.ClonePixelWand(wand);
 end;
 
 {******************************************************************************************}
 function ClonePixelWands(const wands: PPPixelWand; const number_wands: size_t): PPPixelWand;
 begin
-  Result := ALImageMagickLib.ClonePixelWands(wands, number_wands);
+  Result := ALImageMagickLibrary.ClonePixelWands(wands, number_wands);
 end;
 
 {******************************************************}
 function DestroyPixelWand(wand: PPixelWand): PPixelWand;
 begin
-  Result := ALImageMagickLib.DestroyPixelWand(wand);
+  Result := ALImageMagickLibrary.DestroyPixelWand(wand);
 end;
 
 {*************************************************************************************}
 function DestroyPixelWands(wand: PPPixelWand; const number_wands: size_t): PPPixelWand;
 begin
-  Result := ALImageMagickLib.DestroyPixelWands(wand, number_wands);
+  Result := ALImageMagickLibrary.DestroyPixelWands(wand, number_wands);
 end;
 
 {***********************************************************************************************}
 function IsPixelWandSimilar(p: PPixelWand; q: PPixelWand; const fuzz: double): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsPixelWandSimilar(p, q, fuzz);
+  Result := ALImageMagickLibrary.IsPixelWandSimilar(p, q, fuzz);
 end;
 
 {**************************************************************}
 function IsPixelWand(const wand: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsPixelWand(wand);
+  Result := ALImageMagickLibrary.IsPixelWand(wand);
 end;
 
 {**********************************}
 function NewPixelWand(): PPixelWand;
 begin
-  Result := ALImageMagickLib.NewPixelWand();
+  Result := ALImageMagickLibrary.NewPixelWand();
 end;
 
 {**************************************************************}
 function NewPixelWands(const number_wands: size_t): PPPixelWand;
 begin
-  Result := ALImageMagickLib.NewPixelWands(number_wands);
+  Result := ALImageMagickLibrary.NewPixelWands(number_wands);
 end;
 
 {****************************************************************}
 function PixelClearException(wand: PPixelWand): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PixelClearException(wand);
+  Result := ALImageMagickLibrary.PixelClearException(wand);
 end;
 
 {*****************************************************}
 function PixelGetAlpha(const wand: PPixelWand): double;
 begin
-  Result := ALImageMagickLib.PixelGetAlpha(wand);
+  Result := ALImageMagickLibrary.PixelGetAlpha(wand);
 end;
 
 {*************************************************************}
 function PixelGetAlphaQuantum(const wand: PPixelWand): Quantum;
 begin
-  Result := ALImageMagickLib.PixelGetAlphaQuantum(wand);
+  Result := ALImageMagickLibrary.PixelGetAlphaQuantum(wand);
 end;
 
 {*****************************************************}
 function PixelGetBlack(const wand: PPixelWand): double;
 begin
-  Result := ALImageMagickLib.PixelGetBlack(wand);
+  Result := ALImageMagickLibrary.PixelGetBlack(wand);
 end;
 
 {*************************************************************}
 function PixelGetBlackQuantum(const wand: PPixelWand): Quantum;
 begin
-  Result := ALImageMagickLib.PixelGetBlackQuantum(wand);
+  Result := ALImageMagickLibrary.PixelGetBlackQuantum(wand);
 end;
 
 {****************************************************}
 function PixelGetBlue(const wand: PPixelWand): double;
 begin
-  Result := ALImageMagickLib.PixelGetBlue(wand);
+  Result := ALImageMagickLibrary.PixelGetBlue(wand);
 end;
 
 {************************************************************}
 function PixelGetBlueQuantum(const wand: PPixelWand): Quantum;
 begin
-  Result := ALImageMagickLib.PixelGetBlueQuantum(wand);
+  Result := ALImageMagickLibrary.PixelGetBlueQuantum(wand);
 end;
 
 {****************************************************************}
 function PixelGetColorAsString(const wand: PPixelWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.PixelGetColorAsString(wand);
+  Result := ALImageMagickLibrary.PixelGetColorAsString(wand);
 end;
 
 {**************************************************************************}
 function PixelGetColorAsNormalizedString(const wand: PPixelWand): PAnsiChar;
 begin
-  Result := ALImageMagickLib.PixelGetColorAsNormalizedString(wand);
+  Result := ALImageMagickLibrary.PixelGetColorAsNormalizedString(wand);
 end;
 
 {**********************************************************}
 function PixelGetColorCount(const wand: PPixelWand): size_t;
 begin
-  Result := ALImageMagickLib.PixelGetColorCount(wand);
+  Result := ALImageMagickLibrary.PixelGetColorCount(wand);
 end;
 
 {****************************************************}
 function PixelGetCyan(const wand: PPixelWand): double;
 begin
-  Result := ALImageMagickLib.PixelGetCyan(wand);
+  Result := ALImageMagickLibrary.PixelGetCyan(wand);
 end;
 
 {************************************************************}
 function PixelGetCyanQuantum(const wand: PPixelWand): Quantum;
 begin
-  Result := ALImageMagickLib.PixelGetCyanQuantum(wand);
+  Result := ALImageMagickLibrary.PixelGetCyanQuantum(wand);
 end;
 
 {**************************************************************************************}
 function PixelGetException(const wand: PPixelWand; severity: PExceptionType): PAnsiChar;
 begin
-  Result := ALImageMagickLib.PixelGetException(wand, severity);
+  Result := ALImageMagickLibrary.PixelGetException(wand, severity);
 end;
 
 {********************************************************************}
 function PixelGetExceptionType(const wand: PPixelWand): ExceptionType;
 begin
-  Result := ALImageMagickLib.PixelGetExceptionType(wand);
+  Result := ALImageMagickLibrary.PixelGetExceptionType(wand);
 end;
 
 {****************************************************}
 function PixelGetFuzz(const wand: PPixelWand): double;
 begin
-  Result := ALImageMagickLib.PixelGetFuzz(wand);
+  Result := ALImageMagickLibrary.PixelGetFuzz(wand);
 end;
 
 {*****************************************************}
 function PixelGetGreen(const wand: PPixelWand): double;
 begin
-  Result := ALImageMagickLib.PixelGetGreen(wand);
+  Result := ALImageMagickLibrary.PixelGetGreen(wand);
 end;
 
 {*************************************************************}
 function PixelGetGreenQuantum(const wand: PPixelWand): Quantum;
 begin
-  Result := ALImageMagickLib.PixelGetGreenQuantum(wand);
+  Result := ALImageMagickLibrary.PixelGetGreenQuantum(wand);
 end;
 
 {***************************************************************************************************}
 procedure PixelGetHSL(const wand: PPixelWand; hue: PDouble; saturation: PDouble; lightness: PDouble);
 begin
-  ALImageMagickLib.PixelGetHSL(wand, hue, saturation, lightness);
+  ALImageMagickLibrary.PixelGetHSL(wand, hue, saturation, lightness);
 end;
 
 {******************************************************}
 function PixelGetIndex(const wand: PPixelWand): Quantum;
 begin
-  Result := ALImageMagickLib.PixelGetIndex(wand);
+  Result := ALImageMagickLibrary.PixelGetIndex(wand);
 end;
 
 {*******************************************************}
 function PixelGetMagenta(const wand: PPixelWand): double;
 begin
-  Result := ALImageMagickLib.PixelGetMagenta(wand);
+  Result := ALImageMagickLibrary.PixelGetMagenta(wand);
 end;
 
 {***************************************************************}
 function PixelGetMagentaQuantum(const wand: PPixelWand): Quantum;
 begin
-  Result := ALImageMagickLib.PixelGetMagentaQuantum(wand);
+  Result := ALImageMagickLibrary.PixelGetMagentaQuantum(wand);
 end;
 
 {***********************************************************************}
 procedure PixelGetMagickColor(const wand: PPixelWand; color: PPixelInfo);
 begin
-  ALImageMagickLib.PixelGetMagickColor(wand, color);
+  ALImageMagickLibrary.PixelGetMagickColor(wand, color);
 end;
 
 {********************************************************}
 function PixelGetPixel(const wand: PPixelWand): PixelInfo;
 begin
-  Result := ALImageMagickLib.PixelGetPixel(wand);
+  Result := ALImageMagickLibrary.PixelGetPixel(wand);
 end;
 
 {**************************************************************************}
 procedure PixelGetQuantumPacket(const wand: PPixelWand; packet: PPixelInfo);
 begin
-  ALImageMagickLib.PixelGetQuantumPacket(wand, packet);
+  ALImageMagickLibrary.PixelGetQuantumPacket(wand, packet);
 end;
 
 {*******************************************************************************************}
 procedure PixelGetQuantumPixel(const image: PImage; const wand: PPixelWand; pixel: PQuantum);
 begin
-  ALImageMagickLib.PixelGetQuantumPixel(image, wand, pixel);
+  ALImageMagickLibrary.PixelGetQuantumPixel(image, wand, pixel);
 end;
 
 {***************************************************}
 function PixelGetRed(const wand: PPixelWand): double;
 begin
-  Result := ALImageMagickLib.PixelGetRed(wand);
+  Result := ALImageMagickLibrary.PixelGetRed(wand);
 end;
 
 {***********************************************************}
 function PixelGetRedQuantum(const wand: PPixelWand): Quantum;
 begin
-  Result := ALImageMagickLib.PixelGetRedQuantum(wand);
+  Result := ALImageMagickLibrary.PixelGetRedQuantum(wand);
 end;
 
 {******************************************************}
 function PixelGetYellow(const wand: PPixelWand): double;
 begin
-  Result := ALImageMagickLib.PixelGetYellow(wand);
+  Result := ALImageMagickLibrary.PixelGetYellow(wand);
 end;
 
 {**************************************************************}
 function PixelGetYellowQuantum(const wand: PPixelWand): Quantum;
 begin
-  Result := ALImageMagickLib.PixelGetYellowQuantum(wand);
+  Result := ALImageMagickLibrary.PixelGetYellowQuantum(wand);
 end;
 
 {*************************************************************}
 procedure PixelSetAlpha(wand: PPixelWand; const alpha: double);
 begin
-  ALImageMagickLib.PixelSetAlpha(wand, alpha);
+  ALImageMagickLibrary.PixelSetAlpha(wand, alpha);
 end;
 
 {*********************************************************************}
 procedure PixelSetAlphaQuantum(wand: PPixelWand; const alpha: Quantum);
 begin
-  ALImageMagickLib.PixelSetAlphaQuantum(wand, alpha);
+  ALImageMagickLibrary.PixelSetAlphaQuantum(wand, alpha);
 end;
 
 {*************************************************************}
 procedure PixelSetBlack(wand: PPixelWand; const black: double);
 begin
-  ALImageMagickLib.PixelSetBlack(wand, black);
+  ALImageMagickLibrary.PixelSetBlack(wand, black);
 end;
 
 {*********************************************************************}
 procedure PixelSetBlackQuantum(wand: PPixelWand; const black: Quantum);
 begin
-  ALImageMagickLib.PixelSetBlackQuantum(wand, black);
+  ALImageMagickLibrary.PixelSetBlackQuantum(wand, black);
 end;
 
 {***********************************************************}
 procedure PixelSetBlue(wand: PPixelWand; const blue: double);
 begin
-  ALImageMagickLib.PixelSetBlue(wand, blue);
+  ALImageMagickLibrary.PixelSetBlue(wand, blue);
 end;
 
 {*******************************************************************}
 procedure PixelSetBlueQuantum(wand: PPixelWand; const blue: Quantum);
 begin
-  ALImageMagickLib.PixelSetBlueQuantum(wand, blue);
+  ALImageMagickLibrary.PixelSetBlueQuantum(wand, blue);
 end;
 
 {**********************************************************************************}
 function PixelSetColor(wand: PPixelWand; const color: PAnsiChar): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.PixelSetColor(wand, color);
+  Result := ALImageMagickLibrary.PixelSetColor(wand, color);
 end;
 
 {******************************************************************}
 procedure PixelSetColorCount(wand: PPixelWand; const count: size_t);
 begin
-  ALImageMagickLib.PixelSetColorCount(wand, count);
+  ALImageMagickLibrary.PixelSetColorCount(wand, count);
 end;
 
 {*************************************************************************}
 procedure PixelSetColorFromWand(wand: PPixelWand; const color: PPixelWand);
 begin
-  ALImageMagickLib.PixelSetColorFromWand(wand, color);
+  ALImageMagickLibrary.PixelSetColorFromWand(wand, color);
 end;
 
 {***********************************************************}
 procedure PixelSetCyan(wand: PPixelWand; const cyan: double);
 begin
-  ALImageMagickLib.PixelSetCyan(wand, cyan);
+  ALImageMagickLibrary.PixelSetCyan(wand, cyan);
 end;
 
 {*******************************************************************}
 procedure PixelSetCyanQuantum(wand: PPixelWand; const cyan: Quantum);
 begin
-  ALImageMagickLib.PixelSetCyanQuantum(wand, cyan);
+  ALImageMagickLibrary.PixelSetCyanQuantum(wand, cyan);
 end;
 
 {***********************************************************}
 procedure PixelSetFuzz(wand: PPixelWand; const fuzz: double);
 begin
-  ALImageMagickLib.PixelSetFuzz(wand, fuzz);
+  ALImageMagickLibrary.PixelSetFuzz(wand, fuzz);
 end;
 
 {*************************************************************}
 procedure PixelSetGreen(wand: PPixelWand; const green: double);
 begin
-  ALImageMagickLib.PixelSetGreen(wand, green);
+  ALImageMagickLibrary.PixelSetGreen(wand, green);
 end;
 
 {*********************************************************************}
 procedure PixelSetGreenQuantum(wand: PPixelWand; const green: Quantum);
 begin
-  ALImageMagickLib.PixelSetGreenQuantum(wand, green);
+  ALImageMagickLibrary.PixelSetGreenQuantum(wand, green);
 end;
 
 {************************************************************************************************************}
 procedure PixelSetHSL(wand: PPixelWand; const hue: double; const saturation: double; const lightness: double);
 begin
-  ALImageMagickLib.PixelSetHSL(wand, hue, saturation, lightness);
+  ALImageMagickLibrary.PixelSetHSL(wand, hue, saturation, lightness);
 end;
 
 {**************************************************************}
 procedure PixelSetIndex(wand: PPixelWand; const index: Quantum);
 begin
-  ALImageMagickLib.PixelSetIndex(wand, index);
+  ALImageMagickLibrary.PixelSetIndex(wand, index);
 end;
 
 {*****************************************************************}
 procedure PixelSetMagenta(wand: PPixelWand; const magenta: double);
 begin
-  ALImageMagickLib.PixelSetMagenta(wand, magenta);
+  ALImageMagickLibrary.PixelSetMagenta(wand, magenta);
 end;
 
 {*************************************************************************}
 procedure PixelSetMagentaQuantum(wand: PPixelWand; const magenta: Quantum);
 begin
-  ALImageMagickLib.PixelSetMagentaQuantum(wand, magenta);
+  ALImageMagickLibrary.PixelSetMagentaQuantum(wand, magenta);
 end;
 
 {**********************************************************************}
 procedure PixelSetPixelColor(wand: PPixelWand; const color: PPixelInfo);
 begin
-  ALImageMagickLib.PixelSetPixelColor(wand, color);
+  ALImageMagickLibrary.PixelSetPixelColor(wand, color);
 end;
 
 {*******************************************************************************************}
 procedure PixelSetQuantumPixel(const image: PImage; const pixel: PQuantum; wand: PPixelWand);
 begin
-  ALImageMagickLib.PixelSetQuantumPixel(image, pixel, wand);
+  ALImageMagickLibrary.PixelSetQuantumPixel(image, pixel, wand);
 end;
 
 {*********************************************************}
 procedure PixelSetRed(wand: PPixelWand; const red: double);
 begin
-  ALImageMagickLib.PixelSetRed(wand, red);
+  ALImageMagickLibrary.PixelSetRed(wand, red);
 end;
 
 {*****************************************************************}
 procedure PixelSetRedQuantum(wand: PPixelWand; const red: Quantum);
 begin
-  ALImageMagickLib.PixelSetRedQuantum(wand, red);
+  ALImageMagickLibrary.PixelSetRedQuantum(wand, red);
 end;
 
 {***************************************************************}
 procedure PixelSetYellow(wand: PPixelWand; const yellow: double);
 begin
-  ALImageMagickLib.PixelSetYellow(wand, yellow);
+  ALImageMagickLibrary.PixelSetYellow(wand, yellow);
 end;
 
 {***********************************************************************}
 procedure PixelSetYellowQuantum(wand: PPixelWand; const yellow: Quantum);
 begin
-  ALImageMagickLib.PixelSetYellowQuantum(wand, yellow);
+  ALImageMagickLibrary.PixelSetYellowQuantum(wand, yellow);
 end;
 
 {$ENDREGION}
@@ -18548,19 +18550,19 @@ end;
 {***************************************************************************}
 function AcquireScriptTokenInfo(const filename: PAnsiChar): PScriptTokenInfo;
 begin
-  Result := ALImageMagickLib.AcquireScriptTokenInfo(filename);
+  Result := ALImageMagickLibrary.AcquireScriptTokenInfo(filename);
 end;
 
 {******************************************************************************}
 function DestroyScriptTokenInfo(token_info: PScriptTokenInfo): PScriptTokenInfo;
 begin
-  Result := ALImageMagickLib.DestroyScriptTokenInfo(token_info);
+  Result := ALImageMagickLibrary.DestroyScriptTokenInfo(token_info);
 end;
 
 {***********************************************************************}
 function GetScriptToken(token_info: PScriptTokenInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetScriptToken(token_info);
+  Result := ALImageMagickLibrary.GetScriptToken(token_info);
 end;
 
 {$ENDREGION}
@@ -18570,7 +18572,7 @@ end;
 {*******************************************************************************************************************************************************}
 function StreamImageCommand(image_info: PImageInfo; argc: Integer; argv: PPAnsiChar; metadata: PPAnsiChar; exception: PExceptionInfo): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.StreamImageCommand(image_info, argc, argv, metadata, exception);
+  Result := ALImageMagickLibrary.StreamImageCommand(image_info, argc, argv, metadata, exception);
 end;
 
 {$ENDREGION}
@@ -18580,91 +18582,91 @@ end;
 {************************************************************}
 function CloneWandView(const wand_view: PWandView): PWandView;
 begin
-  Result := ALImageMagickLib.CloneWandView(wand_view);
+  Result := ALImageMagickLibrary.CloneWandView(wand_view);
 end;
 
 {********************************************************}
 function DestroyWandView(wand_view: PWandView): PWandView;
 begin
-  Result := ALImageMagickLib.DestroyWandView(wand_view);
+  Result := ALImageMagickLibrary.DestroyWandView(wand_view);
 end;
 
 {*******************************************************************************************************************************************************************************}
 function DuplexTransferWandViewIterator(source: PWandView; duplex: PWandView; destination: PWandView; transfer: DuplexTransferWandViewMethod; context: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.DuplexTransferWandViewIterator(source, duplex, destination, transfer, context);
+  Result := ALImageMagickLibrary.DuplexTransferWandViewIterator(source, duplex, destination, transfer, context);
 end;
 
 {*********************************************************************************************}
 function GetWandViewException(const wand_view: PWandView; severity: PExceptionType): PAnsiChar;
 begin
-  Result := ALImageMagickLib.GetWandViewException(wand_view, severity);
+  Result := ALImageMagickLibrary.GetWandViewException(wand_view, severity);
 end;
 
 {********************************************************************}
 function GetWandViewExtent(const wand_view: PWandView): RectangleInfo;
 begin
-  Result := ALImageMagickLib.GetWandViewExtent(wand_view);
+  Result := ALImageMagickLibrary.GetWandViewExtent(wand_view);
 end;
 
 {*********************************************************************************************************}
 function GetWandViewIterator(source: PWandView; get: GetWandViewMethod; context: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.GetWandViewIterator(source, get, context);
+  Result := ALImageMagickLibrary.GetWandViewIterator(source, get, context);
 end;
 
 {******************************************************************}
 function GetWandViewPixels(const wand_view: PWandView): PPPixelWand;
 begin
-  Result := ALImageMagickLib.GetWandViewPixels(wand_view);
+  Result := ALImageMagickLibrary.GetWandViewPixels(wand_view);
 end;
 
 {****************************************************************}
 function GetWandViewWand(const wand_view: PWandView): PMagickWand;
 begin
-  Result := ALImageMagickLib.GetWandViewWand(wand_view);
+  Result := ALImageMagickLibrary.GetWandViewWand(wand_view);
 end;
 
 {*****************************************************************}
 function IsWandView(const wand_view: PWandView): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.IsWandView(wand_view);
+  Result := ALImageMagickLibrary.IsWandView(wand_view);
 end;
 
 {*************************************************}
 function NewWandView(wand: PMagickWand): PWandView;
 begin
-  Result := ALImageMagickLib.NewWandView(wand);
+  Result := ALImageMagickLibrary.NewWandView(wand);
 end;
 
 {**************************************************************************************************************************************}
 function NewWandViewExtent(wand: PMagickWand; const x: ssize_t; const y: ssize_t; const width: size_t; const height: size_t): PWandView;
 begin
-  Result := ALImageMagickLib.NewWandViewExtent(wand, x, y, width, height);
+  Result := ALImageMagickLibrary.NewWandViewExtent(wand, x, y, width, height);
 end;
 
 {***********************************************************************************}
 procedure SetWandViewDescription(wand_view: PWandView; const description: PAnsiChar);
 begin
-  ALImageMagickLib.SetWandViewDescription(wand_view, description);
+  ALImageMagickLibrary.SetWandViewDescription(wand_view, description);
 end;
 
 {***************************************************************************************************************}
 function SetWandViewIterator(destination: PWandView; &set: SetWandViewMethod; context: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.SetWandViewIterator(destination, &set, context);
+  Result := ALImageMagickLibrary.SetWandViewIterator(destination, &set, context);
 end;
 
 {************************************************************************************************************************************************}
 function TransferWandViewIterator(source: PWandView; destination: PWandView; transfer: TransferWandViewMethod; context: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.TransferWandViewIterator(source, destination, transfer, context);
+  Result := ALImageMagickLibrary.TransferWandViewIterator(source, destination, transfer, context);
 end;
 
 {******************************************************************************************************************}
 function UpdateWandViewIterator(source: PWandView; update: UpdateWandViewMethod; context: PVoid): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.UpdateWandViewIterator(source, update, context);
+  Result := ALImageMagickLibrary.UpdateWandViewIterator(source, update, context);
 end;
 
 {$ENDREGION}
@@ -18674,19 +18676,19 @@ end;
 {*******************************}
 function AcquireWandId(): size_t;
 begin
-  Result := ALImageMagickLib.AcquireWandId();
+  Result := ALImageMagickLibrary.AcquireWandId();
 end;
 
 {*************************}
 procedure DestroyWandIds();
 begin
-  ALImageMagickLib.DestroyWandIds();
+  ALImageMagickLibrary.DestroyWandIds();
 end;
 
 {*******************************************}
 procedure RelinquishWandId(const id: size_t);
 begin
-  ALImageMagickLib.RelinquishWandId(id);
+  ALImageMagickLibrary.RelinquishWandId(id);
 end;
 
 {$ENDREGION}
@@ -18696,31 +18698,31 @@ end;
 {***************************************************************************************}
 function AcquireMagickCLI(image_info: PImageInfo; exception: PExceptionInfo): PMagickCLI;
 begin
-  Result := ALImageMagickLib.AcquireMagickCLI(image_info, exception);
+  Result := ALImageMagickLibrary.AcquireMagickCLI(image_info, exception);
 end;
 
 {**********************************************************}
 function DestroyMagickCLI(cli_wand: PMagickCLI): PMagickCLI;
 begin
-  Result := ALImageMagickLib.DestroyMagickCLI(cli_wand);
+  Result := ALImageMagickLibrary.DestroyMagickCLI(cli_wand);
 end;
 
 {***********************************************************************************************************}
 function CLICatchException(cli_wand: PMagickCLI; const all_exceptions: MagickBooleanType): MagickBooleanType;
 begin
-  Result := ALImageMagickLib.CLICatchException(cli_wand, all_exceptions);
+  Result := ALImageMagickLibrary.CLICatchException(cli_wand, all_exceptions);
 end;
 
 {**************************************************************************************************************************************************************************************************}
 //function CLILogEvent(cli_wand: PMagickCLI; const &type: LogEventType; const magick_module: PAnsiChar; const &function: PAnsiChar; const line: size_t; const format: PAnsiChar): MagickBooleanType;
 //begin
-//  Result := ALImageMagickLib.CLILogEvent(cli_wand, &type, magick_module, &function, line, format);
+//  Result := ALImageMagickLibrary.CLILogEvent(cli_wand, &type, magick_module, &function, line, format);
 //end;
 
 {**********************************************************************************************************************************************************************************************************************************}
 //function CLIThrowException(cli_wand: PMagickCLI; const magick_module: PAnsiChar; const &function: PAnsiChar; const line: size_t; const severity: ExceptionType; const tag: PAnsiChar; const format: PAnsiChar): MagickBooleanType;
 //begin
-//  Result := ALImageMagickLib.CLIThrowException(cli_wand, magick_module, &function, line, severity, tag, format);
+//  Result := ALImageMagickLibrary.CLIThrowException(cli_wand, magick_module, &function, line, severity, tag, format);
 //end;
 
 {$ENDREGION}
@@ -18729,9 +18731,9 @@ end;
 procedure ALRaiseLastMagickWandError(const AWand: PMagickWand);
 begin
   var LSeverity: ExceptionType;
-  var LPAnsiChar: PAnsiChar := ALImageMagickLib.MagickGetException(AWand, @LSeverity);
+  var LPAnsiChar: PAnsiChar := ALImageMagickLibrary.MagickGetException(AWand, @LSeverity);
   var LDescription: ansiString := LPAnsiChar;
-  ALImageMagickLib.MagickRelinquishMemory(LPAnsiChar);
+  ALImageMagickLibrary.MagickRelinquishMemory(LPAnsiChar);
   raise Exception.create(string(LDescription));
 end;
 
@@ -18739,9 +18741,9 @@ end;
 procedure ALRaiseLastPixelWandError(const AWand: PPixelWand);
 begin
   var LSeverity: ExceptionType;
-  var LPAnsiChar: PAnsiChar := ALImageMagickLib.PixelGetException(AWand, @LSeverity);
+  var LPAnsiChar: PAnsiChar := ALImageMagickLibrary.PixelGetException(AWand, @LSeverity);
   var LDescription: ansiString := LPAnsiChar;
-  ALImageMagickLib.MagickRelinquishMemory(LPAnsiChar);
+  ALImageMagickLibrary.MagickRelinquishMemory(LPAnsiChar);
   raise Exception.create(string(LDescription));
 end;
 
@@ -18749,9 +18751,9 @@ end;
 procedure ALRaiseLastDrawingWandError(const AWand: PDrawingWand);
 begin
   var LSeverity: ExceptionType;
-  var LPAnsiChar: PAnsiChar := ALImageMagickLib.DrawGetException(AWand, @LSeverity);
+  var LPAnsiChar: PAnsiChar := ALImageMagickLibrary.DrawGetException(AWand, @LSeverity);
   var LDescription: ansiString := LPAnsiChar;
-  ALImageMagickLib.MagickRelinquishMemory(LPAnsiChar);
+  ALImageMagickLibrary.MagickRelinquishMemory(LPAnsiChar);
   raise Exception.create(string(LDescription));
 end;
 
@@ -18797,20 +18799,20 @@ end;
 {****************************************************************************************************}
 procedure ALCreateImageMagickLibrary(const AImageMagickHome: String; const AThreadLimit: integer = 0);
 begin
-  if assigned(ALImageMagickLib) then exit;
-  ALImageMagickLib := TALImageMagickLibrary.Create(AImageMagickHome, AThreadLimit);
+  if assigned(ALImageMagickLibrary) then exit;
+  ALImageMagickLibrary := TALImageMagickLibrary.Create(AImageMagickHome, AThreadLimit);
 end;
 
 {*********************************}
 procedure ALFreeImageMagickLibrary;
 begin
-  alFreeAndNil(ALImageMagickLib);
+  ALFreeAndNil(ALImageMagickLibrary);
 end;
 
 initialization
   {$IF defined(DEBUG)}
   ALLog('Alcinoe.ImageMagick','initialization');
   {$ENDIF}
-  ALImageMagickLib := nil;
+  ALImageMagickLibrary := nil;
 
 end.

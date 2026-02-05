@@ -781,7 +781,7 @@ begin
 
 end;
 
-{*****************************}
+{******************************}
 procedure TALMongoDBClient.Find(
             const AOnDocument: TOnDocumentObjProc;
             const AContext: Pointer;
@@ -836,9 +836,9 @@ begin
         Try
 
           var LCollection := mongoc_client_get_collection(
-                              LClient, // client: Pmongoc_client_t;
-                              PAnsiChar(ADatabaseName), // db: PAnsiChar;
-                              PAnsiChar(ACollectionName)); // collection: PAnsiChar
+                               LClient, // client: Pmongoc_client_t;
+                               PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                               PAnsiChar(ACollectionName)); // collection: PAnsiChar
           if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
           try
 
@@ -1061,9 +1061,9 @@ begin
       Try
 
         var LCollection := mongoc_client_get_collection(
-                            LClient, // client: Pmongoc_client_t;
-                            PAnsiChar(ADatabaseName), // db: PAnsiChar;
-                            PAnsiChar(ACollectionName)); // collection: PAnsiChar
+                             LClient, // client: Pmongoc_client_t;
+                             PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                             PAnsiChar(ACollectionName)); // collection: PAnsiChar
         if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
         try
 
@@ -1160,9 +1160,9 @@ begin
       Try
 
         var LCollection := mongoc_client_get_collection(
-                            LClient, // client: Pmongoc_client_t;
-                            PAnsiChar(ADatabaseName), // db: PAnsiChar;
-                            PAnsiChar(ACollectionName)); // collection: PAnsiChar
+                             LClient, // client: Pmongoc_client_t;
+                             PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                             PAnsiChar(ACollectionName)); // collection: PAnsiChar
         if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
         try
 
@@ -1274,9 +1274,9 @@ begin
       Try
 
         var LCollection := mongoc_client_get_collection(
-                            LClient, // client: Pmongoc_client_t;
-                            PAnsiChar(ADatabaseName), // db: PAnsiChar;
-                            PAnsiChar(ACollectionName)); // collection: PAnsiChar
+                             LClient, // client: Pmongoc_client_t;
+                             PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                             PAnsiChar(ACollectionName)); // collection: PAnsiChar
         if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
         try
 
@@ -1382,9 +1382,9 @@ begin
         Try
 
           var LCollection := mongoc_client_get_collection(
-                              LClient, // client: Pmongoc_client_t;
-                              PAnsiChar(ADatabaseName), // db: PAnsiChar;
-                              PAnsiChar(ACollectionName)); // collection: PAnsiChar
+                               LClient, // client: Pmongoc_client_t;
+                               PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                               PAnsiChar(ACollectionName)); // collection: PAnsiChar
           if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
           try
 
@@ -1494,9 +1494,9 @@ begin
         Try
 
           var LCollection := mongoc_client_get_collection(
-                              LClient, // client: Pmongoc_client_t;
-                              PAnsiChar(ADatabaseName), // db: PAnsiChar;
-                              PAnsiChar(ACollectionName)); // collection: PAnsiChar
+                               LClient, // client: Pmongoc_client_t;
+                               PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                               PAnsiChar(ACollectionName)); // collection: PAnsiChar
           if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
           try
 
@@ -1606,9 +1606,9 @@ begin
         Try
 
           var LCollection := mongoc_client_get_collection(
-                              LClient, // client: Pmongoc_client_t;
-                              PAnsiChar(ADatabaseName), // db: PAnsiChar;
-                              PAnsiChar(ACollectionName)); // collection: PAnsiChar
+                               LClient, // client: Pmongoc_client_t;
+                               PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                               PAnsiChar(ACollectionName)); // collection: PAnsiChar
           if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
           try
 
@@ -1712,9 +1712,9 @@ begin
       Try
 
         var LCollection := mongoc_client_get_collection(
-                            LClient, // client: Pmongoc_client_t;
-                            PAnsiChar(ADatabaseName), // db: PAnsiChar;
-                            PAnsiChar(ACollectionName)); // collection: PAnsiChar
+                             LClient, // client: Pmongoc_client_t;
+                             PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                             PAnsiChar(ACollectionName)); // collection: PAnsiChar
         if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
         try
 
@@ -1812,9 +1812,9 @@ begin
       Try
 
         var LCollection := mongoc_client_get_collection(
-                            LClient, // client: Pmongoc_client_t;
-                            PAnsiChar(ADatabaseName), // db: PAnsiChar;
-                            PAnsiChar(ACollectionName)); // collection: PAnsiChar
+                             LClient, // client: Pmongoc_client_t;
+                             PAnsiChar(ADatabaseName), // db: PAnsiChar;
+                             PAnsiChar(ACollectionName)); // collection: PAnsiChar
         if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
         try
 
@@ -1902,9 +1902,9 @@ begin
           if FCollectionName <> '' then begin
 
             var LCollection := mongoc_client_get_collection(
-                                LClient, // client: Pmongoc_client_t;
-                                PAnsiChar(FDatabaseName), // db: PAnsiChar;
-                                PAnsiChar(FCollectionName)); // collection: PAnsiChar
+                                 LClient, // client: Pmongoc_client_t;
+                                 PAnsiChar(FDatabaseName), // db: PAnsiChar;
+                                 PAnsiChar(FCollectionName)); // collection: PAnsiChar
             if LCollection = nil then raise Exception.Create('mongoc_client_get_collection failed');
             try
 
@@ -1975,8 +1975,8 @@ begin
           else if FDatabaseName <> '' then begin
 
             var LDatabase := mongoc_client_get_database(
-                                LClient, // client: Pmongoc_client_t;
-                                PAnsiChar(FDatabaseName)); // name: PAnsiChar
+                               LClient, // client: Pmongoc_client_t;
+                               PAnsiChar(FDatabaseName)); // name: PAnsiChar
             if LDatabase = nil then raise Exception.Create('mongoc_client_get_database failed');
             try
 

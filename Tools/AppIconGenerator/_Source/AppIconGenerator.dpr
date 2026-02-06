@@ -32,39 +32,39 @@ begin
   // Create and initialize MagickWand for container (for multiple image variants)
   var LContainerWand: PMagickWand := nil;
   If length(aDstImgSizes) > 1 then
-    LContainerWand := ALImageMagickLib.NewMagickWand;
+    LContainerWand := NewMagickWand;
   try
     For var I := low(aDstImgSizes) to high(aDstImgSizes) do begin
 
       // Initialize MagickWand and PixelWand objects
-      var LWand: PMagickWand := ALImageMagickLib.NewMagickWand;
-      var LPixelWand: PPixelWand := ALImageMagickLib.NewPixelWand;
+      var LWand: PMagickWand := NewMagickWand;
+      var LPixelWand: PPixelWand := NewPixelWand;
       try
 
         // Ensure the destination image does not already exist
         if (TFile.Exists(aDstImgFilename)) then Raise Exception.Create('Destination file already exists');
 
         // Load the source image into the MagickWand
-        ALCheckMagickWandResult(ALImageMagickLib.MagickReadImage(LWand, pansiChar(AnsiString(aSrcIconFilename))), LWand);
+        ALCheckMagickWandResult(MagickReadImage(LWand, pansiChar(AnsiString(aSrcIconFilename))), LWand);
 
         // Ensure the source image is square by adding transparent padding if needed
-        if (ALImageMagickLib.MagickGetImageWidth(LWand) <> ALImageMagickLib.MagickGetImageHeight(LWand)) then begin
-          ALCheckPixelWandResult(ALImageMagickLib.PixelSetColor(LPixelWand, 'transparent'), LPixelWand);
-          ALCheckMagickWandResult(ALImageMagickLib.MagickSetImageBackgroundColor(LWand, LPixelWand), LWand);
+        if (MagickGetImageWidth(LWand) <> MagickGetImageHeight(LWand)) then begin
+          ALCheckPixelWandResult(PixelSetColor(LPixelWand, 'transparent'), LPixelWand);
+          ALCheckMagickWandResult(MagickSetImageBackgroundColor(LWand, LPixelWand), LWand);
           var LTargetSize: integer;
           var LOffsetX: Integer;
           var LOffsetY: Integer;
-          if ALImageMagickLib.MagickGetImageWidth(LWand) > ALImageMagickLib.MagickGetImageHeight(LWand) then begin
-            LTargetSize := ALImageMagickLib.MagickGetImageWidth(LWand);
+          if MagickGetImageWidth(LWand) > MagickGetImageHeight(LWand) then begin
+            LTargetSize := MagickGetImageWidth(LWand);
             LOffsetX := 0;
-            LOffsetY := (integer(ALImageMagickLib.MagickGetImageHeight(LWand)) - LTargetSize) div 2;
+            LOffsetY := (integer(MagickGetImageHeight(LWand)) - LTargetSize) div 2;
           end
           else begin
-            LTargetSize := ALImageMagickLib.MagickGetImageHeight(LWand);
-            LOffsetX := (integer(ALImageMagickLib.MagickGetImageWidth(LWand)) - LTargetSize) div 2;
+            LTargetSize := MagickGetImageHeight(LWand);
+            LOffsetX := (integer(MagickGetImageWidth(LWand)) - LTargetSize) div 2;
             LOffsetY := 0;
           end;
-          ALCheckMagickWandResult(ALImageMagickLib.MagickExtentImage(LWand, LTargetSize, LTargetSize, LOffsetX, LOffsetY), LWand);
+          ALCheckMagickWandResult(MagickExtentImage(LWand, LTargetSize, LTargetSize, LOffsetX, LOffsetY), LWand);
         end;
 
         // References:
@@ -89,36 +89,36 @@ begin
         //
 
         // Resize the image to the specified icon size
-        if (ALImageMagickLib.MagickGetImageWidth(LWand) < aDstIconSizes[I]) or
-           (ALImageMagickLib.MagickGetImageHeight(LWand) < aDstIconSizes[I]) then raise Exception.Create('Icon dimensions are too small ('+AlIntToStrW(ALImageMagickLib.MagickGetImageWidth(LWand))+'x'+AlIntToStrW(ALImageMagickLib.MagickGetImageHeight(LWand))+') for the requested resize operation ('+AlIntToStrW(aDstIconSizes[I])+'x'+AlIntToStrW(aDstIconSizes[I])+')');
-        ALCheckMagickWandResult(ALImageMagickLib.MagickResizeImage(LWand, aDstIconSizes[I], aDstIconSizes[I], BoxFilter), LWand);
+        if (MagickGetImageWidth(LWand) < aDstIconSizes[I]) or
+           (MagickGetImageHeight(LWand) < aDstIconSizes[I]) then raise Exception.Create('Icon dimensions are too small ('+AlIntToStrW(MagickGetImageWidth(LWand))+'x'+AlIntToStrW(MagickGetImageHeight(LWand))+') for the requested resize operation ('+AlIntToStrW(aDstIconSizes[I])+'x'+AlIntToStrW(aDstIconSizes[I])+')');
+        ALCheckMagickWandResult(MagickResizeImage(LWand, aDstIconSizes[I], aDstIconSizes[I], BoxFilter), LWand);
 
         // Set the background color of the image
-        ALCheckPixelWandResult(ALImageMagickLib.PixelSetColor(LPixelWand, PAnsiChar(AnsiString(aDstBackGroundColor))), LPixelWand);
-        ALCheckMagickWandResult(ALImageMagickLib.MagickSetImageBackgroundColor(LWand, LPixelWand), LWand);
+        ALCheckPixelWandResult(PixelSetColor(LPixelWand, PAnsiChar(AnsiString(aDstBackGroundColor))), LPixelWand);
+        ALCheckMagickWandResult(MagickSetImageBackgroundColor(LWand, LPixelWand), LWand);
 
         // Adjust the image canvas size to the destination size
         var LOffset: integer := (aDstIconSizes[I] - aDstImgSizes[I]) div 2;
         if LOffset > 0 then raise Exception.Create('Invalid size configuration: Image size must be larger than the icon size');
-        ALCheckMagickWandResult(ALImageMagickLib.MagickExtentImage(LWand, aDstImgSizes[I], aDstImgSizes[I], LOffset, LOffset), LWand);
+        ALCheckMagickWandResult(MagickExtentImage(LWand, aDstImgSizes[I], aDstImgSizes[I], LOffset, LOffset), LWand);
 
         // If there's only one size variant, save the image immediately
         If length(aDstImgSizes) = 1 then begin
 
           // Set the output image format (e.g., PNG, ICO)
-          ALCheckMagickWandResult(ALImageMagickLib.MagickSetImageFormat(LWand, PAnsiChar(AnsiString(aDstImgformat))), LWand);
+          ALCheckMagickWandResult(MagickSetImageFormat(LWand, PAnsiChar(AnsiString(aDstImgformat))), LWand);
 
           // Save the composited image to the specified file location
           TDirectory.CreateDirectory(ExtractFilePath(aDstImgFilename));
-          ALCheckMagickWandResult(ALImageMagickLib.MagickWriteImage(LWand, pansiChar(AnsiString(aDstImgFilename))), LWand);
+          ALCheckMagickWandResult(MagickWriteImage(LWand, pansiChar(AnsiString(aDstImgFilename))), LWand);
 
         end
 
         // Add the image to the container wand for later saving
-        else ALCheckMagickWandResult(ALImageMagickLib.MagickAddImage(LContainerWand, LWand), LContainerWand);
+        else ALCheckMagickWandResult(MagickAddImage(LContainerWand, LWand), LContainerWand);
 
       finally
-        ALImageMagickLib.DestroyMagickWand(LWand);
+        DestroyMagickWand(LWand);
       end;
 
     end;
@@ -127,17 +127,17 @@ begin
     If length(aDstImgSizes) > 1 then begin
 
       // Set the output format for the multi-image container
-      ALCheckMagickWandResult(ALImageMagickLib.MagickSetImageFormat(LContainerWand, PAnsiChar(AnsiString(aDstImgformat))), LContainerWand);
+      ALCheckMagickWandResult(MagickSetImageFormat(LContainerWand, PAnsiChar(AnsiString(aDstImgformat))), LContainerWand);
 
       // Save the composited image to the specified file location
       TDirectory.CreateDirectory(ExtractFilePath(aDstImgFilename));
-      ALCheckMagickWandResult(ALImageMagickLib.MagickWriteImages(LContainerWand, pansiChar(AnsiString(aDstImgFilename)), MagickTrue{adjoin}), LContainerWand);
+      ALCheckMagickWandResult(MagickWriteImages(LContainerWand, pansiChar(AnsiString(aDstImgFilename)), MagickTrue{adjoin}), LContainerWand);
 
     end
 
   finally
     If length(aDstImgSizes) > 1 then
-      ALImageMagickLib.DestroyMagickWand(LContainerWand);
+      DestroyMagickWand(LContainerWand);
   end;
 
 end;
@@ -177,83 +177,83 @@ begin
   // Create and initialize MagickWand for container (for multiple image variants)
   var LContainerWand: PMagickWand := nil;
   If length(aDstImgSizes) > 1 then
-    LContainerWand := ALImageMagickLib.NewMagickWand;
+    LContainerWand := NewMagickWand;
   try
     For var I := low(aDstImgSizes) to high(aDstImgSizes) do begin
 
       // Create and initialize MagickWand for squircle mask and icon
-      var LSquircleWand: PMagickWand := ALImageMagickLib.NewMagickWand;
-      var LIconWand: PMagickWand := ALImageMagickLib.NewMagickWand;
+      var LSquircleWand: PMagickWand := NewMagickWand;
+      var LIconWand: PMagickWand := NewMagickWand;
       try
 
         // Verify the destination image file does not exist to prevent overwriting
         if (TFile.Exists(aDstImgFilename)) then Raise Exception.Create('Destination file already exists');
 
         // Set transparent background for the squircle mask
-        var LPixelWand := ALImageMagickLib.MagickGetBackgroundColor(LSquircleWand);
-        ALCheckPixelWandResult(ALImageMagickLib.PixelSetColor(LPixelWand, 'transparent'), LPixelWand);
-        ALCheckMagickWandResult(ALImageMagickLib.MagickSetBackgroundColor(LSquircleWand, LPixelWand), LSquircleWand);
+        var LPixelWand := MagickGetBackgroundColor(LSquircleWand);
+        ALCheckPixelWandResult(PixelSetColor(LPixelWand, 'transparent'), LPixelWand);
+        ALCheckMagickWandResult(MagickSetBackgroundColor(LSquircleWand, LPixelWand), LSquircleWand);
 
         // Load the SVG squircle mask with the specified background color
         var LSquircleMaskSvg: ansiString := '<svg viewBox="0 0 2048 2048" xmlns="http://www.w3.org/2000/svg" version="1.1"><path d="M 0 1024 C 0 256, 256 0, 1024 0 S 2048 256, 2048 1024, 1792 2048 1024 2048, 0 1792, 0 1024" transform="rotate(0,1024,1024)translate(0,0)" fill="'+AnsiString(aDstBackGroundColor)+'"></path></svg>';
         ALCheckMagickWandResult(
-          ALImageMagickLib.MagickReadImageBlob(
+          MagickReadImageBlob(
             LSquircleWand,
             @LSquircleMaskSvg[low(LSquircleMaskSvg)],
             length(LSquircleMaskSvg)), LSquircleWand);
 
         // Resize the squircle mask to the destination image size
-        ALCheckMagickWandResult(ALImageMagickLib.MagickResizeImage(LSquircleWand, aDstImgSizes[I], aDstImgSizes[I], BoxFilter), LSquircleWand);
+        ALCheckMagickWandResult(MagickResizeImage(LSquircleWand, aDstImgSizes[I], aDstImgSizes[I], BoxFilter), LSquircleWand);
 
         // Load the source icon image
-        ALCheckMagickWandResult(ALImageMagickLib.MagickReadImage(LIconWand, pansiChar(AnsiString(aSrcIconFilename))), LIconWand);
+        ALCheckMagickWandResult(MagickReadImage(LIconWand, pansiChar(AnsiString(aSrcIconFilename))), LIconWand);
 
         // Ensure the source image is square by adding transparent padding if needed
-        if (ALImageMagickLib.MagickGetImageWidth(LIconWand) <> ALImageMagickLib.MagickGetImageHeight(LIconWand)) then begin
-          ALCheckPixelWandResult(ALImageMagickLib.PixelSetColor(LPixelWand, 'transparent'), LPixelWand);
-          ALCheckMagickWandResult(ALImageMagickLib.MagickSetImageBackgroundColor(LIconWand, LPixelWand), LIconWand);
+        if (MagickGetImageWidth(LIconWand) <> MagickGetImageHeight(LIconWand)) then begin
+          ALCheckPixelWandResult(PixelSetColor(LPixelWand, 'transparent'), LPixelWand);
+          ALCheckMagickWandResult(MagickSetImageBackgroundColor(LIconWand, LPixelWand), LIconWand);
           var LTargetSize: integer;
           var LOffsetX: Integer;
           var LOffsetY: Integer;
-          if ALImageMagickLib.MagickGetImageWidth(LIconWand) > ALImageMagickLib.MagickGetImageHeight(LIconWand) then begin
-            LTargetSize := ALImageMagickLib.MagickGetImageWidth(LIconWand);
+          if MagickGetImageWidth(LIconWand) > MagickGetImageHeight(LIconWand) then begin
+            LTargetSize := MagickGetImageWidth(LIconWand);
             LOffsetX := 0;
-            LOffsetY := (integer(ALImageMagickLib.MagickGetImageHeight(LIconWand)) - LTargetSize) div 2;
+            LOffsetY := (integer(MagickGetImageHeight(LIconWand)) - LTargetSize) div 2;
           end
           else begin
-            LTargetSize := ALImageMagickLib.MagickGetImageHeight(LIconWand);
-            LOffsetX := (integer(ALImageMagickLib.MagickGetImageWidth(LIconWand)) - LTargetSize) div 2;
+            LTargetSize := MagickGetImageHeight(LIconWand);
+            LOffsetX := (integer(MagickGetImageWidth(LIconWand)) - LTargetSize) div 2;
             LOffsetY := 0;
           end;
-          ALCheckMagickWandResult(ALImageMagickLib.MagickExtentImage(LIconWand, LTargetSize, LTargetSize, LOffsetX, LOffsetY), LIconWand);
+          ALCheckMagickWandResult(MagickExtentImage(LIconWand, LTargetSize, LTargetSize, LOffsetX, LOffsetY), LIconWand);
         end;
 
         // Ensure the icon is large enough for resizing
-        if (ALImageMagickLib.MagickGetImageWidth(LIconWand) < aDstIconSizes[I]) or
-           (ALImageMagickLib.MagickGetImageHeight(LIconWand) < aDstIconSizes[I]) then raise Exception.Create('Icon dimensions are too small ('+AlIntToStrW(ALImageMagickLib.MagickGetImageWidth(LIconWand))+'x'+AlIntToStrW(ALImageMagickLib.MagickGetImageHeight(LIconWand))+') for the requested resize operation ('+AlIntToStrW(aDstIconSizes[I])+'x'+AlIntToStrW(aDstIconSizes[I])+')');
-        ALCheckMagickWandResult(ALImageMagickLib.MagickResizeImage(LIconWand, aDstIconSizes[I], aDstIconSizes[I], BoxFilter), LIconWand);
+        if (MagickGetImageWidth(LIconWand) < aDstIconSizes[I]) or
+           (MagickGetImageHeight(LIconWand) < aDstIconSizes[I]) then raise Exception.Create('Icon dimensions are too small ('+AlIntToStrW(MagickGetImageWidth(LIconWand))+'x'+AlIntToStrW(MagickGetImageHeight(LIconWand))+') for the requested resize operation ('+AlIntToStrW(aDstIconSizes[I])+'x'+AlIntToStrW(aDstIconSizes[I])+')');
+        ALCheckMagickWandResult(MagickResizeImage(LIconWand, aDstIconSizes[I], aDstIconSizes[I], BoxFilter), LIconWand);
 
         // Composite the resized icon onto the squircle mask with centered alignment
-        ALCheckMagickWandResult(ALImageMagickLib.MagickCompositeImageGravity(LSquircleWand, LIconWand, OverCompositeOp, CenterGravity), LSquircleWand);
+        ALCheckMagickWandResult(MagickCompositeImageGravity(LSquircleWand, LIconWand, OverCompositeOp, CenterGravity), LSquircleWand);
 
         // If there's only one size variant, save the image immediately
         If length(aDstImgSizes) = 1 then begin
 
           // Set the output image format (e.g., PNG, ICO)
-          ALCheckMagickWandResult(ALImageMagickLib.MagickSetImageFormat(LSquircleWand, PAnsiChar(AnsiString(aDstImgformat))), LSquircleWand);
+          ALCheckMagickWandResult(MagickSetImageFormat(LSquircleWand, PAnsiChar(AnsiString(aDstImgformat))), LSquircleWand);
 
           // Save the composited image to the specified file location
           TDirectory.CreateDirectory(ExtractFilePath(aDstImgFilename));
-          ALCheckMagickWandResult(ALImageMagickLib.MagickWriteImage(LSquircleWand, pansiChar(AnsiString(aDstImgFilename))), LSquircleWand);
+          ALCheckMagickWandResult(MagickWriteImage(LSquircleWand, pansiChar(AnsiString(aDstImgFilename))), LSquircleWand);
 
         end
 
         // Add the image to the container wand for later saving
-        else ALCheckMagickWandResult(ALImageMagickLib.MagickAddImage(LContainerWand, LSquircleWand), LContainerWand);
+        else ALCheckMagickWandResult(MagickAddImage(LContainerWand, LSquircleWand), LContainerWand);
 
       finally
-        ALImageMagickLib.DestroyMagickWand(LSquircleWand);
-        ALImageMagickLib.DestroyMagickWand(LIconWand);
+        DestroyMagickWand(LSquircleWand);
+        DestroyMagickWand(LIconWand);
       end;
 
     end;
@@ -262,17 +262,17 @@ begin
     If length(aDstImgSizes) > 1 then begin
 
       // Set the output format for the multi-image container
-      ALCheckMagickWandResult(ALImageMagickLib.MagickSetImageFormat(LContainerWand, PAnsiChar(AnsiString(aDstImgformat))), LContainerWand);
+      ALCheckMagickWandResult(MagickSetImageFormat(LContainerWand, PAnsiChar(AnsiString(aDstImgformat))), LContainerWand);
 
       // Save the composited image to the specified file location
       TDirectory.CreateDirectory(ExtractFilePath(aDstImgFilename));
-      ALCheckMagickWandResult(ALImageMagickLib.MagickWriteImages(LContainerWand, pansiChar(AnsiString(aDstImgFilename)), MagickTrue{adjoin}), LContainerWand);
+      ALCheckMagickWandResult(MagickWriteImages(LContainerWand, pansiChar(AnsiString(aDstImgFilename)), MagickTrue{adjoin}), LContainerWand);
 
     end
 
   finally
     If length(aDstImgSizes) > 1 then
-      ALImageMagickLib.DestroyMagickWand(LContainerWand);
+      DestroyMagickWand(LContainerWand);
   end;
 
 end;
@@ -303,27 +303,27 @@ procedure CreateBackgroundImg(
 begin
 
   // Initialize MagickWand and PixelWand objects for image creation
-  var LWand: PMagickWand := ALImageMagickLib.NewMagickWand;
-  var LPixelWand: PPixelWand := ALImageMagickLib.NewPixelWand;
+  var LWand: PMagickWand := NewMagickWand;
+  var LPixelWand: PPixelWand := NewPixelWand;
   try
 
     // Ensure the destination image file does not exist to prevent overwriting
     if (TFile.Exists(aDstImgFilename)) then Raise Exception.Create('Destination file already exists');
 
     // Create a new image with the specified background color and dimensions
-    ALCheckPixelWandResult(ALImageMagickLib.PixelSetColor(LPixelWand, PansiChar(AnsiString(aDstImgBackGroundColor))), LPixelWand);
-    ALCheckMagickWandResult(ALImageMagickLib.MagickNewImage(LWand, aDstImgSize, aDstImgSize, LPixelWand), LWand);
+    ALCheckPixelWandResult(PixelSetColor(LPixelWand, PansiChar(AnsiString(aDstImgBackGroundColor))), LPixelWand);
+    ALCheckMagickWandResult(MagickNewImage(LWand, aDstImgSize, aDstImgSize, LPixelWand), LWand);
 
     // Define the output image format as PNG
-    ALCheckMagickWandResult(ALImageMagickLib.MagickSetImageFormat(LWand, 'png'), LWand);
+    ALCheckMagickWandResult(MagickSetImageFormat(LWand, 'png'), LWand);
 
     // Save the newly created image to the specified file path
     TDirectory.CreateDirectory(ExtractFilePath(aDstImgFilename));
-    ALCheckMagickWandResult(ALImageMagickLib.MagickWriteImage(LWand, pansiChar(AnsiString(aDstImgFilename))), LWand);
+    ALCheckMagickWandResult(MagickWriteImage(LWand, pansiChar(AnsiString(aDstImgFilename))), LWand);
 
   finally
-    ALImageMagickLib.DestroyMagickWand(LWand);
-    ALImageMagickLib.DestroyPixelWand(LPixelWand);
+    DestroyMagickWand(LWand);
+    DestroyPixelWand(LPixelWand);
   end;
 
 end;

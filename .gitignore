@@ -1,5 +1,6 @@
 __history
 __recovery
+_ReleaseNotes.txt
 *.deployproj.local
 *.dproj.local
 *.groupproj.local

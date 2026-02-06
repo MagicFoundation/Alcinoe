@@ -151,6 +151,8 @@ Type
     procedure SetEnabled(const value: Boolean); override;
     function getLineCount: integer; override;
     function getLineHeight: Single; override; // It includes the line spacing
+    function GetSelectionStart: Integer; override;
+    function GetSelectionEnd: Integer; override;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
     Procedure SetSelection(const AIndex: integer); overload; override;
   end;
@@ -280,6 +282,8 @@ Type
     procedure SetEnabled(const value: Boolean); override;
     function getLineCount: integer; override;
     function getLineHeight: Single; override; // It includes the line spacing
+    function GetSelectionStart: Integer; override;
+    function GetSelectionEnd: Integer; override;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
     Procedure SetSelection(const AIndex: integer); overload; override;
   end;
@@ -1017,6 +1021,22 @@ begin
   end;
 end;
 
+{*************************************************}
+function TALIosMemoView.GetSelectionStart: Integer;
+begin
+  var LRange := View.selectedRange;
+  if LRange.location = NSNotFound then Exit(-1);
+  Result := Integer(LRange.location);
+end;
+
+{***********************************************}
+function TALIosMemoView.GetSelectionEnd: Integer;
+begin
+  var LRange := View.selectedRange;
+  if LRange.location = NSNotFound then Exit(-1);
+  Result := Integer(LRange.location + LRange.length);
+end;
+
 {*********************************************************************************}
 Procedure TALIosMemoView.setSelection(const AStart: integer; const AStop: Integer);
 begin
@@ -1507,6 +1527,22 @@ begin
                           TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
     result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
   end;
+end;
+
+{*************************************************}
+function TALMacMemoView.GetSelectionStart: Integer;
+begin
+  var LRange := FTextView.View.selectedRange;
+  if LRange.location = NSNotFound then Exit(-1);
+  Result := Integer(LRange.location);
+end;
+
+{***********************************************}
+function TALMacMemoView.GetSelectionEnd: Integer;
+begin
+  var LRange := FTextView.View.selectedRange;
+  if LRange.location = NSNotFound then Exit(-1);
+  Result := Integer(LRange.location + LRange.length);
 end;
 
 {*********************************************************************************}

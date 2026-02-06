@@ -161,6 +161,8 @@ Type
     property Control: TALBaseEdit read GetControl;
     function getLineCount: integer; virtual;
     function getLineHeight: Single; virtual;
+    function GetSelectionStart: Integer; virtual;
+    function GetSelectionEnd: Integer; virtual;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual;
     Procedure SetSelection(const AIndex: integer); overload; virtual;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
@@ -213,6 +215,8 @@ Type
   public
     function getLineCount: integer; virtual; abstract;
     function getLineHeight: Single; virtual; abstract;
+    function GetSelectionStart: Integer; virtual; abstract;
+    function GetSelectionEnd: Integer; virtual; abstract;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual; abstract;
     Procedure SetSelection(const AIndex: integer); overload; virtual; abstract;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
@@ -314,6 +318,8 @@ Type
     procedure SetEnabled(const value: Boolean); override;
     function getLineCount: integer; override;
     function getLineHeight: Single; override;
+    function GetSelectionStart: Integer; override;
+    function GetSelectionEnd: Integer; override;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
     Procedure SetSelection(const AIndex: integer); overload; override;
   end;
@@ -354,6 +360,8 @@ Type
   public
     function getLineCount: integer; virtual; abstract;
     function getLineHeight: Single; virtual; abstract;
+    function GetSelectionStart: Integer; virtual; abstract;
+    function GetSelectionEnd: Integer; virtual; abstract;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual; abstract;
     Procedure SetSelection(const AIndex: integer); overload; virtual; abstract;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
@@ -450,6 +458,8 @@ Type
     procedure SetEnabled(const value: Boolean); override;
     function getLineCount: integer; override;
     function getLineHeight: Single; override;
+    function GetSelectionStart: Integer; override;
+    function GetSelectionEnd: Integer; override;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
     Procedure SetSelection(const AIndex: integer); overload; override;
   end;
@@ -521,6 +531,8 @@ Type
     property Control: TALBaseEdit read GetControl;
     function getLineCount: integer; virtual;
     function getLineHeight: Single; virtual;
+    function GetSelectionStart: Integer; virtual;
+    function GetSelectionEnd: Integer; virtual;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual;
     Procedure SetSelection(const AIndex: integer); overload; virtual;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
@@ -1035,8 +1047,11 @@ Type
     {$ELSEIF defined(MSWindows)}
     property NativeView: TALWinEditView read GetNativeView;
     {$ENDIF}
+    function GetSelectionStart: Integer; virtual;
+    function GetSelectionEnd: Integer; virtual;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual;
     Procedure SetSelection(const AIndex: integer); overload; virtual;
+    procedure SetTextNoChange(const AText: string);
     function getLineCount: integer;
     function getLineHeight: Single;
     procedure MakeBufDrawable; override;
@@ -1896,6 +1911,18 @@ begin
   result := view.getLineHeight / ALGetScreenScale;
 end;
 
+{*****************************************************}
+function TALAndroidEditView.GetSelectionStart: Integer;
+begin
+  Result := View.getSelectionStart;
+end;
+
+{***************************************************}
+function TALAndroidEditView.GetSelectionEnd: Integer;
+begin
+  Result := View.getSelectionEnd;
+end;
+
 {*************************************************************************************}
 Procedure TALAndroidEditView.setSelection(const AStart: integer; const AStop: Integer);
 begin
@@ -2381,6 +2408,22 @@ begin
   end;
 end;
 
+{*************************************************}
+function TALIosEditView.GetSelectionStart: Integer;
+begin
+  var LRange := View.selectedTextRange;
+  if LRange = nil then Exit(-1);
+  Result := View.offsetFromPosition(View.beginningOfDocument, LRange.start);
+end;
+
+{***********************************************}
+function TALIosEditView.GetSelectionEnd: Integer;
+begin
+  var LRange := View.selectedTextRange;
+  if LRange = nil then Exit(-1);
+  Result := View.offsetFromPosition(View.beginningOfDocument, LRange.&end);
+end;
+
 {*********************************************************************************}
 Procedure TALIosEditView.setSelection(const AStart: integer; const AStop: Integer);
 begin
@@ -2773,6 +2816,22 @@ begin
                           TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
     result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
   end;
+end;
+
+{*************************************************}
+function TALMacEditView.GetSelectionStart: Integer;
+begin
+  var LRange := View.currentEditor.selectedRange;
+  if LRange.location = NSNotFound then Exit(-1);
+  Result := Integer(LRange.location);
+end;
+
+{***********************************************}
+function TALMacEditView.GetSelectionEnd: Integer;
+begin
+  var LRange := View.currentEditor.selectedRange;
+  if LRange.location = NSNotFound then Exit(-1);
+  Result := Integer(LRange.location + LRange.length);
 end;
 
 {*********************************************************************************}
@@ -3256,6 +3315,24 @@ begin
                         TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
   result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
 
+end;
+
+{*************************************************}
+function TALWinEditView.GetSelectionStart: Integer;
+begin
+  var LStart: Integer;
+  var LEnd: Integer;
+  SendMessage(Handle, EM_GETSEL, WPARAM(@LStart), LPARAM(@LEnd));
+  Result := LStart;
+end;
+
+{***********************************************}
+function TALWinEditView.GetSelectionEnd: Integer;
+begin
+  var LStart: Integer;
+  var LEnd: Integer;
+  SendMessage(Handle, EM_GETSEL, WPARAM(@LStart), LPARAM(@LEnd));
+  Result := LEnd;
 end;
 
 {*********************************************************************************}
@@ -5071,6 +5148,18 @@ begin
   end;
 end;
 
+{*********************************************************}
+procedure TALBaseEdit.SetTextNoChange(const AText: string);
+begin
+  var LPrevOnChange := fOnChange;
+  fOnChange := nil;
+  try
+    SetText(AText);
+  finally
+    fOnChange := LPrevOnChange;
+  end;
+end;
+
 {***********************************}
 function TALBaseEdit.getText: String;
 begin
@@ -6471,6 +6560,24 @@ Procedure TALBaseEdit.SetSelection(const AStart: integer; const AStop: Integer);
 begin
   if NativeView <> nil then
     NativeView.SetSelection(AStart, AStop);
+end;
+
+{**********************************************}
+function TALBaseEdit.GetSelectionStart: Integer;
+begin
+  if NativeView <> nil then
+    Result := NativeView.getSelectionStart
+  else
+    Result := -1;
+end;
+
+{********************************************}
+function TALBaseEdit.GetSelectionEnd: Integer;
+begin
+  if NativeView <> nil then
+    Result := NativeView.getSelectionEnd
+  else
+    Result := -1;
 end;
 
 {********************************************************}

@@ -170,7 +170,6 @@ uses
   Grijjy.SymbolTranslator,
   {$IFDEF MSWINDOWS}
   ALDUnitXTestStringUtils in 'ALDUnitXTestStringUtils.pas',
-  ALDUnitXTestCipher in 'ALDUnitXTestCipher.pas',
   ALDUnitXTestHtml in 'ALDUnitXTestHtml.pas',
   {$ENDIF}
   System.SysUtils,

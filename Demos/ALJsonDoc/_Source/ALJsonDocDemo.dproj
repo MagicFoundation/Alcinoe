@@ -64,7 +64,7 @@
     <Manifest_File>None</Manifest_File>
     <Icon_MainIcon>ALJsonDocDemo_Icon.ico</Icon_MainIcon>
     <DCC_CodePage>65001</DCC_CodePage>
-    <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=13.0.11.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=13.0.11.0;Comments=</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=13.0.22.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=13.0.22.0;Comments=</VerInfo_Keys>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;$(DCC_Namespace)</DCC_Namespace>
     <DCC_ImageBase>00400000</DCC_ImageBase>
@@ -153,8 +153,8 @@
           <VersionInfo Name="AutoIncBuild">False</VersionInfo>
           <VersionInfo Name="MajorVer">13</VersionInfo>
           <VersionInfo Name="MinorVer">0</VersionInfo>
-          <VersionInfo Name="Release">11</VersionInfo>
-          <VersionInfo Name="Build">312</VersionInfo>
+          <VersionInfo Name="Release">22</VersionInfo>
+          <VersionInfo Name="Build">323</VersionInfo>
           <VersionInfo Name="Debug">False</VersionInfo>
           <VersionInfo Name="PreRelease">False</VersionInfo>
           <VersionInfo Name="Special">False</VersionInfo>
@@ -166,13 +166,13 @@
         <VersionInfoKeys>
           <VersionInfoKeys Name="CompanyName"/>
           <VersionInfoKeys Name="FileDescription"/>
-          <VersionInfoKeys Name="FileVersion">13.0.11.0</VersionInfoKeys>
+          <VersionInfoKeys Name="FileVersion">13.0.22.0</VersionInfoKeys>
           <VersionInfoKeys Name="InternalName"/>
           <VersionInfoKeys Name="LegalCopyright"/>
           <VersionInfoKeys Name="LegalTrademarks"/>
           <VersionInfoKeys Name="OriginalFilename"/>
           <VersionInfoKeys Name="ProductName"/>
-          <VersionInfoKeys Name="ProductVersion">13.0.11.0</VersionInfoKeys>
+          <VersionInfoKeys Name="ProductVersion">13.0.22.0</VersionInfoKeys>
           <VersionInfoKeys Name="Comments"/>
         </VersionInfoKeys>
         <Excluded_Packages>

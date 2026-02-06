@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{06E401E8-F54A-4E68-8B81-B5B5B54FEC56}</ProjectGuid>
+    <ProjectGuid>{4EE8C378-B20A-4AC2-844F-D995C9420EE8}</ProjectGuid>
     <MainSource>ALSMTPClientDemo.dpr</MainSource>
     <Base>True</Base>
     <Config Condition="'$(Config)'==''">Debug</Config>
@@ -52,7 +52,7 @@
     <Manifest_File>None</Manifest_File>
     <Icon_MainIcon>ALSMTPClientDemo_Icon.ico</Icon_MainIcon>
     <DCC_CodePage>65001</DCC_CodePage>
-    <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=13.0.11.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=13.0.11.0;Comments=</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=13.0.22.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=13.0.22.0;Comments=</VerInfo_Keys>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;$(DCC_Namespace)</DCC_Namespace>
     <DCC_ImageBase>00400000</DCC_ImageBase>
@@ -91,10 +91,17 @@
     <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
     <DCC_Optimize>false</DCC_Optimize>
     <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+    <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+    <DCC_RangeChecking>true</DCC_RangeChecking>
+    <DCC_DebugDCUs>true</DCC_DebugDCUs>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <BT_BuildType>Debug</BT_BuildType>
+    <VerInfo_MajorVer>13</VerInfo_MajorVer>
+    <VerInfo_Release>22</VerInfo_Release>
+    <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
     <BT_BuildType>Debug</BT_BuildType>
@@ -131,8 +138,8 @@
           <VersionInfo Name="AutoIncBuild">False</VersionInfo>
           <VersionInfo Name="MajorVer">13</VersionInfo>
           <VersionInfo Name="MinorVer">0</VersionInfo>
-          <VersionInfo Name="Release">11</VersionInfo>
-          <VersionInfo Name="Build">312</VersionInfo>
+          <VersionInfo Name="Release">22</VersionInfo>
+          <VersionInfo Name="Build">323</VersionInfo>
           <VersionInfo Name="Debug">False</VersionInfo>
           <VersionInfo Name="PreRelease">False</VersionInfo>
           <VersionInfo Name="Special">False</VersionInfo>
@@ -144,18 +151,18 @@
         <VersionInfoKeys>
           <VersionInfoKeys Name="CompanyName"/>
           <VersionInfoKeys Name="FileDescription"/>
-          <VersionInfoKeys Name="FileVersion">13.0.11.0</VersionInfoKeys>
+          <VersionInfoKeys Name="FileVersion">13.0.22.0</VersionInfoKeys>
           <VersionInfoKeys Name="InternalName"/>
           <VersionInfoKeys Name="LegalCopyright"/>
           <VersionInfoKeys Name="LegalTrademarks"/>
           <VersionInfoKeys Name="OriginalFilename"/>
           <VersionInfoKeys Name="ProductName"/>
-          <VersionInfoKeys Name="ProductVersion">13.0.11.0</VersionInfoKeys>
+          <VersionInfoKeys Name="ProductVersion">13.0.22.0</VersionInfoKeys>
           <VersionInfoKeys Name="Comments"/>
         </VersionInfoKeys>
         <Excluded_Packages>
-          <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-          <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+          <Excluded_Packages Name="$(BDSBIN)\dcloffice2k370.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+          <Excluded_Packages Name="$(BDSBIN)\dclofficexp370.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
         </Excluded_Packages>
       </Delphi.Personality>
       <Platforms>

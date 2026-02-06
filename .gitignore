@@ -8,6 +8,7 @@ _ReleaseNotes.txt
 *.exe
 *.res
 *.rsm
+*.cmds
 Dcu
 /Compiled/*
 /Demos/**/Android/Debug*

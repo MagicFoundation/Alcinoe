@@ -1183,6 +1183,8 @@ begin
       if LPrevTypeName <> LTypeName then begin
         LTypeDefStr := ALStringReplaceA(LTypeDefStr, ' ' + LPrevTypeName + ' ', ' ' + LTypeName + ' ');
         LTypeDefStr := ALStringReplaceA(LTypeDefStr, ' ' + LPrevTypeName + ';', ' ' + LTypeName + ';');
+        LTypeDefStr := ALStringReplaceA(LTypeDefStr, ' ^' + LPrevTypeName + ' ', ' ^' + LTypeName + ' ');
+        LTypeDefStr := ALStringReplaceA(LTypeDefStr, ' ^' + LPrevTypeName + ';', ' ^' + LTypeName + ';');
       end;
 
       delete(Result,P1, P3-P1);

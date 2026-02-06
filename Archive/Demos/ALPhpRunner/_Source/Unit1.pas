@@ -94,7 +94,7 @@ implementation
 
 Uses
   Alcinoe.MultiPartParser,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.Common,
   Alcinoe.StringUtils,
   Alcinoe.HTTP.Client;

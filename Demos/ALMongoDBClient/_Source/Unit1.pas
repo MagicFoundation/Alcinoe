@@ -165,7 +165,7 @@ implementation
 Uses
   System.UITypes,
   VCL.Dialogs,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringUtils,
   Alcinoe.Common,
   Alcinoe.MongoDB.Wrapper;

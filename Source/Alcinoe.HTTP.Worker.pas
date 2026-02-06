@@ -178,7 +178,7 @@ uses
   system.net.HttpClient,
   Alcinoe.HTTP.Client.Net,
   {$ENDIF}
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringUtils,
   Alcinoe.HTTP,
   Alcinoe.Common;

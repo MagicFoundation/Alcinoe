@@ -12,7 +12,7 @@ uses
   System.IOUtils,
   System.Classes,
   WinApi.Windows,
-  Alcinoe.files,
+  Alcinoe.FileUtils,
   Alcinoe.StringList,
   Alcinoe.StringUtils,
   Alcinoe.common;

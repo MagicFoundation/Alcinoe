@@ -185,7 +185,7 @@ uses
   Alcinoe.Mime.ContentTypes,
   {$ENDIF}
   FMX.Platform,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringUtils,
   Alcinoe.FMX.LoadingOverlay,
   ALcinoe.Common;

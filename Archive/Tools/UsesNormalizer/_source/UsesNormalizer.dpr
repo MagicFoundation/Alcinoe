@@ -9,7 +9,7 @@ uses
   Alcinoe.XMLDoc,
   Alcinoe.Common,
   Alcinoe.StringList,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringUtils;
 
 procedure _cleanUses(Const AFilename: AnsiString; Const ASection: AnsiString);

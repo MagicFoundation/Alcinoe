@@ -97,7 +97,7 @@ uses
   system.netencoding,
   system.uitypes,
   Alcinoe.StringUtils,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.Cipher;
 
 {$R *.dfm}

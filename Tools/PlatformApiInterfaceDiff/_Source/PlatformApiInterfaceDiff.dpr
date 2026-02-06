@@ -11,7 +11,7 @@ uses
   System.IOUtils,
   system.AnsiStrings,
   system.Math,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringUtils,
   Alcinoe.Common,
   Alcinoe.StringList;

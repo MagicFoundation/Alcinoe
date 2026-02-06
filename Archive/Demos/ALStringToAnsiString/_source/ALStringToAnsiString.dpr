@@ -6,7 +6,7 @@ uses
   Windows,
   Masks,
   SysUtils,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringList,
   Alcinoe.StringUtils;
 

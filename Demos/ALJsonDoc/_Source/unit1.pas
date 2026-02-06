@@ -6,7 +6,7 @@ uses
   Windows, system.Types, SysUtils, Classes, Graphics, Controls, Forms,
   StdCtrls, Alcinoe.StringUtils, Alcinoe.JSONDoc, ExtCtrls,
   Alcinoe.StringList, Shellapi, Vcl.Dialogs,
-  Contnrs, Alcinoe.Files, diagnostics, DBXplatform, IOUtils,
+  Contnrs, Alcinoe.FileUtils, diagnostics, DBXplatform, IOUtils,
   dwsJSON, system.Generics.collections,
   system.UITypes, system.JSON, Vcl.ComCtrls, VclTee.TeeGDIPlus,
   Vcl.Samples.Spin, VCLTee.TeEngine, VCLTee.Series, VCLTee.TeeProcs,

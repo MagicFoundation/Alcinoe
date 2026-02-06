@@ -285,7 +285,7 @@ uses
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Common,
   Alcinoe.HTTP.Client.Net.Pool,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.stringUtils,
   Alcinoe.Common;
 

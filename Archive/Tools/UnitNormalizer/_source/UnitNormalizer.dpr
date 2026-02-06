@@ -9,7 +9,7 @@ uses
   System.ioutils,
   System.types,
   Alcinoe.StringList,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 

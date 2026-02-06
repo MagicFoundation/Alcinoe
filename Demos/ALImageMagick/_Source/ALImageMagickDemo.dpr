@@ -9,7 +9,7 @@ uses
   System.StrUtils,
   System.Rtti,
   System.TypInfo,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.ImageMagick;
 
 type

@@ -13,7 +13,7 @@ uses
   Alcinoe.XMLDoc,
   Alcinoe.Common,
   Alcinoe.StringList,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringUtils;
 
 //

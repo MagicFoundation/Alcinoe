@@ -158,7 +158,7 @@ uses
   winapi.Windows,
   VCL.Dialogs,
   Alcinoe.StringUtils,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.Common;
 
 {$R *.dfm}

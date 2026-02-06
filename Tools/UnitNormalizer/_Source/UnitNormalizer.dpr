@@ -12,7 +12,7 @@ uses
   System.Math,
   System.Character,
   Alcinoe.StringList,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 

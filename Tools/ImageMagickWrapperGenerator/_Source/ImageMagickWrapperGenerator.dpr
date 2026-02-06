@@ -10,7 +10,7 @@ uses
   System.Generics.Defaults,
   System.SysUtils,
   System.IOUtils,
-  Alcinoe.files,
+  Alcinoe.FileUtils,
   Alcinoe.StringList,
   Alcinoe.StringUtils,
   Alcinoe.common;

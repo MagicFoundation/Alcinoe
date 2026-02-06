@@ -14,7 +14,7 @@ uses
   Alcinoe.Common,
   Alcinoe.JSONDoc,
   Alcinoe.Cipher,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.Execute,
   Alcinoe.StringUtils,
   Alcinoe.ImageMagick;

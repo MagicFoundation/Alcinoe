@@ -85,7 +85,7 @@ uses
   System.Ansistrings,
   System.IOUtils,
   Alcinoe.StringUtils,
-  Alcinoe.Files;
+  Alcinoe.FileUtils;
 
 {***************************************************************}
 constructor TALCustomIniFileA.Create(const FileName: AnsiString);

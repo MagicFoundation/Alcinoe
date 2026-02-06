@@ -95,7 +95,7 @@ uses
   FileCtrl,
   Masks,
   UrlMon,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.Mime,
   Alcinoe.StringUtils;
 

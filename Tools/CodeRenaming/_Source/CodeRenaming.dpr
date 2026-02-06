@@ -12,7 +12,7 @@ uses
   System.Character,
   system.AnsiStrings, // H2443 Inline function 'ALStringReplaceA' has not been expanded because unit 'System.AnsiStrings' is not specified in USES list
   Alcinoe.StringList,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringUtils,
   Alcinoe.Execute,
   Alcinoe.Common;
@@ -77,7 +77,7 @@ begin
       LOldToNewNames.add('ALFBXConst=Alcinoe.FBX.Consts');
       LOldToNewNames.add('ALFBXError=Alcinoe.FBX.Error');
       LOldToNewNames.add('ALFBXLib=Alcinoe.FBX.Lib');
-      LOldToNewNames.add('ALFiles=Alcinoe.Files');
+      LOldToNewNames.add('ALFiles=Alcinoe.FileUtils');
       LOldToNewNames.add('ALFmxAni=Alcinoe.FMX.Ani');
       LOldToNewNames.add('ALFmxBreakText=Alcinoe.FMX.BreakText');
       LOldToNewNames.add('ALFmxCommon=Alcinoe.FMX.Common');

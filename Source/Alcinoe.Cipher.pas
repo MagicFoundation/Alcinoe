@@ -527,7 +527,7 @@ uses
   {$ENDIF}
   system.Math,
   System.AnsiStrings,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringList,
   Alcinoe.StringUtils;
 

@@ -60,7 +60,7 @@ uses
   System.Generics.Collections,
   System.Diagnostics,
   System.IOUtils,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.Common;
 
 {**}

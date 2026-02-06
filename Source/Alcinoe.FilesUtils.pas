@@ -1,4 +1,4 @@
-unit Alcinoe.Files;
+unit Alcinoe.FileUtils;
 
 interface
 
@@ -496,7 +496,7 @@ end;
 
 initialization
   {$IF defined(DEBUG)}
-  //ALLog('Alcinoe.Files','initialization');
+  //ALLog('Alcinoe.FileUtils','initialization');
   //ALLog('ALGetAppDataPathW', ALGetAppDataPathW);
   //ALLog('ALGetTempPathW', ALGetTempPathW);
   //ALLog('ALGetCachePathW', ALGetCachePathW);

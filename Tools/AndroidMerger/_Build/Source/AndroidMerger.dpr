@@ -31,7 +31,7 @@ uses
   System.Hash,
   Alcinoe.JSONDoc,
   Alcinoe.StringUtils,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.HTTP.Client,
   Alcinoe.HTTP.Client.WinHTTP,
   Alcinoe.Execute,

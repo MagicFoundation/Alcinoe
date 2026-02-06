@@ -100,7 +100,7 @@ uses
   Macapi.ObjectiveC,
   Macapi.Security,
   {$ENDIF}
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 

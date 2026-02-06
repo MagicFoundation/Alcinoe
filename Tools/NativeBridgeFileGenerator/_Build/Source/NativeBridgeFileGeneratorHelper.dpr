@@ -14,7 +14,7 @@ uses
   system.AnsiStrings,
   system.Math,
   Alcinoe.JSONDoc,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringUtils,
   Alcinoe.Execute,
   Alcinoe.Common,

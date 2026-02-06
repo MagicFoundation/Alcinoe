@@ -9,7 +9,7 @@ uses
   System.math,
   System.AnsiStrings,
   System.IOUtils,
-  Alcinoe.Files,
+  Alcinoe.FileUtils,
   Alcinoe.StringList,
   Alcinoe.Common,
   Alcinoe.StringUtils,

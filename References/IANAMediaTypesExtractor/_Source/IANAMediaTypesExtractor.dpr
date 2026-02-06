@@ -13,7 +13,7 @@ uses
   Alcinoe.StringList,
   Alcinoe.HTTP.Client.WinHTTP,
   Alcinoe.StringUtils,
-  Alcinoe.files;
+  Alcinoe.FileUtils;
 
 begin
   try

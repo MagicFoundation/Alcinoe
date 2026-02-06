@@ -235,7 +235,7 @@
         <DCCReference Include="Alcinoe.FMX.FilterEffects.pas"/>
         <DCCReference Include="Alcinoe.FMX.Ani.pas"/>
         <DCCReference Include="Alcinoe.FMX.Confetti.pas"/>
-        <DCCReference Include="Alcinoe.Files.pas"/>
+        <DCCReference Include="Alcinoe.FileUtils.pas"/>
         <DCCReference Include="Alcinoe.FMX.BreakText.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

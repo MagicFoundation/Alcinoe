@@ -110,7 +110,7 @@
 			<DCCReference Include="Alcinoe.XMLDoc.pas"/>
 			<DCCReference Include="Alcinoe.StringList.pas"/>
 			<DCCReference Include="Alcinoe.Cipher.pas"/>
-			<DCCReference Include="Alcinoe.Files.pas"/>
+			<DCCReference Include="Alcinoe.FileUtils.pas"/>
 			<DCCReference Include="Alcinoe.Execute.pas"/>
 			<DCCReference Include="Alcinoe.FBX.Lib.pas"/>
 			<DCCReference Include="Alcinoe.FBX.Base.pas"/>

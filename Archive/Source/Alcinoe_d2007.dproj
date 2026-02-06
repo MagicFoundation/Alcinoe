@@ -76,7 +76,7 @@
     <DCCReference Include="ALFcnSQL.pas" />
     <DCCReference Include="ALFcnString.pas" />
     <DCCReference Include="ALFcnWinSock.pas" />
-    <DCCReference Include="Alcinoe.Files.pas" />
+    <DCCReference Include="Alcinoe.FileUtils.pas" />
     <DCCReference Include="Alcinoe.FTP.Client.pas" />
     <DCCReference Include="ALGraphic.pas" />
     <DCCReference Include="Alcinoe.GSMComm.pas" />

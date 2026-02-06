@@ -59,7 +59,6 @@ uses
   Alcinoe.AndroidApi.Os,
   Alcinoe.AndroidApi.RenderScript,
   Alcinoe.AndroidApi.Security,
-  Alcinoe.AndroidApi.VKontakte,
   Alcinoe.AndroidApi.WebKit,
   Alcinoe.AndroidApi.Widget,
   Alcinoe.Androidapi.GraphicsContentViewText,
@@ -79,14 +78,8 @@ uses
   Alcinoe.iOSApi.MessageUI,
   Alcinoe.iOSApi.Photos,
   Alcinoe.iOSapi.PhotosUI,
-  {$IFNDEF IOSSIMULATOR}
-  Alcinoe.iOSApi.VKontakte,
-  {$ENDIF}
   Alcinoe.iOSapi.CoreFoundation,
   Alcinoe.iOSapi.CoreVideo,
-  {$ENDIF}
-  {$IFNDEF IOSSIMULATOR}
-  Alcinoe.FMX.VKontakte,
   {$ENDIF}
   {$IFDEF ALMacOS}
   Alcinoe.FMX.NativeView.Mac,

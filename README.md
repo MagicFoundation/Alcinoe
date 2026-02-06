@@ -176,16 +176,6 @@ and all subdirectories from [Embarcadero\Florence](https://github.com/MagicFound
 in your search path.
 
 
-Update Alcinoe
---------------
-
-From time to time, we may need to rename units, classes, 
-and functions in Alcinoe. To help you automatically update 
-these names in your project and stay aligned with the 
-latest version of Alcinoe, we provide a tool called 
-**CodeRenaming**. You can find this tool here: [CodeRenaming](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/CodeRenaming)
-
-
 Propose a Change on GitHub
 --------------------------
 
@@ -865,15 +855,15 @@ Learn more at [Source/Alcinoe.Cipher.pas](https://github.com/MagicFoundation/Alc
 <br/>
   
 
-Android/iOS VKontakte/Facebook SDK login
-========================================
+Android/iOS Facebook SDK login
+==============================
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/facebooklogin.jpg?raw=true" width="540" style="width:540px;"/>
 
-The **VKontakte/Facebook SDK** for Android and iOS allows users 
-to sign into your app using their VKontakte or Facebook credentials. 
+The **Facebook SDK** for Android and iOS allows users 
+to sign into your app using their Facebook credentials. 
 Once logged in, users can grant permissions to your app, enabling you 
-to retrieve information or perform actions on VKontakte/Facebook 
+to retrieve information or perform actions on Facebook 
 on their behalf.
 
 Learn more at [Demos\ALFmxFacebookLogin](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFacebookLogin)

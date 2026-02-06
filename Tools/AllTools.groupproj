@@ -21,9 +21,6 @@
         <Projects Include="AndroidMerger\_Build\Source\AndroidMerger.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="CodeRenaming\_Source\CodeRenaming.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="CHeaderWrapperGenerator\_Source\CHeaderWrapperGenerator.dproj">
             <Dependencies/>
         </Projects>
@@ -110,15 +107,6 @@
     <Target Name="AndroidMerger:Make">
         <MSBuild Projects="AndroidMerger\_Build\Source\AndroidMerger.dproj" Targets="Make"/>
     </Target>
-    <Target Name="CodeRenaming">
-        <MSBuild Projects="CodeRenaming\_Source\CodeRenaming.dproj"/>
-    </Target>
-    <Target Name="CodeRenaming:Clean">
-        <MSBuild Projects="CodeRenaming\_Source\CodeRenaming.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="CodeRenaming:Make">
-        <MSBuild Projects="CodeRenaming\_Source\CodeRenaming.dproj" Targets="Make"/>
-    </Target>
     <Target Name="CHeaderWrapperGenerator">
         <MSBuild Projects="CHeaderWrapperGenerator\_Source\CHeaderWrapperGenerator.dproj"/>
     </Target>
@@ -192,13 +180,13 @@
         <MSBuild Projects="PlatformApiInterfaceDiff\_Source\PlatformApiInterfaceDiff.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="CodeProfiler;AppIconGenerator;EnvOptionsProjUpdater;DeployProjNormalizer;DeployMan;AndroidMerger;CodeRenaming;CHeaderWrapperGenerator;CodeBuilder;UnitNormalizer;NativeBridgeFileGeneratorHelper;DProjVersioning;DProjNormalizer;ImageMagickWrapperGenerator;PlatformApiInterfaceDiff"/>
+        <CallTarget Targets="CodeProfiler;AppIconGenerator;EnvOptionsProjUpdater;DeployProjNormalizer;DeployMan;AndroidMerger;CHeaderWrapperGenerator;CodeBuilder;UnitNormalizer;NativeBridgeFileGeneratorHelper;DProjVersioning;DProjNormalizer;ImageMagickWrapperGenerator;PlatformApiInterfaceDiff"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="CodeProfiler:Clean;AppIconGenerator:Clean;EnvOptionsProjUpdater:Clean;DeployProjNormalizer:Clean;DeployMan:Clean;AndroidMerger:Clean;CodeRenaming:Clean;CHeaderWrapperGenerator:Clean;CodeBuilder:Clean;UnitNormalizer:Clean;NativeBridgeFileGeneratorHelper:Clean;DProjVersioning:Clean;DProjNormalizer:Clean;ImageMagickWrapperGenerator:Clean;PlatformApiInterfaceDiff:Clean"/>
+        <CallTarget Targets="CodeProfiler:Clean;AppIconGenerator:Clean;EnvOptionsProjUpdater:Clean;DeployProjNormalizer:Clean;DeployMan:Clean;AndroidMerger:Clean;CHeaderWrapperGenerator:Clean;CodeBuilder:Clean;UnitNormalizer:Clean;NativeBridgeFileGeneratorHelper:Clean;DProjVersioning:Clean;DProjNormalizer:Clean;ImageMagickWrapperGenerator:Clean;PlatformApiInterfaceDiff:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="CodeProfiler:Make;AppIconGenerator:Make;EnvOptionsProjUpdater:Make;DeployProjNormalizer:Make;DeployMan:Make;AndroidMerger:Make;CodeRenaming:Make;CHeaderWrapperGenerator:Make;CodeBuilder:Make;UnitNormalizer:Make;NativeBridgeFileGeneratorHelper:Make;DProjVersioning:Make;DProjNormalizer:Make;ImageMagickWrapperGenerator:Make;PlatformApiInterfaceDiff:Make"/>
+        <CallTarget Targets="CodeProfiler:Make;AppIconGenerator:Make;EnvOptionsProjUpdater:Make;DeployProjNormalizer:Make;DeployMan:Make;AndroidMerger:Make;CHeaderWrapperGenerator:Make;CodeBuilder:Make;UnitNormalizer:Make;NativeBridgeFileGeneratorHelper:Make;DProjVersioning:Make;DProjNormalizer:Make;ImageMagickWrapperGenerator:Make;PlatformApiInterfaceDiff:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

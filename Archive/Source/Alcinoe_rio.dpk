@@ -57,7 +57,7 @@ contains
   Alcinoe.FMX.Graphics in 'Alcinoe.FMX.Graphics.pas',
   Alcinoe.FMX.FilterEffects in 'Alcinoe.FMX.FilterEffects.pas',
   Alcinoe.FMX.Ani in 'Alcinoe.FMX.Ani.pas',
-  Alcinoe.Files in 'Alcinoe.Files.pas';
+  Alcinoe.FileUtils in 'Alcinoe.FileUtils.pas';
 
 end.
 

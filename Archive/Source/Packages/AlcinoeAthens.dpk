@@ -80,7 +80,7 @@ contains
   Alcinoe.FMX.UserPreferences in 'Alcinoe.FMX.UserPreferences.pas',
   Alcinoe.FMX.VideoPlayer in 'Alcinoe.FMX.VideoPlayer.pas',
   Alcinoe.FMX.WebBrowser in 'Alcinoe.FMX.WebBrowser.pas',
-  Alcinoe.Files in 'Alcinoe.Files.pas',
+  Alcinoe.FileUtils in 'Alcinoe.FileUtils.pas',
   Alcinoe.GuardianThread in 'Alcinoe.GuardianThread.pas',
   Alcinoe.HTML in 'Alcinoe.HTML.pas',
   Alcinoe.HTTP in 'Alcinoe.HTTP.pas',

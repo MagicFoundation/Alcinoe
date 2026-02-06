@@ -51,7 +51,7 @@ contains
   Alcinoe.XMLDoc in 'Alcinoe.XMLDoc.pas',
   Alcinoe.StringList in 'Alcinoe.StringList.pas',
   Alcinoe.Cipher in 'Alcinoe.Cipher.pas',
-  Alcinoe.Files in 'Alcinoe.Files.pas',
+  Alcinoe.FileUtils in 'Alcinoe.FileUtils.pas',
   Alcinoe.Execute in 'Alcinoe.Execute.pas',
   Alcinoe.FBX.Lib in 'Alcinoe.FBX.Lib.pas',
   Alcinoe.FBX.Base in 'Alcinoe.FBX.Base.pas',

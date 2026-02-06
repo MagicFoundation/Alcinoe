@@ -2383,7 +2383,7 @@ type
     KeyDesc: HTTP_SERVICE_CONFIG_CACHE_KEY;
     ParamDesc: HTTP_SERVICE_CONFIG_CACHE_PARAM;
   end;
-  PHTTP_SERVICE_CONFIG_CACHE_SET = ^_ANON_STRUCT_1;
+  PHTTP_SERVICE_CONFIG_CACHE_SET = ^HTTP_SERVICE_CONFIG_CACHE_SET;
 
 //
 // Input types for HttpQueryRequestProperty. Only types are public and not the API

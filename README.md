@@ -1115,42 +1115,21 @@ MongoDb Client
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/mongodb.webp?raw=true"  width="600" style="width:600px;"/>
 
-TALMongoDBClient provides a Delphi **MongoDB** client built on top of 
-the **MongoDB C Driver 2.x** (**libmongoc2 / libbson2**) via 
-`Alcinoe.MongoDB.Wrapper.pas`.
-  
-#### Connection pooling ####
+**TALMongoDBClient** is a Delphi MongoDB client built on top of the 
+**MongoDB C Driver 2.x** (`libmongoc2` / `libbson2`). It’s designed 
+for high-throughput, **multi-threaded** applications: for each 
+database operation, the calling thread borrows a `mongoc_client_t` 
+from an internal `mongoc_client_pool_t`, uses it to execute the 
+request, and then returns it to the pool as soon as the operation 
+completes—avoiding a new connection per call, reducing overhead, 
+and scaling cleanly with concurrency.
 
-`TALMongoDBClient` is designed for high-throughput applications and uses a **client pool**
-(`mongoc_client_pool_t`) internally. Instead of creating a new connection for every request,
-operations borrow a client from the pool and return it when done, which reduces connection
-setup overhead and improves scalability.
-  
-#### CRUD + JSON/BSON-friendly options ####
-
-The API offers the usual operations:
-
-- `Find` (streaming via callback or aggregated as `TALJsonNodeA`)
-- `InsertOne` / `InsertMany`
-- `UpdateOne` / `UpdateMany`
-- `ReplaceOne`
-- `DeleteOne` / `DeleteMany`
-- `FindAndModify`
-
-#### Transactions ####
-
-`StartTransaction`, `CommitTransaction`, and `AbortTransaction` are supported.
-
-#### Change streams in a background thread ####
-
-`TALMongoDBChangeStreamListener` is a `TThread` helper that continuously watches for changes
-using change streams and triggers:
-
-- `OnChange(Sender, ChangeDoc)`
-- `OnError(Sender, Exception)`
-
-Depending on which properties you set, it can watch at the **collection**, **database**,
-or **client** level.
+It includes the usual MongoDB operations (**Find** via callback or as 
+`TALJsonNodeA`, Insert/Update/Replace/Delete, **FindAndModify**), 
+plus **transactions** (`StartTransaction` / `CommitTransaction` / 
+`AbortTransaction`) and **change streams** via 
+`TALMongoDBChangeStreamListener` (background `TThread` with 
+`OnChange` / `OnError`, watching collection/database/client). 
 
 Learn more at [Demos\ALMongoDBClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALMongoDBClient)
 <br/>

@@ -776,6 +776,7 @@ function ALJsonEncodeTextWithNodeSubTypeHelperA(const AValue: AnsiString): AnsiS
 function ALJsonEncodeBinaryWithNodeSubTypeHelperA(const AValue: AnsiString): AnsiString;
 function ALJsonEncodeObjectIDWithNodeSubTypeHelperA(const AValue: AnsiString): AnsiString;
 function ALJsonEncodeBooleanWithNodeSubTypeHelperA(const AValue: Boolean): AnsiString;
+function ALJsonEncodeDateTimeA(const AValue: TdateTime): AnsiString;
 function ALJsonEncodeDateTimeWithNodeSubTypeHelperA(const AValue: TdateTime): AnsiString;
 function ALJsonEncodeJavascriptWithNodeSubTypeHelperA(const AValue: AnsiString): AnsiString;
 function ALJsonEncodeInt64WithNodeSubTypeHelperA(const AValue: int64): AnsiString;
@@ -1307,6 +1308,7 @@ function ALJsonEncodeTextWithNodeSubTypeHelperW(const AValue: String): String;
 function ALJsonEncodeBinaryWithNodeSubTypeHelperW(const AValue: String): String;
 function ALJsonEncodeObjectIDWithNodeSubTypeHelperW(const AValue: String): String;
 function ALJsonEncodeBooleanWithNodeSubTypeHelperW(const AValue: Boolean): String;
+function ALJsonEncodeDateTimeW(const AValue: TdateTime): String;
 function ALJsonEncodeDateTimeWithNodeSubTypeHelperW(const AValue: TdateTime): String;
 function ALJsonEncodeJavascriptWithNodeSubTypeHelperW(const AValue: String): String;
 function ALJsonEncodeInt64WithNodeSubTypeHelperW(const AValue: int64): String;
@@ -1953,6 +1955,7 @@ Begin
   //--
   if assigned(RawJSONStream) then begin
     InitialStreamPosition := RawJSONStream.Position;
+    RawJSONStream.Position := 0;
     Buffer := '';
     BufferLength := 0;
     BufferPos := 1;
@@ -6837,6 +6840,7 @@ end;
 procedure TALJSONNodeA.LoadFromJSONStream(const Stream: TStream; const Options: TALJSONParseOptions = [poClearChildNodes]);
 Begin
   Try
+    Stream.Position := 0;
     ParseJSON(Stream, '', False{SaxMode}, nil{onParseText}, nil{onParseStartObject}, nil{onParseEndObject}, nil{onParseStartArray}, nil{onParseEndArray}, Options);
   except
     ChildNodes.Clear;
@@ -6877,6 +6881,7 @@ end;
 procedure TALJSONNodeA.LoadFromBSONStream(const Stream: TStream; const Options: TALJSONParseOptions = [poClearChildNodes]);
 Begin
   Try
+    Stream.Position := 0;
     ParseBSON(Stream, '', False{SaxMode}, nil{onParseText}, nil{onParseStartObject}, nil{onParseEndObject}, nil{onParseStartArray}, nil{onParseEndArray}, Options);
   except
     ChildNodes.Clear;
@@ -6925,6 +6930,7 @@ procedure TALJSONNodeA.ParseJSONStream(
             const onParseEndArray: TAlJSONParseArrayEventA;
             const Options: TALJSONParseOptions = []);
 Begin
+  Stream.Position := 0;
   ParseJSON(Stream, '', true{SaxMode}, onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
 end;
 
@@ -6983,6 +6989,7 @@ procedure TALJSONNodeA.ParseBSONStream(
             const onParseEndArray: TAlJSONParseArrayEventA;
             const Options: TALJSONParseOptions = []);
 Begin
+  Stream.Position := 0;
   ParseBSON(Stream, '', true{SaxMode}, onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
 end;
 
@@ -8122,6 +8129,12 @@ begin
   else result := 'false';
 end;
 
+{******************************************************************}
+function ALJsonEncodeDateTimeA(const AValue: TdateTime): AnsiString;
+begin
+  result := ALFormatDateTimeA('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', aValue);
+end;
+
 {***************************************************************************************}
 function ALJsonEncodeDateTimeWithNodeSubTypeHelperA(const AValue: TdateTime): AnsiString;
 begin
@@ -8824,6 +8837,7 @@ end;
 {**************************************************************************************************************************************************}
 class function TALJSONDocumentW.CreateFromJSONStream(const Stream: TStream; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeW;
 begin
+  Stream.Position := 0;
   result := CreateFromJSONString(ALGetStringFromStream(Stream, TEncoding.UTF8), Options);
 end;
 
@@ -8854,6 +8868,7 @@ end;
 {**************************************************************************************************************************************************}
 class function TALJSONDocumentW.CreateFromBSONStream(const Stream: TStream; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeW;
 begin
+  Stream.Position := 0;
   result := CreateFromBSONBytes(ALGetBytesFromStream(Stream), Options);
 end;
 
@@ -8907,6 +8922,7 @@ class procedure TALJSONDocumentW.ParseJSONStream(
                   const onParseEndArray: TAlJSONParseArrayEventW;
                   const Options: TALJSONParseOptions = []);
 begin
+  Stream.Position := 0;
   ParseJSONString(
     ALGetStringFromStream(Stream, TEncoding.UTF8),
     OnParseText,
@@ -8978,6 +8994,7 @@ class procedure TALJSONDocumentW.ParseBSONStream(
                   const onParseEndArray: TAlJSONParseArrayEventW;
                   const Options: TALJSONParseOptions = []);
 begin
+  Stream.Position := 0;
   ParseBSONBytes(
     ALGetBytesFromStream(Stream),
     OnParseText,
@@ -13422,6 +13439,7 @@ end;
 {*************************************************************************************************************************}
 procedure TALJSONNodeW.LoadFromJSONStream(const Stream: TStream; const Options: TALJSONParseOptions = [poClearChildNodes]);
 Begin
+  Stream.Position := 0;
   LoadFromJSONString(ALGetStringFromStream(Stream, TEncoding.UTF8), Options);
 end;
 
@@ -13451,6 +13469,7 @@ end;
 {*************************************************************************************************************************}
 procedure TALJSONNodeW.LoadFromBSONStream(const Stream: TStream; const Options: TALJSONParseOptions = [poClearChildNodes]);
 Begin
+  Stream.Position := 0;
   LoadFromBSONBytes(ALGetBytesFromStream(Stream), Options);
 end;
 
@@ -13489,6 +13508,7 @@ procedure TALJSONNodeW.ParseJSONStream(
             const onParseEndArray: TAlJSONParseArrayEventW;
             const Options: TALJSONParseOptions = []);
 Begin
+  Stream.Position := 0;
   ParseJSONString(ALGetStringFromStream(Stream, TEncoding.UTF8), onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
 end;
 
@@ -13534,6 +13554,7 @@ procedure TALJSONNodeW.ParseBSONStream(
             const onParseEndArray: TAlJSONParseArrayEventW;
             const Options: TALJSONParseOptions = []);
 Begin
+  Stream.Position := 0;
   ParseBSONBytes(ALGetBytesFromStream(Stream), onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
 end;
 
@@ -14621,6 +14642,12 @@ function ALJsonEncodeBooleanWithNodeSubTypeHelperW(const AValue: Boolean): Strin
 begin
   if aValue then result := 'true'
   else result := 'false';
+end;
+
+{**************************************************************}
+function ALJsonEncodeDateTimeW(const AValue: TdateTime): String;
+begin
+  result := ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', aValue);
 end;
 
 {***********************************************************************************}

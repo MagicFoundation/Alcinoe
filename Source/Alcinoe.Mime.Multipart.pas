@@ -7,7 +7,9 @@ interface
 Uses
   System.SysUtils,
   System.Classes,
+  System.Generics.Collections,
   Alcinoe.Common,
+  Alcinoe.StringList,
   Alcinoe.StringUtils;
 
 type
@@ -212,13 +214,74 @@ type
                 const AHeaders: TALNameValueArrayA = nil);
   end;
 
+  {----------------------------------}
+  TALMimePartHeadersA = Class(TObject)
+  private
+    FKnownHeaders: array[0..5] of AnsiString;
+    FUnknownHeaders: TALStringsA;
+  protected
+    function PropertyIndexToName(const AIndex: Integer): AnsiString; virtual;
+    function NameToPropertyIndex(const AName: AnsiString): Integer; virtual;
+    function GetUnknownHeaders: TALStringsA; virtual;
+    function GetHeaderValueByPropertyIndex(const Index: Integer): AnsiString; virtual;
+    procedure SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString); virtual;
+    function GetHeaderValueByName(const AName: AnsiString): AnsiString; virtual;
+    procedure SetHeaderValueByName(const AName: AnsiString; const AValue: AnsiString); virtual;
+    Function GetRawHeaderText: AnsiString; virtual;
+    procedure SetRawHeaderText(const ARawHeaderText: AnsiString); virtual;
+    function GetContentCharset: AnsiString; virtual;
+    function GetContentDispositionName: AnsiString; virtual;
+    function GetContentDispositionFilename: AnsiString; virtual;
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    procedure Clear; virtual;
+    property RawHeaderText: AnsiString read GetRawHeaderText write SetRawHeaderText;
+    property ContentType: AnsiString index 0 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Content-Type: text/html; charset=ISO-8859-4}
+    property ContentCharset: AnsiString read GetContentCharset;
+    property ContentDisposition: AnsiString index 1 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Content-Disposition: form-data; name="field"; filename="file.jpg"}
+    property ContentDispositionName: AnsiString read GetContentDispositionName;
+    property ContentDispositionFilename: AnsiString read GetContentDispositionFilename;
+    property ContentTransferEncoding: AnsiString index 2 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Content-Transfer-Encoding: 7bit}
+    property ContentLength: AnsiString index 3 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex;  {Content-Length: 3495}
+    property ContentDescription: AnsiString index 4 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Content-Description: The fixed length records}
+    property ContentID: AnsiString index 5 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Content-ID: <example2@somplace.com>}
+    property UnknownHeaders: TALStringsA read GetUnknownHeaders;
+    property Values[const AName: AnsiString]: AnsiString read GetHeaderValueByName write SetHeaderValueByName; default;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALMultipartDecoderA = class(TObject)
+  public
+    type
+      TPart = Class(TObject)
+      private
+        FHeaders: TALMimePartHeadersA;
+        FBodyStream: TALStringStreamA;
+        function GetBodyStream: TStream;
+        function GetBodyString: AnsiString;
+      public
+        constructor Create(const ARawHeaderText: AnsiString; Const ABodyString: AnsiString); virtual;
+        destructor Destroy; override;
+        property Headers: TALMimePartHeadersA read FHeaders;
+        property BodyStream: TStream read GetBodyStream;
+        property BodyString: AnsiString read GetBodyString;
+      end;
+  private
+    FParts: TObjectList<TPart>;
+  public
+    constructor Create(const AContentType: AnsiString; const APayloadStream: TStream); virtual;
+    destructor Destroy; override;
+    property Parts: TObjectList<TPart> read FParts;
+  end;
+
+
 implementation
 
 Uses
   System.IOUtils,
   System.AnsiStrings,
   System.NetConsts,
-  ALcinoe.Cipher,
   Alcinoe.Mime.ContentTypes;
 
 {**********************************************************************}
@@ -670,6 +733,249 @@ begin
   finally
     ALFreeAndNil(LBytesStream);
   end;
+end;
+
+{*************************************}
+constructor TALMimePartHeadersA.Create;
+Begin
+  inherited;
+  //for var i := Low(FKnownHeaders) to High(FKnownHeaders) do
+  //  FKnownHeaders[i] := '';
+  FUnknownHeaders := nil;
+end;
+
+{*************************************}
+destructor TALMimePartHeadersA.Destroy;
+begin
+  AlFreeAndNil(FUnknownHeaders);
+  inherited;
+end;
+
+{**********************************}
+procedure TALMimePartHeadersA.Clear;
+begin
+  for var i := Low(FKnownHeaders) to High(FKnownHeaders) do
+    FKnownHeaders[i] := '';
+  if FUnknownHeaders <> nil then FUnknownHeaders.Clear;
+end;
+
+{**********************************************************}
+function TALMimePartHeadersA.GetUnknownHeaders: TALStringsA;
+begin
+  if FUnknownHeaders = nil then begin
+    FUnknownHeaders := TALNVStringListA.Create;
+    FUnknownHeaders.NameValueSeparator := ':';
+    FUnknownHeaders.TrailingLineBreak := False;
+  end;
+  Result := FUnknownHeaders;
+end;
+
+{*******************************************************************************************}
+function TALMimePartHeadersA.GetHeaderValueByPropertyIndex(const Index: Integer): AnsiString;
+begin
+  {$IF defined(DEBUG)}
+  if (Index < Low(FKnownHeaders)) or (Index > High(FKnownHeaders)) then
+    raise EArgumentOutOfRangeException.CreateFmt('Header index (%d) out of range [0..%d]', [Index, High(FKnownHeaders)]);
+  {$ENDIF}
+  Result := FKnownHeaders[Index];
+end;
+
+{*********************************************************************************************************}
+procedure TALMimePartHeadersA.SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString);
+begin
+  {$IF defined(DEBUG)}
+  if (Index < Low(FKnownHeaders)) or (Index > High(FKnownHeaders)) then
+    raise EArgumentOutOfRangeException.CreateFmt('Header index (%d) out of range [0..%d]', [Index, High(FKnownHeaders)]);
+  {$ENDIF}
+  FKnownHeaders[Index] := Value;
+end;
+
+{********************************************************}
+Function TALMimePartHeadersA.GetRawHeaderText: AnsiString;
+begin
+  var SB := TALStringBuilderA.Create(256);
+  try
+    // 1) Known headers
+    for var I := Low(FKnownHeaders) to High(FKnownHeaders) do begin
+      if FKnownHeaders[i] <> '' then begin
+        SB.Append(PropertyIndexToName(i));
+        SB.Append(': ');
+        SB.AppendLine(FKnownHeaders[i]);
+      end;
+    end;
+
+    // 3) Unknown headers
+    for var I := 0 to UnknownHeaders.Count - 1 do begin
+      SB.Append(UnknownHeaders.Names[I]);
+      SB.Append(': ');
+      SB.AppendLine(UnknownHeaders.ValueFromIndex[I]);
+    end;
+
+    // 4) Produce the final string
+    Result := SB.ToString(true{AUpdateCapacity});
+  finally
+    ALFreeAndNil(SB);
+  end;
+end;
+
+{*******************************************************************************}
+procedure TALMimePartHeadersA.SetRawHeaderText(const ARawHeaderText: AnsiString);
+begin
+  Clear;
+  var LRawHeaders := TALNVStringListA.create;
+  try
+    LRawHeaders.NameValueSeparator := ':';
+    LRawHeaders.Text := ARawHeaderText;
+    For var I := 0 to LRawHeaders.count - 1 do
+      Values[ALTrim(LRawHeaders.Names[I])] := alTrim(LRawHeaders.ValueFromIndex[I]);
+  finally
+    AlFreeAndNil(LRawHeaders);
+  end;
+end;
+
+{**********************************************************************************}
+function TALMimePartHeadersA.PropertyIndexToName(const AIndex: Integer): AnsiString;
+begin
+  Case AIndex of
+    0: Result := 'Content-Type';
+    1: Result := 'Content-Disposition';
+    2: Result := 'Content-Transfer-Encoding';
+    3: Result := 'Content-Length';
+    4: Result := 'Content-Description';
+    5: Result := 'Content-ID';
+    else
+      Raise Exception.Create('Error 8FA2DFE9-805F-4547-8CC1-07B853445437')
+  End;
+end;
+
+{*********************************************************************************}
+function TALMimePartHeadersA.NameToPropertyIndex(const AName: AnsiString): Integer;
+begin
+  var LLowerName := ALLowerCase(AName);
+       if LLowerName = 'content-type' then Result := 0
+  else if LLowerName = 'content-disposition' then Result := 1
+  else if LLowerName = 'content-transfer-encoding' then Result := 2
+  else if LLowerName = 'content-length' then Result := 3
+  else if LLowerName = 'content-description' then Result := 4
+  else if LLowerName = 'content-id' then Result := 5
+  else Result := -1;
+end;
+
+{*************************************************************************************}
+function TALMimePartHeadersA.GetHeaderValueByName(const AName: AnsiString): AnsiString;
+begin
+  Var LIndex := NameToPropertyIndex(AName);
+  If LIndex >= 0 then Result := GetHeaderValueByPropertyIndex(LIndex)
+  else Result := UnknownHeaders.Values[AName];
+end;
+
+{****************************************************************************************************}
+procedure TALMimePartHeadersA.SetHeaderValueByName(const AName: AnsiString; const AValue: AnsiString);
+begin
+  Var LIndex := NameToPropertyIndex(AName);
+  If LIndex >= 0 then
+    SetHeaderValueByPropertyIndex(LIndex, AValue)
+  else
+    UnknownHeaders.Values[AName] := AValue;
+end;
+
+{*********************************************************}
+function TALMimePartHeadersA.GetContentCharset: AnsiString;
+begin
+  Result := ALExtractHeaderParamValue(ContentType, AnsiString('charset'));
+end;
+
+{*****************************************************************}
+function TALMimePartHeadersA.GetContentDispositionName: AnsiString;
+begin
+  Result := ALExtractHeaderParamValue(ContentDisposition, AnsiString('name'));
+end;
+
+{*********************************************************************}
+function TALMimePartHeadersA.GetContentDispositionFilename: AnsiString;
+begin
+  Result := ALExtractHeaderParamValue(ContentDisposition, AnsiString('filename'));
+end;
+
+{*************************************************************************************************************}
+constructor TALMultipartDecoderA.TPart.Create(const ARawHeaderText: AnsiString; Const ABodyString: AnsiString);
+begin
+  inherited Create;
+  FHeaders := TALMimePartHeadersA.Create;
+  FHeaders.RawHeaderText := ARawHeaderText;
+  FBodyStream := TALStringStreamA.Create(ABodyString);
+end;
+
+{********************************************}
+destructor TALMultipartDecoderA.TPart.Destroy;
+begin
+  ALFreeAndNil(FHeaders);
+  ALFreeAndNil(FBodyStream);
+  inherited;
+end;
+
+{*********************************************************}
+function TALMultipartDecoderA.TPart.GetBodyStream: TStream;
+begin
+  Result := FBodyStream;
+end;
+
+{************************************************************}
+function TALMultipartDecoderA.TPart.GetBodyString: AnsiString;
+begin
+  Result := FBodyStream.DataString;
+end;
+
+{*****************************************************************************************************}
+constructor TALMultipartDecoderA.Create(const AContentType: AnsiString; const APayloadStream: TStream);
+begin
+
+  // Inherited
+  inherited Create;
+
+  // Init FParts
+  FParts := TObjectList<TPart>.Create(True{AOwnsObjects});
+
+  // Extract boundary from Content-Type
+  var LBoundary := ALExtractHeaderParamValue(AContentType, AnsiString('boundary'));
+  if LBoundary = '' then raise EArgumentException.Create('Missing multipart boundary in Content-Type');
+  LBoundary := '--' + LBoundary;
+
+  // Read whole stream in LBodyString
+  var LBodyString: AnsiString;
+  if APayloadStream is TALStringStreamA then LBodyString := TALStringStreamA(APayloadStream).DataString
+  else raise Exception.Create('Unsupported stream type');
+
+  // Iterate over parts
+  var P1 := ALPosA(LBoundary, LBodyString);
+  if P1 <= 0 then raise Exception.Create('Multipart boundary not found in body');
+  if P1 <> low(LBodyString) then raise Exception.Create('Multipart body must start with the boundary delimiter');
+  While P1 > 0 do begin
+    P1 := P1 + length(LBoundary);
+    if (P1 > High(LBodyString) - 1) then raise Exception.Create('Unexpected end of multipart data after boundary');
+    if (LBodyString[P1] = '-') and (LBodyString[P1 + 1] = '-') then break
+    else if (LBodyString[P1] <> #13) or (LBodyString[P1 + 1] <> #10) then raise Exception.Create('Invalid multipart boundary line ending');
+    inc(P1, 2);
+    var P2 := ALPosA(#13#10#13#10, LBodyString, P1);
+    if P2 <= 0 then raise Exception.Create('Missing multipart headers terminator');
+    var LPartRawHeaderText := ALcopyStr(LBodyString, P1, P2-P1);
+    inc(P2, 4{length(#13#10#13#10)});
+    P1 := ALPosA(LBoundary, LBodyString, P2);
+    if P1 <= 0 then raise Exception.Create('Missing closing multipart boundary');
+    if (P1 < P2 + 2) or (LBodyString[P1-1] <> #10) or (LBodyString[P1 - 2] <> #13) then
+      raise Exception.Create('Multipart boundary must be preceded by CRLF');
+    var LPartBodyString := ALCopyStr(LBodyString, P2, P1-2-P2);
+    var LPart := TPart.Create(LPartRawHeaderText, LPartBodyString);
+    FParts.Add(LPart);
+  end;
+
+end;
+
+{**************************************}
+destructor TALMultipartDecoderA.Destroy;
+begin
+  ALFreeAndNil(FParts);
+  inherited;
 end;
 
 end.

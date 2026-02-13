@@ -14,6 +14,7 @@ uses
   System.Types,
   System.Generics.Collections,
   System.Math.Vectors,
+  System.SysUtils,
   {$IF defined(ALMacOS)}
   Macapi.CocoaTypes,
   Macapi.Foundation,
@@ -1117,7 +1118,13 @@ function  ALGetFontMetrics(
             const AFontSize: single;
             const AFontWeight: TFontWeight;
             const AFontSlant: TFontSlant): TALFontMetrics;
+{$IF defined(ALAppleOS)}
+function ALKeychainReadBytes(const AService: String; const AAccount: string; out ABytes: TBytes): Boolean;
+procedure ALKeychainWriteBytes(const AService: String; const AAccount: string; const ABytes: TBytes);
+{$ENDIF}
 function  ALGetAppVersion: String;
+function  ALGetPlatform: String;
+function  ALGetDeviceID: String;
 function  ALCreateResourceStream(const AResourceName: String): TResourceStream;
 function  ALGetResourceFilename(const AResourceName: String): String;
 function  ALTranslate(const AText: string): string;
@@ -1432,7 +1439,6 @@ function ALGetFillTextFlags: TFillTextFlags; Inline;
 implementation
 
 uses
-  System.SysUtils,
   System.Math,
   System.SyncObjs,
   System.IOutils,
@@ -1451,11 +1457,13 @@ uses
   Androidapi.JNIBridge,
   Androidapi.Helpers,
   Androidapi.JNI.App,
+  Androidapi.JNI.Provider,
   Alcinoe.Androidapi.GraphicsContentViewText,
   {$ENDIF}
   {$IF defined(ALMacOS)}
   Macapi.ObjectiveC,
   Macapi.CoreFoundation,
+  Macapi.Security,
   Macapi.Helpers,
   Macapi.AppKit,
   {$ENDIF}
@@ -1463,9 +1471,11 @@ uses
   Macapi.CoreFoundation,
   Macapi.Helpers,
   iOSapi.Helpers,
+  iOSapi.Security,
   Alcinoe.iOSApi.AudioToolbox,
   {$ENDIF}
   {$IF defined(MSWINDOWS)}
+  System.Win.Registry,
   Winapi.Windows,
   FMX.Helpers.Win,
   {$ENDIF}
@@ -6140,6 +6150,100 @@ begin
 
 end;
 
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALKeychainReadBytes(const AService: String; const AAccount: string; out ABytes: TBytes): Boolean;
+begin
+  Result := True;
+  var LQuery := TNSMutableDictionary.Create;
+  try
+    {$IF defined(ALMacOS)}
+    {$IFNDEF ALCompilerVersionSupported130}
+      {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4404 was corrected and adjust the IFDEF'}
+    {$ENDIF}
+    LQuery.setObject(NSStringToID(kSecClassGenericPassword), NSStringToID(kSecClass));
+    LQuery.setObject(StringToID(AService), NSStringToID(kSecAttrService));
+    LQuery.setObject(StringToID(AAccount), NSStringToID(kSecAttrAccount));
+    LQuery.setObject(kCFBooleanTrue, NSStringToID(kSecReturnData));
+    LQuery.setObject(NSStringToID(kSecMatchLimitOne), NSStringToID(kSecMatchLimit));
+    {$ELSE}
+    LQuery.setObject(kSecClassGenericPassword, kSecClass);
+    LQuery.setObject(StringToID(AService), kSecAttrService);
+    LQuery.setObject(StringToID(AAccount), kSecAttrAccount);
+    LQuery.setObject(kCFBooleanTrue, kSecReturnData);
+    LQuery.setObject(kSecMatchLimitOne, kSecMatchLimit);
+    {$ENDIF}
+    var CFRef: CFTypeRef := nil;
+    var Status := SecItemCopyMatching(NSObjectToID(LQuery), @CFRef);
+    if (Status = errSecSuccess) and
+       (CFRef <> nil) and
+       (CFGetTypeID(CFRef) = CFDataGetTypeID) then begin
+      var Data := TNSData.Wrap(CFRef);
+      SetLength(ABytes, Data.length);
+      if Data.length > 0 then Move(Data.bytes^, ABytes[0], Data.length);
+    end
+    else
+      Result := False;
+  finally
+    LQuery.release;
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+procedure ALKeychainWriteBytes(const AService: String; const AAccount: string; const ABytes: TBytes);
+begin
+  var LDataObj: NSData;
+  if Length(ABytes) = 0 then LDataObj := TNSData.Wrap(TNSData.OCClass.data) // empty NSData
+  else LDataObj := TNSData.Wrap(TNSData.OCClass.dataWithBytes(@ABytes[0], Length(ABytes)));
+  // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+  // No release required for LDataObj because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
+  var LQuery := TNSMutableDictionary.Create;
+  Try
+    {$IF defined(ALMacOS)}
+    {$IFNDEF ALCompilerVersionSupported130}
+      {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4404 was corrected and adjust the IFDEF'}
+    {$ENDIF}
+    LQuery.setObject(NSStringToID(kSecClassGenericPassword), NSStringToID(kSecClass));
+    LQuery.setObject(StringToID(AService), NSStringToID(kSecAttrService));
+    LQuery.setObject(StringToID(AAccount), NSStringToID(kSecAttrAccount));
+    {$ELSE}
+    LQuery.setObject(kSecClassGenericPassword, kSecClass);
+    LQuery.setObject(StringToID(AService), kSecAttrService);
+    LQuery.setObject(StringToID(AAccount), kSecAttrAccount);
+    {$ENDIF}
+
+    var LAttrs := TNSMutableDictionary.Create;
+    Try
+      {$IF defined(ALMacOS)}
+      {$IFNDEF ALCompilerVersionSupported130}
+        {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4404 was corrected and adjust the IFDEF'}
+      {$ENDIF}
+      LAttrs.setObject(NSObjectToID(LDataObj), NSStringToID(kSecValueData));
+      LAttrs.setObject(NSStringToID(kSecAttrAccessibleAfterFirstUnlock), NSStringToID(kSecAttrAccessible));
+      {$ELSE}
+      LAttrs.setObject(NSObjectToID(LDataObj), kSecValueData);
+      LAttrs.setObject(kSecAttrAccessibleAfterFirstUnlock, kSecAttrAccessible);
+      {$ENDIF}
+
+      var LStatus := SecItemUpdate(NSObjectToID(LQuery), NSObjectToID(LAttrs));
+      if LStatus = errSecItemNotFound then begin
+        LAttrs.addEntriesFromDictionary(LQuery);
+        LStatus := SecItemAdd(NSObjectToID(LAttrs), nil);
+      end;
+
+      if LStatus <> errSecSuccess then
+        raise Exception.CreateFmt('Keychain save failed (status %d)', [LStatus]);
+    finally
+      LAttrs.release;
+    end;
+  finally
+    LQuery.release;
+  end;
+end;
+{$ENDIF}
+
 {********************************}
 function  ALGetAppVersion: String;
 begin
@@ -6159,6 +6263,71 @@ begin
   Result := AlGetFileVersionW(ALGetModulePathW+ALGetModuleNameW);
   {$ELSE}
   Result := 'x.x.x';
+  {$ENDIF}
+end;
+
+{******************************}
+function  ALGetPlatform: String;
+begin
+  {$IF defined(ANDROID)}
+  Result := 'android';
+  {$ELSEIF defined(IOS)}
+  Result := 'ios';
+  {$ELSEIF defined(ALMacOS)}
+  Result := 'macos';
+  {$ELSEIF defined(MSWINDOWS)}
+  Result := 'windows';
+  {$ELSE}
+  Result := 'unknown';
+  {$ENDIF}
+end;
+
+{******************************}
+function  ALGetDeviceID: String;
+begin
+  {$IF defined(ANDROID)}
+  var LIdJStr := TJSettings_Secure.JavaClass.getString(
+                   TAndroidHelper.Context.getContentResolver, // resolver: JContentResolver
+                   TJSettings_Secure.JavaClass.ANDROID_ID); // name: JString
+  Result := JStringToString(LIdJStr);
+  if Result <> '' then
+    Result := 'android:' + result;
+  {$ELSEIF defined(IOS)}
+  var LBytes: TBytes;
+  if ALKeychainReadBytes('alcinoe', 'device_id', LBytes) then Result := TEncoding.UTF8.GetString(LBytes)
+  else begin
+    Result := ALNewGUIDStringW(true{WithoutBracket}, false{WithoutHyphen});
+    ALKeychainWriteBytes('alcinoe', 'device_id', TEncoding.UTF8.GetBytes(Result))
+  end;
+  if Result <> '' then
+    Result := 'ios:' + result;
+  {$ELSEIF defined(ALMacOS)}
+  var LBytes: TBytes;
+  if ALKeychainReadBytes('alcinoe', 'device_id', LBytes) then Result := TEncoding.UTF8.GetString(LBytes)
+  else begin
+    Result := ALNewGUIDStringW(true{WithoutBracket}, false{WithoutHyphen});
+    ALKeychainWriteBytes('alcinoe', 'device_id', TEncoding.UTF8.GetBytes(Result))
+  end;
+  if Result <> '' then
+    Result := 'macos:' + result;
+  {$ELSEIF defined(MSWINDOWS)}
+  var LRegistry := TRegistry.Create(KEY_READ or KEY_WOW64_64KEY);
+  try
+    LRegistry.RootKey := HKEY_LOCAL_MACHINE;
+    if LRegistry.OpenKeyReadOnly('\SOFTWARE\Microsoft\Cryptography') then
+    try
+      if LRegistry.ValueExists('MachineGuid') then Result := LRegistry.ReadString('MachineGuid')
+      else result := '';
+    finally
+      LRegistry.CloseKey;
+    end;
+  finally
+    ALFreeAndNil(LRegistry);
+  end;
+  if Result <> '' then
+    Result := 'windows:' + result;
+  {$ELSE}
+  Result := '';
   {$ENDIF}
 end;
 

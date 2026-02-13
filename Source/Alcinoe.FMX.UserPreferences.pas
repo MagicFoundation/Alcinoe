@@ -45,8 +45,6 @@ Type
     {$ENDIF}
     {$IF defined(ALAppleOS)}
     FUserDefaults: NSUserDefaults;
-    function KeychainReadBytes(const AKey: string; out ABytes: TBytes): Boolean;
-    procedure KeychainWriteBytes(const AKey: string; const ABytes: TBytes);
     {$ENDIF}
     {$IF defined(MSWindows) and (not defined(ALDPK))}
     FSection: String;
@@ -89,19 +87,14 @@ uses
   Alcinoe.AndroidApi.JavaTypes,
   {$ENDIF}
   {$IF defined(IOS)}
-  Macapi.CoreFoundation,
   Macapi.Helpers,
-  Macapi.ObjectiveC,
-  iOSapi.Security,
   {$ENDIF}
   {$IF defined(ALMacOS)}
-  Macapi.CoreFoundation,
   Macapi.Helpers,
-  Macapi.ObjectiveC,
-  Macapi.Security,
   {$ENDIF}
   Alcinoe.FileUtils,
   Alcinoe.StringUtils,
+  Alcinoe.fmx.Common,
   Alcinoe.Common;
 
 {************************************}
@@ -282,100 +275,6 @@ begin
 end;
 {$ENDIF}
 
-{**********************}
-{$IF defined(ALAppleOS)}
-function TALUserPreferences.KeychainReadBytes(const AKey: string; out ABytes: TBytes): Boolean;
-begin
-  Result := True;
-  var LQuery := TNSMutableDictionary.Create;
-  try
-    {$IF defined(ALMacOS)}
-    {$IFNDEF ALCompilerVersionSupported130}
-      {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4404 was corrected and adjust the IFDEF'}
-    {$ENDIF}
-    LQuery.setObject(NSStringToID(kSecClassGenericPassword), NSStringToID(kSecClass));
-    LQuery.setObject(StringToID('alcinoe.userpreferences'), NSStringToID(kSecAttrService));
-    LQuery.setObject(StringToID(AKey), NSStringToID(kSecAttrAccount));
-    LQuery.setObject(kCFBooleanTrue, NSStringToID(kSecReturnData));
-    LQuery.setObject(NSStringToID(kSecMatchLimitOne), NSStringToID(kSecMatchLimit));
-    {$ELSE}
-    LQuery.setObject(kSecClassGenericPassword, kSecClass);
-    LQuery.setObject(StringToID('alcinoe.userpreferences'), kSecAttrService);
-    LQuery.setObject(StringToID(AKey), kSecAttrAccount);
-    LQuery.setObject(kCFBooleanTrue, kSecReturnData);
-    LQuery.setObject(kSecMatchLimitOne, kSecMatchLimit);
-    {$ENDIF}
-    var CFRef: CFTypeRef := nil;
-    var Status := SecItemCopyMatching(NSObjectToID(LQuery), @CFRef);
-    if (Status = errSecSuccess) and
-       (CFRef <> nil) and
-       (CFGetTypeID(CFRef) = CFDataGetTypeID) then begin
-      var Data := TNSData.Wrap(CFRef);
-      SetLength(ABytes, Data.length);
-      if Data.length > 0 then Move(Data.bytes^, ABytes[0], Data.length);
-    end
-    else
-      Result := False;
-  finally
-    LQuery.release;
-  end;
-end;
-{$ENDIF}
-
-{**********************}
-{$IF defined(ALAppleOS)}
-procedure TALUserPreferences.KeychainWriteBytes(const AKey: string; const ABytes: TBytes);
-begin
-  var LDataObj: NSData;
-  if Length(ABytes) = 0 then LDataObj := TNSData.Wrap(TNSData.OCClass.data) // empty NSData
-  else LDataObj := TNSData.Wrap(TNSData.OCClass.dataWithBytes(@ABytes[0], Length(ABytes)));
-  // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
-  // No release required for LDataObj because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
-  var LQuery := TNSMutableDictionary.Create;
-  Try
-    {$IF defined(ALMacOS)}
-    {$IFNDEF ALCompilerVersionSupported130}
-      {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4404 was corrected and adjust the IFDEF'}
-    {$ENDIF}
-    LQuery.setObject(NSStringToID(kSecClassGenericPassword), NSStringToID(kSecClass));
-    LQuery.setObject(StringToID('alcinoe.userpreferences'), NSStringToID(kSecAttrService));
-    LQuery.setObject(StringToID(AKey), NSStringToID(kSecAttrAccount));
-    {$ELSE}
-    LQuery.setObject(kSecClassGenericPassword, kSecClass);
-    LQuery.setObject(StringToID('alcinoe.userpreferences'), kSecAttrService);
-    LQuery.setObject(StringToID(AKey), kSecAttrAccount);
-    {$ENDIF}
-
-    var LAttrs := TNSMutableDictionary.Create;
-    Try
-      {$IF defined(ALMacOS)}
-      {$IFNDEF ALCompilerVersionSupported130}
-        {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4404 was corrected and adjust the IFDEF'}
-      {$ENDIF}
-      LAttrs.setObject(NSObjectToID(LDataObj), NSStringToID(kSecValueData));
-      LAttrs.setObject(NSStringToID(kSecAttrAccessibleAfterFirstUnlock), NSStringToID(kSecAttrAccessible));
-      {$ELSE}
-      LAttrs.setObject(NSObjectToID(LDataObj), kSecValueData);
-      LAttrs.setObject(kSecAttrAccessibleAfterFirstUnlock, kSecAttrAccessible);
-      {$ENDIF}
-
-      var LStatus := SecItemUpdate(NSObjectToID(LQuery), NSObjectToID(LAttrs));
-      if LStatus = errSecItemNotFound then begin
-        LAttrs.addEntriesFromDictionary(LQuery);
-        LStatus := SecItemAdd(NSObjectToID(LAttrs), nil);
-      end;
-
-      if LStatus <> errSecSuccess then
-        raise Exception.CreateFmt('Keychain save failed (status %d)', [LStatus]);
-    finally
-      LAttrs.release;
-    end;
-  finally
-    LQuery.release;
-  end;
-end;
-{$ENDIF}
-
 {****************************************************************************************************************************}
 function TALUserPreferences.getBoolean(Const AKey: String; const ADefValue: Boolean; const ASecure: Boolean = False): Boolean;
 begin
@@ -394,7 +293,7 @@ begin
   {$ELSEIF defined(ALAppleOS)}
   if ASecure then begin
     var LBytes: TBytes;
-    if KeychainReadBytes(AKey, LBytes) and (Length(LBytes) = 1) then Result := LBytes[0] <> 0
+    if ALKeychainReadBytes('alcinoe.userpreferences', AKey, LBytes) and (Length(LBytes) = 1) then Result := LBytes[0] <> 0
     else Result := ADefValue;
   end
   else begin
@@ -440,7 +339,7 @@ begin
     var LBytes: TBytes;
     SetLength(LBytes, 1);
     LBytes[0] := Byte(AValue);
-    KeychainWriteBytes(AKey, LBytes);
+    ALKeychainWriteBytes('alcinoe.userpreferences', AKey, LBytes);
   end
   else
     FUserDefaults.setBool(AValue, StrToNSStr(AKey));
@@ -467,7 +366,7 @@ begin
   {$ELSEIF defined(ALAppleOS)}
   if ASecure then begin
     var LBytes: TBytes;
-    if KeychainReadBytes(AKey, LBytes) and (Length(LBytes) = SizeOf(Int32)) then Result := PInteger(@LBytes[0])^
+    if ALKeychainReadBytes('alcinoe.userpreferences', AKey, LBytes) and (Length(LBytes) = SizeOf(Int32)) then Result := PInteger(@LBytes[0])^
     else Result := ADefValue;
   end
   else begin
@@ -513,7 +412,7 @@ begin
     var LBytes: TBytes;
     SetLength(LBytes, SizeOf(Int32));
     PInteger(@LBytes[0])^ := AValue;
-    KeychainWriteBytes(AKey, LBytes);
+    ALKeychainWriteBytes('alcinoe.userpreferences', AKey, LBytes);
   end
   else
     FUserDefaults.setInteger(AValue, StrToNSStr(AKey));
@@ -540,7 +439,7 @@ begin
   {$ELSEIF defined(ALAppleOS)}
   if ASecure then begin
     var LBytes: TBytes;
-    if KeychainReadBytes(AKey, LBytes) and (Length(LBytes) = SizeOf(Int64)) then Result := PInt64(@LBytes[0])^
+    if ALKeychainReadBytes('alcinoe.userpreferences', AKey, LBytes) and (Length(LBytes) = SizeOf(Int64)) then Result := PInt64(@LBytes[0])^
     else Result := ADefValue;
   end
   else begin
@@ -586,7 +485,7 @@ begin
     var LBytes: TBytes;
     SetLength(LBytes, SizeOf(Int64));
     PInt64(@LBytes[0])^ := AValue;
-    KeychainWriteBytes(AKey, LBytes);
+    ALKeychainWriteBytes('alcinoe.userpreferences', AKey, LBytes);
   end
   else
     FUserDefaults.setInteger(AValue, StrToNSStr(AKey));
@@ -645,7 +544,7 @@ begin
   {$ELSEIF defined(ALAppleOS)}
   if ASecure then begin
     var LBytes: TBytes;
-    if KeychainReadBytes(AKey, LBytes) then Result := TEncoding.UTF8.GetString(LBytes)
+    if ALKeychainReadBytes('alcinoe.userpreferences', AKey, LBytes) then Result := TEncoding.UTF8.GetString(LBytes)
     else Result := ADefValue;
   end
   else begin
@@ -681,7 +580,7 @@ begin
   LEditor.commit;
   {$ELSEIF defined(ALAppleOS)}
   if ASecure then
-    KeychainWriteBytes(AKey, TEncoding.UTF8.GetBytes(AValue))
+    ALKeychainWriteBytes('alcinoe.userpreferences', AKey, TEncoding.UTF8.GetBytes(AValue))
   else
     FUserDefaults.setObject(StringToID(AValue), StrToNSStr(AKey));
   {$ELSEIF defined(MSWindows) and (not defined(ALDPK))}

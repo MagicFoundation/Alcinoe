@@ -150,6 +150,8 @@ type
   private
     function GetCapacity: Integer; inline;
     procedure SetCapacity(const AValue: Integer);
+    function GetChars(Index: Integer): AnsiChar;
+    procedure SetChars(Index: Integer; Value: AnsiChar);
     function GetLength: Integer; inline;
     procedure SetLength(const AValue: Integer);
     function GetMaxCapacity: Integer; inline;
@@ -176,6 +178,11 @@ type
     function ToString: AnsiString; reintroduce; overload;
     function ToString(const AUpdateCapacity: Boolean): AnsiString; reintroduce; overload;
     property Capacity: Integer read GetCapacity write SetCapacity;
+    /// <summary>
+    ///   Zero-based character access.
+    ///   Valid indices are 0..Length-1 (Chars[0] is the first character).
+    /// </summary>
+    property Chars[index: Integer]: AnsiChar read GetChars write SetChars; default;
     property Length: Integer read GetLength write SetLength;
     property MaxCapacity: Integer read GetMaxCapacity;
   end;
@@ -187,6 +194,8 @@ type
   private
     function GetCapacity: Integer; inline;
     procedure SetCapacity(const AValue: Integer);
+    function GetChars(Index: Integer): Char;
+    procedure SetChars(Index: Integer; Value: Char);
     function GetLength: Integer; inline;
     procedure SetLength(const AValue: Integer);
     function GetMaxCapacity: Integer; inline;
@@ -213,6 +222,11 @@ type
     function ToString: string; overload; override;
     function ToString(const AUpdateCapacity: Boolean): string; reintroduce; overload;
     property Capacity: Integer read GetCapacity write SetCapacity;
+    /// <summary>
+    ///   Zero-based character access.
+    ///   Valid indices are 0..Length-1 (Chars[0] is the first character).
+    /// </summary>
+    property Chars[index: Integer]: Char read GetChars write SetChars; default;
     property Length: Integer read GetLength write SetLength;
     property MaxCapacity: Integer read GetMaxCapacity;
   end;
@@ -599,6 +613,8 @@ function  ALPercentDecode(const AStr: AnsiString; const APlusAsSpaces: Boolean =
 function  ALPercentDecode(const AStr: String; const APlusAsSpaces: Boolean = False): String; overload;
 procedure ALPercentDecodeInPlace(var AStr: AnsiString; const APlusAsSpaces: Boolean = False); overload;
 procedure ALPercentDecodeInPlace(var AStr: String; const APlusAsSpaces: Boolean = False); overload;
+function  ALExtractHeaderParamValue(const AHeaderValue: AnsiString; const AParamName: AnsiString): AnsiString; overload;
+function  ALExtractHeaderParamValue(const AHeaderValue: String; const AParamName: String): String; overload;
 procedure ALExtractHeaderFields(
             const ASeparators: TSysCharSet;
             const AWhiteSpace: TSysCharSet;
@@ -1358,6 +1374,34 @@ begin
   System.SetLength(FData, AValue);
 end;
 
+{*********************}
+{$ZEROBASEDSTRINGS OFF}
+function TALStringBuilderA.GetChars(Index: Integer): AnsiChar;
+begin
+  if Index < 0 then
+    raise ERangeError.CreateResFmt(@SParamIsNegative, ['Index']);
+  if Cardinal(Index) >= Cardinal(Length) then
+    RangeIndexError(Index, Length - 1, Self);
+  Result := FData[Index+1];
+end;
+{$IF defined(ALZeroBasedStringsON)}
+  {$ZEROBASEDSTRINGS ON}
+{$ENDIF}
+
+{*********************}
+{$ZEROBASEDSTRINGS OFF}
+procedure TALStringBuilderA.SetChars(Index: Integer; Value: AnsiChar);
+begin
+  if Index < 0 then
+    raise ERangeError.CreateResFmt(@SParamIsNegative, ['Index']);
+  if Cardinal(Index) >= Cardinal(Length) then
+    RangeIndexError(Index, Length - 1, Self);
+  FData[Index+1] := Value;
+end;
+{$IF defined(ALZeroBasedStringsON)}
+  {$ZEROBASEDSTRINGS ON}
+{$ENDIF}
+
 {********************************************}
 function TALStringBuilderA.GetLength: Integer;
 begin
@@ -1585,6 +1629,34 @@ begin
     raise ERangeError.CreateResFmt(@SListCapacityError, [AValue]);
   System.SetLength(FData, AValue);
 end;
+
+{*********************}
+{$ZEROBASEDSTRINGS OFF}
+function TALStringBuilderW.GetChars(Index: Integer): Char;
+begin
+  if Index < 0 then
+    raise ERangeError.CreateResFmt(@SParamIsNegative, ['Index']);
+  if Cardinal(Index) >= Cardinal(Length) then
+    RangeIndexError(Index, Length - 1, Self);
+  Result := FData[Index+1];
+end;
+{$IF defined(ALZeroBasedStringsON)}
+  {$ZEROBASEDSTRINGS ON}
+{$ENDIF}
+
+{*********************}
+{$ZEROBASEDSTRINGS OFF}
+procedure TALStringBuilderW.SetChars(Index: Integer; Value: Char);
+begin
+  if Index < 0 then
+    raise ERangeError.CreateResFmt(@SParamIsNegative, ['Index']);
+  if Cardinal(Index) >= Cardinal(Length) then
+    RangeIndexError(Index, Length - 1, Self);
+  FData[Index+1] := Value;
+end;
+{$IF defined(ALZeroBasedStringsON)}
+  {$ZEROBASEDSTRINGS ON}
+{$ENDIF}
 
 {********************************************}
 function TALStringBuilderW.GetLength: Integer;
@@ -10265,6 +10337,60 @@ function ALPercentDecode(const AStr: String; const APlusAsSpaces: Boolean = Fals
 begin
   result := AStr;
   ALPercentDecodeInPlace(result, APlusAsSpaces);
+end;
+
+{***********************************************************************************************************}
+function ALExtractHeaderParamValue(const AHeaderValue: AnsiString; const AParamName: AnsiString): AnsiString;
+begin
+
+  //
+  // Content-Type: text/plain; charset=ISO-8859-1
+  // Content-Type: text/plain; charset="UTF-8"
+  //
+
+  var LLst := TALNVStringListA.Create;
+  try
+    LLst.LineBreak := ';';
+    LLst.Text := AHeaderValue;
+    for var I := 0 to LLst.Count - 1 do
+      If ALSameTextA(ALTrim(LLst.Names[i]), AParamName) then begin
+        Result := ALTrim(LLst.ValueFromIndex[I]);
+        if (Length(Result) >= 2) and (Result[low(Result)] = '"') and (Result[high(Result)] = '"') then
+          Result := ALCopyStr(Result, 2, Length(Result) - 2);
+        Exit;
+      end;
+    Result := '';
+  finally
+    ALFreeAndNil(LLst);
+  end;
+
+end;
+
+{************************************************************************************************}
+function  ALExtractHeaderParamValue(const AHeaderValue: String; const AParamName: String): String;
+begin
+
+  //
+  // Content-Type: text/plain; charset=ISO-8859-1
+  // Content-Type: text/plain; charset="UTF-8"
+  //
+
+  var LLst := TALNVStringListW.Create;
+  try
+    LLst.LineBreak := ';';
+    LLst.Text := AHeaderValue;
+    for var I := 0 to LLst.Count - 1 do
+      If ALSameTextW(ALTrim(LLst.Names[i]), AParamName) then begin
+        Result := ALTrim(LLst.ValueFromIndex[I]);
+        if (Length(Result) >= 2) and (Result[low(Result)] = '"') and (Result[high(Result)] = '"') then
+          Result := ALCopyStr(Result, 2, Length(Result) - 2);
+        Exit;
+      end;
+    Result := '';
+  finally
+    ALFreeAndNil(LLst);
+  end;
+
 end;
 
 {***********}

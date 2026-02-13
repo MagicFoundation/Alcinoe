@@ -523,7 +523,7 @@ end;
 {*****************************************************}
 function TALMailHeadersA.GetContentCharset: AnsiString;
 begin
-  Result := ALExtractHttpCharsetFromContentType(ContentType);
+  Result := ALExtractHeaderParamValue(ContentType, AnsiString('charset'));
 end;
 
 {******************************}

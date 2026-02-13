@@ -533,8 +533,6 @@ function ALRfc822DateStrToUtcDateTime(const S: AnsiString): TDateTime; overload;
 function ALRfc822DateStrToUtcDateTime(const S: String): TDateTime; overload;
 function ALGetHttpReasonPhraseA(Const AStatusCode: Integer): Ansistring;
 function ALGetHttpReasonPhraseW(Const AStatusCode: Integer): String;
-function ALExtractHttpCharsetFromContentType(const AContentType: AnsiString): AnsiString; overload;
-function ALExtractHttpCharsetFromContentType(const AContentType: String): String; overload;
 procedure ALDecompressHttpResponseBody(const AContentEncoding: AnsiString; var ABodyStream: TMemoryStream); overload;
 procedure ALDecompressHttpResponseBody(const AContentEncoding: String; var ABodyStream: TMemoryStream); overload;
 
@@ -921,7 +919,7 @@ end;
 {************************************************************}
 function TALHttpRequestHeadersA.GetContentCharset: AnsiString;
 begin
-  Result := ALExtractHttpCharsetFromContentType(ContentType);
+  Result := ALExtractHeaderParamValue(ContentType, AnsiString('charset'));
 end;
 
 {*********************************************************************************}
@@ -1049,7 +1047,7 @@ end;
 {********************************************************}
 function TALHttpRequestHeadersW.GetContentCharset: String;
 begin
-  Result := ALExtractHttpCharsetFromContentType(ContentType);
+  Result := ALExtractHeaderParamValue(ContentType, String('charset'));
 end;
 
 {**************************************************************************************}
@@ -1159,7 +1157,7 @@ end;
 {*************************************************************}
 function TALHttpResponseHeadersA.GetContentCharset: AnsiString;
 begin
-  Result := ALExtractHttpCharsetFromContentType(ContentType);
+  Result := ALExtractHeaderParamValue(ContentType, AnsiString('charset'));
 end;
 
 {**********************************************************************************}
@@ -1269,7 +1267,7 @@ end;
 {*********************************************************}
 function TALHttpResponseHeadersW.GetContentCharset: String;
 begin
-  Result := ALExtractHttpCharsetFromContentType(ContentType);
+  Result := ALExtractHeaderParamValue(ContentType, String('charset'));
 end;
 
 {***********}
@@ -1784,60 +1782,6 @@ begin
   else
     Result := '';
   end
-end;
-
-{***************************************************************************************}
-function ALExtractHttpCharsetFromContentType(const AContentType: AnsiString): AnsiString;
-begin
-
-  //
-  // Content-Type: text/plain; charset=ISO-8859-1
-  // Content-Type: text/plain; charset="UTF-8"
-  //
-
-  var LLst := TALNVStringListA.Create;
-  try
-    LLst.LineBreak := ';';
-    LLst.Text := AContentType;
-    for var I := 0 to LLst.Count - 1 do
-      If ALSameTextA(ALTrim(LLst.Names[i]), 'charset') then begin
-        Result := ALTrim(LLst.ValueFromIndex[I]);
-        if (Length(Result) >= 2) and (Result[low(Result)] = '"') and (Result[high(Result)] = '"') then
-          Result := ALCopyStr(Result, 2, Length(Result) - 2);
-        Exit;
-      end;
-    Result := '';
-  finally
-    ALFreeAndNil(LLst);
-  end;
-
-end;
-
-{*******************************************************************************}
-function ALExtractHttpCharsetFromContentType(const AContentType: String): String;
-begin
-
-  //
-  // Content-Type: text/plain; charset=ISO-8859-1
-  // Content-Type: text/plain; charset="UTF-8"
-  //
-
-  var LLst := TALNVStringListW.Create;
-  try
-    LLst.LineBreak := ';';
-    LLst.Text := AContentType;
-    for var I := 0 to LLst.Count - 1 do
-      If ALSameTextW(ALTrim(LLst.Names[i]), 'charset') then begin
-        Result := ALTrim(LLst.ValueFromIndex[I]);
-        if (Length(Result) >= 2) and (Result[low(Result)] = '"') and (Result[high(Result)] = '"') then
-          Result := ALCopyStr(Result, 2, Length(Result) - 2);
-        Exit;
-      end;
-    Result := '';
-  finally
-    ALFreeAndNil(LLst);
-  end;
-
 end;
 
 {*********************************************************************************************************}

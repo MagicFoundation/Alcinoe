@@ -370,6 +370,10 @@ begin
   AlMimeContentTypeByExtA.Add('.hal','application/vnd.hal+xml');
   AlMimeContentTypeByExtA.Add('.hbci','application/vnd.hbci');
   AlMimeContentTypeByExtA.Add('.hdf','application/x-hdf');
+  AlMimeContentTypeByExtA.Add('.heic','image/heic');
+  AlMimeContentTypeByExtA.Add('.heics','image/heic-sequence');
+  AlMimeContentTypeByExtA.Add('.heif','image/heif');
+  AlMimeContentTypeByExtA.Add('.heifs','image/heif-sequence');
   AlMimeContentTypeByExtA.Add('.hh','text/x-c');
   AlMimeContentTypeByExtA.Add('.hlp','application/winhlp');
   AlMimeContentTypeByExtA.Add('.hpgl','application/vnd.hp-hpgl');
@@ -810,6 +814,8 @@ begin
   AlMimeContentTypeByExtA.Add('.spq','application/scvp-vp-request');
   AlMimeContentTypeByExtA.Add('.spx','audio/ogg');
   AlMimeContentTypeByExtA.Add('.sql','application/x-sql');
+  AlMimeContentTypeByExtA.Add('.sqlite','application/vnd.sqlite3');
+  AlMimeContentTypeByExtA.Add('.sqlite3','application/vnd.sqlite3');
   AlMimeContentTypeByExtA.Add('.src','application/x-wais-source');
   AlMimeContentTypeByExtA.Add('.srt','application/x-subrip');
   AlMimeContentTypeByExtA.Add('.sru','application/sru+xml');
@@ -1546,6 +1552,8 @@ begin
   AlExtbyMimeContentTypeA.Add('application/vnd.solent.sdkm+xml','.sdkm');
   AlExtbyMimeContentTypeA.Add('application/vnd.spotfire.dxp','.dxp');
   AlExtbyMimeContentTypeA.Add('application/vnd.spotfire.sfs','.sfs');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sqlite3','.sqlite');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sqlite3','.sqlite3');
   AlExtbyMimeContentTypeA.Add('application/vnd.stardivision.calc','.sdc');
   AlExtbyMimeContentTypeA.Add('application/vnd.stardivision.draw','.sda');
   AlExtbyMimeContentTypeA.Add('application/vnd.stardivision.impress','.sdd');
@@ -1850,6 +1858,10 @@ begin
   AlExtbyMimeContentTypeA.Add('image/cgm','.cgm');
   AlExtbyMimeContentTypeA.Add('image/g3fax','.g3');
   AlExtbyMimeContentTypeA.Add('image/gif','.gif');
+  AlExtbyMimeContentTypeA.Add('image/heic','.heic');
+  AlExtbyMimeContentTypeA.Add('image/heic-sequence','.heics');
+  AlExtbyMimeContentTypeA.Add('image/heif','.heif');
+  AlExtbyMimeContentTypeA.Add('image/heif-sequence','.heifs');
   AlExtbyMimeContentTypeA.Add('image/ief','.ief');
   //AlExtbyMimeContentTypeA.Add('image/jpeg','.jpe');
   //AlExtbyMimeContentTypeA.Add('image/jpeg','.jpeg');

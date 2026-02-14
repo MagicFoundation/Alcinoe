@@ -1552,7 +1552,7 @@ begin
   AlExtbyMimeContentTypeA.Add('application/vnd.solent.sdkm+xml','.sdkm');
   AlExtbyMimeContentTypeA.Add('application/vnd.spotfire.dxp','.dxp');
   AlExtbyMimeContentTypeA.Add('application/vnd.spotfire.sfs','.sfs');
-  AlExtbyMimeContentTypeA.Add('application/vnd.sqlite3','.sqlite');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.sqlite3','.sqlite');
   AlExtbyMimeContentTypeA.Add('application/vnd.sqlite3','.sqlite3');
   AlExtbyMimeContentTypeA.Add('application/vnd.stardivision.calc','.sdc');
   AlExtbyMimeContentTypeA.Add('application/vnd.stardivision.draw','.sda');

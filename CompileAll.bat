@@ -664,9 +664,9 @@ REM ---------------------
 REM Create Github Release
 REM ---------------------
 
-if "%Alcinoe_Mac_Connection_Profile_Name%"=="" GOTO CLEANUP_TEMP_FILES
-
 :CREATE_GITHUB_RELEASE
+
+if "%Alcinoe_Mac_Connection_Profile_Name%"=="" GOTO CLEANUP_TEMP_FILES
 
 echo --------------
 echo Github Release

@@ -1622,11 +1622,11 @@ begin
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3206 has been corrected and adjust the IFDEF'}
   {$ENDIF}
   TThread.ForceQueue(nil,
-  procedure
-  begin
-    ALFreeAndNil(LOnFrameAvailableListener);
-    ALFreeAndNil(LPlayerListener);
-  end, 5000);
+    procedure
+    begin
+      ALFreeAndNil(LOnFrameAvailableListener);
+      ALFreeAndNil(LPlayerListener);
+    end, 5000);
   //--
   fHandler := nil;
   //--
@@ -2235,12 +2235,12 @@ begin
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3206 has been corrected and adjust the IFDEF'}
   {$ENDIF}
   TThread.ForceQueue(nil,
-  procedure
-  begin
-    AlFreeAndNil(LDisplayLinkListener);
-    AlFreeAndNil(LNotificationsDelegate);
-    AlFreeAndNil(LKVODelegate);
-  end, 5000);
+    procedure
+    begin
+      AlFreeAndNil(LDisplayLinkListener);
+      AlFreeAndNil(LNotificationsDelegate);
+      AlFreeAndNil(LKVODelegate);
+    end, 5000);
   //--
   inherited;
 end;

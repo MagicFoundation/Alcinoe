@@ -930,7 +930,7 @@ begin
   Result := ALExtractHeaderParamValue(ContentType, AnsiString('charset'));
 end;
 
-{************************************************************}
+{*************************************************************}
 function TALHttpRequestHeadersA.GetContentBoundary: AnsiString;
 begin
   Result := ALExtractHeaderParamValue(ContentType, AnsiString('boundary'));
@@ -1064,7 +1064,7 @@ begin
   Result := ALExtractHeaderParamValue(ContentType, String('charset'));
 end;
 
-{********************************************************}
+{*********************************************************}
 function TALHttpRequestHeadersW.GetContentBoundary: String;
 begin
   Result := ALExtractHeaderParamValue(ContentType, String('boundary'));
@@ -1180,7 +1180,7 @@ begin
   Result := ALExtractHeaderParamValue(ContentType, AnsiString('charset'));
 end;
 
-{*************************************************************}
+{**************************************************************}
 function TALHttpResponseHeadersA.GetContentBoundary: AnsiString;
 begin
   Result := ALExtractHeaderParamValue(ContentType, AnsiString('boundary'));
@@ -1296,7 +1296,7 @@ begin
   Result := ALExtractHeaderParamValue(ContentType, String('charset'));
 end;
 
-{*********************************************************}
+{**********************************************************}
 function TALHttpResponseHeadersW.GetContentBoundary: String;
 begin
   Result := ALExtractHeaderParamValue(ContentType, String('boundary'));

@@ -34,6 +34,7 @@ type
     Button16: TButton;
     Button14: TButton;
     Button17: TButton;
+    Button2: TButton;
     procedure ALButton10Click(Sender: TObject);
     procedure ALButton11Click(Sender: TObject);
     procedure ALButton12Click(Sender: TObject);
@@ -49,6 +50,7 @@ type
     procedure Button16Click(Sender: TObject);
     procedure Button17Click(Sender: TObject);
     procedure Button14Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
   public
   end;
@@ -585,6 +587,12 @@ begin
   finally
     LDictionary.free;
   end;
+end;
+
+{*********************************************}
+procedure TForm1.Button2Click(Sender: TObject);
+begin
+  ALMemoCryptedData.Lines.Text := String(ALCalcHMACSHA2(AnsiString(ALMemoDecryptedData.Lines.Text), AnsiString(EditKey.Text)));
 end;
 
 {***************************}

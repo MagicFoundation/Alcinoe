@@ -27,9 +27,9 @@ object Form1: TForm1
   object Label2: TLabel
     Left = 24
     Top = 364
-    Width = 104
+    Width = 28
     Height = 13
-    Caption = 'Unencrypted Data'
+    Caption = 'Data'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -40,9 +40,9 @@ object Form1: TForm1
   object Label3: TLabel
     Left = 384
     Top = 364
-    Width = 187
+    Width = 37
     Height = 13
-    Caption = 'Crypted Data (BASE64 Encoded)'
+    Caption = 'Result'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -65,14 +65,12 @@ object Form1: TForm1
   end
   object PaintBox1: TPaintBox
     Left = 0
-    Top = 288
+    Top = 280
     Width = 768
-    Height = 508
+    Height = 516
     Align = alBottom
     Anchors = [akLeft, akTop, akRight, akBottom]
     Visible = False
-    ExplicitWidth = 1034
-    ExplicitHeight = 565
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -95,8 +93,6 @@ object Form1: TForm1
       item
         Width = 100
       end>
-    ExplicitTop = 771
-    ExplicitWidth = 1034
   end
   object EditKey: TEdit
     Left = 24
@@ -116,7 +112,7 @@ object Form1: TForm1
     Font.Name = 'Courier New'
     Font.Style = []
     ParentFont = False
-    ScrollBars = ssBoth
+    ScrollBars = ssVertical
     TabOrder = 2
   end
   object ALMemoCryptedData: TMemo
@@ -130,7 +126,7 @@ object Form1: TForm1
     Font.Name = 'Courier New'
     Font.Style = []
     ParentFont = False
-    ScrollBars = ssBoth
+    ScrollBars = ssVertical
     TabOrder = 3
   end
   object ALButton10: TButton
@@ -153,7 +149,7 @@ object Form1: TForm1
   end
   object ALButton12: TButton
     Left = 415
-    Top = 16
+    Top = 47
     Width = 218
     Height = 25
     Caption = 'Generate HMAC (SHA1)'
@@ -162,7 +158,7 @@ object Form1: TForm1
   end
   object ALButton13: TButton
     Left = 415
-    Top = 47
+    Top = 16
     Width = 218
     Height = 25
     Caption = 'Generate HMAC (MD5)'
@@ -198,7 +194,7 @@ object Form1: TForm1
     Font.Name = 'Courier New'
     Font.Style = []
     ParentFont = False
-    ScrollBars = ssBoth
+    ScrollBars = ssVertical
     TabOrder = 10
   end
   object Button4: TButton
@@ -281,5 +277,14 @@ object Form1: TForm1
     Caption = 'Bench ALSHA2 256 (Unicode)'
     TabOrder = 19
     OnClick = Button17Click
+  end
+  object Button2: TButton
+    Left = 415
+    Top = 78
+    Width = 218
+    Height = 25
+    Caption = 'Generate HMAC (SHA2 - 256)'
+    TabOrder = 20
+    OnClick = Button2Click
   end
 end

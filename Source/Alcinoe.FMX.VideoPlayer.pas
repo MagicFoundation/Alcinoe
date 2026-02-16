@@ -1613,8 +1613,20 @@ begin
   {$ENDIF}
   alFreeandNilDrawable(fDrawable);
   //--
-  alfreeAndNil(fOnFrameAvailableListener);
-  alFreeAndNil(FPlayerListener);
+  // https://github.com/MagicFoundation/Alcinoe/issues/492
+  var LOnFrameAvailableListener := FOnFrameAvailableListener;
+  var LPlayerListener := FPlayerListener;
+  FOnFrameAvailableListener := nil;
+  FPlayerListener := nil;
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3206 has been corrected and adjust the IFDEF'}
+  {$ENDIF}
+  TThread.ForceQueue(nil,
+  procedure
+  begin
+    ALFreeAndNil(LOnFrameAvailableListener);
+    ALFreeAndNil(LPlayerListener);
+  end, 5000);
   //--
   fHandler := nil;
   //--
@@ -2163,12 +2175,9 @@ begin
   // invalidate is thread safe meaning that it can be called from a thread separate to the one in which the display link is running.
   fDisplayLink.invalidate;
   fDisplayLink.release;
-  AlFreeAndNil(fDisplayLinkListener);
   //--
-  if fNotificationsDelegate <> nil then begin
+  if fNotificationsDelegate <> nil then
     TNSNotificationCenter.OCClass.defaultCenter.removeObserver(FNotificationsDelegate.GetObjectID);
-    AlFreeAndNil(FNotificationsDelegate);
-  end;
   //--
   if FPlayer <> nil then begin
     FPlayer.Pause;
@@ -2184,8 +2193,6 @@ begin
     FPlayerItem.release;
     FPlayerItem := nil;
   end;
-  //--
-  AlFreeAndNil(FKVODelegate);
   //--
   {$IF defined(ALSkiaCanvas)}
   if fGrBackEndTexture <> 0 then
@@ -2216,6 +2223,24 @@ begin
     FPlayerItemVideoOutput.release;
     FPlayerItemVideoOutput := nil;
   end;
+  //--
+  // https://github.com/MagicFoundation/Alcinoe/issues/492
+  var LDisplayLinkListener := FDisplayLinkListener;
+  var LNotificationsDelegate := FNotificationsDelegate;
+  var LKVODelegate := FKVODelegate;
+  FDisplayLinkListener := nil;
+  FNotificationsDelegate := nil;
+  FKVODelegate := nil;
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3206 has been corrected and adjust the IFDEF'}
+  {$ENDIF}
+  TThread.ForceQueue(nil,
+  procedure
+  begin
+    AlFreeAndNil(LDisplayLinkListener);
+    AlFreeAndNil(LNotificationsDelegate);
+    AlFreeAndNil(LKVODelegate);
+  end, 5000);
   //--
   inherited;
 end;

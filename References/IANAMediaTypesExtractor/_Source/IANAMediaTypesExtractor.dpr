@@ -52,7 +52,8 @@ begin
                   else
                     LAlMimeContentTypeByExtA.AddObject('  AlMimeContentTypeByExtA.Add(''.' + LExtLst[j] + ''',''' + LLineLst[0] + ''');', pointer(integer(0)));
                   var LStr := LLineLst[0] + '=' + LExtLst[j];
-                       If (Lstr = 'application/mathematica=ma') or
+                       If (Lstr = 'application/vnd.sqlite3=sqlite') or
+                          (Lstr = 'application/mathematica=ma') or
                           (Lstr = 'application/mathematica=mb') or
                           (Lstr = 'application/mp21=m21') or
                           (Lstr = 'application/msword=dot') or

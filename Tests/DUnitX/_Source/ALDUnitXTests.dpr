@@ -169,7 +169,8 @@ uses
   ALDUnitXTestHttp in 'ALDUnitXTestHttp.pas',
   ALDUnitXTestXmlDoc in 'ALDUnitXTestXmlDoc.pas',
   ALDUnitXTestNet in 'ALDUnitXTestNet.pas',
-  ALDUnitXTestUrl in 'ALDUnitXTestUrl.pas';
+  ALDUnitXTestUrl in 'ALDUnitXTestUrl.pas',
+  ALDUnitXTestMimeMultipart in 'ALDUnitXTestMimeMultipart.pas';
 
 {$IFDEF MSWINDOWS}
   {$IFNDEF TESTINSIGHT}

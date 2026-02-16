@@ -1396,13 +1396,13 @@ begin
   //if event <> nil then
   //  ALLog(
   //    Classname + '.onEditorAction',
-  //    'control.name: ' + FEditText.Control.Name + ' | ' +
+  //    'control.name: ' + FEditView.Control.Name + ' | ' +
   //    'actionId: ' + inttostr(actionId) + ' | ' +
   //    'event: ' + JstringToString(event.toString))
   //else
   //  ALLog(
   //    Classname + '.onEditorAction',
-  //    'control.name: ' + FEditText.Control.Name + ' | ' +
+  //    'control.name: ' + FEditView.Control.Name + ' | ' +
   //    'actionId: ' + inttostr(actionId));
   {$ENDIF}
   //IME_ACTION_DONE: the action key performs a "done" operation, typically meaning there is nothing more to input and the IME will be closed.
@@ -1414,8 +1414,7 @@ begin
   //IME_ACTION_SEND: the action key performs a "send" operation, delivering the text to its target. This is typically used when composing a message in IM or SMS where sending is immediate.
   //IME_ACTION_UNSPECIFIED: no specific action has been associated with this editor, let the editor come up with its own if it can.
   if (assigned(FEditView.Control.OnReturnKey)) and
-     (((actionId = TJEditorInfo.javaClass.IME_ACTION_UNSPECIFIED) and // IME_ACTION_UNSPECIFIED = the return key
-       (not fIsMultiLineEditText)) or
+     (((actionId = TJEditorInfo.javaClass.IME_ACTION_UNSPECIFIED) and (not fIsMultiLineEditText)) or // IME_ACTION_UNSPECIFIED = the return key
       (actionId = TJEditorInfo.javaClass.IME_ACTION_DONE) or
       (actionId = TJEditorInfo.javaClass.IME_ACTION_GO) or
       (actionId = TJEditorInfo.javaClass.IME_ACTION_NEXT) or
@@ -1426,7 +1425,8 @@ begin
     FEditView.Control.DoReturnKey;
 
   end
-  else begin
+  else if not fIsMultiLineEditText then begin
+
     // When using TYPE_CLASS_NUMBER: pressing Return can make Android switch to
     // the default keyboard during the dismiss animation. To avoid this, set the
     // Return key to IME_ACTION_DONE, handle the action manually (clear focus and
@@ -1435,7 +1435,10 @@ begin
     // change).
     result := True;
     FEditView.ResetFocus;
-  end;
+
+  end
+  else
+    result := False;
 end;
 
 {************************************************************************************************************************************************************************}

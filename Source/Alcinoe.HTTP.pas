@@ -154,6 +154,7 @@ type
     Function GetRawHeaderText: AnsiString; virtual; abstract;
     procedure SetRawHeaderText(const ARawHeaderText: AnsiString); virtual; abstract;
     function GetContentCharset: AnsiString; virtual;
+    function GetContentBoundary: AnsiString; virtual;
   public
     procedure Clear; virtual; abstract;
     property RawHeaderText: AnsiString read GetRawHeaderText write SetRawHeaderText;
@@ -173,6 +174,7 @@ type
     property ContentRange: AnsiString index 13 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex;  {Content-Range: bytes 2543-4532/7898}
     property ContentType: AnsiString index 14 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Content-Type: text/html; charset=ISO-8859-4}
     property ContentCharset: AnsiString read GetContentCharset;
+    property ContentBoundary: AnsiString read GetContentBoundary;
     property Date: AnsiString index 15 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Date: Tue, 15 Nov 1994 08:12:31 GMT}
     property Expect: AnsiString index 16 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Expect: 100-continue}
     property Expires: AnsiString index 17 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Expires: Thu, 01 Dec 1994 16:00:00 GMT}
@@ -217,6 +219,7 @@ type
     Function GetRawHeaderText: String; virtual; abstract;
     procedure SetRawHeaderText(const ARawHeaderText: String); virtual; abstract;
     function GetContentCharset: String; virtual;
+    function GetContentBoundary: String; virtual;
   public
     procedure Clear; virtual; abstract;
     property RawHeaderText: String read GetRawHeaderText write SetRawHeaderText;
@@ -236,6 +239,7 @@ type
     property ContentRange: String index 13 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex;  {Content-Range: bytes 2543-4532/7898}
     property ContentType: String index 14 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Content-Type: text/html; charset=ISO-8859-4}
     property ContentCharset: String read GetContentCharset;
+    property ContentBoundary: String read GetContentBoundary;
     property Date: String index 15 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Date: Tue, 15 Nov 1994 08:12:31 GMT}
     property Expect: String index 16 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Expect: 100-continue}
     property Expires: String index 17 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Expires: Thu, 01 Dec 1994 16:00:00 GMT}
@@ -280,6 +284,7 @@ type
     procedure SetRawHeaderText(const ARawHeaderText: AnsiString); virtual; abstract;
     Function GetRawHeaderText: AnsiString; virtual; abstract;
     function GetContentCharset: AnsiString; virtual;
+    function GetContentBoundary: AnsiString; virtual;
   public
     procedure Clear; virtual; abstract;
     property AcceptRanges: AnsiString index 0 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Accept-Ranges: bytes}
@@ -295,6 +300,7 @@ type
     property ContentRange: AnsiString index 10 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex;  {Content-Range: bytes 2543-4532/7898}
     property ContentType: AnsiString index 11 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Content-Type: text/html; charset=ISO-8859-4}
     property ContentCharset: AnsiString read GetContentCharset;
+    property ContentBoundary: AnsiString read GetContentBoundary;
     property Date: AnsiString index 12 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Date: Tue, 15 Nov 1994 08:12:31 GMT}
     property ETag: AnsiString index 13 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {ETag: W/"xyzzy"}
     property Expires: AnsiString index 14 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Expires: Thu, 01 Dec 1994 16:00:00 GMT}
@@ -332,6 +338,7 @@ type
     procedure SetRawHeaderText(const ARawHeaderText: String); virtual; abstract;
     Function GetRawHeaderText: String; virtual; abstract;
     function GetContentCharset: String; virtual;
+    function GetContentBoundary: String; virtual;
   public
     procedure Clear; virtual; abstract;
     property AcceptRanges: String index 0 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Accept-Ranges: bytes}
@@ -347,6 +354,7 @@ type
     property ContentRange: String index 10 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex;  {Content-Range: bytes 2543-4532/7898}
     property ContentType: String index 11 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Content-Type: text/html; charset=ISO-8859-4}
     property ContentCharset: String read GetContentCharset;
+    property ContentBoundary: String read GetContentBoundary;
     property Date: String index 12 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Date: Tue, 15 Nov 1994 08:12:31 GMT}
     property ETag: String index 13 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {ETag: W/"xyzzy"}
     property Expires: String index 14 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Expires: Thu, 01 Dec 1994 16:00:00 GMT}
@@ -922,6 +930,12 @@ begin
   Result := ALExtractHeaderParamValue(ContentType, AnsiString('charset'));
 end;
 
+{************************************************************}
+function TALHttpRequestHeadersA.GetContentBoundary: AnsiString;
+begin
+  Result := ALExtractHeaderParamValue(ContentType, AnsiString('boundary'));
+end;
+
 {*********************************************************************************}
 function TALHttpRequestHeadersW.PropertyIndexToName(const AIndex: Integer): String;
 begin
@@ -1050,6 +1064,12 @@ begin
   Result := ALExtractHeaderParamValue(ContentType, String('charset'));
 end;
 
+{********************************************************}
+function TALHttpRequestHeadersW.GetContentBoundary: String;
+begin
+  Result := ALExtractHeaderParamValue(ContentType, String('boundary'));
+end;
+
 {**************************************************************************************}
 function TALHttpResponseHeadersA.PropertyIndexToName(const AIndex: Integer): AnsiString;
 begin
@@ -1160,6 +1180,12 @@ begin
   Result := ALExtractHeaderParamValue(ContentType, AnsiString('charset'));
 end;
 
+{*************************************************************}
+function TALHttpResponseHeadersA.GetContentBoundary: AnsiString;
+begin
+  Result := ALExtractHeaderParamValue(ContentType, AnsiString('boundary'));
+end;
+
 {**********************************************************************************}
 function TALHttpResponseHeadersW.PropertyIndexToName(const AIndex: Integer): String;
 begin
@@ -1268,6 +1294,12 @@ end;
 function TALHttpResponseHeadersW.GetContentCharset: String;
 begin
   Result := ALExtractHeaderParamValue(ContentType, String('charset'));
+end;
+
+{*********************************************************}
+function TALHttpResponseHeadersW.GetContentBoundary: String;
+begin
+  Result := ALExtractHeaderParamValue(ContentType, String('boundary'));
 end;
 
 {***********}

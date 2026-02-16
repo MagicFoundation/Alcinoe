@@ -257,11 +257,11 @@ type
       TPart = Class(TObject)
       private
         FHeaders: TALMimePartHeadersA;
-        FBodyStream: TALStringStreamA;
+        FBodyStream: TStream;
         function GetBodyStream: TStream;
         function GetBodyString: AnsiString;
       public
-        constructor Create(const ARawHeaderText: AnsiString; Const ABodyString: AnsiString); virtual;
+        constructor Create(const ARawHeaderText: AnsiString; Const ABodyStreamPtr: Pointer; ABodyStreamSize: NativeInt); virtual;
         destructor Destroy; override;
         property Headers: TALMimePartHeadersA read FHeaders;
         property BodyStream: TStream read GetBodyStream;
@@ -270,6 +270,17 @@ type
   private
     FParts: TObjectList<TPart>;
   public
+    /// <summary>
+    ///   Parses a multipart payload (e.g. multipart/form-data) from <paramref name="APayloadStream"/> and exposes
+    ///   the decoded parts via <see cref="Parts"/>.
+    /// </summary>
+    /// <remarks>
+    ///   This decoder is <b>zero-copy</b>: it does not duplicate the payload bytes. Each part body is represented
+    ///   as a stream that points directly into the underlying buffer of <paramref name="APayloadStream"/>.
+    ///   Therefore <paramref name="APayloadStream"/> (and its underlying memory) <b>must remain valid and unchanged</b>
+    ///   for the entire lifetime of the decoder and any <see cref="TPart"/> instances obtained from it.
+    ///   Do not free, resize, or overwrite the stream contents while the decoder is in use.
+    /// </remarks>
     constructor Create(const AContentType: AnsiString; const APayloadStream: TStream); virtual;
     destructor Destroy; override;
     property Parts: TObjectList<TPart> read FParts;
@@ -897,13 +908,13 @@ begin
   Result := ALExtractHeaderParamValue(ContentDisposition, AnsiString('filename'));
 end;
 
-{*************************************************************************************************************}
-constructor TALMultipartDecoderA.TPart.Create(const ARawHeaderText: AnsiString; Const ABodyString: AnsiString);
+{*****************************************************************************************************************************************}
+constructor TALMultipartDecoderA.TPart.Create(const ARawHeaderText: AnsiString; Const ABodyStreamPtr: Pointer; ABodyStreamSize: NativeInt);
 begin
   inherited Create;
   FHeaders := TALMimePartHeadersA.Create;
   FHeaders.RawHeaderText := ARawHeaderText;
-  FBodyStream := TALStringStreamA.Create(ABodyString);
+  FBodyStream := TPointerStream.Create(ABodyStreamPtr, ABodyStreamSize, true{ReadOnly});
 end;
 
 {********************************************}
@@ -918,12 +929,16 @@ end;
 function TALMultipartDecoderA.TPart.GetBodyStream: TStream;
 begin
   Result := FBodyStream;
+  Result.Position := 0;
 end;
 
 {************************************************************}
 function TALMultipartDecoderA.TPart.GetBodyString: AnsiString;
 begin
-  Result := FBodyStream.DataString;
+  FBodyStream.Position := 0;
+  SetLength(Result, FBodyStream.Size);
+  if FBodyStream.Size > 0 then
+    FBodyStream.ReadBuffer(Pointer(Result)^, FBodyStream.Size);
 end;
 
 {*****************************************************************************************************}
@@ -964,8 +979,7 @@ begin
     if P1 <= 0 then raise Exception.Create('Missing closing multipart boundary');
     if (P1 < P2 + 2) or (LBodyString[P1-1] <> #10) or (LBodyString[P1 - 2] <> #13) then
       raise Exception.Create('Multipart boundary must be preceded by CRLF');
-    var LPartBodyString := ALCopyStr(LBodyString, P2, P1-2-P2);
-    var LPart := TPart.Create(LPartRawHeaderText, LPartBodyString);
+    var LPart := TPart.Create(LPartRawHeaderText, PByte(LBodyString) + (P2 - low(LBodyString)){ABodyStreamPtr}, P1-2-P2{ABodyStreamSize});
     FParts.Add(LPart);
   end;
 

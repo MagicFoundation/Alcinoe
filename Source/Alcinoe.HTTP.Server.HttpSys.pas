@@ -2062,9 +2062,10 @@ begin
 
     // Create all WorkerThreads
     var LWorkerThreadCount := FMinWorkerThreadCount;
-    if LWorkerThreadCount = 0 then LWorkerThreadCount := Max(1, TThread.ProcessorCount * 4);
     {$IF defined(DEBUG)}
-    //LWorkerThreadCount := 1;
+    if LWorkerThreadCount = 0 then LWorkerThreadCount := 1;
+    {$ELSE}
+    if LWorkerThreadCount = 0 then LWorkerThreadCount := Max(1, TThread.ProcessorCount * 4);
     {$ENDIF}
     AtomicExchange(FMinInitialReceiveCount, LWorkerThreadCount * 2);
     AtomicExchange(FMaxInitialReceiveCount, LWorkerThreadCount * 4);

@@ -5141,6 +5141,8 @@ procedure TALBaseEdit.SetText(const Value: String);
 begin
   if NativeView <> nil then begin
     NativeView.Text := Value;
+    FDummyText := Value;
+    ClearBufPromptTextDrawable;
     UpdateNativeViewVisibility;
   end
   else begin

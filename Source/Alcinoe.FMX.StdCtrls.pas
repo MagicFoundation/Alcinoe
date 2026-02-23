@@ -7956,7 +7956,12 @@ end;
 {***********************************************************}
 procedure TALBaseCheckBox.TInheritCheckMarkBrush.DoSupersede;
 begin
-  Assign(FParent);
+  if Color = DefaultColor then Color := FParent.Color;
+  if ColorKey = DefaultColorKey then ColorKey := FParent.ColorKey;
+  if ResourceName = DefaultResourceName then ResourceName := FParent.ResourceName;
+  if WrapMode = DefaultWrapMode then WrapMode := FParent.WrapMode;
+  if Thickness = DefaultThickness then Thickness := FParent.Thickness;
+  if Margins.Rect = Margins.DefaultValue then Margins.Assign(FParent.Margins);
 end;
 
 {********************************************************************************************}

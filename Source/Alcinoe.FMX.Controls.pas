@@ -1484,7 +1484,8 @@ begin
     end;
     LControlTmp := LControlTmp.ParentControl;
   end;
-  Result := TRectF.Intersect(Form.ClientRect, LAbsoluteIntersectionRect)
+  var LClientSize := _TCustomFormProtectedAccess(FForm).FWinService.GetClientSize(FForm);
+  Result := TRectF.Intersect(TRectF.Create(TPointF.Zero, LClientSize.X, LClientSize.Y), LAbsoluteIntersectionRect)
 end;
 
 {************************************************}

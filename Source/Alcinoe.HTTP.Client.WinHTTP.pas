@@ -225,8 +225,8 @@ type
   end;
 
 Function ALCreateWinHttpClient(Const AAllowcookies: Boolean = False): TALWinHttpClient;
-function ALAcquireKeepAliveWinHttpClient(const AURI: TUri): TALWinHttpClient;
-procedure ALReleaseKeepAliveWinHttpClient(const AURI: TUri; var AHTTPClient: TALWinHttpClient);
+function ALAcquireKeepAliveWinHttpClient(const AUrl: AnsiString): TALWinHttpClient;
+procedure ALReleaseKeepAliveWinHttpClient(const AUrl: AnsiString; var AHTTPClient: TALWinHttpClient);
 procedure ALReleaseAllKeepAliveWinHttpClients;
 
 implementation
@@ -256,47 +256,59 @@ Begin
   end;
 end;
 
-{***************************************************************************}
-function ALAcquireKeepAliveWinHttpClient(const AURI: TUri): TALWinHttpClient;
+{*********************************************************************************}
+function ALAcquireKeepAliveWinHttpClient(const AUrl: AnsiString): TALWinHttpClient;
 begin
-  ALMonitorEnter(ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveWinHttpClient'{$ENDIF});
+  var LCookedUrlA := TALCookedUrlA.Create(AUrl);
   try
-    var LList: TobjectList<TALWinHttpClient>;
-    if ALWinHttpClientKeepAlives.TryGetValue(AlLowerCase(ansiString(AURI.Scheme)) + '://' + AlLowerCase(ansiString(AURI.Host)) + ':' + ALIntToStrA(AURI.port), LList) then begin
-      if LList.Count > 0 then result := LList.ExtractItem(LList.Last, TDirection.FromEnd)
+    var LKey: AnsiString := AlLowerCase(LCookedUrlA.Scheme) + '://' + AlLowerCase(LCookedUrlA.Host) + ':' + ALIntToStrA(LCookedUrlA.port);
+    ALMonitorEnter(ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveWinHttpClient'{$ENDIF});
+    try
+      var LList: TobjectList<TALWinHttpClient>;
+      if ALWinHttpClientKeepAlives.TryGetValue(LKey, LList) then begin
+        if LList.Count > 0 then result := LList.ExtractItem(LList.Last, TDirection.FromEnd)
+        else result := ALCreateWinHttpClient;
+      end
       else result := ALCreateWinHttpClient;
-    end
-    else result := ALCreateWinHttpClient;
+    finally
+      ALMonitorExit(ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveWinHttpClient'{$ENDIF});
+    end;
   finally
-    ALMonitorExit(ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveWinHttpClient'{$ENDIF});
+    ALFreeAndNil(LCookedUrlA);
   end;
 end;
 
-{*********************************************************************************************}
-procedure ALReleaseKeepAliveWinHttpClient(const AURI: TUri; var AHTTPClient: TALWinHttpClient);
+{***************************************************************************************************}
+procedure ALReleaseKeepAliveWinHttpClient(const AUrl: AnsiString; var AHTTPClient: TALWinHttpClient);
 begin
-  ALMonitorEnter(ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveWinHttpClient'{$ENDIF});
+  var LCookedUrlA := TALCookedUrlA.Create(AUrl);
   try
-    var LList: TobjectList<TALWinHttpClient>;
-    if ALWinHttpClientKeepAlives.TryGetValue(AlLowerCase(ansiString(AURI.Scheme)) + '://' + AlLowerCase(ansiString(AURI.Host)) + ':' + ALIntToStrA(AURI.port), LList) then begin
-      while LList.Count >= ALMaxKeepAliveHttpClientPerHost do
-        LList.Delete(0);
-      LList.Add(AHTTPClient);
-      AHTTPClient := nil;
-    end
-    else begin
-      LList := TobjectList<TALWinHttpClient>.create(true{aOwnObject});
-      try
+    var LKey: AnsiString := AlLowerCase(LCookedUrlA.Scheme) + '://' + AlLowerCase(LCookedUrlA.Host) + ':' + ALIntToStrA(LCookedUrlA.port);
+    ALMonitorEnter(ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveWinHttpClient'{$ENDIF});
+    try
+      var LList: TobjectList<TALWinHttpClient>;
+      if ALWinHttpClientKeepAlives.TryGetValue(LKey, LList) then begin
+        while LList.Count >= ALMaxKeepAliveHttpClientPerHost do
+          LList.Delete(0);
         LList.Add(AHTTPClient);
         AHTTPClient := nil;
-        if not ALWinHttpClientKeepAlives.TryAdd(AlLowerCase(ansiString(AURI.Scheme)) + '://' + AlLowerCase(ansiString(AURI.Host)) + ':' + ALIntToStrA(AURI.port), LList) then ALFreeAndNil(LList);
-      except
-        ALFreeAndNil(LList);
-        raise;
+      end
+      else begin
+        LList := TobjectList<TALWinHttpClient>.create(true{aOwnObject});
+        try
+          LList.Add(AHTTPClient);
+          AHTTPClient := nil;
+          if not ALWinHttpClientKeepAlives.TryAdd(LKey, LList) then ALFreeAndNil(LList);
+        except
+          ALFreeAndNil(LList);
+          raise;
+        end;
       end;
+    finally
+      ALMonitorExit(ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveWinHttpClient'{$ENDIF});
     end;
   finally
-    ALMonitorExit(ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveWinHttpClient'{$ENDIF});
+    ALFreeAndNil(LCookedUrlA);
   end;
 end;
 
@@ -837,13 +849,11 @@ begin
   // Read the protocol version
   var LUsed: DWord;
   LLen := SizeOf(LUsed);
-  CheckApiBoolean(
-    'WinHttpQueryOption',
-    WinHttpQueryOption(
-      AContext, // hInternet: HINTERNET;
-      WINHTTP_OPTION_HTTP_PROTOCOL_USED, // dwOption: DWORD;
-      LUsed, // out lpBuffer;
-      LLen)); // var lpdwBufferLength: DWORD
+  if not WinHttpQueryOption(
+           AContext, // hInternet: HINTERNET;
+           WINHTTP_OPTION_HTTP_PROTOCOL_USED, // dwOption: DWORD;
+           LUsed, // out lpBuffer;
+           LLen) then LUsed := 0; // var lpdwBufferLength: DWORD
   if (LUsed and WINHTTP_PROTOCOL_FLAG_HTTP3) <> 0 then AResponse.Version := TALHttpVersion.v3
   else if (LUsed and WINHTTP_PROTOCOL_FLAG_HTTP2) <> 0 then AResponse.Version := TALHttpVersion.v2
   else begin

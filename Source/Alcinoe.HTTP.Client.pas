@@ -116,6 +116,8 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
+    function ExtractHeaders: TALHttpResponseHeadersA; override;
+    function ExtractBodyStream: TStream; override;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -144,6 +146,8 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
+    function ExtractHeaders: TALHttpResponseHeadersW; override;
+    function ExtractBodyStream: TStream; override;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -904,12 +908,27 @@ begin
   Result := FHeaders;
 end;
 
+{**********************************************************************}
+function TALHttpClientResponseA.ExtractHeaders: TALHttpResponseHeadersA;
+begin
+  Result := FHeaders;
+  FHeaders := nil;
+end;
+
 {*****************************************************}
 function TALHttpClientResponseA.GetBodyStream: TStream;
 begin
   if FBodyStream = nil then
     FBodyStream := TALStringStreamA.Create('');
   Result := FBodyStream;
+end;
+
+{*********************************************************}
+function TALHttpClientResponseA.ExtractBodyStream: TStream;
+begin
+  Result := FBodyStream;
+  FBodyStream := nil;
+  FOwnsBodyStream := True;
 end;
 
 {********************************************************************}
@@ -1035,6 +1054,13 @@ begin
   Result := FHeaders;
 end;
 
+{**********************************************************************}
+function TALHttpClientResponseW.ExtractHeaders: TALHttpResponseHeadersW;
+begin
+  Result := FHeaders;
+  FHeaders := nil;
+end;
+
 {*****************************************************}
 function TALHttpClientResponseW.GetBodyStream: TStream;
 begin
@@ -1046,6 +1072,14 @@ begin
       FBodyStream := TALStringStreamW.Create('', TEncoding.GetEncoding(LCharSet), True{AOwnsEncoding});
   end;
   Result := FBodyStream;
+end;
+
+{*********************************************************}
+function TALHttpClientResponseW.ExtractBodyStream: TStream;
+begin
+  Result := FBodyStream;
+  FBodyStream := nil;
+  FOwnsBodyStream := True;
 end;
 
 {********************************************************************}

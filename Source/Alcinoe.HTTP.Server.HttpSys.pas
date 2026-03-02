@@ -153,6 +153,8 @@ type
   public
     constructor Create(const AHttpRequest: PHTTP_REQUEST); virtual;
     destructor Destroy; override;
+    function ExtractHeaders: TALHttpRequestHeadersA; override;
+    function ExtractBodyStream: TStream; override;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -196,6 +198,8 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
+    function ExtractHeaders: TALHttpResponseHeadersA; override;
+    function ExtractBodyStream: TStream; override;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -809,10 +813,22 @@ begin
   Result := FHeaders;
 end;
 
+{**********************************************************************}
+function TALHttpSysServerRequest.ExtractHeaders: TALHttpRequestHeadersA;
+begin
+  raise Exception.Create('Cannot modify request: http.sys exposes a read-only HTTP_REQUEST');
+end;
+
 {******************************************************}
 function TALHttpSysServerRequest.GetBodyStream: TStream;
 begin
   Result := FBodyStream;
+end;
+
+{**********************************************************}
+function TALHttpSysServerRequest.ExtractBodyStream: TStream;
+begin
+  raise Exception.Create('Cannot modify request: http.sys exposes a read-only HTTP_REQUEST');
 end;
 
 {*********************************************************************}
@@ -954,12 +970,27 @@ begin
   Result := FHeaders;
 end;
 
+{************************************************************************}
+function TALHttpSysServerResponse.ExtractHeaders: TALHttpResponseHeadersA;
+begin
+  Result := FHeaders;
+  FHeaders := nil;
+end;
+
 {*******************************************************}
 function TALHttpSysServerResponse.GetBodyStream: TStream;
 begin
   if FBodyStream = nil then
     FBodyStream := TALStringStreamA.Create('');
   Result := FBodyStream;
+end;
+
+{***********************************************************}
+function TALHttpSysServerResponse.ExtractBodyStream: TStream;
+begin
+  Result := FBodyStream;
+  FBodyStream := nil;
+  FOwnsBodyStream := True;
 end;
 
 {**********************************************************************}

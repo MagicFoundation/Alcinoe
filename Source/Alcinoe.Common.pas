@@ -1246,7 +1246,8 @@ begin
           alFreeAndNil(LWorkerThreadRequest);
         end;
       except
-        //hide the exception
+        on E: Exception do
+          ALLog('TALWorkerThread.Execute', E);
       end;
     end
 

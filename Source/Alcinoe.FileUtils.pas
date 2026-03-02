@@ -23,13 +23,13 @@ Function  AlEmptyDirectoryW(
             Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
 Function  AlEmptyDirectoryA(
             const Directory: ansiString;
-            SubDirectory: Boolean;
+            const SubDirectory: Boolean;
             Const RemoveEmptySubDirectory: Boolean = True;
             Const FileNameMask: ansiString = '*';
             Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
 Function  AlEmptyDirectoryW(
             const Directory: String;
-            SubDirectory: Boolean;
+            const SubDirectory: Boolean;
             Const RemoveEmptySubDirectory: Boolean = True;
             Const FileNameMask: String = '*';
             Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
@@ -174,7 +174,7 @@ end;
 {*************************}
 Function AlEmptyDirectoryA(
            const Directory: ansiString;
-           SubDirectory: Boolean;
+           const SubDirectory: Boolean;
            Const RemoveEmptySubDirectory: Boolean = True;
            Const FileNameMask: ansiString = '*';
            Const MinFileAge: TdateTime = ALNullDate): Boolean;
@@ -191,7 +191,7 @@ end;
 {*************************}
 Function AlEmptyDirectoryW(
            const Directory: String;
-           SubDirectory: Boolean;
+           const SubDirectory: Boolean;
            Const RemoveEmptySubDirectory: Boolean = True;
            Const FileNameMask: String = '*';
            Const MinFileAge: TdateTime = 0): Boolean;

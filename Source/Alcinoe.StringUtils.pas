@@ -1286,7 +1286,7 @@ begin
   try
     Result := CMask.Matches(Filename);
   finally
-    CMask.Free;
+    ALFreeAndNil(CMask);
   end;
 end;
 
@@ -8750,7 +8750,7 @@ begin
     else Result := '';
 
   finally
-    LFileStream.Free;
+    ALFreeAndNil(LFileStream);
   end;
 end;
 
@@ -8801,7 +8801,7 @@ begin
     else Result := '';
 
   finally
-    LFileStream.Free;
+    ALFreeAndNil(LFileStream);
   end;
 end;
 
@@ -8821,7 +8821,7 @@ begin
     LFileStream.Position := LFileStream.Size;
     LFileStream.WriteBuffer(Pointer(Str)^, Length(Str));
   finally
-    LFileStream.Free;
+    ALFreeAndNil(LFileStream);
   end;
 end;
 
@@ -8840,7 +8840,7 @@ begin
   try
     LFileStream.WriteBuffer(Pointer(Str)^, Length(Str));
   finally
-    LFileStream.Free;
+    ALFreeAndNil(LFileStream);
   end;
 end;
 
@@ -10066,7 +10066,7 @@ begin
     Try
       Result := LEncoding.CodePage;
     Finally
-      LEncoding.Free;
+      ALFreeAndNil(LEncoding);
     end;
 
   Except
@@ -10840,7 +10840,7 @@ begin
         end
         else ReplaceString := '';
       finally
-        ParamList.Free;
+        ALFreeAndNil(ParamList);
       end;
     end
     else begin

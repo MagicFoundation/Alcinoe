@@ -1353,15 +1353,14 @@ begin
     procedure
     begin
 
-      Var LUri := TUri.Create(AUrl);
-      var LHttpClient := ALAcquireKeepAliveNetHttpClient(LUri);
+      var LHttpClient := ALAcquireKeepAliveNetHttpClient(AUrl);
       try
         LHttpClient.UserAgent := DefaultUserAgent;
 
         var LResponse := TALHttpClientResponseW.Create;
         try
 
-          var LHTTPRequest: IHTTPRequest := LHttpClient.GetRequest(AMethod, LUri);
+          var LHTTPRequest: IHTTPRequest := LHttpClient.GetRequest(AMethod, AUrl);
           LHTTPRequest.SourceStream := TALStringStreamW.Create(ABodyString, TEncoding.UTF8, False);
           Try
             var LHTTPResponse := LHttpClient.Execute(LHttpRequest, LResponse.BodyStream, AHeaders);
@@ -1411,7 +1410,7 @@ begin
         end;
 
       finally
-        ALReleaseKeepAliveNetHttpClient(LUri, LHttpClient);
+        ALReleaseKeepAliveNetHttpClient(AUrl, LHttpClient);
       end;
 
     end).Start;
@@ -1499,15 +1498,14 @@ begin
     procedure
     begin
 
-      Var LUri := TUri.Create(AUrl);
-      var LHttpClient := ALAcquireKeepAliveNetHttpClient(LUri);
+      var LHttpClient := ALAcquireKeepAliveNetHttpClient(AUrl);
       try
         LHttpClient.UserAgent := DefaultUserAgent;
 
         var LResponse := TALHttpClientResponseW.Create;
         try
 
-          var LHTTPRequest: IHTTPRequest := LHttpClient.GetRequest(AMethod, LUri);
+          var LHTTPRequest: IHTTPRequest := LHttpClient.GetRequest(AMethod, AUrl);
           LHTTPRequest.SourceStream := TfileStream.Create(ABodyFilePath, FmOpenRead or fmShareDenyWrite);
           Try
             var LHTTPResponse := LHttpClient.Execute(LHttpRequest, LResponse.BodyStream, AHeaders);
@@ -1562,7 +1560,7 @@ begin
         end;
 
       finally
-        ALReleaseKeepAliveNetHttpClient(LUri, LHttpClient);
+        ALReleaseKeepAliveNetHttpClient(AUrl, LHttpClient);
       end;
 
     end).Start;
@@ -1675,15 +1673,14 @@ begin
     procedure
     begin
 
-      Var LUri := TUri.Create(AUrl);
-      var LHttpClient := ALAcquireKeepAliveNetHttpClient(LUri);
+      var LHttpClient := ALAcquireKeepAliveNetHttpClient(AUrl);
       try
         LHttpClient.UserAgent := DefaultUserAgent;
 
         var LResponse := TALHttpClientResponseW.Create;
         try
 
-          var LHTTPRequest: IHTTPRequest := LHttpClient.GetRequest(AMethod, LUri);
+          var LHTTPRequest: IHTTPRequest := LHttpClient.GetRequest(AMethod, AUrl);
           LHTTPRequest.SourceStream := TBytesStream.Create(ABodyBytes);
           Try
             var LHTTPResponse := LHttpClient.Execute(LHttpRequest, LResponse.BodyStream, AHeaders);
@@ -1733,7 +1730,7 @@ begin
         end;
 
       finally
-        ALReleaseKeepAliveNetHttpClient(LUri, LHttpClient);
+        ALReleaseKeepAliveNetHttpClient(AUrl, LHttpClient);
       end;
 
     end).Start;

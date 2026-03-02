@@ -9,8 +9,8 @@ uses
   System.net.URLClient;
 
 Function ALCreateNetHTTPClient(Const AAllowcookies: Boolean = False): THttpClient;
-function ALAcquireKeepAliveNetHttpClient(const AURI: TUri): THTTPClient;
-procedure ALReleaseKeepAliveNetHttpClient(const AURI: TUri; var AHTTPClient: THTTPClient);
+function ALAcquireKeepAliveNetHttpClient(const AUrl: String): THTTPClient;
+procedure ALReleaseKeepAliveNetHttpClient(const AUrl: String; var AHTTPClient: THTTPClient);
 procedure ALReleaseAllKeepAliveNetHttpClients;
 
 implementation
@@ -20,6 +20,7 @@ uses
   System.SysUtils,
   System.Types,
   System.Generics.Collections,
+  Alcinoe.Url,
   Alcinoe.Common,
   Alcinoe.HTTP.Client,
   Alcinoe.StringUtils;
@@ -40,47 +41,59 @@ Begin
   Result.SendTimeout := ALCreateHttpClientSendTimeout;
 end;
 
-{**********************************************************************}
-function ALAcquireKeepAliveNetHttpClient(const AURI: TUri): THTTPClient;
+{************************************************************************}
+function ALAcquireKeepAliveNetHttpClient(const AUrl: String): THTTPClient;
 begin
-  ALMonitorEnter(ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveNetHttpClient'{$ENDIF});
+  var LCookedUrlW := TALCookedUrlW.Create(AUrl);
   try
-    var LList: TobjectList<THTTPClient>;
-    if ALNetHttpClientKeepAlives.TryGetValue(AlLowerCase(AURI.Scheme) + '://' + AlLowerCase(AURI.Host) + ':' + ALIntToStrW(AURI.port), LList) then begin
-      if LList.Count > 0 then result := LList.ExtractItem(LList.Last, TDirection.FromEnd)
+    var LKey: String := AlLowerCase(LCookedUrlW.Scheme) + '://' + AlLowerCase(LCookedUrlW.Host) + ':' + ALIntToStrW(LCookedUrlW.port);
+    ALMonitorEnter(ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveNetHttpClient'{$ENDIF});
+    try
+      var LList: TobjectList<THTTPClient>;
+      if ALNetHttpClientKeepAlives.TryGetValue(LKey, LList) then begin
+        if LList.Count > 0 then result := LList.ExtractItem(LList.Last, TDirection.FromEnd)
+        else result := ALCreateNetHTTPClient;
+      end
       else result := ALCreateNetHTTPClient;
-    end
-    else result := ALCreateNetHTTPClient;
+    finally
+      ALMonitorExit(ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveNetHttpClient'{$ENDIF});
+    end;
   finally
-    ALMonitorExit(ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveNetHttpClient'{$ENDIF});
+    ALFreeAndNil(LCookedUrlW);
   end;
 end;
 
-{****************************************************************************************}
-procedure ALReleaseKeepAliveNetHttpClient(const AURI: TUri; var AHTTPClient: THTTPClient);
+{******************************************************************************************}
+procedure ALReleaseKeepAliveNetHttpClient(const AUrl: String; var AHTTPClient: THTTPClient);
 begin
-  ALMonitorEnter(ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveNetHttpClient'{$ENDIF});
+  var LCookedUrlW := TALCookedUrlW.Create(AUrl);
   try
-    var LList: TobjectList<THTTPClient>;
-    if ALNetHttpClientKeepAlives.TryGetValue(AlLowerCase(AURI.Scheme) + '://' + AlLowerCase(AURI.Host) + ':' + ALIntToStrW(AURI.port), LList) then begin
-      while LList.Count >= ALMaxKeepAliveHttpClientPerHost do
-        LList.Delete(0);
-      LList.Add(AHTTPClient);
-      AHTTPClient := nil;
-    end
-    else begin
-      LList := TobjectList<THTTPClient>.create(true{aOwnObject});
-      try
+    var LKey: String := AlLowerCase(LCookedUrlW.Scheme) + '://' + AlLowerCase(LCookedUrlW.Host) + ':' + ALIntToStrW(LCookedUrlW.port);
+    ALMonitorEnter(ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveNetHttpClient'{$ENDIF});
+    try
+      var LList: TobjectList<THTTPClient>;
+      if ALNetHttpClientKeepAlives.TryGetValue(LKey, LList) then begin
+        while LList.Count >= ALMaxKeepAliveHttpClientPerHost do
+          LList.Delete(0);
         LList.Add(AHTTPClient);
         AHTTPClient := nil;
-        if not ALNetHttpClientKeepAlives.TryAdd(AlLowerCase(AURI.Scheme) + '://' + AlLowerCase(AURI.Host) + ':' + ALIntToStrW(AURI.port), LList) then ALFreeAndNil(LList);
-      except
-        ALFreeAndNil(LList);
-        raise;
+      end
+      else begin
+        LList := TobjectList<THTTPClient>.create(true{aOwnObject});
+        try
+          LList.Add(AHTTPClient);
+          AHTTPClient := nil;
+          if not ALNetHttpClientKeepAlives.TryAdd(LKey, LList) then ALFreeAndNil(LList);
+        except
+          ALFreeAndNil(LList);
+          raise;
+        end;
       end;
+    finally
+      ALMonitorExit(ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveNetHttpClient'{$ENDIF});
     end;
   finally
-    ALMonitorExit(ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveNetHttpClient'{$ENDIF});
+    ALFreeAndNil(LCookedUrlW);
   end;
 end;
 

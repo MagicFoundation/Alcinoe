@@ -10,10 +10,10 @@ uses
   Alcinoe.StringList;
 
 //From indy
-Function ALGetDefaultFileExtFromMimeContentType(const AContentType: AnsiString): AnsiString; overload;
-Function ALGetDefaultFileExtFromMimeContentType(const AContentType: String): String; overload;
-Function ALGetDefaultMimeContentTypeFromExt(const AExt: AnsiString): AnsiString; overload;
-Function ALGetDefaultMimeContentTypeFromExt(const AExt: String): String; overload;
+Function ALGetDefaultFileExtFromMimeContentType(const AContentType: AnsiString; const ARaiseIfNotFound: Boolean = False): AnsiString; overload;
+Function ALGetDefaultFileExtFromMimeContentType(const AContentType: String; const ARaiseIfNotFound: Boolean = False): String; overload;
+Function ALGetDefaultMimeContentTypeFromExt(const AExt: AnsiString; const ARaiseIfNotFound: Boolean = False): AnsiString; overload;
+Function ALGetDefaultMimeContentTypeFromExt(const AExt: String; const ARaiseIfNotFound: Boolean = False): String; overload;
 
 Var
   AlMimeContentTypeByExtA: TDictionary<AnsiString, AnsiString>; {.html=text/html}
@@ -30,35 +30,51 @@ uses
   Alcinoe.Common;
 
 {******************************************************************************************}
-Function ALGetDefaultFileExtFromMimeContentType(const AContentType: AnsiString): AnsiString;
+Function ALGetDefaultFileExtFromMimeContentType(const AContentType: AnsiString; const ARaiseIfNotFound: Boolean = False): AnsiString;
 Begin
-  if not AlExtbyMimeContentTypeA.TryGetValue(AlLowerCase(AContentType){Key}, Result{Value}) then
-    result := '';
+  if not AlExtbyMimeContentTypeA.TryGetValue(AlLowerCase(AContentType){Key}, Result{Value}) then begin
+    if ARaiseIfNotFound then
+      raise Exception.CreateFmt('Unknown MIME content type "%s" (no default file extension mapping)', [AContentType])
+    else
+      Result := '';
+  end;
 end;
 
 {**********************************************************************************}
-Function ALGetDefaultFileExtFromMimeContentType(const AContentType: String): String;
+Function ALGetDefaultFileExtFromMimeContentType(const AContentType: String; const ARaiseIfNotFound: Boolean = False): String;
 Begin
-  if not AlExtbyMimeContentTypeW.TryGetValue(AlLowerCase(AContentType){Key}, Result{Value}) then
-    result := '';
+  if not AlExtbyMimeContentTypeW.TryGetValue(AlLowerCase(AContentType){Key}, Result{Value}) then begin
+    if ARaiseIfNotFound then
+      raise Exception.CreateFmt('Unknown MIME content type "%s" (no default file extension mapping)', [AContentType])
+    else
+      Result := '';
+  end;
 end;
 
 {******************************************************************************}
-Function ALGetDefaultMimeContentTypeFromExt(const AExt: AnsiString): AnsiString;
+Function ALGetDefaultMimeContentTypeFromExt(const AExt: AnsiString; const ARaiseIfNotFound: Boolean = False): AnsiString;
 begin
   var LExt := AlLowerCase(AExt);
   If (LExt = '') or (LExt[low(AnsiString)] <> '.') then LExt := '.' + LExt;
-  if not AlMimeContentTypeByExtA.TryGetValue(LExt{Key}, Result{Value}) then
-    Result := 'application/octet-stream';
+  if not AlMimeContentTypeByExtA.TryGetValue(LExt{Key}, Result{Value}) then begin
+    if ARaiseIfNotFound then
+      raise Exception.CreateFmt('Unknown file extension "%s" (no MIME type mapping)', [AExt])
+    else
+      Result := 'application/octet-stream';
+  end;
 end;
 
 {**********************************************************************}
-Function ALGetDefaultMimeContentTypeFromExt(const AExt: String): String;
+Function ALGetDefaultMimeContentTypeFromExt(const AExt: String; const ARaiseIfNotFound: Boolean = False): String;
 begin
   var LExt := AlLowerCase(AExt);
   If (LExt = '') or (LExt[low(String)] <> '.') then LExt := '.' + LExt;
-  if not AlMimeContentTypeByExtW.TryGetValue(LExt{Key}, Result{Value}) then
-    Result := 'application/octet-stream';
+  if not AlMimeContentTypeByExtW.TryGetValue(LExt{Key}, Result{Value}) then begin
+    if ARaiseIfNotFound then
+      raise Exception.CreateFmt('Unknown file extension "%s" (no MIME type mapping)', [AExt])
+    else
+      Result := 'application/octet-stream';
+  end;
 end;
 
 {************************}

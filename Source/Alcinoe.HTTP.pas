@@ -401,9 +401,11 @@ type
     property RawUrl: AnsiString read GetRawUrl write SetRawUrl;
     property CookedUrl: TALCookedUrlA read GetCookedUrl;
     property Headers: TALHttpRequestHeadersA read GetHeaders;
+    function ExtractHeaders: TALHttpRequestHeadersA; virtual; abstract;
     property BodyStream: TStream read GetBodyStream write SetBodyStream;
     property BodyString: AnsiString read GetBodyString write SetBodyString;
     property OwnsBodyStream: Boolean read GetOwnsBodyStream write SetOwnsBodyStream;
+    function ExtractBodyStream: TStream; virtual; abstract;
   end;
 
   {------------------------------}
@@ -429,9 +431,11 @@ type
     property RawUrl: String read GetRawUrl write SetRawUrl;
     property CookedUrl: TALCookedUrlA read GetCookedUrl;
     property Headers: TALHttpRequestHeadersW read GetHeaders;
+    function ExtractHeaders: TALHttpRequestHeadersW; virtual; abstract;
     property BodyStream: TStream read GetBodyStream write SetBodyStream;
     property BodyString: String read GetBodyString write SetBodyString;
     property OwnsBodyStream: Boolean read GetOwnsBodyStream write SetOwnsBodyStream;
+    function ExtractBodyStream: TStream; virtual; abstract;
   end;
 
   {-------------------------------}
@@ -455,9 +459,11 @@ type
     property StatusCode: Integer read GetStatusCode write SetStatusCode;
     property Reason: AnsiString read GetReason write SetReason;
     property Headers: TALHttpResponseHeadersA read GetHeaders;
+    function ExtractHeaders: TALHttpResponseHeadersA; virtual; abstract;
     property BodyStream: TStream read GetBodyStream write SetBodyStream;
     property BodyString: AnsiString read GetBodyString write SetBodyString;
     property OwnsBodyStream: Boolean read GetOwnsBodyStream write SetOwnsBodyStream;
+    function ExtractBodyStream: TStream; virtual; abstract;
   end;
 
   {-------------------------------}
@@ -481,9 +487,11 @@ type
     property StatusCode: Integer read GetStatusCode write SetStatusCode;
     property Reason: String read GetReason write SetReason;
     property Headers: TALHttpResponseHeadersW read GetHeaders;
+    function ExtractHeaders: TALHttpResponseHeadersW; virtual; abstract;
     property BodyStream: TStream read GetBodyStream write SetBodyStream;
     property BodyString: String read GetBodyString write SetBodyString;
     property OwnsBodyStream: Boolean read GetOwnsBodyStream write SetOwnsBodyStream;
+    function ExtractBodyStream: TStream; virtual; abstract;
   end;
 
 const

@@ -168,26 +168,26 @@ type
                      ntArray,  //The node represents an array: [ ... ] or "name": [ ... ]
                      ntText);  //The node represents a text content (javascript, string, number, true, false, null): "..." or "name": "..."
 
-  //from http://bsonspec.org/#/specification
+  //from https://www.mongodb.com/docs/manual/reference/bson-types/
   TALJSONNodeSubType = (nstFloat,      // \x01 | Floating point             | ex { a: 123.4 }
                         nstText,       // \x02 | UTF-8 string               | ex { a: "xxx" }
                         nstObject,     // \x03 | Embedded document          | ex { a: {} }
                         nstArray,      // \x04 | Array                      | ex { a: [] }
                         nstBinary,     // \x05 | Binary data
-                                       // \x06 | Undefined — Deprecated
+                                       // \x06 | Undefined                  | Deprecated
                         nstObjectID,   // \x07 | ObjectId                   | ex { a: ObjectId("507f1f77bcf86cd799439011") }
-                        nstBoolean,    // \x08 | Boolean "false"            | ex { a: False }
-                                       // \x08 | Boolean "true"             | ex { a: true }
+                        nstBoolean,    // \x08 | Boolean                    | ex { a: False }
                         nstDateTime,   // \x09 | UTC datetime               | ex { a: ISODate("yyyy-mm-ddThh:nn:ss.zzzZ") }
                         nstNull,       // \x0A | Null value                 | ex { a: null }
                         nstRegEx,      // \x0B | Regular expression
-                                       // \x0C | DBPointer — Deprecated
+                                       // \x0C | DBPointer                  | Deprecated
                         nstJavascript, // \x0D | JavaScript code            | ex { a: function() }
-                                       // \x0E | Symbol — Deprecated
-                                       // \x0F | JavaScript code w/ scope
+                                       // \x0E | Symbol                     | Deprecated
+                                       // \x0F | JavaScript code w/ scope   | Deprecated
                         nstInt32,      // \x10 | 32-bit Integer             | ex { a: NumberInt(123) }
                         nstTimestamp,  // \x11 | Timestamp                  | ex { a: Timestamp(0, 0) }
                         nstInt64);     // \x12 | 64-bit integer             | ex { a: NumberLong(123) }
+                                       // \x13 | Decimal128
                                        // \xFF | Min key
                                        // \x7F | Max key
 

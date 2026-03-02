@@ -372,14 +372,13 @@ begin
                (not assigned(RetrieveCachedData)) or
                (not RetrieveCachedData(LNetHttpClientPoolRequest.Url, LNetHttpClientPoolRequest.Headers, LHTTPResponse)) then begin
 
-              Var LUri := Turi.Create(LNetHttpClientPoolRequest.Url);
-              var LNetHttpClient := ALAcquireKeepAliveNetHttpClient(LUri);
+              var LNetHttpClient := ALAcquireKeepAliveNetHttpClient(LNetHttpClientPoolRequest.Url);
               try
                 // Note: if the connection drops, the server may close the socket
                 // and the client can still return "success" with partial content.
                 LHTTPResponse := LNetHttpClient.Get(LNetHttpClientPoolRequest.Url, LResponseContent, LNetHttpClientPoolRequest.Headers);
               finally
-                ALReleaseKeepAliveNetHttpClient(LUri, LNetHttpClient);
+                ALReleaseKeepAliveNetHttpClient(LNetHttpClientPoolRequest.Url, LNetHttpClient);
               end;
 
               // Handle Content-Encoding (gzip, deflate, br, ...)

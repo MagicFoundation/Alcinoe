@@ -100,27 +100,27 @@ TALJSONDocumentW.ParseJSONString(
       nstTimestamp:  MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'Timestamp('+ALIntToStrW(int64(cardinal(Args[0].VInteger)))+', '+ALIntToStrW(int64(cardinal(Args[1].VInteger)))+')');
       nstInt64:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
     end;
-  end{onParseText},
+  end{OnParseText},
   //--
   procedure (Sender: TObject; const Path: String; const Name: String)
   begin
     MemoSaxModeEvents.Lines.Add('STARTOBJECT  =>  ' + Name);
-  end{onParseStartObject},
+  end{OnParseStartObject},
   //--
   procedure (Sender: TObject; const Path: String; const Name: String)
   begin
     MemoSaxModeEvents.Lines.Add('ENDOBJECT    =>  ' + Name);
-  end{onParseEndObject},
+  end{OnParseEndObject},
   //--
   procedure (Sender: TObject; const Path: String; const Name: String)
   begin
     MemoSaxModeEvents.Lines.Add('STARTARRAY   =>  ' + Name);
-  end{onParseStartArray},
+  end{OnParseStartArray},
   //--
   procedure (Sender: TObject; const Path: String; const Name: String)
   begin
     MemoSaxModeEvents.Lines.Add('ENDARRAY     =>  ' + Name);
-  end{onParseEndArray});
+  end{OnParseEndArray});
 
 
 DEMO
@@ -146,17 +146,17 @@ uses
   Alcinoe.StringList;
 
 const
-  cAlJSONNodeNotFound           = 'Node "%s" not found';
-  cALJSONInvalidNodeType        = 'Invalid node type';
-  cALJSONInvalidBSONNodeSubType = 'Invalid node sub type';
-  cALJSONListCapacityError      = 'Node list capacity out of bounds (%d)';
-  cALJSONListCountError         = 'Node list count out of bounds (%d)';
-  cALJSONListIndexError         = 'Node list index out of bounds (%d)';
-  cALJSONOperationError         = 'This operation can not be performed with a node of type %s';
-  cALJSONParseError             = 'JSON Parse error';
-  cALBSONParseError             = 'BSON Parse error';
-  CALJSONSortedListError        = 'Operation not allowed on sorted node list';
-  cALJSONDuplicateNodeName      = 'Node list does not allow duplicates';
+  ALJSONNodeNotFound           = 'Node "%s" not found';
+  ALJSONInvalidNodeType        = 'Invalid node type';
+  ALJSONInvalidBSONNodeSubType = 'Invalid node sub type';
+  ALJSONListCapacityError      = 'Node list capacity out of bounds (%d)';
+  ALJSONListCountError         = 'Node list count out of bounds (%d)';
+  ALJSONListIndexError         = 'Node list index out of bounds (%d)';
+  ALJSONOperationError         = 'This operation can not be performed with a node of type %s';
+  ALJSONParseError             = 'JSON Parse error';
+  ALBSONParseError             = 'BSON Parse error';
+  ALJSONSortedListError        = 'Operation not allowed on sorted node list';
+  ALJSONDuplicateNodeName      = 'Node list does not allow duplicates';
 
 type
 
@@ -211,7 +211,6 @@ type
                                                    //   }
   TALJSONParseOptions = set of TALJSONParseOption;
 
-  {Exception}
   EALJSONDocError = class(Exception);
 
   TALJSONTextNodeValueDefined = set of (nvStr, nvInt64);
@@ -224,12 +223,10 @@ type
     preExtended,       // /x -> Allow regex to contain extra whitespace, newlines and Perl-style comments, all of which will be filtered out
     preAnchored,       // /A -> Successful match can only occur at the start of the subject or right after the previous match
     preUnGreedy,       // Repeat operators (+, *, ?) are not greedy by default (i.e. they try to match the minimum number of characters instead of the maximum)
-    preNoAutoCapture   // (group) is a non-capturing group; only named groups capture
-  );
+    preNoAutoCapture); // (group) is a non-capturing group; only named groups capture
 
 type
 
-  {class definition}
   TALJSONNodeA = Class;
   TALJSONNodeListA= Class;
   TALJSONDocumentA= Class;
@@ -242,10 +239,7 @@ type
 
   TALJSONPointerListA = array of TALJSONNodeA;
 
-  {TALJSONNodeListA}
-  {TALJSONNodeListA is used to represent a set of related nodes (TALJSONNodeA object) in an JSON document. For example, TALJSONNodeListA is used to
-   represent all of the children of a node, or all of the attributes of a node. TALJSONNodeListA can be used to add or delete nodes from the
-   List, or to access specific nodes.}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALJSONNodeListA = class(Tobject)
   Private
     FCapacity: Integer;
@@ -253,7 +247,7 @@ type
     FDuplicates: TDuplicates;
     FCount: integer;
     FList: TALJSONPointerListA;
-    [weak] FOwner: TALJSONNodeA;
+    FOwner: TALJSONNodeA;
     procedure QuickSort(L, R: Integer; ACompare: TALJSONNodeListSortCompareA);
   protected
     procedure Grow;
@@ -303,12 +297,11 @@ type
     property Nodes[const Index: integer]: TALJSONNodeA read GetNodeByIndex; default;
   end;
 
-  {TALJSONNodeA}
-  {TALJSONNodeA represents a node in an JSON document.}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALJSONNodeA = class(TObject)
   private
-    [weak] FParentNode: TALJSONNodeA;
-    fNodeName: AnsiString;
+    FParentNode: TALJSONNodeA;
+    FNodeName: AnsiString;
   protected
     function CreateChildList: TALJSONNodeListA;
     function InternalGetChildNodes: TALJSONNodeListA; virtual;
@@ -335,21 +328,21 @@ type
                 const RawJSONStream: TStream;
                 const RawJSONString: AnsiString;
                 const SaxMode: Boolean;
-                const onParseText: TAlJSONParseTextEventA;
-                const onParseStartObject: TAlJSONParseObjectEventA;
-                const onParseEndObject: TAlJSONParseObjectEventA;
-                const onParseStartArray: TAlJSONParseArrayEventA;
-                const onParseEndArray: TAlJSONParseArrayEventA;
+                const OnParseText: TAlJSONParseTextEventA;
+                const OnParseStartObject: TAlJSONParseObjectEventA;
+                const OnParseEndObject: TAlJSONParseObjectEventA;
+                const OnParseStartArray: TAlJSONParseArrayEventA;
+                const OnParseEndArray: TAlJSONParseArrayEventA;
                 const Options: TALJSONParseOptions);
     Procedure ParseBSON(
                 const RawBSONStream: TStream;
                 const RawBSONString: AnsiString;
                 const SaxMode: Boolean;
-                const onParseText: TAlJSONParseTextEventA;
-                const onParseStartObject: TAlJSONParseObjectEventA;
-                const onParseEndObject: TAlJSONParseObjectEventA;
-                const onParseStartArray: TAlJSONParseArrayEventA;
-                const onParseEndArray: TAlJSONParseArrayEventA;
+                const OnParseText: TAlJSONParseTextEventA;
+                const OnParseStartObject: TAlJSONParseObjectEventA;
+                const OnParseEndObject: TAlJSONParseObjectEventA;
+                const OnParseStartArray: TAlJSONParseArrayEventA;
+                const OnParseEndArray: TAlJSONParseArrayEventA;
                 const Options: TALJSONParseOptions);
     procedure SaveToBson(
                 const Stream: TStream;
@@ -361,7 +354,6 @@ type
                 const Options: TALJSONSaveOptions);
   public
     constructor Create(const NodeName: AnsiString); virtual;
-    procedure MultiThreadPrepare(const AOnlyChildList: Boolean = False);
     function GetText(const default: AnsiString): AnsiString; overload;
     function GetText: AnsiString; overload;
     procedure SetText(const Value: AnsiString);
@@ -432,67 +424,67 @@ type
     procedure LoadFromBSONFile(const FileName: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]); overload;
     procedure ParseJSONString(
                 const Str: AnsiString;
-                const onParseText: TAlJSONParseTextEventA;
-                const onParseStartObject: TAlJSONParseObjectEventA;
-                const onParseEndObject: TAlJSONParseObjectEventA;
-                const onParseStartArray: TAlJSONParseArrayEventA;
-                const onParseEndArray: TAlJSONParseArrayEventA;
+                const OnParseText: TAlJSONParseTextEventA;
+                const OnParseStartObject: TAlJSONParseObjectEventA;
+                const OnParseEndObject: TAlJSONParseObjectEventA;
+                const OnParseStartArray: TAlJSONParseArrayEventA;
+                const OnParseEndArray: TAlJSONParseArrayEventA;
                 const Options: TALJSONParseOptions = []);
     procedure ParseJSONStream(
                 const Stream: TStream;
-                const onParseText: TAlJSONParseTextEventA;
-                const onParseStartObject: TAlJSONParseObjectEventA;
-                const onParseEndObject: TAlJSONParseObjectEventA;
-                const onParseStartArray: TAlJSONParseArrayEventA;
-                const onParseEndArray: TAlJSONParseArrayEventA;
+                const OnParseText: TAlJSONParseTextEventA;
+                const OnParseStartObject: TAlJSONParseObjectEventA;
+                const OnParseEndObject: TAlJSONParseObjectEventA;
+                const OnParseStartArray: TAlJSONParseArrayEventA;
+                const OnParseEndArray: TAlJSONParseArrayEventA;
                 const Options: TALJSONParseOptions = []);
     procedure ParseJSONFile(
                 const FileName: String;
-                const onParseText: TAlJSONParseTextEventA;
-                const onParseStartObject: TAlJSONParseObjectEventA;
-                const onParseEndObject: TAlJSONParseObjectEventA;
-                const onParseStartArray: TAlJSONParseArrayEventA;
-                const onParseEndArray: TAlJSONParseArrayEventA;
+                const OnParseText: TAlJSONParseTextEventA;
+                const OnParseStartObject: TAlJSONParseObjectEventA;
+                const OnParseEndObject: TAlJSONParseObjectEventA;
+                const OnParseStartArray: TAlJSONParseArrayEventA;
+                const OnParseEndArray: TAlJSONParseArrayEventA;
                 const Options: TALJSONParseOptions = []); overload;
     procedure ParseJSONFile(
                 const FileName: AnsiString;
-                const onParseText: TAlJSONParseTextEventA;
-                const onParseStartObject: TAlJSONParseObjectEventA;
-                const onParseEndObject: TAlJSONParseObjectEventA;
-                const onParseStartArray: TAlJSONParseArrayEventA;
-                const onParseEndArray: TAlJSONParseArrayEventA;
+                const OnParseText: TAlJSONParseTextEventA;
+                const OnParseStartObject: TAlJSONParseObjectEventA;
+                const OnParseEndObject: TAlJSONParseObjectEventA;
+                const OnParseStartArray: TAlJSONParseArrayEventA;
+                const OnParseEndArray: TAlJSONParseArrayEventA;
                 const Options: TALJSONParseOptions = []); overload;
     procedure ParseBSONString(
                 const Str: AnsiString;
-                const onParseText: TAlJSONParseTextEventA;
-                const onParseStartObject: TAlJSONParseObjectEventA;
-                const onParseEndObject: TAlJSONParseObjectEventA;
-                const onParseStartArray: TAlJSONParseArrayEventA;
-                const onParseEndArray: TAlJSONParseArrayEventA;
+                const OnParseText: TAlJSONParseTextEventA;
+                const OnParseStartObject: TAlJSONParseObjectEventA;
+                const OnParseEndObject: TAlJSONParseObjectEventA;
+                const OnParseStartArray: TAlJSONParseArrayEventA;
+                const OnParseEndArray: TAlJSONParseArrayEventA;
                 const Options: TALJSONParseOptions = []);
     procedure ParseBSONStream(
                 const Stream: TStream;
-                const onParseText: TAlJSONParseTextEventA;
-                const onParseStartObject: TAlJSONParseObjectEventA;
-                const onParseEndObject: TAlJSONParseObjectEventA;
-                const onParseStartArray: TAlJSONParseArrayEventA;
-                const onParseEndArray: TAlJSONParseArrayEventA;
+                const OnParseText: TAlJSONParseTextEventA;
+                const OnParseStartObject: TAlJSONParseObjectEventA;
+                const OnParseEndObject: TAlJSONParseObjectEventA;
+                const OnParseStartArray: TAlJSONParseArrayEventA;
+                const OnParseEndArray: TAlJSONParseArrayEventA;
                 const Options: TALJSONParseOptions = []);
     procedure ParseBSONFile(
                 const FileName: String;
-                const onParseText: TAlJSONParseTextEventA;
-                const onParseStartObject: TAlJSONParseObjectEventA;
-                const onParseEndObject: TAlJSONParseObjectEventA;
-                const onParseStartArray: TAlJSONParseArrayEventA;
-                const onParseEndArray: TAlJSONParseArrayEventA;
+                const OnParseText: TAlJSONParseTextEventA;
+                const OnParseStartObject: TAlJSONParseObjectEventA;
+                const OnParseEndObject: TAlJSONParseObjectEventA;
+                const OnParseStartArray: TAlJSONParseArrayEventA;
+                const OnParseEndArray: TAlJSONParseArrayEventA;
                 const Options: TALJSONParseOptions = []); overload;
     procedure ParseBSONFile(
                 const FileName: AnsiString;
-                const onParseText: TAlJSONParseTextEventA;
-                const onParseStartObject: TAlJSONParseObjectEventA;
-                const onParseEndObject: TAlJSONParseObjectEventA;
-                const onParseStartArray: TAlJSONParseArrayEventA;
-                const onParseEndArray: TAlJSONParseArrayEventA;
+                const OnParseText: TAlJSONParseTextEventA;
+                const OnParseStartObject: TAlJSONParseObjectEventA;
+                const OnParseEndObject: TAlJSONParseObjectEventA;
+                const OnParseStartArray: TAlJSONParseArrayEventA;
+                const OnParseEndArray: TAlJSONParseArrayEventA;
                 const Options: TALJSONParseOptions = []); overload;
     property ChildNodes: TALJSONNodeListA read GetChildNodes write SetChildNodes;
     function GetChildNode(const nodeName: ansiString): TALJSONNodeA; overload;
@@ -554,7 +546,7 @@ type
     procedure SetChildValueBinarySubType(const path: array of ansiString; const value: byte); overload;
     procedure SetChildValueNull(const path: array of ansiString); overload;
     property HasChildNodes: Boolean read GetHasChildNodes;
-    property NodeName: AnsiString read fNodeName write SetNodeName;
+    property NodeName: AnsiString read FNodeName write SetNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
     property NodeValue: AnsiString read GetNodeValueStr; // same as text property but without formating
     property NodeSubType: TALJSONNodeSubType read GetNodeSubType;
@@ -577,7 +569,7 @@ type
     property BSON: AnsiString read GetBSON write SetBSON;
   end;
 
-  //JSON object represents {} or { members }
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALJSONObjectNodeA = Class(TALJSONNodeA)
   private
     FChildNodes: TALJSONNodeListA;
@@ -592,7 +584,7 @@ type
     Destructor Destroy; override;
   end;
 
-  {implements JSON array [] | [ elements ]}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALJSONArrayNodeA = Class(TALJSONNodeA)
   private
     FChildNodes: TALJSONNodeListA;
@@ -607,7 +599,7 @@ type
     Destructor Destroy; override;
   end;
 
-  {Groups javascript, string, number, true, false, null}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALJSONTextNodeA = Class(TALJSONNodeA)
   private
     FRawNodeValueInt64: int64;    // contain the value Stored in an int64 (if the
@@ -628,12 +620,9 @@ type
     procedure SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType); overload; override;
   public
     constructor Create(const NodeName: AnsiString = ''); override;
-    property RawNodeValueDefined: TALJSONTextNodeValueDefined read fRawNodeValueDefined;
-    property RawNodeValueStr: AnsiString read fRawNodeValueStr;
-    property RawNodeValueint64: int64 read fRawNodeValueint64;
   end;
 
-  {TALJSONDocumentA}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALJSONDocumentA = class(TObject)
   private
     class function DetectNodeTypeFromJSon(
@@ -651,77 +640,75 @@ type
     class function CreateFromBSONFile(const FileName: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeA; overload;
     class procedure ParseJSONString(
                       const Str: AnsiString;
-                      const onParseText: TAlJSONParseTextEventA;
-                      const onParseStartObject: TAlJSONParseObjectEventA;
-                      const onParseEndObject: TAlJSONParseObjectEventA;
-                      const onParseStartArray: TAlJSONParseArrayEventA;
-                      const onParseEndArray: TAlJSONParseArrayEventA;
+                      const OnParseText: TAlJSONParseTextEventA;
+                      const OnParseStartObject: TAlJSONParseObjectEventA;
+                      const OnParseEndObject: TAlJSONParseObjectEventA;
+                      const OnParseStartArray: TAlJSONParseArrayEventA;
+                      const OnParseEndArray: TAlJSONParseArrayEventA;
                       const Options: TALJSONParseOptions = []);
     class procedure ParseJSONStream(
                       const Stream: TStream;
-                      const onParseText: TAlJSONParseTextEventA;
-                      const onParseStartObject: TAlJSONParseObjectEventA;
-                      const onParseEndObject: TAlJSONParseObjectEventA;
-                      const onParseStartArray: TAlJSONParseArrayEventA;
-                      const onParseEndArray: TAlJSONParseArrayEventA;
+                      const OnParseText: TAlJSONParseTextEventA;
+                      const OnParseStartObject: TAlJSONParseObjectEventA;
+                      const OnParseEndObject: TAlJSONParseObjectEventA;
+                      const OnParseStartArray: TAlJSONParseArrayEventA;
+                      const OnParseEndArray: TAlJSONParseArrayEventA;
                       const Options: TALJSONParseOptions = []);
     class procedure ParseJSONFile(
                       const FileName: String;
-                      const onParseText: TAlJSONParseTextEventA;
-                      const onParseStartObject: TAlJSONParseObjectEventA;
-                      const onParseEndObject: TAlJSONParseObjectEventA;
-                      const onParseStartArray: TAlJSONParseArrayEventA;
-                      const onParseEndArray: TAlJSONParseArrayEventA;
+                      const OnParseText: TAlJSONParseTextEventA;
+                      const OnParseStartObject: TAlJSONParseObjectEventA;
+                      const OnParseEndObject: TAlJSONParseObjectEventA;
+                      const OnParseStartArray: TAlJSONParseArrayEventA;
+                      const OnParseEndArray: TAlJSONParseArrayEventA;
                       const Options: TALJSONParseOptions = []); overload;
     class procedure ParseJSONFile(
                       const FileName: AnsiString;
-                      const onParseText: TAlJSONParseTextEventA;
-                      const onParseStartObject: TAlJSONParseObjectEventA;
-                      const onParseEndObject: TAlJSONParseObjectEventA;
-                      const onParseStartArray: TAlJSONParseArrayEventA;
-                      const onParseEndArray: TAlJSONParseArrayEventA;
+                      const OnParseText: TAlJSONParseTextEventA;
+                      const OnParseStartObject: TAlJSONParseObjectEventA;
+                      const OnParseEndObject: TAlJSONParseObjectEventA;
+                      const OnParseStartArray: TAlJSONParseArrayEventA;
+                      const OnParseEndArray: TAlJSONParseArrayEventA;
                       const Options: TALJSONParseOptions = []); overload;
     class procedure ParseBSONString(
                       const Str: AnsiString;
-                      const onParseText: TAlJSONParseTextEventA;
-                      const onParseStartObject: TAlJSONParseObjectEventA;
-                      const onParseEndObject: TAlJSONParseObjectEventA;
-                      const onParseStartArray: TAlJSONParseArrayEventA;
-                      const onParseEndArray: TAlJSONParseArrayEventA;
+                      const OnParseText: TAlJSONParseTextEventA;
+                      const OnParseStartObject: TAlJSONParseObjectEventA;
+                      const OnParseEndObject: TAlJSONParseObjectEventA;
+                      const OnParseStartArray: TAlJSONParseArrayEventA;
+                      const OnParseEndArray: TAlJSONParseArrayEventA;
                       const Options: TALJSONParseOptions = []);
     class procedure ParseBSONStream(
                       const Stream: TStream;
-                      const onParseText: TAlJSONParseTextEventA;
-                      const onParseStartObject: TAlJSONParseObjectEventA;
-                      const onParseEndObject: TAlJSONParseObjectEventA;
-                      const onParseStartArray: TAlJSONParseArrayEventA;
-                      const onParseEndArray: TAlJSONParseArrayEventA;
+                      const OnParseText: TAlJSONParseTextEventA;
+                      const OnParseStartObject: TAlJSONParseObjectEventA;
+                      const OnParseEndObject: TAlJSONParseObjectEventA;
+                      const OnParseStartArray: TAlJSONParseArrayEventA;
+                      const OnParseEndArray: TAlJSONParseArrayEventA;
                       const Options: TALJSONParseOptions = []);
     class procedure ParseBSONFile(
                       const FileName: String;
-                      const onParseText: TAlJSONParseTextEventA;
-                      const onParseStartObject: TAlJSONParseObjectEventA;
-                      const onParseEndObject: TAlJSONParseObjectEventA;
-                      const onParseStartArray: TAlJSONParseArrayEventA;
-                      const onParseEndArray: TAlJSONParseArrayEventA;
+                      const OnParseText: TAlJSONParseTextEventA;
+                      const OnParseStartObject: TAlJSONParseObjectEventA;
+                      const OnParseEndObject: TAlJSONParseObjectEventA;
+                      const OnParseStartArray: TAlJSONParseArrayEventA;
+                      const OnParseEndArray: TAlJSONParseArrayEventA;
                       const Options: TALJSONParseOptions = []); overload;
     class procedure ParseBSONFile(
                       const FileName: AnsiString;
-                      const onParseText: TAlJSONParseTextEventA;
-                      const onParseStartObject: TAlJSONParseObjectEventA;
-                      const onParseEndObject: TAlJSONParseObjectEventA;
-                      const onParseStartArray: TAlJSONParseArrayEventA;
-                      const onParseEndArray: TAlJSONParseArrayEventA;
+                      const OnParseText: TAlJSONParseTextEventA;
+                      const OnParseStartObject: TAlJSONParseObjectEventA;
+                      const OnParseEndObject: TAlJSONParseObjectEventA;
+                      const OnParseStartArray: TAlJSONParseArrayEventA;
+                      const OnParseEndArray: TAlJSONParseArrayEventA;
                       const Options: TALJSONParseOptions = []); overload;
   end;
 
-{misc constants}
 var
   ALDefaultJsonNodeIndentA: ansiString;  // var instead of const to avoid new ansitring on assign
   ALDefaultJsonPathSeparatorA: AnsiChar;
   ALJsonISODateFormatSettingsA: TALFormatSettingsA;
 
-{misc function}
 Procedure ALJSONToTStringsA(
             const AJsonStr: AnsiString;
             const AFormatSettings: TALFormatSettingsA;
@@ -809,7 +796,6 @@ Function ALFindJsonNodeByChildValueTextA(
 
 type
 
-  {class definition}
   TALJSONNodeW = Class;
   TALJSONNodeListW = Class;
   TALJSONDocumentW = Class;
@@ -823,10 +809,7 @@ type
 
   TALJSONPointerListW = array of TALJSONNodeW;
 
-  {TALJSONNodeListW}
-  {TALJSONNodeListW is used to represent a set of related nodes (TALJSONNodeW object) in an JSON document. For example, TALJSONNodeListW is used to
-   represent all of the children of a node, or all of the attributes of a node. TALJSONNodeListW can be used to add or delete nodes from the
-   List, or to access specific nodes.}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALJSONNodeListW = class(Tobject)
   Private
     FCapacity: Integer;
@@ -834,7 +817,7 @@ type
     FDuplicates: TDuplicates;
     FCount: integer;
     FList: TALJSONPointerListW;
-    [weak] FOwner: TALJSONNodeW;
+    FOwner: TALJSONNodeW;
     procedure QuickSort(L, R: Integer; ACompare: TALJSONNodeListSortCompareW);
   protected
     procedure Grow;
@@ -884,12 +867,11 @@ type
     property Nodes[const Index: integer]: TALJSONNodeW read GetNodeByIndex; default;
   end;
 
-  {TALJSONNodeW}
-  {TALJSONNodeW represents a node in an JSON document.}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALJSONNodeW = class(TObject)
   private
-    [weak] FParentNode: TALJSONNodeW;
-    fNodeName: String;
+    FParentNode: TALJSONNodeW;
+    FNodeName: String;
   protected
     function CreateChildList: TALJSONNodeListW;
     function InternalGetChildNodes: TALJSONNodeListW; virtual;
@@ -915,20 +897,20 @@ type
     Procedure ParseJSON(
                 const Buffer: String;
                 const SaxMode: Boolean;
-                const onParseText: TAlJSONParseTextEventW;
-                const onParseStartObject: TAlJSONParseObjectEventW;
-                const onParseEndObject: TAlJSONParseObjectEventW;
-                const onParseStartArray: TAlJSONParseArrayEventW;
-                const onParseEndArray: TAlJSONParseArrayEventW;
+                const OnParseText: TAlJSONParseTextEventW;
+                const OnParseStartObject: TAlJSONParseObjectEventW;
+                const OnParseEndObject: TAlJSONParseObjectEventW;
+                const OnParseStartArray: TAlJSONParseArrayEventW;
+                const OnParseEndArray: TAlJSONParseArrayEventW;
                 const Options: TALJSONParseOptions);
     Procedure ParseBSON(
                 const Buffer: Tbytes;
                 const SaxMode: Boolean;
-                const onParseText: TAlJSONParseTextEventW;
-                const onParseStartObject: TAlJSONParseObjectEventW;
-                const onParseEndObject: TAlJSONParseObjectEventW;
-                const onParseStartArray: TAlJSONParseArrayEventW;
-                const onParseEndArray: TAlJSONParseArrayEventW;
+                const OnParseText: TAlJSONParseTextEventW;
+                const OnParseStartObject: TAlJSONParseObjectEventW;
+                const OnParseEndObject: TAlJSONParseObjectEventW;
+                const OnParseStartArray: TAlJSONParseArrayEventW;
+                const OnParseEndArray: TAlJSONParseArrayEventW;
                 const Options: TALJSONParseOptions);
     procedure SaveToBson(
                 const Stream: TStream;
@@ -941,7 +923,6 @@ type
                 const Options: TALJSONSaveOptions);
   public
     constructor Create(const NodeName: String); virtual;
-    procedure MultiThreadPrepare(const AOnlyChildList: Boolean = False);
     function GetText(const default: String): String; overload;
     function GetText: String; overload;
     procedure SetText(const Value: String);
@@ -1010,51 +991,51 @@ type
     procedure LoadFromBSONFile(const FileName: String; const Options: TALJSONParseOptions = [poClearChildNodes]);
     procedure ParseJSONString(
                 const Str: String;
-                const onParseText: TAlJSONParseTextEventW;
-                const onParseStartObject: TAlJSONParseObjectEventW;
-                const onParseEndObject: TAlJSONParseObjectEventW;
-                const onParseStartArray: TAlJSONParseArrayEventW;
-                const onParseEndArray: TAlJSONParseArrayEventW;
+                const OnParseText: TAlJSONParseTextEventW;
+                const OnParseStartObject: TAlJSONParseObjectEventW;
+                const OnParseEndObject: TAlJSONParseObjectEventW;
+                const OnParseStartArray: TAlJSONParseArrayEventW;
+                const OnParseEndArray: TAlJSONParseArrayEventW;
                 const Options: TALJSONParseOptions = []);
     procedure ParseJSONStream(
                 const Stream: TStream;
-                const onParseText: TAlJSONParseTextEventW;
-                const onParseStartObject: TAlJSONParseObjectEventW;
-                const onParseEndObject: TAlJSONParseObjectEventW;
-                const onParseStartArray: TAlJSONParseArrayEventW;
-                const onParseEndArray: TAlJSONParseArrayEventW;
+                const OnParseText: TAlJSONParseTextEventW;
+                const OnParseStartObject: TAlJSONParseObjectEventW;
+                const OnParseEndObject: TAlJSONParseObjectEventW;
+                const OnParseStartArray: TAlJSONParseArrayEventW;
+                const OnParseEndArray: TAlJSONParseArrayEventW;
                 const Options: TALJSONParseOptions = []);
     procedure ParseJSONFile(
                 const FileName: String;
-                const onParseText: TAlJSONParseTextEventW;
-                const onParseStartObject: TAlJSONParseObjectEventW;
-                const onParseEndObject: TAlJSONParseObjectEventW;
-                const onParseStartArray: TAlJSONParseArrayEventW;
-                const onParseEndArray: TAlJSONParseArrayEventW;
+                const OnParseText: TAlJSONParseTextEventW;
+                const OnParseStartObject: TAlJSONParseObjectEventW;
+                const OnParseEndObject: TAlJSONParseObjectEventW;
+                const OnParseStartArray: TAlJSONParseArrayEventW;
+                const OnParseEndArray: TAlJSONParseArrayEventW;
                 const Options: TALJSONParseOptions = []);
     procedure ParseBSONBytes(
                 const Bytes: Tbytes;
-                const onParseText: TAlJSONParseTextEventW;
-                const onParseStartObject: TAlJSONParseObjectEventW;
-                const onParseEndObject: TAlJSONParseObjectEventW;
-                const onParseStartArray: TAlJSONParseArrayEventW;
-                const onParseEndArray: TAlJSONParseArrayEventW;
+                const OnParseText: TAlJSONParseTextEventW;
+                const OnParseStartObject: TAlJSONParseObjectEventW;
+                const OnParseEndObject: TAlJSONParseObjectEventW;
+                const OnParseStartArray: TAlJSONParseArrayEventW;
+                const OnParseEndArray: TAlJSONParseArrayEventW;
                 const Options: TALJSONParseOptions = []);
     procedure ParseBSONStream(
                 const Stream: TStream;
-                const onParseText: TAlJSONParseTextEventW;
-                const onParseStartObject: TAlJSONParseObjectEventW;
-                const onParseEndObject: TAlJSONParseObjectEventW;
-                const onParseStartArray: TAlJSONParseArrayEventW;
-                const onParseEndArray: TAlJSONParseArrayEventW;
+                const OnParseText: TAlJSONParseTextEventW;
+                const OnParseStartObject: TAlJSONParseObjectEventW;
+                const OnParseEndObject: TAlJSONParseObjectEventW;
+                const OnParseStartArray: TAlJSONParseArrayEventW;
+                const OnParseEndArray: TAlJSONParseArrayEventW;
                 const Options: TALJSONParseOptions = []);
     procedure ParseBSONFile(
                 const FileName: String;
-                const onParseText: TAlJSONParseTextEventW;
-                const onParseStartObject: TAlJSONParseObjectEventW;
-                const onParseEndObject: TAlJSONParseObjectEventW;
-                const onParseStartArray: TAlJSONParseArrayEventW;
-                const onParseEndArray: TAlJSONParseArrayEventW;
+                const OnParseText: TAlJSONParseTextEventW;
+                const OnParseStartObject: TAlJSONParseObjectEventW;
+                const OnParseEndObject: TAlJSONParseObjectEventW;
+                const OnParseStartArray: TAlJSONParseArrayEventW;
+                const OnParseEndArray: TAlJSONParseArrayEventW;
                 const Options: TALJSONParseOptions = []);
     property ChildNodes: TALJSONNodeListW read GetChildNodes write SetChildNodes;
     function GetChildNode(const nodeName: String): TALJSONNodeW; overload;
@@ -1116,7 +1097,7 @@ type
     procedure SetChildValueBinarySubType(const path: array of String; const value: byte); overload;
     procedure SetChildValueNull(const path: array of String); overload;
     property HasChildNodes: Boolean read GetHasChildNodes;
-    property NodeName: String read fNodeName write SetNodeName;
+    property NodeName: String read FNodeName write SetNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
     property NodeValue: String read GetNodeValueStr; // same as text property but without formating
     property NodeSubType: TALJSONNodeSubType read GetNodeSubType;
@@ -1139,7 +1120,7 @@ type
     property BSON: Tbytes read GetBSON write SetBSON;
   end;
 
-  //JSON object represents {} or { members }
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALJSONObjectNodeW = Class(TALJSONNodeW)
   private
     FChildNodes: TALJSONNodeListW;
@@ -1154,7 +1135,7 @@ type
     Destructor Destroy; override;
   end;
 
-  {implements JSON array [] | [ elements ]}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALJSONArrayNodeW = Class(TALJSONNodeW)
   private
     FChildNodes: TALJSONNodeListW;
@@ -1169,7 +1150,7 @@ type
     Destructor Destroy; override;
   end;
 
-  {Groups javascript, string, number, true, false, null}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALJSONTextNodeW = Class(TALJSONNodeW)
   private
     FRawNodeValueInt64: int64; // contain the value Stored in an int64 (if the
@@ -1190,12 +1171,9 @@ type
     procedure SetNodeValue(const StrValue: String; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType); overload; override;
   public
     constructor Create(const NodeName: String = ''); override;
-    property RawNodeValueDefined: TALJSONTextNodeValueDefined read fRawNodeValueDefined;
-    property RawNodeValueStr: String read fRawNodeValueStr;
-    property RawNodeValueint64: int64 read fRawNodeValueint64;
   end;
 
-  {TALJSONDocumentW}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALJSONDocumentW = class(TObject)
   private
     class function DetectNodeTypeFromJSon(const Buffer: String): TALJSONNodeType;
@@ -1209,61 +1187,59 @@ type
     class function CreateFromBSONFile(const FileName: String; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeW;
     class procedure ParseJSONString(
                       const Str: String;
-                      const onParseText: TAlJSONParseTextEventW;
-                      const onParseStartObject: TAlJSONParseObjectEventW;
-                      const onParseEndObject: TAlJSONParseObjectEventW;
-                      const onParseStartArray: TAlJSONParseArrayEventW;
-                      const onParseEndArray: TAlJSONParseArrayEventW;
+                      const OnParseText: TAlJSONParseTextEventW;
+                      const OnParseStartObject: TAlJSONParseObjectEventW;
+                      const OnParseEndObject: TAlJSONParseObjectEventW;
+                      const OnParseStartArray: TAlJSONParseArrayEventW;
+                      const OnParseEndArray: TAlJSONParseArrayEventW;
                       const Options: TALJSONParseOptions = []);
     class procedure ParseJSONStream(
                       const Stream: TStream;
-                      const onParseText: TAlJSONParseTextEventW;
-                      const onParseStartObject: TAlJSONParseObjectEventW;
-                      const onParseEndObject: TAlJSONParseObjectEventW;
-                      const onParseStartArray: TAlJSONParseArrayEventW;
-                      const onParseEndArray: TAlJSONParseArrayEventW;
+                      const OnParseText: TAlJSONParseTextEventW;
+                      const OnParseStartObject: TAlJSONParseObjectEventW;
+                      const OnParseEndObject: TAlJSONParseObjectEventW;
+                      const OnParseStartArray: TAlJSONParseArrayEventW;
+                      const OnParseEndArray: TAlJSONParseArrayEventW;
                       const Options: TALJSONParseOptions = []);
     class procedure ParseJSONFile(
                       const FileName: String;
-                      const onParseText: TAlJSONParseTextEventW;
-                      const onParseStartObject: TAlJSONParseObjectEventW;
-                      const onParseEndObject: TAlJSONParseObjectEventW;
-                      const onParseStartArray: TAlJSONParseArrayEventW;
-                      const onParseEndArray: TAlJSONParseArrayEventW;
+                      const OnParseText: TAlJSONParseTextEventW;
+                      const OnParseStartObject: TAlJSONParseObjectEventW;
+                      const OnParseEndObject: TAlJSONParseObjectEventW;
+                      const OnParseStartArray: TAlJSONParseArrayEventW;
+                      const OnParseEndArray: TAlJSONParseArrayEventW;
                       const Options: TALJSONParseOptions = []);
     class procedure ParseBSONBytes(
                       const Bytes: Tbytes;
-                      const onParseText: TAlJSONParseTextEventW;
-                      const onParseStartObject: TAlJSONParseObjectEventW;
-                      const onParseEndObject: TAlJSONParseObjectEventW;
-                      const onParseStartArray: TAlJSONParseArrayEventW;
-                      const onParseEndArray: TAlJSONParseArrayEventW;
+                      const OnParseText: TAlJSONParseTextEventW;
+                      const OnParseStartObject: TAlJSONParseObjectEventW;
+                      const OnParseEndObject: TAlJSONParseObjectEventW;
+                      const OnParseStartArray: TAlJSONParseArrayEventW;
+                      const OnParseEndArray: TAlJSONParseArrayEventW;
                       const Options: TALJSONParseOptions = []);
     class procedure ParseBSONStream(
                       const Stream: TStream;
-                      const onParseText: TAlJSONParseTextEventW;
-                      const onParseStartObject: TAlJSONParseObjectEventW;
-                      const onParseEndObject: TAlJSONParseObjectEventW;
-                      const onParseStartArray: TAlJSONParseArrayEventW;
-                      const onParseEndArray: TAlJSONParseArrayEventW;
+                      const OnParseText: TAlJSONParseTextEventW;
+                      const OnParseStartObject: TAlJSONParseObjectEventW;
+                      const OnParseEndObject: TAlJSONParseObjectEventW;
+                      const OnParseStartArray: TAlJSONParseArrayEventW;
+                      const OnParseEndArray: TAlJSONParseArrayEventW;
                       const Options: TALJSONParseOptions = []);
     class procedure ParseBSONFile(
                       const FileName: String;
-                      const onParseText: TAlJSONParseTextEventW;
-                      const onParseStartObject: TAlJSONParseObjectEventW;
-                      const onParseEndObject: TAlJSONParseObjectEventW;
-                      const onParseStartArray: TAlJSONParseArrayEventW;
-                      const onParseEndArray: TAlJSONParseArrayEventW;
+                      const OnParseText: TAlJSONParseTextEventW;
+                      const OnParseStartObject: TAlJSONParseObjectEventW;
+                      const OnParseEndObject: TAlJSONParseObjectEventW;
+                      const OnParseStartArray: TAlJSONParseArrayEventW;
+                      const OnParseEndArray: TAlJSONParseArrayEventW;
                       const Options: TALJSONParseOptions = []);
   end;
 
-{misc constants}
 var
   ALDefaultJsonNodeIndentW: String;  // var instead of const to avoid new ansitring on assign
   ALDefaultJsonPathSeparatorW: Char;
   ALJsonISODateFormatSettingsW: TALFormatSettingsW;
 
-{misc function}
 Procedure ALJSONToTStringsW(
             const AJsonStr: String;
             const AFormatSettings: TALFormatSettingsW;
@@ -1872,7 +1848,7 @@ begin
     ntObject: AlJSONDocErrorA(Msg, ['ntObject']);
     ntArray: AlJSONDocErrorA(Msg, ['ntArray']);
     ntText: AlJSONDocErrorA(Msg, ['ntText']);
-    else AlJSONDocErrorA(cAlJSONInvalidNodeType);
+    else AlJSONDocErrorA(ALJSONInvalidNodeType);
   end;
 end;
 
@@ -1887,7 +1863,7 @@ begin
     ntText: Result := TALJSONTextNodeA.Create(NodeName);
     else begin
       Result := nil; //for hide warning
-      AlJSONDocErrorA(cAlJSONInvalidNodeType);
+      AlJSONDocErrorA(ALJSONInvalidNodeType);
     end;
   end;
 end;
@@ -2006,7 +1982,7 @@ class function TALJSONDocumentA.CreateFromJSONString(const Str: AnsiString; cons
 begin
   var LNodeType := DetectNodeTypeFromJSON(nil, Str);
   if LNodeType in [ntObject, ntArray] then result := ALCreateJSONNodeA('', LNodeType)
-  else AlJSONDocErrorA(cALJSONParseError);
+  else AlJSONDocErrorA(ALJSONParseError);
   try
     result.LoadFromJSONString(Str, Options);
   except
@@ -2020,7 +1996,7 @@ class function TALJSONDocumentA.CreateFromJSONStream(const Stream: TStream; cons
 begin
   var LNodeType := DetectNodeTypeFromJSON(Stream, '');
   if LNodeType in [ntObject, ntArray] then result := ALCreateJSONNodeA('', LNodeType)
-  else AlJSONDocErrorA(cALJSONParseError);
+  else AlJSONDocErrorA(ALJSONParseError);
   try
     result.LoadFromJSONStream(Stream, Options);
   except
@@ -2092,17 +2068,17 @@ end;
 {***********************************************}
 class procedure TALJSONDocumentA.ParseJSONString(
                   const Str: AnsiString;
-                  const onParseText: TAlJSONParseTextEventA;
-                  const onParseStartObject: TAlJSONParseObjectEventA;
-                  const onParseEndObject: TAlJSONParseObjectEventA;
-                  const onParseStartArray: TAlJSONParseArrayEventA;
-                  const onParseEndArray: TAlJSONParseArrayEventA;
+                  const OnParseText: TAlJSONParseTextEventA;
+                  const OnParseStartObject: TAlJSONParseObjectEventA;
+                  const OnParseEndObject: TAlJSONParseObjectEventA;
+                  const OnParseStartArray: TAlJSONParseArrayEventA;
+                  const OnParseEndArray: TAlJSONParseArrayEventA;
                   const Options: TALJSONParseOptions = []);
 begin
   var LJsonNode: TALJsonNodeA;
   var LNodeType := DetectNodeTypeFromJSON(nil, Str);
   if LNodeType in [ntObject, ntArray] then LJsonNode := ALCreateJSONNodeA('', LNodeType)
-  else AlJSONDocErrorA(cALJSONParseError);
+  else AlJSONDocErrorA(ALJSONParseError);
   try
     LJsonNode.ParseJSONString(
       Str,
@@ -2120,17 +2096,17 @@ end;
 {***********************************************}
 class procedure TALJSONDocumentA.ParseJSONStream(
                   const Stream: TStream;
-                  const onParseText: TAlJSONParseTextEventA;
-                  const onParseStartObject: TAlJSONParseObjectEventA;
-                  const onParseEndObject: TAlJSONParseObjectEventA;
-                  const onParseStartArray: TAlJSONParseArrayEventA;
-                  const onParseEndArray: TAlJSONParseArrayEventA;
+                  const OnParseText: TAlJSONParseTextEventA;
+                  const OnParseStartObject: TAlJSONParseObjectEventA;
+                  const OnParseEndObject: TAlJSONParseObjectEventA;
+                  const OnParseStartArray: TAlJSONParseArrayEventA;
+                  const OnParseEndArray: TAlJSONParseArrayEventA;
                   const Options: TALJSONParseOptions = []);
 begin
   var LJsonNode: TALJsonNodeA;
   var LNodeType := DetectNodeTypeFromJSON(Stream, '');
   if LNodeType in [ntObject, ntArray] then LJsonNode := ALCreateJSONNodeA('', LNodeType)
-  else AlJSONDocErrorA(cALJSONParseError);
+  else AlJSONDocErrorA(ALJSONParseError);
   try
     LJsonNode.ParseJSONStream(
       Stream,
@@ -2148,11 +2124,11 @@ end;
 {*********************************************}
 class procedure TALJSONDocumentA.ParseJSONFile(
                   const FileName: String;
-                  const onParseText: TAlJSONParseTextEventA;
-                  const onParseStartObject: TAlJSONParseObjectEventA;
-                  const onParseEndObject: TAlJSONParseObjectEventA;
-                  const onParseStartArray: TAlJSONParseArrayEventA;
-                  const onParseEndArray: TAlJSONParseArrayEventA;
+                  const OnParseText: TAlJSONParseTextEventA;
+                  const OnParseStartObject: TAlJSONParseObjectEventA;
+                  const OnParseEndObject: TAlJSONParseObjectEventA;
+                  const OnParseStartArray: TAlJSONParseArrayEventA;
+                  const OnParseEndArray: TAlJSONParseArrayEventA;
                   const Options: TALJSONParseOptions = []);
 Var LfileStream: TfileStream;
 Begin
@@ -2174,11 +2150,11 @@ end;
 {*********************************************}
 class procedure TALJSONDocumentA.ParseJSONFile(
                   const FileName: AnsiString;
-                  const onParseText: TAlJSONParseTextEventA;
-                  const onParseStartObject: TAlJSONParseObjectEventA;
-                  const onParseEndObject: TAlJSONParseObjectEventA;
-                  const onParseStartArray: TAlJSONParseArrayEventA;
-                  const onParseEndArray: TAlJSONParseArrayEventA;
+                  const OnParseText: TAlJSONParseTextEventA;
+                  const OnParseStartObject: TAlJSONParseObjectEventA;
+                  const OnParseEndObject: TAlJSONParseObjectEventA;
+                  const OnParseStartArray: TAlJSONParseArrayEventA;
+                  const OnParseEndArray: TAlJSONParseArrayEventA;
                   const Options: TALJSONParseOptions = []);
 begin
   ParseJSONFile(
@@ -2194,11 +2170,11 @@ end;
 {***********************************************}
 class procedure TALJSONDocumentA.ParseBSONString(
                   const Str: AnsiString;
-                  const onParseText: TAlJSONParseTextEventA;
-                  const onParseStartObject: TAlJSONParseObjectEventA;
-                  const onParseEndObject: TAlJSONParseObjectEventA;
-                  const onParseStartArray: TAlJSONParseArrayEventA;
-                  const onParseEndArray: TAlJSONParseArrayEventA;
+                  const OnParseText: TAlJSONParseTextEventA;
+                  const OnParseStartObject: TAlJSONParseObjectEventA;
+                  const OnParseEndObject: TAlJSONParseObjectEventA;
+                  const OnParseStartArray: TAlJSONParseArrayEventA;
+                  const OnParseEndArray: TAlJSONParseArrayEventA;
                   const Options: TALJSONParseOptions = []);
 begin
   var LJsonNode := ALCreateJSONNodeA('', ntObject);
@@ -2219,11 +2195,11 @@ end;
 {***********************************************}
 class procedure TALJSONDocumentA.ParseBSONStream(
                   const Stream: TStream;
-                  const onParseText: TAlJSONParseTextEventA;
-                  const onParseStartObject: TAlJSONParseObjectEventA;
-                  const onParseEndObject: TAlJSONParseObjectEventA;
-                  const onParseStartArray: TAlJSONParseArrayEventA;
-                  const onParseEndArray: TAlJSONParseArrayEventA;
+                  const OnParseText: TAlJSONParseTextEventA;
+                  const OnParseStartObject: TAlJSONParseObjectEventA;
+                  const OnParseEndObject: TAlJSONParseObjectEventA;
+                  const OnParseStartArray: TAlJSONParseArrayEventA;
+                  const OnParseEndArray: TAlJSONParseArrayEventA;
                   const Options: TALJSONParseOptions = []);
 begin
   var LJsonNode := ALCreateJSONNodeA('', ntObject);
@@ -2244,11 +2220,11 @@ end;
 {*********************************************}
 class procedure TALJSONDocumentA.ParseBSONFile(
                   const FileName: String;
-                  const onParseText: TAlJSONParseTextEventA;
-                  const onParseStartObject: TAlJSONParseObjectEventA;
-                  const onParseEndObject: TAlJSONParseObjectEventA;
-                  const onParseStartArray: TAlJSONParseArrayEventA;
-                  const onParseEndArray: TAlJSONParseArrayEventA;
+                  const OnParseText: TAlJSONParseTextEventA;
+                  const OnParseStartObject: TAlJSONParseObjectEventA;
+                  const OnParseEndObject: TAlJSONParseObjectEventA;
+                  const OnParseStartArray: TAlJSONParseArrayEventA;
+                  const OnParseEndArray: TAlJSONParseArrayEventA;
                   const Options: TALJSONParseOptions = []);
 Var LfileStream: TfileStream;
 Begin
@@ -2270,11 +2246,11 @@ end;
 {*********************************************}
 class procedure TALJSONDocumentA.ParseBSONFile(
                   const FileName: AnsiString;
-                  const onParseText: TAlJSONParseTextEventA;
-                  const onParseStartObject: TAlJSONParseObjectEventA;
-                  const onParseEndObject: TAlJSONParseObjectEventA;
-                  const onParseStartArray: TAlJSONParseArrayEventA;
-                  const onParseEndArray: TAlJSONParseArrayEventA;
+                  const OnParseText: TAlJSONParseTextEventA;
+                  const OnParseStartObject: TAlJSONParseObjectEventA;
+                  const OnParseEndObject: TAlJSONParseObjectEventA;
+                  const OnParseStartArray: TAlJSONParseArrayEventA;
+                  const OnParseEndArray: TAlJSONParseArrayEventA;
                   const Options: TALJSONParseOptions = []);
 begin
   ParseBSONFile(
@@ -2305,13 +2281,13 @@ end;
 function TALJSONNodeA.GetChildNodes: TALJSONNodeListA;
 begin
   Result := nil; // hide warning
-  AlJSONDocErrorA(CALJsonOperationError,GetNodeType)
+  AlJSONDocErrorA(ALJSONOperationError,GetNodeType)
 end;
 
 {******************************************************************}
 procedure TALJSONNodeA.SetChildNodes(const Value: TALJSONNodeListA);
 begin
-  AlJSONDocErrorA(CALJsonOperationError,GetNodeType)
+  AlJSONDocErrorA(ALJSONOperationError,GetNodeType)
 end;
 
 {***************************************************************************}
@@ -3085,40 +3061,40 @@ end;
 {************************************************}
 function TALJSONNodeA.GetNodeValueStr: ansiString;
 begin
-  AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
+  AlJSONDocErrorA(ALJSONOperationError,GetNodeType);
   result := ''; // hide warning
 end;
 
 {*********************************************}
 function TALJSONNodeA.GetNodeValueInt64: int64;
 begin
-  AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
+  AlJSONDocErrorA(ALJSONOperationError,GetNodeType);
   result := 0; // hide warning
 end;
 
 {**************************************************************************************************}
 procedure TALJSONNodeA.SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType);
 begin
-  AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
+  AlJSONDocErrorA(ALJSONOperationError,GetNodeType);
 end;
 
 {*********************************************************************************************}
 procedure TALJSONNodeA.SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
-  AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
+  AlJSONDocErrorA(ALJSONOperationError,GetNodeType);
 end;
 
 {******************************************************************************************************************************}
 procedure TALJSONNodeA.SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
-  AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
+  AlJSONDocErrorA(ALJSONOperationError,GetNodeType);
 end;
 
 {*************************************************************}
 procedure TALJSONNodeA.SetNodeName(const NodeName: AnsiString);
 begin
-  if fNodeName <> NodeName then begin
-    fNodeName := NodeName;
+  if FNodeName <> NodeName then begin
+    FNodeName := NodeName;
     Var LParentNode := FParentNode;
     if (LParentNode <> nil) and (LParentNode.ChildNodes.Sorted) then begin
       var LNode := LParentNode.ChildNodes.Extract(self);
@@ -3152,7 +3128,7 @@ begin
     nstInt32: result := GetNodeValueStr;  // return the number
     nstTimestamp: result := GetNodeValueStr;  // return the number (as int64)
     nstInt64: result := GetNodeValueStr;  // return the number
-    else AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+    else AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
   end;
 
 end;
@@ -3268,7 +3244,7 @@ begin
     nstInt32,
     nstInt64: Result := GetNodeValueInt64;
     else begin
-      AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+      AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
       result := 0; // to hide a warning;
     end;
   end;
@@ -3292,7 +3268,7 @@ function TALJSONNodeA.GetDateTime: TDateTime;
 begin
   if NodeSubType = nstDateTime then PInt64(@result)^ := GetNodeValueInt64
   else begin
-    AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+    AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
     result := 0; // to hide a warning;
   end;
 end;
@@ -3315,7 +3291,7 @@ function TALJSONNodeA.GetTimestamp: TALBSONTimestamp;
 begin
   if NodeSubType = nstTimestamp then result.I64 := GetNodeValueInt64
   else begin
-    AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+    AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
     result.I64 := 0; // to hide a warning;
   end;
 end;
@@ -3338,7 +3314,7 @@ function TALJSONNodeA.GetObjectID: ansiString;
 begin
   if NodeSubType = nstObjectID then result := GetNodeValueStr
   else begin
-    AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+    AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
     result := ''; // to hide a warning;
   end;
 end;
@@ -3371,18 +3347,18 @@ begin
                                           // so all integer can be store in the form m*2^e (ie: m = m*2^0)
                                           // so we can compare aInt64 <> aDouble without the need of samevalue
                    (LInt64 > system.int32.MaxValue) or
-                   (LInt64 < system.int32.MinValue) then AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+                   (LInt64 < system.int32.MinValue) then AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
                 result := LInt64;
               end;
     nstInt32: begin
                 LInt64 := GetNodeValueInt64;
                 if (LInt64 > system.int32.MaxValue) or
-                   (LInt64 < system.int32.MinValue) then AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+                   (LInt64 < system.int32.MinValue) then AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
                 result := LInt64;
               end;
     nstInt64: Result := GetNodeValueInt64;
     else begin
-      AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+      AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
       result := 0; // to hide a warning;
     end;
   end;
@@ -3409,7 +3385,7 @@ begin
     nstFloat: begin
                 PInt64(@LDouble)^ := GetNodeValueInt64;
                 result := trunc(LDouble);
-                if result <> LDouble then AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType); // https://stackoverflow.com/questions/41779801/single-double-and-precision
+                if result <> LDouble then AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType); // https://stackoverflow.com/questions/41779801/single-double-and-precision
                                                                                           // Only values that are in form m*2^e, where m and e are integers can be stored in a floating point variable
                                                                                           // so all integer can be store in the form m*2^e (ie: m = m*2^0)
                                                                                           // so we can compare result <> aDouble without the need of samevalue
@@ -3417,7 +3393,7 @@ begin
     nstInt32,
     nstInt64: Result := GetNodeValueInt64;
     else begin
-      AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+      AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
       result := 0; // to hide a warning;
     end;
   end;
@@ -3444,7 +3420,7 @@ begin
     else result := true;
   end
   else begin
-    AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+    AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
     result := False; // to hide a warning;
   end;
 end;
@@ -3481,7 +3457,7 @@ function TALJSONNodeA.GetJavascript: AnsiString;
 begin
   if NodeSubType = nstJavascript then result := GetNodeValueStr
   else begin
-    AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+    AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
     result := ''; // to hide a warning;
   end;
 end;
@@ -3504,7 +3480,7 @@ function TALJSONNodeA.GetRegEx: ansiString;
 begin
   if NodeSubType = nstRegEx then result := GetNodeValueStr
   else begin
-    AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+    AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
     result := ''; // to hide a warning;
   end;
 end;
@@ -3533,7 +3509,7 @@ function TALJSONNodeA.GetRegExOptions: TALPerlRegExOptions;
 begin
   if NodeSubType = nstRegEx then result := TALPerlRegExOptions(byte(GetNodeValueInt64))
   else begin
-    AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+    AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
     result := []; // to hide a warning;
   end;
 end;
@@ -3557,7 +3533,7 @@ function TALJSONNodeA.GetBinary: AnsiString;
 begin
   if NodeSubType = nstBinary then result := GetNodeValueStr
   else begin
-    AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+    AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
     result := ''; // to hide a warning;
   end;
 end;
@@ -3586,7 +3562,7 @@ function TALJSONNodeA.GetBinarySubType: byte;
 begin
   if NodeSubType = nstBinary then result := byte(GetNodeValueInt64)
   else begin
-    AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+    AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
     result := 0; // to hide a warning;
   end;
 end;
@@ -3668,57 +3644,7 @@ end;
 constructor TALJSONNodeA.Create(const NodeName: AnsiString);
 Begin
   FParentNode := nil;
-  fNodeName := NodeName;
-end;
-
-{***************************************************************}
-//will create all the nodevalue and childnodelist to be sure that
-//multiple thread can safely read at the same time the node
-procedure TALJSONNodeA.MultiThreadPrepare(const AOnlyChildList: Boolean = False);
-var I: integer;
-begin
-  if (not aOnlyChildList) and (NodeType = ntText) then begin
-
-    case NodeSubType of
-      nstFloat,
-      nstBoolean,
-      nstDateTime,
-      nstNull,
-      nstInt32,
-      nstTimestamp,
-      nstInt64: GetNodeValueStr;
-      //nstText: can not be retrieve from int64
-      //nstObject: can not be retrieve from int64
-      //nstArray: can not be retrieve from int64
-      //nstBinary: only the binarysubtype is store in int64
-      //nstObjectID: can not be retrieve from int64
-      //nstRegEx: only the regex options is store in the int64
-      //nstJavascript: can not be retrieve from int64
-    end;
-
-    case NodeSubType of
-      nstFloat,
-      nstBoolean,
-      nstDateTime,
-      nstNull,
-      nstInt32,
-      nstTimestamp,
-      nstInt64: GetNodeValueInt64;
-      //nstText: can not be retrieve from int64
-      //nstObject: can not be retrieve from int64
-      //nstArray: can not be retrieve from int64
-      //nstBinary: only the binarysubtype is store in int64
-      //nstObjectID: can not be retrieve from int64
-      //nstRegEx: only the regex options is store in the int64
-      //nstJavascript: can not be retrieve from int64
-    end;
-
-  end
-
-  else if (NodeType in [ntObject,ntArray]) then begin
-    For I := 0 to ChildNodes.Count - 1 do
-      ChildNodes[I].MultiThreadPrepare(aOnlyChildList);
-  end;
+  FNodeName := NodeName;
 end;
 
 {********************************************************************************************************************************************}
@@ -3829,7 +3755,7 @@ begin
     end;
     else begin
       Result := nil;
-      AlJSONDocErrorA(cAlJSONInvalidNodeType);
+      AlJSONDocErrorA(ALJSONInvalidNodeType);
     end;
   end;
   if HasChildNodes then
@@ -3861,11 +3787,11 @@ Procedure TALJSONNodeA.ParseJSON(
             const RawJSONStream: TStream;
             const RawJSONString: AnsiString;
             const SaxMode: Boolean;
-            const onParseText: TAlJSONParseTextEventA;
-            const onParseStartObject: TAlJSONParseObjectEventA;
-            const onParseEndObject: TAlJSONParseObjectEventA;
-            const onParseStartArray: TAlJSONParseArrayEventA;
-            const onParseEndArray: TAlJSONParseArrayEventA;
+            const OnParseText: TAlJSONParseTextEventA;
+            const OnParseStartObject: TAlJSONParseObjectEventA;
+            const OnParseEndObject: TAlJSONParseObjectEventA;
+            const OnParseStartArray: TAlJSONParseArrayEventA;
+            const OnParseEndArray: TAlJSONParseArrayEventA;
             const Options: TALJSONParseOptions);
 
 Const BufferSize: integer = 8192;
@@ -3994,7 +3920,7 @@ Var Buffer: AnsiString;
         else _DoParseTextWithName(Name, Args, NodeSubType);
       end
       else begin
-        if NamePaths.Count = 0 then AlJSONDocErrorA(CALJSONParseError);
+        if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
         if TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]) = ntArray then _DoParseTextWithIndex(Index, Args, NodeSubType)
         else _DoParseTextWithName(Name, Args, NodeSubType);
       end;
@@ -4010,7 +3936,7 @@ Var Buffer: AnsiString;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseEndObject;
   begin
-    if NamePaths.Count = 0 then AlJSONDocErrorA(CALJSONParseError);
+    if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
     if Assigned(OnParseEndObject) then OnParseEndObject(Self, GetPathStr, NamePaths.Names[NamePaths.Count - 1])
   end;
 
@@ -4023,7 +3949,7 @@ Var Buffer: AnsiString;
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseEndArray;
   begin
-    if NamePaths.Count = 0 then AlJSONDocErrorA(CALJSONParseError);
+    if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
     if Assigned(OnParseEndArray) then OnParseEndArray(Self, GetPathStr, NamePaths.Names[NamePaths.Count - 1]);
   end;
 
@@ -4050,7 +3976,7 @@ Var Buffer: AnsiString;
       else _AddNameItemToNamePath(name, Obj);
     end
     else begin
-      if NamePaths.Count = 0 then AlJSONDocErrorA(CALJSONParseError);
+      if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
       if TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]) = ntarray then _AddIndexItemToNamePath(Index, Obj)
       else _AddNameItemToNamePath(name, Obj);
     end;
@@ -4391,7 +4317,7 @@ Var Buffer: AnsiString;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _extractLastIndexFromNamePath: integer;
   begin
-    if NamePaths.Count = 0 then AlJSONDocErrorA(CALJSONParseError);
+    if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
     ALMove(pointer(namePaths.ValueFromIndex[namepaths.Count - 1])^,result,sizeOf(integer));
   end;
 
@@ -4426,10 +4352,10 @@ Var Buffer: AnsiString;
 
       //error if Paths.Count = 0 (mean one end object/array without any starting)
       if assigned(ObjectPaths) then begin
-        if (ObjectPaths.Count = 0) then AlJSONDocErrorA(cALJSONParseError);
+        if (ObjectPaths.Count = 0) then AlJSONDocErrorA(ALJSONParseError);
       end
       else begin
-        if (NamePaths.Count = 0) then AlJSONDocErrorA(cALJSONParseError);
+        if (NamePaths.Count = 0) then AlJSONDocErrorA(ALJSONParseError);
       end;
 
       //if we are not in sax mode
@@ -4440,17 +4366,17 @@ Var Buffer: AnsiString;
         else LNode := TALJSONNodeA(NamePaths.Objects[NamePaths.Count - 1]);
 
         //if anode <> workingNode aie aie aie
-        if (LNode <> WorkingNode) then AlJSONDocErrorA(CALJSONParseError);
+        if (LNode <> WorkingNode) then AlJSONDocErrorA(ALJSONParseError);
 
         //calculate anodeTypeInt
         LNodeType := LNode.NodeType;
-        if not (LNodeType in [ntObject, ntarray]) then AlJSONDocErrorA(cALJSONParseError);
+        if not (LNodeType in [ntObject, ntarray]) then AlJSONDocErrorA(ALJSONParseError);
 
         //check that the end object/array correspond to the aNodeType
         if ((c = '}') and
             (LNodeType <> ntObject)) or
            ((c = ']') and
-            (LNodeType <> ntarray)) then AlJSONDocErrorA(CALJSONParseError);
+            (LNodeType <> ntarray)) then AlJSONDocErrorA(ALJSONParseError);
 
         //if working node <> Self then we can go to one level up
         If WorkingNode <> Self then begin
@@ -4478,13 +4404,13 @@ Var Buffer: AnsiString;
 
          //calculate anodeTypeInt
         LNodeType := TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]);
-        if not (LNodeType in [ntObject,ntarray]) then AlJSONDocErrorA(cALJSONParseError);
+        if not (LNodeType in [ntObject,ntarray]) then AlJSONDocErrorA(ALJSONParseError);
 
         //check that the end object/array correspond to the aNodeType
         if ((c = '}') and
             (LNodeType <> ntObject)) or
            ((c = ']') and
-            (LNodeType <> ntarray)) then AlJSONDocErrorA(CALJSONParseError);
+            (LNodeType <> ntarray)) then AlJSONDocErrorA(ALJSONParseError);
 
         //update CurrIndex if WorkingNode.NodeType = ntArray
         if (Namepaths.Count >= 2) and
@@ -4522,11 +4448,11 @@ Var Buffer: AnsiString;
       if NotSaxMode then begin
 
         //if workingnode = nil then it's mean we are outside Self
-        if not assigned(WorkingNode) then AlJSONDocErrorA(CALJSONParseError);
+        if not assigned(WorkingNode) then AlJSONDocErrorA(ALJSONParseError);
 
         //Node without name can be ONLY present inside an array node
         if (CurrIndex < 0)  or
-           (WorkingNode.nodetype <> ntarray) then AlJSONDocErrorA(CALJSONParseError);
+           (WorkingNode.nodetype <> ntarray) then AlJSONDocErrorA(ALJSONParseError);
 
         //create the node according the the braket char and add it to the workingnode
         if c = '{' then LNode := CreateNode('', ntObject)
@@ -4553,7 +4479,7 @@ Var Buffer: AnsiString;
           //Node without name can be ONLY present inside an array node
           if (CurrIndex < 0) or
              (NamePaths.Count = 0) or
-             (TALJsonNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntarray) then AlJSONDocErrorA(CALJSONParseError);
+             (TALJsonNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntarray) then AlJSONDocErrorA(ALJSONParseError);
 
         //update the path
         if c = '{' then LNodeType := ntObject
@@ -4623,7 +4549,7 @@ Var Buffer: AnsiString;
        if P1 + 1 > BufferLength then ExpandBuffer(P1);
 
       end;
-      if P1 > BufferLength then AlJSONDocErrorA(CALJSONParseError);
+      if P1 > BufferLength then AlJSONDocErrorA(ALJSONParseError);
       BufferPos := P1 + 1; // ... "...\"..."
                            //      ^^^^^^^^^^BufferPos
     end
@@ -4659,7 +4585,7 @@ Var Buffer: AnsiString;
         If Buffer[BufferPos] <= ' ' then inc(bufferPos)
         else break;
       end;
-      if BufferPos > BufferLength then AlJSONDocErrorA(CALJSONParseError);
+      if BufferPos > BufferLength then AlJSONDocErrorA(ALJSONParseError);
 
       P1 := BufferPos; // ... new Date('Dec 03, 1924'), ....
                        //     ^P1
@@ -4703,7 +4629,7 @@ Var Buffer: AnsiString;
                  //     ^^^^^^^^^^^^^^^^^^^^^^^^^P1
 
       end;
-      if P1 > BufferLength then AlJSONDocErrorA(CALJSONParseError);
+      if P1 > BufferLength then AlJSONDocErrorA(ALJSONParseError);
       BufferPos := P1; // ... new Date('Dec 03, 1924'), ....
                        //                             ^BufferPos
 
@@ -4719,7 +4645,7 @@ Var Buffer: AnsiString;
         break;
       end;
     end;
-    if BufferPos > BufferLength then AlJSONDocErrorA(CALJSONParseError);  // .... : ....
+    if BufferPos > BufferLength then AlJSONDocErrorA(ALJSONParseError);  // .... : ....
                                                                           //      ^BufferPos
     {$ENDREGION}
 
@@ -4728,14 +4654,14 @@ Var Buffer: AnsiString;
 
       //Node without name can be ONLY present inside an array node
       if NotSaxMode then begin
-        if not assigned(WorkingNode) then AlJSONDocErrorA(CALJSONParseError);
+        if not assigned(WorkingNode) then AlJSONDocErrorA(ALJSONParseError);
         if (CurrIndex < 0)  or
-           (WorkingNode.nodetype <> ntarray) then AlJSONDocErrorA(CALJSONParseError);
+           (WorkingNode.nodetype <> ntarray) then AlJSONDocErrorA(ALJSONParseError);
       end
       else begin
         if (CurrIndex < 0) or
            (NamePaths.Count = 0) or
-           (TALJSONNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntarray) then AlJSONDocErrorA(CALJSONParseError);
+           (TALJSONNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntarray) then AlJSONDocErrorA(ALJSONParseError);
       end;
 
       //create the node
@@ -4757,7 +4683,7 @@ Var Buffer: AnsiString;
       If Buffer[BufferPos] <= ' ' then inc(BufferPos)
       else break;
     end;
-    if BufferPos > BufferLength then AlJSONDocErrorA(CALJSONParseError); // .... " ....
+    if BufferPos > BufferLength then AlJSONDocErrorA(ALJSONParseError); // .... " ....
                                                                          //      ^BufferPos
     {$ENDREGION}
 
@@ -4775,11 +4701,11 @@ Var Buffer: AnsiString;
       if NotSaxMode then begin
 
         //if workingnode = nil then it's mean we are outside Self
-        if not assigned(WorkingNode) then AlJSONDocErrorA(CALJSONParseError);
+        if not assigned(WorkingNode) then AlJSONDocErrorA(ALJSONParseError);
 
         //Node withe name MUST be ONLY present inside an object node
         if (CurrIndex >= 0)  or
-           (WorkingNode.nodetype <> ntObject) then AlJSONDocErrorA(CALJSONParseError);
+           (WorkingNode.nodetype <> ntObject) then AlJSONDocErrorA(ALJSONParseError);
 
         //create the node according the the braket char and add it to the workingnode
         if c = '{' then LNode := CreateNode(CurrName, ntObject)
@@ -4806,7 +4732,7 @@ Var Buffer: AnsiString;
         //Node withe name MUST be ONLY present inside an object node
         if (CurrIndex >= 0) or
            (NamePaths.Count = 0) or
-           (TALJsonNodeType(NamePaths.Objects[NamePaths.Count - 1]) <> ntobject) then AlJSONDocErrorA(CALJSONParseError);
+           (TALJsonNodeType(NamePaths.Objects[NamePaths.Count - 1]) <> ntobject) then AlJSONDocErrorA(ALJSONParseError);
 
         //update the path
         if c = '{' then LNodeType := ntObject
@@ -4864,7 +4790,7 @@ Var Buffer: AnsiString;
        if P1 + 1 > BufferLength then ExpandBuffer(P1);
 
       end;
-      if P1 > BufferLength then AlJSONDocErrorA(CALJSONParseError);
+      if P1 > BufferLength then AlJSONDocErrorA(ALJSONParseError);
       BufferPos := P1 + 1; // ... "...\"..."
                            //      ^^^^^^^^^^BufferPos
 
@@ -4893,7 +4819,7 @@ Var Buffer: AnsiString;
         If Buffer[BufferPos] <= ' ' then inc(bufferPos)
         else break;
       end;
-      if BufferPos > BufferLength then AlJSONDocErrorA(CALJSONParseError);
+      if BufferPos > BufferLength then AlJSONDocErrorA(ALJSONParseError);
 
       P1 := BufferPos; // ... new Date('Dec 03, 1924'), ....
                        //     ^P1
@@ -4943,7 +4869,7 @@ Var Buffer: AnsiString;
                  //     ^^^^^^^^^^^^^^^^^^^^^^^^^P1
 
       end;
-      if P1 > BufferLength then AlJSONDocErrorA(CALJSONParseError);
+      if P1 > BufferLength then AlJSONDocErrorA(ALJSONParseError);
       BufferPos := P1; // ... new Date('Dec 03, 1924'), ....
                        //                             ^BufferPos
 
@@ -4955,14 +4881,14 @@ Var Buffer: AnsiString;
 
     //Node withe name MUST be ONLY present inside an object node
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(CALJSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALJSONParseError);
       if (CurrIndex >= 0)  or
-         (WorkingNode.nodetype <> ntObject) then AlJSONDocErrorA(CALJSONParseError);
+         (WorkingNode.nodetype <> ntObject) then AlJSONDocErrorA(ALJSONParseError);
     end
     else begin
       if (CurrIndex >= 0) or
          (NamePaths.Count = 0) or
-         (TALJSONNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntObject) then AlJSONDocErrorA(CALJSONParseError);
+         (TALJSONNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntObject) then AlJSONDocErrorA(ALJSONParseError);
     end;
 
     //create the node
@@ -5041,16 +4967,16 @@ Begin
       end
       else begin
         if (c = '{') then begin
-          if (Nodetype <> ntObject) then AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
+          if (Nodetype <> ntObject) then AlJSONDocErrorA(ALJSONOperationError,GetNodeType);
           CurrIndex := -1;
           _DoParseStartObject('');
         end
         else if (c = '[') then begin
-          if (Nodetype <> ntArray) then AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
+          if (Nodetype <> ntArray) then AlJSONDocErrorA(ALJSONOperationError,GetNodeType);
           CurrIndex := 0;
           _DoParseStartArray('');
         end
-        else AlJSONDocErrorA(cALJSONParseError);
+        else AlJSONDocErrorA(ALJSONParseError);
         inc(bufferPos);
         break;
       end;
@@ -5089,14 +5015,14 @@ Begin
 
     //some tags are not closed
     if assigned(ObjectPaths) then begin
-      if ObjectPaths.Count > 0 then AlJSONDocErrorA(cALJSONParseError);
+      if ObjectPaths.Count > 0 then AlJSONDocErrorA(ALJSONParseError);
     end
     else begin
-      if NamePaths.Count > 0 then AlJSONDocErrorA(cALJSONParseError);
+      if NamePaths.Count > 0 then AlJSONDocErrorA(ALJSONParseError);
     end;
 
     //mean the node was not update (empty stream?) or not weel closed
-    if NotSaxMode and (WorkingNode <> nil) then AlJSONDocErrorA(cALJSONParseError);
+    if NotSaxMode and (WorkingNode <> nil) then AlJSONDocErrorA(ALJSONParseError);
 
   finally
 
@@ -5115,11 +5041,11 @@ procedure TALJSONNodeA.ParseBSON(
             const RawBSONStream: TStream;
             const RawBSONString: AnsiString;
             const SaxMode: Boolean;
-            const onParseText: TAlJSONParseTextEventA;
-            const onParseStartObject: TAlJSONParseObjectEventA;
-            const onParseEndObject: TAlJSONParseObjectEventA;
-            const onParseStartArray: TAlJSONParseArrayEventA;
-            const onParseEndArray: TAlJSONParseArrayEventA;
+            const OnParseText: TAlJSONParseTextEventA;
+            const OnParseStartObject: TAlJSONParseObjectEventA;
+            const OnParseEndObject: TAlJSONParseObjectEventA;
+            const OnParseStartArray: TAlJSONParseArrayEventA;
+            const OnParseEndArray: TAlJSONParseArrayEventA;
             const Options: TALJSONParseOptions);
 
 Const BufferSize: integer = 8192;
@@ -5244,7 +5170,7 @@ Var Buffer: AnsiString;
         else _DoParseTextWithName(NameOrIndex, Args, NodeSubType);
       end
       else begin
-        if NamePaths.Count = 0 then AlJSONDocErrorA(CALJSONParseError);
+        if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
         if TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]) = ntArray then _DoParseTextWithIndex(NameOrIndex, Args, NodeSubType)
         else _DoParseTextWithName(NameOrIndex, Args, NodeSubType);
       end;
@@ -5260,7 +5186,7 @@ Var Buffer: AnsiString;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseEndObject;
   begin
-    if NamePaths.Count = 0 then AlJSONDocErrorA(CALJSONParseError);
+    if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
     if Assigned(OnParseEndObject) then OnParseEndObject(Self, GetPathStr, NamePaths[NamePaths.Count - 1])
   end;
 
@@ -5273,7 +5199,7 @@ Var Buffer: AnsiString;
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseEndArray;
   begin
-    if NamePaths.Count = 0 then AlJSONDocErrorA(CALJSONParseError);
+    if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
     if Assigned(OnParseEndArray) then OnParseEndArray(Self, GetPathStr, NamePaths[NamePaths.Count - 1]);
   end;
 
@@ -5297,7 +5223,7 @@ Var Buffer: AnsiString;
       else _AddNameItemToNamePath(nameOrIndex, Obj);
     end
     else begin
-      if NamePaths.Count = 0 then AlJSONDocErrorA(CALJSONParseError);
+      if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
       if TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]) = ntarray then _AddIndexItemToNamePath(nameOrIndex, Obj)
       else _AddNameItemToNamePath(nameOrIndex, Obj);
     end;
@@ -5312,13 +5238,13 @@ Var Buffer: AnsiString;
   begin
     if BufferPos > BufferLength - sizeof(LInt64) + 1 then begin
       ExpandBuffer;
-      if BufferPos > BufferLength - sizeof(LInt64) + 1 then AlJSONDocErrorA(cALBSONParseError);
+      if BufferPos > BufferLength - sizeof(LInt64) + 1 then AlJSONDocErrorA(ALBSONParseError);
     end;
     ALMove(Pbyte(Buffer)[BufferPos-1], LInt64, sizeof(LInt64));
     BufferPos := BufferPos + sizeof(LInt64);
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -5344,13 +5270,13 @@ Var Buffer: AnsiString;
   begin
     if BufferPos > BufferLength - sizeof(LInt32) + 1 then begin
       ExpandBuffer;
-      if BufferPos > BufferLength - sizeof(LInt32) + 1 then AlJSONDocErrorA(cALBSONParseError);
+      if BufferPos > BufferLength - sizeof(LInt32) + 1 then AlJSONDocErrorA(ALBSONParseError);
     end;
     ALMove(Pbyte(Buffer)[BufferPos-1], LInt32, sizeof(LInt32));
     BufferPos := BufferPos + sizeof(LInt32);
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -5377,17 +5303,17 @@ Var Buffer: AnsiString;
   begin
     if BufferPos > BufferLength - sizeof(LInt32) + 1 then begin
       ExpandBuffer;
-      if BufferPos > BufferLength - sizeof(LInt32) + 1 then AlJSONDocErrorA(cALBSONParseError);
+      if BufferPos > BufferLength - sizeof(LInt32) + 1 then AlJSONDocErrorA(ALBSONParseError);
     end;
     ALMove(Pbyte(Buffer)[BufferPos-1], LInt32, sizeof(LInt32));
     BufferPos := BufferPos + sizeof(LInt32);
     while (BufferPos + LInt32 - 1 > BufferLength) do
-      if not ExpandBuffer then AlJSONDocErrorA(cALBSONParseError);
+      if not ExpandBuffer then AlJSONDocErrorA(ALBSONParseError);
     ALCopyStr(Buffer,LText,BufferPos,LInt32 - 1{for the trailing #0});
     BufferPos := BufferPos + LInt32;
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -5413,13 +5339,13 @@ Var Buffer: AnsiString;
   begin
     if BufferPos > BufferLength - sizeof(Double) + 1 then begin
       ExpandBuffer;
-      if BufferPos > BufferLength - sizeof(Double) + 1 then AlJSONDocErrorA(cALBSONParseError);
+      if BufferPos > BufferLength - sizeof(Double) + 1 then AlJSONDocErrorA(ALBSONParseError);
     end;
     ALMove(pbyte(Buffer)[BufferPos-1], LDouble, sizeof(Double));
     BufferPos := BufferPos + sizeof(Double);
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -5448,7 +5374,7 @@ Var Buffer: AnsiString;
     //Get size
     if BufferPos > BufferLength - sizeof(LInt32) + 1 then begin
       ExpandBuffer;
-      if BufferPos > BufferLength - sizeof(LInt32) + 1 then AlJSONDocErrorA(cALBSONParseError);
+      if BufferPos > BufferLength - sizeof(LInt32) + 1 then AlJSONDocErrorA(ALBSONParseError);
     end;
     ALMove(Pbyte(Buffer)[BufferPos-1], LInt32, sizeof(LInt32));
     BufferPos := BufferPos + sizeof(LInt32);
@@ -5456,20 +5382,20 @@ Var Buffer: AnsiString;
     //Get the subtype
     if BufferPos > BufferLength then begin
       ExpandBuffer;
-      if BufferPos > BufferLength then AlJSONDocErrorA(cALBSONParseError);
+      if BufferPos > BufferLength then AlJSONDocErrorA(ALBSONParseError);
     end;
     LBinSubtype := Byte(Buffer[BufferPos]);
     BufferPos := BufferPos + 1;
 
     //Get the data
     while (BufferPos + LInt32 - 1 > BufferLength) do
-      if not ExpandBuffer then AlJSONDocErrorA(cALBSONParseError);
+      if not ExpandBuffer then AlJSONDocErrorA(ALBSONParseError);
     ALCopyStr(Buffer,LBinData,BufferPos,LInt32);
     BufferPos := BufferPos + LInt32;
 
     //create the node
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -5495,14 +5421,14 @@ Var Buffer: AnsiString;
   begin
     if BufferPos > BufferLength - 12{length(aObjectID)} + 1 then begin
       ExpandBuffer;
-      if BufferPos > BufferLength - 12{length(aObjectID)} + 1 then AlJSONDocErrorA(cALBSONParseError);
+      if BufferPos > BufferLength - 12{length(aObjectID)} + 1 then AlJSONDocErrorA(ALBSONParseError);
     end;
     Setlength(LObjectID, 12); // ObjectId is a 12-byte BSON type
     ALMove(Pbyte(Buffer)[BufferPos-1], pbyte(LObjectID)[0], 12{length(aObjectID)}); // pbyte(aObjectID)[0] to not have a jump in uniqueString (aObjectID is already unique thanks to Setlength)
     BufferPos := BufferPos + 12{length(aObjectID)};
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -5528,18 +5454,18 @@ Var Buffer: AnsiString;
   begin
     if BufferPos > BufferLength then begin
       ExpandBuffer;
-      if BufferPos > BufferLength then AlJSONDocErrorA(cALBSONParseError);
+      if BufferPos > BufferLength then AlJSONDocErrorA(ALBSONParseError);
     end;
     if Buffer[BufferPos] = #$00 then LBool := False
     else if Buffer[BufferPos] = #$01 then LBool := true
     else begin
-      AlJSONDocErrorA(cALBSONParseError);
+      AlJSONDocErrorA(ALBSONParseError);
       LBool := False; // to hide a warning;
     end;
     BufferPos := BufferPos + 1;
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -5566,14 +5492,14 @@ Var Buffer: AnsiString;
   begin
     if BufferPos > BufferLength - sizeof(LInt64) + 1 then begin
       ExpandBuffer;
-      if BufferPos > BufferLength - sizeof(LInt64) + 1 then AlJSONDocErrorA(cALBSONParseError);
+      if BufferPos > BufferLength - sizeof(LInt64) + 1 then AlJSONDocErrorA(ALBSONParseError);
     end;
     ALMove(Pbyte(Buffer)[BufferPos-1], LInt64, sizeof(LInt64));
     LDateTime := ALUnixMsToDateTime(LInt64);
     BufferPos := BufferPos + sizeof(LInt64);
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -5600,14 +5526,14 @@ Var Buffer: AnsiString;
   begin
     if BufferPos > BufferLength - sizeof(LInt64) + 1 then begin
       ExpandBuffer;
-      if BufferPos > BufferLength - sizeof(LInt64) + 1 then AlJSONDocErrorA(cALBSONParseError);
+      if BufferPos > BufferLength - sizeof(LInt64) + 1 then AlJSONDocErrorA(ALBSONParseError);
     end;
     ALMove(Pbyte(Buffer)[BufferPos-1], LInt64, sizeof(LInt64));
     LTimestamp.I64 := LInt64;
     BufferPos := BufferPos + sizeof(LInt64);
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -5631,7 +5557,7 @@ Var Buffer: AnsiString;
   var LNode: TALJSONNodeA;
   begin
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -5666,7 +5592,7 @@ Var Buffer: AnsiString;
         break;
       end;
     end;
-    if P1 > BufferLength then AlJSONDocErrorA(cALBSONParseError);
+    if P1 > BufferLength then AlJSONDocErrorA(ALBSONParseError);
     BufferPos := P1 + 1;
     if BufferPos > BufferLength then ExpandBuffer;
 
@@ -5684,13 +5610,13 @@ Var Buffer: AnsiString;
       end;
       inc(BufferPos);
     end;
-    if BufferPos > BufferLength then AlJSONDocErrorA(cALBSONParseError);
+    if BufferPos > BufferLength then AlJSONDocErrorA(ALBSONParseError);
     inc(BufferPos);
     if BufferPos > BufferLength then ExpandBuffer;
 
     //create the node
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -5717,18 +5643,18 @@ Var Buffer: AnsiString;
   begin
     if BufferPos > BufferLength - sizeof(LInt32) + 1 then begin
       ExpandBuffer;
-      if BufferPos > BufferLength - sizeof(LInt32) + 1 then AlJSONDocErrorA(cALBSONParseError);
+      if BufferPos > BufferLength - sizeof(LInt32) + 1 then AlJSONDocErrorA(ALBSONParseError);
     end;
     ALMove(Pbyte(Buffer)[BufferPos-1], LInt32, sizeof(LInt32));
     BufferPos := BufferPos + sizeof(LInt32);
     while (BufferPos + LInt32 - 1 > BufferLength) do
-      if not ExpandBuffer then AlJSONDocErrorA(cALBSONParseError);
+      if not ExpandBuffer then AlJSONDocErrorA(ALBSONParseError);
     ALCopyStr(Buffer,LJavascript,BufferPos,LInt32 - 1{for the trailing #0});
     BufferPos := BufferPos + LInt32;
 
     //create the node
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+      if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -5765,10 +5691,10 @@ Var Buffer: AnsiString;
 
       //error if Paths.Count = 0 (mean one end object/array without any starting)
       if assigned(ObjectPaths) then begin
-        if (ObjectPaths.Count = 0) then AlJSONDocErrorA(cALBSONParseError);
+        if (ObjectPaths.Count = 0) then AlJSONDocErrorA(ALBSONParseError);
       end
       else begin
-        if (NamePaths.Count = 0) then AlJSONDocErrorA(cALBSONParseError);
+        if (NamePaths.Count = 0) then AlJSONDocErrorA(ALBSONParseError);
       end;
 
       //if we are not in sax mode
@@ -5779,11 +5705,11 @@ Var Buffer: AnsiString;
         else LNode := TALJSONNodeA(NamePaths.Objects[NamePaths.Count - 1]);
 
         //if anode <> workingNode aie aie aie
-        if (LNode <> WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+        if (LNode <> WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
 
         //calculate anodeTypeInt
         LNodeType := LNode.NodeType;
-        if not (LNodeType in [ntObject, ntarray]) then AlJSONDocErrorA(cALBSONParseError);
+        if not (LNodeType in [ntObject, ntarray]) then AlJSONDocErrorA(ALBSONParseError);
 
         //if working node <> Self then we can go to one level up
         If WorkingNode <> Self then begin
@@ -5803,7 +5729,7 @@ Var Buffer: AnsiString;
 
         //calculate anodeTypeInt
         LNodeType := TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]);
-        if not (LNodeType in [ntObject,ntarray]) then AlJSONDocErrorA(cALBSONParseError);
+        if not (LNodeType in [ntObject,ntarray]) then AlJSONDocErrorA(ALBSONParseError);
 
       end;
 
@@ -5843,7 +5769,7 @@ Var Buffer: AnsiString;
       #$10: LNodeSubType := nstint32;
       #$11: LNodeSubType := nstTimestamp;
       #$12: LNodeSubType := nstint64;
-      else AlJSONDocErrorA(cALBSONParseError);
+      else AlJSONDocErrorA(ALBSONParseError);
     end;
     BufferPos := BufferPos + 1;
     If BufferPos > BufferLength then ExpandBuffer;
@@ -5858,7 +5784,7 @@ Var Buffer: AnsiString;
         break;
       end;
     end;
-    if P1 > BufferLength then AlJSONDocErrorA(cALBSONParseError);
+    if P1 > BufferLength then AlJSONDocErrorA(ALBSONParseError);
     BufferPos := P1 + 1;
     if BufferPos > BufferLength then ExpandBuffer;
     {$ENDREGION}
@@ -5872,7 +5798,7 @@ Var Buffer: AnsiString;
       if NotSaxMode then begin
 
         //if workingnode = nil then it's mean we are outside Self
-        if not assigned(WorkingNode) then AlJSONDocErrorA(cALBSONParseError);
+        if not assigned(WorkingNode) then AlJSONDocErrorA(ALBSONParseError);
 
         //create the node according the the braket char and add it to the workingnode
         if LNodeSubType = nstObject then begin
@@ -5965,7 +5891,7 @@ Var Buffer: AnsiString;
       // \x12 + name + \x00 + int64
       nstint64: _createInt64Node(CurrName, LNodeSubType);
 
-      else AlJSONDocErrorA(cALBSONParseError);
+      else AlJSONDocErrorA(ALBSONParseError);
     end;
     {$ENDREGION}
 
@@ -5974,7 +5900,7 @@ Var Buffer: AnsiString;
 Begin
 
   //Only Object Node can be loaded from BSON
-  If NodeType <> ntObject then AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
+  If NodeType <> ntObject then AlJSONDocErrorA(ALJSONOperationError,GetNodeType);
   if poClearChildNodes in Options then ChildNodes.Clear;
 
   //init WorkingNode and NotSaxMode
@@ -6024,14 +5950,14 @@ Begin
 
     //some tags are not closed
     if assigned(ObjectPaths) then begin
-      if ObjectPaths.Count > 0 then AlJSONDocErrorA(cALBSONParseError);
+      if ObjectPaths.Count > 0 then AlJSONDocErrorA(ALBSONParseError);
     end
     else begin
-      if NamePaths.Count > 0 then AlJSONDocErrorA(cALBSONParseError);
+      if NamePaths.Count > 0 then AlJSONDocErrorA(ALBSONParseError);
     end;
 
     //mean the node was not update (empty stream?) or not weel closed
-    if NotSaxMode and (WorkingNode <> nil) then AlJSONDocErrorA(cALBSONParseError);
+    if NotSaxMode and (WorkingNode <> nil) then AlJSONDocErrorA(ALBSONParseError);
 
   finally
 
@@ -6291,7 +6217,7 @@ begin
                       else _WriteStartArrayNode2Buffer(CurrentNode);
                    end;
           ntText: _WriteTextNode2Buffer(CurrentNode);
-          else AlJSONDocErrorA(cAlJSONInvalidNodeType);
+          else AlJSONDocErrorA(ALJSONInvalidNodeType);
         end;
 
       CurrentParentNode := CurrentNode.ParentNode;
@@ -6580,7 +6506,7 @@ Var NodeStack: Tstack<TALJSONNodeA>;
         nstInt32: _WriteStr2Buffer(#$10);
         // \x12 + name + \x00 + int64
         nstInt64: _WriteStr2Buffer(#$12);
-        else AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+        else AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
       end;
 
       // write the nodename
@@ -6603,7 +6529,7 @@ Var NodeStack: Tstack<TALJSONNodeA>;
         nstJavascript: _WriteJavascriptValue2Buffer(aTextNode);
         nstInt32: _WriteInt32Value2Buffer(aTextNode);
         nstInt64: _WriteInt64Value2Buffer(aTextNode);
-        else AlJSONDocErrorA(cALJSONInvalidBSONNodeSubType);
+        else AlJSONDocErrorA(ALJSONInvalidBSONNodeSubType);
       end;
     end;
   end;
@@ -6757,7 +6683,7 @@ begin
                       else _WriteStartArrayNode2Buffer(CurrentNode, CurrentNodeIndex);
                    end;
           ntText: _WriteTextNode2Buffer(CurrentNode, CurrentNodeIndex);
-          else AlJSONDocErrorA(cAlJSONInvalidNodeType);
+          else AlJSONDocErrorA(ALJSONInvalidNodeType);
         end;
 
       CurrentParentNode := CurrentNode.ParentNode;
@@ -6825,7 +6751,7 @@ end;
 procedure TALJSONNodeA.LoadFromJSONString(const Str: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]);
 Begin
   Try
-    ParseJson(nil, Str, False{SaxMode}, nil{onParseText}, nil{onParseStartObject}, nil{onParseEndObject}, nil{onParseStartArray}, nil{onParseEndArray}, Options);
+    ParseJson(nil, Str, False{SaxMode}, nil{OnParseText}, nil{OnParseStartObject}, nil{OnParseEndObject}, nil{OnParseStartArray}, nil{OnParseEndArray}, Options);
   except
     ChildNodes.Clear;
     raise;
@@ -6837,7 +6763,7 @@ procedure TALJSONNodeA.LoadFromJSONStream(const Stream: TStream; const Options: 
 Begin
   Try
     Stream.Position := 0;
-    ParseJSON(Stream, '', False{SaxMode}, nil{onParseText}, nil{onParseStartObject}, nil{onParseEndObject}, nil{onParseStartArray}, nil{onParseEndArray}, Options);
+    ParseJSON(Stream, '', False{SaxMode}, nil{OnParseText}, nil{OnParseStartObject}, nil{OnParseEndObject}, nil{OnParseStartArray}, nil{OnParseEndArray}, Options);
   except
     ChildNodes.Clear;
     raise;
@@ -6866,7 +6792,7 @@ end;
 procedure TALJSONNodeA.LoadFromBSONString(const Str: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]);
 Begin
   Try
-    ParseBSON(nil, Str, False{SaxMode}, nil{onParseText}, nil{onParseStartObject}, nil{onParseEndObject}, nil{onParseStartArray}, nil{onParseEndArray}, Options);
+    ParseBSON(nil, Str, False{SaxMode}, nil{OnParseText}, nil{OnParseStartObject}, nil{OnParseEndObject}, nil{OnParseStartArray}, nil{OnParseEndArray}, Options);
   except
     ChildNodes.Clear;
     raise;
@@ -6878,7 +6804,7 @@ procedure TALJSONNodeA.LoadFromBSONStream(const Stream: TStream; const Options: 
 Begin
   Try
     Stream.Position := 0;
-    ParseBSON(Stream, '', False{SaxMode}, nil{onParseText}, nil{onParseStartObject}, nil{onParseEndObject}, nil{onParseStartArray}, nil{onParseEndArray}, Options);
+    ParseBSON(Stream, '', False{SaxMode}, nil{OnParseText}, nil{OnParseStartObject}, nil{OnParseEndObject}, nil{OnParseStartArray}, nil{OnParseEndArray}, Options);
   except
     ChildNodes.Clear;
     raise;
@@ -6906,44 +6832,44 @@ end;
 {*************************************}
 procedure TALJSONNodeA.ParseJSONString(
             const Str: AnsiString;
-            const onParseText: TAlJSONParseTextEventA;
-            const onParseStartObject: TAlJSONParseObjectEventA;
-            const onParseEndObject: TAlJSONParseObjectEventA;
-            const onParseStartArray: TAlJSONParseArrayEventA;
-            const onParseEndArray: TAlJSONParseArrayEventA;
+            const OnParseText: TAlJSONParseTextEventA;
+            const OnParseStartObject: TAlJSONParseObjectEventA;
+            const OnParseEndObject: TAlJSONParseObjectEventA;
+            const OnParseStartArray: TAlJSONParseArrayEventA;
+            const OnParseEndArray: TAlJSONParseArrayEventA;
             const Options: TALJSONParseOptions = []);
 Begin
-  ParseJson(nil, Str, true{SaxMode}, onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+  ParseJson(nil, Str, true{SaxMode}, OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
 end;
 
 {*************************************}
 procedure TALJSONNodeA.ParseJSONStream(
             const Stream: TStream;
-            const onParseText: TAlJSONParseTextEventA;
-            const onParseStartObject: TAlJSONParseObjectEventA;
-            const onParseEndObject: TAlJSONParseObjectEventA;
-            const onParseStartArray: TAlJSONParseArrayEventA;
-            const onParseEndArray: TAlJSONParseArrayEventA;
+            const OnParseText: TAlJSONParseTextEventA;
+            const OnParseStartObject: TAlJSONParseObjectEventA;
+            const OnParseEndObject: TAlJSONParseObjectEventA;
+            const OnParseStartArray: TAlJSONParseArrayEventA;
+            const OnParseEndArray: TAlJSONParseArrayEventA;
             const Options: TALJSONParseOptions = []);
 Begin
   Stream.Position := 0;
-  ParseJSON(Stream, '', true{SaxMode}, onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+  ParseJSON(Stream, '', true{SaxMode}, OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
 end;
 
 {***********************************}
 procedure TALJSONNodeA.ParseJSONFile(
             const FileName: String;
-            const onParseText: TAlJSONParseTextEventA;
-            const onParseStartObject: TAlJSONParseObjectEventA;
-            const onParseEndObject: TAlJSONParseObjectEventA;
-            const onParseStartArray: TAlJSONParseArrayEventA;
-            const onParseEndArray: TAlJSONParseArrayEventA;
+            const OnParseText: TAlJSONParseTextEventA;
+            const OnParseStartObject: TAlJSONParseObjectEventA;
+            const OnParseEndObject: TAlJSONParseObjectEventA;
+            const OnParseStartArray: TAlJSONParseArrayEventA;
+            const OnParseEndArray: TAlJSONParseArrayEventA;
             const Options: TALJSONParseOptions = []);
 Var LfileStream: TfileStream;
 Begin
   LfileStream := TfileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
   Try
-    ParseJSONStream(LfileStream, onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+    ParseJSONStream(LfileStream, OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
   finally
     ALFreeAndNil(LfileStream);
   end;
@@ -6952,57 +6878,57 @@ end;
 {***********************************}
 procedure TALJSONNodeA.ParseJSONFile(
             const FileName: AnsiString;
-            const onParseText: TAlJSONParseTextEventA;
-            const onParseStartObject: TAlJSONParseObjectEventA;
-            const onParseEndObject: TAlJSONParseObjectEventA;
-            const onParseStartArray: TAlJSONParseArrayEventA;
-            const onParseEndArray: TAlJSONParseArrayEventA;
+            const OnParseText: TAlJSONParseTextEventA;
+            const OnParseStartObject: TAlJSONParseObjectEventA;
+            const OnParseEndObject: TAlJSONParseObjectEventA;
+            const OnParseStartArray: TAlJSONParseArrayEventA;
+            const OnParseEndArray: TAlJSONParseArrayEventA;
             const Options: TALJSONParseOptions = []);
 Begin
-  ParseJSONFile(String(FileName), onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+  ParseJSONFile(String(FileName), OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
 end;
 
 {*************************************}
 procedure TALJSONNodeA.ParseBSONString(
             const Str: AnsiString;
-            const onParseText: TAlJSONParseTextEventA;
-            const onParseStartObject: TAlJSONParseObjectEventA;
-            const onParseEndObject: TAlJSONParseObjectEventA;
-            const onParseStartArray: TAlJSONParseArrayEventA;
-            const onParseEndArray: TAlJSONParseArrayEventA;
+            const OnParseText: TAlJSONParseTextEventA;
+            const OnParseStartObject: TAlJSONParseObjectEventA;
+            const OnParseEndObject: TAlJSONParseObjectEventA;
+            const OnParseStartArray: TAlJSONParseArrayEventA;
+            const OnParseEndArray: TAlJSONParseArrayEventA;
             const Options: TALJSONParseOptions = []);
 Begin
-  ParseBSON(nil, Str, true{SaxMode}, onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+  ParseBSON(nil, Str, true{SaxMode}, OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
 end;
 
 {*************************************}
 procedure TALJSONNodeA.ParseBSONStream(
             const Stream: TStream;
-            const onParseText: TAlJSONParseTextEventA;
-            const onParseStartObject: TAlJSONParseObjectEventA;
-            const onParseEndObject: TAlJSONParseObjectEventA;
-            const onParseStartArray: TAlJSONParseArrayEventA;
-            const onParseEndArray: TAlJSONParseArrayEventA;
+            const OnParseText: TAlJSONParseTextEventA;
+            const OnParseStartObject: TAlJSONParseObjectEventA;
+            const OnParseEndObject: TAlJSONParseObjectEventA;
+            const OnParseStartArray: TAlJSONParseArrayEventA;
+            const OnParseEndArray: TAlJSONParseArrayEventA;
             const Options: TALJSONParseOptions = []);
 Begin
   Stream.Position := 0;
-  ParseBSON(Stream, '', true{SaxMode}, onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+  ParseBSON(Stream, '', true{SaxMode}, OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
 end;
 
 {***********************************}
 procedure TALJSONNodeA.ParseBSONFile(
             const FileName: String;
-            const onParseText: TAlJSONParseTextEventA;
-            const onParseStartObject: TAlJSONParseObjectEventA;
-            const onParseEndObject: TAlJSONParseObjectEventA;
-            const onParseStartArray: TAlJSONParseArrayEventA;
-            const onParseEndArray: TAlJSONParseArrayEventA;
+            const OnParseText: TAlJSONParseTextEventA;
+            const OnParseStartObject: TAlJSONParseObjectEventA;
+            const OnParseEndObject: TAlJSONParseObjectEventA;
+            const OnParseStartArray: TAlJSONParseArrayEventA;
+            const OnParseEndArray: TAlJSONParseArrayEventA;
             const Options: TALJSONParseOptions = []);
 Var LfileStream: TfileStream;
 Begin
   LfileStream := TfileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
   Try
-    ParseBSONStream(LfileStream, onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+    ParseBSONStream(LfileStream, OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
   finally
     ALFreeAndNil(LfileStream);
   end;
@@ -7011,27 +6937,27 @@ end;
 {***********************************}
 procedure TALJSONNodeA.ParseBSONFile(
             const FileName: AnsiString;
-            const onParseText: TAlJSONParseTextEventA;
-            const onParseStartObject: TAlJSONParseObjectEventA;
-            const onParseEndObject: TAlJSONParseObjectEventA;
-            const onParseStartArray: TAlJSONParseArrayEventA;
-            const onParseEndArray: TAlJSONParseArrayEventA;
+            const OnParseText: TAlJSONParseTextEventA;
+            const OnParseStartObject: TAlJSONParseObjectEventA;
+            const OnParseEndObject: TAlJSONParseObjectEventA;
+            const OnParseStartArray: TAlJSONParseArrayEventA;
+            const OnParseEndArray: TAlJSONParseArrayEventA;
             const Options: TALJSONParseOptions = []);
 Begin
-  ParseBSONFile(String(FileName), onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+  ParseBSONFile(String(FileName), OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
 end;
 
 {*********************************************************************}
 constructor TALJSONObjectNodeA.Create(const NodeName: AnsiString = '');
 begin
   inherited create(NodeName);
-  FChildNodes := nil;
+  FChildNodes := CreateChildList;
 end;
 
 {************************************}
 destructor TALJSONObjectNodeA.Destroy;
 begin
-  If assigned(FChildNodes) then FreeAndNil(FchildNodes);
+  ALFreeAndNil(FChildNodes);
   inherited;
 end;
 
@@ -7045,7 +6971,7 @@ end;
 {************************************************************************}
 procedure TALJSONObjectNodeA.SetChildNodes(const Value: TALJSONNodeListA);
 begin
-  If Assigned(FChildNodes) then FreeAndNil(FchildNodes);
+  ALFreeAndNil(FChildNodes);
   FChildNodes := Value;
 end;
 
@@ -7072,13 +6998,13 @@ end;
 constructor TALJSONArrayNodeA.Create(const NodeName: AnsiString = '');
 begin
   inherited create(NodeName);
-  FChildNodes := nil;
+  FChildNodes := CreateChildList;
 end;
 
 {***********************************}
 destructor TALJSONArrayNodeA.Destroy;
 begin
-  If assigned(FChildNodes) then FreeAndNil(FchildNodes);
+  ALFreeAndNil(FChildNodes);
   inherited;
 end;
 
@@ -7092,7 +7018,7 @@ end;
 {***********************************************************************}
 procedure TALJSONArrayNodeA.SetChildNodes(const Value: TALJSONNodeListA);
 begin
-  If Assigned(FChildNodes) then FreeAndNil(FchildNodes);
+  ALFreeAndNil(FChildNodes);
   FChildNodes := Value;
 end;
 
@@ -7143,28 +7069,25 @@ begin
   if nvStr in fRawNodeValueDefined then result := fRawNodeValueStr
   else begin
 
-    if not (nvInt64 in fRawNodeValueDefined) then AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
+    if not (nvInt64 in fRawNodeValueDefined) then AlJSONDocErrorA(ALJSONOperationError,GetNodeType);
 
     case fNodeSubType of
-      nstFloat: ALFloatToStrA(GetFloat, fRawNodeValueStr);
+      nstFloat: ALFloatToStrA(GetFloat, Result);
       //nstText: can not be retrieve from int64
       //nstObject: can not be retrieve from int64
       //nstArray: can not be retrieve from int64
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
-      nstBoolean: ALBoolToStrA(fRawNodeValueStr, getBool, 'true', 'false');
-      nstDateTime: ALDateTimeToStrA(GetDateTime, fRawNodeValueStr);
-      nstNull: fRawNodeValueStr := 'null';
+      nstBoolean: ALBoolToStrA(Result, getBool, 'true', 'false');
+      nstDateTime: ALDateTimeToStrA(GetDateTime, Result);
+      nstNull: Result := 'null';
       //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
-      nstInt32: ALIntToStrA(GetInt32, fRawNodeValueStr);
-      nstTimestamp: ALFormatA('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], fRawNodeValueStr);
-      nstInt64: ALIntToStrA(GetInt64, fRawNodeValueStr);
-      else AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
+      nstInt32: ALIntToStrA(GetInt32, Result);
+      nstTimestamp: ALFormatA('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], Result);
+      nstInt64: ALIntToStrA(GetInt64, Result);
+      else AlJSONDocErrorA(ALJSONOperationError,GetNodeType);
     end;
-
-    fRawNodeValueDefined := fRawNodeValueDefined + [nvStr];
-    result := fRawNodeValueStr;
 
   end;
 end;
@@ -7180,12 +7103,12 @@ begin
   if nvInt64 in fRawNodeValueDefined then result := fRawNodeValueInt64
   else begin
 
-    if not (nvStr in fRawNodeValueDefined) then AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
+    if not (nvStr in fRawNodeValueDefined) then AlJSONDocErrorA(ALJSONOperationError,GetNodeType);
 
     case fNodeSubType of
       nstFloat: begin
                   IF not ALTryStrToFloat(fRawNodeValueStr, LDouble) then AlJSONDocErrorA('%s is not a valid Float', [fRawNodeValueStr]);
-                  fRawNodeValueInt64 := Pint64(@LDouble)^;
+                  Result := Pint64(@LDouble)^;
                 end;
       //nstText: can not be retrieve from int64
       //nstObject: can not be retrieve from int64
@@ -7194,33 +7117,30 @@ begin
       //nstObjectID: can not be retrieve from int64
       nstBoolean: begin
                     IF not ALTryStrToBool(fRawNodeValueStr, LBool) then AlJSONDocErrorA('%s is not a valid Boolean', [fRawNodeValueStr]);
-                    fRawNodeValueInt64 := ALBoolToInt(LBool);
+                    Result := ALBoolToInt(LBool);
                   end;
       nstDateTime: begin
                      IF not ALTryStrToDateTime(fRawNodeValueStr, LDateTime) then AlJSONDocErrorA('%s is not a valid Datetime', [fRawNodeValueStr]);
-                     fRawNodeValueInt64 := Pint64(@LDateTime)^;
+                     Result := Pint64(@LDateTime)^;
                    end;
       nstNull:  begin
-                  fRawNodeValueInt64 := 0;
+                  Result := 0;
                 end;
       //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
       nstInt32: begin
                   IF not ALTryStrToInt(fRawNodeValueStr, LInt32) then AlJSONDocErrorA('%s is not a valid Int32', [fRawNodeValueStr]);
-                  fRawNodeValueInt64 := LInt32;
+                  Result := LInt32;
                 end;
       nstTimestamp: begin
                       IF not ALJSONTryStrToTimestampA(fRawNodeValueStr, LTimestamp) then AlJSONDocErrorA('%s is not a valid Timestamp', [fRawNodeValueStr]);
-                      fRawNodeValueInt64 := LTimestamp.I64;
+                      Result := LTimestamp.I64;
                     end;
       nstInt64: begin
-                  IF not ALTryStrToInt64(fRawNodeValueStr, fRawNodeValueInt64) then AlJSONDocErrorA('%s is not a valid Int64', [fRawNodeValueStr]);
+                  IF not ALTryStrToInt64(fRawNodeValueStr, Result) then AlJSONDocErrorA('%s is not a valid Int64', [fRawNodeValueStr]);
                 end;
-      else AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
+      else AlJSONDocErrorA(ALJSONOperationError,GetNodeType);
     end;
-
-    fRawNodeValueDefined := fRawNodeValueDefined + [nvInt64];
-    result := fRawNodeValueInt64;
 
   end;
 end;
@@ -7473,7 +7393,7 @@ end;
   Index should be less than the value of the Count property.}
 function TALJSONNodeListA.Get(Index: Integer): TALJSONNodeA;
 begin
-  if (Index < 0) or (Index >= FCount) then AlJSONDocErrorA(CALJSONListIndexError, [Index]);
+  if (Index < 0) or (Index >= FCount) then AlJSONDocErrorA(ALJSONListIndexError, [Index]);
   Result := FList[Index];
 end;
 
@@ -7496,7 +7416,7 @@ end;
 function TALJSONNodeListA.GetNodeByName(const Name: AnsiString): TALJSONNodeA;
 begin
   Result := FindNode(Name);
-  if not Assigned(Result) then AlJSONDocErrorA(CALJSONNodeNotFound, [Name]);
+  if not Assigned(Result) then AlJSONDocErrorA(ALJSONNodeNotFound, [Name]);
 end;
 
 {****************************************************************************}
@@ -7588,7 +7508,7 @@ begin
                      ALFreeAndNil(Node);
                      Exit;
                    end;
-        dupError: AlJSONDocErrorA(cALJSONDuplicateNodeName);
+        dupError: AlJSONDocErrorA(ALJSONDuplicateNodeName);
       end;
   InternalInsert(Result, Node);
 end;
@@ -7618,8 +7538,8 @@ procedure TALJSONNodeListA.Insert(Index: Integer; const Node: TALJSONNodeA);
 begin
   if Index = -1 then Add(Node)
   else begin
-    if Sorted then AlJSONDocErrorA(CALJSONSortedListError);
-    if (Index < 0) or (Index > FCount) then AlJSONDocErrorA(CALJSONListIndexError, [Index]);
+    if Sorted then AlJSONDocErrorA(ALJSONSortedListError);
+    if (Index < 0) or (Index > FCount) then AlJSONDocErrorA(ALJSONListIndexError, [Index]);
     InternalInsert(Index, Node);
   end;
 end;
@@ -7684,8 +7604,8 @@ end;
 procedure TALJSONNodeListA.Exchange(Index1, Index2: Integer);
 var Item: Pointer;
 begin
-  if (Index1 < 0) or (Index1 >= FCount) then AlJSONDocErrorA(cALJSONListIndexError, [Index1]);
-  if (Index2 < 0) or (Index2 >= FCount) then AlJSONDocErrorA(cALJSONListIndexError, [Index2]);
+  if (Index1 < 0) or (Index1 >= FCount) then AlJSONDocErrorA(ALJSONListIndexError, [Index1]);
+  if (Index2 < 0) or (Index2 >= FCount) then AlJSONDocErrorA(ALJSONListIndexError, [Index2]);
   Item := pointer(FList[Index1]);
   pointer(FList[Index1]) := pointer(FList[Index2]);
   pointer(FList[Index2]) := Item;
@@ -7748,7 +7668,7 @@ end;
 {***********************************************************}
 procedure TALJSONNodeListA.SetCapacity(NewCapacity: Integer);
 begin
-  if (NewCapacity < FCount) then AlJSONDocErrorA(CALJSONListCapacityError, [NewCapacity]);
+  if (NewCapacity < FCount) then AlJSONDocErrorA(ALJSONListCapacityError, [NewCapacity]);
   if NewCapacity <> FCapacity then begin
     SetLength(FList, NewCapacity);
     FCapacity := NewCapacity;
@@ -7802,7 +7722,7 @@ end;
 procedure TALJSONNodeListA.SetCount(NewCount: Integer);
 var I: Integer;
 begin
-  if (NewCount < 0) then AlJSONDocErrorA(CALJSONListCountError, [NewCount]);
+  if (NewCount < 0) then AlJSONDocErrorA(ALJSONListCountError, [NewCount]);
   if NewCount > FCapacity then SetCapacity(NewCount);
   if NewCount > FCount then FillChar(FList[FCount], (NewCount - FCount) * SizeOf(Pointer), 0)
   else for I := FCount - 1 downto NewCount do Delete(I);
@@ -7832,29 +7752,29 @@ begin
       else if (NodeSubType = nstnull) then      aLst.Add(aPath + Path + aLst.NameValueSeparator + aNullStr)
       else                                      aLst.Add(aPath + Path + aLst.NameValueSeparator + ansiString(Args[0].VAnsiString));
       LContainChilds := True;
-    end{onParseText},
+    end{OnParseText},
     //--
     procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
     begin
       LContainChilds := False;
-    end{onParseStartObject},
+    end{OnParseStartObject},
     //--
     procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
     begin
       if (not LContainChilds) and (aPath + Path <> ''{Path = '' mean it's the root object}) then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '{}');
       LContainChilds := True;
-    end{onParseEndObject},
+    end{OnParseEndObject},
     //--
     procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
     begin
       LContainChilds := False;
-    end{onParseStartArray},
+    end{OnParseStartArray},
     //--
     procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
     begin
       if not LContainChilds then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '[]');
       LContainChilds := True;
-    end{onParseEndArray});
+    end{OnParseEndArray});
 end;
 
 {**************************}
@@ -8758,7 +8678,7 @@ begin
     ntObject: ALJSONDocErrorW(Msg, ['ntObject']);
     ntArray: ALJSONDocErrorW(Msg, ['ntArray']);
     ntText: ALJSONDocErrorW(Msg, ['ntText']);
-    else ALJSONDocErrorW(cAlJSONInvalidNodeType);
+    else ALJSONDocErrorW(ALJSONInvalidNodeType);
   end;
 end;
 
@@ -8773,7 +8693,7 @@ begin
     ntText: Result := TALJSONTextNodeW.Create(NodeName);
     else begin
       Result := nil; //for hide warning
-      ALJSONDocErrorW(cAlJSONInvalidNodeType);
+      ALJSONDocErrorW(ALJSONInvalidNodeType);
     end;
   end;
 end;
@@ -8821,7 +8741,7 @@ class function TALJSONDocumentW.CreateFromJSONString(const Str: String; const Op
 begin
   var LNodeType := DetectNodeTypeFromJSON(Str);
   if LNodeType in [ntObject, ntArray] then result := ALCreateJSONNodeW('', LNodeType)
-  else AlJSONDocErrorW(cALJSONParseError);
+  else AlJSONDocErrorW(ALJSONParseError);
   try
     result.LoadFromJSONString(Str, Options);
   except
@@ -8883,17 +8803,17 @@ end;
 {***********************************************}
 class procedure TALJSONDocumentW.ParseJSONString(
                   const Str: String;
-                  const onParseText: TAlJSONParseTextEventW;
-                  const onParseStartObject: TAlJSONParseObjectEventW;
-                  const onParseEndObject: TAlJSONParseObjectEventW;
-                  const onParseStartArray: TAlJSONParseArrayEventW;
-                  const onParseEndArray: TAlJSONParseArrayEventW;
+                  const OnParseText: TAlJSONParseTextEventW;
+                  const OnParseStartObject: TAlJSONParseObjectEventW;
+                  const OnParseEndObject: TAlJSONParseObjectEventW;
+                  const OnParseStartArray: TAlJSONParseArrayEventW;
+                  const OnParseEndArray: TAlJSONParseArrayEventW;
                   const Options: TALJSONParseOptions = []);
 begin
   var LJsonNode: TALJsonNodeW;
   var LNodeType := DetectNodeTypeFromJSON(Str);
   if LNodeType in [ntObject, ntArray] then LJsonNode := ALCreateJSONNodeW('', LNodeType)
-  else AlJSONDocErrorW(cALJSONParseError);
+  else AlJSONDocErrorW(ALJSONParseError);
   try
     LJsonNode.ParseJSONString(
       Str,
@@ -8911,11 +8831,11 @@ end;
 {***********************************************}
 class procedure TALJSONDocumentW.ParseJSONStream(
                   const Stream: TStream;
-                  const onParseText: TAlJSONParseTextEventW;
-                  const onParseStartObject: TAlJSONParseObjectEventW;
-                  const onParseEndObject: TAlJSONParseObjectEventW;
-                  const onParseStartArray: TAlJSONParseArrayEventW;
-                  const onParseEndArray: TAlJSONParseArrayEventW;
+                  const OnParseText: TAlJSONParseTextEventW;
+                  const OnParseStartObject: TAlJSONParseObjectEventW;
+                  const OnParseEndObject: TAlJSONParseObjectEventW;
+                  const OnParseStartArray: TAlJSONParseArrayEventW;
+                  const OnParseEndArray: TAlJSONParseArrayEventW;
                   const Options: TALJSONParseOptions = []);
 begin
   Stream.Position := 0;
@@ -8932,11 +8852,11 @@ end;
 {*********************************************}
 class procedure TALJSONDocumentW.ParseJSONFile(
                   const FileName: String;
-                  const onParseText: TAlJSONParseTextEventW;
-                  const onParseStartObject: TAlJSONParseObjectEventW;
-                  const onParseEndObject: TAlJSONParseObjectEventW;
-                  const onParseStartArray: TAlJSONParseArrayEventW;
-                  const onParseEndArray: TAlJSONParseArrayEventW;
+                  const OnParseText: TAlJSONParseTextEventW;
+                  const OnParseStartObject: TAlJSONParseObjectEventW;
+                  const OnParseEndObject: TAlJSONParseObjectEventW;
+                  const OnParseStartArray: TAlJSONParseArrayEventW;
+                  const OnParseEndArray: TAlJSONParseArrayEventW;
                   const Options: TALJSONParseOptions = []);
 Var LfileStream: TfileStream;
 Begin
@@ -8958,11 +8878,11 @@ end;
 {**********************************************}
 class procedure TALJSONDocumentW.ParseBSONBytes(
                   const Bytes: Tbytes;
-                  const onParseText: TAlJSONParseTextEventW;
-                  const onParseStartObject: TAlJSONParseObjectEventW;
-                  const onParseEndObject: TAlJSONParseObjectEventW;
-                  const onParseStartArray: TAlJSONParseArrayEventW;
-                  const onParseEndArray: TAlJSONParseArrayEventW;
+                  const OnParseText: TAlJSONParseTextEventW;
+                  const OnParseStartObject: TAlJSONParseObjectEventW;
+                  const OnParseEndObject: TAlJSONParseObjectEventW;
+                  const OnParseStartArray: TAlJSONParseArrayEventW;
+                  const OnParseEndArray: TAlJSONParseArrayEventW;
                   const Options: TALJSONParseOptions = []);
 begin
   var LJsonNode := ALCreateJSONNodeW('', ntObject);
@@ -8983,11 +8903,11 @@ end;
 {***********************************************}
 class procedure TALJSONDocumentW.ParseBSONStream(
                   const Stream: TStream;
-                  const onParseText: TAlJSONParseTextEventW;
-                  const onParseStartObject: TAlJSONParseObjectEventW;
-                  const onParseEndObject: TAlJSONParseObjectEventW;
-                  const onParseStartArray: TAlJSONParseArrayEventW;
-                  const onParseEndArray: TAlJSONParseArrayEventW;
+                  const OnParseText: TAlJSONParseTextEventW;
+                  const OnParseStartObject: TAlJSONParseObjectEventW;
+                  const OnParseEndObject: TAlJSONParseObjectEventW;
+                  const OnParseStartArray: TAlJSONParseArrayEventW;
+                  const OnParseEndArray: TAlJSONParseArrayEventW;
                   const Options: TALJSONParseOptions = []);
 begin
   Stream.Position := 0;
@@ -9004,11 +8924,11 @@ end;
 {*********************************************}
 class procedure TALJSONDocumentW.ParseBSONFile(
                   const FileName: String;
-                  const onParseText: TAlJSONParseTextEventW;
-                  const onParseStartObject: TAlJSONParseObjectEventW;
-                  const onParseEndObject: TAlJSONParseObjectEventW;
-                  const onParseStartArray: TAlJSONParseArrayEventW;
-                  const onParseEndArray: TAlJSONParseArrayEventW;
+                  const OnParseText: TAlJSONParseTextEventW;
+                  const OnParseStartObject: TAlJSONParseObjectEventW;
+                  const OnParseEndObject: TAlJSONParseObjectEventW;
+                  const OnParseStartArray: TAlJSONParseArrayEventW;
+                  const OnParseEndArray: TAlJSONParseArrayEventW;
                   const Options: TALJSONParseOptions = []);
 Var LfileStream: TfileStream;
 Begin
@@ -9045,13 +8965,13 @@ end;
 function TALJSONNodeW.GetChildNodes: TALJSONNodeListW;
 begin
   Result := nil; // hide warning
-  ALJSONDocErrorW(CALJsonOperationError,GetNodeType)
+  ALJSONDocErrorW(ALJSONOperationError,GetNodeType)
 end;
 
 {******************************************************************}
 procedure TALJSONNodeW.SetChildNodes(const Value: TALJSONNodeListW);
 begin
-  ALJSONDocErrorW(CALJsonOperationError,GetNodeType)
+  ALJSONDocErrorW(ALJSONOperationError,GetNodeType)
 end;
 
 {***********************************************************************}
@@ -9825,40 +9745,40 @@ end;
 {********************************************}
 function TALJSONNodeW.GetNodeValueStr: String;
 begin
-  ALJSONDocErrorW(CALJsonOperationError,GetNodeType);
+  ALJSONDocErrorW(ALJSONOperationError,GetNodeType);
   result := ''; // hide warning
 end;
 
 {*********************************************}
 function TALJSONNodeW.GetNodeValueInt64: int64;
 begin
-  ALJSONDocErrorW(CALJsonOperationError,GetNodeType);
+  ALJSONDocErrorW(ALJSONOperationError,GetNodeType);
   result := 0; // hide warning
 end;
 
 {**********************************************************************************************}
 procedure TALJSONNodeW.SetNodeValue(const Value: String; const NodeSubType: TALJSONNodeSubType);
 begin
-  ALJSONDocErrorW(CALJsonOperationError,GetNodeType);
+  ALJSONDocErrorW(ALJSONOperationError,GetNodeType);
 end;
 
 {*********************************************************************************************}
 procedure TALJSONNodeW.SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
-  ALJSONDocErrorW(CALJsonOperationError,GetNodeType);
+  ALJSONDocErrorW(ALJSONOperationError,GetNodeType);
 end;
 
 {**************************************************************************************************************************}
 procedure TALJSONNodeW.SetNodeValue(const StrValue: String; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
-  ALJSONDocErrorW(CALJsonOperationError,GetNodeType);
+  ALJSONDocErrorW(ALJSONOperationError,GetNodeType);
 end;
 
 {*********************************************************}
 procedure TALJSONNodeW.SetNodeName(const NodeName: String);
 begin
-  if fNodeName <> NodeName then begin
-    fNodeName := NodeName;
+  if FNodeName <> NodeName then begin
+    FNodeName := NodeName;
     Var LParentNode := FParentNode;
     if (LParentNode <> nil) and (LParentNode.ChildNodes.Sorted) then begin
       var LNode := LParentNode.ChildNodes.Extract(self);
@@ -9892,7 +9812,7 @@ begin
     nstInt32: result := GetNodeValueStr;  // return the number
     nstTimestamp: result := GetNodeValueStr;  // return the number (as int64)
     nstInt64: result := GetNodeValueStr;  // return the number
-    else ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+    else ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
   end;
 
 end;
@@ -10008,7 +9928,7 @@ begin
     nstInt32,
     nstInt64: Result := GetNodeValueInt64;
     else begin
-      ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+      ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
       result := 0; // to hide a warning;
     end;
   end;
@@ -10032,7 +9952,7 @@ function TALJSONNodeW.GetDateTime: TDateTime;
 begin
   if NodeSubType = nstDateTime then PInt64(@result)^ := GetNodeValueInt64
   else begin
-    ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+    ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
     result := 0; // to hide a warning;
   end;
 end;
@@ -10055,7 +9975,7 @@ function TALJSONNodeW.GetTimestamp: TALBSONTimestamp;
 begin
   if NodeSubType = nstTimestamp then result.I64 := GetNodeValueInt64
   else begin
-    ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+    ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
     result.I64 := 0; // to hide a warning;
   end;
 end;
@@ -10078,7 +9998,7 @@ function TALJSONNodeW.GetObjectID: String;
 begin
   if NodeSubType = nstObjectID then result := GetNodeValueStr
   else begin
-    ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+    ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
     result := ''; // to hide a warning;
   end;
 end;
@@ -10111,18 +10031,18 @@ begin
                                           // so all integer can be store in the form m*2^e (ie: m = m*2^0)
                                           // so we can compare aInt64 <> aDouble without the need of samevalue
                    (LInt64 > system.int32.MaxValue) or
-                   (LInt64 < system.int32.MinValue) then ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+                   (LInt64 < system.int32.MinValue) then ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
                 result := LInt64;
               end;
     nstInt32: begin
                 LInt64 := GetNodeValueInt64;
                 if (LInt64 > system.int32.MaxValue) or
-                   (LInt64 < system.int32.MinValue) then ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+                   (LInt64 < system.int32.MinValue) then ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
                 result := LInt64;
               end;
     nstInt64: Result := GetNodeValueInt64;
     else begin
-      ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+      ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
       result := 0; // to hide a warning;
     end;
   end;
@@ -10149,7 +10069,7 @@ begin
     nstFloat: begin
                 PInt64(@LDouble)^ := GetNodeValueInt64;
                 result := trunc(LDouble);
-                if result <> LDouble then ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType); // https://stackoverflow.com/questions/41779801/single-double-and-precision
+                if result <> LDouble then ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType); // https://stackoverflow.com/questions/41779801/single-double-and-precision
                                                                                           // Only values that are in form m*2^e, where m and e are integers can be stored in a floating point variable
                                                                                           // so all integer can be store in the form m*2^e (ie: m = m*2^0)
                                                                                           // so we can compare result <> aDouble without the need of samevalue
@@ -10157,7 +10077,7 @@ begin
     nstInt32,
     nstInt64: Result := GetNodeValueInt64;
     else begin
-      ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+      ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
       result := 0; // to hide a warning;
     end;
   end;
@@ -10184,7 +10104,7 @@ begin
     else result := true;
   end
   else begin
-    ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+    ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
     result := False; // to hide a warning;
   end;
 end;
@@ -10221,7 +10141,7 @@ function TALJSONNodeW.GetJavascript: String;
 begin
   if NodeSubType = nstJavascript then result := GetNodeValueStr
   else begin
-    ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+    ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
     result := ''; // to hide a warning;
   end;
 end;
@@ -10244,7 +10164,7 @@ function TALJSONNodeW.GetRegEx: String;
 begin
   if NodeSubType = nstRegEx then result := GetNodeValueStr
   else begin
-    ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+    ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
     result := ''; // to hide a warning;
   end;
 end;
@@ -10273,7 +10193,7 @@ function TALJSONNodeW.GetRegExOptions: TALPerlRegExOptions;
 begin
   if NodeSubType = nstRegEx then result := TALPerlRegExOptions(byte(GetNodeValueInt64))
   else begin
-    ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+    ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
     result := []; // to hide a warning;
   end;
 end;
@@ -10297,7 +10217,7 @@ function TALJSONNodeW.GetBinary: String;
 begin
   if NodeSubType = nstBinary then result := GetNodeValueStr
   else begin
-    ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+    ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
     result := ''; // to hide a warning;
   end;
 end;
@@ -10326,7 +10246,7 @@ function TALJSONNodeW.GetBinarySubType: byte;
 begin
   if NodeSubType = nstBinary then result := byte(GetNodeValueInt64)
   else begin
-    ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+    ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
     result := 0; // to hide a warning;
   end;
 end;
@@ -10408,57 +10328,7 @@ end;
 constructor TALJSONNodeW.Create(const NodeName: String);
 Begin
   FParentNode := nil;
-  fNodeName := NodeName;
-end;
-
-{***************************************************************}
-//will create all the nodevalue and childnodelist to be sure that
-//multiple thread can safely read at the same time the node
-procedure TALJSONNodeW.MultiThreadPrepare(const AOnlyChildList: Boolean = False);
-var I: integer;
-begin
-  if (not aOnlyChildList) and (NodeType = ntText) then begin
-
-    case NodeSubType of
-      nstFloat,
-      nstBoolean,
-      nstDateTime,
-      nstNull,
-      nstInt32,
-      nstTimestamp,
-      nstInt64: GetNodeValueStr;
-      //nstText: can not be retrieve from int64
-      //nstObject: can not be retrieve from int64
-      //nstArray: can not be retrieve from int64
-      //nstBinary: only the binarysubtype is store in int64
-      //nstObjectID: can not be retrieve from int64
-      //nstRegEx: only the regex options is store in the int64
-      //nstJavascript: can not be retrieve from int64
-    end;
-
-    case NodeSubType of
-      nstFloat,
-      nstBoolean,
-      nstDateTime,
-      nstNull,
-      nstInt32,
-      nstTimestamp,
-      nstInt64: GetNodeValueInt64;
-      //nstText: can not be retrieve from int64
-      //nstObject: can not be retrieve from int64
-      //nstArray: can not be retrieve from int64
-      //nstBinary: only the binarysubtype is store in int64
-      //nstObjectID: can not be retrieve from int64
-      //nstRegEx: only the regex options is store in the int64
-      //nstJavascript: can not be retrieve from int64
-    end;
-
-  end
-
-  else if (NodeType in [ntObject,ntArray]) then begin
-    For I := 0 to ChildNodes.Count - 1 do
-      ChildNodes[I].MultiThreadPrepare(aOnlyChildList);
-  end;
+  FNodeName := NodeName;
 end;
 
 {****************************************************************************************************************************************}
@@ -10569,7 +10439,7 @@ begin
     end;
     else begin
       Result := nil;
-      AlJSONDocErrorW(cAlJSONInvalidNodeType);
+      AlJSONDocErrorW(ALJSONInvalidNodeType);
     end;
   end;
   if HasChildNodes then
@@ -10602,11 +10472,11 @@ end;
 Procedure TALJSONNodeW.ParseJSON(
             const Buffer: String;
             const SaxMode: Boolean;
-            const onParseText: TAlJSONParseTextEventW;
-            const onParseStartObject: TAlJSONParseObjectEventW;
-            const onParseEndObject: TAlJSONParseObjectEventW;
-            const onParseStartArray: TAlJSONParseArrayEventW;
-            const onParseEndArray: TAlJSONParseArrayEventW;
+            const OnParseText: TAlJSONParseTextEventW;
+            const OnParseStartObject: TAlJSONParseObjectEventW;
+            const OnParseEndObject: TAlJSONParseObjectEventW;
+            const OnParseStartArray: TAlJSONParseArrayEventW;
+            const OnParseEndArray: TAlJSONParseArrayEventW;
             const Options: TALJSONParseOptions);
 
 Var BufferLength: Integer;
@@ -10687,7 +10557,7 @@ Var BufferLength: Integer;
         else _DoParseTextWithName(Name, Args, NodeSubType);
       end
       else begin
-        if NamePaths.Count = 0 then ALJSONDocErrorW(CALJSONParseError);
+        if NamePaths.Count = 0 then ALJSONDocErrorW(ALJSONParseError);
         if TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]) = ntArray then _DoParseTextWithIndex(Index, Args, NodeSubType)
         else _DoParseTextWithName(Name, Args, NodeSubType);
       end;
@@ -10703,7 +10573,7 @@ Var BufferLength: Integer;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseEndObject;
   begin
-    if NamePaths.Count = 0 then ALJSONDocErrorW(CALJSONParseError);
+    if NamePaths.Count = 0 then ALJSONDocErrorW(ALJSONParseError);
     if Assigned(OnParseEndObject) then OnParseEndObject(Self, GetPathStr, NamePaths.Names[NamePaths.Count - 1])
   end;
 
@@ -10716,7 +10586,7 @@ Var BufferLength: Integer;
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseEndArray;
   begin
-    if NamePaths.Count = 0 then ALJSONDocErrorW(CALJSONParseError);
+    if NamePaths.Count = 0 then ALJSONDocErrorW(ALJSONParseError);
     if Assigned(OnParseEndArray) then OnParseEndArray(Self, GetPathStr, NamePaths.Names[NamePaths.Count - 1]);
   end;
 
@@ -10743,7 +10613,7 @@ Var BufferLength: Integer;
       else _AddNameItemToNamePath(name, Obj);
     end
     else begin
-      if NamePaths.Count = 0 then ALJSONDocErrorW(CALJSONParseError);
+      if NamePaths.Count = 0 then ALJSONDocErrorW(ALJSONParseError);
       if TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]) = ntarray then _AddIndexItemToNamePath(Index, Obj)
       else _AddNameItemToNamePath(name, Obj);
     end;
@@ -11084,7 +10954,7 @@ Var BufferLength: Integer;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _extractLastIndexFromNamePath: integer;
   begin
-    if NamePaths.Count = 0 then ALJSONDocErrorW(CALJSONParseError);
+    if NamePaths.Count = 0 then ALJSONDocErrorW(ALJSONParseError);
     ALMove(pointer(namePaths.ValueFromIndex[namepaths.Count - 1])^,result,sizeOf(integer));
   end;
 
@@ -11119,10 +10989,10 @@ Var BufferLength: Integer;
 
       //error if Paths.Count = 0 (mean one end object/array without any starting)
       if assigned(ObjectPaths) then begin
-        if (ObjectPaths.Count = 0) then ALJSONDocErrorW(cALJSONParseError);
+        if (ObjectPaths.Count = 0) then ALJSONDocErrorW(ALJSONParseError);
       end
       else begin
-        if (NamePaths.Count = 0) then ALJSONDocErrorW(cALJSONParseError);
+        if (NamePaths.Count = 0) then ALJSONDocErrorW(ALJSONParseError);
       end;
 
       //if we are not in sax mode
@@ -11133,17 +11003,17 @@ Var BufferLength: Integer;
         else LNode := TALJSONNodeW(NamePaths.Objects[NamePaths.Count - 1]);
 
         //if anode <> workingNode aie aie aie
-        if (LNode <> WorkingNode) then ALJSONDocErrorW(CALJSONParseError);
+        if (LNode <> WorkingNode) then ALJSONDocErrorW(ALJSONParseError);
 
         //calculate anodeTypeInt
         LNodeType := LNode.NodeType;
-        if not (LNodeType in [ntObject, ntarray]) then ALJSONDocErrorW(cALJSONParseError);
+        if not (LNodeType in [ntObject, ntarray]) then ALJSONDocErrorW(ALJSONParseError);
 
         //check that the end object/array correspond to the aNodeType
         if ((c = '}') and
             (LNodeType <> ntObject)) or
            ((c = ']') and
-            (LNodeType <> ntarray)) then ALJSONDocErrorW(CALJSONParseError);
+            (LNodeType <> ntarray)) then ALJSONDocErrorW(ALJSONParseError);
 
         //if working node <> Self then we can go to one level up
         If WorkingNode <> Self then begin
@@ -11171,13 +11041,13 @@ Var BufferLength: Integer;
 
          //calculate anodeTypeInt
         LNodeType := TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]);
-        if not (LNodeType in [ntObject,ntarray]) then ALJSONDocErrorW(cALJSONParseError);
+        if not (LNodeType in [ntObject,ntarray]) then ALJSONDocErrorW(ALJSONParseError);
 
         //check that the end object/array correspond to the aNodeType
         if ((c = '}') and
             (LNodeType <> ntObject)) or
            ((c = ']') and
-            (LNodeType <> ntarray)) then ALJSONDocErrorW(CALJSONParseError);
+            (LNodeType <> ntarray)) then ALJSONDocErrorW(ALJSONParseError);
 
         //update CurrIndex if WorkingNode.NodeType = ntArray
         if (Namepaths.Count >= 2) and
@@ -11215,11 +11085,11 @@ Var BufferLength: Integer;
       if NotSaxMode then begin
 
         //if workingnode = nil then it's mean we are outside Self
-        if not assigned(WorkingNode) then ALJSONDocErrorW(CALJSONParseError);
+        if not assigned(WorkingNode) then ALJSONDocErrorW(ALJSONParseError);
 
         //Node without name can be ONLY present inside an array node
         if (CurrIndex < 0)  or
-           (WorkingNode.nodetype <> ntarray) then ALJSONDocErrorW(CALJSONParseError);
+           (WorkingNode.nodetype <> ntarray) then ALJSONDocErrorW(ALJSONParseError);
 
         //create the node according the the braket char and add it to the workingnode
         if c = '{' then LNode := CreateNode('', ntObject)
@@ -11246,7 +11116,7 @@ Var BufferLength: Integer;
           //Node without name can be ONLY present inside an array node
           if (CurrIndex < 0) or
              (NamePaths.Count = 0) or
-             (TALJsonNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntarray) then ALJSONDocErrorW(CALJSONParseError);
+             (TALJsonNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntarray) then ALJSONDocErrorW(ALJSONParseError);
 
         //update the path
         if c = '{' then LNodeType := ntObject
@@ -11313,7 +11183,7 @@ Var BufferLength: Integer;
                      //      ^^^^^^^^^P1
 
       end;
-      if P1 > BufferLength then ALJSONDocErrorW(CALJSONParseError);
+      if P1 > BufferLength then ALJSONDocErrorW(ALJSONParseError);
       BufferPos := P1 + 1; // ... "...\"..."
                            //      ^^^^^^^^^^BufferPos
     end
@@ -11349,7 +11219,7 @@ Var BufferLength: Integer;
         If Buffer[BufferPos] <= ' ' then inc(bufferPos)
         else break;
       end;
-      if BufferPos > BufferLength then ALJSONDocErrorW(CALJSONParseError);
+      if BufferPos > BufferLength then ALJSONDocErrorW(ALJSONParseError);
 
       P1 := BufferPos; // ... new Date('Dec 03, 1924'), ....
                        //     ^P1
@@ -11393,7 +11263,7 @@ Var BufferLength: Integer;
                  //     ^^^^^^^^^^^^^^^^^^^^^^^^^P1
 
       end;
-      if P1 > BufferLength then ALJSONDocErrorW(CALJSONParseError);
+      if P1 > BufferLength then ALJSONDocErrorW(ALJSONParseError);
       BufferPos := P1; // ... new Date('Dec 03, 1924'), ....
                        //                             ^BufferPos
 
@@ -11409,7 +11279,7 @@ Var BufferLength: Integer;
         break;
       end;
     end;
-    if BufferPos > BufferLength then ALJSONDocErrorW(CALJSONParseError);  // .... : ....
+    if BufferPos > BufferLength then ALJSONDocErrorW(ALJSONParseError);  // .... : ....
                                                                           //      ^BufferPos
     {$ENDREGION}
 
@@ -11418,14 +11288,14 @@ Var BufferLength: Integer;
 
       //Node without name can be ONLY present inside an array node
       if NotSaxMode then begin
-        if not assigned(WorkingNode) then ALJSONDocErrorW(CALJSONParseError);
+        if not assigned(WorkingNode) then ALJSONDocErrorW(ALJSONParseError);
         if (CurrIndex < 0)  or
-           (WorkingNode.nodetype <> ntarray) then ALJSONDocErrorW(CALJSONParseError);
+           (WorkingNode.nodetype <> ntarray) then ALJSONDocErrorW(ALJSONParseError);
       end
       else begin
         if (CurrIndex < 0) or
            (NamePaths.Count = 0) or
-           (TALJSONNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntarray) then ALJSONDocErrorW(CALJSONParseError);
+           (TALJSONNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntarray) then ALJSONDocErrorW(ALJSONParseError);
       end;
 
       //create the node
@@ -11447,7 +11317,7 @@ Var BufferLength: Integer;
       If Buffer[BufferPos] <= ' ' then inc(BufferPos)
       else break;
     end;
-    if BufferPos > BufferLength then ALJSONDocErrorW(CALJSONParseError); // .... " ....
+    if BufferPos > BufferLength then ALJSONDocErrorW(ALJSONParseError); // .... " ....
                                                                          //      ^BufferPos
     {$ENDREGION}
 
@@ -11465,11 +11335,11 @@ Var BufferLength: Integer;
       if NotSaxMode then begin
 
         //if workingnode = nil then it's mean we are outside Self
-        if not assigned(WorkingNode) then ALJSONDocErrorW(CALJSONParseError);
+        if not assigned(WorkingNode) then ALJSONDocErrorW(ALJSONParseError);
 
         //Node withe name MUST be ONLY present inside an object node
         if (CurrIndex >= 0)  or
-           (WorkingNode.nodetype <> ntObject) then ALJSONDocErrorW(CALJSONParseError);
+           (WorkingNode.nodetype <> ntObject) then ALJSONDocErrorW(ALJSONParseError);
 
         //create the node according the the braket char and add it to the workingnode
         if c = '{' then LNode := CreateNode(CurrName, ntObject)
@@ -11496,7 +11366,7 @@ Var BufferLength: Integer;
         //Node withe name MUST be ONLY present inside an object node
         if (CurrIndex >= 0) or
            (NamePaths.Count = 0) or
-           (TALJsonNodeType(NamePaths.Objects[NamePaths.Count - 1]) <> ntobject) then ALJSONDocErrorW(CALJSONParseError);
+           (TALJsonNodeType(NamePaths.Objects[NamePaths.Count - 1]) <> ntobject) then ALJSONDocErrorW(ALJSONParseError);
 
         //update the path
         if c = '{' then LNodeType := ntObject
@@ -11551,7 +11421,7 @@ Var BufferLength: Integer;
                      //      ^^^^^^^^^P1
 
       end;
-      if P1 > BufferLength then ALJSONDocErrorW(CALJSONParseError);
+      if P1 > BufferLength then ALJSONDocErrorW(ALJSONParseError);
       BufferPos := P1 + 1; // ... "...\"..."
                            //      ^^^^^^^^^^BufferPos
 
@@ -11580,7 +11450,7 @@ Var BufferLength: Integer;
         If Buffer[BufferPos] <= ' ' then inc(bufferPos)
         else break;
       end;
-      if BufferPos > BufferLength then ALJSONDocErrorW(CALJSONParseError);
+      if BufferPos > BufferLength then ALJSONDocErrorW(ALJSONParseError);
 
       P1 := BufferPos; // ... new Date('Dec 03, 1924'), ....
                        //     ^P1
@@ -11630,7 +11500,7 @@ Var BufferLength: Integer;
                  //     ^^^^^^^^^^^^^^^^^^^^^^^^^P1
 
       end;
-      if P1 > BufferLength then ALJSONDocErrorW(CALJSONParseError);
+      if P1 > BufferLength then ALJSONDocErrorW(ALJSONParseError);
       BufferPos := P1; // ... new Date('Dec 03, 1924'), ....
                        //                             ^BufferPos
 
@@ -11642,14 +11512,14 @@ Var BufferLength: Integer;
 
     //Node withe name MUST be ONLY present inside an object node
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(CALJSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALJSONParseError);
       if (CurrIndex >= 0)  or
-         (WorkingNode.nodetype <> ntObject) then ALJSONDocErrorW(CALJSONParseError);
+         (WorkingNode.nodetype <> ntObject) then ALJSONDocErrorW(ALJSONParseError);
     end
     else begin
       if (CurrIndex >= 0) or
          (NamePaths.Count = 0) or
-         (TALJSONNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntObject) then ALJSONDocErrorW(CALJSONParseError);
+         (TALJSONNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntObject) then ALJSONDocErrorW(ALJSONParseError);
     end;
 
     //create the node
@@ -11705,16 +11575,16 @@ Begin
       If c <= ' ' then inc(bufferPos)
       else begin
         if (c = '{') then begin
-          if (Nodetype <> ntObject) then ALJSONDocErrorW(CALJsonOperationError,GetNodeType);
+          if (Nodetype <> ntObject) then ALJSONDocErrorW(ALJSONOperationError,GetNodeType);
           CurrIndex := -1;
           _DoParseStartObject('');
         end
         else if (c = '[') then begin
-          if (Nodetype <> ntArray) then ALJSONDocErrorW(CALJsonOperationError,GetNodeType);
+          if (Nodetype <> ntArray) then ALJSONDocErrorW(ALJSONOperationError,GetNodeType);
           CurrIndex := 0;
           _DoParseStartArray('');
         end
-        else AlJSONDocErrorW(cALJSONParseError);
+        else AlJSONDocErrorW(ALJSONParseError);
         inc(bufferPos);
         break;
       end;
@@ -11753,14 +11623,14 @@ Begin
 
     //some tags are not closed
     if assigned(ObjectPaths) then begin
-      if ObjectPaths.Count > 0 then ALJSONDocErrorW(cALJSONParseError);
+      if ObjectPaths.Count > 0 then ALJSONDocErrorW(ALJSONParseError);
     end
     else begin
-      if NamePaths.Count > 0 then ALJSONDocErrorW(cALJSONParseError);
+      if NamePaths.Count > 0 then ALJSONDocErrorW(ALJSONParseError);
     end;
 
     //mean the node was not update (empty stream?) or not weel closed
-    if NotSaxMode and (WorkingNode <> nil) then ALJSONDocErrorW(cALJSONParseError);
+    if NotSaxMode and (WorkingNode <> nil) then ALJSONDocErrorW(ALJSONParseError);
 
   finally
 
@@ -11781,11 +11651,11 @@ end;
 procedure TALJSONNodeW.ParseBSON(
             const Buffer: Tbytes;
             const SaxMode: Boolean;
-            const onParseText: TAlJSONParseTextEventW;
-            const onParseStartObject: TAlJSONParseObjectEventW;
-            const onParseEndObject: TAlJSONParseObjectEventW;
-            const onParseStartArray: TAlJSONParseArrayEventW;
-            const onParseEndArray: TAlJSONParseArrayEventW;
+            const OnParseText: TAlJSONParseTextEventW;
+            const OnParseStartObject: TAlJSONParseObjectEventW;
+            const OnParseEndObject: TAlJSONParseObjectEventW;
+            const OnParseStartArray: TAlJSONParseArrayEventW;
+            const OnParseEndArray: TAlJSONParseArrayEventW;
             const Options: TALJSONParseOptions);
 
 Var BufferLength: Integer;
@@ -11862,7 +11732,7 @@ Var BufferLength: Integer;
         else _DoParseTextWithName(NameOrIndex, Args, NodeSubType);
       end
       else begin
-        if NamePaths.Count = 0 then ALJSONDocErrorW(CALJSONParseError);
+        if NamePaths.Count = 0 then ALJSONDocErrorW(ALJSONParseError);
         if TALJsonNodeType(NamePaths.Objects[NamePaths.Count - 1]) = ntArray then _DoParseTextWithIndex(NameOrIndex, Args, NodeSubType)
         else _DoParseTextWithName(NameOrIndex, Args, NodeSubType);
       end;
@@ -11878,7 +11748,7 @@ Var BufferLength: Integer;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseEndObject;
   begin
-    if NamePaths.Count = 0 then ALJSONDocErrorW(CALJSONParseError);
+    if NamePaths.Count = 0 then ALJSONDocErrorW(ALJSONParseError);
     if Assigned(OnParseEndObject) then OnParseEndObject(Self, GetPathStr, NamePaths[NamePaths.Count - 1])
   end;
 
@@ -11891,7 +11761,7 @@ Var BufferLength: Integer;
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseEndArray;
   begin
-    if NamePaths.Count = 0 then ALJSONDocErrorW(CALJSONParseError);
+    if NamePaths.Count = 0 then ALJSONDocErrorW(ALJSONParseError);
     if Assigned(OnParseEndArray) then OnParseEndArray(Self, GetPathStr, NamePaths[NamePaths.Count - 1]);
   end;
 
@@ -11915,7 +11785,7 @@ Var BufferLength: Integer;
       else _AddNameItemToNamePath(nameOrIndex, Obj);
     end
     else begin
-      if NamePaths.Count = 0 then ALJSONDocErrorW(CALJSONParseError);
+      if NamePaths.Count = 0 then ALJSONDocErrorW(ALJSONParseError);
       if TALJsonNodeType(NamePaths.Objects[NamePaths.Count - 1]) = ntarray then _AddIndexItemToNamePath(nameOrIndex, Obj)
       else _AddNameItemToNamePath(nameOrIndex, Obj);
     end;
@@ -11928,12 +11798,12 @@ Var BufferLength: Integer;
   var LNode: TALJSONNodeW;
       LInt64: System.Int64;
   begin
-    if BufferPos > BufferLength - sizeof(LInt64) then ALJSONDocErrorW(cALBSONParseError);
+    if BufferPos > BufferLength - sizeof(LInt64) then ALJSONDocErrorW(ALBSONParseError);
     ALMove(Buffer[BufferPos], LInt64, sizeof(LInt64));
     BufferPos := BufferPos + sizeof(LInt64);
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -11957,12 +11827,12 @@ Var BufferLength: Integer;
   var LNode: TALJSONNodeW;
       LInt32: System.Int32;
   begin
-    if BufferPos > BufferLength - sizeof(LInt32) then ALJSONDocErrorW(cALBSONParseError);
+    if BufferPos > BufferLength - sizeof(LInt32) then ALJSONDocErrorW(ALBSONParseError);
     ALMove(Buffer[BufferPos], LInt32, sizeof(LInt32));
     BufferPos := BufferPos + sizeof(LInt32);
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -11987,15 +11857,15 @@ Var BufferLength: Integer;
       LInt32: System.Int32;
       LText: String;
   begin
-    if BufferPos > BufferLength - sizeof(LInt32) then ALJSONDocErrorW(cALBSONParseError);
+    if BufferPos > BufferLength - sizeof(LInt32) then ALJSONDocErrorW(ALBSONParseError);
     ALMove(Buffer[BufferPos], LInt32, sizeof(LInt32));
     BufferPos := BufferPos + sizeof(LInt32);
-    if (BufferPos + LInt32 > BufferLength) then ALJSONDocErrorW(cALBSONParseError);
+    if (BufferPos + LInt32 > BufferLength) then ALJSONDocErrorW(ALBSONParseError);
     LText := Tencoding.UTF8.GetString(Buffer,BufferPos,LInt32 - 1{for the trailing #0});
     BufferPos := BufferPos + LInt32;
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -12019,12 +11889,12 @@ Var BufferLength: Integer;
   var LNode: TALJSONNodeW;
       LDouble: Double;
   begin
-    if BufferPos > BufferLength - sizeof(Double) then ALJSONDocErrorW(cALBSONParseError);
+    if BufferPos > BufferLength - sizeof(Double) then ALJSONDocErrorW(ALBSONParseError);
     ALMove(Buffer[BufferPos], LDouble, sizeof(Double));
     BufferPos := BufferPos + sizeof(Double);
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -12052,17 +11922,17 @@ Var BufferLength: Integer;
       LBase64Data: String;
   begin
     //Get size
-    if BufferPos > BufferLength - sizeof(LInt32) then ALJSONDocErrorW(cALBSONParseError);
+    if BufferPos > BufferLength - sizeof(LInt32) then ALJSONDocErrorW(ALBSONParseError);
     ALMove(Buffer[BufferPos], LInt32, sizeof(LInt32));
     BufferPos := BufferPos + sizeof(LInt32);
 
     //Get the subtype
-    if BufferPos >= BufferLength then ALJSONDocErrorW(cALBSONParseError);
+    if BufferPos >= BufferLength then ALJSONDocErrorW(ALBSONParseError);
     LBinSubtype := Buffer[BufferPos];
     BufferPos := BufferPos + 1;
 
     //Get the data
-    if (BufferPos + LInt32 > BufferLength) then ALJSONDocErrorW(cALBSONParseError);
+    if (BufferPos + LInt32 > BufferLength) then ALJSONDocErrorW(ALBSONParseError);
     setlength(LBinData, LInt32);
     ALMove(Buffer[BufferPos], pointer(LBinData)^, LInt32);
     LBase64Data := ALBase64EncodeBytesW(LBinData);
@@ -12070,7 +11940,7 @@ Var BufferLength: Integer;
 
     //create the node
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -12095,14 +11965,14 @@ Var BufferLength: Integer;
       LObjectID: Tbytes;
       LHexData: String;
   begin
-    if BufferPos > BufferLength - 12{length(aObjectID)} then ALJSONDocErrorW(cALBSONParseError);
+    if BufferPos > BufferLength - 12{length(aObjectID)} then ALJSONDocErrorW(ALBSONParseError);
     setlength(LObjectID, 12);
     ALMove(Buffer[BufferPos], pointer(LObjectID)^, 12{length(aObjectID)});
     LHexData := ALBinToHexW(LObjectID);
     BufferPos := BufferPos + 12{length(aObjectID)};
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -12126,17 +11996,17 @@ Var BufferLength: Integer;
   var LNode: TALJSONNodeW;
       LBool: Boolean;
   begin
-    if BufferPos >= BufferLength then ALJSONDocErrorW(cALBSONParseError);
+    if BufferPos >= BufferLength then ALJSONDocErrorW(ALBSONParseError);
     if Buffer[BufferPos] = $00 then LBool := False
     else if Buffer[BufferPos] = $01 then LBool := true
     else begin
-      ALJSONDocErrorW(cALBSONParseError);
+      ALJSONDocErrorW(ALBSONParseError);
       LBool := False; // to hide a warning;
     end;
     BufferPos := BufferPos + 1;
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -12161,13 +12031,13 @@ Var BufferLength: Integer;
       LDateTime: TdateTime;
       LInt64: System.Int64;
   begin
-    if BufferPos > BufferLength - sizeof(LInt64) then ALJSONDocErrorW(cALBSONParseError);
+    if BufferPos > BufferLength - sizeof(LInt64) then ALJSONDocErrorW(ALBSONParseError);
     ALMove(Buffer[BufferPos], LInt64, sizeof(LInt64));
     LDateTime := ALUnixMsToDateTime(LInt64);
     BufferPos := BufferPos + sizeof(LInt64);
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -12192,13 +12062,13 @@ Var BufferLength: Integer;
       LTimestamp: TALBSONTimestamp;
       LInt64: System.Int64;
   begin
-    if BufferPos > BufferLength - sizeof(LInt64) then ALJSONDocErrorW(cALBSONParseError);
+    if BufferPos > BufferLength - sizeof(LInt64) then ALJSONDocErrorW(ALBSONParseError);
     ALMove(Buffer[BufferPos], LInt64, sizeof(LInt64));
     LTimestamp.I64 := LInt64;
     BufferPos := BufferPos + sizeof(LInt64);
 
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -12222,7 +12092,7 @@ Var BufferLength: Integer;
   var LNode: TALJSONNodeW;
   begin
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -12257,7 +12127,7 @@ Var BufferLength: Integer;
         break;
       end;
     end;
-    if P1 >= BufferLength then ALJSONDocErrorW(cALBSONParseError);
+    if P1 >= BufferLength then ALJSONDocErrorW(ALBSONParseError);
     BufferPos := P1 + 1;
 
     //Get options
@@ -12274,12 +12144,12 @@ Var BufferLength: Integer;
       end;
       inc(BufferPos);
     end;
-    if BufferPos >= BufferLength then ALJSONDocErrorW(cALBSONParseError);
+    if BufferPos >= BufferLength then ALJSONDocErrorW(ALBSONParseError);
     inc(BufferPos);
 
     //create the node
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -12304,16 +12174,16 @@ Var BufferLength: Integer;
       LJavascript: String;
       LInt32: System.Int32;
   begin
-    if BufferPos > BufferLength - sizeof(LInt32) then ALJSONDocErrorW(cALBSONParseError);
+    if BufferPos > BufferLength - sizeof(LInt32) then ALJSONDocErrorW(ALBSONParseError);
     ALMove(Buffer[BufferPos], LInt32, sizeof(LInt32));
     BufferPos := BufferPos + sizeof(LInt32);
-    if (BufferPos + LInt32 > BufferLength) then ALJSONDocErrorW(cALBSONParseError);
+    if (BufferPos + LInt32 > BufferLength) then ALJSONDocErrorW(ALBSONParseError);
     LJavascript := Tencoding.UTF8.GetString(Buffer,BufferPos,LInt32 - 1{for the trailing #0});
     BufferPos := BufferPos + LInt32;
 
     //create the node
     if NotSaxMode then begin
-      if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+      if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
       if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
       else LNode := CreateNode(Name, nttext);
       try
@@ -12350,10 +12220,10 @@ Var BufferLength: Integer;
 
       //error if Paths.Count = 0 (mean one end object/array without any starting)
       if assigned(ObjectPaths) then begin
-        if (ObjectPaths.Count = 0) then ALJSONDocErrorW(cALBSONParseError);
+        if (ObjectPaths.Count = 0) then ALJSONDocErrorW(ALBSONParseError);
       end
       else begin
-        if (NamePaths.Count = 0) then ALJSONDocErrorW(cALBSONParseError);
+        if (NamePaths.Count = 0) then ALJSONDocErrorW(ALBSONParseError);
       end;
 
       //if we are not in sax mode
@@ -12364,11 +12234,11 @@ Var BufferLength: Integer;
         else LNode := TALJSONNodeW(NamePaths.Objects[NamePaths.Count - 1]);
 
         //if anode <> workingNode aie aie aie
-        if (LNode <> WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+        if (LNode <> WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
 
         //calculate anodeTypeInt
         LNodeType := LNode.NodeType;
-        if not (LNodeType in [ntObject, ntarray]) then ALJSONDocErrorW(cALBSONParseError);
+        if not (LNodeType in [ntObject, ntarray]) then ALJSONDocErrorW(ALBSONParseError);
 
         //if working node <> Self then we can go to one level up
         If WorkingNode <> Self then begin
@@ -12388,7 +12258,7 @@ Var BufferLength: Integer;
 
         //calculate anodeTypeInt
         LNodeType := TALJsonNodeType(NamePaths.Objects[NamePaths.Count - 1]);
-        if not (LNodeType in [ntObject,ntarray]) then ALJSONDocErrorW(cALBSONParseError);
+        if not (LNodeType in [ntObject,ntarray]) then ALJSONDocErrorW(ALBSONParseError);
 
       end;
 
@@ -12428,7 +12298,7 @@ Var BufferLength: Integer;
       $10: LNodeSubType := nstint32;
       $11: LNodeSubType := nstTimestamp;
       $12: LNodeSubType := nstint64;
-      else ALJSONDocErrorW(cALBSONParseError);
+      else ALJSONDocErrorW(ALBSONParseError);
     end;
     BufferPos := BufferPos + 1;
     {$ENDREGION}
@@ -12442,7 +12312,7 @@ Var BufferLength: Integer;
         break;
       end;
     end;
-    if P1 >= BufferLength then ALJSONDocErrorW(cALBSONParseError);
+    if P1 >= BufferLength then ALJSONDocErrorW(ALBSONParseError);
     BufferPos := P1 + 1;
     {$ENDREGION}
 
@@ -12455,7 +12325,7 @@ Var BufferLength: Integer;
       if NotSaxMode then begin
 
         //if workingnode = nil then it's mean we are outside Self
-        if not assigned(WorkingNode) then ALJSONDocErrorW(cALBSONParseError);
+        if not assigned(WorkingNode) then ALJSONDocErrorW(ALBSONParseError);
 
         //create the node according the the braket char and add it to the workingnode
         if LNodeSubType = nstObject then begin
@@ -12548,7 +12418,7 @@ Var BufferLength: Integer;
       // \x12 + name + \x00 + int64
       nstint64: _createInt64Node(CurrName, LNodeSubType);
 
-      else ALJSONDocErrorW(cALBSONParseError);
+      else ALJSONDocErrorW(ALBSONParseError);
     end;
     {$ENDREGION}
 
@@ -12557,7 +12427,7 @@ Var BufferLength: Integer;
 Begin
 
   //Only Object Node can be loaded from BSON
-  If NodeType <> ntObject then AlJSONDocErrorW(CALJsonOperationError,GetNodeType);
+  If NodeType <> ntObject then AlJSONDocErrorW(ALJSONOperationError,GetNodeType);
   if poClearChildNodes in Options then ChildNodes.Clear;
 
   //init WorkingNode and NotSaxMode
@@ -12598,14 +12468,14 @@ Begin
 
     //some tags are not closed
     if assigned(ObjectPaths) then begin
-      if ObjectPaths.Count > 0 then ALJSONDocErrorW(cALBSONParseError);
+      if ObjectPaths.Count > 0 then ALJSONDocErrorW(ALBSONParseError);
     end
     else begin
-      if NamePaths.Count > 0 then ALJSONDocErrorW(cALBSONParseError);
+      if NamePaths.Count > 0 then ALJSONDocErrorW(ALBSONParseError);
     end;
 
     //mean the node was not update (empty stream?) or not weel closed
-    if NotSaxMode and (WorkingNode <> nil) then ALJSONDocErrorW(cALBSONParseError);
+    if NotSaxMode and (WorkingNode <> nil) then ALJSONDocErrorW(ALBSONParseError);
 
   finally
 
@@ -12872,7 +12742,7 @@ begin
                       else _WriteStartArrayNode2Buffer(CurrentNode);
                    end;
           ntText: _WriteTextNode2Buffer(CurrentNode);
-          else ALJSONDocErrorW(cAlJSONInvalidNodeType);
+          else ALJSONDocErrorW(ALJSONInvalidNodeType);
         end;
 
       CurrentParentNode := CurrentNode.ParentNode;
@@ -13186,7 +13056,7 @@ Var NodeStack: Tstack<TALJSONNodeW>;
         nstInt32: _WriteByte2Buffer($10);
         // \x12 + name + \x00 + int64
         nstInt64: _WriteByte2Buffer($12);
-        else ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+        else ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
       end;
 
       // write the nodename
@@ -13209,7 +13079,7 @@ Var NodeStack: Tstack<TALJSONNodeW>;
         nstJavascript: _WriteJavascriptValue2Buffer(aTextNode);
         nstInt32: _WriteInt32Value2Buffer(aTextNode);
         nstInt64: _WriteInt64Value2Buffer(aTextNode);
-        else ALJSONDocErrorW(cALJSONInvalidBSONNodeSubType);
+        else ALJSONDocErrorW(ALJSONInvalidBSONNodeSubType);
       end;
     end;
   end;
@@ -13363,7 +13233,7 @@ begin
                       else _WriteStartArrayNode2Buffer(CurrentNode, CurrentNodeIndex);
                    end;
           ntText: _WriteTextNode2Buffer(CurrentNode, CurrentNodeIndex);
-          else ALJSONDocErrorW(cAlJSONInvalidNodeType);
+          else ALJSONDocErrorW(ALJSONInvalidNodeType);
         end;
 
       CurrentParentNode := CurrentNode.ParentNode;
@@ -13425,7 +13295,7 @@ end;
 procedure TALJSONNodeW.LoadFromJSONString(const Str: String; const Options: TALJSONParseOptions = [poClearChildNodes]);
 Begin
   Try
-    ParseJson(Str, False{SaxMode}, nil{onParseText}, nil{onParseStartObject}, nil{onParseEndObject}, nil{onParseStartArray}, nil{onParseEndArray}, Options);
+    ParseJson(Str, False{SaxMode}, nil{OnParseText}, nil{OnParseStartObject}, nil{OnParseEndObject}, nil{OnParseStartArray}, nil{OnParseEndArray}, Options);
   except
     ChildNodes.Clear;
     raise;
@@ -13455,7 +13325,7 @@ end;
 procedure TALJSONNodeW.LoadFromBSONBytes(const Bytes: Tbytes; const Options: TALJSONParseOptions = [poClearChildNodes]);
 Begin
   Try
-    ParseBSON(Bytes, False{SaxMode}, nil{onParseText}, nil{onParseStartObject}, nil{onParseEndObject}, nil{onParseStartArray}, nil{onParseEndArray}, Options);
+    ParseBSON(Bytes, False{SaxMode}, nil{OnParseText}, nil{OnParseStartObject}, nil{OnParseEndObject}, nil{OnParseStartArray}, nil{OnParseEndArray}, Options);
   except
     ChildNodes.Clear;
     raise;
@@ -13484,44 +13354,44 @@ end;
 {*************************************}
 procedure TALJSONNodeW.ParseJSONString(
             const Str: String;
-            const onParseText: TAlJSONParseTextEventW;
-            const onParseStartObject: TAlJSONParseObjectEventW;
-            const onParseEndObject: TAlJSONParseObjectEventW;
-            const onParseStartArray: TAlJSONParseArrayEventW;
-            const onParseEndArray: TAlJSONParseArrayEventW;
+            const OnParseText: TAlJSONParseTextEventW;
+            const OnParseStartObject: TAlJSONParseObjectEventW;
+            const OnParseEndObject: TAlJSONParseObjectEventW;
+            const OnParseStartArray: TAlJSONParseArrayEventW;
+            const OnParseEndArray: TAlJSONParseArrayEventW;
             const Options: TALJSONParseOptions = []);
 Begin
-  ParseJson(Str, true{SaxMode}, onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+  ParseJson(Str, true{SaxMode}, OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
 end;
 
 {*************************************}
 procedure TALJSONNodeW.ParseJSONStream(
             const Stream: TStream;
-            const onParseText: TAlJSONParseTextEventW;
-            const onParseStartObject: TAlJSONParseObjectEventW;
-            const onParseEndObject: TAlJSONParseObjectEventW;
-            const onParseStartArray: TAlJSONParseArrayEventW;
-            const onParseEndArray: TAlJSONParseArrayEventW;
+            const OnParseText: TAlJSONParseTextEventW;
+            const OnParseStartObject: TAlJSONParseObjectEventW;
+            const OnParseEndObject: TAlJSONParseObjectEventW;
+            const OnParseStartArray: TAlJSONParseArrayEventW;
+            const OnParseEndArray: TAlJSONParseArrayEventW;
             const Options: TALJSONParseOptions = []);
 Begin
   Stream.Position := 0;
-  ParseJSONString(ALGetStringFromStream(Stream, TEncoding.UTF8), onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+  ParseJSONString(ALGetStringFromStream(Stream, TEncoding.UTF8), OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
 end;
 
 {***********************************}
 procedure TALJSONNodeW.ParseJSONFile(
             const FileName: String;
-            const onParseText: TAlJSONParseTextEventW;
-            const onParseStartObject: TAlJSONParseObjectEventW;
-            const onParseEndObject: TAlJSONParseObjectEventW;
-            const onParseStartArray: TAlJSONParseArrayEventW;
-            const onParseEndArray: TAlJSONParseArrayEventW;
+            const OnParseText: TAlJSONParseTextEventW;
+            const OnParseStartObject: TAlJSONParseObjectEventW;
+            const OnParseEndObject: TAlJSONParseObjectEventW;
+            const OnParseStartArray: TAlJSONParseArrayEventW;
+            const OnParseEndArray: TAlJSONParseArrayEventW;
             const Options: TALJSONParseOptions = []);
 Var LfileStream: TfileStream;
 Begin
   LfileStream := TfileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
   Try
-    ParseJSONStream(LfileStream, onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+    ParseJSONStream(LfileStream, OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
   finally
     ALFreeAndNil(LfileStream);
   end;
@@ -13530,44 +13400,44 @@ end;
 {************************************}
 procedure TALJSONNodeW.ParseBSONBytes(
             const Bytes: Tbytes;
-            const onParseText: TAlJSONParseTextEventW;
-            const onParseStartObject: TAlJSONParseObjectEventW;
-            const onParseEndObject: TAlJSONParseObjectEventW;
-            const onParseStartArray: TAlJSONParseArrayEventW;
-            const onParseEndArray: TAlJSONParseArrayEventW;
+            const OnParseText: TAlJSONParseTextEventW;
+            const OnParseStartObject: TAlJSONParseObjectEventW;
+            const OnParseEndObject: TAlJSONParseObjectEventW;
+            const OnParseStartArray: TAlJSONParseArrayEventW;
+            const OnParseEndArray: TAlJSONParseArrayEventW;
             const Options: TALJSONParseOptions = []);
 Begin
-  ParseBSON(Bytes, true{SaxMode}, onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+  ParseBSON(Bytes, true{SaxMode}, OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
 end;
 
 {*************************************}
 procedure TALJSONNodeW.ParseBSONStream(
             const Stream: TStream;
-            const onParseText: TAlJSONParseTextEventW;
-            const onParseStartObject: TAlJSONParseObjectEventW;
-            const onParseEndObject: TAlJSONParseObjectEventW;
-            const onParseStartArray: TAlJSONParseArrayEventW;
-            const onParseEndArray: TAlJSONParseArrayEventW;
+            const OnParseText: TAlJSONParseTextEventW;
+            const OnParseStartObject: TAlJSONParseObjectEventW;
+            const OnParseEndObject: TAlJSONParseObjectEventW;
+            const OnParseStartArray: TAlJSONParseArrayEventW;
+            const OnParseEndArray: TAlJSONParseArrayEventW;
             const Options: TALJSONParseOptions = []);
 Begin
   Stream.Position := 0;
-  ParseBSONBytes(ALGetBytesFromStream(Stream), onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+  ParseBSONBytes(ALGetBytesFromStream(Stream), OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
 end;
 
 {***********************************}
 procedure TALJSONNodeW.ParseBSONFile(
             const FileName: String;
-            const onParseText: TAlJSONParseTextEventW;
-            const onParseStartObject: TAlJSONParseObjectEventW;
-            const onParseEndObject: TAlJSONParseObjectEventW;
-            const onParseStartArray: TAlJSONParseArrayEventW;
-            const onParseEndArray: TAlJSONParseArrayEventW;
+            const OnParseText: TAlJSONParseTextEventW;
+            const OnParseStartObject: TAlJSONParseObjectEventW;
+            const OnParseEndObject: TAlJSONParseObjectEventW;
+            const OnParseStartArray: TAlJSONParseArrayEventW;
+            const OnParseEndArray: TAlJSONParseArrayEventW;
             const Options: TALJSONParseOptions = []);
 Var LfileStream: TfileStream;
 Begin
   LfileStream := TfileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
   Try
-    ParseBSONStream(LfileStream, onParseText, onParseStartObject, onParseEndObject, onParseStartArray, onParseEndArray, Options);
+    ParseBSONStream(LfileStream, OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
   finally
     ALFreeAndNil(LfileStream);
   end;
@@ -13577,13 +13447,13 @@ end;
 constructor TALJSONObjectNodeW.Create(const NodeName: String = '');
 begin
   inherited create(NodeName);
-  FChildNodes := nil;
+  FChildNodes := CreateChildList;
 end;
 
 {************************************}
 destructor TALJSONObjectNodeW.Destroy;
 begin
-  If assigned(FChildNodes) then ALFreeAndNil(FchildNodes);
+  ALFreeAndNil(FChildNodes);
   inherited;
 end;
 
@@ -13597,7 +13467,7 @@ end;
 {************************************************************************}
 procedure TALJSONObjectNodeW.SetChildNodes(const Value: TALJSONNodeListW);
 begin
-  If Assigned(FChildNodes) then ALFreeAndNil(FchildNodes);
+  ALFreeAndNil(FChildNodes);
   FChildNodes := Value;
 end;
 
@@ -13624,13 +13494,13 @@ end;
 constructor TALJSONArrayNodeW.Create(const NodeName: String = '');
 begin
   inherited create(NodeName);
-  FChildNodes := nil;
+  FChildNodes := CreateChildList;
 end;
 
 {***********************************}
 destructor TALJSONArrayNodeW.Destroy;
 begin
-  If assigned(FChildNodes) then ALFreeAndNil(FchildNodes);
+  ALFreeAndNil(FChildNodes);
   inherited;
 end;
 
@@ -13644,7 +13514,7 @@ end;
 {***********************************************************************}
 procedure TALJSONArrayNodeW.SetChildNodes(const Value: TALJSONNodeListW);
 begin
-  If Assigned(FChildNodes) then ALFreeAndNil(FchildNodes);
+  ALFreeAndNil(FChildNodes);
   FChildNodes := Value;
 end;
 
@@ -13695,28 +13565,25 @@ begin
   if nvStr in fRawNodeValueDefined then result := fRawNodeValueStr
   else begin
 
-    if not (nvInt64 in fRawNodeValueDefined) then ALJSONDocErrorW(CALJsonOperationError,GetNodeType);
+    if not (nvInt64 in fRawNodeValueDefined) then ALJSONDocErrorW(ALJSONOperationError,GetNodeType);
 
     case fNodeSubType of
-      nstFloat: ALFloatToStrW(GetFloat, fRawNodeValueStr);
+      nstFloat: ALFloatToStrW(GetFloat, Result);
       //nstText: can not be retrieve from int64
       //nstObject: can not be retrieve from int64
       //nstArray: can not be retrieve from int64
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
-      nstBoolean: ALBoolToStrW(fRawNodeValueStr, getBool, 'true', 'false');
-      nstDateTime: ALDateTimeToStrW(GetDateTime, fRawNodeValueStr);
-      nstNull: fRawNodeValueStr := 'null';
+      nstBoolean: ALBoolToStrW(Result, getBool, 'true', 'false');
+      nstDateTime: ALDateTimeToStrW(GetDateTime, Result);
+      nstNull: Result := 'null';
       //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
-      nstInt32: ALIntToStrW(GetInt32, fRawNodeValueStr);
-      nstTimestamp: ALFormatW('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], fRawNodeValueStr);
-      nstInt64: ALIntToStrW(GetInt64, fRawNodeValueStr);
-      else ALJSONDocErrorW(CALJsonOperationError,GetNodeType);
+      nstInt32: ALIntToStrW(GetInt32, Result);
+      nstTimestamp: ALFormatW('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], Result);
+      nstInt64: ALIntToStrW(GetInt64, Result);
+      else ALJSONDocErrorW(ALJSONOperationError,GetNodeType);
     end;
-
-    fRawNodeValueDefined := fRawNodeValueDefined + [nvStr];
-    result := fRawNodeValueStr;
 
   end;
 end;
@@ -13732,12 +13599,12 @@ begin
   if nvInt64 in fRawNodeValueDefined then result := fRawNodeValueInt64
   else begin
 
-    if not (nvStr in fRawNodeValueDefined) then ALJSONDocErrorW(CALJsonOperationError,GetNodeType);
+    if not (nvStr in fRawNodeValueDefined) then ALJSONDocErrorW(ALJSONOperationError,GetNodeType);
 
     case fNodeSubType of
       nstFloat: begin
                   IF not ALTryStrToFloat(fRawNodeValueStr, LDouble) then ALJSONDocErrorW('%s is not a valid Float', [fRawNodeValueStr]);
-                  fRawNodeValueInt64 := Pint64(@LDouble)^;
+                  Result := Pint64(@LDouble)^;
                 end;
       //nstText: can not be retrieve from int64
       //nstObject: can not be retrieve from int64
@@ -13746,33 +13613,30 @@ begin
       //nstObjectID: can not be retrieve from int64
       nstBoolean: begin
                     IF not ALTryStrToBool(fRawNodeValueStr, LBool) then ALJSONDocErrorW('%s is not a valid Boolean', [fRawNodeValueStr]);
-                    fRawNodeValueInt64 := ALBoolToInt(LBool);
+                    Result := ALBoolToInt(LBool);
                   end;
       nstDateTime: begin
                      IF not ALTryStrToDateTime(fRawNodeValueStr, LDateTime) then ALJSONDocErrorW('%s is not a valid Datetime', [fRawNodeValueStr]);
-                     fRawNodeValueInt64 := Pint64(@LDateTime)^;
+                     Result := Pint64(@LDateTime)^;
                    end;
       nstNull:  begin
-                  fRawNodeValueInt64 := 0;
+                  Result := 0;
                 end;
       //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
       nstInt32: begin
                   IF not ALTryStrToInt(fRawNodeValueStr, LInt32) then ALJSONDocErrorW('%s is not a valid Int32', [fRawNodeValueStr]);
-                  fRawNodeValueInt64 := LInt32;
+                  Result := LInt32;
                 end;
       nstTimestamp: begin
                       IF not ALJSONTryStrToTimestampW(fRawNodeValueStr, LTimestamp) then ALJSONDocErrorW('%s is not a valid Timestamp', [fRawNodeValueStr]);
-                      fRawNodeValueInt64 := LTimestamp.I64;
+                      Result := LTimestamp.I64;
                     end;
       nstInt64: begin
-                  IF not ALTryStrToInt64(fRawNodeValueStr, fRawNodeValueInt64) then ALJSONDocErrorW('%s is not a valid Int64', [fRawNodeValueStr]);
+                  IF not ALTryStrToInt64(fRawNodeValueStr, Result) then ALJSONDocErrorW('%s is not a valid Int64', [fRawNodeValueStr]);
                 end;
-      else ALJSONDocErrorW(CALJsonOperationError,GetNodeType);
+      else ALJSONDocErrorW(ALJSONOperationError,GetNodeType);
     end;
-
-    fRawNodeValueDefined := fRawNodeValueDefined + [nvInt64];
-    result := fRawNodeValueInt64;
 
   end;
 end;
@@ -14025,7 +13889,7 @@ end;
   Index should be less than the value of the Count property.}
 function TALJSONNodeListW.Get(Index: Integer): TALJSONNodeW;
 begin
-  if (Index < 0) or (Index >= FCount) then ALJSONDocErrorW(CALJSONListIndexError, [Index]);
+  if (Index < 0) or (Index >= FCount) then ALJSONDocErrorW(ALJSONListIndexError, [Index]);
   Result := FList[Index];
 end;
 
@@ -14048,7 +13912,7 @@ end;
 function TALJSONNodeListW.GetNodeByName(const Name: String): TALJSONNodeW;
 begin
   Result := FindNode(Name);
-  if not Assigned(Result) then ALJSONDocErrorW(CALJSONNodeNotFound, [Name]);
+  if not Assigned(Result) then ALJSONDocErrorW(ALJSONNodeNotFound, [Name]);
 end;
 
 {************************************************************************}
@@ -14140,7 +14004,7 @@ begin
                      ALFreeAndNil(Node);
                      Exit;
                    end;
-        dupError: ALJSONDocErrorW(cALJSONDuplicateNodeName);
+        dupError: ALJSONDocErrorW(ALJSONDuplicateNodeName);
       end;
   InternalInsert(Result, Node);
 end;
@@ -14170,8 +14034,8 @@ procedure TALJSONNodeListW.Insert(Index: Integer; const Node: TALJSONNodeW);
 begin
   if Index = -1 then Add(Node)
   else begin
-    if Sorted then ALJSONDocErrorW(CALJSONSortedListError);
-    if (Index < 0) or (Index > FCount) then ALJSONDocErrorW(CALJSONListIndexError, [Index]);
+    if Sorted then ALJSONDocErrorW(ALJSONSortedListError);
+    if (Index < 0) or (Index > FCount) then ALJSONDocErrorW(ALJSONListIndexError, [Index]);
     InternalInsert(Index, Node);
   end;
 end;
@@ -14236,8 +14100,8 @@ end;
 procedure TALJSONNodeListW.Exchange(Index1, Index2: Integer);
 var Item: Pointer;
 begin
-  if (Index1 < 0) or (Index1 >= FCount) then ALJSONDocErrorW(cALJSONListIndexError, [Index1]);
-  if (Index2 < 0) or (Index2 >= FCount) then ALJSONDocErrorW(cALJSONListIndexError, [Index2]);
+  if (Index1 < 0) or (Index1 >= FCount) then ALJSONDocErrorW(ALJSONListIndexError, [Index1]);
+  if (Index2 < 0) or (Index2 >= FCount) then ALJSONDocErrorW(ALJSONListIndexError, [Index2]);
   Item := pointer(FList[Index1]);
   pointer(FList[Index1]) := pointer(FList[Index2]);
   pointer(FList[Index2]) := Item;
@@ -14300,7 +14164,7 @@ end;
 {***********************************************************}
 procedure TALJSONNodeListW.SetCapacity(NewCapacity: Integer);
 begin
-  if (NewCapacity < FCount) then ALJSONDocErrorW(CALJSONListCapacityError, [NewCapacity]);
+  if (NewCapacity < FCount) then ALJSONDocErrorW(ALJSONListCapacityError, [NewCapacity]);
   if NewCapacity <> FCapacity then begin
     SetLength(FList, NewCapacity);
     FCapacity := NewCapacity;
@@ -14354,7 +14218,7 @@ end;
 procedure TALJSONNodeListW.SetCount(NewCount: Integer);
 var I: Integer;
 begin
-  if (NewCount < 0) then ALJSONDocErrorW(CALJSONListCountError, [NewCount]);
+  if (NewCount < 0) then ALJSONDocErrorW(ALJSONListCountError, [NewCount]);
   if NewCount > FCapacity then SetCapacity(NewCount);
   if NewCount > FCount then FillChar(FList[FCount], (NewCount - FCount) * SizeOf(Pointer), 0)
   else for I := FCount - 1 downto NewCount do Delete(I);
@@ -14384,29 +14248,29 @@ begin
       else if (NodeSubType = nstnull) then      aLst.Add(aPath + Path + aLst.NameValueSeparator + aNullStr)
       else                                      aLst.Add(aPath + Path + aLst.NameValueSeparator + String(Args[0].VUnicodeString));
       LContainChilds := True;
-    end{onParseText},
+    end{OnParseText},
     //--
     procedure (Sender: TObject; const Path: String; const Name: String)
     begin
       LContainChilds := False;
-    end{onParseStartObject},
+    end{OnParseStartObject},
     //--
     procedure (Sender: TObject; const Path: String; const Name: String)
     begin
       if (not LContainChilds) and (aPath + Path <> ''{Path = '' mean it's the root object}) then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '{}');
       LContainChilds := True;
-    end{onParseEndObject},
+    end{OnParseEndObject},
     //--
     procedure (Sender: TObject; const Path: String; const Name: String)
     begin
       LContainChilds := False;
-    end{onParseStartArray},
+    end{OnParseStartArray},
     //--
     procedure (Sender: TObject; const Path: String; const Name: String)
     begin
       if not LContainChilds then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '[]');
       LContainChilds := True;
-    end{onParseEndArray});
+    end{OnParseEndArray});
 end;
 
 {**************************}

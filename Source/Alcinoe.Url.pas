@@ -427,7 +427,7 @@ begin
   FQueryString := '';
 end;
 
-{****************************************************************************************************************************}
+{************************************************************************************************************************}
 constructor TALCookedUrlW.Create(const AUrl: String; Const ADecode: Boolean = False; Const APlusAsSpaces: Boolean = True);
 begin
   inherited create;
@@ -456,7 +456,7 @@ begin
   FAnchor := '';
 end;
 
-{****************************************************************************************************************************}
+{************************************************************************************************************************}
 procedure TALCookedUrlW.CrackUrl(const AUrl: String; Const ADecode: Boolean = False; Const APlusAsSpaces: Boolean = True);
 begin
 
@@ -588,7 +588,7 @@ begin
 
 end;
 
-{*****************************************************************************************************************}
+{*************************************************************************************************************}
 function TALCookedUrlW.GetFullUrl(const AEncode: Boolean = False; Const ASpacesAsPlus: Boolean = True): String;
 begin
   Var LLength := length(FScheme) + 3{://} +
@@ -718,14 +718,14 @@ begin
   end;
 end;
 
-{************************************************}
+{********************************************}
 function TALCookedUrlW.GetQueryString: String;
 begin
   if (FQueryString = '') and (FQueryParams <> nil) then FQueryString := FQueryParams.Text;
   Result := FQueryString;
 end;
 
-{***************************************************************}
+{***********************************************************}
 procedure TALCookedUrlW.SetQueryString(const AValue: String);
 begin
   if (AValue <> FQueryString) then begin

@@ -33,9 +33,9 @@ To access the document nodes
 ----------------------------
 
 MyJsonDoc := TALJsonDocumentW.CreateFromJSONString('{...}');
-MyJsonDoc.GetChildNodeValueInt32('_id', 0{default if node not exists});
-MyJsonDoc.GetChildNodeValueText(['name','first'], ''{default if node not exists});
-MyJsonDoc.GetChildNodeValueDateTime('birth', Now{default if node not exists});
+MyJsonDoc.GetChildValueInt32('_id', 0{default if node not exists});
+MyJsonDoc.GetChildValueText(['name','first'], ''{default if node not exists});
+MyJsonDoc.GetChildValueDateTime('birth', Now{default if node not exists});
 for i := 0 to MyJsonDoc.childnodes['contribs'].ChildNodes.count - 1 do
   MyJsonDoc.childnodes['contribs'].childnodes[i].text;
 
@@ -500,63 +500,63 @@ type
                 const Options: TALJSONParseOptions = []); overload;
     property ChildNodes: TALJSONNodeListA read GetChildNodes write SetChildNodes;
     function GetChildNode(const nodeName: ansiString): TALJSONNodeA; overload;
-    function GetChildNodeValueText(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;
-    function GetChildNodeValueFloat(const nodeName: ansiString; const default: Double): Double; overload;
-    function GetChildNodeValueDateTime(const nodeName: ansiString; const default: TDateTime): TDateTime; overload;
-    function GetChildNodeValueTimestamp(const nodeName: ansiString; const default: TALBSONTimestamp): TALBSONTimestamp; overload;
-    function GetChildNodeValueObjectID(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
-    function GetChildNodeValueInt32(const nodeName: ansiString; const default: Integer): Integer; overload;
-    function GetChildNodeValueInt64(const nodeName: ansiString; const default: Int64): Int64; overload;
-    function GetChildNodeValueBool(const nodeName: ansiString; const default: Boolean): Boolean; overload;
-    function GetChildNodeValueJavascript(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;
-    function GetChildNodeValueRegEx(const nodeName: ansiString; const default: ansiString): ansiString; overload;
-    function GetChildNodeValueRegExOptions(const nodeName: ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
-    function GetChildNodeValueBinary(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
-    function GetChildNodeValueBinarySubType(const nodeName: ansiString; const default: byte): byte; overload;
-    function GetChildNodeValueNull(const nodeName: ansiString): Boolean; overload;
+    function GetChildValueText(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;
+    function GetChildValueFloat(const nodeName: ansiString; const default: Double): Double; overload;
+    function GetChildValueDateTime(const nodeName: ansiString; const default: TDateTime): TDateTime; overload;
+    function GetChildValueTimestamp(const nodeName: ansiString; const default: TALBSONTimestamp): TALBSONTimestamp; overload;
+    function GetChildValueObjectID(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
+    function GetChildValueInt32(const nodeName: ansiString; const default: Integer): Integer; overload;
+    function GetChildValueInt64(const nodeName: ansiString; const default: Int64): Int64; overload;
+    function GetChildValueBool(const nodeName: ansiString; const default: Boolean): Boolean; overload;
+    function GetChildValueJavascript(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;
+    function GetChildValueRegEx(const nodeName: ansiString; const default: ansiString): ansiString; overload;
+    function GetChildValueRegExOptions(const nodeName: ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
+    function GetChildValueBinary(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
+    function GetChildValueBinarySubType(const nodeName: ansiString; const default: byte): byte; overload;
+    function GetChildValueNull(const nodeName: ansiString): Boolean; overload;
     function GetChildNode(const path: array of ansiString): TALJSONNodeA; overload;
-    function GetChildNodeValueText(const path: array of ansiString; const default: AnsiString): AnsiString; overload;
-    function GetChildNodeValueFloat(const path: array of ansiString; const default: Double): Double; overload;
-    function GetChildNodeValueDateTime(const path: array of ansiString; const default: TDateTime): TDateTime; overload;
-    function GetChildNodeValueTimestamp(const path: array of ansiString; const default: TALBSONTimestamp): TALBSONTimestamp; overload;
-    function GetChildNodeValueObjectID(const path: array of ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
-    function GetChildNodeValueInt32(const path: array of ansiString; const default: Integer): Integer; overload;
-    function GetChildNodeValueInt64(const path: array of ansiString; const default: Int64): Int64; overload;
-    function GetChildNodeValueBool(const path: array of ansiString; const default: Boolean): Boolean; overload;
-    function GetChildNodeValueJavascript(const path: array of ansiString; const default: AnsiString): AnsiString; overload;
-    function GetChildNodeValueRegEx(const path: array of ansiString; const default: ansiString): ansiString; overload;
-    function GetChildNodeValueRegExOptions(const path: array of ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
-    function GetChildNodeValueBinary(const path: array of ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
-    function GetChildNodeValueBinarySubType(const path: array of ansiString; const default: byte): byte; overload;
-    function GetChildNodeValueNull(const path: array of ansiString): Boolean; overload;
-    procedure SetChildNodeValueText(const nodeName: ansiString; const value: AnsiString); overload;
-    procedure SetChildNodeValueFloat(const nodeName: ansiString; const value: Double); overload;
-    procedure SetChildNodeValueDateTime(const nodeName: ansiString; const value: TDateTime); overload;
-    procedure SetChildNodeValueTimestamp(const nodeName: ansiString; const value: TALBSONTimestamp); overload;
-    procedure SetChildNodeValueObjectID(const nodeName: ansiString; const value: AnsiString); overload;
-    procedure SetChildNodeValueInt32(const nodeName: ansiString; const value: Integer); overload;
-    procedure SetChildNodeValueInt64(const nodeName: ansiString; const value: Int64); overload;
-    procedure SetChildNodeValueBool(const nodeName: ansiString; const value: Boolean); overload;
-    procedure SetChildNodeValueJavascript(const nodeName: ansiString; const value: AnsiString); overload;
-    procedure SetChildNodeValueRegEx(const nodeName: ansiString; const value: ansiString); overload;
-    procedure SetChildNodeValueRegExOptions(const nodeName: ansiString; const value: TALPerlRegExOptions); overload;
-    procedure SetChildNodeValueBinary(const nodeName: ansiString; const value: AnsiString); overload;
-    procedure SetChildNodeValueBinarySubType(const nodeName: ansiString; const value: byte); overload;
-    procedure SetChildNodeValueNull(const nodeName: ansiString); overload;
-    procedure SetChildNodeValueText(const path: array of ansiString; const value: AnsiString); overload;
-    procedure SetChildNodeValueFloat(const path: array of ansiString; const value: Double); overload;
-    procedure SetChildNodeValueDateTime(const path: array of ansiString; const value: TDateTime); overload;
-    procedure SetChildNodeValueTimestamp(const path: array of ansiString; const value: TALBSONTimestamp); overload;
-    procedure SetChildNodeValueObjectID(const path: array of ansiString; const value: AnsiString); overload;
-    procedure SetChildNodeValueInt32(const path: array of ansiString; const value: Integer); overload;
-    procedure SetChildNodeValueInt64(const path: array of ansiString; const value: Int64); overload;
-    procedure SetChildNodeValueBool(const path: array of ansiString; const value: Boolean); overload;
-    procedure SetChildNodeValueJavascript(const path: array of ansiString; const value: AnsiString); overload;
-    procedure SetChildNodeValueRegEx(const path: array of ansiString; const value: ansiString); overload;
-    procedure SetChildNodeValueRegExOptions(const path: array of ansiString; const value: TALPerlRegExOptions); overload;
-    procedure SetChildNodeValueBinary(const path: array of ansiString; const value: AnsiString); overload;
-    procedure SetChildNodeValueBinarySubType(const path: array of ansiString; const value: byte); overload;
-    procedure SetChildNodeValueNull(const path: array of ansiString); overload;
+    function GetChildValueText(const path: array of ansiString; const default: AnsiString): AnsiString; overload;
+    function GetChildValueFloat(const path: array of ansiString; const default: Double): Double; overload;
+    function GetChildValueDateTime(const path: array of ansiString; const default: TDateTime): TDateTime; overload;
+    function GetChildValueTimestamp(const path: array of ansiString; const default: TALBSONTimestamp): TALBSONTimestamp; overload;
+    function GetChildValueObjectID(const path: array of ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
+    function GetChildValueInt32(const path: array of ansiString; const default: Integer): Integer; overload;
+    function GetChildValueInt64(const path: array of ansiString; const default: Int64): Int64; overload;
+    function GetChildValueBool(const path: array of ansiString; const default: Boolean): Boolean; overload;
+    function GetChildValueJavascript(const path: array of ansiString; const default: AnsiString): AnsiString; overload;
+    function GetChildValueRegEx(const path: array of ansiString; const default: ansiString): ansiString; overload;
+    function GetChildValueRegExOptions(const path: array of ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
+    function GetChildValueBinary(const path: array of ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
+    function GetChildValueBinarySubType(const path: array of ansiString; const default: byte): byte; overload;
+    function GetChildValueNull(const path: array of ansiString): Boolean; overload;
+    procedure SetChildValueText(const nodeName: ansiString; const value: AnsiString); overload;
+    procedure SetChildValueFloat(const nodeName: ansiString; const value: Double); overload;
+    procedure SetChildValueDateTime(const nodeName: ansiString; const value: TDateTime); overload;
+    procedure SetChildValueTimestamp(const nodeName: ansiString; const value: TALBSONTimestamp); overload;
+    procedure SetChildValueObjectID(const nodeName: ansiString; const value: AnsiString); overload;
+    procedure SetChildValueInt32(const nodeName: ansiString; const value: Integer); overload;
+    procedure SetChildValueInt64(const nodeName: ansiString; const value: Int64); overload;
+    procedure SetChildValueBool(const nodeName: ansiString; const value: Boolean); overload;
+    procedure SetChildValueJavascript(const nodeName: ansiString; const value: AnsiString); overload;
+    procedure SetChildValueRegEx(const nodeName: ansiString; const value: ansiString); overload;
+    procedure SetChildValueRegExOptions(const nodeName: ansiString; const value: TALPerlRegExOptions); overload;
+    procedure SetChildValueBinary(const nodeName: ansiString; const value: AnsiString); overload;
+    procedure SetChildValueBinarySubType(const nodeName: ansiString; const value: byte); overload;
+    procedure SetChildValueNull(const nodeName: ansiString); overload;
+    procedure SetChildValueText(const path: array of ansiString; const value: AnsiString); overload;
+    procedure SetChildValueFloat(const path: array of ansiString; const value: Double); overload;
+    procedure SetChildValueDateTime(const path: array of ansiString; const value: TDateTime); overload;
+    procedure SetChildValueTimestamp(const path: array of ansiString; const value: TALBSONTimestamp); overload;
+    procedure SetChildValueObjectID(const path: array of ansiString; const value: AnsiString); overload;
+    procedure SetChildValueInt32(const path: array of ansiString; const value: Integer); overload;
+    procedure SetChildValueInt64(const path: array of ansiString; const value: Int64); overload;
+    procedure SetChildValueBool(const path: array of ansiString; const value: Boolean); overload;
+    procedure SetChildValueJavascript(const path: array of ansiString; const value: AnsiString); overload;
+    procedure SetChildValueRegEx(const path: array of ansiString; const value: ansiString); overload;
+    procedure SetChildValueRegExOptions(const path: array of ansiString; const value: TALPerlRegExOptions); overload;
+    procedure SetChildValueBinary(const path: array of ansiString; const value: AnsiString); overload;
+    procedure SetChildValueBinarySubType(const path: array of ansiString; const value: byte); overload;
+    procedure SetChildValueNull(const path: array of ansiString); overload;
     property HasChildNodes: Boolean read GetHasChildNodes;
     property NodeName: AnsiString read fNodeName write SetNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
@@ -1062,63 +1062,63 @@ type
                 const Options: TALJSONParseOptions = []);
     property ChildNodes: TALJSONNodeListW read GetChildNodes write SetChildNodes;
     function GetChildNode(const nodeName: String): TALJSONNodeW; overload;
-    function GetChildNodeValueText(const nodeName: String; const default: String): String; overload;
-    function GetChildNodeValueFloat(const nodeName: String; const default: Double): Double; overload;
-    function GetChildNodeValueDateTime(const nodeName: String; const default: TDateTime): TDateTime; overload;
-    function GetChildNodeValueTimestamp(const nodeName: String; const default: TALBSONTimestamp): TALBSONTimestamp; overload;
-    function GetChildNodeValueObjectID(const nodeName: String; const default: String): String; overload; // return a hex string
-    function GetChildNodeValueInt32(const nodeName: String; const default: Integer): Integer; overload;
-    function GetChildNodeValueInt64(const nodeName: String; const default: Int64): Int64; overload;
-    function GetChildNodeValueBool(const nodeName: String; const default: Boolean): Boolean; overload;
-    function GetChildNodeValueJavascript(const nodeName: String; const default: String): String; overload;
-    function GetChildNodeValueRegEx(const nodeName: String; const default: String): String; overload;
-    function GetChildNodeValueRegExOptions(const nodeName: String; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
-    function GetChildNodeValueBinary(const nodeName: String; const default: String): String; overload;  // return a base64 encoded string
-    function GetChildNodeValueBinarySubType(const nodeName: String; const default: byte): byte; overload;
-    function GetChildNodeValueNull(const nodeName: String): Boolean; overload;
+    function GetChildValueText(const nodeName: String; const default: String): String; overload;
+    function GetChildValueFloat(const nodeName: String; const default: Double): Double; overload;
+    function GetChildValueDateTime(const nodeName: String; const default: TDateTime): TDateTime; overload;
+    function GetChildValueTimestamp(const nodeName: String; const default: TALBSONTimestamp): TALBSONTimestamp; overload;
+    function GetChildValueObjectID(const nodeName: String; const default: String): String; overload; // return a hex string
+    function GetChildValueInt32(const nodeName: String; const default: Integer): Integer; overload;
+    function GetChildValueInt64(const nodeName: String; const default: Int64): Int64; overload;
+    function GetChildValueBool(const nodeName: String; const default: Boolean): Boolean; overload;
+    function GetChildValueJavascript(const nodeName: String; const default: String): String; overload;
+    function GetChildValueRegEx(const nodeName: String; const default: String): String; overload;
+    function GetChildValueRegExOptions(const nodeName: String; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
+    function GetChildValueBinary(const nodeName: String; const default: String): String; overload;  // return a base64 encoded string
+    function GetChildValueBinarySubType(const nodeName: String; const default: byte): byte; overload;
+    function GetChildValueNull(const nodeName: String): Boolean; overload;
     function GetChildNode(const path: array of String): TALJSONNodeW; overload;
-    function GetChildNodeValueText(const path: array of String; const default: String): String; overload;
-    function GetChildNodeValueFloat(const path: array of String; const default: Double): Double; overload;
-    function GetChildNodeValueDateTime(const path: array of String; const default: TDateTime): TDateTime; overload;
-    function GetChildNodeValueTimestamp(const path: array of String; const default: TALBSONTimestamp): TALBSONTimestamp; overload;
-    function GetChildNodeValueObjectID(const path: array of String; const default: String): String; overload;  // return a hex string
-    function GetChildNodeValueInt32(const path: array of String; const default: Integer): Integer; overload;
-    function GetChildNodeValueInt64(const path: array of String; const default: Int64): Int64; overload;
-    function GetChildNodeValueBool(const path: array of String; const default: Boolean): Boolean; overload;
-    function GetChildNodeValueJavascript(const path: array of String; const default: String): String; overload;
-    function GetChildNodeValueRegEx(const path: array of String; const default: String): String; overload;
-    function GetChildNodeValueRegExOptions(const path: array of String; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
-    function GetChildNodeValueBinary(const path: array of String; const default: String): String; overload;  // return a base64 encoded string
-    function GetChildNodeValueBinarySubType(const path: array of String; const default: byte): byte; overload;
-    function GetChildNodeValueNull(const path: array of String): Boolean; overload;
-    procedure SetChildNodeValueText(const nodeName: String; const value: String); overload;
-    procedure SetChildNodeValueFloat(const nodeName: String; const value: Double); overload;
-    procedure SetChildNodeValueDateTime(const nodeName: String; const value: TDateTime); overload;
-    procedure SetChildNodeValueTimestamp(const nodeName: String; const value: TALBSONTimestamp); overload;
-    procedure SetChildNodeValueObjectID(const nodeName: String; const value: String); overload;
-    procedure SetChildNodeValueInt32(const nodeName: String; const value: Integer); overload;
-    procedure SetChildNodeValueInt64(const nodeName: String; const value: Int64); overload;
-    procedure SetChildNodeValueBool(const nodeName: String; const value: Boolean); overload;
-    procedure SetChildNodeValueJavascript(const nodeName: String; const value: String); overload;
-    procedure SetChildNodeValueRegEx(const nodeName: String; const value: String); overload;
-    procedure SetChildNodeValueRegExOptions(const nodeName: String; const value: TALPerlRegExOptions); overload;
-    procedure SetChildNodeValueBinary(const nodeName: String; const value: String); overload;
-    procedure SetChildNodeValueBinarySubType(const nodeName: String; const value: byte); overload;
-    procedure SetChildNodeValueNull(const nodeName: String); overload;
-    procedure SetChildNodeValueText(const path: array of String; const value: String); overload;
-    procedure SetChildNodeValueFloat(const path: array of String; const value: Double); overload;
-    procedure SetChildNodeValueDateTime(const path: array of String; const value: TDateTime); overload;
-    procedure SetChildNodeValueTimestamp(const path: array of String; const value: TALBSONTimestamp); overload;
-    procedure SetChildNodeValueObjectID(const path: array of String; const value: String); overload;
-    procedure SetChildNodeValueInt32(const path: array of String; const value: Integer); overload;
-    procedure SetChildNodeValueInt64(const path: array of String; const value: Int64); overload;
-    procedure SetChildNodeValueBool(const path: array of String; const value: Boolean); overload;
-    procedure SetChildNodeValueJavascript(const path: array of String; const value: String); overload;
-    procedure SetChildNodeValueRegEx(const path: array of String; const value: String); overload;
-    procedure SetChildNodeValueRegExOptions(const path: array of String; const value: TALPerlRegExOptions); overload;
-    procedure SetChildNodeValueBinary(const path: array of String; const value: String); overload;
-    procedure SetChildNodeValueBinarySubType(const path: array of String; const value: byte); overload;
-    procedure SetChildNodeValueNull(const path: array of String); overload;
+    function GetChildValueText(const path: array of String; const default: String): String; overload;
+    function GetChildValueFloat(const path: array of String; const default: Double): Double; overload;
+    function GetChildValueDateTime(const path: array of String; const default: TDateTime): TDateTime; overload;
+    function GetChildValueTimestamp(const path: array of String; const default: TALBSONTimestamp): TALBSONTimestamp; overload;
+    function GetChildValueObjectID(const path: array of String; const default: String): String; overload;  // return a hex string
+    function GetChildValueInt32(const path: array of String; const default: Integer): Integer; overload;
+    function GetChildValueInt64(const path: array of String; const default: Int64): Int64; overload;
+    function GetChildValueBool(const path: array of String; const default: Boolean): Boolean; overload;
+    function GetChildValueJavascript(const path: array of String; const default: String): String; overload;
+    function GetChildValueRegEx(const path: array of String; const default: String): String; overload;
+    function GetChildValueRegExOptions(const path: array of String; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
+    function GetChildValueBinary(const path: array of String; const default: String): String; overload;  // return a base64 encoded string
+    function GetChildValueBinarySubType(const path: array of String; const default: byte): byte; overload;
+    function GetChildValueNull(const path: array of String): Boolean; overload;
+    procedure SetChildValueText(const nodeName: String; const value: String); overload;
+    procedure SetChildValueFloat(const nodeName: String; const value: Double); overload;
+    procedure SetChildValueDateTime(const nodeName: String; const value: TDateTime); overload;
+    procedure SetChildValueTimestamp(const nodeName: String; const value: TALBSONTimestamp); overload;
+    procedure SetChildValueObjectID(const nodeName: String; const value: String); overload;
+    procedure SetChildValueInt32(const nodeName: String; const value: Integer); overload;
+    procedure SetChildValueInt64(const nodeName: String; const value: Int64); overload;
+    procedure SetChildValueBool(const nodeName: String; const value: Boolean); overload;
+    procedure SetChildValueJavascript(const nodeName: String; const value: String); overload;
+    procedure SetChildValueRegEx(const nodeName: String; const value: String); overload;
+    procedure SetChildValueRegExOptions(const nodeName: String; const value: TALPerlRegExOptions); overload;
+    procedure SetChildValueBinary(const nodeName: String; const value: String); overload;
+    procedure SetChildValueBinarySubType(const nodeName: String; const value: byte); overload;
+    procedure SetChildValueNull(const nodeName: String); overload;
+    procedure SetChildValueText(const path: array of String; const value: String); overload;
+    procedure SetChildValueFloat(const path: array of String; const value: Double); overload;
+    procedure SetChildValueDateTime(const path: array of String; const value: TDateTime); overload;
+    procedure SetChildValueTimestamp(const path: array of String; const value: TALBSONTimestamp); overload;
+    procedure SetChildValueObjectID(const path: array of String; const value: String); overload;
+    procedure SetChildValueInt32(const path: array of String; const value: Integer); overload;
+    procedure SetChildValueInt64(const path: array of String; const value: Int64); overload;
+    procedure SetChildValueBool(const path: array of String; const value: Boolean); overload;
+    procedure SetChildValueJavascript(const path: array of String; const value: String); overload;
+    procedure SetChildValueRegEx(const path: array of String; const value: String); overload;
+    procedure SetChildValueRegExOptions(const path: array of String; const value: TALPerlRegExOptions); overload;
+    procedure SetChildValueBinary(const path: array of String; const value: String); overload;
+    procedure SetChildValueBinarySubType(const path: array of String; const value: byte); overload;
+    procedure SetChildValueNull(const path: array of String); overload;
     property HasChildNodes: Boolean read GetHasChildNodes;
     property NodeName: String read fNodeName write SetNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
@@ -2325,7 +2325,7 @@ begin
 end;
 
 {*************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueText(const nodeName: ansiString; const default: AnsiString): AnsiString;
+function TALJSONNodeA.GetChildValueText(const nodeName: ansiString; const default: AnsiString): AnsiString;
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2334,7 +2334,7 @@ begin
 end;
 
 {******************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueFloat(const nodeName: ansiString; const default: Double): Double;
+function TALJSONNodeA.GetChildValueFloat(const nodeName: ansiString; const default: Double): Double;
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2343,7 +2343,7 @@ begin
 end;
 
 {***************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueDateTime(const nodeName: ansiString; const default: TDateTime): TDateTime;
+function TALJSONNodeA.GetChildValueDateTime(const nodeName: ansiString; const default: TDateTime): TDateTime;
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2352,7 +2352,7 @@ begin
 end;
 
 {******************************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueTimestamp(const nodeName: ansiString; const default: TALBSONTimestamp): TALBSONTimestamp;
+function TALJSONNodeA.GetChildValueTimestamp(const nodeName: ansiString; const default: TALBSONTimestamp): TALBSONTimestamp;
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2361,7 +2361,7 @@ begin
 end;
 
 {********************************************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueObjectID(const nodeName: ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
+function TALJSONNodeA.GetChildValueObjectID(const nodeName: ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2370,7 +2370,7 @@ begin
 end;
 
 {********************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueInt32(const nodeName: ansiString; const default: Integer): Integer;
+function TALJSONNodeA.GetChildValueInt32(const nodeName: ansiString; const default: Integer): Integer;
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2379,7 +2379,7 @@ begin
 end;
 
 {****************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueInt64(const nodeName: ansiString; const default: Int64): Int64;
+function TALJSONNodeA.GetChildValueInt64(const nodeName: ansiString; const default: Int64): Int64;
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2388,7 +2388,7 @@ begin
 end;
 
 {*******************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueBool(const nodeName: ansiString; const default: Boolean): Boolean;
+function TALJSONNodeA.GetChildValueBool(const nodeName: ansiString; const default: Boolean): Boolean;
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2397,7 +2397,7 @@ begin
 end;
 
 {*******************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueJavascript(const nodeName: ansiString; const default: AnsiString): AnsiString;
+function TALJSONNodeA.GetChildValueJavascript(const nodeName: ansiString; const default: AnsiString): AnsiString;
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2406,7 +2406,7 @@ begin
 end;
 
 {**************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueRegEx(const nodeName: ansiString; const default: ansiString): ansiString;
+function TALJSONNodeA.GetChildValueRegEx(const nodeName: ansiString; const default: ansiString): ansiString;
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2415,7 +2415,7 @@ begin
 end;
 
 {***************************************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueRegExOptions(const nodeName: ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions;
+function TALJSONNodeA.GetChildValueRegExOptions(const nodeName: ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions;
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2424,7 +2424,7 @@ begin
 end;
 
 {******************************************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueBinary(const nodeName: ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
+function TALJSONNodeA.GetChildValueBinary(const nodeName: ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2433,7 +2433,7 @@ begin
 end;
 
 {**********************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueBinarySubType(const nodeName: ansiString; const default: byte): byte;
+function TALJSONNodeA.GetChildValueBinarySubType(const nodeName: ansiString; const default: byte): byte;
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2442,7 +2442,7 @@ begin
 end;
 
 {*******************************************************************************}
-function TALJSONNodeA.GetChildNodeValueNull(const nodeName: ansiString): Boolean;
+function TALJSONNodeA.GetChildValueNull(const nodeName: ansiString): Boolean;
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2462,7 +2462,7 @@ begin
 end;
 
 {******************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueText(const path: array of ansiString; const default: AnsiString): AnsiString;
+function TALJSONNodeA.GetChildValueText(const path: array of ansiString; const default: AnsiString): AnsiString;
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2480,7 +2480,7 @@ begin
 end;
 
 {***********************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueFloat(const path: array of ansiString; const default: Double): Double;
+function TALJSONNodeA.GetChildValueFloat(const path: array of ansiString; const default: Double): Double;
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2498,7 +2498,7 @@ begin
 end;
 
 {********************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueDateTime(const path: array of ansiString; const default: TDateTime): TDateTime;
+function TALJSONNodeA.GetChildValueDateTime(const path: array of ansiString; const default: TDateTime): TDateTime;
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2516,7 +2516,7 @@ begin
 end;
 
 {***********************************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueTimestamp(const path: array of ansiString; const default: TALBSONTimestamp): TALBSONTimestamp;
+function TALJSONNodeA.GetChildValueTimestamp(const path: array of ansiString; const default: TALBSONTimestamp): TALBSONTimestamp;
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2534,7 +2534,7 @@ begin
 end;
 
 {*************************************************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueObjectID(const path: array of ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
+function TALJSONNodeA.GetChildValueObjectID(const path: array of ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2552,7 +2552,7 @@ begin
 end;
 
 {*************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueInt32(const path: array of ansiString; const default: Integer): Integer;
+function TALJSONNodeA.GetChildValueInt32(const path: array of ansiString; const default: Integer): Integer;
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2570,7 +2570,7 @@ begin
 end;
 
 {*********************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueInt64(const path: array of ansiString; const default: Int64): Int64;
+function TALJSONNodeA.GetChildValueInt64(const path: array of ansiString; const default: Int64): Int64;
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2588,7 +2588,7 @@ begin
 end;
 
 {************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueBool(const path: array of ansiString; const default: Boolean): Boolean;
+function TALJSONNodeA.GetChildValueBool(const path: array of ansiString; const default: Boolean): Boolean;
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2606,7 +2606,7 @@ begin
 end;
 
 {************************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueJavascript(const path: array of ansiString; const default: AnsiString): AnsiString;
+function TALJSONNodeA.GetChildValueJavascript(const path: array of ansiString; const default: AnsiString): AnsiString;
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2624,7 +2624,7 @@ begin
 end;
 
 {*******************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueRegEx(const path: array of ansiString; const default: ansiString): ansiString;
+function TALJSONNodeA.GetChildValueRegEx(const path: array of ansiString; const default: ansiString): ansiString;
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2642,7 +2642,7 @@ begin
 end;
 
 {********************************************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueRegExOptions(const path: array of ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions;
+function TALJSONNodeA.GetChildValueRegExOptions(const path: array of ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions;
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2660,7 +2660,7 @@ begin
 end;
 
 {***********************************************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueBinary(const path: array of ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
+function TALJSONNodeA.GetChildValueBinary(const path: array of ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2678,7 +2678,7 @@ begin
 end;
 
 {***************************************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueBinarySubType(const path: array of ansiString; const default: byte): byte;
+function TALJSONNodeA.GetChildValueBinarySubType(const path: array of ansiString; const default: byte): byte;
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2696,7 +2696,7 @@ begin
 end;
 
 {************************************************************************************}
-function TALJSONNodeA.GetChildNodeValueNull(const path: array of ansiString): Boolean;
+function TALJSONNodeA.GetChildValueNull(const path: array of ansiString): Boolean;
 var LNode: TALJSONNodeA;
     I: integer;
 begin
@@ -2714,7 +2714,7 @@ begin
 end;
 
 {************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueText(const nodeName: ansiString; const value: AnsiString);
+procedure TALJSONNodeA.SetChildValueText(const nodeName: ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2723,7 +2723,7 @@ begin
 end;
 
 {*********************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueFloat(const nodeName: ansiString; const value: Double);
+procedure TALJSONNodeA.SetChildValueFloat(const nodeName: ansiString; const value: Double);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2732,7 +2732,7 @@ begin
 end;
 
 {***************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueDateTime(const nodeName: ansiString; const value: TDateTime);
+procedure TALJSONNodeA.SetChildValueDateTime(const nodeName: ansiString; const value: TDateTime);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2741,7 +2741,7 @@ begin
 end;
 
 {***********************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueTimestamp(const nodeName: ansiString; const value: TALBSONTimestamp);
+procedure TALJSONNodeA.SetChildValueTimestamp(const nodeName: ansiString; const value: TALBSONTimestamp);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2750,7 +2750,7 @@ begin
 end;
 
 {****************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueObjectID(const nodeName: ansiString; const value: AnsiString);
+procedure TALJSONNodeA.SetChildValueObjectID(const nodeName: ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2759,7 +2759,7 @@ begin
 end;
 
 {**********************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueInt32(const nodeName: ansiString; const value: Integer);
+procedure TALJSONNodeA.SetChildValueInt32(const nodeName: ansiString; const value: Integer);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2768,7 +2768,7 @@ begin
 end;
 
 {********************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueInt64(const nodeName: ansiString; const value: Int64);
+procedure TALJSONNodeA.SetChildValueInt64(const nodeName: ansiString; const value: Int64);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2777,7 +2777,7 @@ begin
 end;
 
 {*********************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueBool(const nodeName: ansiString; const value: Boolean);
+procedure TALJSONNodeA.SetChildValueBool(const nodeName: ansiString; const value: Boolean);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2786,7 +2786,7 @@ begin
 end;
 
 {******************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueJavascript(const nodeName: ansiString; const value: AnsiString);
+procedure TALJSONNodeA.SetChildValueJavascript(const nodeName: ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2795,7 +2795,7 @@ begin
 end;
 
 {*************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueRegEx(const nodeName: ansiString; const value: ansiString);
+procedure TALJSONNodeA.SetChildValueRegEx(const nodeName: ansiString; const value: ansiString);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2804,7 +2804,7 @@ begin
 end;
 
 {*****************************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueRegExOptions(const nodeName: ansiString; const value: TALPerlRegExOptions);
+procedure TALJSONNodeA.SetChildValueRegExOptions(const nodeName: ansiString; const value: TALPerlRegExOptions);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2813,7 +2813,7 @@ begin
 end;
 
 {**************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueBinary(const nodeName: ansiString; const value: AnsiString);
+procedure TALJSONNodeA.SetChildValueBinary(const nodeName: ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2822,7 +2822,7 @@ begin
 end;
 
 {***************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueBinarySubType(const nodeName: ansiString; const value: byte);
+procedure TALJSONNodeA.SetChildValueBinarySubType(const nodeName: ansiString; const value: byte);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2831,7 +2831,7 @@ begin
 end;
 
 {***********************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueNull(const nodeName: ansiString);
+procedure TALJSONNodeA.SetChildValueNull(const nodeName: ansiString);
 var LNode: TALJSONNodeA;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -2840,7 +2840,7 @@ begin
 end;
 
 {*****************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueText(const path: array of ansiString; const value: AnsiString);
+procedure TALJSONNodeA.SetChildValueText(const path: array of ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -2857,7 +2857,7 @@ begin
 end;
 
 {**************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueFloat(const path: array of ansiString; const value: Double);
+procedure TALJSONNodeA.SetChildValueFloat(const path: array of ansiString; const value: Double);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -2874,7 +2874,7 @@ begin
 end;
 
 {********************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueDateTime(const path: array of ansiString; const value: TDateTime);
+procedure TALJSONNodeA.SetChildValueDateTime(const path: array of ansiString; const value: TDateTime);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -2891,7 +2891,7 @@ begin
 end;
 
 {****************************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueTimestamp(const path: array of ansiString; const value: TALBSONTimestamp);
+procedure TALJSONNodeA.SetChildValueTimestamp(const path: array of ansiString; const value: TALBSONTimestamp);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -2908,7 +2908,7 @@ begin
 end;
 
 {*********************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueObjectID(const path: array of ansiString; const value: AnsiString);
+procedure TALJSONNodeA.SetChildValueObjectID(const path: array of ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -2925,7 +2925,7 @@ begin
 end;
 
 {***************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueInt32(const path: array of ansiString; const value: Integer);
+procedure TALJSONNodeA.SetChildValueInt32(const path: array of ansiString; const value: Integer);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -2942,7 +2942,7 @@ begin
 end;
 
 {*************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueInt64(const path: array of ansiString; const value: Int64);
+procedure TALJSONNodeA.SetChildValueInt64(const path: array of ansiString; const value: Int64);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -2959,7 +2959,7 @@ begin
 end;
 
 {**************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueBool(const path: array of ansiString; const value: Boolean);
+procedure TALJSONNodeA.SetChildValueBool(const path: array of ansiString; const value: Boolean);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -2976,7 +2976,7 @@ begin
 end;
 
 {***********************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueJavascript(const path: array of ansiString; const value: AnsiString);
+procedure TALJSONNodeA.SetChildValueJavascript(const path: array of ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -2993,7 +2993,7 @@ begin
 end;
 
 {******************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueRegEx(const path: array of ansiString; const value: ansiString);
+procedure TALJSONNodeA.SetChildValueRegEx(const path: array of ansiString; const value: ansiString);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -3010,7 +3010,7 @@ begin
 end;
 
 {**********************************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueRegExOptions(const path: array of ansiString; const value: TALPerlRegExOptions);
+procedure TALJSONNodeA.SetChildValueRegExOptions(const path: array of ansiString; const value: TALPerlRegExOptions);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -3027,7 +3027,7 @@ begin
 end;
 
 {*******************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueBinary(const path: array of ansiString; const value: AnsiString);
+procedure TALJSONNodeA.SetChildValueBinary(const path: array of ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -3044,7 +3044,7 @@ begin
 end;
 
 {********************************************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueBinarySubType(const path: array of ansiString; const value: byte);
+procedure TALJSONNodeA.SetChildValueBinarySubType(const path: array of ansiString; const value: byte);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -3061,7 +3061,7 @@ begin
 end;
 
 {****************************************************************************}
-procedure TALJSONNodeA.SetChildNodeValueNull(const path: array of ansiString);
+procedure TALJSONNodeA.SetChildValueNull(const path: array of ansiString);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
     I: integer;
@@ -9065,7 +9065,7 @@ begin
 end;
 
 {*************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueText(const nodeName: String; const default: String): String;
+function TALJSONNodeW.GetChildValueText(const nodeName: String; const default: String): String;
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9074,7 +9074,7 @@ begin
 end;
 
 {**************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueFloat(const nodeName: String; const default: Double): Double;
+function TALJSONNodeW.GetChildValueFloat(const nodeName: String; const default: Double): Double;
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9083,7 +9083,7 @@ begin
 end;
 
 {***********************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueDateTime(const nodeName: String; const default: TDateTime): TDateTime;
+function TALJSONNodeW.GetChildValueDateTime(const nodeName: String; const default: TDateTime): TDateTime;
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9092,7 +9092,7 @@ begin
 end;
 
 {**************************************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueTimestamp(const nodeName: String; const default: TALBSONTimestamp): TALBSONTimestamp;
+function TALJSONNodeW.GetChildValueTimestamp(const nodeName: String; const default: TALBSONTimestamp): TALBSONTimestamp;
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9101,7 +9101,7 @@ begin
 end;
 
 {****************************************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueObjectID(const nodeName: String; const default: String): String; // return a hex string
+function TALJSONNodeW.GetChildValueObjectID(const nodeName: String; const default: String): String; // return a hex string
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9110,7 +9110,7 @@ begin
 end;
 
 {****************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueInt32(const nodeName: String; const default: Integer): Integer;
+function TALJSONNodeW.GetChildValueInt32(const nodeName: String; const default: Integer): Integer;
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9119,7 +9119,7 @@ begin
 end;
 
 {************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueInt64(const nodeName: String; const default: Int64): Int64;
+function TALJSONNodeW.GetChildValueInt64(const nodeName: String; const default: Int64): Int64;
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9128,7 +9128,7 @@ begin
 end;
 
 {***************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueBool(const nodeName: String; const default: Boolean): Boolean;
+function TALJSONNodeW.GetChildValueBool(const nodeName: String; const default: Boolean): Boolean;
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9137,7 +9137,7 @@ begin
 end;
 
 {*******************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueJavascript(const nodeName: String; const default: String): String;
+function TALJSONNodeW.GetChildValueJavascript(const nodeName: String; const default: String): String;
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9146,7 +9146,7 @@ begin
 end;
 
 {**************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueRegEx(const nodeName: String; const default: String): String;
+function TALJSONNodeW.GetChildValueRegEx(const nodeName: String; const default: String): String;
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9155,7 +9155,7 @@ begin
 end;
 
 {***********************************************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueRegExOptions(const nodeName: String; const default: TALPerlRegExOptions): TALPerlRegExOptions;
+function TALJSONNodeW.GetChildValueRegExOptions(const nodeName: String; const default: TALPerlRegExOptions): TALPerlRegExOptions;
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9164,7 +9164,7 @@ begin
 end;
 
 {**************************************************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueBinary(const nodeName: String; const default: String): String;  // return a base64 encoded string
+function TALJSONNodeW.GetChildValueBinary(const nodeName: String; const default: String): String;  // return a base64 encoded string
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9173,7 +9173,7 @@ begin
 end;
 
 {******************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueBinarySubType(const nodeName: String; const default: byte): byte;
+function TALJSONNodeW.GetChildValueBinarySubType(const nodeName: String; const default: byte): byte;
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9182,7 +9182,7 @@ begin
 end;
 
 {***************************************************************************}
-function TALJSONNodeW.GetChildNodeValueNull(const nodeName: String): Boolean;
+function TALJSONNodeW.GetChildValueNull(const nodeName: String): Boolean;
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9202,7 +9202,7 @@ begin
 end;
 
 {******************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueText(const path: array of String; const default: String): String;
+function TALJSONNodeW.GetChildValueText(const path: array of String; const default: String): String;
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9220,7 +9220,7 @@ begin
 end;
 
 {*******************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueFloat(const path: array of String; const default: Double): Double;
+function TALJSONNodeW.GetChildValueFloat(const path: array of String; const default: Double): Double;
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9238,7 +9238,7 @@ begin
 end;
 
 {****************************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueDateTime(const path: array of String; const default: TDateTime): TDateTime;
+function TALJSONNodeW.GetChildValueDateTime(const path: array of String; const default: TDateTime): TDateTime;
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9256,7 +9256,7 @@ begin
 end;
 
 {*******************************************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueTimestamp(const path: array of String; const default: TALBSONTimestamp): TALBSONTimestamp;
+function TALJSONNodeW.GetChildValueTimestamp(const path: array of String; const default: TALBSONTimestamp): TALBSONTimestamp;
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9274,7 +9274,7 @@ begin
 end;
 
 {*********************************************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueObjectID(const path: array of String; const default: String): String; // return a hex string
+function TALJSONNodeW.GetChildValueObjectID(const path: array of String; const default: String): String; // return a hex string
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9292,7 +9292,7 @@ begin
 end;
 
 {*********************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueInt32(const path: array of String; const default: Integer): Integer;
+function TALJSONNodeW.GetChildValueInt32(const path: array of String; const default: Integer): Integer;
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9310,7 +9310,7 @@ begin
 end;
 
 {*****************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueInt64(const path: array of String; const default: Int64): Int64;
+function TALJSONNodeW.GetChildValueInt64(const path: array of String; const default: Int64): Int64;
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9328,7 +9328,7 @@ begin
 end;
 
 {********************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueBool(const path: array of String; const default: Boolean): Boolean;
+function TALJSONNodeW.GetChildValueBool(const path: array of String; const default: Boolean): Boolean;
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9346,7 +9346,7 @@ begin
 end;
 
 {************************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueJavascript(const path: array of String; const default: String): String;
+function TALJSONNodeW.GetChildValueJavascript(const path: array of String; const default: String): String;
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9364,7 +9364,7 @@ begin
 end;
 
 {*******************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueRegEx(const path: array of String; const default: String): String;
+function TALJSONNodeW.GetChildValueRegEx(const path: array of String; const default: String): String;
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9382,7 +9382,7 @@ begin
 end;
 
 {****************************************************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueRegExOptions(const path: array of String; const default: TALPerlRegExOptions): TALPerlRegExOptions;
+function TALJSONNodeW.GetChildValueRegExOptions(const path: array of String; const default: TALPerlRegExOptions): TALPerlRegExOptions;
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9400,7 +9400,7 @@ begin
 end;
 
 {*******************************************************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueBinary(const path: array of String; const default: String): String;  // return a base64 encoded string
+function TALJSONNodeW.GetChildValueBinary(const path: array of String; const default: String): String;  // return a base64 encoded string
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9418,7 +9418,7 @@ begin
 end;
 
 {***********************************************************************************************************}
-function TALJSONNodeW.GetChildNodeValueBinarySubType(const path: array of String; const default: byte): byte;
+function TALJSONNodeW.GetChildValueBinarySubType(const path: array of String; const default: byte): byte;
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9436,7 +9436,7 @@ begin
 end;
 
 {********************************************************************************}
-function TALJSONNodeW.GetChildNodeValueNull(const path: array of String): Boolean;
+function TALJSONNodeW.GetChildValueNull(const path: array of String): Boolean;
 var LNode: TALJSONNodeW;
     I: integer;
 begin
@@ -9454,7 +9454,7 @@ begin
 end;
 
 {****************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueText(const nodeName: String; const value: String);
+procedure TALJSONNodeW.SetChildValueText(const nodeName: String; const value: String);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9463,7 +9463,7 @@ begin
 end;
 
 {*****************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueFloat(const nodeName: String; const value: Double);
+procedure TALJSONNodeW.SetChildValueFloat(const nodeName: String; const value: Double);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9472,7 +9472,7 @@ begin
 end;
 
 {***********************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueDateTime(const nodeName: String; const value: TDateTime);
+procedure TALJSONNodeW.SetChildValueDateTime(const nodeName: String; const value: TDateTime);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9481,7 +9481,7 @@ begin
 end;
 
 {*******************************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueTimestamp(const nodeName: String; const value: TALBSONTimestamp);
+procedure TALJSONNodeW.SetChildValueTimestamp(const nodeName: String; const value: TALBSONTimestamp);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9490,7 +9490,7 @@ begin
 end;
 
 {********************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueObjectID(const nodeName: String; const value: String);
+procedure TALJSONNodeW.SetChildValueObjectID(const nodeName: String; const value: String);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9499,7 +9499,7 @@ begin
 end;
 
 {******************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueInt32(const nodeName: String; const value: Integer);
+procedure TALJSONNodeW.SetChildValueInt32(const nodeName: String; const value: Integer);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9508,7 +9508,7 @@ begin
 end;
 
 {****************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueInt64(const nodeName: String; const value: Int64);
+procedure TALJSONNodeW.SetChildValueInt64(const nodeName: String; const value: Int64);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9517,7 +9517,7 @@ begin
 end;
 
 {*****************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueBool(const nodeName: String; const value: Boolean);
+procedure TALJSONNodeW.SetChildValueBool(const nodeName: String; const value: Boolean);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9526,7 +9526,7 @@ begin
 end;
 
 {**********************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueJavascript(const nodeName: String; const value: String);
+procedure TALJSONNodeW.SetChildValueJavascript(const nodeName: String; const value: String);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9535,7 +9535,7 @@ begin
 end;
 
 {*****************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueRegEx(const nodeName: String; const value: String);
+procedure TALJSONNodeW.SetChildValueRegEx(const nodeName: String; const value: String);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9544,7 +9544,7 @@ begin
 end;
 
 {*************************************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueRegExOptions(const nodeName: String; const value: TALPerlRegExOptions);
+procedure TALJSONNodeW.SetChildValueRegExOptions(const nodeName: String; const value: TALPerlRegExOptions);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9553,7 +9553,7 @@ begin
 end;
 
 {******************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueBinary(const nodeName: String; const value: String);
+procedure TALJSONNodeW.SetChildValueBinary(const nodeName: String; const value: String);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9562,7 +9562,7 @@ begin
 end;
 
 {***********************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueBinarySubType(const nodeName: String; const value: byte);
+procedure TALJSONNodeW.SetChildValueBinarySubType(const nodeName: String; const value: byte);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9571,7 +9571,7 @@ begin
 end;
 
 {*******************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueNull(const nodeName: String);
+procedure TALJSONNodeW.SetChildValueNull(const nodeName: String);
 var LNode: TALJSONNodeW;
 begin
   LNode := ChildNodes.findNode(nodeName);
@@ -9580,7 +9580,7 @@ begin
 end;
 
 {*********************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueText(const path: array of String; const value: String);
+procedure TALJSONNodeW.SetChildValueText(const path: array of String; const value: String);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9597,7 +9597,7 @@ begin
 end;
 
 {**********************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueFloat(const path: array of String; const value: Double);
+procedure TALJSONNodeW.SetChildValueFloat(const path: array of String; const value: Double);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9614,7 +9614,7 @@ begin
 end;
 
 {****************************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueDateTime(const path: array of String; const value: TDateTime);
+procedure TALJSONNodeW.SetChildValueDateTime(const path: array of String; const value: TDateTime);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9631,7 +9631,7 @@ begin
 end;
 
 {************************************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueTimestamp(const path: array of String; const value: TALBSONTimestamp);
+procedure TALJSONNodeW.SetChildValueTimestamp(const path: array of String; const value: TALBSONTimestamp);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9648,7 +9648,7 @@ begin
 end;
 
 {*************************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueObjectID(const path: array of String; const value: String);
+procedure TALJSONNodeW.SetChildValueObjectID(const path: array of String; const value: String);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9665,7 +9665,7 @@ begin
 end;
 
 {***********************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueInt32(const path: array of String; const value: Integer);
+procedure TALJSONNodeW.SetChildValueInt32(const path: array of String; const value: Integer);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9682,7 +9682,7 @@ begin
 end;
 
 {*********************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueInt64(const path: array of String; const value: Int64);
+procedure TALJSONNodeW.SetChildValueInt64(const path: array of String; const value: Int64);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9699,7 +9699,7 @@ begin
 end;
 
 {**********************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueBool(const path: array of String; const value: Boolean);
+procedure TALJSONNodeW.SetChildValueBool(const path: array of String; const value: Boolean);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9716,7 +9716,7 @@ begin
 end;
 
 {***************************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueJavascript(const path: array of String; const value: String);
+procedure TALJSONNodeW.SetChildValueJavascript(const path: array of String; const value: String);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9733,7 +9733,7 @@ begin
 end;
 
 {**********************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueRegEx(const path: array of String; const value: String);
+procedure TALJSONNodeW.SetChildValueRegEx(const path: array of String; const value: String);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9750,7 +9750,7 @@ begin
 end;
 
 {******************************************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueRegExOptions(const path: array of String; const value: TALPerlRegExOptions);
+procedure TALJSONNodeW.SetChildValueRegExOptions(const path: array of String; const value: TALPerlRegExOptions);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9767,7 +9767,7 @@ begin
 end;
 
 {***********************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueBinary(const path: array of String; const value: String);
+procedure TALJSONNodeW.SetChildValueBinary(const path: array of String; const value: String);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9784,7 +9784,7 @@ begin
 end;
 
 {****************************************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueBinarySubType(const path: array of String; const value: byte);
+procedure TALJSONNodeW.SetChildValueBinarySubType(const path: array of String; const value: byte);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;
@@ -9801,7 +9801,7 @@ begin
 end;
 
 {************************************************************************}
-procedure TALJSONNodeW.SetChildNodeValueNull(const path: array of String);
+procedure TALJSONNodeW.SetChildValueNull(const path: array of String);
 var LNode: TALJSONNodeW;
     LTmpNode: TALJSONNodeW;
     I: integer;

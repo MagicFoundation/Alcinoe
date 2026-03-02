@@ -3981,7 +3981,7 @@ begin
   var LItemIdNodeName := ItemIdNodeName;
   If LItemIdNodeName = '' then raise Exception.Create('ItemIdNodeName must be defined');
   for var I := low(FItems^) to ItemsCount - 1 do
-    if FItems^[i].Data.GetChildNodeValueText(LItemIdNodeName, '') = AId then begin
+    if FItems^[i].Data.GetChildValueText(LItemIdNodeName, '') = AId then begin
       DeleteItemAtIndex(i);
       Exit;
     end;
@@ -3994,7 +3994,7 @@ begin
   var LItemIdNodeName := ItemIdNodeName;
   If LItemIdNodeName = '' then raise Exception.Create('ItemIdNodeName must be defined');
   for var I := low(FItems^) to ItemsCount - 1 do
-    if FItems^[i].Data.GetChildNodeValueInt64(LItemIdNodeName, 0) = AId then begin
+    if FItems^[i].Data.GetChildValueInt64(LItemIdNodeName, 0) = AId then begin
       DeleteItemAtIndex(i);
       Exit;
     end;
@@ -4113,7 +4113,7 @@ begin
   var LItemIdNodeName := ItemIdNodeName;
   If LItemIdNodeName = '' then raise Exception.Create('ItemIdNodeName must be defined');
   for var I := low(FItems^) to ItemsCount - 1 do
-    if (FItems^[i].Visible) and (FItems^[i].Data.GetChildNodeValueText(LItemIdNodeName, '') = AId) then begin
+    if (FItems^[i].Visible) and (FItems^[i].Data.GetChildValueText(LItemIdNodeName, '') = AId) then begin
       result := ScrollToItemIndex(i, AHideTopBar, AHideBottomBar, ADuration, Adx, Ady);
       Exit;
     end;
@@ -4132,7 +4132,7 @@ begin
   var LItemIdNodeName := ItemIdNodeName;
   If LItemIdNodeName = '' then raise Exception.Create('ItemIdNodeName must be defined');
   for var I := low(FItems^) to ItemsCount - 1 do
-    if (FItems^[i].Visible) and (FItems^[i].Data.GetChildNodeValueInt64(LItemIdNodeName, 0) = AId) then begin
+    if (FItems^[i].Visible) and (FItems^[i].Data.GetChildValueInt64(LItemIdNodeName, 0) = AId) then begin
       result := ScrollToItemIndex(i, AHideTopBar, AHideBottomBar, ADuration, Adx, Ady);
       Exit;
     end;
@@ -4478,13 +4478,13 @@ begin
 
             for var J := Low(LOwner.FItemIdempotencyKeyScopes) to High(LOwner.FItemIdempotencyKeyScopes) do begin
               if LOwner.FItemIdempotencyKeyScopes[J].NodeType = TItemIdNodeType.Int64 then begin
-                if LItemNode.getChildNodeValueInt64(LOwner.FItemIdempotencyKeyScopes[J].NodePath, 0) <> LOwner.FItemIdempotencyKeyScopes[J].Int64Value then begin
+                if LItemNode.GetChildValueInt64(LOwner.FItemIdempotencyKeyScopes[J].NodePath, 0) <> LOwner.FItemIdempotencyKeyScopes[J].Int64Value then begin
                   LItemNode := nil;
                   break;
                 end;
               end
               else begin
-                if LItemNode.getChildNodeValueText(LOwner.FItemIdempotencyKeyScopes[J].NodePath, '') <> LOwner.FItemIdempotencyKeyScopes[J].TextValue then begin
+                if LItemNode.GetChildValueText(LOwner.FItemIdempotencyKeyScopes[J].NodePath, '') <> LOwner.FItemIdempotencyKeyScopes[J].TextValue then begin
                   LItemNode := nil;
                   break;
                 end;
@@ -4495,14 +4495,14 @@ begin
               Continue;
 
             if LOwner.FItemIdempotencyKeyNodeType = TItemIdNodeType.Int64 then begin
-              var LItemIdempotencyKey := LItemNode.getChildNodeValueInt64(LOwner.FItemIdempotencyKeyNodeName, 0);
+              var LItemIdempotencyKey := LItemNode.GetChildValueInt64(LOwner.FItemIdempotencyKeyNodeName, 0);
               if (LItemIdempotencyKey <> 0) and (not LOwner.FInt64ItemIdempotencyKeys.TryAdd(LItemIdempotencyKey, true)) then begin
                 AData.ChildNodes.Delete(i);
                 continue;
               end;
             end
             else begin
-              var LItemIdempotencyKey := LItemNode.getChildNodeValueText(LOwner.FItemIdempotencyKeyNodeName, '');
+              var LItemIdempotencyKey := LItemNode.GetChildValueText(LOwner.FItemIdempotencyKeyNodeName, '');
               if (LItemIdempotencyKey <> '') and (not LOwner.FTextItemIdempotencyKeys.TryAdd(LItemIdempotencyKey, true)) then begin
                 AData.ChildNodes.Delete(i);
                 continue;
@@ -4549,14 +4549,14 @@ begin
             if Lcount >= Acontext.MaxItems then break;
             var LItemNode := AData.ChildNodes[i];
             if LOwner.FItemIdNodeType = TItemIdNodeType.Int64 then begin
-              var LItemId := LItemNode.getChildNodeValueInt64(LOwner.FItemIdNodeName, 0);
+              var LItemId := LItemNode.GetChildValueInt64(LOwner.FItemIdNodeName, 0);
               if (LItemID <> 0) and (not LOwner.FInt64ItemIds.TryAdd(LItemID, true)) then begin
                 AData.ChildNodes.Delete(i);
                 continue;
               end;
             end
             else begin
-              var LItemId := LItemNode.getChildNodeValueText(LOwner.FItemIdNodeName, '');
+              var LItemId := LItemNode.GetChildValueText(LOwner.FItemIdNodeName, '');
               if (LItemID <> '') and (not LOwner.FTextItemIds.TryAdd(LItemID, true)) then begin
                 AData.ChildNodes.Delete(i);
                 continue;

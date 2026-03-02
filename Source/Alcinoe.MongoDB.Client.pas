@@ -290,7 +290,7 @@ begin
     end;
 
     // mode
-    var LMode := LDoc.GetChildNodeValueText('mode', 'primary');
+    var LMode := LDoc.GetChildValueText('mode', 'primary');
     if LMode = 'primary' then Result := mongoc_read_prefs_new(MONGOC_READ_PRIMARY)
     else if LMode = 'primary_preferred' then Result := mongoc_read_prefs_new(MONGOC_READ_PRIMARY_PREFERRED)
     else if LMode = 'secondary' then Result := mongoc_read_prefs_new(MONGOC_READ_SECONDARY)

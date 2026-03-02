@@ -212,7 +212,7 @@ end;
 {********************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateItem(const AContext: TALDynamicListBox.TView.TDownloadItemsContext; var AData: TALJSONNodeW): TALDynamicListBox.TItem;
 begin
-  if AData.GetChildNodeValueText('type', '') = 'stories' then begin
+  if AData.GetChildValueText('type', '') = 'stories' then begin
     var Lview := TALDynamicListBox.TView.Create(nil);
     Lview.Orientation := TOrientation.Horizontal;
     Lview.Height := 132;
@@ -222,7 +222,7 @@ begin
     Lview.OnCreateLoadMoreRetryButton := CarouselCreateLoadMoreRetryButton;
     Result := LView;
   end
-  else if AData.GetChildNodeValueText('type', '') = 'suggested' then begin
+  else if AData.GetChildValueText('type', '') = 'suggested' then begin
     var Lview := TALDynamicListBox.TView.Create(nil);
     Lview.Orientation := TOrientation.Horizontal;
     Lview.Height := 255;
@@ -563,7 +563,7 @@ begin
 
     var LAvatar := TALDynamicImage.Create(LRainbowCircle);
     LAvatar.WrapMode := TALImageWrapMode.Cover;
-    LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
+    LAvatar.ResourceName := AContext.Owner.Data.GetChildValueText('profile_pic_url', '');
     {$IF defined(debug)}
     LAvatar.TagString := 'Avatar_'+ALIntToStrW(AContext.Owner.index);
     {$ENDIF}
@@ -597,7 +597,7 @@ begin
     LUsername.TextSettings.Font.weight := TFontWeight.Medium;
     LUsername.TextSettings.Font.Color := $FF262626;
     LUsername.AutoSize := TALAutoSizeMode.Both;
-    LUsername.Text := {$IF defined(debug)}{'['+ALIntToStrW(AContext.Owner.index)+']'+}{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
+    LUsername.Text := {$IF defined(debug)}{'['+ALIntToStrW(AContext.Owner.index)+']'+}{$ENDIF}AContext.Owner.Data.GetChildValueText('username', '') ;
 
     var LGeotag := TALDynamicText.Create(LLayout2);
     LGeotag.Align := TALAlignLayout.topLeft;
@@ -606,33 +606,33 @@ begin
     LGeotag.TextSettings.Font.weight := TFontWeight.Regular;
     LGeotag.TextSettings.Font.Color := $FF262626;
     LGeotag.AutoSize := TALAutoSizeMode.Both;
-    LGeotag.Text := AContext.Owner.Data.GetChildNodeValueText('geotag', '');
+    LGeotag.Text := AContext.Owner.Data.GetChildValueText('geotag', '');
 
     var LmediaNode := AContext.Owner.Data.GetChildNode('media');
     If LmediaNode.ChildNodes.Count > 1 then begin
       var LPageController := TALDynamicPageController.Create(Result);
       LPageController.Align := TALAlignLayout.Top;
-      LPageController.Height := (Result.Width / LmediaNode.ChildNodes[0].GetChildNodeValueInt32('width', 0)) * LmediaNode.ChildNodes[0].GetChildNodeValueInt32('height', 0);
+      LPageController.Height := (Result.Width / LmediaNode.ChildNodes[0].GetChildValueInt32('width', 0)) * LmediaNode.ChildNodes[0].GetChildValueInt32('height', 0);
       LPageController.Margins.Top := 11;
       LPageController.OnActivePageChanged := PageControllerActivePageChanged;
       for var I := 0 to LmediaNode.ChildNodes.Count - 1 do begin
         var LPageView := LPageController.AddPage;
         var LMediumNode := LmediaNode.ChildNodes[I];
-        if LMediumNode.GetChildNodeValueBool('is_video', false) then begin
+        if LMediumNode.GetChildValueBool('is_video', false) then begin
           var LVideoPlayerSurface1 := TALDynamicVideoPlayerSurface.Create(LPageView);
           LVideoPlayerSurface1.Align := TALAlignLayout.Client;
-          LVideoPlayerSurface1.PreviewResourceName := LMediumNode.GetChildNodeValueText('preview_url', '');
+          LVideoPlayerSurface1.PreviewResourceName := LMediumNode.GetChildValueText('preview_url', '');
           {$IF defined(debug)}
           LVideoPlayerSurface1.TagString := 'Media_'+ALIntToStrW(AContext.Owner.index) + '_' + ALIntToStrW(I);
           {$ENDIF}
           LVideoPlayerSurface1.Looping := true;
           LVideoPlayerSurface1.AutoStartMode := TALDynamicVideoPlayerSurface.TAutoStartMode.WhenDisplayed;
-          LVideoPlayerSurface1.DataSource := LMediumNode.GetChildNodeValueText('url', '');
+          LVideoPlayerSurface1.DataSource := LMediumNode.GetChildValueText('url', '');
         end
         else begin
           var LMedia1 := TALDynamicImage.Create(LPageView);
           LMedia1.WrapMode := TALImageWrapMode.Cover;
-          LMedia1.ResourceName := LMediumNode.GetChildNodeValueText('url', '');
+          LMedia1.ResourceName := LMediumNode.GetChildValueText('url', '');
           {$IF defined(debug)}
           LMedia1.TagString := 'Media_'+ALIntToStrW(AContext.Owner.index) + '_' + ALIntToStrW(I);
           {$ENDIF}
@@ -668,29 +668,29 @@ begin
     end
     else If LmediaNode.ChildNodes.Count = 1 then begin
       var LMediumNode := LmediaNode.ChildNodes[0];
-      if LMediumNode.GetChildNodeValueBool('is_video', false) then begin
+      if LMediumNode.GetChildValueBool('is_video', false) then begin
         var LVideoPlayerSurface1 := TALDynamicVideoPlayerSurface.Create(Result);
         LVideoPlayerSurface1.Margins.Top := 11;
         LVideoPlayerSurface1.Align := TALAlignLayout.top;
-        LVideoPlayerSurface1.Height := (Result.Width / LMediumNode.GetChildNodeValueInt32('width', 0)) * LMediumNode.GetChildNodeValueInt32('height', 0);
-        LVideoPlayerSurface1.PreviewResourceName := LMediumNode.GetChildNodeValueText('preview_url', '');
+        LVideoPlayerSurface1.Height := (Result.Width / LMediumNode.GetChildValueInt32('width', 0)) * LMediumNode.GetChildValueInt32('height', 0);
+        LVideoPlayerSurface1.PreviewResourceName := LMediumNode.GetChildValueText('preview_url', '');
         {$IF defined(debug)}
         LVideoPlayerSurface1.TagString := 'Media_'+ALIntToStrW(AContext.Owner.index);
         {$ENDIF}
         LVideoPlayerSurface1.Looping := true;
         LVideoPlayerSurface1.AutoStartMode := TALDynamicVideoPlayerSurface.TAutoStartMode.WhenDisplayed;
-        LVideoPlayerSurface1.DataSource := LMediumNode.GetChildNodeValueText('url', '');
+        LVideoPlayerSurface1.DataSource := LMediumNode.GetChildValueText('url', '');
       end
       else begin
         var LMedia1 := TALDynamicImage.Create(Result);
         LMedia1.WrapMode := TALImageWrapMode.Cover;
-        LMedia1.ResourceName := LMediumNode.GetChildNodeValueText('url', '');
+        LMedia1.ResourceName := LMediumNode.GetChildValueText('url', '');
         {$IF defined(debug)}
         LMedia1.TagString := 'Media_'+ALIntToStrW(AContext.Owner.index);
         {$ENDIF}
         LMedia1.Margins.Top := 11;
         LMedia1.Align := TALAlignLayout.top;
-        LMedia1.Height := (Result.Width / LMediumNode.GetChildNodeValueInt32('width', 0)) * LMediumNode.GetChildNodeValueInt32('height', 0);
+        LMedia1.Height := (Result.Width / LMediumNode.GetChildValueInt32('width', 0)) * LMediumNode.GetChildValueInt32('height', 0);
         if AContext.Owner.Index = 1 then begin
           LLayout1.Margins.top := 12;
           LMedia1.AddControl(LLayout1);
@@ -737,7 +737,7 @@ begin
     LLikeCountText.TextSettings.Font.weight := TFontWeight.Medium;
     LLikeCountText.TextSettings.Font.Color := $FF0d1014;
     LLikeCountText.AutoSize := TALAutoSizeMode.Both;
-    LLikeCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('like_count', 0));
+    LLikeCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildValueInt32('like_count', 0));
 
     var LCommentCountBtn := TALDynamicButton.Create(LLayout3);
     LCommentCountBtn.Fill.Color := TalphaColors.Null;
@@ -757,7 +757,7 @@ begin
     LCommentCountText.TextSettings.Font.weight := TFontWeight.Medium;
     LCommentCountText.TextSettings.Font.Color := $FF0d1014;
     LCommentCountText.AutoSize := TALAutoSizeMode.Both;
-    LCommentCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('comment_count', 0));
+    LCommentCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildValueInt32('comment_count', 0));
 
     var LReshareCountsBtn := TALDynamicButton.Create(LLayout3);
     LReshareCountsBtn.Fill.Color := TalphaColors.Null;
@@ -777,7 +777,7 @@ begin
     LReshareCountText.TextSettings.Font.weight := TFontWeight.Medium;
     LReshareCountText.TextSettings.Font.Color := $FF0d1014;
     LReshareCountText.AutoSize := TALAutoSizeMode.Both;
-    LReshareCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('reshare_count', 0));
+    LReshareCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildValueInt32('reshare_count', 0));
 
     var LBookmarkBtn := TALDynamicToggleButton.Create(LLayout3);
     LBookmarkBtn.StateStyles.Unchecked.Default.Fill.Inherit := False;
@@ -813,7 +813,7 @@ begin
     LCaption.TextSettings.EllipsisSettings.Inherit := False;
     LCaption.TextSettings.EllipsisSettings.Font.Size := 14;
     LCaption.TextSettings.EllipsisSettings.Font.Color := $FF70767f;
-    var LStr := AContext.Owner.Data.GetChildNodeValueText('caption', '');
+    var LStr := AContext.Owner.Data.GetChildValueText('caption', '');
     var P1 := AlposW('#',LStr);
     While P1 > 0 do begin
       Insert('<font color="#306dcc">',LStr,P1);
@@ -830,7 +830,7 @@ begin
       Insert('</font>',LStr,P1);
       P1 := AlposW('@',LStr, P1);
     end;
-    LStr := '<b>'+AContext.Owner.Data.GetChildNodeValueText('username', '')+'</b> ' + LStr;
+    LStr := '<b>'+AContext.Owner.Data.GetChildValueText('username', '')+'</b> ' + LStr;
     LStr := ALStringReplaceW(LStr, #13#10, '<br/>', [RfReplaceAll]);
     LCaption.Text := LStr;
     LCaption.HitTest := True;
@@ -885,7 +885,7 @@ begin
 
     var LAvatar := TALDynamicImage.Create(LRainbowCircle);
     LAvatar.WrapMode := TALImageWrapMode.Cover;
-    LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
+    LAvatar.ResourceName := AContext.Owner.Data.GetChildValueText('profile_pic_url', '');
     {$IF defined(debug)}
     LAvatar.TagString := 'Stories_Avatar_'+ALIntToStrW(AContext.Owner.index);
     {$ENDIF}
@@ -905,7 +905,7 @@ begin
     LUsername.TextSettings.HorzAlign := TALTextHorzAlign.Center;
     LUsername.TextSettings.MaxLines := 1;
     LUsername.AutoSize := TALAutoSizeMode.Both;
-    LUsername.Text := {$IF defined(debug)}{'['+ALIntToStrW(AContext.Owner.index)+']'+}{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
+    LUsername.Text := {$IF defined(debug)}{'['+ALIntToStrW(AContext.Owner.index)+']'+}{$ENDIF}AContext.Owner.Data.GetChildValueText('username', '') ;
 
   Except
     ALFreeAndNil(Result);
@@ -978,7 +978,7 @@ begin
 
     var LAvatar := TALDynamicImage.Create(LBackground);
     LAvatar.WrapMode := TALImageWrapMode.Cover;
-    LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
+    LAvatar.ResourceName := AContext.Owner.Data.GetChildValueText('profile_pic_url', '');
     {$IF defined(debug)}
     LAvatar.TagString := 'Suggested_Avatar_'+ALIntToStrW(AContext.Owner.index);
     {$ENDIF}
@@ -998,7 +998,7 @@ begin
     LUsername.TextSettings.Font.Color := $FF0d1014;
     LUsername.AutoSize := TALAutoSizeMode.Both;
     LUsername.TextSettings.MaxLines := 1;
-    LUsername.Text := {$IF defined(debug)}{'['+ALIntToStrW(AContext.Owner.index)+']'+}{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
+    LUsername.Text := {$IF defined(debug)}{'['+ALIntToStrW(AContext.Owner.index)+']'+}{$ENDIF}AContext.Owner.Data.GetChildValueText('username', '') ;
     LUsername.Margins.top := 12;
 
     var LFollowButton := TALDynamicButton.Create(LBackground);
@@ -1080,14 +1080,14 @@ begin
           Result := random(MaxInt) - Random(Maxint);
         end);
       for var I := AData.ChildNodes.Count - 1 downto 0 do begin
-        if AData.ChildNodes[i].GetChildNodeValueText('type', 'post') <> 'post' then
+        if AData.ChildNodes[i].GetChildValueText('type', 'post') <> 'post' then
           AData.ChildNodes.Delete(I);
       end;
     end;
 
     // For the mock to work correctly, each item needs a unique ID.
     For var I := 0 to AData.ChildNodes.Count - 1 do
-      AData.ChildNodes[i].SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
+      AData.ChildNodes[i].SetChildValueInt64('id', ALRandom64(ALMaxInt64));
 
     // Increment the pagination token for the next data batch.
     APaginationToken := ALInttoStrW(ALStrtoInt(APaginationToken) + 1);
@@ -1095,7 +1095,7 @@ begin
     // Stories is only on the very first bulk
     if APaginationToken <> '1' then begin
       For var I := AData.ChildNodes.Count - 1 downto 0 do
-        if AData.ChildNodes[i].GetChildNodeValueText('type', '') = 'stories' then
+        if AData.ChildNodes[i].GetChildValueText('type', '') = 'stories' then
           AData.ChildNodes.Delete(i);
     end;
 
@@ -1155,7 +1155,7 @@ begin
 
     // For the mock to work correctly, each item needs a unique ID.
     For var I := 0 to AData.ChildNodes.Count - 1 do
-      AData.ChildNodes[i].SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
+      AData.ChildNodes[i].SetChildValueInt64('id', ALRandom64(ALMaxInt64));
 
     // Increment the pagination token for the next data batch.
     APaginationToken := ALInttoStrW(ALStrtoInt(APaginationToken) + 1);
@@ -1216,7 +1216,7 @@ begin
 
     // For the mock to work correctly, each item needs a unique ID.
     For var I := 0 to AData.ChildNodes.Count - 1 do
-      AData.ChildNodes[i].SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
+      AData.ChildNodes[i].SetChildValueInt64('id', ALRandom64(ALMaxInt64));
 
     // Increment the pagination token for the next data batch.
     APaginationToken := ALInttoStrW(ALStrtoInt(APaginationToken) + 1);

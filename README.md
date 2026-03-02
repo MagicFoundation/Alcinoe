@@ -1013,17 +1013,10 @@ Learn more at [Demos\ALSMTPClient](https://github.com/MagicFoundation/Alcinoe/tr
 Json Parser
 ===========
 
-**TALJSONDocument** is a Delphi parser and writer for both **JSON** 
-and **BSON** data formats. It supports both **DOM** and **SAX** 
-parsers (although a more appropriate name for SAX could be 
-**SAJ**—Simple API for JSON—rather than Simple API for XML, the 
-well-known SAX terminology is retained). 
-
-In addition to its JSON capabilities, **TALJSONDocument** also 
-supports the **BSON** format, using a syntax similar to 
-**TALXMLDocument/TXMLDocument**. It can further export JSON/BSON 
-data to **TALStringList**, making it a flexible tool for data 
-parsing and manipulation in Delphi applications.
+**TALJSONDocument** is a high-performance JSON parser and generator for Delphi, 
+offering both DOM and SAX APIs for maximum flexibility. It’s designed for 
+speed and low overhead, with convenient typed accessors, and it also supports 
+BSON for seamless integration with MongoDB-style payloads.
 
 Example :
 
@@ -1050,9 +1043,9 @@ Example :
 To access the document nodes :
 
 ```
-    MyJsonDoc.GetChildNodeValueInt32('_id', 0{default if node not exists});
-    MyJsonDoc.GetChildNodeValueText(['name','first'], ''{default if node not exists});
-    MyJsonDoc.GetChildNodeValueDateTime('birth', Now{default if node not exists});
+    MyJsonDoc.GetChildValueInt32('_id', 0{default if node not exists});
+    MyJsonDoc.GetChildValueText(['name','first'], ''{default if node not exists});
+    MyJsonDoc.GetChildValueDateTime('birth', Now{default if node not exists});
 ```
 
 Learn more at [Source/Alcinoe.JSONDoc.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.JSONDoc.pas)

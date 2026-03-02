@@ -97,10 +97,10 @@ begin
           //  "reshare_count":NumberInt(81)
           //}
           With LPostsJsonData.AddChild(ntObject) do begin
-            SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
-            var lUserName := LPostJsonData.GetChildNodeValueText(['node', 'iphone_struct','user','username'], '');
+            SetChildValueInt64('id', ALRandom64(ALMaxInt64));
+            var lUserName := LPostJsonData.GetChildValueText(['node', 'iphone_struct','user','username'], '');
             if lUserName = '' then raise Exception.Create('Error CEE296F2-9E79-4100-9B8F-48B16EF3863E | ' + Lfile);
-            SetChildNodeValueText('username', lUserName);
+            SetChildValueText('username', lUserName);
             var LGeoTag: AnsiString;
             Case ALRandom32(200) of
               001: LGeoTag := 'Ulaanbaatar, Mongolia';
@@ -304,11 +304,11 @@ begin
               199: LGeoTag := 'Beirut, Lebanon';
               200: LGeoTag := 'Yekaterinburg, Russia';
             End;
-            SetChildNodeValueText('geotag', LGeoTag);
-            SetChildNodeValueText('caption', LPostJsonData.GetChildNodeValueText(['node', 'iphone_struct','caption', 'text'], ''));
-            SetChildNodeValueInt32('like_count', LPostJsonData.GetChildNodeValueInt32(['node','edge_liked_by', 'count'], 0));
-            SetChildNodeValueInt32('comment_count', LPostJsonData.GetChildNodeValueInt32(['node','edge_media_to_comment', 'count'], 0));
-            SetChildNodeValueInt32('share_count ', LPostJsonData.GetChildNodeValueInt32(['node','iphone_struct', 'reshare_count'], 0));
+            SetChildValueText('geotag', LGeoTag);
+            SetChildValueText('caption', LPostJsonData.GetChildValueText(['node', 'iphone_struct','caption', 'text'], ''));
+            SetChildValueInt32('like_count', LPostJsonData.GetChildValueInt32(['node','edge_liked_by', 'count'], 0));
+            SetChildValueInt32('comment_count', LPostJsonData.GetChildValueInt32(['node','edge_media_to_comment', 'count'], 0));
+            SetChildValueInt32('share_count ', LPostJsonData.GetChildValueInt32(['node','iphone_struct', 'reshare_count'], 0));
             //--
             var LFilenameWithoutExt := ALStringReplaceW(Lfile, '.json', '', [RFignoreCase]);
             with AddChild('media', ntarray) do begin
@@ -325,7 +325,7 @@ begin
                 end;
                 With addchild(TALJsonNodeType.ntObject) do begin
                   if LIsVideo then begin
-                    SetChildNodeValueBool('is_video', true);
+                    SetChildValueBool('is_video', true);
                     TFile.Copy(LImgFilename, LdoneDir + ALExtractfilename(LImgFilename));
                     AddChild('url').Text := 'https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/' + ALExtractFileName(AnsiString(LImgFilename));
 
@@ -351,8 +351,8 @@ begin
                     Var LBitmap := Tbitmap.create;
                     try
                       LBitmap.LoadFromFile(LdoneDir + ALExtractfilename(LImgFilename, true{RemoveFileExt})+'.jpg');
-                      SetChildNodeValueInt32('width', LBitmap.Width);
-                      SetChildNodeValueInt32('height', LBitmap.Height);
+                      SetChildValueInt32('width', LBitmap.Width);
+                      SetChildValueInt32('height', LBitmap.Height);
                     finally
                       ALfreeAndNil(Lbitmap);
                     end;
@@ -364,8 +364,8 @@ begin
                     Var LBitmap := Tbitmap.create;
                     try
                       LBitmap.LoadFromFile(LdoneDir + ALExtractfilename(LImgFilename));
-                      SetChildNodeValueInt32('width', LBitmap.Width);
-                      SetChildNodeValueInt32('height', LBitmap.Height);
+                      SetChildValueInt32('width', LBitmap.Width);
+                      SetChildValueInt32('height', LBitmap.Height);
                     finally
                       ALfreeAndNil(Lbitmap);
                     end;
@@ -381,7 +381,7 @@ begin
               try
                 var LFileStream := TFileStream.Create(ALGetModulePathW + '：saved\'+String(lUserName)+'.jpg', fmCreate);
                 try
-                  LHttpClient.Get(String(LPostJsonData.GetChildNodeValueText(['node', 'iphone_struct','user','profile_pic_url'], '')), LFileStream);
+                  LHttpClient.Get(String(LPostJsonData.GetChildValueText(['node', 'iphone_struct','user','profile_pic_url'], '')), LFileStream);
                 finally
                   LFileStream.Free;
                 end;
@@ -391,17 +391,17 @@ begin
             end;
             if not TFile.Exists(LdoneDir + String(lUserName)+'.jpg') then
               TFile.Copy(ALGetModulePathW + '：saved\'+String(lUserName)+'.jpg', LdoneDir + String(lUserName)+'.jpg');
-            SetChildNodeValueText('profile_pic_url', 'https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/' + ansiString(lUserName)+'.jpg');
+            SetChildValueText('profile_pic_url', 'https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/' + ansiString(lUserName)+'.jpg');
           end;
           //--
           //--
-          if LuserNames.TryAdd(LPostJsonData.GetChildNodeValueText(['node', 'iphone_struct','user','username'], ''), true) then begin
+          if LuserNames.TryAdd(LPostJsonData.GetChildValueText(['node', 'iphone_struct','user','username'], ''), true) then begin
             With LStoriesJsonData.AddChild(ntObject) do begin
-              SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
-              var lUserName := LPostJsonData.GetChildNodeValueText(['node', 'iphone_struct','user','username'], '');
+              SetChildValueInt64('id', ALRandom64(ALMaxInt64));
+              var lUserName := LPostJsonData.GetChildValueText(['node', 'iphone_struct','user','username'], '');
               if lUserName = '' then raise Exception.Create('Error CEE296F2-9E79-4100-9B8F-48B16EF3863E | ' + Lfile);
-              SetChildNodeValueText('username', lUserName);
-              SetChildNodeValueText('profile_pic_url', 'https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/' + ansiString(lUserName)+'.jpg');
+              SetChildValueText('username', lUserName);
+              SetChildValueText('profile_pic_url', 'https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/' + ansiString(lUserName)+'.jpg');
             end;
           end;
         end;
@@ -410,7 +410,7 @@ begin
         var LVideoJsonNode := TList<TALJsonNodeA>.create;
         try
           for var I := LPostsJsonData.ChildNodes.Count - 1 downto 0 do begin
-            if LPostsJsonData.ChildNodes[i].ChildNodes['media'].ChildNodes[0].GetChildNodeValueBool('is_video', false) then
+            if LPostsJsonData.ChildNodes[i].ChildNodes['media'].ChildNodes[0].GetChildValueBool('is_video', false) then
               LVideoJsonNode.Add(LPostsJsonData.ChildNodes.Extract(i));
           end;
           for var i := 0 to LVideoJsonNode.Count - 1 do begin

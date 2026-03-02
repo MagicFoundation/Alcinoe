@@ -1180,9 +1180,9 @@ begin
   Result := nil;
   for var I := 0 to ALibraries.ChildNodes.Count - 1 do begin
     var LLibrary := ALibraries.ChildNodes[i];
-    if ((AGroupID = '') or (LLibrary.GetChildNodeValueText('groupid', ''{default}) = AGroupID)) and
-       ((AArtifactID = '') or (LLibrary.GetChildNodeValueText('artifactid', ''{default}) = AArtifactID)) and
-       ((AVersion = '') or (LLibrary.GetChildNodeValueText('version', ''{default}) = AVersion)) then begin
+    if ((AGroupID = '') or (LLibrary.GetChildValueText('groupid', ''{default}) = AGroupID)) and
+       ((AArtifactID = '') or (LLibrary.GetChildValueText('artifactid', ''{default}) = AArtifactID)) and
+       ((AVersion = '') or (LLibrary.GetChildValueText('version', ''{default}) = AVersion)) then begin
       if result <> nil then raise Exception.Create('Error 1C88C34A-EF22-4CBB-AD85-B1CC130346D8');
       result := LLibrary;
     end;
@@ -1805,11 +1805,11 @@ begin
       Var LBuildGradledependencies: AnsiString := '';
       for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
         var LLibrary := LLibraries.ChildNodes[i];
-        Var LGroupID := LLibrary.GetChildNodeValueText('groupid', ''{default});
-        Var Lartifactid := LLibrary.GetChildNodeValueText('artifactid', ''{default});
-        Var LVersion := LLibrary.GetChildNodeValueText('version', ''{default});
-        var LLibraryArchiveFileName := string(LLibrary.GetChildNodeValueText('archivefilename', ''{default}));
-        var LPomFileName := string(LLibrary.GetChildNodeValueText('pomfilename', ''{default}));
+        Var LGroupID := LLibrary.GetChildValueText('groupid', ''{default});
+        Var Lartifactid := LLibrary.GetChildValueText('artifactid', ''{default});
+        Var LVersion := LLibrary.GetChildValueText('version', ''{default});
+        var LLibraryArchiveFileName := string(LLibrary.GetChildValueText('archivefilename', ''{default}));
+        var LPomFileName := string(LLibrary.GetChildValueText('pomfilename', ''{default}));
         if (LGroupID <> '') and (Lartifactid <> '') and (LVersion <> '') then begin
           LBuildGradledependencies := LBuildGradledependencies + '    implementation "'+LGroupID+':'+Lartifactid+':'+LVersion+'"'#13#10;
           if ((LLibraryArchiveFileName <> '') and
@@ -2068,7 +2068,7 @@ begin
       Writeln('Check AndroidX support');
       for Var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
         var LLibraryNode := LLibraries.ChildNodes[i];
-        Var LLibraryID := LLibraryNode.GetChildNodeValueText('groupid', ''{default}) + ':' + LLibraryNode.GetChildNodeValueText('artifactid', ''{default});
+        Var LLibraryID := LLibraryNode.GetChildValueText('groupid', ''{default}) + ':' + LLibraryNode.GetChildValueText('artifactid', ''{default});
         var J := LSupportLibraryToAndroidx.IndexOfName(LLibraryID);
         if J >= 0 then
           Writeln(
@@ -2081,15 +2081,15 @@ begin
       Writeln('Uncompress all AAR libraries');
       for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
         var LLibrary := LLibraries.ChildNodes[i];
-        var LLibraryArchiveFileName := string(LLibrary.GetChildNodeValueText('archivefilename', ''{default}));
+        var LLibraryArchiveFileName := string(LLibrary.GetChildValueText('archivefilename', ''{default}));
         if LLibraryArchiveFileName = '' then continue;
         Var LUncompressDir := LtmpDirectoryLibraries+
-                              String(LLibrary.GetChildNodeValueText('groupid', ''{default}))+'-'+
-                              String(LLibrary.GetChildNodeValueText('artifactid', ''{default}))+'-'+
-                              String(LLibrary.GetChildNodeValueText('version', ''{default}))+'\';
+                              String(LLibrary.GetChildValueText('groupid', ''{default}))+'-'+
+                              String(LLibrary.GetChildValueText('artifactid', ''{default}))+'-'+
+                              String(LLibrary.GetChildValueText('version', ''{default}))+'\';
         if LUncompressDir = LtmpDirectoryLibraries + '--\' then
           LUncompressDir := LtmpDirectoryLibraries + ALExtractFileName(ALExcludeTrailingPathDelimiterW(LLibraryArchiveFileName), true{RemoveFileExt})+'\';
-        LLibrary.SetChildNodeValueText('uncompressdir', ansiString(LUncompressDir));
+        LLibrary.SetChildValueText('uncompressdir', ansiString(LUncompressDir));
         if TDirectory.Exists(LLibraryArchiveFileName) then begin
           if not AlCopyDirectoryW(
                    LLibraryArchiveFileName, // SrcDirectory,
@@ -2112,7 +2112,7 @@ begin
       {$REGION 'Copy all jar to <OutputDir>\libs'}
       Writeln('Copy all jar to <OutputDir>\libs');
       for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
-        var LUncompressDir := string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}));
+        var LUncompressDir := string(LLibraries.childNodes[I].GetChildValueText('uncompressdir', ''{default}));
         if LUncompressDir = '' then continue;
         //--
         var LJarFiles := TDirectory.GetFiles(LUncompressDir, '*.jar', TSearchOption.soTopDirectoryOnly);
@@ -2146,7 +2146,7 @@ begin
       {$REGION 'Copy all jni to <OutputDir>\jni'}
       Writeln('Copy all jni to <OutputDir>\jni');
       for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
-        var LUncompressDir := string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}));
+        var LUncompressDir := string(LLibraries.childNodes[I].GetChildValueText('uncompressdir', ''{default}));
         if LUncompressDir = '' then continue;
         if Tdirectory.Exists(LUncompressDir + '\jni\arm64-v8a') then begin
           var LJniFiles := TDirectory.GetFiles(LUncompressDir + '\jni\arm64-v8a', '*', TSearchOption.soAllDirectories);
@@ -2169,14 +2169,14 @@ begin
 
       {$REGION 'make all AndroidManifest ready'}
       for var I := 0 to LLibraries.ChildNodes.Count - 1 do
-        MakeAndroidManifestReady(string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))+'\AndroidManifest.xml');
+        MakeAndroidManifestReady(string(LLibraries.childNodes[I].GetChildValueText('uncompressdir', ''{default}))+'\AndroidManifest.xml');
       {$ENDREGION}
 
       {$REGION 'Merge resources in <OutputDir>\res'}
       Writeln('Merge resources in <OutputDir>\res');
       for var I := 0 to LLibraries.childNodes.Count - 1 do
         MergeResources(
-          string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))+'\res\', // const ASrcDir: String;
+          string(LLibraries.childNodes[I].GetChildValueText('uncompressdir', ''{default}))+'\res\', // const ASrcDir: String;
           LResOutputDir, // const ADestDir: String;
           ''); // const ASubPath: String
       {$ENDREGION}
@@ -2199,7 +2199,7 @@ begin
           if LOauthClientNodes = nil then raise Exception.Create('Could not find client.oauth_client node in google-services.json');
           var LOauthClientType3Node: TALJsonNodeA := nil;
           for var I := 0 to LOauthClientNodes.ChildNodes.Count - 1 do
-            if SameValue(LOauthClientNodes.ChildNodes[i].GetChildNodeValueFloat('client_type', 0), 3) then begin
+            if SameValue(LOauthClientNodes.ChildNodes[i].GetChildValueFloat('client_type', 0), 3) then begin
               LOauthClientType3Node := LOauthClientNodes.ChildNodes[i];
               break;
             end;
@@ -2224,38 +2224,38 @@ begin
             with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
               Attributes['name'] := 'default_web_client_id';
               Attributes['translatable'] := 'false';
-              text := LOauthClientType3Node.GetChildNodeValueText('client_id','');
+              text := LOauthClientType3Node.GetChildValueText('client_id','');
             end;
           end;
           with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
             Attributes['name'] := 'gcm_defaultSenderId';
             Attributes['translatable'] := 'false';
-            text := LGoogleServicesjsonDoc.GetChildNodeValueText(['project_info','project_number'],'');
+            text := LGoogleServicesjsonDoc.GetChildValueText(['project_info','project_number'],'');
           end;
           with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
             Attributes['name'] := 'google_api_key';
             Attributes['translatable'] := 'false';
-            text := LApikeyNode.GetChildNodeValueText('current_key','');
+            text := LApikeyNode.GetChildValueText('current_key','');
           end;
           with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
             Attributes['name'] := 'google_app_id';
             Attributes['translatable'] := 'false';
-            text := LClientNode.GetChildNodeValueText(['client_info','mobilesdk_app_id'],'');
+            text := LClientNode.GetChildValueText(['client_info','mobilesdk_app_id'],'');
           end;
           with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
             Attributes['name'] := 'google_crash_reporting_api_key';
             Attributes['translatable'] := 'false';
-            text := LApikeyNode.GetChildNodeValueText('current_key','');
+            text := LApikeyNode.GetChildValueText('current_key','');
           end;
           with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
             Attributes['name'] := 'google_storage_bucket';
             Attributes['translatable'] := 'false';
-            text := LGoogleServicesjsonDoc.GetChildNodeValueText(['project_info','storage_bucket'],'');
+            text := LGoogleServicesjsonDoc.GetChildValueText(['project_info','storage_bucket'],'');
           end;
           with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
             Attributes['name'] := 'project_id';
             Attributes['translatable'] := 'false';
-            text := LGoogleServicesjsonDoc.GetChildNodeValueText(['project_info','project_id'],'');
+            text := LGoogleServicesjsonDoc.GetChildValueText(['project_info','project_id'],'');
           end;
           //----
           var LDirectory := LtmpDirectoryGoogleServices + '\res\values\';
@@ -2329,7 +2329,7 @@ begin
       if not AlEmptyDirectoryW(LtmpDirectoryRClass, true{SubDirectory}) then raise EALException.CreateFmt('Cannot clear %s', [LtmpDirectoryRClass]);
       for var I := 0 to LLibraries.childnodes.Count - 1 do begin
         CreateRClasses(
-          ALIncludeTrailingPathDelimiterW(string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))), // const ALibPath: String;
+          ALIncludeTrailingPathDelimiterW(string(LLibraries.childNodes[I].GetChildValueText('uncompressdir', ''{default}))), // const ALibPath: String;
           LRFlataFilename, // const AMergedResPath: String;
           LtmpDirectory, // const ATmpDir: String;
           LtmpDirectoryRJava, // const ARjavaPath: String;
@@ -2387,7 +2387,7 @@ begin
             LDisabledXmlDoc);
           //--
           for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
-            var LSrcFilename := string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))+'\AndroidManifest.xml.original';
+            var LSrcFilename := string(LLibraries.childNodes[I].GetChildValueText('uncompressdir', ''{default}))+'\AndroidManifest.xml.original';
             if TFile.Exists(LSrcFilename) then begin
               Var LSrcXmlDoc := TALXmlDocument.Create;
               Try
@@ -2733,16 +2733,16 @@ begin
       Try
         for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
           var LLibrary := LLibraries.ChildNodes[i];
-          var LgroupID := LLibrary.GetChildNodeValueText('groupid', ''{default});
+          var LgroupID := LLibrary.GetChildValueText('groupid', ''{default});
           if LgroupID = '' then begin
             LdependenciesLst.Add(
-              LLibrary.GetChildNodeValueText('archivefilename', ''{default}));
+              LLibrary.GetChildValueText('archivefilename', ''{default}));
           end
           else begin
             LdependenciesLst.Add(
-              LLibrary.GetChildNodeValueText('groupid', ''{default}) + ':' +
-              LLibrary.GetChildNodeValueText('artifactid', ''{default}) + ':' +
-              LLibrary.GetChildNodeValueText('version', ''{default}));
+              LLibrary.GetChildValueText('groupid', ''{default}) + ':' +
+              LLibrary.GetChildValueText('artifactid', ''{default}) + ':' +
+              LLibrary.GetChildValueText('version', ''{default}));
           end;
         end;
         LdependenciesLst.Sorted := True;

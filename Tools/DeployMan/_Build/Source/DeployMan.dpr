@@ -247,8 +247,8 @@ begin
         //add to deployment all items from local res\ folder
         for Var I := 0 to Lpaths.ChildNodes.Count - 1 do begin
           var Lpath := Lpaths.ChildNodes[i];
-          Var LLocalPath := AnsiString(Lpath.GetChildNodeValueText('localpath', '')); // DirA\notificationservice.appex\Info.plist
-          Var LRemotePath := AnsiString(Lpath.GetChildNodeValueText('remotepath', '')); // .\PlugIns\notificationservice.appex\Info.plist
+          Var LLocalPath := AnsiString(Lpath.GetChildValueText('localpath', '')); // DirA\notificationservice.appex\Info.plist
+          Var LRemotePath := AnsiString(Lpath.GetChildValueText('remotepath', '')); // .\PlugIns\notificationservice.appex\Info.plist
           for var LConfig in LConfigs do begin
             With LDeploymentNode.AddChild('DeployFile') do begin
               Attributes['LocalName'] := LLocalPath; // DirA\notificationservice.appex\Info.plist

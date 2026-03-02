@@ -1393,7 +1393,7 @@ begin
         //  "expires_in": 3600
         //}
         LJsonDoc.LoadFromJSONString(LHTTPClientResponse.BodyString);
-        Result := LJsonDoc.GetChildNodeValueText('access_token', '');
+        Result := LJsonDoc.GetChildValueText('access_token', '');
         if result = '' then raise Exception.Create('Error 8CBF4FB7-7878-4225-A26D-14369A49081A');
 
         //update _GoogleOAuth2AccessTokens
@@ -1403,7 +1403,7 @@ begin
           pointer(
             {$IF defined(WIN64)}int64{$ELSE}integer{$ENDIF}(
               DateTimeToUnix(
-                IncSecond(ALUtcNow, LJsonDoc.GetChildNodeValueInt32('expires_in', 0) div 2)))));
+                IncSecond(ALUtcNow, LJsonDoc.GetChildValueInt32('expires_in', 0) div 2)))));
 
       finally
         ALFreeAndNil(LHTTPClientResponse);

@@ -703,7 +703,7 @@ begin
       if LValueObj = nil then LValueStr := ''
       else LValueStr := JStringToString(LValueObj.toString);
       //-----
-      LJsonDoc.SetChildNodeValueText(JStringToString(LKeyStr), LValueStr);
+      LJsonDoc.SetChildValueText(JStringToString(LKeyStr), LValueStr);
     end;
     Setlength(StartupNotificationMessages, length(StartupNotificationMessages) + 1);
     StartupNotificationMessages[high(StartupNotificationMessages)] := LJsonDoc.JSON;
@@ -754,7 +754,7 @@ begin
 
         {$REGION 'ANDROID'}
         {$IF defined(ANDROID)}
-        LJsonDoc.SetChildNodeValueText('alcinoe.notification_clicked', '1');
+        LJsonDoc.SetChildValueText('alcinoe.notification_clicked', '1');
         var LPushStartupNotificationMessage := TPushStartupNotificationMessage.Create(TPushNotificationData.Create(LJsonDoc.JSON));
         TMessageManager.DefaultManager.SendMessage(nil, LPushStartupNotificationMessage);
         {$ENDIF}
@@ -765,8 +765,8 @@ begin
         //under ios data message can (if you are lucky) wake up the app and fire this method
         //so we must detect if it's an alert or a pure data message. I use content-available that I
         //think will be only present in data message
-        if LJsonDoc.GetChildNodeValueFloat(['aps', 'content-available'], 0) = 0 then
-          LJsonDoc.SetChildNodeValueText('alcinoe.notification_clicked', '1');
+        if LJsonDoc.GetChildValueFloat(['aps', 'content-available'], 0) = 0 then
+          LJsonDoc.SetChildValueText('alcinoe.notification_clicked', '1');
         var LPushRemoteNotificationMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJsonDoc.JSON));
         TMessageManager.DefaultManager.SendMessage(nil, LPushRemoteNotificationMessage);
         {$ENDIF}
@@ -955,7 +955,7 @@ begin
     allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:didReceiveNotificationResponse:withCompletionHandler', 'Message: ' + LJsonDoc.JSON);
     {$ENDIF}
 
-    LJsonDoc.SetChildNodeValueText('alcinoe.notification_clicked', '1');
+    LJsonDoc.SetChildValueText('alcinoe.notification_clicked', '1');
     var LMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJsonDoc.JSON));
     TMessageManager.DefaultManager.SendMessage(nil, LMessage);
 
@@ -983,7 +983,7 @@ begin
     allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:willPresentNotification:withCompletionHandler', LJsonStr);
     {$ENDIF}
 
-    if ALStrToBool(LJsonDoc.GetChildNodeValuetext('alcinoe.present_notification', '0')) then begin
+    if ALStrToBool(LJsonDoc.GetChildValuetext('alcinoe.present_notification', '0')) then begin
 
       @LImp := imp_implementationWithBlock(withCompletionHandler);
       if TOSVersion.Check(14) then

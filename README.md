@@ -19,6 +19,12 @@ visibility and growth.
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/star.jpg?raw=true" />
 
+For upgrade notes and breaking changes, please refer to the 
+[ChangeLog.md](ChangeLog.md). From time to time, we may rename 
+units/types or adjust procedure/function signatures; the 
+changelog is the authoritative place to see what changed between 
+versions and what you may need to update in your code.
+
 
 Fuel the Magic, Inspire Innovation
 ----------------------------------
@@ -33,6 +39,7 @@ updates until resolved.
 <a href="https://github.com/sponsors/MagicFoundation">
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/becomeasponsor.webp?raw=true" width="800" />
 </a>
+
 
 Example of an App Built with Alcinoe
 ------------------------------------
@@ -145,6 +152,7 @@ forced to apply patches to the original Delphi source files:
 * [macOS: Add missing NSTextField APIs (delegate getter/setter + placeholder getters/setter)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4353)
 * [iOS vs macOS mismatch in CGImageDestinationFinalize declaration (Boolean vs Integer return type)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4714)
 * [Delphi language enhancement: allow multiple inline variant parts inside records (not only trailing)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4920)
+* [TCommonCustomForm.ClientRect loses precision because GetClientWidth/Height round float client size](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4999)
 
 
 Install Alcinoe

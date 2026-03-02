@@ -2971,7 +2971,7 @@ begin
 
             if (not ALDisableResourceScaleMismatchLog) and
                (
-                ((AWrapMode in [TALImageWrapMode.Fit, TALImageWrapMode.FitAndCrop]) and
+                ((AWrapMode in [TALImageWrapMode.Fit, TALImageWrapMode.Cover]) and
                  (not SameValue(((W * AScale) / ALGetScreenScale) * 4, sk4d_image_get_width(LImage), TEpsilon.Position)) and
                  (not SameValue(((H * AScale) / ALGetScreenScale) * 4, sk4d_image_get_height(LImage), TEpsilon.Position)))
                 or
@@ -3050,7 +3050,7 @@ begin
       if LMaskImage <> 0 then begin
         // When LMaskImage is not null, the W, H provided as input
         // are ignored, and LDstRect is set to the size of LMaskImage.
-        // ASrcRect is always calculated using the FitAndCrop wrap mode.
+        // ASrcRect is always calculated using the cover wrap mode.
         LDstRect := TrectF.Create(0, 0, sk4d_image_get_width(LMaskImage), sk4d_image_get_Height(LMaskImage));
         LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
         LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, sk4d_image_get_width(LImage), sk4d_image_get_Height(LImage)), ACropCenter);
@@ -3084,7 +3084,7 @@ begin
             LDstRect.SetLocation(0,0);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
           end;
-          TALImageWrapMode.FitAndCrop: Begin
+          TALImageWrapMode.Cover: Begin
             LDstRect := TRectF.Create(0, 0, W * AScale, H * AScale);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
             LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, sk4d_image_get_width(LImage), sk4d_image_get_Height(LImage)), ACropCenter);
@@ -3537,7 +3537,7 @@ begin
 
         if (not ALDisableResourceScaleMismatchLog) and
            (
-            ((AWrapMode in [TALImageWrapMode.Fit, TALImageWrapMode.FitAndCrop]) and
+            ((AWrapMode in [TALImageWrapMode.Fit, TALImageWrapMode.Cover]) and
              (not SameValue(((W * AScale) / ALGetScreenScale) * 4, LBitmap.GetWidth, TEpsilon.Position)) and
              (not SameValue(((H * AScale) / ALGetScreenScale) * 4, LBitmap.GetHeight, TEpsilon.Position)))
             or
@@ -3622,7 +3622,7 @@ begin
       if LMaskBitmap <> nil then begin
         // When LMaskBitmap is not null, the W, H provided as input
         // are ignored, and LDstRect is set to the size of LMaskBitmap.
-        // ASrcRect is always calculated using the FitAndCrop wrap mode.
+        // ASrcRect is always calculated using the cover wrap mode.
         LDstRect := TrectF.Create(0, 0, LMaskBitmap.getWidth, LMaskBitmap.getHeight);
         LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
         LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, LBitmap.getWidth, LBitmap.getHeight), ACropCenter);
@@ -3656,7 +3656,7 @@ begin
             LDstRect.SetLocation(0,0);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
           end;
-          TALImageWrapMode.FitAndCrop: Begin
+          TALImageWrapMode.Cover: Begin
             LDstRect := TRectF.Create(0, 0, W * AScale, H * AScale);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
             LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, LBitmap.getWidth, LBitmap.getHeight), ACropCenter);
@@ -4170,7 +4170,7 @@ begin
 
         if (not ALDisableResourceScaleMismatchLog) and
            (
-            ((AWrapMode in [TALImageWrapMode.Fit, TALImageWrapMode.FitAndCrop]) and
+            ((AWrapMode in [TALImageWrapMode.Fit, TALImageWrapMode.Cover]) and
              (not SameValue(((W * AScale) / ALGetScreenScale) * 4, ALOSImageGetWidth(LOSImage), TEpsilon.Position)) and
              (not SameValue(((H * AScale) / ALGetScreenScale) * 4, ALOSImageGetHeight(LOSImage), TEpsilon.Position)))
             or
@@ -4256,7 +4256,7 @@ begin
       if LMaskImage <> nil then begin
         // When LMaskImage is not null, the W, H provided as input
         // are ignored, and LDstRect is set to the size of LMaskImage.
-        // ASrcRect is always calculated using the FitAndCrop wrap mode.
+        // ASrcRect is always calculated using the cover wrap mode.
         LDstRect := TrectF.Create(0, 0, CGImageGetWidth(LMaskImage), CGImageGetHeight(LMaskImage));
         LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
         LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)), ACropCenter);
@@ -4290,7 +4290,7 @@ begin
             LDstRect.SetLocation(0,0);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
           end;
-          TALImageWrapMode.FitAndCrop: Begin
+          TALImageWrapMode.Cover: Begin
             LDstRect := TRectF.Create(0, 0, W * AScale, H * AScale);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
             LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)), ACropCenter);
@@ -4576,7 +4576,7 @@ begin
 
         if (not ALDisableResourceScaleMismatchLog) and
            (
-            ((AWrapMode in [TALImageWrapMode.Fit, TALImageWrapMode.FitAndCrop]) and
+            ((AWrapMode in [TALImageWrapMode.Fit, TALImageWrapMode.Cover]) and
              (not SameValue(((W * AScale) / ALGetScreenScale) * 4, LBitmap.Width, TEpsilon.Position)) and
              (not SameValue(((H * AScale) / ALGetScreenScale) * 4, LBitmap.Height, TEpsilon.Position)))
             or
@@ -4652,7 +4652,7 @@ begin
       if LMaskBitmap <> nil then begin
         // When LMaskBitmap is not null, the W, H provided as input
         // are ignored, and LDstRect is set to the size of LMaskBitmap.
-        // ASrcRect is always calculated using the FitAndCrop wrap mode.
+        // ASrcRect is always calculated using the cover wrap mode.
         LDstRect := TrectF.Create(0, 0, LMaskBitmap.Width, LMaskBitmap.Height);
         LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
         LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, LBitmap.Width, Lbitmap.Height), ACropCenter);
@@ -4686,7 +4686,7 @@ begin
             LDstRect.SetLocation(0,0);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
           end;
-          TALImageWrapMode.FitAndCrop: Begin
+          TALImageWrapMode.Cover: Begin
             LDstRect := TRectF.Create(0, 0, W * AScale, H * AScale);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
             LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, LBitmap.Width, LBitmap.Height), ACropCenter);

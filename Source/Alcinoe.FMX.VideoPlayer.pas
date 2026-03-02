@@ -4750,7 +4750,7 @@ begin
         LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)).
                       PlaceInto(LLocalRect);
       end;
-      TALImageWrapMode.FitAndCrop: begin
+      TALImageWrapMode.Cover: begin
         LDstRect := TRectF.Create(0, 0, Width, Height);
         LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
         LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)));

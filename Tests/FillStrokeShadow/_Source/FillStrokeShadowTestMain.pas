@@ -183,7 +183,7 @@ begin
                               ALIfThen(LFillColor, TAlphaColors.yellow, TAlphaColors.Null),// const AFillColor: TAlphaColor;
                               TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
                               LFillGradientColors, // const AFillGradientColors: Tarray<TAlphaColor>;
-                              ALIfThenW(LFillResourceName, ALIfThenW(LFillWrapMode in [TALImageWrapMode.FitAndCrop], 'sticker_cropped', 'sticker'), ''), // const AFillResourceName: String;
+                              ALIfThenW(LFillResourceName, ALIfThenW(LFillWrapMode in [TALImageWrapMode.Cover], 'sticker_cropped', 'sticker'), ''), // const AFillResourceName: String;
                               LFillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
                               LFillBackgroundMarginsRect, // const aFillBackgroundMarginsRect: TrectF;
                               LFillImageMarginsRect, // const aFillImageMarginsRect: TrectF;
@@ -321,7 +321,7 @@ begin
                           ALIfThen(LFillColor, TAlphaColors.yellow, TAlphaColors.Null),// const AFillColor: TAlphaColor;
                           TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
                           LFillGradientColors, // const AFillGradientColors: Tarray<TAlphaColor>;
-                          ALIfThenW(LFillResourceName, ALIfThenW(LFillWrapMode in [TALImageWrapMode.FitAndCrop], 'sticker_cropped', 'sticker'), ''), // const AFillResourceName: String;
+                          ALIfThenW(LFillResourceName, ALIfThenW(LFillWrapMode in [TALImageWrapMode.Cover], 'sticker_cropped', 'sticker'), ''), // const AFillResourceName: String;
                           LFillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
                           LFillBackgroundMarginsRect, // const aFillBackgroundMarginsRect: TrectF;
                           LFillImageMarginsRect, // const aFillImageMarginsRect: TrectF;

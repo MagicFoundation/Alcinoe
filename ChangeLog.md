@@ -4,6 +4,7 @@
 - Added ExtractHeaders and ExtractBodyStream to TALHttpRequestA/TALHttpRequestW and TALHttpResponseA/TALHttpResponseW  
 - Changed `ALAcquireKeepAliveWinHttpClient/ALReleaseKeepAliveWinHttpClient` to use `AUrl: AnsiString` instead of `AURI: TUri`  
 - Changed `ALAcquireKeepAliveNetHttpClient/ALReleaseKeepAliveNetHttpClient` to use `AUrl: String` instead of `AURI: TUri`
+- Renamed TALImageWrapMode.FitAndCrop to TALImageWrapMode.Cover
 
 ## 02/19/2026
 

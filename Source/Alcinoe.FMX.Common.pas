@@ -73,65 +73,25 @@ type
 
   {~~~~~~~~~~~~~~~~~~}
   TALImageWrapMode = (
-    // Display the image with its original dimensions:
-    // * The image is placed in the upper-left corner of the rectangle of the control.
-    // * If the image is larger than the control's rectangle, then only the upper-left part of the image,
-    //   which fits in the rectangle of the control, is shown. The image is not resized.
-    //Original,
-
     /// <summary>
-    ///   Best fit the image in the rectangle of the control.
+    ///   The image is resized (shrunk or enlarged) to be as large as possible
+    ///   within the given width or height while preserving the aspect ratio.
     /// </summary>
-    /// <remarks><para>
-    ///   * If any dimension of the image is larger than the rectangle of the control, then scales down the image
-    ///     (keeping image proportions – the ratio between the width and height) to fit the whole image in the rectangle
-    ///     of the control. That is, either the width of the resized image is equal to the width of the control's rectangle
-    ///     or the height of the resized image is equal to the height of the rectangle of the control. The whole image
-    ///     should be displayed. The image is displayed centered in the rectangle of the control.
-    /// </para><para>
-    ///   * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
-    ///     the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
-    /// </para></remarks>
     Fit,
-
     /// <summary>
     ///   Stretch the image to fill the entire rectangle of the control
     /// </summary>
     Stretch,
-
-    // Tile (multiply) the image to cover the entire rectangle of the control:
-    // * If the image is larger than the rectangle of the control, then only the
-    //   upper-left part of the image, which fits in the rectangle of the control, is shown. The image is not resized.
-    // * If the image (original size) is smaller than the rectangle of the control, then the multiple images are tiled
-    //   (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
-    //   the upper-left corner of the rectangle of the control.
-    //Tile,
-
     /// <summary>
-    ///   Fit the image in the rectangle of the control:
+    ///   The image is shrunk in size to fully fit within the given width or
+    ///   height, but will not be enlarged.
     /// </summary>
-    /// <remarks><para>
-    ///   * If any dimension of the image is larger than the rectangle of the control, then scales down the image (keeping image proportions--the ratio between the width and height)
-    ///     to fit the whole image in the rectangle of the control. That is, either the width of the resized image is equal to the width of the control's rectangle or the height of the
-    ///     resized image is equal to the height of the control's rectangle. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
-    /// </para><para>
-    ///   * If the original image is smaller than the rectangle of the control, then the image is not resized. The image is displayed centered in the rectangle of the control.
-    /// </para></remarks>
     Place,
-
     /// <summary>
-    ///   Best fit the image in the rectangle of the control:
+    ///   The image is resized to exactly fill the entire area specified by
+    ///   width and height and will be cropped if necessary.
     /// </summary>
-    /// <remarks><para>
-    ///   * If any dimension of the image is larger than the rectangle of the control, then scales down the image
-    ///     (keeping image proportions – the ratio between the width and height) to fit the height or the width of the image in the rectangle
-    ///     of the control and crop the extra part of the image. That is, the width of the resized image is equal to the width of the control's rectangle
-    ///     AND the height of the resized image is equal to the height of the rectangle of the control.
-    /// </para><para>
-    ///   * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
-    ///     the rectangle of the control. Whole the image should be displayed.
-    /// </para></remarks>
-    FitAndCrop);
+    Cover);
 
 type
 

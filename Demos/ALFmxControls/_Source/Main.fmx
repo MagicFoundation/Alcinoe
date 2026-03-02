@@ -3484,7 +3484,7 @@ object MainForm: TMainForm
         Size.Width = 158.000000000000000000
         Size.Height = 150.000000000000000000
         Size.PlatformDefault = False
-        WrapMode = FitAndCrop
+        WrapMode = Cover
       end
       object ALAutoSizeLayoutText: TALText
         Align = Top
@@ -8103,7 +8103,7 @@ object MainForm: TMainForm
       Size.Width = 150.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      WrapMode = FitAndCrop
+      WrapMode = Cover
     end
     object ALButton33: TALButton
       Align = TopLeft
@@ -8241,7 +8241,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      WrapMode = FitAndCrop
+      WrapMode = Cover
       XRadius = 24.000000000000000000
       YRadius = 24.000000000000000000
     end
@@ -8329,7 +8329,7 @@ object MainForm: TMainForm
           Size.Width = 228.000015258789100000
           Size.Height = 355.000000000000000000
           Size.PlatformDefault = False
-          WrapMode = FitAndCrop
+          WrapMode = Cover
           XRadius = 16.000000000000000000
           YRadius = 16.000000000000000000
         end
@@ -8342,7 +8342,7 @@ object MainForm: TMainForm
           Size.Width = 228.000015258789100000
           Size.Height = 355.000000000000000000
           Size.PlatformDefault = False
-          WrapMode = FitAndCrop
+          WrapMode = Cover
           XRadius = 16.000000000000000000
           YRadius = 16.000000000000000000
         end
@@ -8355,7 +8355,7 @@ object MainForm: TMainForm
           Size.Width = 228.000015258789100000
           Size.Height = 355.000000000000000000
           Size.PlatformDefault = False
-          WrapMode = FitAndCrop
+          WrapMode = Cover
           XRadius = 16.000000000000000000
           YRadius = 16.000000000000000000
         end
@@ -8368,7 +8368,7 @@ object MainForm: TMainForm
           Size.Width = 228.000015258789100000
           Size.Height = 355.000000000000000000
           Size.PlatformDefault = False
-          WrapMode = FitAndCrop
+          WrapMode = Cover
           XRadius = 16.000000000000000000
           YRadius = 16.000000000000000000
         end
@@ -8381,7 +8381,7 @@ object MainForm: TMainForm
           Size.Width = 228.000015258789100000
           Size.Height = 355.000000000000000000
           Size.PlatformDefault = False
-          WrapMode = FitAndCrop
+          WrapMode = Cover
           XRadius = 16.000000000000000000
           YRadius = 16.000000000000000000
         end
@@ -8394,7 +8394,7 @@ object MainForm: TMainForm
           Size.Width = 228.000015258789100000
           Size.Height = 355.000000000000000000
           Size.PlatformDefault = False
-          WrapMode = FitAndCrop
+          WrapMode = Cover
           XRadius = 16.000000000000000000
           YRadius = 16.000000000000000000
         end
@@ -8423,7 +8423,7 @@ object MainForm: TMainForm
           Size.Width = 330.000000000000000000
           Size.Height = 396.000000000000000000
           Size.PlatformDefault = False
-          WrapMode = FitAndCrop
+          WrapMode = Cover
           XRadius = 16.000000000000000000
           YRadius = 16.000000000000000000
         end
@@ -8438,7 +8438,7 @@ object MainForm: TMainForm
           Size.Width = 330.000000000000000000
           Size.Height = 396.000000000000000000
           Size.PlatformDefault = False
-          WrapMode = FitAndCrop
+          WrapMode = Cover
           XRadius = 16.000000000000000000
           YRadius = 16.000000000000000000
         end
@@ -8453,7 +8453,7 @@ object MainForm: TMainForm
           Size.Width = 330.000000000000000000
           Size.Height = 396.000000000000000000
           Size.PlatformDefault = False
-          WrapMode = FitAndCrop
+          WrapMode = Cover
           XRadius = 16.000000000000000000
           YRadius = 16.000000000000000000
         end
@@ -8468,7 +8468,7 @@ object MainForm: TMainForm
           Size.Width = 330.000000000000000000
           Size.Height = 396.000000000000000000
           Size.PlatformDefault = False
-          WrapMode = FitAndCrop
+          WrapMode = Cover
           XRadius = 16.000000000000000000
           YRadius = 16.000000000000000000
         end
@@ -8483,7 +8483,7 @@ object MainForm: TMainForm
           Size.Width = 330.000000000000000000
           Size.Height = 396.000000000000000000
           Size.PlatformDefault = False
-          WrapMode = FitAndCrop
+          WrapMode = Cover
           XRadius = 16.000000000000000000
           YRadius = 16.000000000000000000
         end
@@ -8498,7 +8498,7 @@ object MainForm: TMainForm
           Size.Width = 330.000000000000000000
           Size.Height = 396.000000000000000000
           Size.PlatformDefault = False
-          WrapMode = FitAndCrop
+          WrapMode = Cover
           XRadius = 16.000000000000000000
           YRadius = 16.000000000000000000
         end

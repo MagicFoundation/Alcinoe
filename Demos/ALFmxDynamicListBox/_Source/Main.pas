@@ -562,7 +562,7 @@ begin
     LRainbowCircle.CacheEngine := AContext.CacheEngine;
 
     var LAvatar := TALDynamicImage.Create(LRainbowCircle);
-    LAvatar.WrapMode := TALImageWrapMode.FitAndCrop;
+    LAvatar.WrapMode := TALImageWrapMode.Cover;
     LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
     {$IF defined(debug)}
     LAvatar.TagString := 'Avatar_'+ALIntToStrW(AContext.Owner.index);
@@ -631,7 +631,7 @@ begin
         end
         else begin
           var LMedia1 := TALDynamicImage.Create(LPageView);
-          LMedia1.WrapMode := TALImageWrapMode.FitAndCrop;
+          LMedia1.WrapMode := TALImageWrapMode.Cover;
           LMedia1.ResourceName := LMediumNode.GetChildNodeValueText('url', '');
           {$IF defined(debug)}
           LMedia1.TagString := 'Media_'+ALIntToStrW(AContext.Owner.index) + '_' + ALIntToStrW(I);
@@ -683,7 +683,7 @@ begin
       end
       else begin
         var LMedia1 := TALDynamicImage.Create(Result);
-        LMedia1.WrapMode := TALImageWrapMode.FitAndCrop;
+        LMedia1.WrapMode := TALImageWrapMode.Cover;
         LMedia1.ResourceName := LMediumNode.GetChildNodeValueText('url', '');
         {$IF defined(debug)}
         LMedia1.TagString := 'Media_'+ALIntToStrW(AContext.Owner.index);
@@ -884,7 +884,7 @@ begin
     LRainbowCircle.CacheEngine := AContext.CacheEngine;
 
     var LAvatar := TALDynamicImage.Create(LRainbowCircle);
-    LAvatar.WrapMode := TALImageWrapMode.FitAndCrop;
+    LAvatar.WrapMode := TALImageWrapMode.Cover;
     LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
     {$IF defined(debug)}
     LAvatar.TagString := 'Stories_Avatar_'+ALIntToStrW(AContext.Owner.index);
@@ -977,7 +977,7 @@ begin
     LBackground.CacheEngine := AContext.CacheEngine;
 
     var LAvatar := TALDynamicImage.Create(LBackground);
-    LAvatar.WrapMode := TALImageWrapMode.FitAndCrop;
+    LAvatar.WrapMode := TALImageWrapMode.Cover;
     LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
     {$IF defined(debug)}
     LAvatar.TagString := 'Suggested_Avatar_'+ALIntToStrW(AContext.Owner.index);

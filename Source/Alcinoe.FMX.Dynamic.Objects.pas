@@ -3181,7 +3181,7 @@ begin
     TALImageWrapMode.Fit: FRenderRect := FRenderRect.FitInto(LocalRect.ReducePrecision);
     TALImageWrapMode.Stretch: FRenderRect := FRenderRect.FitInto(LocalRect.ReducePrecision); // TALImageWrapMode.Stretch not yet supported, use TALImageWrapMode.Fit instead
     TALImageWrapMode.Place: FRenderRect := FRenderRect.PlaceInto(LocalRect.ReducePrecision);
-    TALImageWrapMode.FitAndCrop: FRenderRect := FRenderRect.FitInto(LocalRect.ReducePrecision); // TALImageWrapMode.FitAndCrop not yet supported, use TALImageWrapMode.Fit instead
+    TALImageWrapMode.Cover: FRenderRect := FRenderRect.FitInto(LocalRect.ReducePrecision); // TALImageWrapMode.Cover not yet supported, use TALImageWrapMode.Fit instead
     else
       Raise Exception.Create('Error 822CE359-8404-40CE-91B9-1CFC3DBA259F')
   end;

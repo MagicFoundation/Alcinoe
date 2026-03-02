@@ -734,7 +734,7 @@ begin
                               0, // const AScale: Single;
                               LIconSize.Width, LIconSize.Height, // const W, H: single;
                               False, //const AApplyMetadataOrientation: Boolean;
-                              TALImageWrapMode.fitAndCrop, // const AWrapMode: TALImageWrapMode;
+                              TALImageWrapMode.Cover, // const AWrapMode: TALImageWrapMode;
                               TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                               TAlphaColors.Null, // const ATintColor: TalphaColor;
                               0, // const ABlurRadius: single;

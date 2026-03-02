@@ -1,12 +1,8 @@
-(******************************************************
-TALJSONDocument is a Delphi parser/writer for JSON/BSON
-data formats. It supports both DOM and SAX parsers. (Note
-that a better name for SAX could be SAJ for Simple API for
-JSON instead of Simple API for XML, but as the concept of
-SAX is well-known, I will keep this name.) TALJSONDocument
-also supports BSON format and uses a syntax similar to
-TALXMLDocument/TXMLDocument. Additionally, TALJSONDocument
-can export Json/Bson data to TALStringListA.
+(**************************************************************************
+TALJSONDocument is a high-performance JSON parser and generator for Delphi,
+offering both DOM and SAX APIs for maximum flexibility. It’s designed for speed
+and low overhead, with convenient typed accessors, and it also supports BSON
+for seamless integration with MongoDB-style payloads.
 
 Exemple :
 
@@ -795,17 +791,17 @@ function ALJSONTryStrToTimestampA(const S: AnsiString; out Value: TALBSONTimesta
 function ALJSONTryStrToInt32A(const S: AnsiString; out Value: integer): Boolean;
 function ALJSONTryStrToInt64A(const S: AnsiString; out Value: int64): Boolean;
 
-Function ALFindJsonNodeByChildNodeValueInt32A(
+Function ALFindJsonNodeByChildValueInt32A(
            const AJsonNode: TALJSONNodeA;
            Const AChildNodeName: AnsiString;
            Const AChildNodeValue : Int32;
            Const ARecurse: Boolean = False): TALJSONNodeA;
-Function ALFindJsonNodeByChildNodeValueInt64A(
+Function ALFindJsonNodeByChildValueInt64A(
            const AJsonNode: TALJSONNodeA;
            Const AChildNodeName: AnsiString;
            Const AChildNodeValue : Int64;
            Const ARecurse: Boolean = False): TALJSONNodeA;
-Function ALFindJsonNodeByChildNodeValueTextA(
+Function ALFindJsonNodeByChildValueTextA(
            const AJsonNode: TALJSONNodeA;
            Const AChildNodeName: AnsiString;
            Const AChildNodeValue : AnsiString;
@@ -1327,17 +1323,17 @@ function ALJSONTryStrToTimestampW(const S: String; out Value: TALBSONTimestamp):
 function ALJSONTryStrToInt32W(const S: String; out Value: integer): Boolean;
 function ALJSONTryStrToInt64W(const S: String; out Value: int64): Boolean;
 
-Function ALFindJsonNodeByChildNodeValueInt32W(
+Function ALFindJsonNodeByChildValueInt32W(
            const AJsonNode: TALJSONNodeW;
            Const AChildNodeName: String;
            Const AChildNodeValue : Int32;
            Const ARecurse: Boolean = False): TALJSONNodeW;
-Function ALFindJsonNodeByChildNodeValueInt64W(
+Function ALFindJsonNodeByChildValueInt64W(
            const AJsonNode: TALJSONNodeW;
            Const AChildNodeName: String;
            Const AChildNodeValue : Int64;
            Const ARecurse: Boolean = False): TALJSONNodeW;
-Function ALFindJsonNodeByChildNodeValueTextW(
+Function ALFindJsonNodeByChildValueTextW(
            const AJsonNode: TALJSONNodeW;
            Const AChildNodeName: String;
            Const AChildNodeValue : String;
@@ -1354,8 +1350,8 @@ uses
   Alcinoe.HTML,
   Alcinoe.Common;
 
-{********************************************}
-Function ALFindJsonNodeByChildNodeValueInt32A(
+{****************************************}
+Function ALFindJsonNodeByChildValueInt32A(
            const AJsonNode: TALJSONNodeA;
            Const AChildNodeName: AnsiString;
            Const AChildNodeValue : Int32;
@@ -1373,7 +1369,7 @@ Begin
       exit;
     end;
     if ARecurse then begin
-      result := ALFindJsonNodeByChildNodeValueInt32A(
+      result := ALFindJsonNodeByChildValueInt32A(
                   LCandidateNode,
                   AChildNodeName,
                   AChildNodeValue,
@@ -1383,8 +1379,8 @@ Begin
   end;
 end;
 
-{********************************************}
-Function ALFindJsonNodeByChildNodeValueInt64A(
+{****************************************}
+Function ALFindJsonNodeByChildValueInt64A(
            const AJsonNode: TALJSONNodeA;
            Const AChildNodeName: AnsiString;
            Const AChildNodeValue : Int64;
@@ -1402,7 +1398,7 @@ Begin
       exit;
     end;
     if ARecurse then begin
-      result := ALFindJsonNodeByChildNodeValueInt64A(
+      result := ALFindJsonNodeByChildValueInt64A(
                   LCandidateNode,
                   AChildNodeName,
                   AChildNodeValue,
@@ -1412,8 +1408,8 @@ Begin
   end;
 end;
 
-{*******************************************}
-Function ALFindJsonNodeByChildNodeValueTextA(
+{***************************************}
+Function ALFindJsonNodeByChildValueTextA(
            const AJsonNode: TALJSONNodeA;
            Const AChildNodeName: AnsiString;
            Const AChildNodeValue : AnsiString;
@@ -1431,7 +1427,7 @@ Begin
       exit;
     end;
     if ARecurse then begin
-      result := ALFindJsonNodeByChildNodeValueTextA(
+      result := ALFindJsonNodeByChildValueTextA(
                   LCandidateNode,
                   AChildNodeName,
                   AChildNodeValue,
@@ -8196,8 +8192,8 @@ begin
   end;
 end;
 
-{********************************************}
-Function ALFindJsonNodeByChildNodeValueInt32W(
+{****************************************}
+Function ALFindJsonNodeByChildValueInt32W(
            const AJsonNode: TALJSONNodeW;
            Const AChildNodeName: String;
            Const AChildNodeValue : Int32;
@@ -8215,7 +8211,7 @@ Begin
       exit;
     end;
     if ARecurse then begin
-      result := ALFindJsonNodeByChildNodeValueInt32W(
+      result := ALFindJsonNodeByChildValueInt32W(
                   LCandidateNode,
                   AChildNodeName,
                   AChildNodeValue,
@@ -8225,8 +8221,8 @@ Begin
   end;
 end;
 
-{********************************************}
-Function ALFindJsonNodeByChildNodeValueInt64W(
+{****************************************}
+Function ALFindJsonNodeByChildValueInt64W(
            const AJsonNode: TALJSONNodeW;
            Const AChildNodeName: String;
            Const AChildNodeValue : Int64;
@@ -8244,7 +8240,7 @@ Begin
       exit;
     end;
     if ARecurse then begin
-      result := ALFindJsonNodeByChildNodeValueInt64W(
+      result := ALFindJsonNodeByChildValueInt64W(
                   LCandidateNode,
                   AChildNodeName,
                   AChildNodeValue,
@@ -8254,8 +8250,8 @@ Begin
   end;
 end;
 
-{*******************************************}
-Function ALFindJsonNodeByChildNodeValueTextW(
+{***************************************}
+Function ALFindJsonNodeByChildValueTextW(
            const AJsonNode: TALJSONNodeW;
            Const AChildNodeName: String;
            Const AChildNodeValue : String;
@@ -8273,7 +8269,7 @@ Begin
       exit;
     end;
     if ARecurse then begin
-      result := ALFindJsonNodeByChildNodeValueTextW(
+      result := ALFindJsonNodeByChildValueTextW(
                   LCandidateNode,
                   AChildNodeName,
                   AChildNodeValue,

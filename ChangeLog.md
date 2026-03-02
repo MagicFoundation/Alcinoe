@@ -6,6 +6,7 @@
 - Changed `ALAcquireKeepAliveNetHttpClient/ALReleaseKeepAliveNetHttpClient` to use `AUrl: String` instead of `AURI: TUri`
 - Renamed `TALImageWrapMode.FitAndCrop` to `TALImageWrapMode.Cover`
 - Renamed `TALJSONNodeA/TALJSONNodeW.GetChildNodeValueXXX` to `TALJSONNodeA/TALJSONNodeW.GetChildValueXXX`
+- Renamed `ALFindJsonNodeByChildNodeValueXXX` to `ALFindJsonNodeByChildValueXXX`
 
 ## 02/19/2026
 

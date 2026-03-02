@@ -6513,6 +6513,8 @@ implementation
 uses
   system.IOUtils,
   system.sysutils,
+  Alcinoe.WinApi.Windows,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {*************************}
@@ -6538,27 +6540,24 @@ begin
   // http://www.imagemagick.org/script/resources.php
   AImageMagickHome := ExcludeTrailingPathDelimiter(AImageMagickHome);
   var LPath := getEnvironmentVariable('PATH');
-  if ((pos(AImageMagickHome, LPath) <= 0) and
-      (not setEnvironmentVariable(PChar('PATH'), pChar(LPath + ';' + AImageMagickHome)))) then raiseLastOsError;
+  if (ALPosW(AImageMagickHome, LPath) <= 0) then
+    ALCheckWinApiBoolean('setEnvironmentVariable', setEnvironmentVariable(PChar('PATH'), pChar(LPath + ';' + AImageMagickHome)));
 
   // http://www.imagemagick.org/script/resources.php
   // https://stackoverflow.com/questions/69199708/setenvironmentvariable-does-not-seem-to-set-values-that-can-be-retrieved-by-ge
   // https://stackoverflow.com/questions/69199952/how-to-call-putenv-from-delphi/69200498
-  if (_wputenv_s(PChar('MAGICK_HOME'), pChar(AImageMagickHome)) <> 0) or
-     (_wputenv_s(PChar('MAGICK_CONFIGURE_PATH'), pChar(AImageMagickHome)) <> 0) or
-     (_wputenv_s(PChar('MAGICK_CODER_FILTER_PATH'), pChar(TPath.Combine(AImageMagickHome, 'modules\filters'))) <> 0) or
-     (_wputenv_s(PChar('MAGICK_CODER_MODULE_PATH'), pChar(TPath.Combine(AImageMagickHome, 'modules\coders'))) <> 0) then raiseLastOsError;
+  ALCheckWinApiErrorCode('_wputenv_s', _wputenv_s(PChar('MAGICK_HOME'), pChar(AImageMagickHome)));
+  ALCheckWinApiErrorCode('_wputenv_s', _wputenv_s(PChar('MAGICK_CONFIGURE_PATH'), pChar(AImageMagickHome)));
+  ALCheckWinApiErrorCode('_wputenv_s', _wputenv_s(PChar('MAGICK_CODER_FILTER_PATH'), pChar(TPath.Combine(AImageMagickHome, 'modules\filters'))));
+  ALCheckWinApiErrorCode('_wputenv_s', _wputenv_s(PChar('MAGICK_CODER_MODULE_PATH'), pChar(TPath.Combine(AImageMagickHome, 'modules\coders'))));
 
   //https://www.imagemagick.org/discourse-server/viewtopic.php?f=6&t=33662
   //https://stackoverflow.com/questions/49266246/imagemagick-wand-use-only-one-single-cpu
-  if (AThreadLimit > 0) and
-     (_wputenv_s(PChar('MAGICK_THREAD_LIMIT'), pChar(Inttostr(AThreadLimit))) <> 0) then raiseLastOsError;
+  if (AThreadLimit > 0) then ALCheckWinApiErrorCode('_wputenv_s', _wputenv_s(PChar('MAGICK_THREAD_LIMIT'), pChar(Inttostr(AThreadLimit))))
+  else ALCheckWinApiErrorCode('_wputenv_s', _wputenv_s(PChar('MAGICK_THREAD_LIMIT'), pChar('')));
 
-  FMagickCorelib := LoadLibrary(pChar(TPath.Combine(AImageMagickHome, 'CORE_RL_MagickCore_.dll')));
-  if FMagickCorelib = 0 then raiseLastOsError;
-
-  FMagickWandlib := LoadLibrary(pChar(TPath.Combine(AImageMagickHome, 'CORE_RL_MagickWand_.dll')));
-  if FMagickWandlib = 0 then raiseLastOsError;
+  FMagickCorelib := ALCheckWinApiHandle('LoadLibrary', LoadLibrary(pChar(TPath.Combine(AImageMagickHome, 'CORE_RL_MagickCore_.dll'))));
+  FMagickWandlib := ALCheckWinApiHandle('LoadLibrary', LoadLibrary(pChar(TPath.Combine(AImageMagickHome, 'CORE_RL_MagickWand_.dll'))));
 
   {$REGION 'MagickCore - animate.c - https://imagemagick.org/api/animate.html'}
   AnimateImages := GetProcAddress(FMagickCorelib,'AnimateImages');
@@ -8530,16 +8529,10 @@ destructor TALImageMagickLibrary.Destroy;
 begin
   if FMagickWandlib > 0 then begin
     MagickWandTerminus;
-    // After heavy ImageMagick usage, immediately unloading the DLL can
-    // occasionally trigger an AV inside FreeLibrary(FMagickWandlib).
-    // Pause briefly to let internal threads/finalizers settle before freeing.
-    sleep(250);
-    if not FreeLibrary(FMagickWandlib) then
-      raiseLastOsError;
+    ALCheckWinApiBoolean('FreeLibrary', FreeLibrary(FMagickWandlib));
   end;
-  if (FMagickCorelib <> 0) and
-     (not FreeLibrary(FMagickCorelib)) then
-    raiseLastOsError;
+  if (FMagickCorelib <> 0) then
+    ALCheckWinApiBoolean('FreeLibrary', FreeLibrary(FMagickCorelib));
   inherited Destroy;
 end;
 

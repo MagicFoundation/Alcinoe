@@ -115,7 +115,7 @@ forced to apply patches to the original Delphi source files:
 * [Project option to define where to look/create the LaunchScreen.TemplateiOS directory](https://quality.embarcadero.com/browse/RSP-33503)
 * [Support configuration-specific deployment templates (AndroidManifest / Info.plist / Entitlements)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4922)
 * [Replace Pointer-based signatures in iOS/macOS bridges with strongly typed wrappers](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4433)
-* [Performance Issue - Comparing Equality Between Two Strings](https://quality.embarcadero.com/browse/RSP-42011)
+* [Win64: AnsiString equality comparison significantly slower than UnicodeString](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5052)
 * [Allow linking of Swift compatibility frameworks](https://quality.embarcadero.com/browse/RSP-38700)
 * [need to uncomment _GetAUDIO_ATTRIBUTES_DEFAULT from JNotificationClass](https://quality.embarcadero.com/browse/RSP-21296)
 * [Resolve Circular Reference in JBitmapClass by Refactoring JHardwareBuffer Declaration](https://quality.embarcadero.com/browse/RSP-44100)    
@@ -1013,40 +1013,97 @@ Learn more at [Demos\ALSMTPClient](https://github.com/MagicFoundation/Alcinoe/tr
 Json Parser
 ===========
 
-**TALJSONDocument** is a high-performance JSON parser and generator for Delphi, 
-offering both DOM and SAX APIs for maximum flexibility. It’s designed for 
-speed and low overhead, with convenient typed accessors, and it also supports 
-BSON for seamless integration with MongoDB-style payloads.
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/bson.png?raw=true" width="540" style="width:540px;"/>
 
-Example :
+**TALJSONDocument** is a high-performance JSON parser and generator for
+Delphi, offering both **DOM** and **SAX** APIs for maximum flexibility.
 
-```
+However, **TALJSONDocument is much more than a traditional JSON
+parser**. It implements an **extended JSON model inspired by MongoDB's BSON
+(Binary JSON)**.
+
+Standard JSON supports only a very limited set of primitive types:
+
+-   `number` (double precision)
+-   `string`
+-   `boolean`
+-   `null`
+-   arrays
+-   objects
+
+In real-world applications this is often insufficient. Developers
+frequently need additional primitives such as:
+
+-   **32-bit integers**
+-   **64-bit integers**
+-   **datetime values**
+-   **binary data**
+-   **ObjectId**
+
+With standard JSON these values must usually be encoded as **strings**,
+which is inefficient and error-prone.
+
+**TALJSONDocument solves this limitation** by supporting an extended set
+of primitives compatible with **BSON** while remaining fully compatible
+with standard JSON.
+
+This means data can be exchanged in two formats:
+
+• **Binary BSON format** --- compact and efficient\
+• **MongoDB shell / Extended JSON format**
+
+Example of extended JSON representation:
+
+    {
+      myInt32: NumberInt(42),
+      myInt64: NumberLong(58954488559885),
+      created: ISODate("2026-03-06T18:45:17.478Z"),
+      id: ObjectId("507f1f77bcf86cd799439011"),
+      payload: BinData(0,"SGVsbG8=")
+    }
+
+Because BSON supports many more primitive types than JSON, it is an
+**excellent container for RPC payloads, APIs, and high-performance data
+exchange**.
+
+Naturally, **TALJSONDocument is also the ideal component for working
+with MongoDB**.
+
+------------------------------------------------------------------------
+
+#### Example ####
+
     {
       _id: 1, // comments
       name: { first: "John", last: "Backus" },
       birth: new Date('1999-10-21T21:04:54.234Z'),
       contribs: [ "Fortran", "ALGOL", "Backus-Naur Form", "FP" ],
       awards: [
-                { award: "National Medal of Science",
-                  year: 1975,
-                  by: "National Science Foundation" },
-                { award: "Turing Award",
-                  year: 1977,
-                  by: "ACM" }
-              ],
+        {
+          award: "National Medal of Science",
+          year: 1975,
+          by: "National Science Foundation"
+        },
+        {
+          award: "Turing Award",
+          year: 1977,
+          by: "ACM"
+        }
+      ],
       spouse: "",
       address: {},
       phones: []
     }
-```
 
-To access the document nodes :
+------------------------------------------------------------------------
 
-```
+#### Accessing document nodes ####
+
     MyJsonDoc.GetChildValueInt32('_id', 0{default if node not exists});
     MyJsonDoc.GetChildValueText(['name','first'], ''{default if node not exists});
     MyJsonDoc.GetChildValueDateTime('birth', Now{default if node not exists});
-```
+
+------------------------------------------------------------------------
 
 Learn more at [Source/Alcinoe.JSONDoc.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.JSONDoc.pas)
 <br/>

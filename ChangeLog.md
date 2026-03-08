@@ -1,3 +1,26 @@
+## 03/08/2026
+
+- Added `poBinaryAsPtrStream` to `TALJSONParseOption`
+- Added `LoadFromBSONBytes` and `ParseBSONBytes` to `TALJSONNodeA/TALJSONDocumentA`
+- Added `GetBinaryAsBytes`, `GetBinaryAsStream`, `SetBinaryAsBytes`, `SetBinaryAsStream`, `GetOwnsBinaryStream`, and `SetOwnsBinaryStream` to `TALJSONNodeA/TALJSONNodeW`
+- Added `GetChildValueBinaryAsBytes`, `GetChildValueBinaryAsStream`, `SetChildValueBinaryAsBytes`, and `SetChildValueBinaryAsStream` to `TALJSONNodeA/TALJSONNodeW`
+- Changed `TALJSONNodeA/TALJSONNodeW.ParseBSON` to use `RawBSONBytes: TBytes` instead of string-based BSON buffers
+- Changed `TALJSONNodeA/TALJSONNodeW.ObjectID` and related getters/setters to use `TBytes` instead of `AnsiString/String`
+- Changed binary handling in `TALJSONNodeA/TALJSONNodeW` from `Binary: AnsiString/String` to `BinaryAsBytes: TBytes` and `BinaryAsStream: TStream`
+- Changed `ALJsonEncodeBinaryWithNodeSubTypeHelperA/W` and `ALJsonEncodeObjectIDWithNodeSubTypeHelperA/W` to use `TBytes`
+- Changed `ALJSONTryStrToBinaryA/W` and `ALJSONTryStrToObjectIDA/W` to return `TBytes`
+- Renamed `TAlJSONParseTextEventA/W`, `TAlJSONParseObjectEventA/W`, and `TAlJSONParseArrayEventA/W` to `TALJSONParseTextEventA/W`, `TALJSONParseObjectEventA/W`, and `TALJSONParseArrayEventA/W`
+- Renamed `DetectNodeTypeFromJSon` to `DetectNodeTypeFromJSON`
+- Renamed `ALFindJsonNodeByChildValueXXX` parameters from `AChildNodeName/AChildNodeValue` to `AChildName/AChildValue`
+- Removed sorted/duplicate/owner support from `TALJSONNodeListA/TALJSONNodeListW`
+- Removed `MultiThreadPrepare`, `NextSibling`, `PreviousSibling`, `ParentNode`, and `NodeValue` from `TALJSONNodeA/TALJSONNodeW`
+- Removed raw text-node storage properties from `TALJSONTextNodeA/TALJSONTextNodeW`
+- Removed `SetChildNodes` from `TALJSONNodeA/TALJSONNodeW`, `TALJSONObjectNodeA/TALJSONObjectNodeW`, and `TALJSONArrayNodeA/TALJSONArrayNodeW`
+- Removed `ALJSONToXMLA`
+- Removed `ALJsonEncodeWithNodeSubTypeHelperA/W`
+- Removed `TAlJSONParseDocumentW`
+- Added `ALConvertStringToBytes` and `ALRevertBytesToString` to convert an `AnsiString` to `TBytes` without copying the underlying data.
+
 ## 03/02/2026
 
 - Added TALCookedUrlW  

@@ -25,7 +25,7 @@ REM -------------------
 REM Normalize all units
 REM -------------------
 
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Demos\" -CreateBackup="false" -FilesToIgnore="superxmlparser.pas;supertimezone.pas;superobject.pas;superdate.pas;dwsXPlatform.pas;dwsUtils.pas;dwsJSON.pas;dwsStrings.pas"
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Demos\" -CreateBackup="false" -FilesToIgnore="superxmlparser.pas;supertimezone.pas;superobject.pas;superdate.pas;dwsXPlatform.pas;dwsUtils.pas;dwsJSON.pas;dwsStrings.pas;dwsJSONConnector.pas;dwsJSONPath.pas;dwsJSONScript.pas;dwsUTF8.pas;dwsUnicode.pas;dwsXXHash.pas"
 IF ERRORLEVEL 1 goto ERROR
 call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Source\" -FilesToIgnore="Grijjy.SymbolTranslator.pas;Grijjy.ErrorReporting.pas;Alcinoe.iOSapi.ImageIO.pas" -CreateBackup="false"
 IF ERRORLEVEL 1 goto ERROR

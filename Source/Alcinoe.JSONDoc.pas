@@ -2173,7 +2173,7 @@ begin
   Result := TALJSONNodeListA.Create;
 end;
 
-{********************************************}
+{************************************************************}
 function TALJSONNodeA.InternalGetChildNodes: TALJSONNodeListA;
 begin
   Result := nil;
@@ -2223,7 +2223,7 @@ begin
   else Result := LNode.GetTimestamp(default);
 end;
 
-{*************************************************************************************************************}
+{*****************************************************************************************************}
 function TALJSONNodeA.GetChildValueObjectID(const NodeName: AnsiString; const Default: TBytes): TBytes;
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -2279,7 +2279,7 @@ begin
   else Result := LNode.GetRegExOptions(default);
 end;
 
-{******************************************************************************************************}
+{**********************************************************************************************************}
 function TALJSONNodeA.GetChildValueBinaryAsBytes(const NodeName: AnsiString; const Default: TBytes): TBytes;
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -2287,7 +2287,7 @@ begin
   else Result := LNode.GetBinaryAsBytes(default);
 end;
 
-{******************************************************************************************************}
+{*************************************************************************************************************}
 function TALJSONNodeA.GetChildValueBinaryAsStream(const NodeName: AnsiString; const Default: TStream): TStream;
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -2385,7 +2385,7 @@ begin
   else Result := LNode.GetTimestamp(default);
 end;
 
-{******************************************************************************************************************}
+{**********************************************************************************************************}
 function TALJSONNodeA.GetChildValueObjectID(const Path: array of AnsiString; const Default: TBytes): TBytes;
 begin
   var LNode := Self;
@@ -2497,7 +2497,7 @@ begin
   else Result := LNode.GetRegExOptions(default);
 end;
 
-{******************************************************************************************************}
+{***************************************************************************************************************}
 function TALJSONNodeA.GetChildValueBinaryAsBytes(const Path: array of AnsiString; const Default: TBytes): TBytes;
 begin
   var LNode := Self;
@@ -2513,7 +2513,7 @@ begin
   else Result := LNode.GetBinaryAsBytes(default);
 end;
 
-{******************************************************************************************************}
+{******************************************************************************************************************}
 function TALJSONNodeA.GetChildValueBinaryAsStream(const Path: array of AnsiString; const Default: TStream): TStream;
 begin
   var LNode := Self;
@@ -2593,7 +2593,7 @@ begin
   else LNode.SetTimestamp(value);
 end;
 
-{************************************************************************************************}
+{********************************************************************************************}
 procedure TALJSONNodeA.SetChildValueObjectID(const NodeName: AnsiString; const Value: TBytes);
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -2649,7 +2649,7 @@ begin
   else LNode.SetRegExOptions(value);
 end;
 
-{*****************************************************************************************}
+{*************************************************************************************************}
 procedure TALJSONNodeA.SetChildValueBinaryAsBytes(const NodeName: AnsiString; const Value: TBytes);
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -2657,7 +2657,7 @@ begin
   else LNode.SetBinaryAsBytes(value);
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 procedure TALJSONNodeA.SetChildValueBinaryAsStream(const NodeName: AnsiString; const Value: TStream);
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -2737,7 +2737,7 @@ begin
   else LTmpNode.SetTimestamp(value);
 end;
 
-{*****************************************************************************************************}
+{*************************************************************************************************}
 procedure TALJSONNodeA.SetChildValueObjectID(const Path: array of AnsiString; const Value: TBytes);
 begin
   var LNode := Self;
@@ -2835,7 +2835,7 @@ begin
   else LTmpNode.SetRegExOptions(value);
 end;
 
-{*****************************************************************************************}
+{******************************************************************************************************}
 procedure TALJSONNodeA.SetChildValueBinaryAsBytes(const Path: array of AnsiString; const Value: TBytes);
 begin
   var LNode := Self;
@@ -2849,7 +2849,7 @@ begin
   else LTmpNode.SetBinaryAsBytes(value);
 end;
 
-{*****************************************************************************************}
+{********************************************************************************************************}
 procedure TALJSONNodeA.SetChildValueBinaryAsStream(const Path: array of AnsiString; const Value: TStream);
 begin
   var LNode := Self;
@@ -3129,49 +3129,49 @@ begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{*********************************************}
 function TALJSONNodeA.GetBinaryAsBytes: TBytes;
 begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{********************************************************************}
 function TALJSONNodeA.GetBinaryAsBytes(const Default: TBytes): TBytes;
 begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{***********************************************}
 function TALJSONNodeA.GetBinaryAsStream: TStream;
 begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{***********************************************************************}
 function TALJSONNodeA.GetBinaryAsStream(const Default: TStream): TStream;
 begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{**********************************************************}
 procedure TALJSONNodeA.SetBinaryAsBytes(const Data: TBytes);
 begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{************************************************************}
 procedure TALJSONNodeA.SetBinaryAsStream(const Data: TStream);
 begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{*************************************************}
 function TALJSONNodeA.GetOwnsBinaryStream: Boolean;
 begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{***************************************************************}
 procedure TALJSONNodeA.SetOwnsBinaryStream(const Value: Boolean);
 begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
@@ -5895,25 +5895,25 @@ Var
     if BufferPos >= 65536 then _WriteBuffer2Stream(Buffer,BufferPos);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteStr2Buffer(const str:AnsiString); overload; inline;
   begin
     _Write2Buffer(pointer(str)^,length(Str));
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteStr2Buffer(const index:Integer); overload; inline;
   begin
     _WriteStr2Buffer(ALIntToStrA(index));
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteByte2Buffer(const AByte:Byte); inline;
   begin
     _Write2Buffer(aByte, sizeOF(aByte));
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteBytes2Buffer(const ABytes:TBytes); inline;
   begin
     _Write2Buffer(pointer(ABytes)^,length(ABytes));
@@ -6750,7 +6750,7 @@ begin
   end;
 end;
 
-{*******************************************************************}
+{***********************************************************************}
 function TALJSONTextNodeA.GetText(const Default: AnsiString): AnsiString;
 begin
   if FNodeSubType = nstNull then Result := default
@@ -6767,7 +6767,7 @@ begin
   FStorageKind := TALJSONStorageKind.skString;
 end;
 
-{*************************************}
+{*****************************************}
 function TALJSONTextNodeA.GetFloat: Double;
 begin
   case FNodeSubType of
@@ -6778,14 +6778,14 @@ begin
   end;
 end;
 
-{************************************************************}
+{****************************************************************}
 function TALJSONTextNodeA.GetFloat(const Default: Double): Double;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetFloat;
 end;
 
-{***************************************************}
+{*******************************************************}
 procedure TALJSONTextNodeA.SetFloat(const Value: Double);
 begin
   ClearNodeValue;
@@ -6793,21 +6793,21 @@ begin
   FNodeSubType := nstFloat;
 end;
 
-{*******************************************}
+{***********************************************}
 function TALJSONTextNodeA.GetDateTime: TDateTime;
 begin
   if FNodeSubType = nstDateTime then PInt64(@result)^ := FNodeValue
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{*********************************************************************}
+{*************************************************************************}
 function TALJSONTextNodeA.GetDateTime(const Default: TDateTime): TDateTime;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetDateTime;
 end;
 
-{*********************************************************}
+{*************************************************************}
 procedure TALJSONTextNodeA.SetDateTime(const Value: TDateTime);
 begin
   ClearNodeValue;
@@ -6815,21 +6815,21 @@ begin
   FNodeSubType := nstDateTime;
 end;
 
-{***************************************************}
+{*******************************************************}
 function TALJSONTextNodeA.GetTimestamp: TALBSONTimestamp;
 begin
   if FNodeSubType = nstTimestamp then Result.I64 := FNodeValue
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{************************************************************************************}
+{****************************************************************************************}
 function TALJSONTextNodeA.GetTimestamp(const Default: TALBSONTimestamp): TALBSONTimestamp;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetTimestamp;
 end;
 
-{*****************************************************************}
+{*********************************************************************}
 procedure TALJSONTextNodeA.SetTimestamp(const Value: TALBSONTimestamp);
 begin
   ClearNodeValue;
@@ -6844,7 +6844,7 @@ begin
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{***************************************************************}
+{*******************************************************************}
 function TALJSONTextNodeA.GetObjectID(const Default: TBytes): TBytes;
 begin
   if FNodeSubType = nstNull then Result := default
@@ -6861,7 +6861,7 @@ begin
   FStorageKind := TALJSONStorageKind.skBytes;
 end;
 
-{**************************************}
+{******************************************}
 function TALJSONTextNodeA.GetInt32: Integer;
 begin
   case FNodeSubType of
@@ -6889,14 +6889,14 @@ begin
   end;
 end;
 
-{**************************************************************}
+{******************************************************************}
 function TALJSONTextNodeA.GetInt32(const Default: Integer): Integer;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetInt32;
 end;
 
-{****************************************************}
+{********************************************************}
 procedure TALJSONTextNodeA.SetInt32(const Value: Integer);
 begin
   ClearNodeValue;
@@ -6904,7 +6904,7 @@ begin
   FNodeSubType := nstInt32;
 end;
 
-{************************************}
+{****************************************}
 function TALJSONTextNodeA.GetInt64: Int64;
 begin
   case FNodeSubType of
@@ -6924,14 +6924,14 @@ begin
   end;
 end;
 
-{**********************************************************}
+{**************************************************************}
 function TALJSONTextNodeA.GetInt64(const Default: Int64): Int64;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetInt64;
 end;
 
-{**************************************************}
+{******************************************************}
 procedure TALJSONTextNodeA.SetInt64(const Value: Int64);
 begin
   ClearNodeValue;
@@ -6939,7 +6939,7 @@ begin
   FNodeSubType := nstInt64;
 end;
 
-{*************************************}
+{*****************************************}
 function TALJSONTextNodeA.GetBool: Boolean;
 begin
   if FNodeSubType = nstBoolean then begin
@@ -6949,14 +6949,14 @@ begin
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{*************************************************************}
+{*****************************************************************}
 function TALJSONTextNodeA.GetBool(const Default: Boolean): Boolean;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetBool;
 end;
 
-{***************************************************}
+{*******************************************************}
 procedure TALJSONTextNodeA.SetBool(const Value: Boolean);
 begin
   ClearNodeValue;
@@ -6965,13 +6965,13 @@ begin
   FNodeSubType := nstBoolean;
 end;
 
-{*************************************}
+{*****************************************}
 function TALJSONTextNodeA.GetNull: Boolean;
 begin
   Result := FNodeSubType = nstNull;
 end;
 
-{***************************************************}
+{*******************************************************}
 procedure TALJSONTextNodeA.SetNull(const Value: Boolean);
 begin
   if Value then begin
@@ -6982,21 +6982,21 @@ begin
   FNodeSubType := nstNull;
 end;
 
-{**********************************************}
+{**************************************************}
 function TALJSONTextNodeA.GetJavascript: AnsiString;
 begin
   if FNodeSubType = nstJavascript then Result := PAnsiString(@FNodeValue)^
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{*************************************************************************}
+{*****************************************************************************}
 function TALJSONTextNodeA.GetJavascript(const Default: AnsiString): AnsiString;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetJavascript;
 end;
 
-{************************************************************}
+{****************************************************************}
 procedure TALJSONTextNodeA.SetJavascript(const Value: AnsiString);
 begin
   ClearNodeValue;
@@ -7005,21 +7005,21 @@ begin
   FStorageKind := TALJSONStorageKind.skString;
 end;
 
-{*****************************************}
+{*********************************************}
 function TALJSONTextNodeA.GetRegEx: AnsiString;
 begin
   if FNodeSubType = nstRegEx then Result := PAnsiString(@FNodeValue)^
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{********************************************************************}
+{************************************************************************}
 function TALJSONTextNodeA.GetRegEx(const Default: AnsiString): AnsiString;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetRegEx;
 end;
 
-{*********************************************************}
+{*************************************************************}
 procedure TALJSONTextNodeA.SetRegEx(const Pattern: AnsiString);
 begin
   ClearNodeValue;
@@ -7029,28 +7029,28 @@ begin
   FRegExOptions := [];
 end;
 
-{*********************************************************}
+{*************************************************************}
 function TALJSONTextNodeA.GetRegExOptions: TALPerlRegExOptions;
 begin
   if FNodeSubType = nstRegEx then Result := FRegExOptions
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{*********************************************************************************************}
+{*************************************************************************************************}
 function TALJSONTextNodeA.GetRegExOptions(const Default: TALPerlRegExOptions): TALPerlRegExOptions;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetRegExOptions;
 end;
 
-{***********************************************************************}
+{***************************************************************************}
 procedure TALJSONTextNodeA.SetRegExOptions(const Value: TALPerlRegExOptions);
 begin
   if FNodeSubType = nstRegEx then FRegExOptions := Value
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{****************************************************************}
+{*************************************************}
 function TALJSONTextNodeA.GetBinaryAsBytes: TBytes;
 begin
   if FNodeSubType = nstBinary then begin
@@ -7060,14 +7060,14 @@ begin
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{****************************************************************}
+{************************************************************************}
 function TALJSONTextNodeA.GetBinaryAsBytes(const Default: TBytes): TBytes;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetBinaryAsBytes;
 end;
 
-{****************************************************************}
+{***************************************************}
 function TALJSONTextNodeA.GetBinaryAsStream: TStream;
 begin
   if FNodeSubType = nstBinary then begin
@@ -7077,14 +7077,14 @@ begin
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{****************************************************************}
+{***************************************************************************}
 function TALJSONTextNodeA.GetBinaryAsStream(const Default: TStream): TStream;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetBinaryAsStream;
 end;
 
-{****************************************************************}
+{**************************************************************}
 procedure TALJSONTextNodeA.SetBinaryAsBytes(const Data: TBytes);
 begin
   ClearNodeValue;
@@ -7102,14 +7102,14 @@ begin
   FStorageKind := TALJSONStorageKind.skOwnedStream;
 end;
 
-{****************************************************************}
+{*****************************************************}
 function TALJSONTextNodeA.GetOwnsBinaryStream: Boolean;
 begin
   if FNodeSubType = nstBinary then Result := FStorageKind = TALJSONStorageKind.skOwnedStream
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{****************************************************************}
+{*******************************************************************}
 procedure TALJSONTextNodeA.SetOwnsBinaryStream(const Value: Boolean);
 begin
   if FNodeSubType = nstBinary then begin
@@ -7120,21 +7120,21 @@ begin
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{*******************************************}
+{***********************************************}
 function TALJSONTextNodeA.GetBinarySubType: Byte;
 begin
   if FNodeSubType = nstBinary then Result := FBinarySubType
   else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
 end;
 
-{****************************************************************}
+{********************************************************************}
 function TALJSONTextNodeA.GetBinarySubType(const Default: Byte): Byte;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetBinarySubType;
 end;
 
-{***********************************************************}
+{***************************************************************}
 procedure TALJSONTextNodeA.SetBinarySubType(const Subtype: Byte);
 begin
   if FNodeSubType = nstBinary then FBinarySubType := Subtype
@@ -7892,7 +7892,7 @@ begin
   Result := 'BinData(0, "' + ALBase64EncodeBytesA(aValue) + '")';
 end;
 
-{****************************************************************************************}
+{************************************************************************************}
 function ALJsonEncodeObjectIDWithNodeSubTypeHelperA(const AValue: TBytes): AnsiString;
 begin
   Result := 'ObjectId("'+ALBinToHexA(aValue)+'")';
@@ -8868,7 +8868,7 @@ begin
   else Result := LNode.GetBinaryAsBytes(default);
 end;
 
-{******************************************************************************************************}
+{*********************************************************************************************************}
 function TALJSONNodeW.GetChildValueBinaryAsStream(const NodeName: String; const Default: TStream): TStream;
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -9078,7 +9078,7 @@ begin
   else Result := LNode.GetRegExOptions(default);
 end;
 
-{******************************************************************************************************}
+{***********************************************************************************************************}
 function TALJSONNodeW.GetChildValueBinaryAsBytes(const Path: array of String; const Default: TBytes): TBytes;
 begin
   var LNode := Self;
@@ -9094,7 +9094,7 @@ begin
   else Result := LNode.GetBinaryAsBytes(default);
 end;
 
-{******************************************************************************************************}
+{**************************************************************************************************************}
 function TALJSONNodeW.GetChildValueBinaryAsStream(const Path: array of String; const Default: TStream): TStream;
 begin
   var LNode := Self;
@@ -9230,7 +9230,7 @@ begin
   else LNode.SetRegExOptions(value);
 end;
 
-{*****************************************************************************************}
+{*********************************************************************************************}
 procedure TALJSONNodeW.SetChildValueBinaryAsBytes(const NodeName: String; const Value: TBytes);
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -9238,7 +9238,7 @@ begin
   else LNode.SetBinaryAsBytes(value);
 end;
 
-{*****************************************************************************************}
+{***********************************************************************************************}
 procedure TALJSONNodeW.SetChildValueBinaryAsStream(const NodeName: String; const Value: TStream);
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -9416,7 +9416,7 @@ begin
   else LTmpNode.SetRegExOptions(value);
 end;
 
-{*****************************************************************************************}
+{**************************************************************************************************}
 procedure TALJSONNodeW.SetChildValueBinaryAsBytes(const Path: array of String; const Value: TBytes);
 begin
   var LNode := Self;
@@ -9430,7 +9430,7 @@ begin
   else LTmpNode.SetBinaryAsBytes(value);
 end;
 
-{*****************************************************************************************}
+{****************************************************************************************************}
 procedure TALJSONNodeW.SetChildValueBinaryAsStream(const Path: array of String; const Value: TStream);
 begin
   var LNode := Self;
@@ -9710,49 +9710,49 @@ begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{*********************************************}
 function TALJSONNodeW.GetBinaryAsBytes: TBytes;
 begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{********************************************************************}
 function TALJSONNodeW.GetBinaryAsBytes(const Default: TBytes): TBytes;
 begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{***********************************************}
 function TALJSONNodeW.GetBinaryAsStream: TStream;
 begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{***********************************************************************}
 function TALJSONNodeW.GetBinaryAsStream(const Default: TStream): TStream;
 begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{**********************************************************}
 procedure TALJSONNodeW.SetBinaryAsBytes(const Data: TBytes);
 begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{************************************************************}
 procedure TALJSONNodeW.SetBinaryAsStream(const Data: TStream);
 begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{*************************************************}
 function TALJSONNodeW.GetOwnsBinaryStream: Boolean;
 begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************************}
+{***************************************************************}
 procedure TALJSONNodeW.SetOwnsBinaryStream(const Value: Boolean);
 begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
@@ -11147,7 +11147,7 @@ Var
     PosToKeepSync := PosToKeepSync - (P1 - BufferPos);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function GetPathStr(const ExtraItems: String = ''): String;
   begin
     var LB: Char := ALDefaultJsonPathSeparatorW;
@@ -11217,7 +11217,7 @@ Var
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseStartObject(const Name: String);
   begin
     if Assigned(OnParseStartObject) then OnParseStartObject(Self, GetPathStr, Name);
@@ -11232,7 +11232,7 @@ Var
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseStartArray(const index: String);
   begin
     if Assigned(OnParseStartArray) then OnParseStartArray(Self, GetPathStr, index)
@@ -11247,19 +11247,19 @@ Var
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _AddIndexItemToNamePath(const index: String; Obj: Pointer);
   begin
     NamePaths.AddObject('[' + Index + ']', Obj)
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _AddNameItemToNamePath(const name: String; Obj: Pointer);
   begin
     NamePaths.AddObject(Name, Obj)
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _AddItemToNamePath(const nameOrIndex: String; Obj: Pointer);
   begin
     if notSaxMode then begin
@@ -12418,26 +12418,26 @@ Var
     if BufferPos >= 65536 then _WriteBuffer2Stream(Buffer,BufferPos);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteUTF8Str2Buffer(const str:String); overload; inline;
   begin
     var LBytes: TBytes := Tencoding.UTF8.GetBytes(str);
     _Write2Buffer(pointer(LBytes)^,length(LBytes));
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteUTF8Str2Buffer(const index:Integer); overload; inline;
   begin
     _WriteUTF8Str2Buffer(ALIntToStrW(index));
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteByte2Buffer(const AByte:Byte); inline;
   begin
     _Write2Buffer(aByte, sizeOF(aByte));
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteBytes2Buffer(const ABytes: TBytes); inline;
   begin
     _Write2Buffer(pointer(ABytes)^,length(ABytes));
@@ -13180,7 +13180,7 @@ begin
   end;
 end;
 
-{***********************************************************}
+{***************************************************************}
 function TALJSONTextNodeW.GetText(const Default: String): String;
 begin
   if FNodeSubType = nstNull then Result := default
@@ -13197,7 +13197,7 @@ begin
   FStorageKind := TALJSONStorageKind.skString;
 end;
 
-{*************************************}
+{*****************************************}
 function TALJSONTextNodeW.GetFloat: Double;
 begin
   case FNodeSubType of
@@ -13208,14 +13208,14 @@ begin
   end;
 end;
 
-{************************************************************}
+{****************************************************************}
 function TALJSONTextNodeW.GetFloat(const Default: Double): Double;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetFloat;
 end;
 
-{***************************************************}
+{*******************************************************}
 procedure TALJSONTextNodeW.SetFloat(const Value: Double);
 begin
   ClearNodeValue;
@@ -13223,21 +13223,21 @@ begin
   FNodeSubType := nstFloat;
 end;
 
-{*******************************************}
+{***********************************************}
 function TALJSONTextNodeW.GetDateTime: TDateTime;
 begin
   if FNodeSubType = nstDateTime then PInt64(@result)^ := FNodeValue
   else ALJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{*********************************************************************}
+{*************************************************************************}
 function TALJSONTextNodeW.GetDateTime(const Default: TDateTime): TDateTime;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetDateTime;
 end;
 
-{*********************************************************}
+{*************************************************************}
 procedure TALJSONTextNodeW.SetDateTime(const Value: TDateTime);
 begin
   ClearNodeValue;
@@ -13245,21 +13245,21 @@ begin
   FNodeSubType := nstDateTime;
 end;
 
-{***************************************************}
+{*******************************************************}
 function TALJSONTextNodeW.GetTimestamp: TALBSONTimestamp;
 begin
   if FNodeSubType = nstTimestamp then Result.I64 := FNodeValue
   else ALJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{************************************************************************************}
+{****************************************************************************************}
 function TALJSONTextNodeW.GetTimestamp(const Default: TALBSONTimestamp): TALBSONTimestamp;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetTimestamp;
 end;
 
-{*****************************************************************}
+{*********************************************************************}
 procedure TALJSONTextNodeW.SetTimestamp(const Value: TALBSONTimestamp);
 begin
   ClearNodeValue;
@@ -13267,21 +13267,21 @@ begin
   FNodeSubType := nstTimestamp;
 end;
 
-{****************************************}
+{********************************************}
 function TALJSONTextNodeW.GetObjectID: TBytes;
 begin
   if FNodeSubType = nstObjectID then Result := PBytes(@FNodeValue)^
   else AlJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{***************************************************************}
+{*******************************************************************}
 function TALJSONTextNodeW.GetObjectID(const Default: TBytes): TBytes;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetObjectID;
 end;
 
-{******************************************************}
+{**********************************************************}
 procedure TALJSONTextNodeW.SetObjectID(const Value: TBytes);
 begin
   if length(Value) <> 12 then AlJSONDocErrorW(ALJSONObjectIDInvalidSize);
@@ -13291,7 +13291,7 @@ begin
   FStorageKind := TALJSONStorageKind.skBytes;
 end;
 
-{**************************************}
+{******************************************}
 function TALJSONTextNodeW.GetInt32: Integer;
 begin
   case FNodeSubType of
@@ -13319,14 +13319,14 @@ begin
   end;
 end;
 
-{**************************************************************}
+{******************************************************************}
 function TALJSONTextNodeW.GetInt32(const Default: Integer): Integer;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetInt32;
 end;
 
-{****************************************************}
+{********************************************************}
 procedure TALJSONTextNodeW.SetInt32(const Value: Integer);
 begin
   ClearNodeValue;
@@ -13334,7 +13334,7 @@ begin
   FNodeSubType := nstInt32;
 end;
 
-{************************************}
+{****************************************}
 function TALJSONTextNodeW.GetInt64: Int64;
 begin
   case FNodeSubType of
@@ -13354,14 +13354,14 @@ begin
   end;
 end;
 
-{**********************************************************}
+{**************************************************************}
 function TALJSONTextNodeW.GetInt64(const Default: Int64): Int64;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetInt64;
 end;
 
-{**************************************************}
+{******************************************************}
 procedure TALJSONTextNodeW.SetInt64(const Value: Int64);
 begin
   ClearNodeValue;
@@ -13369,7 +13369,7 @@ begin
   FNodeSubType := nstInt64;
 end;
 
-{*************************************}
+{*****************************************}
 function TALJSONTextNodeW.GetBool: Boolean;
 begin
   if FNodeSubType = nstBoolean then begin
@@ -13379,14 +13379,14 @@ begin
   else ALJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{*************************************************************}
+{*****************************************************************}
 function TALJSONTextNodeW.GetBool(const Default: Boolean): Boolean;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetBool;
 end;
 
-{***************************************************}
+{*******************************************************}
 procedure TALJSONTextNodeW.SetBool(const Value: Boolean);
 begin
   ClearNodeValue;
@@ -13395,13 +13395,13 @@ begin
   FNodeSubType := nstBoolean;
 end;
 
-{*************************************}
+{*****************************************}
 function TALJSONTextNodeW.GetNull: Boolean;
 begin
   Result := FNodeSubType = nstNull;
 end;
 
-{***************************************************}
+{*******************************************************}
 procedure TALJSONTextNodeW.SetNull(const Value: Boolean);
 begin
   if Value then begin
@@ -13412,21 +13412,21 @@ begin
   FNodeSubType := nstNull;
 end;
 
-{******************************************}
+{**********************************************}
 function TALJSONTextNodeW.GetJavascript: String;
 begin
   if FNodeSubType = nstJavascript then Result := PString(@FNodeValue)^
   else ALJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{*****************************************************************}
+{*********************************************************************}
 function TALJSONTextNodeW.GetJavascript(const Default: String): String;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetJavascript;
 end;
 
-{********************************************************}
+{************************************************************}
 procedure TALJSONTextNodeW.SetJavascript(const Value: String);
 begin
   ClearNodeValue;
@@ -13435,21 +13435,21 @@ begin
   FStorageKind := TALJSONStorageKind.skString;
 end;
 
-{*************************************}
+{*****************************************}
 function TALJSONTextNodeW.GetRegEx: String;
 begin
   if FNodeSubType = nstRegEx then Result := PString(@FNodeValue)^
   else ALJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{************************************************************}
+{****************************************************************}
 function TALJSONTextNodeW.GetRegEx(const Default: String): String;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetRegEx;
 end;
 
-{*****************************************************}
+{*********************************************************}
 procedure TALJSONTextNodeW.SetRegEx(const Pattern: String);
 begin
   ClearNodeValue;
@@ -13459,28 +13459,28 @@ begin
   FRegExOptions := [];
 end;
 
-{*********************************************************}
+{*************************************************************}
 function TALJSONTextNodeW.GetRegExOptions: TALPerlRegExOptions;
 begin
   if FNodeSubType = nstRegEx then Result := FRegExOptions
   else ALJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{*********************************************************************************************}
+{*************************************************************************************************}
 function TALJSONTextNodeW.GetRegExOptions(const Default: TALPerlRegExOptions): TALPerlRegExOptions;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetRegExOptions;
 end;
 
-{***********************************************************************}
+{***************************************************************************}
 procedure TALJSONTextNodeW.SetRegExOptions(const Value: TALPerlRegExOptions);
 begin
   if FNodeSubType = nstRegEx then FRegExOptions := Value
   else AlJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{****************************************************************}
+{*************************************************}
 function TALJSONTextNodeW.GetBinaryAsBytes: TBytes;
 begin
   if FNodeSubType = nstBinary then begin
@@ -13490,14 +13490,14 @@ begin
   else AlJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{****************************************************************}
+{************************************************************************}
 function TALJSONTextNodeW.GetBinaryAsBytes(const Default: TBytes): TBytes;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetBinaryAsBytes;
 end;
 
-{****************************************************************}
+{***************************************************}
 function TALJSONTextNodeW.GetBinaryAsStream: TStream;
 begin
   if FNodeSubType = nstBinary then begin
@@ -13507,14 +13507,14 @@ begin
   else AlJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{****************************************************************}
+{***************************************************************************}
 function TALJSONTextNodeW.GetBinaryAsStream(const Default: TStream): TStream;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetBinaryAsStream;
 end;
 
-{****************************************************************}
+{**************************************************************}
 procedure TALJSONTextNodeW.SetBinaryAsBytes(const Data: TBytes);
 begin
   ClearNodeValue;
@@ -13532,14 +13532,14 @@ begin
   FStorageKind := TALJSONStorageKind.skOwnedStream;
 end;
 
-{****************************************************************}
+{*****************************************************}
 function TALJSONTextNodeW.GetOwnsBinaryStream: Boolean;
 begin
   if FNodeSubType = nstBinary then Result := FStorageKind = TALJSONStorageKind.skOwnedStream
   else AlJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{****************************************************************}
+{*******************************************************************}
 procedure TALJSONTextNodeW.SetOwnsBinaryStream(const Value: Boolean);
 begin
   if FNodeSubType = nstBinary then begin
@@ -13550,21 +13550,21 @@ begin
   else AlJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{*******************************************}
+{***********************************************}
 function TALJSONTextNodeW.GetBinarySubType: Byte;
 begin
   if FNodeSubType = nstBinary then Result := FBinarySubType
   else ALJSONDocErrorW(ALJSONInvalidNodeSubType);
 end;
 
-{****************************************************************}
+{********************************************************************}
 function TALJSONTextNodeW.GetBinarySubType(const Default: Byte): Byte;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetBinarySubType;
 end;
 
-{***********************************************************}
+{***************************************************************}
 procedure TALJSONTextNodeW.SetBinarySubType(const Subtype: Byte);
 begin
   if FNodeSubType = nstBinary then FBinarySubType := Subtype

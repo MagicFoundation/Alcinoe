@@ -1,4 +1,3 @@
-{$HINTS OFF}{$WARNINGS OFF}
 {**********************************************************************}
 {                                                                      }
 {    "The contents of this file are subject to the Mozilla Public      }
@@ -38,7 +37,6 @@ const
   SYS_SYSTEM = 'System';
   SYS_DEFAULT = 'Default';
   SYS_OBJECT = 'Object';
-  SYS_ANY = 'Any';
   SYS_TCLASS = 'TClass';
   SYS_TOBJECT = 'TObject';
   SYS_TOBJECT_CREATE = 'Create';
@@ -58,12 +56,21 @@ const
   SYS_EDELPHI_EXCEPTIONCLASS_FIELD = 'FExceptionClass';
   SYS_TCUSTOMATTRIBUTE = 'TCustomAttribute';
   SYS_IINTERFACE = 'IInterface';
+  SYS_ANY_TYPE = 'Any Type';
+
+  SYS_ARRAY_OF_STRING = 'array of String';
+  SYS_ARRAY_OF_INTEGER = 'array of Integer';
+  SYS_ARRAY_OF_FLOAT = 'array of Float';
+  SYS_ARRAY_OF_VARIANT = 'array of Variant';
 
   SYS_COMPILER_VERSION = 'CompilerVersion';
 
   SYS_MainModule = '*MainModule*';
 
   SYS_EXTERNAL_ARRAY = '[]';
+
+  SYS_JSON_STRINGIFY = 'Stringify';
+  SYS_JSON_PRETTY_STRINGIFY = 'PrettyStringify';
 
   // Compiler switches
   SWI_INCLUDE_LONG = 'INCLUDE';
@@ -101,18 +108,20 @@ const
 const
 
   // Missing Tokens
-  CPE_XxxExpected = ' expected.';
-  CPE_Unexpected_X = 'Unexpected "%s".';
-  CPE_X_ExpectedBut_Y_Found = '%s expected but %s found.';
-  CPE_CommaExpected = '"," expected.';
-  CPE_SemiExpected = '";" expected.';
-  CPE_BrackLeftExpected = '"(" expected.';
-  CPE_BrackRightExpected = '")" expected.';
+  CPE_XxxExpected = ' expected';
+  CPE_Unexpected_X = 'Unexpected "%s"';
+  CPE_X_ExpectedBut_Y_Found = '%s expected but %s found';
+  CPE_CommaExpected = '"," expected';
+  CPE_SemiExpected = '";" expected';
+  CPE_BrackLeftExpected = '"(" expected';
+  CPE_BrackRightExpected = '")" expected';
   CPE_ArrayBracketRightExpected = '"]" expected';
   CPE_ArrayBracketLeftExpected = '"[" expected';
   CPE_AtExpected = '"@" expected';
   CPE_UnexpectedAt = 'unexpected "@"';
   CPE_CurlyRightExpected = '"}" expected';
+  CPE_GreaterExpected = '">" expected';
+  CPE_LesserExpected = '"<" expected';
   CPE_ColonExpected = 'Colon ":" expected';
   CPE_DotExpected = 'Dot "." expected';
   CPE_NameExpected = 'Name expected';
@@ -146,7 +155,16 @@ const
   CPE_ExternalArrayForStaticMethodsOnly = 'External array is supported only for static methods';
   CPE_ExternalVariablesMustBeGlobal = 'External variables must be global';
   CPE_ExternalClassVariablesInitializationIsNotSupported = 'External class variables initialization is not supported';
-  CPE_ExternalPropertyNoArguments = 'External properties cannot have arguments';
+  CPE_ExternalPropertyNoArguments = 'External properties can only have zero or one argument';
+  CPE_ExternalPropertyNoType = 'External properties require a type';
+
+  CPE_GenericParametersNotSupportedHere = 'Generic parameters not supported here';
+  CPE_GenericParametersListExpected = 'Generic parameters list expected';
+  CPE_UnsupportedGenericConstraint = 'Unsupported generic constraint';
+  CPE_SpecializationNotSupportedYet = 'Specialization of %s is not supported yet';
+  CPE_GenericityNotSupportedYet = 'Genericity of %s not supported yet';
+  CPE_PartialClassesCannotBeSpecialized = 'Partial classes cannot be specialized';
+  CPE_NoAvailableBinaryOpSpecialization = 'No available specialization of operator "%s" for types "%s" and "%s"';
 
   // ReadName
   CPE_UnknownName = 'Unknown name "%s"';
@@ -172,6 +190,7 @@ const
   CPE_ClassOperatorRedefined = 'Class operator already defined for type "%s"';
   CPE_ClassVarRedefined = 'There is already a class variable with name "%s"';
   CPE_ClassConstRedefined = 'There is already a class const with name "%s"';
+  CPE_SymbolRedefined = 'There is already a symbol with name "%s"';
   CPE_ImplClassNameExpected = 'Class name expected';
   CPE_ImplInvalidClass = '"%s" is not a method of class "%s"';
   CPE_ImplAbstract = '"%s.%s" is declared "abstract", no implementation allowed';
@@ -187,12 +206,14 @@ const
   CPE_InheritedWithoutName = 'Name expected after "inherited"';
   CPE_InheritedMethodNotFound = 'Method "%s" not found in ancestor class';
   CPE_StaticMethodExpected = 'Class method or constructor expected';
+  CPE_InternalConstructorCall = 'Constructing internal class "%s" is not allowed';
   CPE_UnexpectedConstructor = 'Constructor invoked on instance outside of constructor';
   CPE_UnexpectedDestructor = 'Destructor can only be invoked on instance';
   CPE_UnexpectedMethodImplementation = 'Unexpected method implementation';
   CPE_WriteOnlyProperty = 'Cannot read a write only property';
   CPE_ReadOnlyProperty = 'Cannot set a value for a read-only property';
   CPE_CantReadProperty = 'Property cannot be read-accessed';
+  CPE_FieldIsReadOnly = 'Field "%s" is readonly';
   CPE_ObjectReferenceExpected = 'Object reference needed to read/write an object field';
   CPE_StaticPropertyWriteExpected = 'Write access of property should be a static method';
   CPE_StaticPropertyReadExpected = 'Read access of property should be a static method';
@@ -204,11 +225,13 @@ const
   CPE_ClassForwardAlreadyExists = 'There is already a forward declaration of the "%s" class';
   CPE_ClassAlreadyDefined = 'Class "%s" already defined';
   CPE_ClassWasNotPartial = 'Previous declaration of class was not "partial"';
+  CPH_ClassWasPartial = 'Previous declaration of class was "partial"';
   CPE_ClassPartialModifiersNotMatched = 'Modifiers do not match previous "partial" declaration of class';
   CPE_FuncForwardAlreadyExists = 'There is already a forward declaration of this function';
   CPE_ForwardNotImplemented = 'The function "%s" was forward declared but not implemented';
   CPE_CantImplementAFunctionType = 'Cannot implement a function type';
   CPE_ClassIsSealed = 'Class "%s" is sealed, inheriting is not allowed';
+  CPE_ClassIsInternal = 'Class "%s" is internal, inheriting is not allowed';
   CPE_ClassIsStaticNoInstantiation = 'Class "%s" is static, instantiation not allowed';
   CPE_ClassIsStaticNoInstances = 'Class "%s" is static, no instances allowed';
   CPE_ClassAncestorNotStatic = 'Class "%s" is not static, cannot inherit as static';
@@ -244,6 +267,8 @@ const
   CPE_AnonymousMethodsNotAllowedHere = 'Anonymous methods not allowed here';
   CPE_AnonymousClassesMustBeFullyDefined = 'Anonymous classes must be fully defined';
   CPE_AnonymousClassNotAllowed = 'Anonymous class not allowed by compiler options';
+  CPE_AsyncNotSupported = 'ASYNC is not supported';
+  CPE_AwaitNotSupported = 'AWAIT is not supported';
 
   CPE_AttributeConstructorExpected = 'Attribute constructor expected';
   CPE_DanglingAttribute = 'Dangling attribute declaration';
@@ -267,6 +292,7 @@ const
   CPE_MethodExpected = 'Declaration should be "method"';
   CPE_ConstructorExpected = 'Declaration should be "constructor"';
   CPE_DestructorExpected = 'Declaration should be "destructor"';
+  CPE_LambdaExpected = 'Declaration should be "lambda"';
   CPE_BadResultType = 'Result type should be "%s"';
   CPE_BadNumberOfParameters = 'Expected %d parameters (instead of %d)';
   CPE_BadParameterName = 'Parameter %d - Name "%s" expected';
@@ -285,14 +311,17 @@ const
   CPE_ArrayBoundsOfDifferentTypes = 'Array bounds are of different types';
   CPE_ArrayIndexMismatch = 'Array index expected "%s" but got "%s"';
   CPE_ArrayMethodRestrictedToDynamicArrays = 'Array method "%s" is restricted to dynamic arrays';
+  CPE_ArrayMethodNotAvailableOnOpenArrays = 'Array method "%s" not available on open arrays';
   CPE_ArrayDoesNotHaveNaturalSortOrder = 'Array does not have a natural sort order';
 
   // Sets
   CPE_SetTooLargeForCastToInteger = 'Set has too many elements for cast to integer';
+  CPE_ElementOutOfSetBound = 'Element is out of set bounds';
 
   // Assign
   CPE_RightSideNeedsReturnType = 'Assignment''s right-side-argument has no return type';
   CPE_CantWriteToLeftSide = 'Cannot assign a value to the left-side argument';
+  CPE_ExitValueNeedsType = 'Invalid Exit argument';
 
   // Function/Procedures
   CPE_FunctionTypeExpected = 'Function type expected';
@@ -305,7 +334,8 @@ const
   CPE_NameIsReserved = 'Name "%s" is reserved';
   CPE_TypeExpected = 'Type expected';
   CPE_InvalidType = '%s is not a Type';
-  CPE_UnknownMember = 'There is no accessible member with name "%s"';
+  CPE_UnknownMemberForType = 'There is no accessible member with name "%s" for type %s';
+  CPE_UnknownMethodForType = 'There is no accessible method with name "%s" for type %s';
   CPE_NoMemberExpected = 'No member expected';
   CPE_NoArrayExpected = 'Not an array';
   CPE_NoMethodExpected = 'Not a method';
@@ -319,22 +349,29 @@ const
   CPE_NoArgumentsExpected = 'No arguments expected';
   CPE_WrongArgumentType = 'Argument %d expects type "%s"';
   CPE_WrongArgumentType_Long = 'Argument %d expects type "%s" instead of "%s"';
+  CPE_NoDefaultConstructor = 'Class "%s" has no default constructor';
   CPE_NoDefaultProperty = 'Class "%s" has no default property';
   CPE_ConstVarParam = 'Argument %d (%s) cannot be passed as Var-parameter';
   CPE_OnlyVariablesAsVarParam = 'Only a variable can be be passed as Var-parameter';
+  CPE_StrictParameterTypeCheckNotSupportedFor = 'Strict parameter typecheck is not support for "%s" parameters';
   CPE_MustExplicitOverloads = 'Overloaded procedure "%s" must be marked with the "overload" directive';
-  CPH_ShouldExplicitOverload = 'Overloaded method "%s" should be marked with the "overload" directive';
+  CPH_MustExplicitMethodOverload = 'Overloaded method "%s" must be marked with the "overload" directive';
+  CPH_ShouldExplicitMethodOverload = 'Overloaded method "%s" should be marked with the "overload" directive';
   CPE_NoMatchingOverloadDeclaration = 'There is no overloaded version of "%s" declared with these arguments';
   CPE_NoMatchingOverloadForCall = 'There is no overloaded version of "%s" that can be called with these arguments';
   CPE_MatchingOverload = 'Overload of "%s" will be ambiguous with a previously declared version';
+  CPH_AmbiguousMatchingOverloadsForCall = 'Ambiguous matching overloads of "%s"';
   CPE_OverloadNotAllowed = 'Overload not allowed';
-  CPE_ClassMethodExpected = 'Class method expected';
+  CPE_ClassMethodOrConstructorExpected = 'Class method or constructor expected';
   CPE_ClassMemberExpected = 'Class member expected';
   CPE_RecordTypeExpected = 'Record type expected';
   CPE_RecordTypeNotFullyDefined = 'Record type "%s" is not fully defined';
 
   CPE_InvalidOperands = 'Invalid Operands';
   CPE_IncompatibleOperands = 'Incompatible operands';
+
+  CPE_InvalidTypeCast = 'Invalid typecast';
+  CPE_CannotCastAs = 'Cannot cast "%s" as "%s"';
 
   CPE_FunctionOptimizationFailed = 'Evaluation of "%s" failed: %s %s';
 
@@ -351,19 +388,30 @@ const
   CPH_ReferenceTypeParamAsConst = '"%s" parameter is a reference type passed as CONST';
   CPH_UnitAlreadyReferred = 'Unit "%s" redeclared';
   CPH_UnitAlreadyReferredInInterface = 'Unit "%s" already declared in interface section';
+  CPH_AssigningToItself = 'Assigning %s to itself';
+
+  CPH_PreferIntToStr = 'Prefer .ToString or IntToStr()';
+  CPH_PreferFloatToStr = 'Prefer .ToString or FloatToStr()';
 
   CPH_OfObjectIsLegacy = 'OF OBJECT modifier is legacy and ignored';
   CPE_OfObjectExpected = 'OF OBJECT expected';
   CPH_ReferenceToIsLegacy = 'REFERENCE TO modifier is legacy and ignored';
 
   CPH_CaseDoesNotMatchDeclaration = '"%s" does not match case of declaration ("%s")';
+  CPH_KeywordCaseMismatch = 'Case mismatch for "%s" should be "%s"';
 
   CPH_CallConventionIsNotSupportedAndIgnored = 'Call convention "%s" is not supported and ignored';
+
+  CPH_ReintroducedPropertyBrackets = 'Property "%s" reintroduced a method, you should remove empty brackets ()';
 
   CPH_UnnamedEnumerationElement = 'Enumeration element is unnamed or out of range';
 
   CPH_EmptyThenBlock = 'Empty THEN block';
   CPH_EmptyElseBlock = 'Empty ELSE block';
+  CPH_EmptyForBlock = 'Empty FOR loop';
+  CPH_BeginInCaseOfElseClause = 'Redundant "begin" in clause of a case..of';
+
+  CPH_CaseRangeLowerBoundIsGreaterThanHigherBound = 'Case range condition lower bound is greater than higher bound';
 
   // TypeCheck
   CPE_BooleanExpected = 'Boolean expected';
@@ -384,8 +432,12 @@ const
   CPE_RangeIncompatibleTypes = 'Range start and range stop are of incompatible types: "%s" and "%s"';
   CPE_TypeCouldNotBeInferenced = 'Type could not be inferenced';
   CPE_RangeTooLarge = 'Range is too large';
+  CPE_InvalidIntegerFormat = '"%s" is not a valid integer value';
+  CPE_InvalidIntegerBaseFormat = '"%s" is not a valid 64bit integer value in base %d';
+  CPE_InvalidFloatFormat = '"%s" is not a valid floating point value';
 
   CPE_LocalFunctionAsDelegate = 'Local procedure/function cannot be used as delegate';
+  CPE_SymbolCannotBeCaptured = 'Symbol "%s" cannot be captured';
 
   // Connector
   CPE_ConnectorCall = 'Method "%s" not found in connector "%s"';
@@ -403,11 +455,13 @@ const
 
   // Others
   CPE_CompilationAborted = 'Compilation aborted';
+  CPE_RecompileInContextDoesntSupportUnits = 'RecompileInContect does not support units';
 
   CPE_ConstantExpressionExpected = 'Constant expression expected';
   CPE_IntegerExpressionExpected = 'Integer expression expected';
   CPE_OrdinalExpressionExpected = 'Ordinal expression expected';
   CPE_InvalidConstType = 'Invalid const type "%s"';
+  CPE_InvalidConstTypeVsExpected = 'Invalid const type "%s" expected "%s"';
   CPE_ConstantCannotBeWrittenTo = 'Constant "%s" cannot be written to';
 
   CPE_CompilerSwitchUnknown = 'Compiler switch "%s" unknown';
@@ -434,7 +488,6 @@ const
 
   CPE_TypeIsUnknown = 'Type "%s" unknown';
   CPE_TypeForParamNotFound = 'Type "%s" not found for parameter "%s"';
-  CPE_LazyParamCantBeVarOrConst = 'lazy parameter cannot be var or const';
   CPE_LazyParamCantHaveDefaultValue = 'lazy parameter cannot have a default value';
   CPE_LazyParamCantBeFunctionPointer = 'Lazy parameter cannot be a function pointer';
   CPE_VarParamCantHaveDefaultValue = 'var parameter cannot have a default value';
@@ -458,9 +511,13 @@ const
   CPW_ForwardIsMeaningless = '"forward" is meaningless for external functions';
   CPW_PropertyWriterDoesNothing = 'Property writer does nothing';
 
+  CPW_AmbiguousOperator = 'Operator "%s" is ambiguous';
+
   CPE_NoResultTypeRequired = 'No result type required';
   CPE_ResultTypeExpected = 'Result type expected';
   CPE_NoResultRequired = 'No result required';
+
+  CPE_NotSupportedFor = '"%s" is not supported for "%s"';
 
   CPE_CanNotOverride = 'Method %s not found in parent class. Cannot override';
   CPE_InvalidArgCombination = 'Invalid argument combination';
@@ -471,15 +528,16 @@ const
   CPE_DivisionByZero = 'Division by zero';
 
   // Contracts
-  CPE_PreconditionsMustBeInRootMethod = 'Preconditions must be defined in the root method only.';
+  CPE_PreconditionsMustBeInRootMethod = 'Preconditions must be defined in the root method only';
 
   // Units
   CPE_UnitExpected = '"unit" expected';
   CPE_UnitNotFound = 'Unit "%s" referenced in unit "%s" not found';
   CPE_UnitNameDoesntMatch = 'Unit name does not match file name';
+  CPH_UnitNameCaseDoesntMatch = 'Unit name case does not match file name';
   CPE_UnitCircularReference = 'Circular referencing units detected';
-  CPE_FilterDependsOnUnit = 'The filter "%s" depends on unit "%s" that is not available.';
-  CPE_ResultTypeDependsOnUnit = 'The result-type "%s" depends on unit "%s" that is not available.';
+  CPE_FilterDependsOnUnit = 'The filter "%s" depends on unit "%s" that is not available';
+  CPE_ResultTypeDependsOnUnit = 'The result-type "%s" depends on unit "%s" that is not available';
   CPE_NoStaticSymbols = 'Invalid use of static symbols';
 
   // Filter
@@ -487,7 +545,7 @@ const
 
   // TOKENIZER ERRORS
   TOK_InvalidChar = 'Invalid character';
-  TOK_EqualityExpected = '"=" expected.';
+  TOK_EqualityExpected = '"=" expected';
   TOK_NumberExpected = 'Number expected';
   TOK_HexDigitExpected = 'Hexadecimal digit expected';
   TOK_BinDigitExpected = 'Binary digit expected';
@@ -497,7 +555,9 @@ const
   TOK_GreaterEqualityExpected = '">" or "=" expected';
   TOK_StringTerminationError = 'End of string constant not found (end of line)';
   TOK_HereDocTerminationError = 'End of string constant not found (end of file)';
-  TOK_InvalidHexConstant = 'Invalid hexadezimal constant "%s"';
+  TOK_TripleAposStringError = 'Incorrect triple apostrophe string';
+  TOK_TripleAposStringIndentError = 'Incorrect triple apostrophe string indentation';
+  TOK_InvalidHexConstant = 'Invalid hexadecimal constant "%s"';
   TOK_InvalidCharConstant = 'Invalid char constant "%s"';
   TOK_InvalidIntegerConstant = 'Invalid integer constant "%s"';
   TOK_InvalidFloatConstant = 'Invalid floating point constant "%s"';
@@ -514,6 +574,7 @@ const
   MSG_ScriptPosLine = 'line: %d';
   MSG_ScriptPosColumn = 'column: %d';
   MSG_ScriptPosFile = 'file: %s';
+  MSG_ScriptPosFileFull = 'file: %s (%s)';
   MSG_Hint = 'Hint: %s';
   MSG_Warning = 'Warning: %s';
   MSG_CompileError = 'Compile Error: %s';
@@ -525,10 +586,10 @@ const
   RTE_CantRunScript = 'Script compiled with errors. Cannot execute';
   RTE_ScriptAlreadyRunning = 'Script is already running';
   RTE_ScriptStillRunning = 'Script is still running';
-  RTE_ScriptStopped = 'Script was stopped.';
+  RTE_ScriptStopped = 'Script was stopped';
   RTE_ScriptHasLiveExecutions = 'Script has %d live executions';
-  RTE_StateInitializedExpected = 'ProgramState "psInitialized" expected.';
-  RTE_StateReadyToRunExpected = 'ProgramState "psReadyToRun" expected.';
+  RTE_StateInitializedExpected = 'ProgramState "psInitialized" expected';
+  RTE_StateReadyToRunExpected = 'ProgramState "psReadyToRun" expected';
 
   RTE_InstanceOfAbstractClass = 'Trying to create an instance of an abstract class';
   RTE_ArrayUpperBoundExceeded = 'Upper bound exceeded! Index %d';
@@ -543,7 +604,8 @@ const
   RTE_ClassInstanceCastFailed = 'Cannot cast instance of type "%s" to class "%s"';
   RTE_MetaClassCastFailed = 'Cannot cast "%s" to class "%s"';
   RTE_OrdinalExpected = 'Ordinal expected';
-  RTE_VariantCastFailed = 'Could not cast variant from "%s" to "%s" (%s)';
+  RTE_VariantVTCastFailed = 'Could not cast variant (%d) to %s';
+  RTE_VariantCastFailed = 'Could not cast variant from %s to %s';
 
   RTE_ObjCastToIntfFailed = 'Class "%s" does not implement interface "%s"';
   RTE_IntfCastToObjFailed = 'Cannot cast interface of "%s" to class "%s"';
@@ -566,6 +628,7 @@ const
   RTE_UnHandledExternalCall = 'Unhandled call to external symbol "%s" from%s';
 
   RTE_UnauthorizedFilePath = 'Unauthorized file path: "%s"';
+  RTE_UnauthorizedFileSystem = 'Unauthorized file system access';
 
   // Connectors
   RTE_ConnectorCallFailed = 'Connector Call "%s" failed';
@@ -604,6 +667,7 @@ const
   RTE_UseParameter = 'Use ''Parameter'' property to set parameter "%s" of Function "%s"';
   RTE_NoParameterFound = 'No parameter "%s" found in function "%s"';
   RTE_IncorrectParameterIndex = 'Incorrect parameter index %d';
+  RTE_IncorrectParameterValue = 'Incorrect parameter value';
   RTE_NoIndexFound = 'No index parameter "%s" found for property "%s"';
 
   RTE_NoRecordMemberFound = 'No member "%s" found in record "%s"';
@@ -635,6 +699,7 @@ const
   UNT_ClassAlreadyDefined = 'Class already defined';
   UNT_ClassNameAlreadyDefined = 'The class "%s" is already used for another symbol %s';
   UNT_SuperClassUnknwon = 'Superclass "%s" not found';
+  UNT_PropertyNotFoundForPromotion = 'Property "%s" not found in parent class for visibility promotion';
   UNT_ReadAccessNotFound = 'ReadAccess "%s" not found';
   UNT_WriteAccessNotFound = 'WriteAccess "%s" not found';
   UNT_UsesAccessNotFound = 'UsesAccess "%s" not found';
@@ -645,6 +710,7 @@ const
   UNT_CantChangeUnitname = 'Cannot change UnitName while property "Script" is assigned';
 
   UNT_InstancesNotSupportedInStaticUnits = 'Instances are not supported in static units';
+  UNT_FastEvalNotSupportedForVirtualMethods = 'FastEval not supported for virtual methods';
 
   ADP_ChainIsFormingLoop = 'Adapter chain is forming a loop';
   ADP_IncompatibleAdapters = 'Incompatible Adapters: %s -> %s';
@@ -662,3 +728,4 @@ const
 implementation
 
 end.
+

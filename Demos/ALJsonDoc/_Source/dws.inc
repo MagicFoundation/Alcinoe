@@ -24,7 +24,7 @@
 {                                                                      }
 {**********************************************************************}
 
-// DWSII include file
+// DWS include file
 
 {global compiler options}
 
@@ -50,21 +50,32 @@
    {$ELSE}
       {$DEFINE DELPHI_2010_MINUS}
       {$DEFINE WINDOWS}
-   {$IFEND}
+   {$ENDIF}
    {$IF CompilerVersion>22.0}
       {$DEFINE DELPHI_XE2_PLUS}
-   {$IFEND}
+   {$ENDIF}
    {$IF CompilerVersion>23.0}
       {$DEFINE DELPHI_XE3_PLUS}
-   {$IFEND}
+   {$ENDIF}
+   {$IF CompilerVersion>=32.0}
+      {$DEFINE DELPHI_TOKYO_PLUS}
+   {$ENDIF}
+   {$IF CompilerVersion>=35.0}
+      {$DEFINE DELPHI_ALEXANDRIA_PLUS}
+   {$ENDIF}
+   {$IF CompilerVersion>=36.0}
+      {$DEFINE DELPHI_ATHENS_PLUS}
+   {$ENDIF}
 {$ELSE}
    {$mode delphi}
    {$DEFINE PUREPASCAL}
+   {$ASMMODE INTEL}
 {$ENDIF}
 
 {.$DEFINE PUREPASCAL}
 {.$DEFINE UNICODE_IDENTIFIERS}
 {.$DEFINE COALESCE_VAR_INITIALIZATION}
+{$define JS_BIGINTEGER}
 
 {$IFNDEF PUREPASCAL}
    {$IF Defined(WIN32)}
@@ -82,7 +93,14 @@
 
 {$IF Defined(WIN32)}
    {$DEFINE WINDOWS}
+   {$DEFINE WIN32}
 {$ELSEIF Defined(WIN64)}
    {$DEFINE WINDOWS}
+   {$DEFINE WIN64}
 {$IFEND}
 
+{$IFOPT R+}
+   {$DEFINE RANGEON}
+{$ELSE}
+   {$UNDEF RANGEON}
+{$ENDIF}

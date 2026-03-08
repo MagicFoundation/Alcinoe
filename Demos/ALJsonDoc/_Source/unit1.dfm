@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 438
   Top = 209
   Caption = 'Form1'
-  ClientHeight = 724
-  ClientWidth = 1008
+  ClientHeight = 733
+  ClientWidth = 1029
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,11 +14,13 @@ object Form1: TForm1
   object PageControl1: TPageControl
     Left = 0
     Top = 0
-    Width = 1008
-    Height = 724
+    Width = 1029
+    Height = 733
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 1023
+    ExplicitHeight = 726
     object TabSheet1: TTabSheet
       Caption = 'Main'
       object Label1: TLabel
@@ -149,7 +151,7 @@ object Form1: TForm1
         Font.Name = 'Courier New'
         Font.Style = []
         ParentFont = False
-        ScrollBars = ssBoth
+        ScrollBars = ssVertical
         TabOrder = 4
       end
       object ButtonLoadJsonFromBson: TButton
@@ -170,9 +172,9 @@ object Form1: TForm1
       object CheckBoxUseTALJsonDocumentW: TCheckBox
         Left = 16
         Top = 12
-        Width = 297
+        Width = 441
         Height = 17
-        Caption = 'Use unicode version of TalJsonDoc (ie: TalJsonDocW)'
+        Caption = 'Use unicode version of TALJSONDocument (TALJSONDocumentW)'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = 16
@@ -214,8 +216,8 @@ object Form1: TForm1
       object Chart1: TChart
         Left = 0
         Top = 115
-        Width = 1000
-        Height = 581
+        Width = 1021
+        Height = 590
         Legend.Alignment = laTop
         Title.Text.Strings = (
           'TChart')
@@ -232,6 +234,8 @@ object Form1: TForm1
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akTop, akRight, akBottom]
+        ExplicitWidth = 1015
+        ExplicitHeight = 583
         DefaultCanvas = 'TGDIPlusCanvas'
         PrintMargins = (
           15
@@ -240,11 +244,11 @@ object Form1: TForm1
           23)
         ColorPaletteIndex = 7
         object Series1: TBarSeries
-          HoverElement = []
           Legend.Text = 'TALJsonDoc (AnsiString)'
           LegendTitle = 'TALJsonDoc (AnsiString)'
           Marks.Visible = False
           Marks.Angle = 90
+          Marks.OnTop = True
           Emboss.Color = 8618883
           Shadow.Color = 8618883
           XValues.Name = 'X'
@@ -253,11 +257,11 @@ object Form1: TForm1
           YValues.Order = loNone
         end
         object Series2: TBarSeries
-          HoverElement = []
           Legend.Text = 'TALJsonDocW (Unicode)'
           LegendTitle = 'TALJsonDocW (Unicode)'
           Marks.Visible = False
           Marks.Angle = 90
+          Marks.OnTop = True
           Emboss.Color = 8684676
           Shadow.Color = 8684676
           XValues.Name = 'X'
@@ -266,11 +270,11 @@ object Form1: TForm1
           YValues.Order = loNone
         end
         object Series3: TBarSeries
-          HoverElement = []
           Legend.Text = 'System.Json'
           LegendTitle = 'System.Json'
           Marks.Visible = False
           Marks.Angle = 90
+          Marks.OnTop = True
           Emboss.Color = 8750469
           Shadow.Color = 8750469
           XValues.Name = 'X'
@@ -279,11 +283,11 @@ object Form1: TForm1
           YValues.Order = loNone
         end
         object Series4: TBarSeries
-          HoverElement = []
           Legend.Text = 'dwsJSON'
           LegendTitle = 'dwsJSON'
           Marks.Visible = False
           Marks.Angle = 90
+          Marks.OnTop = True
           Emboss.Color = 8750469
           Shadow.Color = 8750469
           XValues.Name = 'X'

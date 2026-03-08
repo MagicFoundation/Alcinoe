@@ -122,42 +122,42 @@ begin
       procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
       begin
         case NodeSubType of
-          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ALFloatToStrA(Args[0].VExtended^)));
+          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFloatToStrW(Args[0].VExtended^));
           nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
           nstObject: ;
           nstArray: ;
-          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'ObjectId("'+string(ALBinToHexA(ansiString(Args[0].VAnsiString)))+'")');
-          nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + String(ALBoolToStrA(Args[0].VBoolean,'true','false')));
-          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^)));
+          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBinToHexW(TBytes(Args[0].VPointer)));
+          nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
+          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
           nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'null');
           nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
-          nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+string(ansiString(ALBase64EncodeString(ansiString(Args[0].VAnsiString))))+'")');
+          nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBase64EncodeBytesW(TBytes(Args[0].VPointer)));
           nstJavascript: MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
-          nstInt32:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'NumberInt('+inttostr(Args[0].VInteger)+')');
+          nstInt32:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALIntToStrW(Args[0].VInteger));
           nstTimestamp:  MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
-          nstInt64:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
+          nstInt64:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALIntToStrW(Args[0].VInt64^));
         end;
-      end{onParseText},
+      end{OnParseText},
       //--
       procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
       begin
         MemoSaxModeEvents.Lines.Add('STARTOBJECT  =>  ' + String(Name));
-      end{onParseStartObject},
+      end{OnParseStartObject},
       //--
       procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
       begin
         MemoSaxModeEvents.Lines.Add('ENDOBJECT    =>  ' + String(Name));
-      end{onParseEndObject},
+      end{OnParseEndObject},
       //--
       procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
       begin
         MemoSaxModeEvents.Lines.Add('STARTARRAY   =>  ' + String(Name));
-      end{onParseStartArray},
+      end{OnParseStartArray},
       //--
       procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
       begin
         MemoSaxModeEvents.Lines.Add('ENDARRAY     =>  ' + String(Name));
-      end{onParseEndArray});
+      end{OnParseEndArray});
 
   end
 
@@ -185,42 +185,42 @@ begin
       procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
       begin
         case NodeSubType of
-          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFloatToStrW(Args[0].VExtended^));
-          nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
+          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFloatToStrW(Args[0].VExtended^));
+          nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(Args[0].VUnicodeString));
           nstObject: ;
           nstArray: ;
-          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'ObjectId("'+string(Args[0].VUnicodeString)+'")');
-          nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
-          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
-          nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'null');
-          nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
-          nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'BinData('+ALIntToStrW(Args[1].VInteger)+', "'+String(Args[0].VunicodeString)+'")');
-          nstJavascript: MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
-          nstInt32:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'NumberInt('+ALIntToStrW(Args[0].VInteger)+')');
-          nstTimestamp:  MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'Timestamp('+ALIntToStrW(int64(cardinal(Args[0].VInteger)))+', '+ALIntToStrW(int64(cardinal(Args[1].VInteger)))+')');
-          nstInt64:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
+          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBinToHexW(TBytes(Args[0].VPointer)));
+          nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
+          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
+          nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'null');
+          nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(Args[0].VUnicodeString));
+          nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBase64EncodeBytesW(TBytes(Args[0].VPointer)));
+          nstJavascript: MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(Args[0].VUnicodeString));
+          nstInt32:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALIntToStrW(Args[0].VInteger));
+          nstTimestamp:  MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
+          nstInt64:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALIntToStrW(Args[0].VInt64^));
         end;
-      end{onParseText},
+      end{OnParseText},
       //--
       procedure (Sender: TObject; const Path: String; const Name: String)
       begin
         MemoSaxModeEvents.Lines.Add('STARTOBJECT  =>  ' + Name);
-      end{onParseStartObject},
+      end{OnParseStartObject},
       //--
       procedure (Sender: TObject; const Path: String; const Name: String)
       begin
         MemoSaxModeEvents.Lines.Add('ENDOBJECT    =>  ' + Name);
-      end{onParseEndObject},
+      end{OnParseEndObject},
       //--
       procedure (Sender: TObject; const Path: String; const Name: String)
       begin
         MemoSaxModeEvents.Lines.Add('STARTARRAY   =>  ' + Name);
-      end{onParseStartArray},
+      end{OnParseStartArray},
       //--
       procedure (Sender: TObject; const Path: String; const Name: String)
       begin
         MemoSaxModeEvents.Lines.Add('ENDARRAY     =>  ' + Name);
-      end{onParseEndArray});
+      end{OnParseEndArray});
 
   end;
 
@@ -272,10 +272,10 @@ begin
         RegExOptions := [preMultiLine, preCaseLess];
       end;
       with LALJsonDocumentA.AddChild('binary') do begin
-        binary := #1#2#3#4#5;
+        BinaryAsBytes := TBytes.Create(1, 2, 3, 4, 5);
         BinarySubType := 0;
       end;
-      LALJsonDocumentA.AddChild('ObjectId').ObjectId := #1#2#3#4#5#6#7#8#9#0#1#2;
+      LALJsonDocumentA.AddChild('ObjectId').ObjectId := TBytes.Create(1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2);
 
       var LJsonStr: AnsiString;
       LALJsonDocumentA.SaveToJSONString(LJsonStr, [soNodeAutoIndent]);
@@ -332,7 +332,7 @@ begin
         LBytes[2] := 3;
         LBytes[3] := 4;
         LBytes[4] := 5;
-        binary := ALBase64EncodeBytesW(LBytes);
+        BinaryAsBytes := LBytes;
         BinarySubType := 0;
       end;
       setlength(LBytes, 12);
@@ -348,7 +348,7 @@ begin
       LBytes[9] := 0;
       LBytes[10] := 1;
       LBytes[11] := 2;
-      LALJsonDocumentW.AddChild('ObjectId').ObjectId := ALBinToHexW(LBytes);
+      LALJsonDocumentW.AddChild('ObjectId').ObjectId := LBytes;
 
       var LJsonStr: String;
       LALJsonDocumentW.SaveToJSONString(LJsonStr, [soNodeAutoIndent]);
@@ -379,7 +379,7 @@ begin
     //exemple 1 load the JSON doc in memory
     var LALJsonDocumentA := TALJSONDocumentA.Create;
     try
-      LALJsonDocumentA.LoadFromBSONString(LBsonStr);
+      LALJsonDocumentA.LoadFromBSONString(LBsonStr, [poBinaryAsPtrStream]);
 
       var LJsonStr: AnsiString;
       LALJsonDocumentA.SaveToJSONString(LJsonStr, [soNodeAutoIndent]);
@@ -395,42 +395,42 @@ begin
       procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
       begin
         case NodeSubType of
-          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ALFloatToStrA(Args[0].VExtended^)));
+          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFloatToStrW(Args[0].VExtended^));
           nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
           nstObject: ;
           nstArray: ;
-          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'ObjectId("'+string(ALBinToHexA(ansiString(Args[0].VAnsiString)))+'")');
-          nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + String(ALBoolToStrA(Args[0].VBoolean,'true','false')));
-          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^)));
+          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBinToHexW(TBytes(Args[0].VPointer)));
+          nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
+          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
           nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'null');
           nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
-          nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+string(ansiString(ALBase64EncodeString(ansiString(Args[0].VAnsiString))))+'")');
+          nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBase64EncodeBytesW(TBytes(Args[0].VPointer)));
           nstJavascript: MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
-          nstInt32:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'NumberInt('+inttostr(Args[0].VInteger)+')');
+          nstInt32:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALIntToStrW(Args[0].VInteger));
           nstTimestamp:  MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
-          nstInt64:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
+          nstInt64:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALIntToStrW(Args[0].VInt64^));
         end;
-      end{onParseText},
+      end{OnParseText},
       //--
       procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
       begin
         MemoSaxModeEvents.Lines.Add('STARTOBJECT  =>  ' + String(Name));
-      end{onParseStartObject},
+      end{OnParseStartObject},
       //--
       procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
       begin
         MemoSaxModeEvents.Lines.Add('ENDOBJECT    =>  ' + String(Name));
-      end{onParseEndObject},
+      end{OnParseEndObject},
       //--
       procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
       begin
         MemoSaxModeEvents.Lines.Add('STARTARRAY   =>  ' + String(Name));
-      end{onParseStartArray},
+      end{OnParseStartArray},
       //--
       procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
       begin
         MemoSaxModeEvents.Lines.Add('ENDARRAY     =>  ' + String(Name));
-      end{onParseEndArray});
+      end{OnParseEndArray});
 
   end
 
@@ -440,7 +440,7 @@ begin
     //exemple 1 load the JSON doc in memory
     var LALJsonDocumentW := TALJSONDocumentW.Create;
     try
-      LALJsonDocumentW.LoadFromBSONBytes(BytesOf(LBsonStr));
+      LALJsonDocumentW.LoadFromBSONBytes(BytesOf(LBsonStr), [poBinaryAsPtrStream]);
 
       var LJsonStr: String;
       LALJsonDocumentW.SaveToJSONString(LJsonStr, [soNodeAutoIndent]);
@@ -456,42 +456,42 @@ begin
       procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
       begin
         case NodeSubType of
-          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFloatToStrW(Args[0].VExtended^));
-          nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
+          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFloatToStrW(Args[0].VExtended^));
+          nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(Args[0].VUnicodeString));
           nstObject: ;
           nstArray: ;
-          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'ObjectId("'+string(Args[0].VUnicodeString)+'")');
-          nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
-          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
-          nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'null');
-          nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
-          nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'BinData('+ALIntToStrW(Args[1].VInteger)+', "'+String(Args[0].VunicodeString)+'")');
-          nstJavascript: MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
-          nstInt32:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'NumberInt('+ALIntToStrW(Args[0].VInteger)+')');
-          nstTimestamp:  MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'Timestamp('+ALIntToStrW(int64(cardinal(Args[0].VInteger)))+', '+ALIntToStrW(int64(cardinal(Args[1].VInteger)))+')');
-          nstInt64:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
+          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBinToHexW(TBytes(Args[0].VPointer)));
+          nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
+          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
+          nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'null');
+          nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(Args[0].VUnicodeString));
+          nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBase64EncodeBytesW(TBytes(Args[0].VPointer)));
+          nstJavascript: MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(Args[0].VUnicodeString));
+          nstInt32:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALIntToStrW(Args[0].VInteger));
+          nstTimestamp:  MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
+          nstInt64:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALIntToStrW(Args[0].VInt64^));
         end;
-      end{onParseText},
+      end{OnParseText},
       //--
       procedure (Sender: TObject; const Path: String; const Name: String)
       begin
         MemoSaxModeEvents.Lines.Add('STARTOBJECT  =>  ' + Name);
-      end{onParseStartObject},
+      end{OnParseStartObject},
       //--
       procedure (Sender: TObject; const Path: String; const Name: String)
       begin
         MemoSaxModeEvents.Lines.Add('ENDOBJECT    =>  ' + Name);
-      end{onParseEndObject},
+      end{OnParseEndObject},
       //--
       procedure (Sender: TObject; const Path: String; const Name: String)
       begin
         MemoSaxModeEvents.Lines.Add('STARTARRAY   =>  ' + Name);
-      end{onParseStartArray},
+      end{OnParseStartArray},
       //--
       procedure (Sender: TObject; const Path: String; const Name: String)
       begin
         MemoSaxModeEvents.Lines.Add('ENDARRAY     =>  ' + Name);
-      end{onParseEndArray});
+      end{OnParseEndArray});
 
   end;
 
@@ -501,7 +501,7 @@ end;
 procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
 
   const
-    _iterationcount: integer = 1000000;
+    _iterationcount: integer = 1_000_000;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _scrollAllNode(aNode: TALJSONNodeA): Integer; overload;
@@ -659,15 +659,7 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
       for var i := 1 to _iterationcount do
         LALJsonDocumentA.ChildNodes.FindNode(ALLowerCase(ALRandomStrA(7)));
       LStopWatch.Stop;
-      chart1.Series[0].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (unsorted)');
-      application.ProcessMessages;
-      //----
-      LALJsonDocumentA.ChildNodes.SetSorted(True{Value}, true{Recurse});
-      LStopWatch := TstopWatch.StartNew;
-      for var i := 1 to _iterationcount do
-        LALJsonDocumentA.ChildNodes.FindNode(ALLowerCase(ALRandomStrA(7)));
-      LStopWatch.Stop;
-      chart1.Series[0].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (sorted)');
+      chart1.Series[0].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find');
       application.ProcessMessages;
       //----
       LStopWatch := TStopWatch.StartNew;
@@ -723,15 +715,7 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
       for var i := 1 to _iterationcount do
         LALJsonDocumentW.ChildNodes.FindNode(ALLowerCase(ALRandomStrW(7)));
       LStopWatch.Stop;
-      chart1.Series[1].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (unsorted)');
-      application.ProcessMessages;
-      //----
-      LALJsonDocumentW.ChildNodes.SetSorted(True{Value}, true{Recurse});
-      LStopWatch := TstopWatch.StartNew;
-      for var i := 1 to _iterationcount do
-        LALJsonDocumentW.ChildNodes.FindNode(ALLowerCase(ALRandomStrW(7)));
-      LStopWatch.Stop;
-      chart1.Series[1].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (sorted)');
+      chart1.Series[1].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find');
       application.ProcessMessages;
       //----
       LStopWatch := TStopWatch.StartNew;
@@ -781,10 +765,8 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
       for var i := 1 to _iterationcount do
         LJSONValue.FindValue(AlLowerCase(ALRandomStrW(7)));
       LStopWatch.Stop;
-      chart1.Series[2].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (unsorted)');
+      chart1.Series[2].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find');
       application.ProcessMessages;
-      //----
-      chart1.Series[2].AddY(0, 'Find (sorted)');
       //-----
       LStopWatch := TStopWatch.StartNew;
       TFile.WriteAllText(ALGetModulePathW + '~tmp.json', LJSONValue.ToString);
@@ -829,10 +811,8 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
       for var i := 1 to _iterationcount do
         LJSONValue.Items[AlLowerCase(ALRandomStrW(7))];
       LStopWatch.Stop;
-      chart1.Series[3].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (unsorted)');
+      chart1.Series[3].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find');
       application.ProcessMessages;
-      //----
-      chart1.Series[3].AddY(0, 'Find (sorted)');
       //----
       LStopWatch := TStopWatch.StartNew;
       TFile.WriteAllText(ALGetModulePathW + '~tmp.json', LJSONValue.ToString);

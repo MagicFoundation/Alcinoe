@@ -1038,7 +1038,6 @@ frequently need additional primitives such as:
 -   **64-bit integers**
 -   **datetime values**
 -   **binary data**
--   **ObjectId**
 
 With standard JSON these values must usually be encoded as **strings**,
 which is inefficient and error-prone.
@@ -1069,8 +1068,6 @@ exchange**.
 Naturally, **TALJSONDocument is also the ideal component for working
 with MongoDB**.
 
-------------------------------------------------------------------------
-
 #### Example ####
 
     {
@@ -1095,15 +1092,11 @@ with MongoDB**.
       phones: []
     }
 
-------------------------------------------------------------------------
-
 #### Accessing document nodes ####
 
     MyJsonDoc.GetChildValueInt32('_id', 0{default if node not exists});
     MyJsonDoc.GetChildValueText(['name','first'], ''{default if node not exists});
     MyJsonDoc.GetChildValueDateTime('birth', Now{default if node not exists});
-
-------------------------------------------------------------------------
 
 Learn more at [Source/Alcinoe.JSONDoc.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.JSONDoc.pas)
 <br/>

@@ -937,6 +937,7 @@ begin
   if AValue <> FBodyStream then begin
     if OwnsBodyStream then ALFreeAndNil(FBodyStream);
     FBodyStream := AValue;
+    FOwnsBodyStream := True;
   end;
 end;
 
@@ -985,6 +986,7 @@ begin
       ALFreeAndNil(FBodyStream)
   end;
   FBodyStream := TALStringStreamA.Create(AValue);
+  FOwnsBodyStream := True;
 end;
 
 {****************************************}
@@ -1088,6 +1090,7 @@ begin
   if AValue <> FBodyStream then begin
     if OwnsBodyStream then ALFreeAndNil(FBodyStream);
     FBodyStream := AValue;
+    FOwnsBodyStream := True;
   end;
 end;
 
@@ -1181,6 +1184,7 @@ begin
     FBodyStream := TALStringStreamW.Create(AValue, TEncoding.UTF8, False{AOwnsEncoding})
   else
     FBodyStream := TALStringStreamW.Create(AValue, TEncoding.GetEncoding(LCharSet), True{AOwnsEncoding});
+  FOwnsBodyStream := True;
 end;
 
 {*******************************************}

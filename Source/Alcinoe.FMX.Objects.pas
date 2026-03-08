@@ -1993,6 +1993,7 @@ begin
       ALFreeAndNil(FResourceStream);
     ClearBufDrawable;
     FResourceStream := Value;
+    FOwnsResourceStream := True;
     Repaint;
   end;
 end;
@@ -3573,6 +3574,7 @@ begin
       ALFreeAndNil(FResourceStream);
     ClearBufDrawable;
     FResourceStream := Value;
+    FOwnsResourceStream := True;
     Repaint;
   end;
 end;

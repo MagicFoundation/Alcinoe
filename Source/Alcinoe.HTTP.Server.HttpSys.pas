@@ -999,6 +999,7 @@ begin
   if AValue <> FBodyStream then begin
     if OwnsBodyStream then ALFreeAndNil(FBodyStream);
     FBodyStream := AValue;
+    FOwnsBodyStream := True;
   end;
 end;
 

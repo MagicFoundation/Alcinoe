@@ -4262,6 +4262,7 @@ begin
     if FOwnsResourceStream then
       ALFreeAndNil(FResourceStream);
     FResourceStream := Value;
+    FOwnsResourceStream := True;
     Change;
   end;
 end;

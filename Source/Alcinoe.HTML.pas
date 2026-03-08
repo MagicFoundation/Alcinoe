@@ -823,6 +823,17 @@ begin
                Inc(Rp, 2);
              end;
            end;
+      #47: begin // Forward slash (/) ... mostly to hide / inside JavaScript regex literals.
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('\u002F', Rp, 6);
+               Inc(Rp, 6);
+             end
+             else begin
+               ALStrMove('\/', Rp, 2);
+               Inc(Rp, 2);
+             end;
+           end;
       #60: begin // < ... mostly to hide all </script> tag inside javascript.
                  // http://www.wwco.com/~wls/blog/2007/04/25/using-script-in-a-javascript-literal/
              if not IsUniqueString then _GenerateUniqueString;
@@ -977,6 +988,17 @@ begin
              end
              else begin
                ALStrMove('\''', Rp, 2);
+               Inc(Rp, 2);
+             end;
+           end;
+      #47: begin // Forward slash (/) ... mostly to hide / inside JavaScript regex literals.
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('\u002F', Rp, 6);
+               Inc(Rp, 6);
+             end
+             else begin
+               ALStrMove('\/', Rp, 2);
                Inc(Rp, 2);
              end;
            end;

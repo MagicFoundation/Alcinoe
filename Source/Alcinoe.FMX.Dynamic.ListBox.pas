@@ -4577,8 +4577,6 @@ begin
     Setlength(AItems, AData.ChildNodes.Count);
     For var I := AData.ChildNodes.Count - 1 downto 0 do begin
       var LData := AData.ChildNodes.Extract(I);
-      LData.ChildNodes.SetSorted(true{Value},true{recurse});
-      LData.MultiThreadPrepare(true{aOnlyChildList});
       var LItem: TItem;
       If assigned(AContext.FOnCreateItem) then begin
         //var LMethod: TMethod;

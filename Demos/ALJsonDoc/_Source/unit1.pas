@@ -108,7 +108,8 @@ begin
       LALJsonDocumentA.SaveToJSONString(LJsonStr, [soNodeAutoIndent]);
       MemoJSON.Lines.Text := String(LJSONStr);
 
-      var LBsonStr := LALJsonDocumentA.BSON;
+      var LBsonStr: AnsiString;
+      LALJsonDocumentA.SaveToBSONString(LBsonStr);
       if LBsonStr <> '' then
         MemoBSON.Lines.Text := String(ALBinToHexA(LALJsonDocumentA.BSON));
     finally

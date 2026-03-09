@@ -19,8 +19,6 @@ object Form1: TForm1
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 1023
-    ExplicitHeight = 726
     object TabSheet1: TTabSheet
       Caption = 'Main'
       object Label1: TLabel

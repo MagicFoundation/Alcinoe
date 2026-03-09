@@ -1,5 +1,6 @@
 ## 03/08/2026
 
+- Changed `TALJSONNodeA.BSON` from `AnsiString` to `TBytes`. If you still need the BSON payload as a byte-based AnsiString, use `TALJSONNodeA.SaveToBSONString`
 - Added `poBinaryAsPtrStream` to `TALJSONParseOption`
 - Added `LoadFromBSONBytes` and `ParseBSONBytes` to `TALJSONNodeA/TALJSONDocumentA`
 - Added `GetBinaryAsBytes`, `GetBinaryAsStream`, `SetBinaryAsBytes`, `SetBinaryAsStream`, `GetOwnsBinaryStream`, and `SetOwnsBinaryStream` to `TALJSONNodeA/TALJSONNodeW`
@@ -9,12 +10,8 @@
 - Changed binary handling in `TALJSONNodeA/TALJSONNodeW` from `Binary: AnsiString/String` to `BinaryAsBytes: TBytes` and `BinaryAsStream: TStream`
 - Changed `ALJsonEncodeBinaryWithNodeSubTypeHelperA/W` and `ALJsonEncodeObjectIDWithNodeSubTypeHelperA/W` to use `TBytes`
 - Changed `ALJSONTryStrToBinaryA/W` and `ALJSONTryStrToObjectIDA/W` to return `TBytes`
-- Renamed `TAlJSONParseTextEventA/W`, `TAlJSONParseObjectEventA/W`, and `TAlJSONParseArrayEventA/W` to `TALJSONParseTextEventA/W`, `TALJSONParseObjectEventA/W`, and `TALJSONParseArrayEventA/W`
-- Renamed `DetectNodeTypeFromJSon` to `DetectNodeTypeFromJSON`
-- Renamed `ALFindJsonNodeByChildValueXXX` parameters from `AChildNodeName/AChildNodeValue` to `AChildName/AChildValue`
 - Removed sorted/duplicate/owner support from `TALJSONNodeListA/TALJSONNodeListW`
 - Removed `MultiThreadPrepare`, `NextSibling`, `PreviousSibling`, `ParentNode`, and `NodeValue` from `TALJSONNodeA/TALJSONNodeW`
-- Removed raw text-node storage properties from `TALJSONTextNodeA/TALJSONTextNodeW`
 - Removed `SetChildNodes` from `TALJSONNodeA/TALJSONNodeW`, `TALJSONObjectNodeA/TALJSONObjectNodeW`, and `TALJSONArrayNodeA/TALJSONArrayNodeW`
 - Removed `ALJSONToXMLA`
 - Removed `ALJsonEncodeWithNodeSubTypeHelperA/W`

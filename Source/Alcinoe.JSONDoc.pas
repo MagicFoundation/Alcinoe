@@ -177,8 +177,8 @@ type
     function GetInterchangeValue(const SkipNodeSubTypeHelper: Boolean = False): AnsiString; virtual;
     function GetJSON: AnsiString;
     procedure SetJSON(const Value: AnsiString);
-    function GetBSON: AnsiString;
-    procedure SetBSON(const Value: AnsiString);
+    function GetBSON: TBytes;
+    procedure SetBSON(const Value: TBytes);
     procedure ParseJSON(
                 const RawJSONStream: TStream;
                 const RawJSONString: AnsiString;
@@ -201,7 +201,7 @@ type
                 const Options: TALJSONParseOptions);
     procedure SaveToBSON(
                 const Stream: TStream;
-                var Buffer: AnsiString;
+                var Buffer: TBytes;
                 const Options: TALJSONSaveOptions);
     procedure SaveToJSON(
                 const Stream: TStream;
@@ -270,6 +270,7 @@ type
     procedure SaveToBSONFile(const FileName: String; const Options: TALJSONSaveOptions = []); overload;
     procedure SaveToBSONFile(const FileName: AnsiString; const Options: TALJSONSaveOptions = []); overload;
     procedure SaveToBSONString(var Str: AnsiString; const Options: TALJSONSaveOptions = []);
+    procedure SaveToBSONBytes(var Bytes: TBytes; const Options: TALJSONSaveOptions = []);
     procedure LoadFromJSONString(const Str: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]);
     procedure LoadFromJSONStream(const Stream: TStream; const Options: TALJSONParseOptions = [poClearChildNodes]);
     procedure LoadFromJSONFile(const FileName: String; const Options: TALJSONParseOptions = [poClearChildNodes]); overload;
@@ -435,7 +436,7 @@ type
     property OwnsBinaryStream: Boolean read GetOwnsBinaryStream write SetOwnsBinaryStream;
     property BinarySubType: Byte read GetBinarySubType write SetBinarySubType;
     property JSON: AnsiString read GetJSON write SetJSON;
-    property BSON: AnsiString read GetBSON write SetBSON;
+    property BSON: TBytes read GetBSON write SetBSON;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -3213,16 +3214,16 @@ end;
 {********************************************************************}
 {Returns the BSON that corresponds to the subtree rooted at this node.
  GetBSON returns the BSON that corresponds to this node and any child nodes it contains.}
-function TALJSONNodeA.GetBSON: AnsiString;
+function TALJSONNodeA.GetBSON: TBytes;
 begin
-  SaveToBSONString(result);
+  SaveToBSONBytes(result);
 end;
 
 {*************************************************}
 {SetBSON reload the node with the new given value }
-procedure TALJSONNodeA.SetBSON(const Value: AnsiString);
+procedure TALJSONNodeA.SetBSON(const Value: TBytes);
 begin
-  LoadFromBSONString(Value);
+  LoadFromBSONBytes(Value);
 end;
 
 {**********************************************************}
@@ -5856,7 +5857,7 @@ end;
 {********************************}
 procedure TALJSONNodeA.SaveToBSON(
             const Stream: TStream;
-            var Buffer: AnsiString;
+            var Buffer: TBytes;
             const Options: TALJSONSaveOptions);
 
 type
@@ -5875,8 +5876,8 @@ Var
   BufferPos: NativeInt;
   StreamPos: system.Int64;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _WriteBuffer2Stream(const buffer: AnsiString; BufferLength: Integer);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _WriteBuffer2Stream(const buffer: TBytes; BufferLength: Integer);
   begin
     if assigned(Stream) then begin
       If BufferLength > 0 then stream.Writebuffer(pointer(buffer)^,BufferLength);
@@ -5890,7 +5891,7 @@ Var
   begin
     if Count = 0 then exit;
     if Count + BufferPos > length(Buffer) then setlength(Buffer, Count + BufferPos + BufferSize);
-    ALMove(Source, pByte(Buffer)[BufferPos], Count);
+    ALMove(Source, Buffer[BufferPos], Count);
     BufferPos := BufferPos + Count;
     if BufferPos >= 65536 then _WriteBuffer2Stream(Buffer,BufferPos);
   end;
@@ -5927,7 +5928,7 @@ Var
       stream.Writebuffer(aInt,sizeof(aInt));
       Stream.position := StreamPos;
     end
-    else ALMove(aInt, Buffer[aPos - StreamPos + 1], sizeOf(aInt));
+    else ALMove(aInt, Buffer[aPos - StreamPos], sizeOf(aInt));
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -6261,7 +6262,7 @@ end;
 {*****************************************************************************************************}
 procedure TALJSONNodeA.SaveToBSONStream(const Stream: TStream; const Options: TALJSONSaveOptions = []);
 begin
-  var Buffer: AnsiString;
+  var Buffer: TBytes;
   SaveToBSON(Stream, buffer, Options);
 end;
 
@@ -6301,7 +6302,20 @@ end;
 {***************************************************************************************************}
 procedure TALJSONNodeA.SaveToBSONString(var str: AnsiString; const Options: TALJSONSaveOptions = []);
 begin
-  SaveToBSON(nil, Str, Options);
+  var LStream := TALStringStreamA.Create('');
+  Try
+    var Buffer: TBytes;
+    SaveToBSON(LStream, Buffer, Options);
+    Str := LStream.DataString;
+  finally
+    ALFreeAndNil(LStream);
+  end;
+end;
+
+{************************************************************************************************}
+procedure TALJSONNodeA.SaveToBSONBytes(var Bytes: TBytes; const Options: TALJSONSaveOptions = []);
+begin
+  SaveToBSON(Nil, Bytes, Options);
 end;
 
 {*************************************************************************************************************************}

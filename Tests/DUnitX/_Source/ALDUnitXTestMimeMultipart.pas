@@ -231,7 +231,7 @@ begin
 
     _AssertContainsA('Content-Disposition: form-data; name="file"; filename="a.txt"'#13#10, Payload, 'Has filename');
     _AssertContainsA('Content-Length: 5'#13#10, Payload, 'Has content length');
-    // Content-Type default depends on ALGetDefaultMIMEContentTypeFromExt, so just ensure header exists
+    // Content-Type default depends on ALGetDefaultMimeTypeFromExt, so just ensure header exists
     _AssertContainsA('Content-Type: ', Payload, 'Has Content-Type');
     _AssertContainsA(#13#10'HELLO'#13#10, Payload, 'Stream bytes present');
   finally

@@ -1,3 +1,27 @@
+## 03/26/2026
+
+- Renamed `Alcinoe.Mime.ContentTypes` to `Alcinoe.Mime.Types`
+- Renamed MIME helper functions:
+  - `ALGetDefaultMIMEContentTypeFromExt` to `ALGetDefaultMimeTypeFromExt`
+  - `ALGetDefaultFileExtFromMimeContentType` to `ALGetDefaultFileExtFromMimeType`
+- Changed `TALStringStreamA` to inherit from `TMemoryStream` instead of `TStream`
+- Added `ALStopCurrentService`
+- Updated `ALInstallService`:
+  - default `APreshutdownTimeout` is now `180000`
+  - added `AEnableFailureAutoRestart: Boolean = True`
+  - configured automatic restart on service failure
+- Added success messages to `ALInstallService` and `ALUninstallService`
+- Renamed `TALHttpServerA.MaxBodySize` to `TALHttpServerA.MaxRequestBodySize`
+- Simplified `TALHttpServerHttpSys` worker thread management:
+  - removed `MinWorkerThreadCount`
+  - removed `MaxWorkerThreadCount`
+  - `WorkerThreadCount` is now directly configurable
+- Added Windows version guards before enabling WinHTTP HTTP/2, HTTP/3, and decompression options
+- Optimized parts of `TALJSONNodeA/TALJSONNodeW` JSON/BSON parsing and serialization:
+  - reduced internal buffer sizes from `32768` to `16384`
+  - used `TBufferedFileStream` for JSON/BSON file saves
+  - streamlined direct stream writes in serialization paths
+
 ## 03/08/2026
 
 - Changed `TALJSONNodeA.BSON` from `AnsiString` to `TBytes`. If you still need the BSON payload as a byte-based AnsiString, use `TALJSONNodeA.SaveToBSONString`

@@ -29,7 +29,7 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.Common;
 
-{***********************************************************************************************************************************}
+{****************************************************************************************************************************}
 Function ALGetDefaultFileExtFromMimeType(const AContentType: AnsiString; const ARaiseIfNotFound: Boolean = False): AnsiString;
 Begin
   if not AlExtbyMimeTypeA.TryGetValue(AlLowerCase(AContentType){Key}, Result{Value}) then begin
@@ -40,7 +40,7 @@ Begin
   end;
 end;
 
-{***************************************************************************************************************************}
+{********************************************************************************************************************}
 Function ALGetDefaultFileExtFromMimeType(const AContentType: String; const ARaiseIfNotFound: Boolean = False): String;
 Begin
   if not AlExtbyMimeTypeW.TryGetValue(AlLowerCase(AContentType){Key}, Result{Value}) then begin
@@ -51,7 +51,7 @@ Begin
   end;
 end;
 
-{***********************************************************************************************************************}
+{****************************************************************************************************************}
 Function ALGetDefaultMimeTypeFromExt(const AExt: AnsiString; const ARaiseIfNotFound: Boolean = False): AnsiString;
 begin
   var LExt := AlLowerCase(AExt);
@@ -64,7 +64,7 @@ begin
   end;
 end;
 
-{***************************************************************************************************************}
+{********************************************************************************************************}
 Function ALGetDefaultMimeTypeFromExt(const AExt: String; const ARaiseIfNotFound: Boolean = False): String;
 begin
   var LExt := AlLowerCase(AExt);

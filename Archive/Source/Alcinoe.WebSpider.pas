@@ -784,7 +784,7 @@ Var LExt: AnsiString;
 Begin
   if fSaveDirectory = '' then result := ''
   else begin
-    LExt := ALlowercase(ALGetDefaultFileExtFromMimeContentType(aContentType)); // '.htm'
+    LExt := ALlowercase(ALGetDefaultFileExtFromMimeType(aContentType)); // '.htm'
 
     If FCurrentLocalFileNameIndex = 0 then Begin
       result := fSaveDirectory + 'Start' + LExt;

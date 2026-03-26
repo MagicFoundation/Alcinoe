@@ -86,7 +86,6 @@ begin
       <body>
       ''' +
       '<b>Worker Thread Count:</b> ' + ALIntToStrA(MainHttpServer.WorkerThreadCount) + '<br />' + #13#10 +
-      '<b>Peak Worker Thread Count:</b> ' + ALIntToStrA(MainHttpServer.PeakWorkerThreadCount) + '<br />' + #13#10 +
       '<b>Busy Worker Thread Count:</b> ' + ALIntToStrA(MainHttpServer.BusyWorkerThreadCount) + '<br />' + #13#10 +
       '<b>Peak Busy Worker Thread Count:</b> ' + ALIntToStrA(MainHttpServer.PeakBusyWorkerThreadCount) + '<br />' + #13#10 +
       '<b>IOCP Pending Initial Receive Count:</b> ' + ALIntToStrA(MainHttpServer.IOCPPendingInitialReceiveCount) + '<br />' + #13#10 +

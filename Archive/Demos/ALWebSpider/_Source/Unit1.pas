@@ -215,7 +215,7 @@ Var aExt: AnsiString;
   end;
 
 Begin
-  aExt := ALlowercase(ALGetDefaultFileExtFromMimeContentType(aContentType)); // '.htm'
+  aExt := ALlowercase(ALGetDefaultFileExtFromMimeType(aContentType)); // '.htm'
 
   If FCurrentLocalFileNameIndex = 0 then Begin
     result := AnsiString(EditSaveDirectory.Text) + 'Start' + aExt;

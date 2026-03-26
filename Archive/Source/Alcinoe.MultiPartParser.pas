@@ -610,7 +610,7 @@ end;
 procedure TALMultiPartBaseContent.LoadDataFromFile(const aFileName: AnsiString);
 begin
   TmemoryStream(FDataStream).LoadFromFile(String(aFileName));
-  ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(aFileName));
+  ContentType := ALGetDefaultMimeTypeFromExt(ALExtractFileExt(aFileName));
   ContentTransferEncoding := 'binary';
 end;
 
@@ -622,7 +622,7 @@ begin
   Buffer := ALBase64EncodeStringMIME(AlGetStringFromFile(aFileName));
   FDataStream.WriteBuffer(pointer(Buffer)^, length(Buffer));
   FDataStream.Position := 0;
-  ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(aFileName));
+  ContentType := ALGetDefaultMimeTypeFromExt(ALExtractFileExt(aFileName));
   ContentTransferEncoding := 'base64';
 end;
 

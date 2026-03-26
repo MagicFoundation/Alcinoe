@@ -125,7 +125,7 @@ Uses
   Alcinoe.Mime.MultiPart,
   Alcinoe.FileUtils,
   Alcinoe.Common,
-  Alcinoe.Mime.ContentTypes,
+  Alcinoe.Mime.Types,
   Alcinoe.StringList,
   Alcinoe.HTTP;
 

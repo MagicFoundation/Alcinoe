@@ -23,13 +23,13 @@ begin
       Try
         if LHttpResponse.StatusCode <> 200 then raise Exception.Create('Error A042F0D0-CE40-4203-A0B3-BB38080434D5');
         var LSrcLst := TALStringListA.Create;
-        var LAlMimeContentTypeByExtA := TALStringListA.Create;
-        var LAlExtbyMimeContentTypeA := TALStringListA.Create;
+        var LAlMimeTypeByExtA := TALStringListA.Create;
+        var LAlExtbyMimeTypeA := TALStringListA.Create;
         try
-          LAlMimeContentTypeByExtA.Duplicates := DupError;
-          LAlMimeContentTypeByExtA.Sorted := True;
-          LAlExtbyMimeContentTypeA.Duplicates := DupError;
-          LAlExtbyMimeContentTypeA.Sorted := True;
+          LAlMimeTypeByExtA.Duplicates := DupError;
+          LAlMimeTypeByExtA.Sorted := True;
+          LAlExtbyMimeTypeA.Duplicates := DupError;
+          LAlExtbyMimeTypeA.Sorted := True;
           LSrcLst.Text := ALLowercase(LHttpResponse.BodyString);
           for var I := 0 to LSrcLst.Count - 1 do begin
             var LLine := ALTrim(LSrcLst[i]);
@@ -48,9 +48,9 @@ begin
                 for var J := 0 to LExtLst.Count - 1 do begin
                   if (LExtLst[j] = 'sub') or
                      (LExtLst[j] = 'wmz') then
-                    LAlMimeContentTypeByExtA.AddObject('  AlMimeContentTypeByExtA.Add(''.' + LExtLst[j] + ''',''' + LLineLst[0] + ''');', pointer(integer(1)))
+                    LAlMimeTypeByExtA.AddObject('  AlMimeTypeByExtA.Add(''.' + LExtLst[j] + ''',''' + LLineLst[0] + ''');', pointer(integer(1)))
                   else
-                    LAlMimeContentTypeByExtA.AddObject('  AlMimeContentTypeByExtA.Add(''.' + LExtLst[j] + ''',''' + LLineLst[0] + ''');', pointer(integer(0)));
+                    LAlMimeTypeByExtA.AddObject('  AlMimeTypeByExtA.Add(''.' + LExtLst[j] + ''',''' + LLineLst[0] + ''');', pointer(integer(0)));
                   var LStr := LLineLst[0] + '=' + LExtLst[j];
                        If (Lstr = 'application/vnd.sqlite3=sqlite') or
                           (Lstr = 'application/mathematica=ma') or
@@ -277,9 +277,9 @@ begin
                           (Lstr = 'video/x-matroska=mks') or
                           (Lstr = 'video/x-ms-asf=asx') or
                           (Lstr = 'application/inkml+xml=ink') then
-                    LAlExtbyMimeContentTypeA.addObject('  AlExtbyMimeContentTypeA.Add('''+LLineLst[0] + ''',''.' + LExtLst[j] + ''');', pointer(integer(1)))
+                    LAlExtbyMimeTypeA.addObject('  AlExtbyMimeTypeA.Add('''+LLineLst[0] + ''',''.' + LExtLst[j] + ''');', pointer(integer(1)))
                   else
-                    LAlExtbyMimeContentTypeA.addObject('  AlExtbyMimeContentTypeA.Add('''+LLineLst[0] + ''',''.' + LExtLst[j] + ''');', pointer(integer(0)))
+                    LAlExtbyMimeTypeA.addObject('  AlExtbyMimeTypeA.Add('''+LLineLst[0] + ''',''.' + LExtLst[j] + ''');', pointer(integer(0)))
                 end;
               finally
                 ALFreeAndNil(LExtLst);
@@ -288,20 +288,20 @@ begin
               ALFreeAndNil(LLineLst);
             end;
           end;
-          LAlMimeContentTypeByExtA.Sorted := False;
-          LAlExtbyMimeContentTypeA.Sorted := False;
-          for var I := 0 to LAlMimeContentTypeByExtA.Count - 1 do
-            if integer(LAlMimeContentTypeByExtA.Objects[I]) = 1 then
-              LAlMimeContentTypeByExtA[i] := '  //' + ALTrim(LAlMimeContentTypeByExtA[i]);
-          for var I := 0 to LAlExtbyMimeContentTypeA.Count - 1 do
-            if integer(LAlExtbyMimeContentTypeA.Objects[I]) = 1 then
-              LAlExtbyMimeContentTypeA[i] := '  //' + ALTrim(LAlExtbyMimeContentTypeA[i]);
-          LAlMimeContentTypeByExtA.SaveToFile(ALGetModulePathW + '\AlMimeContentTypeByExtA.pas');
-          LAlExtbyMimeContentTypeA.SaveToFile(ALGetModulePathW + '\AlExtbyMimeContentTypeA.pas');
+          LAlMimeTypeByExtA.Sorted := False;
+          LAlExtbyMimeTypeA.Sorted := False;
+          for var I := 0 to LAlMimeTypeByExtA.Count - 1 do
+            if integer(LAlMimeTypeByExtA.Objects[I]) = 1 then
+              LAlMimeTypeByExtA[i] := '  //' + ALTrim(LAlMimeTypeByExtA[i]);
+          for var I := 0 to LAlExtbyMimeTypeA.Count - 1 do
+            if integer(LAlExtbyMimeTypeA.Objects[I]) = 1 then
+              LAlExtbyMimeTypeA[i] := '  //' + ALTrim(LAlExtbyMimeTypeA[i]);
+          LAlMimeTypeByExtA.SaveToFile(ALGetModulePathW + '\AlMimeTypeByExtA.pas');
+          LAlExtbyMimeTypeA.SaveToFile(ALGetModulePathW + '\AlExtbyMimeTypeA.pas');
         finally
           ALFreeAndNil(LSrcLst);
-          ALFreeAndNil(LAlMimeContentTypeByExtA);
-          ALFreeAndNil(LAlExtbyMimeContentTypeA);
+          ALFreeAndNil(LAlMimeTypeByExtA);
+          ALFreeAndNil(LAlExtbyMimeTypeA);
         end;
       Finally
         ALFreeAndNil(LHttpResponse);

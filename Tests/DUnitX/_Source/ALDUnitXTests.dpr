@@ -149,7 +149,7 @@ uses
   Alcinoe.InternetMessages,
   Alcinoe.JSONDoc,
   Alcinoe.Localization,
-  Alcinoe.Mime.ContentTypes,
+  Alcinoe.Mime.Types,
   Alcinoe.Mime.Multipart,
   Alcinoe.Net,
   Alcinoe.Net.Socket.Client,

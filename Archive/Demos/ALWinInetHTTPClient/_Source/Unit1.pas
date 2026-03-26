@@ -496,7 +496,7 @@ begin
           LMultiPartFormDataFile := TALMultiPartFormDataContent.Create;
           TMemoryStream(LMultiPartFormDataFile.DataStream).LoadFromFile(MemoPostDataFiles.Lines.ValueFromIndex[I]);
           LMultiPartFormDataFile.ContentDisposition := 'form-data; name="'+AnsiString(MemoPostDataFiles.Lines.Names[I])+'"; filename="'+AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])+'"';
-          LMultiPartFormDataFile.ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])));
+          LMultiPartFormDataFile.ContentType := ALGetDefaultMimeTypeFromExt(ALExtractFileExt(AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])));
           LMultiPartFormDataFiles.Add(LMultiPartFormDataFile);
         end;
 
@@ -593,7 +593,7 @@ begin
           LMultiPartFormDataFile := TALMultiPartFormDataContent.Create;
           TMemoryStream(LMultiPartFormDataFile.DataStream).LoadFromFile(MemoPostDataFiles.Lines.ValueFromIndex[I]);
           LMultiPartFormDataFile.ContentDisposition := 'form-data; name="'+AnsiString(MemoPostDataFiles.Lines.Names[I])+'"; filename="'+AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])+'"';
-          LMultiPartFormDataFile.ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])));
+          LMultiPartFormDataFile.ContentType := ALGetDefaultMimeTypeFromExt(ALExtractFileExt(AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])));
           LMultiPartFormDataFiles.Add(LMultiPartFormDataFile);
         end;
 

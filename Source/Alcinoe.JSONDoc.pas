@@ -1608,7 +1608,7 @@ begin
   Value.W2 := LArg2; // lower  4 Bytes - timestamp
 end;
 
-{******************************************************************************}
+{****************************************************************************}
 function ALJSONTryStrToInt32A(const S: AnsiString; out Value: Int32): Boolean;
 begin
 
@@ -2232,7 +2232,7 @@ begin
   else Result := LNode.GetObjectID(default);
 end;
 
-{****************************************************************************************************}
+{************************************************************************************************}
 function TALJSONNodeA.GetChildValueInt32(const NodeName: AnsiString; const Default: Int32): Int32;
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -2402,7 +2402,7 @@ begin
   else Result := LNode.GetObjectID(default);
 end;
 
-{*********************************************************************************************************}
+{*****************************************************************************************************}
 function TALJSONNodeA.GetChildValueInt32(const Path: array of AnsiString; const Default: Int32): Int32;
 begin
   var LNode := Self;
@@ -2602,7 +2602,7 @@ begin
   else LNode.SetObjectID(value);
 end;
 
-{******************************************************************************************}
+{****************************************************************************************}
 procedure TALJSONNodeA.SetChildValueInt32(const NodeName: AnsiString; const Value: Int32);
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -2752,7 +2752,7 @@ begin
   else LTmpNode.SetObjectID(value);
 end;
 
-{***********************************************************************************************}
+{*********************************************************************************************}
 procedure TALJSONNodeA.SetChildValueInt32(const Path: array of AnsiString; const Value: Int32);
 begin
   var LNode := Self;
@@ -3010,19 +3010,19 @@ begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
 
-{**************************************}
+{************************************}
 function TALJSONNodeA.GetInt32: Int32;
 begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
 
-{**************************************************************}
+{**********************************************************}
 function TALJSONNodeA.GetInt32(const Default: Int32): Int32;
 begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************}
+{**************************************************}
 procedure TALJSONNodeA.SetInt32(const Value: Int32);
 begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
@@ -5581,7 +5581,7 @@ Var
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteTextNode2Buffer(ATextNode:TALJSONTextNodeA; AParentNode: TALJSONNodeA);
   begin
     with ATextNode do begin
@@ -6039,7 +6039,7 @@ Var
     _Write2Buffer(LInt64, sizeOf(LInt64));
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteTextNode2Buffer(ATextNode:TALJSONTextNodeA; AParentNode: TALJSONNodeA; ANodeIndex: Integer);
   begin
     with ATextNode do begin
@@ -6881,7 +6881,7 @@ begin
   FStorageKind := TALJSONStorageKind.skBytes;
 end;
 
-{******************************************}
+{****************************************}
 function TALJSONTextNodeA.GetInt32: Int32;
 begin
   case FNodeSubType of
@@ -6909,14 +6909,14 @@ begin
   end;
 end;
 
-{******************************************************************}
+{**************************************************************}
 function TALJSONTextNodeA.GetInt32(const Default: Int32): Int32;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetInt32;
 end;
 
-{********************************************************}
+{******************************************************}
 procedure TALJSONTextNodeA.SetInt32(const Value: Int32);
 begin
   ClearNodeValue;
@@ -8832,7 +8832,7 @@ begin
   else Result := LNode.GetObjectID(default);
 end;
 
-{************************************************************************************************}
+{********************************************************************************************}
 function TALJSONNodeW.GetChildValueInt32(const NodeName: String; const Default: Int32): Int32;
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -9002,7 +9002,7 @@ begin
   else Result := LNode.GetObjectID(default);
 end;
 
-{*****************************************************************************************************}
+{*************************************************************************************************}
 function TALJSONNodeW.GetChildValueInt32(const Path: array of String; const Default: Int32): Int32;
 begin
   var LNode := Self;
@@ -9202,7 +9202,7 @@ begin
   else LNode.SetObjectID(value);
 end;
 
-{**************************************************************************************}
+{************************************************************************************}
 procedure TALJSONNodeW.SetChildValueInt32(const NodeName: String; const Value: Int32);
 begin
   var LNode := ChildNodes.findNode(nodeName);
@@ -9352,7 +9352,7 @@ begin
   else LTmpNode.SetObjectID(value);
 end;
 
-{*******************************************************************************************}
+{*****************************************************************************************}
 procedure TALJSONNodeW.SetChildValueInt32(const Path: array of String; const Value: Int32);
 begin
   var LNode := Self;
@@ -9610,19 +9610,19 @@ begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
 
-{**************************************}
+{************************************}
 function TALJSONNodeW.GetInt32: Int32;
 begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
 
-{**************************************************************}
+{**********************************************************}
 function TALJSONNodeW.GetInt32(const Default: Int32): Int32;
 begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
 
-{****************************************************}
+{**************************************************}
 procedure TALJSONNodeW.SetInt32(const Value: Int32);
 begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
@@ -12113,7 +12113,7 @@ Var
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteTextNode2Buffer(ATextNode:TALJSONTextNodeW; AParentNode: TALJSONNodeW);
   begin
     with ATextNode do begin
@@ -12582,7 +12582,7 @@ Var
     _Write2Buffer(LInt64, sizeOf(LInt64));
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteTextNode2Buffer(ATextNode:TALJSONTextNodeW; AParentNode: TALJSONNodeW; ANodeIndex: Integer);
   begin
     with ATextNode do begin
@@ -13317,7 +13317,7 @@ begin
   FStorageKind := TALJSONStorageKind.skBytes;
 end;
 
-{******************************************}
+{****************************************}
 function TALJSONTextNodeW.GetInt32: Int32;
 begin
   case FNodeSubType of
@@ -13345,14 +13345,14 @@ begin
   end;
 end;
 
-{******************************************************************}
+{**************************************************************}
 function TALJSONTextNodeW.GetInt32(const Default: Int32): Int32;
 begin
   if FNodeSubType = nstNull then Result := default
   else Result := GetInt32;
 end;
 
-{********************************************************}
+{******************************************************}
 procedure TALJSONTextNodeW.SetInt32(const Value: Int32);
 begin
   ClearNodeValue;

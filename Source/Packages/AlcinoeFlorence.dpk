@@ -90,7 +90,7 @@ contains
   Alcinoe.HTTP.Client.WinHTTP in 'Alcinoe.HTTP.Client.WinHTTP.pas',
   Alcinoe.JSONDoc in 'Alcinoe.JSONDoc.pas',
   Alcinoe.Localization in 'Alcinoe.Localization.pas',
-  Alcinoe.Mime.ContentTypes in 'Alcinoe.Mime.ContentTypes.pas',
+  Alcinoe.Mime.Types in 'Alcinoe.Mime.Types.pas',
   Alcinoe.Mime.Multipart in 'Alcinoe.Mime.Multipart.pas',
   Alcinoe.StringList in 'Alcinoe.StringList.pas',
   Alcinoe.StringUtils in 'Alcinoe.StringUtils.pas',

@@ -3041,7 +3041,7 @@ begin
   {$ELSE}
   FSignal := TEvent.Create(nil, false{ManualReset}, false, '');
   {$ENDIF}
-  //FLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
+  //FLock := ?? There is no TLightweightMREW.Create; initialization is done through the TLightweightMREW.Initialize class operator instead
   Setlength(FEngines, 10);
   for var I := Low(FEngines) to High(FEngines) do
     FEngines[I] := TEngine.Create;
@@ -4819,7 +4819,7 @@ initialization
   TALVideoPlayerControllerThread.FInstance := nil;
   TALVideoPlayerControllerThread.CreateInstanceFunc := @TALVideoPlayerControllerThread.CreateInstance;
   TALVideoPlayerSurface.AutoStartedVideoPlayerSurface := Nil;
-  //ALVideoPlayerEventLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
+  //ALVideoPlayerEventLock := ?? There is no TLightweightMREW.Create; initialization is done through the TLightweightMREW.Initialize class operator instead
 
   {$REGION 'IOS'}
   {$IF defined(IOS)}

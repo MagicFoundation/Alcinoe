@@ -49,7 +49,7 @@ uses
 constructor TALBufDrawableCacheEngine.Create;
 begin
   inherited;
-  //FLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
+  //FLock := ?? There is no TLightweightMREW.Create; initialization is done through the TLightweightMREW.Initialize class operator instead
   FEntries := nil;
 end;
 

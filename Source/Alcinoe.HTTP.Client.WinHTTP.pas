@@ -601,13 +601,13 @@ begin
   try
 
     // Allow HTTP/2 (keeps HTTP/1.1 as fallback)
-    if ProtocolVersion = TALHTTPVersion.v2 then begin
+    if (ProtocolVersion = TALHTTPVersion.v2) and TOSVersion.Check(10, 0) {Windows 10 / Windows Server 2016} then begin
       var LOption: DWord := WINHTTP_PROTOCOL_FLAG_HTTP2;
       CheckApiBoolean('WinHttpSetOption', WinHttpSetOption(Result, WINHTTP_OPTION_ENABLE_HTTP_PROTOCOL , Pointer(@LOption), SizeOf(LOption)));
     end
 
     // Allow HTTP/3 (keeps HTTP/1.1 as fallback)
-    else if ProtocolVersion = TALHTTPVersion.v3 then begin
+    else if (ProtocolVersion = TALHTTPVersion.v3) and TOSVersion.Check(10, 0) {Windows 10 / Windows Server 2016} then begin
       var LOption: DWord := WINHTTP_PROTOCOL_FLAG_HTTP3;
       CheckApiBoolean('WinHttpSetOption', WinHttpSetOption(Result, WINHTTP_OPTION_ENABLE_HTTP_PROTOCOL , Pointer(@LOption), SizeOf(LOption)));
     end;
@@ -643,7 +643,7 @@ begin
       var LOption: DWord := WINHTTP_DISABLE_REDIRECTS;
       CheckApiBoolean('WinHttpSetOption', WinHttpSetOption(Result, WINHTTP_OPTION_DISABLE_FEATURE, Pointer(@LOption), sizeof(LOption)));
     end;
-    If (THttpOption.Decompression in HttpOptions) then begin
+    If (THttpOption.Decompression in HttpOptions) and TOSVersion.Check(6, 3) {Windows 8.1 / Server 2012 R2} then begin
       var LOption: DWord := WINHTTP_DECOMPRESSION_FLAG_ALL;
       CheckApiBoolean('WinHttpSetOption', WinHttpSetOption(Result, WINHTTP_OPTION_DECOMPRESSION, Pointer(@LOption), sizeof(LOption)));
     end;

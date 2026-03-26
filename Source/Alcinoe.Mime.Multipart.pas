@@ -293,7 +293,7 @@ Uses
   System.IOUtils,
   System.AnsiStrings,
   System.NetConsts,
-  Alcinoe.Mime.ContentTypes;
+  Alcinoe.Mime.Types;
 
 {**********************************************************************}
 constructor TALMultipartBaseEncoderA.Create(AOwnsOutputStream: Boolean);
@@ -468,7 +468,7 @@ begin
   Var LContentLength: AnsiString := ALInttostrA(AStream.Size);
 
   var LContentType := AContentType;
-  if LContentType = '' then LContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(AFileName));
+  if LContentType = '' then LContentType := ALGetDefaultMimeTypeFromExt(ALExtractFileExt(AFileName));
 
   var LSize: int64 := 0;
   LSize := LSize + 2{--} + Length(FBoundary) + 2{#13#10};
@@ -685,7 +685,7 @@ procedure TALMultipartMixedEncoderA.AddStream(
 begin
 
   var LContentType := AContentType;
-  if LContentType = '' then LContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(AFileName));
+  if LContentType = '' then LContentType := ALGetDefaultMimeTypeFromExt(ALExtractFileExt(AFileName));
 
   var LHeaders := AHeaders;
   var LContentDispositionInHeaders: Boolean := False;

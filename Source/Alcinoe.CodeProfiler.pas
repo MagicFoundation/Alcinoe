@@ -500,7 +500,7 @@ initialization
   ALIsInCodeProfiler := False;
   ALCodeProfilerAppStartTimeStamp := TStopWatch.GetTimeStamp;
   TALStopWatchProcMetrics.ExecutionIDSequence := 0;
-  //ALProcMetricsLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
+  //ALProcMetricsLock := ?? There is no TLightweightMREW.Create; initialization is done through the TLightweightMREW.Initialize class operator instead
   ALCodeProfilerEnabled := True;
   ALProcMetricsFilename := '';
   ALCodeProfilerServerName := '';

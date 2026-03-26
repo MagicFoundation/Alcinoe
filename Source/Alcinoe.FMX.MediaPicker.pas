@@ -182,7 +182,7 @@ uses
   {$IF defined(MSWindows)}
   System.UITypes,
   FMX.Dialogs,
-  Alcinoe.Mime.ContentTypes,
+  Alcinoe.Mime.Types,
   {$ENDIF}
   FMX.Platform,
   Alcinoe.FileUtils,
@@ -788,9 +788,9 @@ begin
         SetLength(LItems, LOpenDialog.Files.Count);
         For var I := 0 to LOpenDialog.Files.Count - 1 do begin
           var LMediaType: TMediaType;
-          var LMimeContentType := ALGetDefaultMimeContentTypeFromExt(ALExtractFileExt(LOpenDialog.Files[I]));
-          If alposW('image/', LMimeContentType) = 1 then LMediaType := TMediaType.Image
-          else If alposW('video/', LMimeContentType) = 1 then LMediaType := TMediaType.video
+          var LMimeType := ALGetDefaultMimeTypeFromExt(ALExtractFileExt(LOpenDialog.Files[I]));
+          If alposW('image/', LMimeType) = 1 then LMediaType := TMediaType.Image
+          else If alposW('video/', LMimeType) = 1 then LMediaType := TMediaType.video
           else LMediaType := TMediaType.Unknown;
           LItems[I] := TMediaItem.Create(
                          LOpenDialog.Files[I],

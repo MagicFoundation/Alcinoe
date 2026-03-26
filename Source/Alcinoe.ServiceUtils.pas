@@ -6,7 +6,8 @@ interface
 
 uses
   System.SysUtils,
-  System.SyncObjs;
+  System.SyncObjs,
+  Winapi.Windows;
 
 procedure ALInstallService(
             const AServiceName: string;
@@ -16,20 +17,21 @@ procedure ALInstallService(
             const ADependencies: TArray<String>;
             const AAccountName: String;
             const APassword: String;
-            const APreshutdownTimeout: integer = 0);
+            const APreshutdownTimeout: integer = 180000;
+            const AEnableFailureAutoRestart: Boolean = True);
 procedure ALUninstallService(const AServiceName: string);
 Procedure ALStartService(const AServiceName: String);
 procedure ALStopService(const AServiceName: String);
 procedure ALStartServiceCtrlDispatcher(const AServiceName: String; const AServiceProc: TProcedure);
+procedure ALStopCurrentService(const AWin32ExitCode: DWORD = NO_ERROR);
 
 var
   ALStopServiceEvent: TEvent = nil;
-
+  ALServiceStoppedWin32ExitCode: DWORD = NO_ERROR;
 
 implementation
 
 uses
-  Winapi.Windows,
   Winapi.WinSvc,
   Alcinoe.WinApi.Windows,
   Alcinoe.Common;
@@ -43,7 +45,8 @@ procedure ALInstallService(
             const ADependencies: TArray<String>;
             const AAccountName: String;
             const APassword: String;
-            const APreshutdownTimeout: integer = 0);
+            const APreshutdownTimeout: integer = 180000;
+            const AEnableFailureAutoRestart: Boolean = True);
 begin
   var LSCManager := ALCheckWinApiHandle(
                       'OpenSCManagerW',
@@ -81,7 +84,7 @@ begin
         var LServiceDescription: SERVICE_DESCRIPTIONW;
         LServiceDescription.lpDescription := PWideChar(ADescription);
         ALCheckWinApiBoolean(
-          'ChangeServiceConfig2W',
+          'ChangeServiceConfig2W(SERVICE_CONFIG_DESCRIPTION)',
           ChangeServiceConfig2W(
             LService,
             SERVICE_CONFIG_DESCRIPTION,
@@ -92,11 +95,45 @@ begin
         var lServicePreshutdownInfo: SERVICE_PRESHUTDOWN_INFO;
         lServicePreshutdownInfo.dwPreshutdownTimeout := APreshutdownTimeout;
         ALCheckWinApiBoolean(
-          'ChangeServiceConfig2W',
+          'ChangeServiceConfig2W(SERVICE_CONFIG_PRESHUTDOWN_INFO)',
           ChangeServiceConfig2W(
             LService,
             SERVICE_CONFIG_PRESHUTDOWN_INFO,
             @lServicePreshutdownInfo));
+      end;
+
+      if AEnableFailureAutoRestart then begin
+        var LActions: array[0..2] of SC_ACTION;
+        LActions[0].&Type := SC_ACTION_RESTART;
+        LActions[0].Delay := 5000;   // 5 sec
+        LActions[1].&Type := SC_ACTION_RESTART;
+        LActions[1].Delay := 15000;  // 15 sec
+        LActions[2].&Type := SC_ACTION_RESTART;
+        LActions[2].Delay := 60000;  // 60 sec
+
+        var LFailureActions: SERVICE_FAILURE_ACTIONSW;
+        LFailureActions.dwResetPeriod := 86400; // reset failure count after 1 day
+        LFailureActions.lpRebootMsg := nil;
+        LFailureActions.lpCommand := nil;
+        LFailureActions.cActions := Length(LActions);
+        LFailureActions.lpsaActions := @LActions[0];
+
+        ALCheckWinApiBoolean(
+          'ChangeServiceConfig2W(SERVICE_CONFIG_FAILURE_ACTIONS)',
+          ChangeServiceConfig2W(
+            LService,
+            SERVICE_CONFIG_FAILURE_ACTIONS,
+            @LFailureActions));
+
+        var LFailureActionsFlag: SERVICE_FAILURE_ACTIONS_FLAG;
+        LFailureActionsFlag.fFailureActionsOnNonCrashFailures := 1;
+
+        ALCheckWinApiBoolean(
+          'ChangeServiceConfig2W(SERVICE_CONFIG_FAILURE_ACTIONS_FLAG)',
+          ChangeServiceConfig2W(
+            LService,
+            SERVICE_CONFIG_FAILURE_ACTIONS_FLAG,
+            @LFailureActionsFlag));
       end;
 
     finally
@@ -106,6 +143,8 @@ begin
   finally
     CloseServiceHandle(LSCManager);
   end;
+
+  Writeln(Format('Service "%s" was successfully installed.', [AServiceName]));
 end;
 
 {*******************************************************}
@@ -136,6 +175,8 @@ begin
   finally
     CloseServiceHandle(LSCManager);
   end;
+
+  Writeln(Format('Service "%s" was successfully uninstalled.', [AServiceName]));
 end;
 
 {***************************************************}
@@ -241,8 +282,8 @@ var
   _ServiceProc: TProcedure = nil;
   _ServiceStatusHandle: SERVICE_STATUS_HANDLE = 0;
 
-{**********************************************************************************************}
-procedure _SetServiceStatus(const ACurrentState: DWORD; const AWin32ExitCode: DWORD = NO_ERROR);
+{***********************************************************************************}
+procedure _SetServiceStatus(const ACurrentState: DWORD; const AWin32ExitCode: DWORD);
 begin
   if _ServiceStatusHandle = 0 then Exit;
   var LServiceStatus: SERVICE_STATUS;
@@ -277,7 +318,7 @@ begin
     SERVICE_CONTROL_STOP,
     SERVICE_CONTROL_PRESHUTDOWN,
     SERVICE_CONTROL_SHUTDOWN: begin
-      _SetServiceStatus(SERVICE_STOP_PENDING);
+      _SetServiceStatus(SERVICE_STOP_PENDING, NO_ERROR);
       if ALStopServiceEvent <> nil then ALStopServiceEvent.SetEvent;
       Result := NO_ERROR;
     end;
@@ -301,10 +342,10 @@ begin
                                   PWideChar(_ServiceName), // LPCWSTR               lpServiceName,
                                   @_ServiceCtrlHandlerEx, // LPHANDLER_FUNCTION_EX lpHandlerProc,
                                   nil)); // LPVOID                lpContext
-      _SetServiceStatus(SERVICE_START_PENDING);
-      _SetServiceStatus(SERVICE_RUNNING);
+      _SetServiceStatus(SERVICE_START_PENDING, NO_ERROR);
+      _SetServiceStatus(SERVICE_RUNNING, NO_ERROR);
       _ServiceProc();
-      _SetServiceStatus(SERVICE_STOPPED);
+      _SetServiceStatus(SERVICE_STOPPED, ALServiceStoppedWin32ExitCode);
     finally
       ALFreeAndNil(ALStopServiceEvent);
     end;
@@ -331,6 +372,13 @@ begin
   ALCheckWinApiBoolean(
     'StartServiceCtrlDispatcherW',
     StartServiceCtrlDispatcherW(@LServiceTableEntries[0]));
+end;
+
+{*********************************************************************}
+procedure ALStopCurrentService(const AWin32ExitCode: DWORD = NO_ERROR);
+begin
+  ALServiceStoppedWin32ExitCode := AWin32ExitCode;
+  if ALStopServiceEvent <> nil then ALStopServiceEvent.setEvent;
 end;
 
 end.

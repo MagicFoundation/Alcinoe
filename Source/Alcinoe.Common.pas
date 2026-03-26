@@ -110,7 +110,7 @@ type
   protected
     procedure Execute; override;
   public
-    constructor Create(const aWorkerThreadPool: TALWorkerThreadPool);
+    constructor Create(const AWorkerThreadPool: TALWorkerThreadPool);
     destructor Destroy; override;
     property Signal: TEvent read FSignal;
     property Waiting: Boolean read fWaiting write fWaiting;
@@ -1185,12 +1185,12 @@ begin
 end;
 
 {*******************************************************************************}
-constructor TALWorkerThread.Create(const aWorkerThreadPool: TALWorkerThreadPool);
+constructor TALWorkerThread.Create(const AWorkerThreadPool: TALWorkerThreadPool);
 begin
   inherited Create(True);
   FSignal := TEvent.Create(nil{EventAttributes}, false{ManualReset}, false{InitialState}, ''{Name});
   FWaiting := False;
-  FWorkerThreadPool := aWorkerThreadPool;
+  FWorkerThreadPool := AWorkerThreadPool;
   {$IF defined(ANDROID) or defined(IOS)}
   Policy := SCHED_OTHER;
   priority := sched_get_priority_min(SCHED_OTHER);
@@ -3920,7 +3920,7 @@ begin
   {$IF defined(DEBUG)}
   //ALLog('ALMonitorEnter', ATag, TALLogType.verbose);
   if not TMonitor.Enter(AObject, 1{Timeout}) then begin
-    ALLog(ATag, 'Lock contention detected', TALLogType.WARN);
+    if ATag <> '' then ALLog(ATag, 'Lock contention detected', TALLogType.WARN);
     TMonitor.Enter(AObject);
   end;
   {$ELSE}

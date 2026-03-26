@@ -76,23 +76,21 @@ Const
 
 type
 
-  TALStringStreamA = class(TStream)
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if System.classes.TStringStream is still the same and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if System.classes.TBytesStream is still the same and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if System.classes.TMemoryStream is still the same and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if System.classes.TCustomMemoryStream is still the same and adjust the IFDEF'}
+  {$ENDIF}
+  TALStringStreamA = class(TMemoryStream)
   private
     FDataString: AnsiString;
-    FPosition: Integer;
     procedure SetDataString(const AValue: AnsiString);
   protected
-    function GetSize: Int64; override;
-    procedure SetSize(NewSize: Longint); override;
-    procedure SetSize(const NewSize: Int64); override;
+    function Realloc(var NewCapacity: NativeInt): Pointer; override;
   public
     constructor Create(const AString: AnsiString);
-    procedure LoadFromStream(Stream: TStream);
-    procedure LoadFromFile(const FileName: string);
-    function Read(var Buffer; Count: Longint): Longint; override;
     function ReadString(Count: Longint): AnsiString;
-    function Seek(Offset: Longint; Origin: Word): Longint; override;
-    function Write(const Buffer; Count: Longint): Longint; override;
     procedure WriteString(const AString: AnsiString);
     property DataString: AnsiString read FDataString write SetDataString;
   end;
@@ -782,31 +780,33 @@ type
     Length: NativeInt;
   end;
 
+Type
+
+  {*************************************}
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if System.classes.TMemoryStream is still the same and adjust the IFDEF'}
+  {$ENDIF}
+  _TALMemoryStreamPrivateAccess = class(TCustomMemoryStream)
+  public
+    FCapacity: NativeInt;
+  end;
+
 {*************************************************************}
 constructor TALStringStreamA.Create(const AString: AnsiString);
 begin
   inherited Create;
-  FDataString := AString;
+  SetDataString(AString);
 end;
 
-{*********************************************************}
-procedure TALStringStreamA.LoadFromStream(Stream: TStream);
+{*********************************************************************}
+function TALStringStreamA.Realloc(var NewCapacity: NativeInt): Pointer;
 begin
-  Stream.Position := 0;
-  var LCount := Stream.Size;
-  SetSize(LCount);
-  if LCount <> 0 then
-    Stream.ReadBuffer(PAnsiChar(FDataString)^, LCount);
-end;
-
-{**************************************************************}
-procedure TALStringStreamA.LoadFromFile(const FileName: string);
-begin
-  var LFileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
-  try
-    LoadFromStream(LFileStream);
-  finally
-    ALFreeAndNil(LFileStream);
+  Result := Pointer(FDataString);
+  if NewCapacity <> Capacity then begin
+    SetLength(FDataString, NewCapacity);
+    Result := Pointer(FDataString);
+    if NewCapacity = 0 then Exit;
+    if Result = nil then raise EStreamError.CreateRes(@SMemoryStreamError);
   end;
 end;
 
@@ -814,86 +814,25 @@ end;
 procedure TALStringStreamA.SetDataString(const AValue: AnsiString);
 begin
   FDataString := AValue;
-  FPosition := 0;
-end;
-
-{******************************************************************}
-function TALStringStreamA.Read(var Buffer; Count: Longint): Longint;
-begin
-  Result := Length(FDataString) - FPosition;
-  if Result > Count then Result := Count;
-
-  // a little modification from the original TStringStream
-  // because in original we will have a call to uniqueString on FDataString :(
-  // https://forums.embarcadero.com/thread.jspa?threadID=119103
-  // ALMove(PAnsiChar(@FDataString[FPosition + SizeOf(AnsiChar)])^, Buffer, Result * SizeOf(AnsiChar));
-  ALMove(Pbyte(FDataString)[FPosition], Buffer, Result * SizeOf(AnsiChar));
-
-  Inc(FPosition, Result);
-end;
-
-{*********************************************************************}
-function TALStringStreamA.Write(const Buffer; Count: Longint): Longint;
-begin
-  Result := Count;
-
-  // a little modification from the original TStringStream
-  // because in original it's crazy we can not update part inside the datastring !!
-  // SetLength(FDataString, (FPosition + Result));
-  if FPosition + Result > length(FDataString) then SetLength(FDataString, (FPosition + Result));
-
-  ALMove(Buffer, PAnsiChar(@FDataString[FPosition + SizeOf(AnsiChar)])^, Result * SizeOf(AnsiChar));
-  Inc(FPosition, Result);
-end;
-
-{*********************************************************************}
-function TALStringStreamA.Seek(Offset: Longint; Origin: Word): Longint;
-begin
-  case Origin of
-    soFromBeginning: FPosition := Offset;
-    soFromCurrent: FPosition := FPosition + Offset;
-    soFromEnd: FPosition := Length(FDataString) - Offset;
-  end;
-  if FPosition > Length(FDataString) then
-    FPosition := Length(FDataString)
-  else if FPosition < 0 then FPosition := 0;
-  Result := FPosition;
+  SetPointer(Pointer(FDataString), Length(FDataString));
+  _TALMemoryStreamPrivateAccess(Self).FCapacity := length(FDataString){FSize};
+  Position := 0;
 end;
 
 {***************************************************************}
 function TALStringStreamA.ReadString(Count: Longint): AnsiString;
-var
-  Len: Integer;
 begin
-  Len := Length(FDataString) - FPosition;
-  if Len > Count then Len := Count;
-  SetString(Result, PAnsiChar(@FDataString[FPosition + SizeOf(AnsiChar)]), Len);
-  Inc(FPosition, Len);
+  var LPosition: int64 := Position;
+  if Count > Length(FDataString){Size} - LPosition then
+    Count := Length(FDataString){Size} - LPosition;
+  SetString(Result, PAnsiChar(@FDataString[LPosition + SizeOf(AnsiChar)]), Count);
+  Position := LPosition + Count;
 end;
 
 {****************************************************************}
 procedure TALStringStreamA.WriteString(const AString: AnsiString);
 begin
-  Write(PAnsiChar(AString)^, Length(AString));
-end;
-
-{***************************************}
-function TALStringStreamA.GetSize: Int64;
-begin
-  Result := length(FDataString);
-end;
-
-{***************************************************}
-procedure TALStringStreamA.SetSize(NewSize: Longint);
-begin
-  SetSize(Int64(NewSize));
-end;
-
-{*******************************************************}
-procedure TALStringStreamA.SetSize(const NewSize: Int64);
-begin
-  SetLength(FDataString, NewSize);
-  if FPosition > NewSize then FPosition := NewSize;
+  Write(pointer(AString)^, Length(AString));
 end;
 
 {*********************************************************************************************************}

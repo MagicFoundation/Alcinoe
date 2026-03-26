@@ -61,7 +61,7 @@ type
     Type
       TRequestEvent = procedure(Const ARequest: TALHttpServerRequestA; Const AResponse: TALHttpServerResponseA) of object;
   private
-    FMaxBodySize: Int64;
+    FMaxRequestBodySize: Int64;
     FOnRequest: TRequestEvent;
   protected
     FRunning: Boolean;
@@ -72,7 +72,7 @@ type
     procedure Start; virtual; abstract;
     procedure Stop; virtual; abstract;
     property Running: Boolean read FRunning;
-    property MaxBodySize: Int64 read FMaxBodySize write FMaxBodySize;
+    property MaxRequestBodySize: Int64 read FMaxRequestBodySize write FMaxRequestBodySize;
     property OnRequest: TRequestEvent read FOnRequest write FOnRequest;
   end;
 
@@ -83,7 +83,7 @@ constructor TALHttpServerA.Create;
 begin
   inherited;
   FRunning := False;
-  FMaxBodySize := 33554432; // 32 MiB (binary; 1 MiB = 1,048,576 bytes)
+  FMaxRequestBodySize := 33554432; // 32 MiB (binary; 1 MiB = 1,048,576 bytes)
   FOnRequest := nil;
 end;
 

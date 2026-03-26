@@ -247,11 +247,9 @@ type
     FUrlPrefixes: TALStringListW;
     FLoggingInfo: TLoggingInfo;
     FWorkerThreads: TObjectList<TWorkerThread>;
-    FMinWorkerThreadCount: Integer;
-    FMaxWorkerThreadCount: Integer;
     FWorkerThreadCount: Integer;
+    FActiveWorkerThreadCount: Integer;
     FBusyWorkerThreadCount: Integer;
-    FPeakWorkerThreadCount: Integer;
     FPeakBusyWorkerThreadCount: Integer;
     FRequestQueueHandle: HANDLE;
     FIoCompletionPort: THandle;
@@ -261,24 +259,18 @@ type
     FIOCPPendingContinuationCount: Integer;
     FMinInitialReceiveCount: Integer;
     FMaxInitialReceiveCount: Integer;
+    procedure SetWorkerThreadCount(const AValue: Integer);
   public
     constructor Create; override;
     destructor Destroy; override;
     procedure Start; override;
     procedure Stop; override;
     /// <summary>
-    ///   Minimum number of worker threads to start with.
-    ///   If set to 0, defaults to (CPU core count * 4).
+    ///   Number of worker threads. If set to 0, defaults to 1 in Debug builds
+    ///   and to (CPU core count * 4) in Release builds.
     /// </summary>
-    property MinWorkerThreadCount: Integer read FMinWorkerThreadCount write FMinWorkerThreadCount;
-    /// <summary>
-    ///   Maximum number of worker threads the pool can grow to.
-    ///   Set to 0 (or any value <= MinWorkerThreadCount) to disable dynamic growth.
-    /// </summary>
-    property MaxWorkerThreadCount: Integer read FMaxWorkerThreadCount write FMaxWorkerThreadCount;
-    property WorkerThreadCount: Integer read FWorkerThreadCount;
+    property WorkerThreadCount: Integer read FWorkerThreadCount write SetWorkerThreadCount;
     property BusyWorkerThreadCount: Integer read FBusyWorkerThreadCount;
-    property PeakWorkerThreadCount: Integer read FPeakWorkerThreadCount;
     property PeakBusyWorkerThreadCount: Integer read FPeakBusyWorkerThreadCount;
     property IOCPPendingInitialReceiveCount: Integer read FIOCPPendingInitialReceiveCount;
     property IOCPPendingContinuationCount: Integer read FIOCPPendingContinuationCount;
@@ -1283,6 +1275,7 @@ begin
                            @LBytesReturned, // BytesReturned: PULONG; // OPTIONAL
                            @LOverlappedContext^.Overlapped); // Overlapped: LPOVERLAPPED)
           if LStatus <> ERROR_IO_PENDING then begin
+            LOverlappedContext^.InitialReceive := False;
             LOverlappedContext^.CompletedInline := True;
             LOverlappedContext^.HttpApiStatus := LStatus;
             LOverlappedContext^.NumberOfBytesTransferred := LBytesReturned;
@@ -1315,12 +1308,12 @@ begin
         if Terminated then begin
           TMonitor.Enter(Fowner);
           Try
-            If (FOwner.FWorkerThreadCount > 1) or
-               ((FOwner.FWorkerThreadCount = 1) and
+            If (FOwner.FActiveWorkerThreadCount > 1) or
+               ((FOwner.FActiveWorkerThreadCount = 1) and
                 (Fowner.FIOCPPendingInitialReceiveCount = 0) and
                 (Fowner.FIOCPPendingContinuationCount = 0)) then begin
               AtomicIncrement(FOwner.FBusyWorkerThreadCount);
-              AtomicDecrement(FOwner.FWorkerThreadCount);
+              AtomicDecrement(FOwner.FActiveWorkerThreadCount);
               Break;
             end;
           Finally
@@ -1449,8 +1442,8 @@ begin
           var LContentLength: integer;
           if not ALTryStrToInt(LOverlappedContext^.HttpSysRequest.Headers.ContentLength, LContentLength) then LContentLength := 0;
           if (LContentLength > 0) or (AlposIgnoreCaseA('chunked', LOverlappedContext^.HttpSysRequest.Headers.TransferEncoding) > 0) then begin
-            if (LContentLength > FOwner.MaxBodySize) and (FOwner.MaxBodySize > 0) then
-              raise EALHttpServerBodySizeTooBig.CreateFmt('Body size (%d bytes) is bigger than the maximum allowed size (%d bytes)', [LContentLength, FOwner.MaxBodySize]);
+            if (LContentLength > FOwner.MaxRequestBodySize) and (FOwner.MaxRequestBodySize > 0) then
+              raise EALHttpServerBodySizeTooBig.CreateFmt('Body size (%d bytes) is bigger than the maximum allowed size (%d bytes)', [LContentLength, FOwner.MaxRequestBodySize]);
             var LBodyStream := TALStringStreamA(LOverlappedContext^.HttpSysRequest.BodyStream);
             ZeroMemory(@LOverlappedContext^.Overlapped, SizeOf(TOverlapped));
             LOverlappedContext^.Operation := OP_RECEIVE_REQUEST_ENTITY_BODY;
@@ -1523,8 +1516,8 @@ begin
             end
             else begin
               var LBodyStreamSize := LBodyStream.Size + HttpSysRequestBodyStreamDefaultSize - (LBodyStream.Size - LBodyStream.Position);
-              if (LBodyStreamSize > FOwner.MaxBodySize) and (FOwner.MaxBodySize > 0) then
-                raise EALHttpServerBodySizeTooBig.CreateFmt('Body size (%d bytes) is bigger than the maximum allowed size (%d bytes)', [LBodyStreamSize, FOwner.MaxBodySize]);
+              if (LBodyStreamSize > FOwner.MaxRequestBodySize) and (FOwner.MaxRequestBodySize > 0) then
+                raise EALHttpServerBodySizeTooBig.CreateFmt('Body size (%d bytes) is bigger than the maximum allowed size (%d bytes)', [LBodyStreamSize, FOwner.MaxRequestBodySize]);
               LBodyStream.Size := LBodyStreamSize;
               LEntityBuffer := @LBodyStream.DataString[low(AnsiString) + LBodyStream.Position];
               LEntityBufferLength := LBodyStream.Size - LBodyStream.Position;
@@ -1568,8 +1561,8 @@ begin
                 raise EALHttpServerConnectionDropped.Createfmt('Client Dropped Connection. Total Bytes indicated by Header: %d. Total Bytes Read: %d', [LContentLength, LBodyStream.Position]);
             end
             else begin
-              if (LBodyStream.Position > FOwner.MaxBodySize) and (FOwner.MaxBodySize > 0) then
-                raise EALHttpServerBodySizeTooBig.CreateFmt('Body size (%d bytes) is bigger than the maximum allowed size (%d bytes)', [LBodyStream.Position, FOwner.MaxBodySize]);
+              if (LBodyStream.Position > FOwner.MaxRequestBodySize) and (FOwner.MaxRequestBodySize > 0) then
+                raise EALHttpServerBodySizeTooBig.CreateFmt('Body size (%d bytes) is bigger than the maximum allowed size (%d bytes)', [LBodyStream.Position, FOwner.MaxRequestBodySize]);
               LBodyStream.Size := LBodyStream.Position;
             end;
             //-
@@ -1703,11 +1696,7 @@ begin
             else if LOverlappedContext^.HttpSysResponse.FBodyStream <> nil then begin
               ZeroMemory(LOverlappedContext^.HttpApiDataChunk, SizeOf(HTTP_DATA_CHUNK));
               LOverlappedContext^.HttpApiDataChunk^.DataChunkType := HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromMemory;
-              if (LOverlappedContext^.HttpSysResponse.FBodyStream is TALStringStreamA) then begin
-                LOverlappedContext^.HttpApiDataChunk^.fromMemory.pBuffer := PAnsiChar(TALStringStreamA(LOverlappedContext^.HttpSysResponse.FBodyStream).DataString);
-                LOverlappedContext^.HttpApiDataChunk^.fromMemory.BufferLength := LOverlappedContext^.HttpSysResponse.FBodyStream.Size;
-              end
-              else if (LOverlappedContext^.HttpSysResponse.FBodyStream is TCustomMemoryStream) then begin
+              if (LOverlappedContext^.HttpSysResponse.FBodyStream is TCustomMemoryStream) then begin
                 LOverlappedContext^.HttpApiDataChunk^.fromMemory.pBuffer := TCustomMemoryStream(LOverlappedContext^.HttpSysResponse.FBodyStream).Memory;
                 LOverlappedContext^.HttpApiDataChunk^.fromMemory.BufferLength := LOverlappedContext^.HttpSysResponse.FBodyStream.Size;
               end
@@ -1917,11 +1906,9 @@ begin
   FUrlPrefixes := TALStringListW.Create;
   FLoggingInfo := TLoggingInfo.Create;
   FWorkerThreads := TObjectList<TWorkerThread>.Create(true{AOwnsObjects});
-  FMinWorkerThreadCount := 0;
-  FMaxWorkerThreadCount := 0;
-  FWorkerThreadCount := 0;
+  SetWorkerThreadCount(0);
+  FActiveWorkerThreadCount := 0;
   FBusyWorkerThreadCount := 0;
-  FPeakWorkerThreadCount := 0;
   FPeakBusyWorkerThreadCount := 0;
   FRequestQueueHandle := 0;
   FIoCompletionPort := 0;
@@ -1940,6 +1927,17 @@ begin
   ALFreeAndNil(FUrlPrefixes);
   ALFreeAndNil(FLoggingInfo);
   ALFreeAndNil(FWorkerThreads);
+end;
+
+{*********************************************************************}
+procedure TALHttpSysServer.SetWorkerThreadCount(const AValue: Integer);
+begin
+  FWorkerThreadCount := AValue;
+  {$IF defined(DEBUG)}
+  if FWorkerThreadCount = 0 then FWorkerThreadCount := 1;
+  {$ELSE}
+  if FWorkerThreadCount = 0 then FWorkerThreadCount := Max(1, TThread.ProcessorCount * 4);
+  {$ENDIF}
 end;
 
 {*******************************}
@@ -2093,17 +2091,11 @@ begin
                              0)); // NumberOfConcurrentThreads: DWORD
 
     // Create all WorkerThreads
-    var LWorkerThreadCount := FMinWorkerThreadCount;
-    {$IF defined(DEBUG)}
-    if LWorkerThreadCount = 0 then LWorkerThreadCount := 1;
-    {$ELSE}
-    if LWorkerThreadCount = 0 then LWorkerThreadCount := Max(1, TThread.ProcessorCount * 4);
-    {$ENDIF}
-    AtomicExchange(FMinInitialReceiveCount, LWorkerThreadCount * 2);
-    AtomicExchange(FMaxInitialReceiveCount, LWorkerThreadCount * 4);
-    AtomicExchange(FWorkerThreadCount, LWorkerThreadCount);
-    AtomicExchange(FPeakWorkerThreadCount, LWorkerThreadCount);
-    For var I := 1 to LWorkerThreadCount do
+    var LActiveWorkerThreadCount := FWorkerThreadCount;
+    AtomicExchange(FMinInitialReceiveCount, LActiveWorkerThreadCount * 2);
+    AtomicExchange(FMaxInitialReceiveCount, LActiveWorkerThreadCount * 4);
+    AtomicExchange(FActiveWorkerThreadCount, LActiveWorkerThreadCount);
+    For var I := 1 to LActiveWorkerThreadCount do
       FWorkerThreads.Add(TWorkerThread.Create(Self{AOwner}));
 
   except
@@ -2149,9 +2141,8 @@ begin
   end;
 
   // Update counts
-  AtomicExchange(FWorkerThreadCount, 0);
+  AtomicExchange(FActiveWorkerThreadCount, 0);
   AtomicExchange(FBusyWorkerThreadCount, 0);
-  AtomicExchange(FPeakWorkerThreadCount, 0);
   AtomicExchange(FPeakBusyWorkerThreadCount, 0);
   AtomicExchange(FIOCPPendingInitialReceiveCount, 0);
   AtomicExchange(FIOCPPendingContinuationCount, 0);

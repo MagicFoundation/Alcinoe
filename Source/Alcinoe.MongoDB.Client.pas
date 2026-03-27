@@ -54,6 +54,51 @@ type
     FPool: Pmongoc_client_pool_t;
     procedure OnDocumentToRefProc(Sender: TObject; var ADoc: TALJsonNodeA; const AContext: Pointer);
     procedure OnDocumentToJSon(Sender: TObject; var ADoc: TALJsonNodeA; const AContext: Pointer);
+  protected
+    function FindAndModify(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const AQuery: AnsiString;
+               const ASort: AnsiString;
+               const AUpdateJSON: AnsiString;
+               const AUpdateBSON: TBytes;
+               const AFields: AnsiString;
+               const ARemove: ByteBool;
+               const AUpsert: ByteBool;
+               const ANew: ByteBool): TALJsonNodeA; overload; virtual;
+    function InsertOne(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ADocumentJSON: AnsiString;
+               const ADocumentBSON: TBytes;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; virtual;
+    function InsertMany(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ADocumentJSONs: TArray<AnsiString>;
+               const ADocumentBSONs: TArray<TBytes>;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; virtual;
+    function UpdateOne(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ASelector: AnsiString;
+               const AUpdateJSON: AnsiString;
+               const AUpdateBSON: TBytes;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; virtual;
+     function UpdateMany(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ASelector: AnsiString;
+               const AUpdateJSON: AnsiString;
+               const AUpdateBSON: TBytes;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; virtual;
+    function ReplaceOne(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ASelector: AnsiString;
+               const AReplacementJSON: AnsiString;
+               const AReplacementBSON: TBytes;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; virtual;
   public
     /// <summary>
     ///   Creates a MongoDB client pool from a MongoDB connection URI.
@@ -105,35 +150,73 @@ type
                const AFields: AnsiString;
                const ARemove: ByteBool;
                const AUpsert: ByteBool;
-               const ANew: ByteBool): TALJsonNodeA; virtual;
+               const ANew: ByteBool): TALJsonNodeA; overload; inline;
+    function FindAndModify(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const AQuery: AnsiString;
+               const ASort: AnsiString;
+               const AUpdate: TBytes;
+               const AFields: AnsiString;
+               const ARemove: ByteBool;
+               const AUpsert: ByteBool;
+               const ANew: ByteBool): TALJsonNodeA; overload; inline;
     function InsertOne(
                const ADatabaseName: AnsiString;
                const ACollectionName: AnsiString;
                const ADocument: AnsiString;
-               const AOpts: AnsiString = ''): TALJsonNodeA; virtual;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; inline;
+    function InsertOne(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ADocument: TBytes;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; inline;
     function InsertMany(
                const ADatabaseName: AnsiString;
                const ACollectionName: AnsiString;
                const ADocuments: TArray<AnsiString>;
-               const AOpts: AnsiString = ''): TALJsonNodeA; virtual;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; inline;
+    function InsertMany(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ADocuments: TArray<TBytes>;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; inline;
     function UpdateOne(
                const ADatabaseName: AnsiString;
                const ACollectionName: AnsiString;
                const ASelector: AnsiString;
                const AUpdate: AnsiString;
-               const AOpts: AnsiString = ''): TALJsonNodeA; virtual;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; inline;
+    function UpdateOne(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ASelector: AnsiString;
+               const AUpdate: TBytes;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; inline;
     function UpdateMany(
                const ADatabaseName: AnsiString;
                const ACollectionName: AnsiString;
                const ASelector: AnsiString;
                const AUpdate: AnsiString;
-               const AOpts: AnsiString = ''): TALJsonNodeA; virtual;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; inline;
+    function UpdateMany(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ASelector: AnsiString;
+               const AUpdate: TBytes;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; inline;
     function ReplaceOne(
                const ADatabaseName: AnsiString;
                const ACollectionName: AnsiString;
                const ASelector: AnsiString;
                const AReplacement: AnsiString;
-               const AOpts: AnsiString = ''): TALJsonNodeA; virtual;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; inline;
+    function ReplaceOne(
+               const ADatabaseName: AnsiString;
+               const ACollectionName: AnsiString;
+               const ASelector: AnsiString;
+               const AReplacement: TBytes;
+               const AOpts: AnsiString = ''): TALJsonNodeA; overload; inline;
     function DeleteOne(
                const ADatabaseName: AnsiString;
                const ACollectionName: AnsiString;
@@ -224,27 +307,18 @@ begin
           [LMsg, AError.domain, AError.code])
 end;
 
-{*******************************}
-function ALMakeBsonPtrFromString(
-           const ASource: AnsiString;
+{**********************************}
+function ALMakeBsonPtrFromBSONBytes(
+           const ASource: TBytes;
            const ABufferBson: Pbson_t;
            out AIsAllocatedResult: Boolean;
            const AReadOnly: Boolean = True): Pbson_t;
 begin
-  if ASource <> '' then begin
-    if ASource[high(ASource)] <> #0 then begin
-      var LError: bson_error_t;
-      Result := bson_new_from_json(
-                  @ASource[low(ASource)], // data: Puint8_t;
-                  ssize_t(Length(ASource)), // len: ssize_t;
-                  @LError); // error: Pbson_error_t
-      if Result = nil then ALRaiseMongoDBError(LError);
-      AIsAllocatedResult := True;
-    end
-    else if AReadOnly then begin
+  if length(ASource) > 0 then begin
+    if AReadOnly then begin
       if not bson_init_static(
                ABufferBson, // b: Pbson_t;
-               @ASource[low(ASource)], // data: Puint8_t;
+               @ASource[0], // data: Puint8_t;
                size_t(Length(ASource))) then // length: size_t
         raise Exception.Create('bson_init_static failed');
       Result := ABufferBson;
@@ -252,7 +326,7 @@ begin
     end
     else begin
       Result := bson_new_from_data(
-                  @ASource[low(ASource)], // data: Puint8_t;
+                  @ASource[0], // data: Puint8_t;
                   size_t(Length(ASource))); // length: size_t
       if Result = nil then raise Exception.Create('bson_new_from_data failed');
       AIsAllocatedResult := True;
@@ -265,8 +339,31 @@ begin
   end;
 end;
 
+{***********************************}
+function ALMakeBsonPtrFromJSONString(
+           const ASource: AnsiString;
+           const ABufferBson: Pbson_t;
+           out AIsAllocatedResult: Boolean;
+           const AReadOnly: Boolean = True): Pbson_t;
+begin
+  if length(ASource) > 0 then begin
+    var LError: bson_error_t;
+    Result := bson_new_from_json(
+                @ASource[low(ASource)], // data: Puint8_t;
+                ssize_t(Length(ASource)), // len: ssize_t;
+                @LError); // error: Pbson_error_t
+    if Result = nil then ALRaiseMongoDBError(LError);
+    AIsAllocatedResult := True;
+  end
+  else begin
+    bson_init(ABufferBson);
+    Result := ABufferBson;
+    AIsAllocatedResult := False;
+  end;
+end;
+
 {**********************************************************************************}
-function ALMakeReadPrefsFromString(const ASource: AnsiString): Pmongoc_read_prefs_t;
+function ALMakeReadPrefsFromJSonDoc(const ADoc: TALJsonNodeA): Pmongoc_read_prefs_t;
 begin
 
   //
@@ -281,63 +378,63 @@ begin
   // }
   //
 
-  var LDoc := TALJSONDocumentA.Create;
+  // mode
+  var LMode := ADoc.GetChildValueText('mode', 'primary');
+  if LMode = 'primary' then Result := mongoc_read_prefs_new(MONGOC_READ_PRIMARY)
+  else if LMode = 'primary_preferred' then Result := mongoc_read_prefs_new(MONGOC_READ_PRIMARY_PREFERRED)
+  else if LMode = 'secondary' then Result := mongoc_read_prefs_new(MONGOC_READ_SECONDARY)
+  else if LMode = 'secondary_preferred' then Result := mongoc_read_prefs_new(MONGOC_READ_SECONDARY_PREFERRED)
+  else if LMode = 'nearest' then Result := mongoc_read_prefs_new(MONGOC_READ_NEAREST)
+  else raise Exception.CreateFmt('Invalid read preference mode: %s', [LMode]);
+  if Result = nil then raise Exception.Create('mongoc_read_prefs_new failed');
+
   try
 
-    if ASource <> '' then begin
-      if ASource[high(ASource)] <> #0 then LDoc.LoadFromJSONString(ASource)
-      else LDoc.LoadFromBSONString(ASource);
-    end;
-
-    // mode
-    var LMode := LDoc.GetChildValueText('mode', 'primary');
-    if LMode = 'primary' then Result := mongoc_read_prefs_new(MONGOC_READ_PRIMARY)
-    else if LMode = 'primary_preferred' then Result := mongoc_read_prefs_new(MONGOC_READ_PRIMARY_PREFERRED)
-    else if LMode = 'secondary' then Result := mongoc_read_prefs_new(MONGOC_READ_SECONDARY)
-    else if LMode = 'secondary_preferred' then Result := mongoc_read_prefs_new(MONGOC_READ_SECONDARY_PREFERRED)
-    else if LMode = 'nearest' then Result := mongoc_read_prefs_new(MONGOC_READ_NEAREST)
-    else raise Exception.CreateFmt('Invalid read preference mode: %s', [LMode]);
-    if Result = nil then raise Exception.Create('mongoc_read_prefs_new failed');
-
-    try
-
-      // tags
-      var LTagsNode := LDoc.ChildNodes.FindNode('tags');
-      if (LTagsNode <> nil) then begin
-        if not (LTagsNode is TALJSONArrayNodeA) then
-          raise Exception.Create('Tags must be an array');
-        for var I := 0 to LTagsNode.ChildNodes.Count - 1 do begin
-          var LBsonRec: bson_t;
-          var LBsonIsAllocated: Boolean;
-          var LBsonStr: AnsiString := LTagsNode.ChildNodes[I].BSON;
-          var LBsonPtr := ALMakeBsonPtrFromString(LBsonStr, @LBsonRec, LBsonIsAllocated);
-          try
-            mongoc_read_prefs_add_tag(Result, LBsonPtr);
-          finally
-            if LBsonIsAllocated then
-              bson_destroy(LBsonPtr);
-          end;
+    // tags
+    var LTagsNode := ADoc.ChildNodes.FindNode('tags');
+    if (LTagsNode <> nil) then begin
+      if not (LTagsNode is TALJSONArrayNodeA) then
+        raise Exception.Create('Tags must be an array');
+      for var I := 0 to LTagsNode.ChildNodes.Count - 1 do begin
+        var LBsonRec: bson_t;
+        var LBsonIsAllocated: Boolean;
+        var LBsonBytes: TBytes := LTagsNode.ChildNodes[I].BSON;
+        var LBsonPtr := ALMakeBsonPtrFromBSONBytes(LBsonBytes, @LBsonRec, LBsonIsAllocated);
+        try
+          mongoc_read_prefs_add_tag(Result, LBsonPtr);
+        finally
+          if LBsonIsAllocated then
+            bson_destroy(LBsonPtr);
         end;
       end;
-
-      // maxStalenessSeconds
-      var LMaxStalenessNode := LDoc.ChildNodes.FindNode('maxStalenessSeconds');
-      if LMaxStalenessNode <> nil then
-        mongoc_read_prefs_set_max_staleness_seconds(Result, LMaxStalenessNode.int64);
-
-    except
-      mongoc_read_prefs_destroy(Result);
-      raise;
     end;
 
-  finally
-    ALFreeAndNil(LDoc);
+    // maxStalenessSeconds
+    var LMaxStalenessNode := ADoc.ChildNodes.FindNode('maxStalenessSeconds');
+    if LMaxStalenessNode <> nil then
+      mongoc_read_prefs_set_max_staleness_seconds(Result, LMaxStalenessNode.int64);
+
+  except
+    mongoc_read_prefs_destroy(Result);
+    raise;
   end;
 
 end;
 
+{**********************************************************************************}
+function ALMakeReadPrefsFromJSONString(const ASource: AnsiString): Pmongoc_read_prefs_t;
+begin
+  var LDoc := TALJSONDocumentA.Create;
+  try
+    if ASource <> '' then LDoc.LoadFromJSONString(ASource);
+    result := ALMakeReadPrefsFromJSonDoc(LDoc);
+  finally
+    ALFreeAndNil(LDoc);
+  end;
+end;
+
 {**************************************************************************************}
-function ALMakeReadConcernFromString(const ASource: AnsiString): Pmongoc_read_concern_t;
+function ALMakeReadConcernFromJSonDoc(const ADoc: TALJsonNodeA): Pmongoc_read_concern_t;
 begin
 
   //
@@ -346,39 +443,39 @@ begin
   // }
   //
 
-  var LDoc := TALJSONDocumentA.Create;
+  Result := mongoc_read_concern_new;
+  if Result = nil then raise Exception.Create('mongoc_read_concern_new failed');
   try
 
-    if ASource <> '' then begin
-      if ASource[high(ASource)] <> #0 then LDoc.LoadFromJSONString(ASource)
-      else LDoc.LoadFromBSONString(ASource);
+    // level
+    var LLevelNode := ADoc.ChildNodes.FindNode('level');
+    if LLevelNode <> nil then begin
+      var LLevel: AnsiString := LLevelNode.Text;
+      if not mongoc_read_concern_set_level(Result, PAnsiChar(LLevel)) then
+        raise Exception.CreateFmt('Invalid read concern level: %s', [LLevel]);
     end;
 
-    Result := mongoc_read_concern_new;
-    if Result = nil then raise Exception.Create('mongoc_read_concern_new failed');
-    try
-
-      // level
-      var LLevelNode := LDoc.ChildNodes.FindNode('level');
-      if LLevelNode <> nil then begin
-        var LLevel: AnsiString := LLevelNode.Text;
-        if not mongoc_read_concern_set_level(Result, PAnsiChar(LLevel)) then
-          raise Exception.CreateFmt('Invalid read concern level: %s', [LLevel]);
-      end;
-
-    except
-      mongoc_read_concern_destroy(Result);
-      raise;
-    end;
-
-  finally
-    ALFreeAndNil(LDoc);
+  except
+    mongoc_read_concern_destroy(Result);
+    raise;
   end;
 
 end;
 
+{**************************************************************************************}
+function ALMakeReadConcernFromJSONString(const ASource: AnsiString): Pmongoc_read_concern_t;
+begin
+  var LDoc := TALJSONDocumentA.Create;
+  try
+    if ASource <> '' then LDoc.LoadFromJSONString(ASource);
+    result := ALMakeReadConcernFromJSonDoc(LDoc);
+  finally
+    ALFreeAndNil(LDoc);
+  end;
+end;
+
 {****************************************************************************************}
-function ALMakeWriteConcernFromString(const ASource: AnsiString): Pmongoc_write_concern_t;
+function ALMakeWriteConcernFromJSonDoc(const ADoc: TALJsonNodeA): Pmongoc_write_concern_t;
 begin
 
   //
@@ -391,58 +488,58 @@ begin
   // }
   //
 
-  var LDoc := TALJSONDocumentA.Create;
+  Result := mongoc_write_concern_new;
+  if Result = nil then raise Exception.Create('mongoc_write_concern_new failed');
   try
 
-    if ASource <> '' then begin
-      if ASource[high(ASource)] <> #0 then LDoc.LoadFromJSONString(ASource)
-      else LDoc.LoadFromBSONString(ASource);
+    // journal
+    var LJournalNode := ADoc.ChildNodes.FindNode('journal');
+    if LJournalNode <> nil then
+      mongoc_write_concern_set_journal(Result, LJournalNode.bool);
+
+    // w
+    var LWNode := ADoc.ChildNodes.FindNode('w');
+    if LWNode <> nil then
+      mongoc_write_concern_set_w(Result, LWNode.int32);
+
+    // wtag
+    var LWTagNode := ADoc.ChildNodes.FindNode('wtag');
+    if LWTagNode <> nil then begin
+      var LW: AnsiString := LWTagNode.Text;
+      mongoc_write_concern_set_wtag(Result, PAnsiChar(LW));
     end;
 
-    Result := mongoc_write_concern_new;
-    if Result = nil then raise Exception.Create('mongoc_write_concern_new failed');
-    try
+    // wtimeout
+    var LWTimeoutNode := ADoc.ChildNodes.FindNode('wtimeout');
+    if LWTimeoutNode <> nil then
+      mongoc_write_concern_set_wtimeout_int64(Result, LWTimeoutNode.int64);
 
-      // journal
-      var LJournalNode := LDoc.ChildNodes.FindNode('journal');
-      if LJournalNode <> nil then
-        mongoc_write_concern_set_journal(Result, LJournalNode.bool);
+    // wmajority
+    var LWMajorityNode := ADoc.ChildNodes.FindNode('wmajority');
+    if LWMajorityNode <> nil then
+      mongoc_write_concern_set_wmajority(Result, LWMajorityNode.int32);
 
-      // w
-      var LWNode := LDoc.ChildNodes.FindNode('w');
-      if LWNode <> nil then
-        mongoc_write_concern_set_w(Result, LWNode.int32);
-
-      // wtag
-      var LWTagNode := LDoc.ChildNodes.FindNode('wtag');
-      if LWTagNode <> nil then begin
-        var LW: AnsiString := LWTagNode.Text;
-        mongoc_write_concern_set_wtag(Result, PAnsiChar(LW));
-      end;
-
-      // wtimeout
-      var LWTimeoutNode := LDoc.ChildNodes.FindNode('wtimeout');
-      if LWTimeoutNode <> nil then
-        mongoc_write_concern_set_wtimeout_int64(Result, LWTimeoutNode.int64);
-
-      // wmajority
-      var LWMajorityNode := LDoc.ChildNodes.FindNode('wmajority');
-      if LWMajorityNode <> nil then
-        mongoc_write_concern_set_wmajority(Result, LWMajorityNode.int32);
-
-    except
-      mongoc_write_concern_destroy(Result);
-      raise;
-    end;
-
-  finally
-    ALFreeAndNil(LDoc);
+  except
+    mongoc_write_concern_destroy(Result);
+    raise;
   end;
 
 end;
 
+{****************************************************************************************}
+function ALMakeWriteConcernFromJSONString(const ASource: AnsiString): Pmongoc_write_concern_t;
+begin
+  var LDoc := TALJSONDocumentA.Create;
+  try
+    if ASource <> '' then LDoc.LoadFromJSONString(ASource);
+    result := ALMakeWriteConcernFromJSonDoc(LDoc);
+  finally
+    ALFreeAndNil(LDoc);
+  end;
+end;
+
 {*********************************************************************************************}
-function ALMakeTransactionOptsFromString(const ASource: AnsiString): Pmongoc_transaction_opt_t;
+function ALMakeTransactionOptsFromJSonDoc(const ADoc: TALJsonNodeA): Pmongoc_transaction_opt_t;
 begin
 
   //
@@ -454,72 +551,72 @@ begin
   // }
   //
 
-  var LDoc := TALJSONDocumentA.Create;
+  Result := mongoc_transaction_opts_new();
+  if Result = nil then raise Exception.Create('mongoc_transaction_opts_new failed');
   try
 
-    if ASource <> '' then begin
-      if ASource[high(ASource)] <> #0 then LDoc.LoadFromJSONString(ASource)
-      else LDoc.LoadFromBSONString(ASource);
+    // readConcern
+    var LReadConcernNode := ADoc.ChildNodes.FindNode('readConcern');
+    if LReadConcernNode <> nil then begin
+      var LReadConcern := ALMakeReadConcernFromJSonDoc(LReadConcernNode);
+      if LReadConcern = nil then raise Exception.Create('ALMakeReadConcernFromJSonDoc failed');
+      try
+        mongoc_transaction_opts_set_read_concern(Result, LReadConcern);
+      finally
+        mongoc_read_concern_destroy(LReadConcern);
+      end;
     end;
 
-    Result := mongoc_transaction_opts_new();
-    if Result = nil then raise Exception.Create('mongoc_transaction_opts_new failed');
-    try
-
-      // readConcern
-      var LReadConcernNode := LDoc.ChildNodes.FindNode('readConcern');
-      if LReadConcernNode <> nil then begin
-        var LReadConcern := ALMakeReadConcernFromString(LReadConcernNode.BSON);
-        if LReadConcern = nil then raise Exception.Create('ALMakeReadConcernFromString failed');
-        try
-          mongoc_transaction_opts_set_read_concern(Result, LReadConcern);
-        finally
-          mongoc_read_concern_destroy(LReadConcern);
-        end;
+    // writeConcern
+    var LWriteConcernNode := ADoc.ChildNodes.FindNode('writeConcern');
+    if LWriteConcernNode <> nil then begin
+      var LWriteConcern := ALMakeWriteConcernFromJSonDoc(LWriteConcernNode);
+      if LWriteConcern = nil then raise Exception.Create('ALMakeWriteConcernFromJSonDoc failed');
+      try
+        mongoc_transaction_opts_set_write_concern(Result, LWriteConcern);
+      finally
+        mongoc_write_concern_destroy(LWriteConcern);
       end;
-
-      // writeConcern
-      var LWriteConcernNode := LDoc.ChildNodes.FindNode('writeConcern');
-      if LWriteConcernNode <> nil then begin
-        var LWriteConcern := ALMakeWriteConcernFromString(LWriteConcernNode.BSON);
-        if LWriteConcern = nil then raise Exception.Create('ALMakeWriteConcernFromString failed');
-        try
-          mongoc_transaction_opts_set_write_concern(Result, LWriteConcern);
-        finally
-          mongoc_write_concern_destroy(LWriteConcern);
-        end;
-      end;
-
-      // readPrefs
-      var LReadPrefsNode := LDoc.ChildNodes.FindNode('readPrefs');
-      if LReadPrefsNode <> nil then begin
-        var LReadPrefs := ALMakeReadPrefsFromString(LReadPrefsNode.BSON);
-        if LReadPrefs = nil then raise Exception.Create('ALMakeReadPrefsFromString failed');
-        try
-          mongoc_transaction_opts_set_read_prefs(Result, LReadPrefs);
-        finally
-          mongoc_read_prefs_destroy(LReadPrefs);
-        end;
-      end;
-
-      // maxCommitTimeMS
-      var LMaxCommitTimeNode := LDoc.ChildNodes.FindNode('maxCommitTimeMS');
-      if LMaxCommitTimeNode <> nil then
-        mongoc_transaction_opts_set_max_commit_time_ms(Result, LMaxCommitTimeNode.int64);
-
-    except
-      mongoc_transaction_opts_destroy(Result);
-      raise;
     end;
 
-  finally
-    ALFreeAndNil(LDoc);
+    // readPrefs
+    var LReadPrefsNode := ADoc.ChildNodes.FindNode('readPrefs');
+    if LReadPrefsNode <> nil then begin
+      var LReadPrefs := ALMakeReadPrefsFromJSonDoc(LReadPrefsNode);
+      if LReadPrefs = nil then raise Exception.Create('ALMakeReadPrefsFromJSonDoc failed');
+      try
+        mongoc_transaction_opts_set_read_prefs(Result, LReadPrefs);
+      finally
+        mongoc_read_prefs_destroy(LReadPrefs);
+      end;
+    end;
+
+    // maxCommitTimeMS
+    var LMaxCommitTimeNode := ADoc.ChildNodes.FindNode('maxCommitTimeMS');
+    if LMaxCommitTimeNode <> nil then
+      mongoc_transaction_opts_set_max_commit_time_ms(Result, LMaxCommitTimeNode.int64);
+
+  except
+    mongoc_transaction_opts_destroy(Result);
+    raise;
   end;
 
 end;
 
+{*********************************************************************************************}
+function ALMakeTransactionOptsFromJSONString(const ASource: AnsiString): Pmongoc_transaction_opt_t;
+begin
+  var LDoc := TALJSONDocumentA.Create;
+  try
+    if ASource <> '' then LDoc.LoadFromJSONString(ASource);
+    result := ALMakeTransactionOptsFromJSonDoc(LDoc);
+  finally
+    ALFreeAndNil(LDoc);
+  end;
+end;
+
 {*************************************************************************************}
-function ALMakeSessionOptsFromString(const ASource: AnsiString): Pmongoc_session_opt_t;
+function ALMakeSessionOptsFromJSonDoc(const ADoc: TALJsonNodeA): Pmongoc_session_opt_t;
 begin
 
   //
@@ -534,45 +631,46 @@ begin
   // }
   //
 
-  var LDoc := TALJSONDocumentA.Create;
+  Result := mongoc_session_opts_new();
+  if Result = nil then raise Exception.Create('mongoc_session_opts_new failed');
   try
 
-    if ASource <> '' then begin
-      if ASource[high(ASource)] <> #0 then LDoc.LoadFromJSONString(ASource)
-      else LDoc.LoadFromBSONString(ASource);
-    end;
+    // causalConsistency
+    var LCausalConsistencyNode := ADoc.ChildNodes.FindNode('causalConsistency');
+    if LCausalConsistencyNode <> nil then
+      mongoc_session_opts_set_causal_consistency(Result, LCausalConsistencyNode.Bool);
 
-    Result := mongoc_session_opts_new();
-    if Result = nil then raise Exception.Create('mongoc_session_opts_new failed');
-    try
+    // snapshot
+    var LSnapshotNode := ADoc.ChildNodes.FindNode('snapshot');
+    if LSnapshotNode <> nil then
+      mongoc_session_opts_set_snapshot(Result, LSnapshotNode.Bool);
 
-      // causalConsistency
-      var LCausalConsistencyNode := LDoc.ChildNodes.FindNode('causalConsistency');
-      if LCausalConsistencyNode <> nil then
-        mongoc_session_opts_set_causal_consistency(Result, LCausalConsistencyNode.Bool);
-
-      // snapshot
-      var LSnapshotNode := LDoc.ChildNodes.FindNode('snapshot');
-      if LSnapshotNode <> nil then
-        mongoc_session_opts_set_snapshot(Result, LSnapshotNode.Bool);
-
-      // defaultTransactionOpts
-      var LDefaultTransactionOptsNode := LDoc.ChildNodes.FindNode('defaultTransactionOpts');
-      if LDefaultTransactionOptsNode <> nil then begin
-        var LDefaultTransactionOpts := ALMakeTransactionOptsFromString(LDefaultTransactionOptsNode.BSON);
-        if LDefaultTransactionOpts = nil then raise Exception.Create('ALMakeTransactionOptsFromString failed');
-        try
-          mongoc_session_opts_set_default_transaction_opts(Result, LDefaultTransactionOpts);
-        finally
-          mongoc_transaction_opts_destroy(LDefaultTransactionOpts);
-        end;
+    // defaultTransactionOpts
+    var LDefaultTransactionOptsNode := ADoc.ChildNodes.FindNode('defaultTransactionOpts');
+    if LDefaultTransactionOptsNode <> nil then begin
+      var LDefaultTransactionOpts := ALMakeTransactionOptsFromJSonDoc(LDefaultTransactionOptsNode);
+      if LDefaultTransactionOpts = nil then raise Exception.Create('ALMakeTransactionOptsFromJSonDoc failed');
+      try
+        mongoc_session_opts_set_default_transaction_opts(Result, LDefaultTransactionOpts);
+      finally
+        mongoc_transaction_opts_destroy(LDefaultTransactionOpts);
       end;
-
-    except
-      mongoc_session_opts_destroy(Result);
-      raise;
     end;
 
+  except
+    mongoc_session_opts_destroy(Result);
+    raise;
+  end;
+
+end;
+
+{*************************************************************************************}
+function ALMakeSessionOptsFromJSONString(const ASource: AnsiString): Pmongoc_session_opt_t;
+begin
+  var LDoc := TALJSONDocumentA.Create;
+  try
+    if ASource <> '' then LDoc.LoadFromJSONString(ASource);
+    result := ALMakeSessionOptsFromJSonDoc(LDoc);
   finally
     ALFreeAndNil(LDoc);
   end;
@@ -641,7 +739,7 @@ begin
   Try
 
     var LMongoSessionOpts: Pmongoc_session_opt_t;
-    if ASessionOpts <> '' then LMongoSessionOpts := ALMakeSessionOptsFromString(ASessionOpts)
+    if ASessionOpts <> '' then LMongoSessionOpts := ALMakeSessionOptsFromJSONString(ASessionOpts)
     else LMongoSessionOpts := nil;
     try
 
@@ -655,7 +753,7 @@ begin
       try
 
         var LMongoTransactionOpts: Pmongoc_transaction_opt_t;
-        if ATransactionOpts <> '' then LMongoTransactionOpts := ALMakeTransactionOptsFromString(ATransactionOpts)
+        if ATransactionOpts <> '' then LMongoTransactionOpts := ALMakeTransactionOptsFromJSONString(ATransactionOpts)
         else LMongoTransactionOpts := nil;
         try
 
@@ -797,18 +895,18 @@ begin
 
   var LFilterBsonRec: bson_t;
   var LFilterBsonIsAllocated: Boolean;
-  var LFilterBsonPtr := ALMakeBsonPtrFromString(Afilter, @LFilterBsonRec, LFilterBsonIsAllocated);
+  var LFilterBsonPtr := ALMakeBsonPtrFromJSONString(Afilter, @LFilterBsonRec, LFilterBsonIsAllocated);
   try
 
     var LOptsBsonRec: bson_t;
     var LOptsBsonIsAllocated := False;
     var LOptsBsonPtr: Pbson_t;
-    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromJSONString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
     else LOptsBsonPtr := nil;
     try
 
       var LMongoReadPrefs: Pmongoc_read_prefs_t;
-      if AReadPrefs <> '' then LMongoReadPrefs := ALMakeReadPrefsFromString(AReadPrefs)
+      if AReadPrefs <> '' then LMongoReadPrefs := ALMakeReadPrefsFromJSONString(AReadPrefs)
       else LMongoReadPrefs := nil;
       try
 
@@ -962,7 +1060,8 @@ function TALMongoDBClient.FindAndModify(
            const ACollectionName: AnsiString;
            const AQuery: AnsiString;
            const ASort: AnsiString;
-           const AUpdate: AnsiString;
+           const AUpdateJSON: AnsiString;
+           const AUpdateBSON: TBytes;
            const AFields: AnsiString;
            const ARemove: ByteBool;
            const AUpsert: ByteBool;
@@ -978,13 +1077,13 @@ begin
 
     var LQueryBsonRec: bson_t;
     var LQueryBsonIsAllocated: Boolean;
-    var LQueryBsonPtr := ALMakeBsonPtrFromString(AQuery, @LQueryBsonRec, LQueryBsonIsAllocated);
+    var LQueryBsonPtr := ALMakeBsonPtrFromJSONString(AQuery, @LQueryBsonRec, LQueryBsonIsAllocated);
     try
 
       if ASort <> '' then begin
         var LSortBsonRec: bson_t;
         var LSortBsonIsAllocated: Boolean;
-        var LSortBsonPtr := ALMakeBsonPtrFromString(ASort, @LSortBsonRec, LSortBsonIsAllocated);
+        var LSortBsonPtr := ALMakeBsonPtrFromJSONString(ASort, @LSortBsonRec, LSortBsonIsAllocated);
         try
           if not mongoc_find_and_modify_opts_set_sort(LOpts, LSortBsonPtr) then
             raise Exception.Create('mongoc_find_and_modify_opts_set_sort failed');
@@ -994,10 +1093,22 @@ begin
         end;
       end;
 
-      if AUpdate <> '' then begin
+      if Length(AUpdateJSON) > 0 then begin
         var LUpdateBsonRec: bson_t;
         var LUpdateBsonIsAllocated: Boolean;
-        var LUpdateBsonPtr := ALMakeBsonPtrFromString(AUpdate, @LUpdateBsonRec, LUpdateBsonIsAllocated);
+        var LUpdateBsonPtr := ALMakeBsonPtrFromJSONString(AUpdateJSON, @LUpdateBsonRec, LUpdateBsonIsAllocated);
+        try
+          if not mongoc_find_and_modify_opts_set_update(LOpts, LUpdateBsonPtr) then
+            raise Exception.Create('mongoc_find_and_modify_opts_set_update failed');
+        finally
+          if LUpdateBsonIsAllocated then
+            bson_destroy(LUpdateBsonPtr);
+        end;
+      end
+      else if Length(AUpdateBSON) > 0 then begin
+        var LUpdateBsonRec: bson_t;
+        var LUpdateBsonIsAllocated: Boolean;
+        var LUpdateBsonPtr := ALMakeBsonPtrFromBSONBytes(AUpdateBSON, @LUpdateBsonRec, LUpdateBsonIsAllocated);
         try
           if not mongoc_find_and_modify_opts_set_update(LOpts, LUpdateBsonPtr) then
             raise Exception.Create('mongoc_find_and_modify_opts_set_update failed');
@@ -1010,7 +1121,7 @@ begin
       if AFields <> '' then begin
         var LFieldsBsonRec: bson_t;
         var LFieldsBsonIsAllocated: Boolean;
-        var LFieldsBsonPtr := ALMakeBsonPtrFromString(AFields, @LFieldsBsonRec, LFieldsBsonIsAllocated);
+        var LFieldsBsonPtr := ALMakeBsonPtrFromJSONString(AFields, @LFieldsBsonRec, LFieldsBsonIsAllocated);
         try
           if not mongoc_find_and_modify_opts_set_fields(LOpts, LFieldsBsonPtr) then
             raise Exception.Create('mongoc_find_and_modify_opts_set_fields failed');
@@ -1041,7 +1152,7 @@ begin
         if LSession <> nil then begin
           var LOptsBsonRec: bson_t;
           var LOptsBsonIsAllocated: Boolean;
-          var LOptsBsonPtr := ALMakeBsonPtrFromString('', @LOptsBsonRec, LOptsBsonIsAllocated, False{AReadOnly});
+          var LOptsBsonPtr := ALMakeBsonPtrFromJSONString('', @LOptsBsonRec, LOptsBsonIsAllocated, False{AReadOnly});
           try
             var LError: bson_error_t;
             if not mongoc_client_session_append(
@@ -1114,10 +1225,61 @@ begin
 end;
 
 {**********************************}
+function TALMongoDBClient.FindAndModify(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const AQuery: AnsiString;
+           const ASort: AnsiString;
+           const AUpdate: AnsiString;
+           const AFields: AnsiString;
+           const ARemove: ByteBool;
+           const AUpsert: ByteBool;
+           const ANew: ByteBool): TALJsonNodeA;
+begin
+  Result := FindAndModify(
+              ADatabaseName, // const ADatabaseName: AnsiString;
+              ACollectionName, // const ACollectionName: AnsiString;
+              AQuery, // const AQuery: AnsiString;
+              ASort, // const ASort: AnsiString;
+              AUpdate, // const AUpdateJSON: AnsiString;
+              nil, // const AUpdateBSON: TBytes;
+              AFields, // const AFields: AnsiString;
+              ARemove, // const ARemove: ByteBool;
+              AUpsert, // const AUpsert: ByteBool;
+              ANew); // const ANew: ByteBool): TALJsonNodeA;
+end;
+
+{**********************************}
+function TALMongoDBClient.FindAndModify(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const AQuery: AnsiString;
+           const ASort: AnsiString;
+           const AUpdate: TBytes;
+           const AFields: AnsiString;
+           const ARemove: ByteBool;
+           const AUpsert: ByteBool;
+           const ANew: ByteBool): TALJsonNodeA;
+begin
+  Result := FindAndModify(
+              ADatabaseName, // const ADatabaseName: AnsiString;
+              ACollectionName, // const ACollectionName: AnsiString;
+              AQuery, // const AQuery: AnsiString;
+              ASort, // const ASort: AnsiString;
+              '', // const AUpdateJSON: AnsiString;
+              AUpdate, // const AUpdateBSON: TBytes;
+              AFields, // const AFields: AnsiString;
+              ARemove, // const ARemove: ByteBool;
+              AUpsert, // const AUpsert: ByteBool;
+              ANew); // const ANew: ByteBool): TALJsonNodeA;
+end;
+
+{**********************************}
 function TALMongoDBClient.InsertOne(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
-           const ADocument: AnsiString;
+           const ADocumentJSON: AnsiString;
+           const ADocumentBSON: TBytes;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
 
@@ -1126,13 +1288,15 @@ begin
 
   var LDocumentBsonRec: bson_t;
   var LDocumentBsonIsAllocated: Boolean;
-  var LDocumentBsonPtr := ALMakeBsonPtrFromString(ADocument, @LDocumentBsonRec, LDocumentBsonIsAllocated);
+  var LDocumentBsonPtr: Pbson_t;
+  if length(ADocumentJSON) > 0 then LDocumentBsonPtr := ALMakeBsonPtrFromJSONString(ADocumentJSON, @LDocumentBsonRec, LDocumentBsonIsAllocated)
+  else LDocumentBsonPtr := ALMakeBsonPtrFromBSONBytes(ADocumentBSON, @LDocumentBsonRec, LDocumentBsonIsAllocated);
   try
 
     var LOptsBsonRec: bson_t;
     var LOptsBsonIsAllocated := False;
     var LOptsBsonPtr: Pbson_t;
-    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromJSONString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
     else LOptsBsonPtr := nil;
     try
 
@@ -1214,39 +1378,81 @@ begin
 end;
 
 {***********************************}
+function TALMongoDBClient.InsertOne(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ADocument: AnsiString;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+  Result := InsertOne(
+              ADatabaseName, // const ADatabaseName: AnsiString;
+              ACollectionName, // const ACollectionName: AnsiString;
+              ADocument, // const ADocumentJSON: AnsiString;
+              nil, // const ADocumentBSON: TBytes;
+              AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+end;
+
+{***********************************}
+function TALMongoDBClient.InsertOne(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ADocument: TBytes;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+  Result := InsertOne(
+              ADatabaseName, // const ADatabaseName: AnsiString;
+              ACollectionName, // const ACollectionName: AnsiString;
+              '', // const ADocumentJSON: AnsiString;
+              ADocument, // const ADocumentBSON: TBytes;
+              AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+end;
+
+{***********************************}
 function TALMongoDBClient.InsertMany(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
-           const ADocuments: TArray<AnsiString>;
+           const ADocumentJSONs: TArray<AnsiString>;
+           const ADocumentBSONs: TArray<TBytes>;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
 
   var LOwnsClient: Boolean := False;
   var LClient := FClient;
 
-  if Length(ADocuments) = 0 then
+  var LDocumentBsonRecs: TArray<bson_t>;
+  var LDocumentBsonPtrs: TArray<Pbson_t>;
+  var LDocumentBsonAllocated: TArray<Boolean>;
+  if length(ADocumentJSONs) > 0 then begin
+    SetLength(LDocumentBsonRecs, Length(ADocumentJSONs));
+    SetLength(LDocumentBsonPtrs, Length(ADocumentJSONs));
+    SetLength(LDocumentBsonAllocated, Length(ADocumentJSONs));
+  end
+  else if length(ADocumentBSONs) > 0 then begin
+    SetLength(LDocumentBsonRecs, Length(ADocumentBSONs));
+    SetLength(LDocumentBsonPtrs, Length(ADocumentBSONs));
+    SetLength(LDocumentBsonAllocated, Length(ADocumentBSONs));
+  end
+  else
     raise Exception.Create('No documents to insert');
 
-  var LDocumentBsonRecs: TArray<bson_t>;
-  SetLength(LDocumentBsonRecs, Length(ADocuments));
-
-  var LDocumentBsonPtrs: TArray<Pbson_t>;
-  SetLength(LDocumentBsonPtrs, Length(ADocuments));
-
-  var LDocumentBsonAllocated: TArray<Boolean>;
-  SetLength(LDocumentBsonAllocated, Length(ADocuments));
   for var I := Low(LDocumentBsonAllocated) to High(LDocumentBsonAllocated) do
     LDocumentBsonAllocated[I] := False;
 
   try
 
-    for var I := low(ADocuments) to High(ADocuments) do
-      LDocumentBsonPtrs[I] := ALMakeBsonPtrFromString(ADocuments[I], @LDocumentBsonRecs[I], LDocumentBsonAllocated[I]);
+    if length(ADocumentJSONs) > 0 then begin
+      for var I := low(ADocumentJSONs) to High(ADocumentJSONs) do
+        LDocumentBsonPtrs[I] := ALMakeBsonPtrFromJSONString(ADocumentJSONs[I], @LDocumentBsonRecs[I], LDocumentBsonAllocated[I]);
+    end
+    else begin
+      for var I := low(ADocumentBSONs) to High(ADocumentBSONs) do
+        LDocumentBsonPtrs[I] := ALMakeBsonPtrFromBSONBytes(ADocumentBSONs[I], @LDocumentBsonRecs[I], LDocumentBsonAllocated[I]);
+    end;
 
     var LOptsBsonRec: bson_t;
     var LOptsBsonIsAllocated := False;
     var LOptsBsonPtr: Pbson_t;
-    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromJSONString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
     else LOptsBsonPtr := nil;
     try
 
@@ -1330,11 +1536,42 @@ begin
 end;
 
 {**********************************}
+function TALMongoDBClient.InsertMany(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ADocuments: TArray<AnsiString>;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+  Result := InsertMany(
+              ADatabaseName, // const ADatabaseName: AnsiString;
+              ACollectionName, // const ACollectionName: AnsiString;
+              ADocuments, // const ADocumentJSONs: TArray<AnsiString>;
+              nil, // const ADocumentBSONs: TArray<TBytes>;
+              AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+end;
+
+{**********************************}
+function TALMongoDBClient.InsertMany(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ADocuments: TArray<TBytes>;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+  Result := InsertMany(
+              ADatabaseName, // const ADatabaseName: AnsiString;
+              ACollectionName, // const ACollectionName: AnsiString;
+              nil, // const ADocumentJSONs: TArray<AnsiString>;
+              ADocuments, // const ADocumentBSONs: TArray<TBytes>;
+              AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+end;
+
+{**********************************}
 function TALMongoDBClient.UpdateOne(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
            const ASelector: AnsiString;
-           const AUpdate: AnsiString;
+           const AUpdateJSON: AnsiString;
+           const AUpdateBSON: TBytes;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
 
@@ -1343,18 +1580,20 @@ begin
 
   var LSelectorBsonRec: bson_t;
   var LSelectorBsonIsAllocated: Boolean;
-  var LSelectorBsonPtr := ALMakeBsonPtrFromString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
+  var LSelectorBsonPtr := ALMakeBsonPtrFromJSONString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
   try
 
     var LUpdateBsonRec: bson_t;
     var LUpdateBsonIsAllocated: Boolean;
-    var LUpdateBsonPtr := ALMakeBsonPtrFromString(AUpdate, @LUpdateBsonRec, LUpdateBsonIsAllocated);
+    var LUpdateBsonPtr: Pbson_t;
+    if length(AUpdateJSON) > 0 then LUpdateBsonPtr := ALMakeBsonPtrFromJSONString(AUpdateJSON, @LUpdateBsonRec, LUpdateBsonIsAllocated)
+    else LUpdateBsonPtr := ALMakeBsonPtrFromBSONBytes(AUpdateBSON, @LUpdateBsonRec, LUpdateBsonIsAllocated);
     try
 
       var LOptsBsonRec: bson_t;
       var LOptsBsonIsAllocated := False;
       var LOptsBsonPtr: Pbson_t;
-      if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+      if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromJSONString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
       else LOptsBsonPtr := nil;
       try
 
@@ -1442,11 +1681,46 @@ begin
 end;
 
 {***********************************}
-function TALMongoDBClient.UpdateMany(
+function TALMongoDBClient.UpdateOne(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
            const ASelector: AnsiString;
            const AUpdate: AnsiString;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+  Result := UpdateOne(
+              ADatabaseName, // const ADatabaseName: AnsiString;
+              ACollectionName, // const ACollectionName: AnsiString;
+              ASelector, // const ASelector: AnsiString;
+              AUpdate, // const AUpdateJSON: AnsiString;
+              nil, // const AUpdateBSON: TBytes;
+              AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+end;
+
+{***********************************}
+function TALMongoDBClient.UpdateOne(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ASelector: AnsiString;
+           const AUpdate: TBytes;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+  Result := UpdateOne(
+              ADatabaseName, // const ADatabaseName: AnsiString;
+              ACollectionName, // const ACollectionName: AnsiString;
+              ASelector, // const ASelector: AnsiString;
+              '', // const AUpdateJSON: AnsiString;
+              AUpdate, // const AUpdateBSON: TBytes;
+              AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+end;
+
+{***********************************}
+function TALMongoDBClient.UpdateMany(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ASelector: AnsiString;
+           const AUpdateJSON: AnsiString;
+           const AUpdateBSON: TBytes;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
 
@@ -1455,18 +1729,20 @@ begin
 
   var LSelectorBsonRec: bson_t;
   var LSelectorBsonIsAllocated: Boolean;
-  var LSelectorBsonPtr := ALMakeBsonPtrFromString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
+  var LSelectorBsonPtr := ALMakeBsonPtrFromJSONString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
   try
 
     var LUpdateBsonRec: bson_t;
     var LUpdateBsonIsAllocated: Boolean;
-    var LUpdateBsonPtr := ALMakeBsonPtrFromString(AUpdate, @LUpdateBsonRec, LUpdateBsonIsAllocated);
+    var LUpdateBsonPtr: Pbson_t;
+    if length(AUpdateJSON) > 0 then LUpdateBsonPtr := ALMakeBsonPtrFromJSONString(AUpdateJSON, @LUpdateBsonRec, LUpdateBsonIsAllocated)
+    else LUpdateBsonPtr := ALMakeBsonPtrFromBSONBytes(AUpdateBSON, @LUpdateBsonRec, LUpdateBsonIsAllocated);
     try
 
       var LOptsBsonRec: bson_t;
       var LOptsBsonIsAllocated := False;
       var LOptsBsonPtr: Pbson_t;
-      if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+      if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromJSONString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
       else LOptsBsonPtr := nil;
       try
 
@@ -1554,11 +1830,46 @@ begin
 end;
 
 {***********************************}
+function TALMongoDBClient.UpdateMany(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ASelector: AnsiString;
+           const AUpdate: AnsiString;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+  Result := UpdateMany(
+              ADatabaseName, // const ADatabaseName: AnsiString;
+              ACollectionName, // const ACollectionName: AnsiString;
+              ASelector, // const ASelector: AnsiString;
+              AUpdate, // const AUpdateJSON: AnsiString;
+              nil, // const AUpdateBSON: TBytes;
+              AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+end;
+
+{***********************************}
+function TALMongoDBClient.UpdateMany(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ASelector: AnsiString;
+           const AUpdate: TBytes;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+  Result := UpdateMany(
+              ADatabaseName, // const ADatabaseName: AnsiString;
+              ACollectionName, // const ACollectionName: AnsiString;
+              ASelector, // const ASelector: AnsiString;
+              '', // const AUpdateJSON: AnsiString;
+              AUpdate, // const AUpdateBSON: TBytes;
+              AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+end;
+
+{***********************************}
 function TALMongoDBClient.ReplaceOne(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
            const ASelector: AnsiString;
-           const AReplacement: AnsiString;
+           const AReplacementJSON: AnsiString;
+           const AReplacementBSON: TBytes;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
 
@@ -1567,18 +1878,20 @@ begin
 
   var LSelectorBsonRec: bson_t;
   var LSelectorBsonIsAllocated: Boolean;
-  var LSelectorBsonPtr := ALMakeBsonPtrFromString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
+  var LSelectorBsonPtr := ALMakeBsonPtrFromJSONString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
   try
 
     var LReplacementBsonRec: bson_t;
     var LReplacementBsonIsAllocated: Boolean;
-    var LReplacementBsonPtr := ALMakeBsonPtrFromString(AReplacement, @LReplacementBsonRec, LReplacementBsonIsAllocated);
+    var LReplacementBsonPtr: Pbson_t;
+    if Length(AReplacementJSON) > 0 then LReplacementBsonPtr := ALMakeBsonPtrFromJSONString(AReplacementJSON, @LReplacementBsonRec, LReplacementBsonIsAllocated)
+    else LReplacementBsonPtr := ALMakeBsonPtrFromBSONBytes(AReplacementBSON, @LReplacementBsonRec, LReplacementBsonIsAllocated);
     try
 
       var LOptsBsonRec: bson_t;
       var LOptsBsonIsAllocated := False;
       var LOptsBsonPtr: Pbson_t;
-      if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+      if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromJSONString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
       else LOptsBsonPtr := nil;
       try
 
@@ -1666,6 +1979,40 @@ begin
 end;
 
 {**********************************}
+function TALMongoDBClient.ReplaceOne(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ASelector: AnsiString;
+           const AReplacement: AnsiString;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+  Result := ReplaceOne(
+              ADatabaseName, // const ADatabaseName: AnsiString;
+              ACollectionName, // const ACollectionName: AnsiString;
+              ASelector, // const ASelector: AnsiString;
+              AReplacement, // const AReplacementJSON: AnsiString;
+              nil, // const AReplacementBSON: TBytes;
+              AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+end;
+
+{**********************************}
+function TALMongoDBClient.ReplaceOne(
+           const ADatabaseName: AnsiString;
+           const ACollectionName: AnsiString;
+           const ASelector: AnsiString;
+           const AReplacement: TBytes;
+           const AOpts: AnsiString = ''): TALJsonNodeA;
+begin
+  Result := ReplaceOne(
+              ADatabaseName, // const ADatabaseName: AnsiString;
+              ACollectionName, // const ACollectionName: AnsiString;
+              ASelector, // const ASelector: AnsiString;
+              '', // const AReplacementJSON: AnsiString;
+              AReplacement, // const AReplacementBSON: TBytes;
+              AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+end;
+
+{**********************************}
 function TALMongoDBClient.DeleteOne(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
@@ -1678,13 +2025,13 @@ begin
 
   var LSelectorBsonRec: bson_t;
   var LSelectorBsonIsAllocated: Boolean;
-  var LSelectorBsonPtr := ALMakeBsonPtrFromString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
+  var LSelectorBsonPtr := ALMakeBsonPtrFromJSONString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
   try
 
     var LOptsBsonRec: bson_t;
     var LOptsBsonIsAllocated := False;
     var LOptsBsonPtr: Pbson_t;
-    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromJSONString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
     else LOptsBsonPtr := nil;
     try
 
@@ -1778,13 +2125,13 @@ begin
 
   var LSelectorBsonRec: bson_t;
   var LSelectorBsonIsAllocated: Boolean;
-  var LSelectorBsonPtr := ALMakeBsonPtrFromString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
+  var LSelectorBsonPtr := ALMakeBsonPtrFromJSONString(ASelector, @LSelectorBsonRec, LSelectorBsonIsAllocated);
   try
 
     var LOptsBsonRec: bson_t;
     var LOptsBsonIsAllocated := False;
     var LOptsBsonPtr: Pbson_t;
-    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
+    if (AOpts <> '') or (LClient <> nil) then LOptsBsonPtr := ALMakeBsonPtrFromJSONString(AOpts, @LOptsBsonRec, LOptsBsonIsAllocated, LClient = nil{AReadOnly})
     else LOptsBsonPtr := nil;
     try
 
@@ -1910,13 +2257,13 @@ begin
 
               var LPipelineBsonRec: bson_t;
               var LPipelineBsonIsAllocated: Boolean;
-              var LPipelineBsonPtr := ALMakeBsonPtrFromString(FPipeline, @LPipelineBsonRec, LPipelineBsonIsAllocated);
+              var LPipelineBsonPtr := ALMakeBsonPtrFromJSONString(FPipeline, @LPipelineBsonRec, LPipelineBsonIsAllocated);
               try
 
                 var LOptsBsonRec: bson_t;
                 var LOptsBsonIsAllocated := False;
                 var LOptsBsonPtr: Pbson_t;
-                if FOpts <> '' then LOptsBsonPtr := ALMakeBsonPtrFromString(FOpts, @LOptsBsonRec, LOptsBsonIsAllocated)
+                if FOpts <> '' then LOptsBsonPtr := ALMakeBsonPtrFromJSONString(FOpts, @LOptsBsonRec, LOptsBsonIsAllocated)
                 else LOptsBsonPtr := nil;
                 try
 
@@ -1982,13 +2329,13 @@ begin
 
               var LPipelineBsonRec: bson_t;
               var LPipelineBsonIsAllocated: Boolean;
-              var LPipelineBsonPtr := ALMakeBsonPtrFromString(FPipeline, @LPipelineBsonRec, LPipelineBsonIsAllocated);
+              var LPipelineBsonPtr := ALMakeBsonPtrFromJSONString(FPipeline, @LPipelineBsonRec, LPipelineBsonIsAllocated);
               try
 
                 var LOptsBsonRec: bson_t;
                 var LOptsBsonIsAllocated := False;
                 var LOptsBsonPtr: Pbson_t;
-                if FOpts <> '' then LOptsBsonPtr := ALMakeBsonPtrFromString(FOpts, @LOptsBsonRec, LOptsBsonIsAllocated)
+                if FOpts <> '' then LOptsBsonPtr := ALMakeBsonPtrFromJSONString(FOpts, @LOptsBsonRec, LOptsBsonIsAllocated)
                 else LOptsBsonPtr := nil;
                 try
 
@@ -2048,13 +2395,13 @@ begin
 
             var LPipelineBsonRec: bson_t;
             var LPipelineBsonIsAllocated: Boolean;
-            var LPipelineBsonPtr := ALMakeBsonPtrFromString(FPipeline, @LPipelineBsonRec, LPipelineBsonIsAllocated);
+            var LPipelineBsonPtr := ALMakeBsonPtrFromJSONString(FPipeline, @LPipelineBsonRec, LPipelineBsonIsAllocated);
             try
 
               var LOptsBsonRec: bson_t;
               var LOptsBsonIsAllocated := False;
               var LOptsBsonPtr: Pbson_t;
-              if FOpts <> '' then LOptsBsonPtr := ALMakeBsonPtrFromString(FOpts, @LOptsBsonRec, LOptsBsonIsAllocated)
+              if FOpts <> '' then LOptsBsonPtr := ALMakeBsonPtrFromJSONString(FOpts, @LOptsBsonRec, LOptsBsonIsAllocated)
               else LOptsBsonPtr := nil;
               try
 

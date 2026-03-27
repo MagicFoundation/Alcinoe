@@ -21,6 +21,8 @@
   - reduced internal buffer sizes from `32768` to `16384`
   - used `TBufferedFileStream` for JSON/BSON file saves
   - streamlined direct stream writes in serialization paths
+- Updated `TALMongoDBClient` so JSON payloads remain `AnsiString` and BSON payloads use `TBytes`
+- Added `TBytes` overloads for `TALMongoDBClient.FindAndModify`, `InsertOne`, `InsertMany`, `UpdateOne`, `UpdateMany`, and `ReplaceOne`
 
 ## 03/08/2026
 

@@ -86,12 +86,12 @@ type
                const AUpdateBSON: TBytes;
                const AOpts: AnsiString = ''): TALJsonNodeA; overload; virtual;
      function UpdateMany(
-               const ADatabaseName: AnsiString;
-               const ACollectionName: AnsiString;
-               const ASelector: AnsiString;
-               const AUpdateJSON: AnsiString;
-               const AUpdateBSON: TBytes;
-               const AOpts: AnsiString = ''): TALJsonNodeA; overload; virtual;
+                const ADatabaseName: AnsiString;
+                const ACollectionName: AnsiString;
+                const ASelector: AnsiString;
+                const AUpdateJSON: AnsiString;
+                const AUpdateBSON: TBytes;
+                const AOpts: AnsiString = ''): TALJsonNodeA; overload; virtual;
     function ReplaceOne(
                const ADatabaseName: AnsiString;
                const ACollectionName: AnsiString;
@@ -421,7 +421,7 @@ begin
 
 end;
 
-{**********************************************************************************}
+{**************************************************************************************}
 function ALMakeReadPrefsFromJSONString(const ASource: AnsiString): Pmongoc_read_prefs_t;
 begin
   var LDoc := TALJSONDocumentA.Create;
@@ -462,7 +462,7 @@ begin
 
 end;
 
-{**************************************************************************************}
+{******************************************************************************************}
 function ALMakeReadConcernFromJSONString(const ASource: AnsiString): Pmongoc_read_concern_t;
 begin
   var LDoc := TALJSONDocumentA.Create;
@@ -526,7 +526,7 @@ begin
 
 end;
 
-{****************************************************************************************}
+{********************************************************************************************}
 function ALMakeWriteConcernFromJSONString(const ASource: AnsiString): Pmongoc_write_concern_t;
 begin
   var LDoc := TALJSONDocumentA.Create;
@@ -603,7 +603,7 @@ begin
 
 end;
 
-{*********************************************************************************************}
+{*************************************************************************************************}
 function ALMakeTransactionOptsFromJSONString(const ASource: AnsiString): Pmongoc_transaction_opt_t;
 begin
   var LDoc := TALJSONDocumentA.Create;
@@ -664,7 +664,7 @@ begin
 
 end;
 
-{*************************************************************************************}
+{*****************************************************************************************}
 function ALMakeSessionOptsFromJSONString(const ASource: AnsiString): Pmongoc_session_opt_t;
 begin
   var LDoc := TALJSONDocumentA.Create;
@@ -1224,7 +1224,7 @@ begin
 
 end;
 
-{**********************************}
+{**************************************}
 function TALMongoDBClient.FindAndModify(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
@@ -1249,7 +1249,7 @@ begin
               ANew); // const ANew: ByteBool): TALJsonNodeA;
 end;
 
-{**********************************}
+{**************************************}
 function TALMongoDBClient.FindAndModify(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
@@ -1377,7 +1377,7 @@ begin
 
 end;
 
-{***********************************}
+{**********************************}
 function TALMongoDBClient.InsertOne(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
@@ -1392,7 +1392,7 @@ begin
               AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
 end;
 
-{***********************************}
+{**********************************}
 function TALMongoDBClient.InsertOne(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
@@ -1535,7 +1535,7 @@ begin
 
 end;
 
-{**********************************}
+{***********************************}
 function TALMongoDBClient.InsertMany(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
@@ -1550,7 +1550,7 @@ begin
               AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
 end;
 
-{**********************************}
+{***********************************}
 function TALMongoDBClient.InsertMany(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
@@ -1680,7 +1680,7 @@ begin
 
 end;
 
-{***********************************}
+{**********************************}
 function TALMongoDBClient.UpdateOne(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
@@ -1697,7 +1697,7 @@ begin
               AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
 end;
 
-{***********************************}
+{**********************************}
 function TALMongoDBClient.UpdateOne(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
@@ -1978,7 +1978,7 @@ begin
 
 end;
 
-{**********************************}
+{***********************************}
 function TALMongoDBClient.ReplaceOne(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;
@@ -1995,7 +1995,7 @@ begin
               AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
 end;
 
-{**********************************}
+{***********************************}
 function TALMongoDBClient.ReplaceOne(
            const ADatabaseName: AnsiString;
            const ACollectionName: AnsiString;

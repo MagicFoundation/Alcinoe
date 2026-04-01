@@ -1271,15 +1271,6 @@
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -2620,15 +2611,6 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_ALSkiaEngine'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_ALSkiaEngine'" Include="Android\Merged\res\values-vi\values-vi.xml">
@@ -3973,15 +3955,6 @@
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_ALSkiaEngine_Metal'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_ALSkiaEngine_Metal'" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -5322,15 +5295,6 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_ALSkiaEngine_Vulkan'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_ALSkiaEngine_Vulkan'" Include="Android\Merged\res\values-vi\values-vi.xml">
@@ -6675,15 +6639,6 @@
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_Metal'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_Metal'" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -8024,15 +7979,6 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_OpenGL'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_OpenGL'" Include="Android\Merged\res\values-vi\values-vi.xml">
@@ -9377,15 +9323,6 @@
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_Skia'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_Skia'" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -10726,15 +10663,6 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_Skia_Metal'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_Skia_Metal'" Include="Android\Merged\res\values-vi\values-vi.xml">
@@ -12079,15 +12007,6 @@
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_Skia_Vulkan'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_Skia_Vulkan'" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -13428,15 +13347,6 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Merged\res\values-vi\values-vi.xml">
@@ -14783,15 +14693,6 @@
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -16132,15 +16033,6 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_ALSkiaEngine'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_ALSkiaEngine'" Include="Android\Merged\res\values-vi\values-vi.xml">
@@ -17485,15 +17377,6 @@
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_ALSkiaEngine_Metal'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_ALSkiaEngine_Metal'" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -18834,15 +18717,6 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_ALSkiaEngine_Vulkan'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_ALSkiaEngine_Vulkan'" Include="Android\Merged\res\values-vi\values-vi.xml">
@@ -20187,15 +20061,6 @@
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_Metal'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_Metal'" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -21536,15 +21401,6 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_OpenGL'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_OpenGL'" Include="Android\Merged\res\values-vi\values-vi.xml">
@@ -22889,15 +22745,6 @@
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_Skia'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_Skia'" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -24240,15 +24087,6 @@
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_Skia_Metal'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_Skia_Metal'" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -25589,15 +25427,6 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug_Skia_Vulkan'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug_Skia_Vulkan'" Include="Android\Merged\res\values-vi\values-vi.xml">
@@ -26949,15 +26778,6 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v31\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Merged\res\values-vi\values-vi.xml">

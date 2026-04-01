@@ -348,11 +348,17 @@ end;
 {**********************************************************}
 function TALNativeControl.GetNativeViewAbsoluteRect: TRectF;
 begin
-  Result := Padding.PaddingRect(AbsoluteRect);
+  Result := LocalToAbsolute(GetNativeViewBoundsRect);
+end;
+
+{********************************************************}
+function TALNativeControl.GetNativeViewBoundsRect: TRectF;
+begin
+  Result := Padding.PaddingRect(LocalRect);
   for var I := 0 to ControlsCount - 1 do begin
     var LControl := Controls[i];
     if not LControl.Visible then continue;
-    {$IFNDEF ALCompilerVersionSupported130}
+    {$IFNDEF ALCompilerVersionSupported131}
       {$MESSAGE WARN 'Check if FMX.Types.TAlignLayout was not updated and adjust the IFDEF'}
     {$ENDIF}
     case Lcontrol.Align of
@@ -400,12 +406,6 @@ begin
   Result := NativeViewMargins.PaddingRect(Result);
 end;
 
-{********************************************************}
-function TALNativeControl.GetNativeViewBoundsRect: TRectF;
-begin
-  Result := AbsoluteToLocal(GetNativeViewAbsoluteRect);
-end;
-
 {*******************************************************}
 function TALNativeControl.GetNativeViewPosition: TPointF;
 begin
@@ -415,13 +415,13 @@ end;
 {***************************************************}
 function TALNativeControl.GetNativeViewWidth: Single;
 begin
-  Result := GetNativeViewAbsoluteRect.Width;
+  Result := GetNativeViewBoundsRect.Width;
 end;
 
 {****************************************************}
 function TALNativeControl.GetNativeViewHeight: Single;
 begin
-  Result := GetNativeViewAbsoluteRect.Height;
+  Result := GetNativeViewBoundsRect.Height;
 end;
 
 {*****************************************************}

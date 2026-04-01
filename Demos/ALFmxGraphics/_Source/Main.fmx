@@ -12,18 +12,19 @@ object MainForm: TMainForm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnPaint = FormPaint
+  OnSafeAreaChanged = FormSafeAreaChanged
   DesignerMasterStyle = 0
   object MainScrollBox: TALVertScrollBox
     VScrollBar.Size.Width = 4.000000000000000000
-    VScrollBar.Size.Height = 755.000000000000000000
+    VScrollBar.Size.Height = 731.000000000000000000
     VScrollBar.Size.PlatformDefault = False
     VScrollBar.TabOrder = 0
     VScrollBar.Thumb.Size.Width = 4.000000000000000000
-    VScrollBar.Thumb.Size.Height = 362.000000000000000000
+    VScrollBar.Thumb.Size.Height = 339.000000000000000000
     VScrollBar.Thumb.Size.PlatformDefault = False
     Align = Client
     Size.Width = 380.000000000000000000
-    Size.Height = 755.000000000000000000
+    Size.Height = 731.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 11
     object MainTitle: TALText
@@ -83,7 +84,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 21
+      TabOrder = 23
       Text = 'Recreate Buffers'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -132,7 +133,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 19
+      TabOrder = 21
       Text = 'Test FPS'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -2937,42 +2938,42 @@ object MainForm: TMainForm
   end
   object StatusLabel3: TALText
     Align = Bottom
-    Fill.Color = xFF3B3B3B
+    Fill.Color = claWhite
     Padding.Left = 6.000000000000000000
-    Padding.Right = 2.000000000000000000
-    Padding.Bottom = 2.000000000000000000
-    Position.Y = 755.000000000000000000
+    Padding.Top = 5.000000000000000000
+    Padding.Right = 6.000000000000000000
+    Padding.Bottom = 5.000000000000000000
+    Position.Y = 731.000000000000000000
     Size.Width = 380.000000000000000000
-    Size.Height = 21.000000000000000000
+    Size.Height = 29.000000000000000000
     Size.PlatformDefault = False
     Text = 'StatusLabel3'
-    TextSettings.Font.Color = claWhite
   end
   object StatusLabel1: TALText
     Align = Bottom
-    Fill.Color = xFF3B3B3B
+    Fill.Color = claWhite
     Padding.Left = 6.000000000000000000
-    Padding.Right = 2.000000000000000000
-    Padding.Bottom = 2.000000000000000000
-    Position.Y = 797.000000000000000000
+    Padding.Top = 5.000000000000000000
+    Padding.Right = 6.000000000000000000
+    Padding.Bottom = 5.000000000000000000
+    Position.Y = 789.000000000000000000
     Size.Width = 380.000000000000000000
-    Size.Height = 21.000000000000000000
+    Size.Height = 29.000000000000000000
     Size.PlatformDefault = False
     Text = 'StatusLabel1'
-    TextSettings.Font.Color = claWhite
   end
   object StatusLabel2: TALText
     Align = Bottom
-    Fill.Color = xFF3B3B3B
+    Fill.Color = claWhite
     Padding.Left = 6.000000000000000000
-    Padding.Right = 2.000000000000000000
-    Padding.Bottom = 2.000000000000000000
-    Position.Y = 776.000000000000000000
+    Padding.Top = 5.000000000000000000
+    Padding.Right = 6.000000000000000000
+    Padding.Bottom = 5.000000000000000000
+    Position.Y = 760.000000000000000000
     Size.Width = 380.000000000000000000
-    Size.Height = 21.000000000000000000
+    Size.Height = 29.000000000000000000
     Size.PlatformDefault = False
     Text = 'StatusLabel2'
-    TextSettings.Font.Color = claWhite
   end
   object ButtonStop: TALButton
     Align = MostTop

@@ -14,7 +14,7 @@ uses
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4346 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   ALCIFilterClass = interface(CIFilterClass)

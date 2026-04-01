@@ -10,6 +10,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
+  OnSafeAreaChanged = FormSafeAreaChanged
   DesignerMasterStyle = 0
   object MemoLog: TMemo
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
@@ -20,8 +21,8 @@ object Form1: TForm1
     Size.Height = 224.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 6
-    Viewport.Width = 356.000000000000000000
-    Viewport.Height = 220.000000000000000000
+    Viewport.Width = 360.000000000000000000
+    Viewport.Height = 224.000000000000000000
   end
   object ButtonGetToken: TButton
     Align = Top

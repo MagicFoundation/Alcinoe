@@ -39,7 +39,7 @@ type
   TJUiModeManager = class(TJavaGenericImport<JUiModeManagerClass, JUiModeManager>) end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-21296 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALNotificationClass = interface(JNotificationClass)
@@ -54,7 +54,7 @@ type
   TJALNotification = class(TJavaGenericImport<JALNotificationClass, JALNotification>) end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-21296 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALNotificationChannelClass = interface(JNotificationChannelClass)

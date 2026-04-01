@@ -9,6 +9,7 @@ object Form1: TForm1
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
+  OnSafeAreaChanged = FormSafeAreaChanged
   DesignerMasterStyle = 0
   object MainTabControl: TTabControl
     Align = Client
@@ -28,7 +29,6 @@ object Form1: TForm1
       CustomIcon = <
         item
         end>
-      TextSettings.Trimming = None
       IsSelected = True
       Size.Width = 114.000000000000000000
       Size.Height = 26.000000000000000000
@@ -48,7 +48,6 @@ object Form1: TForm1
         Size.PlatformDefault = False
         TabOrder = 5
         object TextInterpolationType: TALText
-          AutoSize = Both
           Position.X = 15.000000000000000000
           Size.Width = 113.000000000000000000
           Size.Height = 19.000000000000000000
@@ -89,7 +88,6 @@ object Form1: TForm1
         Size.PlatformDefault = False
         TabOrder = 3
         object TextInterpolationMode: TALText
-          AutoSize = Both
           Position.X = 15.000000000000000000
           Size.Width = 120.000000000000000000
           Size.Height = 19.000000000000000000
@@ -120,7 +118,6 @@ object Form1: TForm1
           Position.X = 15.000000000000000000
           TabOrder = 1
           Text = 'Start'
-          TextSettings.Trimming = None
           OnClick = ButtonStartClick
           OnResized = LayoutResized
         end
@@ -131,7 +128,6 @@ object Form1: TForm1
           Size.PlatformDefault = False
           TabOrder = 0
           Text = 'Clear Graph'
-          TextSettings.Trimming = None
           OnClick = ButtonClearGraphClick
           OnResized = LayoutResized
         end
@@ -184,7 +180,6 @@ object Form1: TForm1
           OnPaint = PaintBoxChartPaint
         end
         object ALText0_0: TALText
-          AutoSize = Both
           Position.X = 42.000000000000000000
           Position.Y = 296.000000000000000000
           Size.Width = 13.000000000000000000
@@ -195,7 +190,6 @@ object Form1: TForm1
           OnResized = LayoutResized
         end
         object ALText1_4: TALText
-          AutoSize = Both
           Position.X = 43.000000000000000000
           Size.Width = 13.000000000000000000
           Size.Height = 13.000000000000000000
@@ -205,7 +199,6 @@ object Form1: TForm1
           OnResized = LayoutResized
         end
         object ALTextmin1_0: TALText
-          AutoSize = Both
           Position.X = 44.000000000000000000
           Position.Y = 456.000000000000000000
           Size.Width = 17.000000000000000000
@@ -216,7 +209,6 @@ object Form1: TForm1
           OnResized = LayoutResized
         end
         object ALTextmin1_4: TALText
-          AutoSize = Both
           Position.X = 39.000000000000000000
           Position.Y = 640.000000000000000000
           Size.Width = 17.000000000000000000
@@ -227,7 +219,6 @@ object Form1: TForm1
           OnResized = LayoutResized
         end
         object ALText1_0: TALText
-          AutoSize = Both
           Position.X = 43.000000000000000000
           Position.Y = 88.000000000000000000
           Size.Width = 13.000000000000000000
@@ -247,7 +238,6 @@ object Form1: TForm1
         Size.PlatformDefault = False
         TabOrder = 4
         object TextCustomInterpolation: TALText
-          AutoSize = Both
           Position.X = 15.000000000000000000
           Size.Width = 132.000000000000000000
           Size.Height = 19.000000000000000000
@@ -280,7 +270,6 @@ object Form1: TForm1
         Size.PlatformDefault = False
         TabOrder = 2
         object TextBezier: TALText
-          AutoSize = Both
           Position.X = 15.000000000000000000
           Size.Width = 121.000000000000000000
           Size.Height = 19.000000000000000000
@@ -345,7 +334,6 @@ object Form1: TForm1
         Size.PlatformDefault = False
         TabOrder = 1
         object TextOvershoot: TALText
-          AutoSize = Both
           Position.X = 15.000000000000000000
           Size.Width = 65.000000000000000000
           Size.Height = 19.000000000000000000
@@ -370,7 +358,6 @@ object Form1: TForm1
       CustomIcon = <
         item
         end>
-      TextSettings.Trimming = None
       IsSelected = False
       Size.Width = 84.000000000000000000
       Size.Height = 26.000000000000000000
@@ -389,7 +376,6 @@ object Form1: TForm1
         Size.PlatformDefault = False
         TabOrder = 1
         object TextDampingRatio: TALText
-          AutoSize = Both
           Position.X = 15.000000000000000000
           Size.Width = 89.000000000000000000
           Size.Height = 19.000000000000000000
@@ -421,7 +407,6 @@ object Form1: TForm1
         Size.PlatformDefault = False
         TabOrder = 0
         object TextStiffness: TALText
-          AutoSize = Both
           Position.X = 15.000000000000000000
           Size.Width = 52.000000000000000000
           Size.Height = 19.000000000000000000
@@ -478,7 +463,6 @@ object Form1: TForm1
           end
           object TextDragMe: TALText
             Align = Center
-            AutoSize = Both
             Size.Width = 39.000000000000000000
             Size.Height = 13.000000000000000000
             Size.PlatformDefault = False

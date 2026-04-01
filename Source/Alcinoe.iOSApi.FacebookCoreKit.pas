@@ -7,7 +7,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported130}
+{$IFNDEF ALCompilerVersionSupported131}
   //Pleast update <Alcinoe>\Libraries\ios\Facebook\ to the last one and then run
   //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
   //and gave the path to <Alcinoe>\Source\Alcinoe.iOSApi.FacebookCoreKit.pas to build
@@ -60,9 +60,11 @@ type
     ['{FA8D976C-3BC9-4152-A053-CD08C919210D}']
     procedure initializeSDK; cdecl;
     [MethodName('application:openURL:options:')]
-    function applicationOpenURLOptions(application: UIApplication; openURL: NSURL; options: NSDictionary) : Boolean; cdecl;
+    function applicationOpenURLOptions(application: UIApplication; openURL: NSURL; options: NSDictionary): Boolean; cdecl;
+    [MethodName('application:openURL:sourceApplication:annotation:')]
+    function applicationOpenURLSourceApplicationAnnotation(application: UIApplication; openURL: NSURL; sourceApplication: NSString; annotation: Pointer): Boolean; cdecl;
     [MethodName('application:didFinishLaunchingWithOptions:')]
-    function applicationDidFinishLaunchingWithOptions(application: UIApplication; didFinishLaunchingWithOptions: NSDictionary) : Boolean; cdecl;
+    function applicationDidFinishLaunchingWithOptions(application: UIApplication; didFinishLaunchingWithOptions: NSDictionary): Boolean; cdecl;
   end;
   TFBSDKApplicationDelegate = class(TOCGenericImport<FBSDKApplicationDelegateClass, FBSDKApplicationDelegate>) end;
 
@@ -87,8 +89,8 @@ type
   FBSDKGraphRequest = interface(NSObject)
     ['{C964E2C1-1500-4A35-B61D-02F46AF53B3C}']
     [MethodName('initWithGraphPath:parameters:HTTPMethod:')]
-    function initWithGraphPathParametersHTTPMethod(graphPath: NSString; parameters: NSDictionary; HTTPMethod: FBSDKHTTPMethod) : FBSDKGraphRequest; cdecl;
-    function startWithCompletion(completion: FBSDKGraphRequestCompletion) : FBSDKGraphRequestConnecting; cdecl;
+    function initWithGraphPathParametersHTTPMethod(graphPath: NSString; parameters: NSDictionary; HTTPMethod: FBSDKHTTPMethod): FBSDKGraphRequest; cdecl;
+    function startWithCompletion(completion: FBSDKGraphRequestCompletion): FBSDKGraphRequestConnecting; cdecl;
   end;
   TFBSDKGraphRequest = class(TOCGenericImport<FBSDKGraphRequestClass, FBSDKGraphRequest>) end;
 
@@ -104,9 +106,6 @@ procedure libcLoader; cdecl; external '/usr/lib/libc++.dylib';
 procedure libvDSPLoader; cdecl; external '/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libvDSP.dylib';
 procedure libvMiscLoader; cdecl; external '/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libvMisc.dylib';
 
-{$IFNDEF ALCompilerVersionSupported130}
-  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-38700 is corrected and if yes check if all declarations below are still mandatories.'}
-{$ENDIF}
 {$IF Defined(IOSSIMULATOR)}
 procedure libswiftCompatibility50Loader; cdecl; external '/usr/lib/swift/iphonesimulator/libswiftCompatibility50.a';
 procedure libswiftCompatibility51Loader; cdecl; external '/usr/lib/swift/iphonesimulator/libswiftCompatibility51.a';

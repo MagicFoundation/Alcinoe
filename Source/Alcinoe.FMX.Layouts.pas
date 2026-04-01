@@ -4,7 +4,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported130}
+{$IFNDEF ALCompilerVersionSupported131}
   {$MESSAGE WARN 'Check if FMX.Layouts.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -646,7 +646,7 @@ begin
     else begin
 
       // AbsoluteRect returns a rectangle already multiplied by Scale
-      {$IFNDEF ALCompilerVersionSupported130}
+      {$IFNDEF ALCompilerVersionSupported131}
         {$MESSAGE WARN 'Check the status of https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4523 and adjust the IFDEF'}
       {$ENDIF}
       var LChildRect := AbsoluteToLocal(AChild.AbsoluteRect);

@@ -365,7 +365,7 @@ end;
 procedure ALCodeProfilerExitProc(const aProcID : Cardinal);
 
   type
-    {$IFNDEF ALCompilerVersionSupported130}
+    {$IFNDEF ALCompilerVersionSupported131}
       {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch was not updated and adjust the IFDEF'}
     {$ENDIF}
     TStopwatchAccessPrivate = record
@@ -420,7 +420,7 @@ begin
           ParentExecutionID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ParentExecutionID;
           ProcID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ProcID;
           ThreadID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ThreadID;
-          {$IFNDEF ALCompilerVersionSupported130}
+          {$IFNDEF ALCompilerVersionSupported131}
             {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
           {$ENDIF}
           {$IF defined(MSWINDOWS)}

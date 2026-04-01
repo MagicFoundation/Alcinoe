@@ -33,6 +33,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ButtonDownloadClick(Sender: TObject);
+    procedure FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
   private
     procedure HttpWorkResultHandler(const Sender: TObject; const Msg: System.Messaging.TMessage);
   public
@@ -52,6 +53,7 @@ uses
   Alcinoe.FMX.Snackbar,
   Alcinoe.Http.Worker,
   Alcinoe.Common,
+  Alcinoe.FMX.Common,
   Alcinoe.FileUtils,
   Alcinoe.FMX.ErrorReporting,
   Alcinoe.Localization,
@@ -94,6 +96,11 @@ begin
     LoadingContainer.Visible := False;
     LoadingAnimatedImage.Enabled := False;
   end;
+  ALSetSystemBarsColor(
+    Fill.Color, // const AStatusBarColor: TAlphaColor
+    Fill.Color, // const ANavigationBarColor: TAlphaColor
+    False, // const AStatusBarUseLightIcons: TAlphaColor
+    False); // const ANavigationBarUseLightIcons: TAlphaColor
 end;
 
 {***********************************************}
@@ -101,6 +108,13 @@ procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   ALLog('TMainForm.FormDestroy');
   TMessageManager.DefaultManager.Unsubscribe(TALHttpWorker.TWorkResultMessage, HttpWorkResultHandler);
+end;
+
+{******************************************************************************}
+procedure TMainForm.FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Top := AInsets.Top;
+  Padding.Bottom := AInsets.Bottom;
 end;
 
 {*****************************************************}

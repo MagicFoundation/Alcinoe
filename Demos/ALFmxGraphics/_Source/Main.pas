@@ -71,6 +71,7 @@ type
     procedure TextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
     procedure ButtonTestMultilineTextClick(Sender: TObject);
     procedure ButtonStopClick(Sender: TObject);
+    procedure FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
   private
     FScrollBoxDrawables: TArray<TAlDrawable>;
     FTestFPSDrawables: TArray<TAlDrawable>;
@@ -190,6 +191,12 @@ begin
   end;
 
   InitScrollBoxDrawables;
+
+  ALSetSystemBarsColor(
+    Fill.Color, // const AStatusBarColor: TAlphaColor
+    Fill.Color, // const ANavigationBarColor: TAlphaColor
+    False, // const AStatusBarUseLightIcons: TAlphaColor
+    False); // const ANavigationBarUseLightIcons: TAlphaColor
 end;
 
 {***********************************************}
@@ -325,6 +332,13 @@ begin
     end;
   end;
 
+end;
+
+{******************************************************************************}
+procedure TMainForm.FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Top := AInsets.Top;
+  Padding.Bottom := AInsets.Bottom;
 end;
 
 {***********************************}

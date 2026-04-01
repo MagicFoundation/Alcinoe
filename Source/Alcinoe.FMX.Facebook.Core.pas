@@ -169,6 +169,7 @@ uses
   iOSapi.Foundation,
   Macapi.Helpers,
   iOSapi.Helpers,
+  iOSapi.UIKit,
   FMX.Platform,
   FMX.Platform.iOS,
   Alcinoe.iOSApi.FacebookCoreKit,
@@ -241,21 +242,19 @@ begin
         'Url: ' + Lcontext.URL);
       {$ENDIF}
       if not _ALFacebookInitialised then exit;
-      {$IFNDEF ALCompilerVersionSupported130}
-        // Ios doc say iOS 13 moved opening URL functionality to the SceneDelegate. If you are
-        // using iOS 13, add the following method to your SceneDelegate so that operations like
-        // logging in or sharing function as intended (https://developers.facebook.com/docs/ios/getting-started)
-        // but actually their is no implementation in delphi for the SceneDelegate and also it's
-        // seam that the event is still called in ios 13+
-        // (https://stackoverflow.com/questions/75062913/applicationopenurloptions-vs-sceneopenurlcontexts)
-        // so for now I simply skip it and I add this warn to verify if one day
-        // SceneDelegate will be implemented in delphi
-        {$MESSAGE WARN 'Check if SceneDelegate is implemented in Delphi source code'}
+      {$IFNDEF ALCompilerVersionSupported131}
+        {$MESSAGE WARN 'Check if FMX.Platform.iOS.sceneOpenURLContexts still calls HandleOpenURLAppEvent with Options as UISceneOpenURLOptions, not as an ObjectID'}
+        {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5196 has been implemented'}
+        // If RSS-5196 has been implemented, test the code below with a cold start:
+        // in the browser, enter fb224667374702876://test while ALFmxFacebookLoginDemo is installed,
+        // then check the log and confirm that the application does not crash.
       {$ENDIF}
-      TFBSDKApplicationDelegate.OCClass.sharedInstance.applicationOpenURLOptions(
+      var LOpenURLOptions := UISceneOpenURLOptions(Lcontext.Context);
+      TFBSDKApplicationDelegate.OCClass.sharedInstance.applicationOpenURLSourceApplicationAnnotation(
         TiOSHelper.SharedApplication, // application: UIApplication
         StrToNSUrl(Lcontext.Url),  // openURL: NSURL;
-        TNSDictionary.Wrap(Lcontext.Context)); // options: NSDictionary
+        StrToNSStr(Lcontext.sourceApp), // sourceApplication: NSString;
+        LOpenURLOptions.annotation); // annotation: Pointer
     end
     else if LValue.Event = TApplicationEvent.FinishedLaunching then begin
       if not ALInitFacebookSDKAtStartup then exit;

@@ -33,6 +33,7 @@ type
     procedure FormPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
     procedure ConfettiFinish(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
   private
     { Private declarations }
     fSkew: single;
@@ -53,6 +54,7 @@ uses
   system.Math,
   Alcinoe.Common,
   Alcinoe.Localization,
+  Alcinoe.FMX.Common,
   Alcinoe.StringUtils;
 
 {$R *.fmx}
@@ -119,12 +121,24 @@ end;
 procedure TTMainForm.FormCreate(Sender: TObject);
 begin
   fDebugFpsStarted := False;
+  ALSetSystemBarsColor(
+    Fill.Color, // const AStatusBarColor: TAlphaColor
+    Fill.Color, // const ANavigationBarColor: TAlphaColor
+    False, // const AStatusBarUseLightIcons: TAlphaColor
+    False); // const ANavigationBarUseLightIcons: TAlphaColor
 end;
 
 {************************************************************************************}
 procedure TTMainForm.FormPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
 begin
   UpdateStatusBar;
+end;
+
+{*******************************************************************************}
+procedure TTMainForm.FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Top := AInsets.Top;
+  Padding.Bottom := AInsets.Bottom;
 end;
 
 {**************************************************************}

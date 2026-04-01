@@ -765,7 +765,7 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.FMX.Types3D;
 
-{$IFNDEF ALCompilerVersionSupported130}
+{$IFNDEF ALCompilerVersionSupported131}
   {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4392 was corrected, if yes delete the function below, and adjust the IFDEF'}
 {$ENDIF}
 {$IF defined(ALAppleOS)}
@@ -3833,7 +3833,7 @@ begin
                                ASrcRect.height,
                                CGImageGetHeight(AImage)));
       try
-        {$IFNDEF ALCompilerVersionSupported130}
+        {$IFNDEF ALCompilerVersionSupported131}
           {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4347 was corrected and adjust the IFDEF'}
           {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4348 was corrected and adjust the IFDEF'}
           {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4349 was corrected and adjust the IFDEF'}
@@ -4958,7 +4958,7 @@ begin
           if LProperties = nil then raise Exception.Create('Unable to create export properties');
           try
             CGImageDestinationAddImage(LImageDestinationRef{idst}, ABitmap{image}, LProperties{properties});
-            {$IFNDEF ALCompilerVersionSupported130}
+            {$IFNDEF ALCompilerVersionSupported131}
               {$MESSAGE WARN 'Check the status of https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4714 and adjust the IFDEF'}
             {$ENDIF}
             {$IF defined(IOS)}
@@ -8816,7 +8816,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALGetSkImageinfo(const W, H: int32_t): sk_imageinfo_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_imageinfo_t didn''t changed'}
   {$ENDIF}
   Result.width := W;
@@ -9130,7 +9130,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALGetCubicMitchellNetravaliSkSamplingoptions: sk_samplingoptions_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_samplingoptions_t didn''t changed'}
   {$ENDIF}
   Result.max_anisotropic := 0;
@@ -9148,7 +9148,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALGetLinearSkSamplingoptions: sk_samplingoptions_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_samplingoptions_t didn''t changed'}
   {$ENDIF}
   Result.max_anisotropic := 0;
@@ -9164,7 +9164,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALGetNearestSkSamplingoptions: sk_samplingoptions_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_samplingoptions_t didn''t changed'}
   {$ENDIF}
   Result.max_anisotropic := 0;
@@ -9406,7 +9406,7 @@ end;
 {$IF defined(ALAppleOS)}
 function ALCreateCGContextRef(const W, H: integer; const AData: Pointer = nil; const ABytesPerRow: Integer = -1): CGContextRef;
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4391 is corrected and if yes replace UInt32 by CGBitmapInfo'}
   {$ENDIF}
   var LbitmapInfo: UInt32{CGBitmapInfo};
@@ -9648,7 +9648,7 @@ begin
   // TCanvas/TBitmap do not work from a background thread. On Android/iOS,
   // and with Skia, we use platform API functions to draw images. However,
   // on other platforms, we resort to using TCanvas. :(
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-19673 is corrected and if yes remove the Synchronize'}
   {$ENDIF}
   TThread.Synchronize(nil,
@@ -9682,7 +9682,7 @@ begin
   // TCanvas/TBitmap do not work from a background thread. On Android/iOS,
   // and with Skia, we use platform API functions to draw images. However,
   // on other platforms, we resort to using TCanvas. :(
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-19673 is corrected and if yes remove the Synchronize'}
   {$ENDIF}
   TThread.Synchronize(nil,

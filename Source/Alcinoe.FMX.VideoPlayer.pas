@@ -1090,7 +1090,7 @@ begin
     {$ELSE}
     if (fVideoPlayerEngine.fDrawable.Width <> fVideoPlayerEngine.fVideoWidth) or
        (fVideoPlayerEngine.fDrawable.Height <> fVideoPlayerEngine.fVideoHeight) then begin
-      {$IFNDEF ALCompilerVersionSupported130}
+      {$IFNDEF ALCompilerVersionSupported131}
         {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
       {$ENDIF}
       // we can't use setsize because it's will finalise the texture
@@ -1618,7 +1618,7 @@ begin
   var LPlayerListener := FPlayerListener;
   FOnFrameAvailableListener := nil;
   FPlayerListener := nil;
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3206 has been corrected and adjust the IFDEF'}
   {$ENDIF}
   TThread.ForceQueue(nil,
@@ -2231,7 +2231,7 @@ begin
   FDisplayLinkListener := nil;
   FNotificationsDelegate := nil;
   FKVODelegate := nil;
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3206 has been corrected and adjust the IFDEF'}
   {$ENDIF}
   TThread.ForceQueue(nil,
@@ -2430,7 +2430,7 @@ begin
         end;
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        {$IFNDEF ALCompilerVersionSupported130}
+        {$IFNDEF ALCompilerVersionSupported131}
           {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
         {$ENDIF}
         // we can't use setsize because it's will finalise the texture
@@ -2762,7 +2762,7 @@ begin
   {$ENDIF}
   if not SetState(vpsPreparing, vpsIdle) then raise Exception.Create('Prepare can be call only in the idle state');
   //--
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4401 is corrected, if yes replace P: Pointer by LURL: NSUrl, and adjust the IFDEF'}
   {$ENDIF}
   var LURL: NSURL;

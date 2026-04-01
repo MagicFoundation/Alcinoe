@@ -4,13 +4,13 @@ object TMainForm: TTMainForm
   Caption = 'Main'
   ClientHeight = 614
   ClientWidth = 513
-  Fill.Color = claSilver
   Fill.Kind = Solid
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   OnPaint = FormPaint
+  OnSafeAreaChanged = FormSafeAreaChanged
   DesignerMasterStyle = 0
   object Confetti: TALConfetti
     OnFinish = ConfettiFinish
@@ -29,7 +29,6 @@ object TMainForm: TTMainForm
     Size.PlatformDefault = False
     TabOrder = 4
     Text = 'Fire (School Pride)'
-    TextSettings.Trimming = None
     OnClick = BtnFireSchoolPrideClick
   end
   object BtnFireSnow: TButton
@@ -44,7 +43,6 @@ object TMainForm: TTMainForm
     Size.PlatformDefault = False
     TabOrder = 3
     Text = 'Fire (Snow)'
-    TextSettings.Trimming = None
     OnClick = BtnFireSnowClick
   end
   object BtnFireFireworks: TButton
@@ -59,7 +57,6 @@ object TMainForm: TTMainForm
     Size.PlatformDefault = False
     TabOrder = 2
     Text = 'Fire (Fireworks)'
-    TextSettings.Trimming = None
     OnClick = BtnFireFireworksClick
   end
   object BtnFireRealisticLook: TButton
@@ -74,7 +71,6 @@ object TMainForm: TTMainForm
     Size.PlatformDefault = False
     TabOrder = 1
     Text = 'Fire (Realistic Look)'
-    TextSettings.Trimming = None
     OnClick = BtnFireRealisticLookClick
   end
   object SnowTimer: TTimer
@@ -103,7 +99,6 @@ object TMainForm: TTMainForm
     Size.PlatformDefault = False
     TabOrder = 5
     Text = 'Fire (Random Direction)'
-    TextSettings.Trimming = None
     OnClick = BtnRandomDirectionClick
   end
   object FireworksTimer: TTimer

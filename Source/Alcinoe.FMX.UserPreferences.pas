@@ -107,7 +107,7 @@ begin
   FAESKey := nil;
   {$ENDIF}
   {$IF defined(ALAppleOS)}
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4389 was corrected and adjust the IFDEF'}
   {$ENDIF}
   FUserDefaults := {$IF defined(ALMacOS)}TNSUserDefaults.Wrap({$ENDIF}TNSUserDefaults.OCClass.standardUserDefaults{$IF defined(ALMacOS)}){$ENDIF};

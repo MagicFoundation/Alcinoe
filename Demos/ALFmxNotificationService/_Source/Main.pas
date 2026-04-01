@@ -76,6 +76,7 @@ type
     procedure ButtonShowNotificationClick(Sender: TObject);
     procedure ButtonDeleteTokenClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
   private
     FBadge: integer;
     procedure NotificationReceivedMessageHandler(const Sender: TObject; const AMessage: TMessage);
@@ -91,6 +92,9 @@ var
   Form1: TForm1;
 
 implementation
+
+uses
+  Alcinoe.FMX.Common;
 
 {$R *.fmx}
 
@@ -149,6 +153,11 @@ begin
     TALNotificationChannel.create('demo'{AID})
       .SetImportance(TALNotificationImportance.High));
   TALNotificationService.Instance.setBadgeCount(0);
+  ALSetSystemBarsColor(
+    Fill.Color, // const AStatusBarColor: TAlphaColor
+    Fill.Color, // const ANavigationBarColor: TAlphaColor
+    False, // const AStatusBarUseLightIcons: TAlphaColor
+    False); // const ANavigationBarUseLightIcons: TAlphaColor
 end;
 
 {********************************************}
@@ -159,6 +168,13 @@ begin
   TMessageManager.DefaultManager.Unsubscribe(TALNotificationService.TDeleteTokenMessage, DeleteTokenMessageHandler);
   TMessageManager.DefaultManager.Unsubscribe(TALNotificationService.TTokenRefreshMessage, TokenRefreshMessageHandler);
   TMessageManager.DefaultManager.Unsubscribe(TALNotificationService.TNotificationPermissionResultMessage, NotificationPermissionResultMessageHandler);
+end;
+
+{***************************************************************************}
+procedure TForm1.FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Top := AInsets.Top;
+  Padding.Bottom := AInsets.Bottom;
 end;
 
 {*****************************************}

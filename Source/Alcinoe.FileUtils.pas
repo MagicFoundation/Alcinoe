@@ -217,7 +217,7 @@ begin
   // OS X:          /Users/<username>/Library/Application Support/
   // iOS Device:    /var/mobile/Containers/Data/Application/<application ID>/Library/Application Support/
   var LNSFile := TNSFileManager.Wrap(TNSFileManager.OCClass.defaultManager);
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4412 was corrected and adjust the IFDEF'}
   {$ENDIF}
   var LErrorPtr: Pointer := nil;
@@ -285,7 +285,7 @@ begin
   // OS X:          /Users/<username>/Library/Caches/
   // iOS Device:    /var/mobile/Containers/Data/Application/<application ID>/Library/Caches/
   var LNSFile := TNSFileManager.Wrap(TNSFileManager.OCClass.defaultManager);
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4412 was corrected and adjust the IFDEF'}
   {$ENDIF}
   var LErrorPtr: Pointer := nil;

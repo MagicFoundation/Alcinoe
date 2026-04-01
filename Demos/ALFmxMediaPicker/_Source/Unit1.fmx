@@ -9,6 +9,7 @@ object Form1: TForm1
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
+  OnSafeAreaChanged = FormSafeAreaChanged
   DesignerMasterStyle = 0
   object ALButton1: TALButton
     Align = TopCenter

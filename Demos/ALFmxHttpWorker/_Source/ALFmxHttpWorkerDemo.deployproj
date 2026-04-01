@@ -1667,15 +1667,6 @@
       <RemoteDir>ALFmxHttpWorkerDemo\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxHttpWorkerDemo\res\values-v35\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -3412,15 +3403,6 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxHttpWorkerDemo\res\values-v31\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxHttpWorkerDemo\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Merged\res\values-vi\values-vi.xml">
@@ -5163,15 +5145,6 @@
       <RemoteDir>ALFmxHttpWorkerDemo\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxHttpWorkerDemo\res\values-v35\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -6908,15 +6881,6 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxHttpWorkerDemo\res\values-v31\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Merged\res\values-v35\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxHttpWorkerDemo\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Merged\res\values-vi\values-vi.xml">

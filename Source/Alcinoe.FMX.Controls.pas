@@ -16,7 +16,7 @@ uses
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Types.TAlignLayout was not updated and adjust the IFDEF'}
   {$ENDIF}
   // ⚠ Important:
@@ -81,7 +81,7 @@ type
   TALClickSoundMode = (Default, Always, Never);
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALControl = class(TControl, IRotatedControl)
@@ -179,7 +179,7 @@ type
     function IsDisplayed: Boolean; virtual;
     property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     property Form: TCommonCustomForm read FForm;
-    {$IFNDEF ALCompilerVersionSupported130}
+    {$IFNDEF ALCompilerVersionSupported131}
       {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed still not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
     {$ENDIF}
     property Pressed: Boolean read GetPressed write SetPressed;
@@ -212,7 +212,7 @@ type
   end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TContent was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALContent = class(TALControl, IContent)
@@ -457,7 +457,7 @@ end;
 // This series of operations results in the BufDrawable being
 // recalculated multiple times, leading to significant performance
 // overhead.
-{$IFNDEF ALCompilerVersionSupported130}
+{$IFNDEF ALCompilerVersionSupported131}
   {$MESSAGE WARN 'Check if FMX.Controls.TControl.EndUpdate was not updated and adjust the IFDEF'}
 {$ENDIF}
 procedure TALControl.EndUpdate;
@@ -515,7 +515,7 @@ begin
     var LLegacyAlign: TAlignLayout;
     Case Value of
 
-      {$IFNDEF ALCompilerVersionSupported130}
+      {$IFNDEF ALCompilerVersionSupported131}
         {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4335 was correct and if yes delete the code below'}
       {$ENDIF}
       TALAlignLayout.TopCenter: LLegacyAlign := TAlignLayout.Top;
@@ -576,7 +576,7 @@ begin
   //ALLog(ClassName+'.DoRealign', 'Name: ' + Name);
   {$ENDIF}
 
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-15768 was implemented and adjust the IFDEF'}
   {$ENDIF}
   // I decided to remove this workaround because it doesn't
@@ -633,7 +633,7 @@ begin
   If LParentRealigning then
     ParentRealigning;
 
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4335 was correct and if yes uncomment the code below'}
   {$ENDIF}
   If (LParentRealigning) // and
@@ -1341,7 +1341,7 @@ end;
 {**************************************}
 function TALControl.GetScale: TPosition;
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Types.ArrangeControl(const Control: IAlignableObject... was not updated and adjust the IFDEF'}
   {$ENDIF}
   // ArrangeControl calls IRotatedControl.GetScale to determine the control’s scale
@@ -1498,7 +1498,7 @@ end;
 {***********************************************}
 procedure TALControl.SetNewScene(AScene: IScene);
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.Pressed is still changed only in SetNewScene/MouseDown/MouseUp/MouseClick'}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.IsFocused is still changed only in SetNewScene/DoEnter/DoExit'}
@@ -1765,7 +1765,7 @@ end;
 {****************************************************}
 procedure TALControl.DoMatrixChanged(Sender: TObject);
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMatrixChanged was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2823 was not corrected and adjust the IFDEF'}
   {$ENDIF}
@@ -1901,7 +1901,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported130}
+{$IFNDEF ALCompilerVersionSupported131}
   {$MESSAGE WARN 'Check if FMX.Controls.TContentTabList was not updated and adjust the IFDEF'}
 {$ENDIF}
 type

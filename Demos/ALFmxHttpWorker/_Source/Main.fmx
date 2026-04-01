@@ -11,6 +11,7 @@ object MainForm: TMainForm
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnSafeAreaChanged = FormSafeAreaChanged
   DesignerMasterStyle = 0
   object ButtonUpload: TALButton
     Align = TopCenter

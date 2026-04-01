@@ -4,7 +4,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported130}
+{$IFNDEF ALCompilerVersionSupported131}
   {$MESSAGE WARN 'Check if FMX.Presentation.Android.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -219,10 +219,20 @@ begin
     LParam.height := R.Height;
     Layout.setLayoutParams(LParam);
   end;
-  if Layout.getLeft <> R.Left then
+  if Layout.getX <> R.Left then
     Layout.setX(R.Left);
-  if Layout.getTop <> R.Top then
+  if Layout.getY <> R.Top then
     Layout.setY(R.Top);
+  // In theory, setLayoutParams already triggers a layout pass, and setX/setY only affect the
+  // visual position (translation) without requiring a new layout. However, in practice, when
+  // the native view is initially positioned outside the visible screen area, it may remain
+  // non-rendered even after being moved back into the visible area using setX/setY alone.
+  // Forcing a requestLayout when the view enters the visible region ensures that the Android
+  // view hierarchy performs a proper layout pass, after which the view behaves normally.
+  // This appears to be related to how the FMX host integrates native views rather than a
+  // standard Android behavior.
+  if not Layout.isInLayout then
+    Layout.requestLayout;
 end;
 
 {***********************************************************}

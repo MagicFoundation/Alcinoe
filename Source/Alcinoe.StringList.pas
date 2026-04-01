@@ -33,15 +33,15 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported130}
+{$IFNDEF ALCompilerVersionSupported131}
   {$MESSAGE WARN 'Check if System.classes.TStringsEnumerator didn''t change and adjust the IFDEF'}
 {$ENDIF}
 
-{$IFNDEF ALCompilerVersionSupported130}
+{$IFNDEF ALCompilerVersionSupported131}
   {$MESSAGE WARN 'Check if System.classes.TStrings didn''t change and adjust the IFDEF'}
 {$ENDIF}
 
-{$IFNDEF ALCompilerVersionSupported130}
+{$IFNDEF ALCompilerVersionSupported131}
   {$MESSAGE WARN 'Check if System.classes.TStringList didn''t change and adjust the IFDEF'}
 {$ENDIF}
 
@@ -4139,7 +4139,7 @@ end;
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if System.Generics.Collections.TObjectDictionary<K,V> was not updated and adjust the IFDEF'}
   {$ENDIF}
   _TObjectDictionaryAccessPrivate<K,V> = class(TObjectDictionary<K,V>)
@@ -4975,7 +4975,7 @@ begin
     else
     begin
       SetLength(Buffer, Size);
-      Stream.Read(Buffer, 0, Size);
+      Stream.ReadBuffer(Buffer, 0, Size);
       Size := TEncoding.GetBufferEncoding(Buffer, Encoding, FDefaultEncoding);
       SetEncoding(Encoding); // Keep Encoding in case the stream is saved
       SetTextStr(Encoding.GetString(Buffer, Size, Length(Buffer) - Size));

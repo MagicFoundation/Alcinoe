@@ -465,7 +465,9 @@ type
     procedure ButtonShowLoadingOverlayClick(Sender: TObject);
     procedure ButtonShowSnackbarClick(Sender: TObject);
     procedure ButtonStartLoadingClick(Sender: TObject);
+    procedure FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
   private
+    FSafeAreaInsets: TRectf;
     FDatePickerDialog: TALDatePickerDialog;
     fLine: TLineStopWatch;
     fALLine: TALLineStopWatch;
@@ -531,6 +533,7 @@ begin
   // already fully loaded.
   TALFontManager.RegisterTypefaceFromResource('GoodDogPlain', 'GoodDog Plain');
   TALFontManager.RegisterTypefaceFromResource('MaShanZhengRegular', 'Ma Shan Zheng');
+  TALFontManager.RegisterTypefaceFromResource('CourierPrimeRegular', 'Courier Prime');
   ALSetSystemBarsColor(
     TALStyleManager.Instance.GetColor('Material3.Color.Surface'), // const AStatusBarColor: TAlphaColor
     TALStyleManager.Instance.GetColor('Material3.Color.Surface'), // const ANavigationBarColor: TAlphaColor
@@ -549,6 +552,8 @@ begin
   ALLog('TMainForm.FormCreate', 'begin');
 
   TALErrorReporting.Instance;
+
+  FSafeAreaInsets := TRectF.Empty;
 
   FCanvasColorAdjustTextureMaterialGallery2 := TALCanvasColorAdjustTextureMaterial.Create;
 
@@ -813,6 +818,14 @@ begin
   ALVideoPlayerSurface1.Height := (ALVertScrollBox1.Content.width / 1920) * 1080;
 end;
 
+{******************************************************************************}
+procedure TMainForm.FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
+begin
+  FSafeAreaInsets := AInsets;
+  Padding.Top := AInsets.Top;
+  Padding.bottom := AInsets.bottom;
+end;
+
 {***********************************************************}
 procedure TMainForm.ALVertScrollBox1Resized(Sender: TObject);
 begin
@@ -960,6 +973,8 @@ end;
 procedure TMainForm.ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
 begin
   var LScrollBoxDemoForm := TScrollBoxDemoForm.Create(nil);
+  LScrollBoxDemoForm.Padding.Top := Padding.Top;
+  LScrollBoxDemoForm.Padding.Bottom := Padding.Bottom;
   var LVertScrollBox := TalVertScrollBox.Create(LScrollBoxDemoForm);
   LVertScrollBox.Parent := LScrollBoxDemoForm;
   LVertScrollBox.BeginUpdate;
@@ -1091,6 +1106,8 @@ end;
 procedure TMainForm.ButtonLaunchScrollBoxDemoDelphiClick(Sender: TObject);
 begin
   var LScrollBoxDemoForm := TScrollBoxDemoForm.Create(nil);
+  LScrollBoxDemoForm.Padding.Top := Padding.Top;
+  LScrollBoxDemoForm.Padding.Bottom := Padding.Bottom;
   var LVertScrollBox := TVertScrollBox.Create(LScrollBoxDemoForm);
   LVertScrollBox.Parent := LScrollBoxDemoForm;
   LVertScrollBox.BeginUpdate;
@@ -1576,10 +1593,16 @@ begin
   _addIcon(LBar2, 'tool5');
   _addIcon(LBar2, 'tool6');
 
+  var LMargins := FSafeAreaInsets;
+  if CompareValue(LMargins.Left, 0, TEpsilon.Position) <= 0 then LMargins.Left := LMargins.Left + 25;
+  if CompareValue(LMargins.Top, 0, TEpsilon.Position) <= 0 then LMargins.Top := LMargins.Top + 10;
+  if CompareValue(LMargins.right, 0, TEpsilon.Position) <= 0 then LMargins.right := LMargins.right + 25;
+  if CompareValue(LMargins.Bottom, 0, TEpsilon.Position) <= 0 then LMargins.Bottom := LMargins.Bottom + 25;
+
   TALTopSheet.Builder
     .Setcontent(LContent)
     .SetContainerCorners(AllCorners)
-    .SetContainerMargins(TRectF.Create(25,25,25,25))
+    .SetContainerMargins(LMargins)
     .Show;
 
 end;
@@ -1672,13 +1695,19 @@ begin
   _addIcon(LContent, 'tool5');
   _addIcon(LContent, 'tool6');
 
+  var LMargins := FSafeAreaInsets;
+  if CompareValue(LMargins.Left, 0, TEpsilon.Position) <= 0 then LMargins.Left := LMargins.Left + 15;
+  if CompareValue(LMargins.Top, 0, TEpsilon.Position) <= 0 then LMargins.Top := LMargins.Top + 15;
+  if CompareValue(LMargins.right, 0, TEpsilon.Position) <= 0 then LMargins.right := LMargins.right + 15;
+  if CompareValue(LMargins.Bottom, 0, TEpsilon.Position) <= 0 then LMargins.Bottom := LMargins.Bottom + 15;
+
   TALLeftSheet.Builder
     .AddBackButton(0{ATag})
     //.AddCloseButton(0{ATag})
     .SetHeadlineText('Title')
     .Setcontent(LContent)
     .SetContainerCorners(AllCorners)
-    .SetContainerMargins(TRectF.Create(15,15,15,15))
+    .SetContainerMargins(LMargins)
     .Show;
 
 end;
@@ -1717,13 +1746,19 @@ begin
   _addIcon(LContent, 'tool5');
   _addIcon(LContent, 'tool6');
 
+  var LMargins := FSafeAreaInsets;
+  if CompareValue(LMargins.Left, 0, TEpsilon.Position) <= 0 then LMargins.Left := LMargins.Left + 15;
+  if CompareValue(LMargins.Top, 0, TEpsilon.Position) <= 0 then LMargins.Top := LMargins.Top + 15;
+  if CompareValue(LMargins.right, 0, TEpsilon.Position) <= 0 then LMargins.right := LMargins.right + 15;
+  if CompareValue(LMargins.Bottom, 0, TEpsilon.Position) <= 0 then LMargins.Bottom := LMargins.Bottom + 15;
+
   TALRightSheet.Builder
     .AddBackButton(0{ATag})
     //.AddCloseButton(0{ATag})
     .SetHeadlineText('Title')
     .Setcontent(LContent)
     .SetContainerCorners(AllCorners)
-    .SetContainerMargins(TRectF.Create(15,15,15,15))
+    .SetContainerMargins(LMargins)
     .Show;
 
 end;

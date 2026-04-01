@@ -43,6 +43,7 @@ type
     procedure ButtonLogoutFromFacebookClick(Sender: TObject);
     procedure ButtonGetCurrentUserInfosClick(Sender: TObject);
     procedure ButtonShowShareLinkDialogClick(Sender: TObject);
+    procedure FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
   private
     fFaceBookLogin: TalFacebookLogin;
     fFacebookGraphRequest: TALFacebookGraphRequest;
@@ -74,6 +75,12 @@ begin
   fFacebookGraphRequest := TALFacebookGraphRequest.Create;
   fFacebookGraphRequest.onCompleted := onFaceBookGraphRequestCompleted;
 
+  ALSetSystemBarsColor(
+    Fill.Color, // const AStatusBarColor: TAlphaColor
+    Fill.Color, // const ANavigationBarColor: TAlphaColor
+    False, // const AStatusBarUseLightIcons: TAlphaColor
+    False); // const ANavigationBarUseLightIcons: TAlphaColor
+
 end;
 
 {********************************************}
@@ -81,6 +88,13 @@ procedure TForm1.FormDestroy(Sender: TObject);
 begin
   alFreeAndNil(fFaceBookLogin);
   alFreeAndNil(fFacebookGraphRequest);
+end;
+
+{***************************************************************************}
+procedure TForm1.FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Top := AInsets.Top;
+  Padding.Bottom := AInsets.Bottom;
 end;
 
 {*************************************}

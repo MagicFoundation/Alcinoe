@@ -455,7 +455,7 @@ begin
   {$REGION 'IOS'}
   {$IF defined(IOS)}
   fUserNotificationCenterDelegate := TUserNotificationCenterDelegate.Create(self);
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4344 is corrected and if yes remove .GetObjectID below'}
   {$ENDIF}
   TUNUserNotificationCenter.OCClass.currentNotificationCenter.setdelegate(fUserNotificationCenterDelegate.GetObjectID);
@@ -1005,7 +1005,7 @@ begin
       var LMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJsonStr));
       TMessageManager.DefaultManager.SendMessage(nil, LMessage);
 
-      {$IFNDEF ALCompilerVersionSupported130}
+      {$IFNDEF ALCompilerVersionSupported131}
         {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4325 is corrected and if yes remove the UNNotificationPresentationOptionNone declaration below'}
       {$ENDIF}
       const UNNotificationPresentationOptionNone = 0;

@@ -427,7 +427,7 @@ type
     function IsDisplayed: Boolean; override;
     property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     //**property Form: TCommonCustomForm read FForm;
-    {$IFNDEF ALCompilerVersionSupported130}
+    {$IFNDEF ALCompilerVersionSupported131}
       {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed still not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
     {$ENDIF}
     property Pressed: Boolean read GetPressed write SetPressed;
@@ -756,7 +756,7 @@ end;
 procedure TALDynamicControl.BeforeDestruction;
 begin
   fIsDestroying := True;
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Types.TFmxObject.BeforeDestruction was not updated and adjust the IFDEF'}
   {$ENDIF}
   if FNotifyList <> nil then begin
@@ -1037,7 +1037,7 @@ end;
 {**************************************************************************************************}
 procedure TALDynamicControl.EnumControls(const Proc: TFunc<TALDynamicControl, TEnumControlsResult>);
 
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.EnumControls was not updated and adjust the IFDEF'}
   {$ENDIF}
 
@@ -1370,7 +1370,7 @@ end;
 {*******************************************************************}
 function TALDynamicControl.PointInObjectLocal(X, Y: Double): Boolean;
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.PointInObjectLocal was not updated and adjust the IFDEF'}
   {$ENDIF}
   Result := (X >= (0 - TouchTargetExpansion.Left)) and
@@ -1461,7 +1461,7 @@ end;
 {**********************************************************}
 procedure TALDynamicControl.SetOpacity(const Value: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.SetOpacity was not updated and adjust the IFDEF'}
   {$ENDIF}
   if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
@@ -1634,7 +1634,7 @@ end;
 {*******************************************************}
 function TALDynamicControl.FillTextFlags: TFillTextFlags;
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.FillTextFlags was not updated and adjust the IFDEF'}
   {$ENDIF}
   if (Form = nil) then result := ALGetFillTextFlags
@@ -1750,7 +1750,7 @@ end;
 {**********************************}
 procedure TALDynamicControl.Realign;
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.Realign was not updated and adjust the IFDEF'}
   {$ENDIF}
   if IsDestroying then
@@ -2427,7 +2427,7 @@ end;
 {*************************************}
 procedure TALDynamicControl.MouseEnter;
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMouseEnter was not updated and adjust the IFDEF'}
   {$ENDIF}
   FIsMouseOver := True;
@@ -2438,7 +2438,7 @@ end;
 {*************************************}
 procedure TALDynamicControl.MouseLeave;
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMouseLeave was not updated and adjust the IFDEF'}
   {$ENDIF}
   FIsMouseOver := False;
@@ -2449,7 +2449,7 @@ end;
 {********************************************************************************************}
 procedure TALDynamicControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseDown was not updated and adjust the IFDEF'}
   {$ENDIF}
   if Assigned(FOnMouseDown) then
@@ -2465,7 +2465,7 @@ end;
 {**********************************************************************}
 procedure TALDynamicControl.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseMove was not updated and adjust the IFDEF'}
   {$ENDIF}
   if Assigned(FOnMouseMove) then
@@ -2475,7 +2475,7 @@ end;
 {******************************************************************************************}
 procedure TALDynamicControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseUp was not updated and adjust the IFDEF'}
   {$ENDIF}
   ReleaseCapture;
@@ -2487,7 +2487,7 @@ end;
 {*********************************************************************************************}
 procedure TALDynamicControl.MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseClick was not updated and adjust the IFDEF'}
   {$ENDIF}
   if AbsoluteEnabled and FPressed and PointInObjectLocal(X, Y) then begin
@@ -2499,7 +2499,7 @@ end;
 {****************************************************************************************************}
 procedure TALDynamicControl.MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
 begin
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseWheel was not updated and adjust the IFDEF'}
   {$ENDIF}
   //if Assigned(FOnMouseWheel) then
@@ -2767,7 +2767,7 @@ end;
 // This series of operations results in the BufDrawable being
 // recalculated multiple times, leading to significant performance
 // overhead.
-{$IFNDEF ALCompilerVersionSupported130}
+{$IFNDEF ALCompilerVersionSupported131}
   {$MESSAGE WARN 'Check if FMX.Controls.TControl.EndUpdate was not updated and adjust the IFDEF'}
 {$ENDIF}
 procedure TALDynamicExtendedControl.EndUpdate;
@@ -2825,7 +2825,7 @@ end;
 //**    var LLegacyAlign: TAlignLayout;
 //**    Case Value of
 //**
-//**      {$IFNDEF ALCompilerVersionSupported130}
+//**      {$IFNDEF ALCompilerVersionSupported131}
 //**        {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4335 was correct and if yes delete the code below'}
 //**      {$ENDIF}
 //**      TALAlignLayout.TopCenter: LLegacyAlign := TAlignLayout.Top;
@@ -2886,7 +2886,7 @@ begin
   //ALLog(ClassName+'.DoRealign', 'Name: ' + Name);
   {$ENDIF}
 
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-15768 was implemented and adjust the IFDEF'}
   {$ENDIF}
   // I decided to remove this workaround because it doesn't
@@ -2943,7 +2943,7 @@ begin
   If LParentRealigning then
     ParentRealigning;
 
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4335 was correct and if yes uncomment the code below'}
   {$ENDIF}
   If (LParentRealigning) // and
@@ -3651,7 +3651,7 @@ end;
 {*********************************************************}
 //**function TALDynamicExtendedControl.GetScale: TPosition;
 //**begin
-//**  {$IFNDEF ALCompilerVersionSupported130}
+//**  {$IFNDEF ALCompilerVersionSupported131}
 //**    {$MESSAGE WARN 'Check if FMX.Types.ArrangeControl(const Control: IAlignableObject... was not updated and adjust the IFDEF'}
 //**  {$ENDIF}
 //**  // ArrangeControl calls IRotatedControl.GetScale to determine the control’s scale
@@ -3809,7 +3809,7 @@ end;
 {******************************************************************}
 //**procedure TALDynamicExtendedControl.SetNewScene(AScene: IScene);
 //**begin
-//**  {$IFNDEF ALCompilerVersionSupported130}
+//**  {$IFNDEF ALCompilerVersionSupported131}
 //**    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
 //**    {$MESSAGE WARN 'Check if FMX.Controls.TControl.Pressed is still changed only in SetNewScene/MouseDown/MouseUp/MouseClick'}
 //**    {$MESSAGE WARN 'Check if FMX.Controls.TControl.IsFocused is still changed only in SetNewScene/DoEnter/DoExit'}
@@ -4077,7 +4077,7 @@ end;
 {***********************************************************************}
 //**procedure TALDynamicExtendedControl.DoMatrixChanged(Sender: TObject);
 //**begin
-//**  {$IFNDEF ALCompilerVersionSupported130}
+//**  {$IFNDEF ALCompilerVersionSupported131}
 //**    {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMatrixChanged was not updated and adjust the IFDEF'}
 //**    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2823 was not corrected and adjust the IFDEF'}
 //**  {$ENDIF}

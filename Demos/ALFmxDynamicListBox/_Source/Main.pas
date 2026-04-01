@@ -72,6 +72,7 @@ type
     function MainListBoxCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
     function MainListBoxCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
     function MainListBoxCreatePullToRefreshIndicator(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TBasePullToRefreshIndicator;
+    procedure FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
   private
     {$IF defined(ALUIAutomationEnabled)}
     FSimulateInfiniteScrollCurrentPoint: TPointF;
@@ -161,6 +162,13 @@ begin
       SimulateInfiniteScroll;
     end, 5000);
   {$ENDIF}
+end;
+
+{******************************************************************************}
+procedure TMainForm.FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Top := AInsets.Top;
+  Padding.Bottom := AInsets.Bottom;
 end;
 
 {*******************************************************************************************}

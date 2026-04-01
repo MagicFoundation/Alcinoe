@@ -71,6 +71,7 @@ type
     procedure LayoutSpringForceMouseLeave(Sender: TObject);
     procedure ComboBoxInterpolationTypeChange(Sender: TObject);
     procedure ButtonStartTestClick(Sender: TObject);
+    procedure FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
   private
     FPoints: TArray<TPair<TAlphaColor, Tpointf>>;
     FStartTime: int64;
@@ -95,6 +96,7 @@ uses
   {$ENDIF}
   system.Math,
   System.TypInfo,
+  Alcinoe.FMX.Common,
   Alcinoe.Common;
 
 {*******************************************}
@@ -105,6 +107,18 @@ begin
     ComboBoxInterpolationType.Items.Add(GetEnumName(TypeInfo(TALInterpolationType), I));
   ComboBoxInterpolationType.ItemIndex := 0;
   LayoutResized(nil);
+  ALSetSystemBarsColor(
+    Fill.Color, // const AStatusBarColor: TAlphaColor
+    Fill.Color, // const ANavigationBarColor: TAlphaColor
+    False, // const AStatusBarUseLightIcons: TAlphaColor
+    False); // const ANavigationBarUseLightIcons: TAlphaColor
+end;
+
+{***************************************************************************}
+procedure TForm1.FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Top := AInsets.Top;
+  Padding.Bottom := AInsets.Bottom;
 end;
 
 {***********************************************************************************}

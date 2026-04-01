@@ -1300,7 +1300,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported130}
+{$IFNDEF ALCompilerVersionSupported131}
   {$MESSAGE WARN 'Check if FMX.Presentation.Android.TAndroidNativeView.ProcessTouch was not updated and adjust the IFDEF'}
 {$ENDIF}
 function TALAndroidEditView.TTouchListener.onTouch(v: JView; event: JMotionEvent): Boolean;
@@ -2513,7 +2513,7 @@ begin
   View.setDrawsBackground(false);
   View.setFocusRingType(NSFocusRingTypeNone);
   FTextFieldDelegate := TTextFieldDelegate.Create(Self);
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4352 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   View.setDelegate(FTextFieldDelegate);
@@ -5475,7 +5475,7 @@ begin
 
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
 
-  var LNativeAbsoluteRect := GetNativeViewAbsoluteRect;
+  var LNativeAbsoluteRect := GetNativeViewBoundsRect;
   var LMaxSize := TSizeF.Create(LNativeAbsoluteRect.Width, LNativeAbsoluteRect.Height);
 
   //init ABufDrawableRect
@@ -5519,7 +5519,13 @@ begin
     LOptions.AutoSize := TALAutoSizeMode.Both;
     //--
     //LOptions.MaxLines := 65535;
-    //LOptions.LineHeightMultiplier := TextSettings.LineHeightMultiplier;
+    // !!! IMPORTANT: must be 1.
+    // !!! AdjustSize relies on GetLineHeight, which uses an unknown/default line height.
+    // !!! If ALCreateMultiLineTextDrawable produces a height greater than GetLineHeight,
+    // !!! it may return an empty drawable.
+    // !!! Since BufPrompt is single-line, LineHeightMultiplier has no visual impact,
+    // !!! so we force the minimal value (1) to avoid inconsistencies.
+    LOptions.LineHeightMultiplier := 1;
     //LOptions.LetterSpacing := TextSettings.LetterSpacing;
     //LOptions.Trimming := TextSettings.Trimming;
     //LOptions.FailIfTextBroken: boolean; // default = false

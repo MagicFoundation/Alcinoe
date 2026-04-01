@@ -46,6 +46,7 @@ type
     procedure ALTrackBarGammaChange(Sender: TObject);
     procedure ALTrackBarExposureChange(Sender: TObject);
     procedure ALLayout1Resized(Sender: TObject);
+    procedure FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
   public
     { Public declarations }
   end;
@@ -59,6 +60,7 @@ implementation
 
 uses
   Alcinoe.FMX.ErrorReporting,
+  Alcinoe.FMX.Common,
   Alcinoe.Common;
 
 {*********************************************************}
@@ -134,7 +136,19 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
   TALErrorReporting.Instance;
   ALColorAdjustEffect1.Enabled := true;
-  ALLayout1.Height := ALLayout1.Width / (720 / 404)
+  ALLayout1.Height := ALLayout1.Width / (720 / 404);
+  ALSetSystemBarsColor(
+    Fill.Color, // const AStatusBarColor: TAlphaColor
+    Fill.Color, // const ANavigationBarColor: TAlphaColor
+    False, // const AStatusBarUseLightIcons: TAlphaColor
+    False); // const ANavigationBarUseLightIcons: TAlphaColor
+end;
+
+{***************************************************************************}
+procedure TForm1.FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Top := AInsets.Top;
+  Padding.Bottom := AInsets.Bottom;
 end;
 
 initialization

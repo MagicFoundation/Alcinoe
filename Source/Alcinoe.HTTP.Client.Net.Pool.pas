@@ -12,7 +12,7 @@ uses
 
 type
 
-  {$IFNDEF ALCompilerVersionSupported130}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4664 was corrected'}
     // If https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4664 has been fixed then
     // replace

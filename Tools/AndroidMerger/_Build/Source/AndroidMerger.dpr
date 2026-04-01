@@ -2487,7 +2487,7 @@ begin
           if LDeploymentNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject.Deployment node not found!');
 
           //init LDeployFilesToDeactivate
-          {$IFNDEF ALCompilerVersionSupported130}
+          {$IFNDEF ALCompilerVersionSupported131}
             {$MESSAGE WARN 'Check if no new Android resource files were added in DeployProjNormalizer'}
           {$ENDIF}
           LDeployFilesToDeactivate.Add('Android_Strings=<PlatForm>\<Config>\strings.xml');

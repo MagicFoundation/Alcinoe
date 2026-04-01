@@ -12,9 +12,13 @@ built with the philosophy that every developer deserves the
 platforms—all while maintaining **independence** from the 
 dominance of GAFA (Google, Apple, Facebook, Amazon). 
 
-**Alcinoe** is fully compatible with **Delphi Florence 13.0**. 
-If you find this library helpful, please consider giving it a 
-star on GitHub. It’s free and greatly supports the project’s 
+**Alcinoe** is fully compatible with **Delphi Florence 13.1**.
+If you are using an older version of Delphi, please refer to the
+releases section to find the latest Alcinoe version compatible with
+your Delphi version.
+
+If you find this library helpful, please consider giving it a
+star on GitHub. It’s free and greatly supports the project’s
 visibility and growth.
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/star.jpg?raw=true" />
@@ -104,11 +108,9 @@ forced to apply patches to the original Delphi source files:
 * [Enhance MouseEvent Handling by Providing Access to MotionEvent (Android) and UIEvent (iOS)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002)
 * [Improve Rendering Timing by Using Choreographer Instead of Runnable](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865)
 * [Allow TTexture to Define a Material (GLSL Shader) to Use](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549)
-* [TControl.DoRemoveObject should only realign when the removed control is visible](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4001)
 * [TControl.SetBounds: Missing ParentContentChanged Call on Size-Only Updates](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3264)
 * [Missing ResetUpdatingState call in TCustomForm.DoRemoveObject](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4302)
 * [Effect ProcessTexture is not working and function TFilter.InputTexture: TTexture do unecessary work](https://quality.embarcadero.com/browse/RSP-20825)
-* [TAndroidMotionManager does not handle AMOTION_EVENT_ACTION_CANCEL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3762)
 * [Add ExtractContentStream to TURLResponse / IURLResponse to allow taking ownership without copying.](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4664)
 * [Architectural Issues in FMX.Skia.Canvas.GL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1541)
 * [FMX.VirtualKeyboard.Android: Unused variable and unnecessary logic in Delphi 13 update](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4311)
@@ -153,6 +155,7 @@ forced to apply patches to the original Delphi source files:
 * [iOS vs macOS mismatch in CGImageDestinationFinalize declaration (Boolean vs Integer return type)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4714)
 * [Delphi language enhancement: allow multiple inline variant parts inside records (not only trailing)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4920)
 * [TCommonCustomForm.ClientRect loses precision because GetClientWidth/Height round float client size](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4999)
+* [iOS: TApplicationEvent.OpenURL is not fired on cold start when app is launched from URL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5196)
 
 
 Install Alcinoe

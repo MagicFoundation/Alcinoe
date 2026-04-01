@@ -17,6 +17,7 @@ type
     ALPageIndicator1: TALPageIndicator;
     procedure FormCreate(Sender: TObject);
     procedure ALButton1Click(Sender: TObject);
+    procedure FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
   private
     procedure OnPickMediaSuccess(const AItems: TArray<TALMediaPicker.TMediaItem>);
     procedure OnPickMediaCancel;
@@ -91,6 +92,18 @@ begin
   TALErrorReporting.Instance;
   TALStyleManager.Instance.ApplyLoadingOverlayManagerStyle('Material3.LoadingOverlayManager', TALLoadingOverlayManager.Instance);
   TALStyleManager.Instance.ApplyDialogManagerStyle('Material3.DialogManager', TALDialogManager.Instance, 18{AFontSize});
+  ALSetSystemBarsColor(
+    Fill.Color, // const AStatusBarColor: TAlphaColor
+    Fill.Color, // const ANavigationBarColor: TAlphaColor
+    False, // const AStatusBarUseLightIcons: TAlphaColor
+    False); // const ANavigationBarUseLightIcons: TAlphaColor
+end;
+
+{***************************************************************************}
+procedure TForm1.FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Top := AInsets.Top;
+  Padding.Bottom := AInsets.Bottom;
 end;
 
 {***********************************************************************************}

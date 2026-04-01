@@ -1865,7 +1865,12 @@ begin
         OP_SEND_HTTP_RESPONSE: begin
 
           {$REGION 'Check HttpApiStatus'}
-          ALCheckWinApiErrorCode('HttpSendHttpResponse', LOverlappedContext^.HttpApiStatus, FHttpApiModuleHandle);
+          if (LOverlappedContext^.HttpApiStatus <> ERROR_CONNECTION_INVALID) and // An operation was attempted on a nonexistent network connection.
+             (LOverlappedContext^.HttpApiStatus <> ERROR_CONNECTION_ABORTED) and // The network connection was aborted by the local system.
+             (LOverlappedContext^.HttpApiStatus <> ERROR_OPERATION_ABORTED) and // The I/O operation has been aborted because of either a thread exit or an application request.
+             (LOverlappedContext^.HttpApiStatus <> ERROR_NETNAME_DELETED) and // The specified network name is no longer available.
+             (LOverlappedContext^.HttpApiStatus <> ERROR_SEM_TIMEOUT) then // The semaphore timeout period has expired.
+            ALCheckWinApiErrorCode('HttpSendHttpResponse', LOverlappedContext^.HttpApiStatus, FHttpApiModuleHandle);
           {$ENDREGION}
 
           {$REGION 'Break loop to post new initial HttpReceiveHttpRequest'}

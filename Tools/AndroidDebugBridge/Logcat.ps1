@@ -293,7 +293,7 @@ if ($script:_freshPids.Count -gt 0) {
     $knownPids = [System.Collections.Generic.HashSet[string]]::new($script:_freshPids)
 }
 
-$job = Start-Job -ScriptBlock { param($a,$l) & $a logcat -v threadtime "*:$l" } -ArgumentList $adbPath, $logLevel
+$job = Start-Job -ScriptBlock { param($a,$l) & $a logcat -v threadtime "*:$l" 2>$null } -ArgumentList $adbPath, $logLevel
 
 # --------------------- Background Key Reader (Runspace) ---------------------
 $keyQueue = [System.Collections.Concurrent.ConcurrentQueue[string]]::new()
@@ -354,22 +354,27 @@ try {
         $output = Receive-Job $job
         if ($output) {
             foreach ($line in $output) {
-                if ($line -match '^(?<date>\d\d-\d\d)\s+(?<time>[\d:.]+)\s+(?<pid>\d+)\s+(?<tid>\d+)\s+(?<prio>[VDIWEFS])\s+(?<tag>.*?):\s?(?<msg>.*)$') {
-                    if (-not [string]::IsNullOrWhiteSpace($packageName) -and ($knownPids.Count -eq 0 -or -not $knownPids.Contains($matches.pid))) { continue }
-                    if ($filterText -and $line -notmatch "(?i)$filterRegex") { continue }
 
-                    $color = switch ($matches.prio) {
-                        'V' { 'Gray'   }
-                        'D' { 'Blue'   }
-                        'I' { 'White'  }
-                        'W' { 'Yellow' }
-                        'E' { 'Red'    }
-                        'F' { 'Red'    }
-                        default { 'White' }
-                    }
+                # Skip any line that does not match the expected logcat format
+                if ($line -notmatch '^(?<date>\d\d-\d\d)\s+(?<time>[\d:.]+)\s+(?<pid>\d+)\s+(?<tid>\d+)\s+(?<prio>[VDIWEFS])\s+(?<tag>.*?):\s?(?<msg>.*)$') { continue }
 
-                    Write-Host "$($matches.date) $($matches.time) $($matches.pid) $($matches.prio) $($matches.tag): $($matches.msg)" -ForegroundColor $color
+                # Save captures now — the filter -notmatch below will overwrite $Matches
+                $m = $Matches
+
+                if (-not [string]::IsNullOrWhiteSpace($packageName) -and ($knownPids.Count -eq 0 -or -not $knownPids.Contains($m.pid))) { continue }
+                if ($filterText -and $line -notmatch "(?i)$filterRegex") { continue }
+
+                $color = switch ($m.prio) {
+                    'V' { 'Gray'   }
+                    'D' { 'Blue'   }
+                    'I' { 'White'  }
+                    'W' { 'Yellow' }
+                    'E' { 'Red'    }
+                    'F' { 'Red'    }
+                    default { 'White' }
                 }
+
+                Write-Host "$($m.date) $($m.time) $($m.pid) $($m.prio) $($m.tag): $($m.msg)" -ForegroundColor $color
             }
         }
 

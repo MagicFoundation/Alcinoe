@@ -2,9 +2,7 @@
 # ADB Logcat - App Package + Filter + Level
 # =====================================================
 
-# --------------------- Set exact console colors ---------------------
-# We remap several slots in the 16-entry console color table
-
+# --------------------- Set exact console colors + font ---------------------
 $colorTableCode = @'
 using System;
 using System.Runtime.InteropServices;
@@ -52,6 +50,35 @@ public class ConsoleHelper {
         SetConsoleScreenBufferInfoEx(handle, ref info);
     }
 }
+
+public class ConsoleFont {
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct CONSOLE_FONT_INFOEX {
+        public uint cbSize;
+        public uint nFont;
+        public COORD dwFontSize;
+        public int FontFamily;
+        public int FontWeight;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+        public string FaceName;
+    }
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr GetStdHandle(int nStdHandle);
+
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    public static extern bool SetCurrentConsoleFontEx(IntPtr hOut, bool bMaximumWindow, ref CONSOLE_FONT_INFOEX cfi);
+
+    public static void SetFont(string faceName, short size) {
+        IntPtr handle = GetStdHandle(-11);
+        var cfi = new CONSOLE_FONT_INFOEX();
+        cfi.cbSize     = (uint)Marshal.SizeOf(cfi);
+        cfi.FaceName   = faceName;
+        cfi.dwFontSize = new COORD { X = 0, Y = size };
+        cfi.FontWeight = 400;
+        SetCurrentConsoleFontEx(handle, false, ref cfi);
+    }
+}
 '@
 
 if (-not ([System.Management.Automation.PSTypeName]'ConsoleHelper').Type) {
@@ -92,10 +119,11 @@ function Restore-ConsolePalette {
     [ConsoleHelper]::SetColorTableEntry(15, 0xff, 0xff, 0xff) # White
 }
 
+[ConsoleFont]::SetFont("Consolas", 21)
 Set-ConsolePalette
 
 $Host.UI.RawUI.BackgroundColor = 'Black'   # renders as #303030
-$Host.UI.RawUI.ForegroundColor = 'White'    # renders as #dcdcd4
+$Host.UI.RawUI.ForegroundColor = 'White'   # renders as #dcdcd4
 Clear-Host
 
 # Helper: Read-Host with prompt rendered in #dcdcd4
@@ -331,12 +359,12 @@ try {
                     if ($filterText -and $line -notmatch "(?i)$filterRegex") { continue }
 
                     $color = switch ($matches.prio) {
-                        'V' { 'Gray' }
-                        'D' { 'Blue'     }
-                        'I' { 'White'    }
-                        'W' { 'Yellow'   }
-                        'E' { 'Red'      }
-                        'F' { 'Red'      }
+                        'V' { 'Gray'   }
+                        'D' { 'Blue'   }
+                        'I' { 'White'  }
+                        'W' { 'Yellow' }
+                        'E' { 'Red'    }
+                        'F' { 'Red'    }
                         default { 'White' }
                     }
 

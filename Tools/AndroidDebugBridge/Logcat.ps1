@@ -248,7 +248,7 @@ function Refresh-AppPids {
     param([string]$Package)
     $script:_freshPids = [System.Collections.Generic.HashSet[string]]::new()
     if ([string]::IsNullOrWhiteSpace($Package)) { return }
-    $raw = (& $adbPath shell pidof $Package 2>$null).Trim()
+    $raw = "$( & $adbPath shell pidof $Package 2>$null )".Trim()
     if ($raw) {
         foreach ($p in ($raw -split '\s+')) {
             if ($p -match '^\d+$') { [void]$script:_freshPids.Add($p) }
@@ -327,7 +327,7 @@ try {
         if ($output) {
             foreach ($line in $output) {
                 if ($line -match '^(?<date>\d\d-\d\d)\s+(?<time>[\d:.]+)\s+(?<pid>\d+)\s+(?<tid>\d+)\s+(?<prio>[VDIWEFS])\s+(?<tag>.*?):\s?(?<msg>.*)$') {
-                    if (-not [string]::IsNullOrWhiteSpace($packageName) -and $knownPids.Count -gt 0 -and -not $knownPids.Contains($matches.pid)) { continue }
+                    if (-not [string]::IsNullOrWhiteSpace($packageName) -and ($knownPids.Count -eq 0 -or -not $knownPids.Contains($matches.pid))) { continue }
                     if ($filterText -and $line -notmatch "(?i)$filterRegex") { continue }
 
                     $color = switch ($matches.prio) {

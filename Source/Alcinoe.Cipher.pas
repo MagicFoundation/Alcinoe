@@ -11,8 +11,8 @@ uses
   {$ELSE}
   system.types,
   {$ENDIF}
-  system.hash;
-
+  system.hash,
+  Alcinoe.Common;
 
 /////////////////
 ////// MD5 //////
@@ -21,12 +21,16 @@ uses
 type
   TALMD5Digest  = array [0..15] of Byte;         { 128 bits - MD5 }
 
-procedure ALStringHashMD5(out ADigest : TBytes; const AStr : AnsiString); overload;
-procedure ALStringHashMD5(out ADigest: TBytes; const AStr: String; const AEncoding: TEncoding); overload;
-procedure ALStringHashMD5(out ADigest : TALMD5Digest; const AStr : AnsiString); overload;
-procedure ALStringHashMD5(out ADigest: TALMD5Digest; const AStr: String; const AEncoding: TEncoding); overload;
-function  ALStringHashMD5(const AStr : AnsiString; const AHexEncode: boolean = true): AnsiString; overload;
-function  ALStringHashMD5(const AStr: String; const AEncoding: TEncoding): String; overload; // result will be hexencoded
+function ALHashMD5AsBytes(const AData: TBytes): TBytes; inline; overload;
+function ALHashMD5AsBytes(const AData: AnsiString): TBytes; inline; overload;
+function ALHashMD5AsBytes(const AData: String; const AEncoding: TEncoding): TBytes; inline; overload;
+function ALHashMD5AsDigest(const AData: TBytes): TALMD5Digest; inline; overload;
+function ALHashMD5AsDigest(const AData: AnsiString): TALMD5Digest; inline; overload;
+function ALHashMD5AsDigest(const AData: String; const AEncoding: TEncoding): TALMD5Digest; inline; overload;
+function ALHashMD5AsStringA(const AData: TBytes; const AHexEncode: boolean = true): AnsiString; inline; overload;
+function ALHashMD5AsStringA(const AData: AnsiString; const AHexEncode: boolean = true): AnsiString; inline; overload;
+function ALHashMD5AsStringW(const AData: TBytes): String; inline; overload;
+function ALHashMD5AsStringW(const AData: String; const AEncoding: TEncoding): String; inline; overload; // result will be hexencoded
 
 
 //////////////////
@@ -36,31 +40,58 @@ function  ALStringHashMD5(const AStr: String; const AEncoding: TEncoding): Strin
 type
   TALSHA1Digest = array [0..19] of Byte;         { 160 bits - SHA-1 }
 
-procedure ALStringHashSHA1(out ADigest: TBytes; const AStr: AnsiString); overload;
-procedure ALStringHashSHA1(out ADigest: TBytes; const AStr : String; const AEncoding: TEncoding); overload;
-procedure ALStringHashSHA1(out ADigest: TALSHA1Digest; const AStr: AnsiString); overload;
-procedure ALStringHashSHA1(out ADigest: TALSHA1Digest; const AStr : String; const AEncoding: TEncoding); overload;
-function  ALStringHashSHA1(const AStr: AnsiString; const AHexEncode: boolean = true): AnsiString; overload;
-function  ALStringHashSHA1(const AStr: String; const AEncoding: TEncoding): String; overload; // result will be hexencoded
+function ALHashSHA1AsBytes(const AData: TBytes): TBytes; inline; overload;
+function ALHashSHA1AsBytes(const AData: AnsiString): TBytes; inline; overload;
+function ALHashSHA1AsBytes(const AData: String; const AEncoding: TEncoding): TBytes; inline; overload;
+function ALHashSHA1AsDigest(const AData: TBytes): TALSHA1Digest; inline; overload;
+function ALHashSHA1AsDigest(const AData: AnsiString): TALSHA1Digest; inline; overload;
+function ALHashSHA1AsDigest(const AData: String; const AEncoding: TEncoding): TALSHA1Digest; inline; overload;
+function ALHashSHA1AsStringA(const AData: TBytes; const AHexEncode: boolean = true): AnsiString; inline; overload;
+function ALHashSHA1AsStringA(const AData: AnsiString; const AHexEncode: boolean = true): AnsiString; inline; overload;
+function ALHashSHA1AsStringW(const AData: TBytes): String; inline; overload;
+function ALHashSHA1AsStringW(const AData: String; const AEncoding: TEncoding): String; inline; overload; // result will be hexencoded
 
 
 //////////////////
 ////// SHA2 //////
 //////////////////
 
-procedure ALStringHashSHA2(out ADigest: TBytes; const AStr: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256); overload;
-procedure ALStringHashSHA2(out ADigest: Tbytes; const AStr: String; const AEncoding: TEncoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256); overload;
-function  ALStringHashSHA2(const AStr: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString; overload;
-function  ALStringHashSHA2(const AStr: String; const AEncoding: TEncoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String; overload; // result will be hexencoded
+function ALHashSHA2AsBytes(const AData: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): TBytes; inline; overload;
+function ALHashSHA2AsBytes(const AData: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): TBytes; inline; overload;
+function ALHashSHA2AsBytes(const AData: String; const AEncoding: TEncoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): TBytes; inline; overload;
+function ALHashSHA2AsStringA(const AData: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString; inline; overload;
+function ALHashSHA2AsStringA(const AData: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString; inline; overload;
+function ALHashSHA2AsStringW(const AData: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String; inline; overload;
+function ALHashSHA2AsStringW(const AData: String; const AEncoding: TEncoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String; inline; overload; // result will be hexencoded
 
 
 /////////////////////////////
 ////// HMAC algorithms //////
 /////////////////////////////
 
-function  ALCalcHMACMD5(const AStr, AKey : AnsiString; const AHexEncode: boolean = true): AnsiString;
-function  ALCalcHMACSHA1(const AStr, AKey : AnsiString; const AHexEncode: boolean = true): AnsiString;
-function  ALCalcHMACSHA2(const AStr, AKey : AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
+function ALCalcHMACMD5AsBytes(const AData: TBytes; const AKey: TBytes): TBytes; inline; overload;
+function ALCalcHMACMD5AsBytes(const AData: AnsiString; const AKey: TBytes): TBytes; inline; overload;
+function ALCalcHMACMD5AsBytes(const AData, AKey: AnsiString): TBytes; inline; overload;
+
+function ALCalcHMACMD5AsStringA(const AData: TBytes; const AKey: TBytes; const AHexEncode: boolean = true): AnsiString; inline; overload;
+function ALCalcHMACMD5AsStringA(const AData: AnsiString; const AKey: TBytes; const AHexEncode: boolean = true): AnsiString; inline; overload;
+function ALCalcHMACMD5AsStringA(const AData, AKey: AnsiString; const AHexEncode: boolean = true): AnsiString; inline; overload;
+
+function ALCalcHMACSHA1AsBytes(const AData: TBytes; const AKey: TBytes): TBytes; inline; overload;
+function ALCalcHMACSHA1AsBytes(const AData: AnsiString; const AKey: TBytes): TBytes; inline; overload;
+function ALCalcHMACSHA1AsBytes(const AData, AKey: AnsiString): TBytes; inline; overload;
+
+function ALCalcHMACSHA1AsStringA(const AData: TBytes; const AKey: TBytes; const AHexEncode: boolean = true): AnsiString; inline; overload;
+function ALCalcHMACSHA1AsStringA(const AData: AnsiString; const AKey: TBytes; const AHexEncode: boolean = true): AnsiString; inline; overload;
+function ALCalcHMACSHA1AsStringA(const AData, AKey: AnsiString; const AHexEncode: boolean = true): AnsiString; inline; overload;
+
+function ALCalcHMACSHA2AsBytes(const AData: TBytes; const AKey: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): TBytes; inline; overload;
+function ALCalcHMACSHA2AsBytes(const AData: AnsiString; const AKey: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): TBytes; inline; overload;
+function ALCalcHMACSHA2AsBytes(const AData, AKey: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): TBytes; inline; overload;
+
+function ALCalcHMACSHA2AsStringA(const AData: TBytes; const AKey: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString; inline; overload;
+function ALCalcHMACSHA2AsStringA(const AData: AnsiString; const AKey: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString; inline; overload;
+function ALCalcHMACSHA2AsStringA(const AData, AKey: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString; inline; overload;
 
 
 //////////////////////////
@@ -187,7 +218,7 @@ type
   PHCRYPTHASH = ^HCRYPTHASH;
 
   _PUBLICKEYSTRUC = record
-    bType   : BYTE;
+    bType  : BYTE;
     bVersion: BYTE;
     reserved: WORD;
     aiKeyAlg: ALG_ID;
@@ -196,7 +227,7 @@ type
   PUBLICKEYSTRUC = _PUBLICKEYSTRUC;
 
   _RSAPUBKEY = record
-    magic : DWORD;
+    magic: DWORD;
     bitlen: DWORD;
     pubexp: DWORD;
   end;
@@ -354,67 +385,86 @@ uses
   {$ENDIF}
   System.Classes,
   Alcinoe.StringList,
-  Alcinoe.StringUtils,
-  Alcinoe.Common;
+  Alcinoe.StringUtils;
 
 
 /////////////////
 ////// MD5 //////
 /////////////////
 
-{*********************************************************************}
-procedure ALStringHashMD5(out ADigest: TBytes; const AStr: AnsiString);
+{*****************************************************}
+function ALHashMD5AsBytes(const AData: TBytes): TBytes;
 begin
   var LMD5 := THashMD5.Create;
-  LMD5.Update(pointer(AStr)^, length(AStr));
-  ADigest := LMD5.HashAsBytes;
+  LMD5.Update(AData);
+  Result := LMD5.HashAsBytes;
+end;
+
+{*********************************************************}
+function ALHashMD5AsBytes(const AData: AnsiString): TBytes;
+begin
+  var LMD5 := THashMD5.Create;
+  if AData <> '' then LMD5.Update(pointer(AData)^, length(AData));
+  Result := LMD5.HashAsBytes;
+end;
+
+{*********************************************************************************}
+function ALHashMD5AsBytes(const AData: String; const AEncoding: TEncoding): TBytes;
+begin
+  var LMD5 := THashMD5.Create;
+  LMD5.Update(AEncoding.GetBytes(AData));
+  Result := LMD5.HashAsBytes;
+end;
+
+{************************************************************}
+function ALHashMD5AsDigest(const AData: TBytes): TALMD5Digest;
+begin
+  var LBytes := ALHashMD5AsBytes(AData);
+  ALMove(PByte(LBytes)^, Result[0], length(LBytes));
+end;
+
+{****************************************************************}
+function ALHashMD5AsDigest(const AData: AnsiString): TALMD5Digest;
+begin
+  var LBytes := ALHashMD5AsBytes(AData);
+  ALMove(PByte(LBytes)^, Result[0], length(LBytes));
+end;
+
+{****************************************************************************************}
+function ALHashMD5AsDigest(const AData: String; const AEncoding: TEncoding): TALMD5Digest;
+begin
+  var LBytes := ALHashMD5AsBytes(AData, AEncoding);
+  ALMove(PByte(LBytes)^, Result[0], length(LBytes));
 end;
 
 {*********************************************************************************************}
-procedure ALStringHashMD5(out ADigest: TBytes; const AStr: String; const AEncoding: TEncoding);
+function ALHashMD5AsStringA(const AData: TBytes; const AHexEncode: boolean = true): AnsiString;
 begin
-  var LMD5 := THashMD5.Create;
-  LMD5.Update(AEncoding.GetBytes(AStr));
-  ADigest := LMD5.HashAsBytes;
+  var LBytes := ALHashMD5AsBytes(AData);
+  if AHexEncode then result := ALBinToHexA(LBytes)
+  else Result := ALBytesToString(LBytes);
 end;
 
-{***************************************************************************}
-procedure ALStringHashMD5(out ADigest: TALMD5Digest; const AStr: AnsiString);
+{*************************************************************************************************}
+function ALHashMD5AsStringA(const AData: AnsiString; const AHexEncode: boolean = true): AnsiString;
 begin
-  var LBytes: TBytes;
-  ALStringHashMD5(LBytes, AStr);
-  ALMove(PByte(LBytes)^, ADigest[0], length(LBytes));
+  var LBytes := ALHashMD5AsBytes(AData);
+  if AHexEncode then result := ALBinToHexA(LBytes)
+  else Result := ALBytesToString(LBytes);
 end;
 
-{***************************************************************************************************}
-procedure ALStringHashMD5(out ADigest: TALMD5Digest; const AStr: String; const AEncoding: TEncoding);
+{*******************************************************}
+function ALHashMD5AsStringW(const AData: TBytes): String;
 begin
-  var LBytes: TBytes;
-  ALStringHashMD5(LBytes, AStr, AEncoding);
-  ALMove(PByte(LBytes)^, ADigest[0], length(LBytes));
+  var LBytes := ALHashMD5AsBytes(AData);
+  Result := ALBinToHexW(LBytes);
 end;
 
-{*********************************************************************************************}
-function ALStringHashMD5(const AStr: AnsiString; const AHexEncode: boolean = true): AnsiString;
+{***********************************************************************************}
+function ALHashMD5AsStringW(const AData: String; const AEncoding: TEncoding): String;
 begin
-  var LMD5 := THashMD5.Create;
-  LMD5.Update(pointer(AStr)^, length(AStr));
-  var LBytes := LMD5.HashAsBytes;
-  if AHexEncode then result := ALBinToHexA(PByte(LBytes)^, length(LBytes))
-  else begin
-    setlength(result, length(LBytes));
-    if length(LBytes) > 0 then
-      ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
-  end;
-end;
-
-{*******************************************************************************}
-function ALStringHashMD5(const AStr: String; const AEncoding: TEncoding): String;
-Begin
-  var LMD5 := THashMD5.Create;
-  LMD5.Update(AEncoding.GetBytes(AStr));
-  var LBytes := LMD5.HashAsBytes;
-  Result := ALBinToHexW(PByte(LBytes)^, length(LBytes));
+  var LBytes := ALHashMD5AsBytes(AData, AEncoding);
+  Result := ALBinToHexW(LBytes);
 end;
 
 
@@ -422,59 +472,79 @@ end;
 ////// SHA1 //////
 //////////////////
 
-{**********************************************************************}
-procedure ALStringHashSHA1(out ADigest: TBytes; const AStr: AnsiString);
+{******************************************************}
+function ALHashSHA1AsBytes(const AData: TBytes): TBytes;
 begin
   var LSHA1 := THashSHA1.Create;
-  LSHA1.Update(pointer(AStr)^, length(AStr));
-  ADigest := LSHA1.HashAsBytes;
+  LSHA1.Update(AData);
+  Result := LSHA1.HashAsBytes;
 end;
 
-{***********************************************************************************************}
-procedure ALStringHashSHA1(out ADigest: TBytes; const AStr : String; const AEncoding: TEncoding);
+{**********************************************************}
+function ALHashSHA1AsBytes(const AData: AnsiString): TBytes;
 begin
   var LSHA1 := THashSHA1.Create;
-  LSHA1.Update(AEncoding.GetBytes(AStr));
-  ADigest := LSHA1.HashAsBytes;
+  if AData <> '' then LSHA1.Update(pointer(AData)^, length(AData));
+  Result := LSHA1.HashAsBytes;
 end;
 
-{*****************************************************************************}
-procedure ALStringHashSHA1(out ADigest: TALSHA1Digest; const AStr: AnsiString);
+{**********************************************************************************}
+function ALHashSHA1AsBytes(const AData: String; const AEncoding: TEncoding): TBytes;
 begin
-  var LBytes: TBytes;
-  ALStringHashSHA1(LBytes, AStr);
-  ALMove(PByte(LBytes)^, ADigest[0], length(LBytes));
+  var LSHA1 := THashSHA1.Create;
+  LSHA1.Update(AEncoding.GetBytes(AData));
+  Result := LSHA1.HashAsBytes;
 end;
 
-{*****************************************************************************************************}
-procedure ALStringHashSHA1(out ADigest: TALSHA1Digest; const AStr: String; const AEncoding: TEncoding);
+{**************************************************************}
+function ALHashSHA1AsDigest(const AData: TBytes): TALSHA1Digest;
 begin
-  var LBytes: TBytes;
-  ALStringHashSHA1(LBytes, AStr, AEncoding);
-  ALMove(PByte(LBytes)^, ADigest[0], length(LBytes));
+  var LBytes := ALHashSHA1AsBytes(AData);
+  ALMove(PByte(LBytes)^, Result[0], length(LBytes));
+end;
+
+{******************************************************************}
+function ALHashSHA1AsDigest(const AData: AnsiString): TALSHA1Digest;
+begin
+  var LBytes := ALHashSHA1AsBytes(AData);
+  ALMove(PByte(LBytes)^, Result[0], length(LBytes));
+end;
+
+{******************************************************************************************}
+function ALHashSHA1AsDigest(const AData: String; const AEncoding: TEncoding): TALSHA1Digest;
+begin
+  var LBytes := ALHashSHA1AsBytes(AData, AEncoding);
+  ALMove(PByte(LBytes)^, Result[0], length(LBytes));
 end;
 
 {**********************************************************************************************}
-function ALStringHashSHA1(const AStr: AnsiString; const AHexEncode: boolean = true): AnsiString;
+function ALHashSHA1AsStringA(const AData: TBytes; const AHexEncode: boolean = true): AnsiString;
 begin
-  var LSHA1 := THashSHA1.Create;
-  LSHA1.Update(pointer(AStr)^, length(AStr));
-  var LBytes := LSHA1.HashAsBytes;
-  if AHexEncode then result := ALBinToHexA(PByte(LBytes)^, length(LBytes))
-  else begin
-    setlength(result, length(LBytes));
-    if length(LBytes) > 0 then
-      ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
-  end;
+  var LBytes := ALHashSHA1AsBytes(AData);
+  if AHexEncode then result := ALBinToHexA(LBytes)
+  else Result := ALBytesToString(LBytes);
 end;
 
-{********************************************************************************}
-function ALStringHashSHA1(const AStr: String; const AEncoding: TEncoding): String;
-Begin
-  var LSHA1 := THashSHA1.Create;
-  LSHA1.Update(AEncoding.GetBytes(AStr));
-  var LBytes := LSHA1.HashAsBytes;
-  Result := ALBinToHexW(PByte(LBytes)^, length(LBytes));
+{**************************************************************************************************}
+function ALHashSHA1AsStringA(const AData: AnsiString; const AHexEncode: boolean = true): AnsiString;
+begin
+  var LBytes := ALHashSHA1AsBytes(AData);
+  if AHexEncode then result := ALBinToHexA(LBytes)
+  else Result := ALBytesToString(LBytes);
+end;
+
+{********************************************************}
+function ALHashSHA1AsStringW(const AData: TBytes): String;
+begin
+  var LBytes := ALHashSHA1AsBytes(AData);
+  Result := ALBinToHexW(LBytes);
+end;
+
+{************************************************************************************}
+function ALHashSHA1AsStringW(const AData: String; const AEncoding: TEncoding): String;
+begin
+  var LBytes := ALHashSHA1AsBytes(AData, AEncoding);
+  Result := ALBinToHexW(LBytes);
 end;
 
 
@@ -482,43 +552,58 @@ end;
 ////// SHA2 //////
 //////////////////
 
-{**************************************************************************************************************************************************}
-procedure ALStringHashSHA2(out ADigest: TBytes; const AStr: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256);
+{**********************************************************************************************************************************}
+function ALHashSHA2AsBytes(const AData: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): TBytes;
 begin
   var LSHA2 := THashSHA2.Create(AHashVersion);
-  LSHA2.Update(pointer(AStr)^, length(AStr));
-  ADigest := LSHA2.HashAsBytes;
+  LSHA2.Update(AData);
+  Result := LSHA2.HashAsBytes;
+end;
+
+{**************************************************************************************************************************************}
+function ALHashSHA2AsBytes(const AData: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): TBytes;
+begin
+  var LSHA2 := THashSHA2.Create(AHashVersion);
+  if AData <> '' then LSHA2.Update(pointer(AData)^, length(AData));
+  Result := LSHA2.HashAsBytes;
+end;
+
+{**************************************************************************************************************************************************************}
+function ALHashSHA2AsBytes(const AData: String; const AEncoding: TEncoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): TBytes;
+begin
+  var LSHA2 := THashSHA2.Create(AHashVersion);
+  LSHA2.Update(AEncoding.GetBytes(AData));
+  Result := LSHA2.HashAsBytes;
 end;
 
 {**************************************************************************************************************************************************************************}
-procedure ALStringHashSHA2(out ADigest: Tbytes; const AStr: String; const AEncoding: TEncoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256);
+function ALHashSHA2AsStringA(const AData: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
 begin
-  var LSHA2 := THashSHA2.Create(AHashVersion);
-  LSHA2.Update(AEncoding.GetBytes(AStr));
-  ADigest := LSHA2.HashAsBytes;
+  var LBytes := ALHashSHA2AsBytes(AData, AHashVersion);
+  if AHexEncode then result := ALBinToHexA(LBytes)
+  else Result := ALBytesToString(LBytes);
 end;
 
-{**************************************************************************************************************************************************************************}
-function ALStringHashSHA2(const AStr: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
+{******************************************************************************************************************************************************************************}
+function ALHashSHA2AsStringA(const AData: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
 begin
-  var LSHA2 := THashSHA2.Create(AHashVersion);
-  LSHA2.Update(pointer(AStr)^, length(AStr));
-  var LBytes := LSHA2.HashAsBytes;
-  if AHexEncode then result := ALBinToHexA(PByte(LBytes)^, length(LBytes))
-  else begin
-    setlength(result, length(LBytes));
-    if length(LBytes) > 0 then
-      ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
-  end;
+  var LBytes := ALHashSHA2AsBytes(AData, AHashVersion);
+  if AHexEncode then result := ALBinToHexA(LBytes)
+  else Result := ALBytesToString(LBytes);
 end;
 
-{************************************************************************************************************************************************************}
-function ALStringHashSHA2(const AStr: String; const AEncoding: TEncoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String;
+{************************************************************************************************************************************}
+function ALHashSHA2AsStringW(const AData: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String;
 begin
-  var LSHA2 := THashSHA2.Create(AHashVersion);
-  LSHA2.Update(AEncoding.GetBytes(AStr));
-  var LBytes := LSHA2.HashAsBytes;
-  Result := ALBinToHexW(PByte(LBytes)^, length(LBytes));
+  var LBytes := ALHashSHA2AsBytes(AData, AHashVersion);
+  Result := ALBinToHexW(LBytes);
+end;
+
+{****************************************************************************************************************************************************************}
+function ALHashSHA2AsStringW(const AData: String; const AEncoding: TEncoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String;
+begin
+  var LBytes := ALHashSHA2AsBytes(AData, AEncoding, AHashVersion);
+  Result := ALBinToHexW(LBytes);
 end;
 
 
@@ -526,82 +611,130 @@ end;
 ////// HMAC algorithms //////
 /////////////////////////////
 
-{**************************************************************************************************}
-function ALCalcHMACMD5(const AStr, AKey : AnsiString; const AHexEncode: boolean = true): AnsiString;
+{*****************************************************************************}
+function ALCalcHMACMD5AsBytes(const AData: TBytes; const AKey: TBytes): TBytes;
 begin
-  var LData: TBytes;
-  SetLength(LData, Length(AStr));
-  if Length(AStr) > 0 then
-    ALMove(Pointer(AStr)^, LData[0], Length(AStr));
-
-  var LKey: TBytes;
-  SetLength(LKey, Length(AKey));
-  if Length(AKey) > 0 then
-    ALMove(Pointer(AKey)^, LKey[0], Length(AKey));
-
-  var LMac := THashMD5.GetHMACAsBytes(LData, LKey);
-
-  if AHexEncode then begin
-    if Length(LMac) = 0 then Exit('');
-    Result := ALBinToHexA(PByte(LMac)^, Length(LMac));
-  end
-  else begin
-    SetLength(Result, Length(LMac));
-    if Length(LMac) > 0 then
-      ALMove(PByte(LMac)^, Pointer(Result)^, Length(LMac));
-  end;
+  Result := THashMD5.GetHMACAsBytes(AData, AKey);
 end;
 
-{****************************************************************************************************}
-function  ALCalcHMACSHA1(const AStr, AKey : AnsiString; const AHexEncode: boolean = true): AnsiString;
+{*********************************************************************************}
+function ALCalcHMACMD5AsBytes(const AData: AnsiString; const AKey: TBytes): TBytes;
 begin
-  var LData: TBytes;
-  SetLength(LData, Length(AStr));
-  if Length(AStr) > 0 then
-    ALMove(Pointer(AStr)^, LData[0], Length(AStr));
-
-  var LKey: TBytes;
-  SetLength(LKey, Length(AKey));
-  if Length(AKey) > 0 then
-    ALMove(Pointer(AKey)^, LKey[0], Length(AKey));
-
-  var LMac := THashSHA1.GetHMACAsBytes(LData, LKey);
-
-  if AHexEncode then begin
-    if Length(LMac) = 0 then Exit('');
-    Result := ALBinToHexA(PByte(LMac)^, Length(LMac));
-  end
-  else begin
-    SetLength(Result, Length(LMac));
-    if Length(LMac) > 0 then
-      ALMove(PByte(LMac)^, Pointer(Result)^, Length(LMac));
-  end;
+  Result := THashMD5.GetHMACAsBytes(ALStringToBytes(AData), AKey);
 end;
 
-{*******************************************************************************************************************************************************************************}
-function ALCalcHMACSHA2(const AStr, AKey : AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
+{*******************************************************************}
+function ALCalcHMACMD5AsBytes(const AData, AKey: AnsiString): TBytes;
 begin
-  var LData: TBytes;
-  SetLength(LData, Length(AStr));
-  if Length(AStr) > 0 then
-    ALMove(Pointer(AStr)^, LData[0], Length(AStr));
+  Result := THashMD5.GetHMACAsBytes(ALStringToBytes(AData), ALStringToBytes(AKey));
+end;
 
-  var LKey: TBytes;
-  SetLength(LKey, Length(AKey));
-  if Length(AKey) > 0 then
-    ALMove(Pointer(AKey)^, LKey[0], Length(AKey));
+{*********************************************************************************************************************}
+function ALCalcHMACMD5AsStringA(const AData: TBytes; const AKey: TBytes; const AHexEncode: boolean = true): AnsiString;
+begin
+  var LMac := ALCalcHMACMD5AsBytes(AData, AKey);
+  if AHexEncode then Result := ALBinToHexA(LMac)
+  else Result := ALBytesToString(LMac);
+end;
 
-  var LMac := THashSHA2.GetHMACAsBytes(LData, LKey, AHashVersion);
+{*************************************************************************************************************************}
+function ALCalcHMACMD5AsStringA(const AData: AnsiString; const AKey: TBytes; const AHexEncode: boolean = true): AnsiString;
+begin
+  var LMac := ALCalcHMACMD5AsBytes(AData, AKey);
+  if AHexEncode then Result := ALBinToHexA(LMac)
+  else Result := ALBytesToString(LMac);
+end;
 
-  if AHexEncode then begin
-    if Length(LMac) = 0 then Exit('');
-    Result := ALBinToHexA(PByte(LMac)^, Length(LMac));
-  end
-  else begin
-    SetLength(Result, Length(LMac));
-    if Length(LMac) > 0 then
-      ALMove(PByte(LMac)^, Pointer(Result)^, Length(LMac));
-  end;
+{***********************************************************************************************************}
+function ALCalcHMACMD5AsStringA(const AData, AKey: AnsiString; const AHexEncode: boolean = true): AnsiString;
+begin
+  var LMac := ALCalcHMACMD5AsBytes(AData, AKey);
+  if AHexEncode then Result := ALBinToHexA(LMac)
+  else Result := ALBytesToString(LMac);
+end;
+
+{******************************************************************************}
+function ALCalcHMACSHA1AsBytes(const AData: TBytes; const AKey: TBytes): TBytes;
+begin
+  Result := THashSHA1.GetHMACAsBytes(AData, AKey);
+end;
+
+{**********************************************************************************}
+function ALCalcHMACSHA1AsBytes(const AData: AnsiString; const AKey: TBytes): TBytes;
+begin
+  Result := THashSHA1.GetHMACAsBytes(ALStringToBytes(AData), AKey);
+end;
+
+{********************************************************************}
+function ALCalcHMACSHA1AsBytes(const AData, AKey: AnsiString): TBytes;
+begin
+  Result := THashSHA1.GetHMACAsBytes(ALStringToBytes(AData), ALStringToBytes(AKey));
+end;
+
+{**********************************************************************************************************************}
+function ALCalcHMACSHA1AsStringA(const AData: TBytes; const AKey: TBytes; const AHexEncode: boolean = true): AnsiString;
+begin
+  var LMac := ALCalcHMACSHA1AsBytes(AData, AKey);
+  if AHexEncode then Result := ALBinToHexA(LMac)
+  else Result := ALBytesToString(LMac);
+end;
+
+{**************************************************************************************************************************}
+function ALCalcHMACSHA1AsStringA(const AData: AnsiString; const AKey: TBytes; const AHexEncode: boolean = true): AnsiString;
+begin
+  var LMac := ALCalcHMACSHA1AsBytes(AData, AKey);
+  if AHexEncode then Result := ALBinToHexA(LMac)
+  else Result := ALBytesToString(LMac);
+end;
+
+{************************************************************************************************************}
+function ALCalcHMACSHA1AsStringA(const AData, AKey: AnsiString; const AHexEncode: boolean = true): AnsiString;
+begin
+  var LMac := ALCalcHMACSHA1AsBytes(AData, AKey);
+  if AHexEncode then Result := ALBinToHexA(LMac)
+  else Result := ALBytesToString(LMac);
+end;
+
+{**********************************************************************************************************************************************************}
+function ALCalcHMACSHA2AsBytes(const AData: TBytes; const AKey: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): TBytes;
+begin
+  Result := THashSHA2.GetHMACAsBytes(AData, AKey, AHashVersion);
+end;
+
+{**************************************************************************************************************************************************************}
+function ALCalcHMACSHA2AsBytes(const AData: AnsiString; const AKey: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): TBytes;
+begin
+  Result := THashSHA2.GetHMACAsBytes(ALStringToBytes(AData), AKey, AHashVersion);
+end;
+
+{************************************************************************************************************************************************}
+function ALCalcHMACSHA2AsBytes(const AData, AKey: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): TBytes;
+begin
+  Result := THashSHA2.GetHMACAsBytes(ALStringToBytes(AData), ALStringToBytes(AKey), AHashVersion);
+end;
+
+{**************************************************************************************************************************************************************************************************}
+function ALCalcHMACSHA2AsStringA(const AData: TBytes; const AKey: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
+begin
+  var LMac := ALCalcHMACSHA2AsBytes(AData, AKey, AHashVersion);
+  if AHexEncode then Result := ALBinToHexA(LMac)
+  else Result := ALBytesToString(LMac);
+end;
+
+{******************************************************************************************************************************************************************************************************}
+function ALCalcHMACSHA2AsStringA(const AData: AnsiString; const AKey: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
+begin
+  var LMac := ALCalcHMACSHA2AsBytes(AData, AKey, AHashVersion);
+  if AHexEncode then Result := ALBinToHexA(LMac)
+  else Result := ALBytesToString(LMac);
+end;
+
+{****************************************************************************************************************************************************************************************}
+function ALCalcHMACSHA2AsStringA(const AData, AKey: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
+begin
+  var LMac := ALCalcHMACSHA2AsBytes(AData, AKey, AHashVersion);
+  if AHexEncode then Result := ALBinToHexA(LMac)
+  else Result := ALBytesToString(LMac);
 end;
 
 
@@ -1262,8 +1395,7 @@ begin
     try
 
       //init HashData
-      var HashData: AnsiString;
-      HashData := ALStringHashSHA2(AData, THashSHA2.TSHA2Version.SHA256, false{aHexEncode});
+      var HashData := ALHashSHA2AsStringA(AData, THashSHA2.TSHA2Version.SHA256, false{aHexEncode});
       var PaddingInfo: BCRYPT_PKCS1_PADDING_INFO;
       PaddingInfo.pszAlgId := BCRYPT_SHA256_ALGORITHM;
 

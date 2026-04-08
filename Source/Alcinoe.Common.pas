@@ -21,6 +21,30 @@ uses
 
 type
 
+  {~~~~~~~~~~~~~~~~~~}
+  TALImageWrapMode = (
+    /// <summary>
+    ///   The image is resized (shrunk or enlarged) to be as large as possible
+    ///   within the given width or height while preserving the aspect ratio.
+    /// </summary>
+    Fit,
+    /// <summary>
+    ///   Stretch the image to fill the entire rectangle of the control
+    /// </summary>
+    Stretch,
+    /// <summary>
+    ///   The image is shrunk in size to fully fit within the given width or
+    ///   height, but will not be enlarged.
+    /// </summary>
+    Place,
+    /// <summary>
+    ///   The image is resized to exactly fill the entire area specified by
+    ///   width and height and will be cropped if necessary.
+    /// </summary>
+    Cover);
+
+type
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALPersistentObserver = class(TPersistent)
   private
@@ -834,6 +858,13 @@ procedure ALLog(Const Tag: String; const TagArgs: array of const; Const msg: Str
 procedure ALLog(Const Tag: String; Const msg: String; const msgArgs: array of const; const &Type: TalLogType = TalLogType.VERBOSE); overload;
 procedure ALLog(Const Tag: String; const Args: array of const; const &Type: TalLogType = TalLogType.VERBOSE); overload;
 procedure ALLog(Const Tag: String; const Args: array of const; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR); overload;
+procedure ALLog(Const Tag: AnsiString; Const msg: AnsiString; const &Type: TalLogType = TalLogType.VERBOSE); overload;
+procedure ALLog(Const Tag: AnsiString; const &Type: TalLogType = TalLogType.VERBOSE); overload;
+procedure ALLog(Const Tag: AnsiString; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR); overload;
+procedure ALLog(Const Tag: AnsiString; const TagArgs: array of const; Const msg: AnsiString; const msgArgs: array of const; const &Type: TalLogType = TalLogType.VERBOSE); overload;
+procedure ALLog(Const Tag: AnsiString; Const msg: AnsiString; const msgArgs: array of const; const &Type: TalLogType = TalLogType.VERBOSE); overload;
+procedure ALLog(Const Tag: AnsiString; const Args: array of const; const &Type: TalLogType = TalLogType.VERBOSE); overload;
+procedure ALLog(Const Tag: AnsiString; const Args: array of const; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR); overload;
 function ALGetLogHistory(const AIgnoreLastLogItemMsg: Boolean = False): String;
 
 {~~}
@@ -921,6 +952,7 @@ function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 Function ALInc(var x: integer; Count: integer): Integer;
 procedure ALAssignError(Const ASource: TObject; const ADest: Tobject);
 procedure ALMove(const Source; var Dest; Count: NativeInt); inline;
+function ALSameBytes(const ABytes1: TBytes; const ABytes2: TBytes): Boolean;
 procedure ALMonitorEnter(const AObject: TObject {$IF defined(DEBUG)}; const ATag: string = ''{$ENDIF}); inline;
 procedure ALMonitorExit(const AObject: TObject {$IF defined(DEBUG)}; const ATag: string = ''{$ENDIF}); inline;
 {$IFDEF MSWINDOWS}
@@ -3416,6 +3448,48 @@ begin
   ALLog(ALFormatW(Tag, Args), E, &Type);
 end;
 
+{**********************************************************************************************************}
+procedure ALLog(Const Tag: AnsiString; Const msg: AnsiString; const &Type: TalLogType = TalLogType.VERBOSE);
+begin
+  ALLog(String(Tag), String(msg), &Type);
+end;
+
+{***********************************************************************************}
+procedure ALLog(Const Tag: AnsiString; const &Type: TalLogType = TalLogType.VERBOSE);
+begin
+  ALLog(String(Tag), &Type);
+end;
+
+{*****************************************************************************************************}
+procedure ALLog(Const Tag: AnsiString; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR);
+begin
+  ALLog(String(Tag), E, &Type);
+end;
+
+{************************************************************************************************************************************************************************}
+procedure ALLog(Const Tag: AnsiString; const TagArgs: array of const; Const msg: AnsiString; const msgArgs: array of const; const &Type: TalLogType = TalLogType.VERBOSE);
+begin
+  ALLog(String(Tag), TagArgs, String(msg), msgArgs, &Type);
+end;
+
+{*****************************************************************************************************************************************}
+procedure ALLog(Const Tag: AnsiString; Const msg: AnsiString; const msgArgs: array of const; const &Type: TalLogType = TalLogType.VERBOSE);
+begin
+  ALLog(String(Tag), String(msg), msgArgs, &Type);
+end;
+
+{***************************************************************************************************************}
+procedure ALLog(Const Tag: AnsiString; const Args: array of const; const &Type: TalLogType = TalLogType.VERBOSE);
+begin
+  ALLog(String(Tag), Args, &Type);
+end;
+
+{*********************************************************************************************************************************}
+procedure ALLog(Const Tag: AnsiString; const Args: array of const; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR);
+begin
+  ALLog(String(Tag), Args, E, &Type);
+end;
+
 {******************************************}
 Function AlBoolToInt(Value:Boolean):Integer;
 Begin
@@ -3930,6 +4004,14 @@ end;
 procedure ALMove(const Source; var Dest; Count: NativeInt);
 begin
   Move(Source, Dest, Count);
+end;
+
+{**************************************************************************}
+function ALSameBytes(const ABytes1: TBytes; const ABytes2: TBytes): Boolean;
+begin
+  if Length(ABytes1) <> Length(ABytes2) then Exit(False);
+  if Length(ABytes1) = 0 then Exit(True);
+  Result := CompareMem(Pointer(ABytes1), Pointer(ABytes2), Length(ABytes1));
 end;
 
 {*****************************************************************************************************}

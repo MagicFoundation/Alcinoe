@@ -232,8 +232,6 @@ object Form1: TForm1
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ExplicitWidth = 1015
-        ExplicitHeight = 583
         DefaultCanvas = 'TGDIPlusCanvas'
         PrintMargins = (
           15

@@ -63,21 +63,25 @@ type
   TALJSONStorageKind = (skInt64, skString, skBytes, skOwnedStream, skBorrowedStream);
 
   // Special internal type used by MongoDB replication and sharding.
-  // First 4 Bytes are an increment, second 4 are a timestamp. Setting the
-  // timestamp to 0 has special semantics.
   TALBSONTimestamp = packed record
     case Integer of
       0: (I64: Int64);
-      1: (W1:  LongWord;
-          W2:  LongWord);
+      1: (t:  LongWord;
+          i:  LongWord);
   end;
 
+  TALJSONInterchangeFormat = (
+    icfStandardJson,       // plain JSON
+    icfMongoShellJson,     // NumberLong(...), ObjectId(...), ISODate(...)
+    icfMongoExtendedJson); // {"$numberLong":"..."}, {"$oid":"..."}, {"$date":"..."}
+
   TALJSONSaveOption = (
-    soNodeAutoIndent, // Automatically indents the JSON output for improved readability.
+    soNodeAutoIndent,          // Automatically indents the JSON output for improved readability.
     soIgnoreControlCharacters, // Don't encode escaped characters (like \").
-    soSkipNodeSubTypeHelper, // Don't use helper functions like NumberLong() to handle 64-bit Integers or NumberInt() to handle 32-bit Integers.
-    soSaveInt64AsText, // JSON represents numbers as double and loses precision for large Integers. Use this option to return Int64 as string.
-    soProtectedSave); // Save first to a tmp file and then later rename the tmp file to the desired filename.
+    soSaveInt64AsText,         // JSON represents numbers as double and loses precision for large Integers. Use this option to return Int64 as string.
+    soProtectedSave,           // Save first to a tmp file and then later rename the tmp file to the desired filename.
+    soStandardJson,            // Standard JSON output without MongoDB-specific wrappers such as NumberLong(...), ObjectId(...), or ISODate(...)
+    soMongoExtendedJson);      // {"$numberLong":"..."}, {"$oid":"..."}, {"$date":"..."}
   TALJSONSaveOptions = set of TALJSONSaveOption;
 
   TALJSONParseOption = (
@@ -174,7 +178,7 @@ type
     function GetNodeType: TALJSONNodeType; virtual; abstract;
     function GetNodeSubType: TALJSONNodeSubType; virtual; abstract;
     procedure SetNodeName(const NodeName: AnsiString);
-    function GetInterchangeValue(const SkipNodeSubTypeHelper: Boolean = False): AnsiString; virtual;
+    function GetInterchangeValue(const AInterchangeFormat: TALJSONInterchangeFormat = icfMongoShellJson): AnsiString; virtual;
     function GetJSON: AnsiString;
     procedure SetJSON(const Value: AnsiString);
     function GetBSON: TBytes;
@@ -265,17 +269,17 @@ type
     procedure SaveToJSONStream(const Stream: TStream; const Options: TALJSONSaveOptions = []);
     procedure SaveToJSONFile(const FileName: String; const Options: TALJSONSaveOptions = []); overload;
     procedure SaveToJSONFile(const FileName: AnsiString; const Options: TALJSONSaveOptions = []); overload;
-    procedure SaveToJSONString(var Str: AnsiString; const Options: TALJSONSaveOptions = []);
+    procedure SaveToJSONString(var Str: AnsiString; const Options: TALJSONSaveOptions = []); overload;
+    function SaveToJSONString(const Options: TALJSONSaveOptions = []): AnsiString; overload;
     procedure SaveToBSONStream(const Stream: TStream; const Options: TALJSONSaveOptions = []);
     procedure SaveToBSONFile(const FileName: String; const Options: TALJSONSaveOptions = []); overload;
     procedure SaveToBSONFile(const FileName: AnsiString; const Options: TALJSONSaveOptions = []); overload;
-    procedure SaveToBSONString(var Str: AnsiString; const Options: TALJSONSaveOptions = []);
-    procedure SaveToBSONBytes(var Bytes: TBytes; const Options: TALJSONSaveOptions = []);
+    procedure SaveToBSONBytes(var Bytes: TBytes; const Options: TALJSONSaveOptions = []); overload;
+    function SaveToBSONBytes(const Options: TALJSONSaveOptions = []): TBytes; overload;
     procedure LoadFromJSONString(const Str: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]);
     procedure LoadFromJSONStream(const Stream: TStream; const Options: TALJSONParseOptions = [poClearChildNodes]);
     procedure LoadFromJSONFile(const FileName: String; const Options: TALJSONParseOptions = [poClearChildNodes]); overload;
     procedure LoadFromJSONFile(const FileName: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]); overload;
-    procedure LoadFromBSONString(const Str: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]);
     procedure LoadFromBSONBytes(const Bytes: TBytes; const Options: TALJSONParseOptions = [poClearChildNodes]);
     procedure LoadFromBSONStream(const Stream: TStream; const Options: TALJSONParseOptions = [poClearChildNodes]);
     procedure LoadFromBSONFile(const FileName: String; const Options: TALJSONParseOptions = [poClearChildNodes]); overload;
@@ -312,14 +316,6 @@ type
                 const OnParseStartArray: TALJSONParseArrayEventA;
                 const OnParseEndArray: TALJSONParseArrayEventA;
                 const Options: TALJSONParseOptions = []); overload;
-    procedure ParseBSONString(
-                const Str: AnsiString;
-                const OnParseText: TALJSONParseTextEventA;
-                const OnParseStartObject: TALJSONParseObjectEventA;
-                const OnParseEndObject: TALJSONParseObjectEventA;
-                const OnParseStartArray: TALJSONParseArrayEventA;
-                const OnParseEndArray: TALJSONParseArrayEventA;
-                const Options: TALJSONParseOptions = []);
     procedure ParseBSONBytes(
                 const Bytes: TBytes;
                 const OnParseText: TALJSONParseTextEventA;
@@ -479,7 +475,7 @@ type
   protected
     function GetNodeType: TALJSONNodeType; override;
     function GetNodeSubType: TALJSONNodeSubType; override;
-    function GetInterchangeValue(const SkipNodeSubTypeHelper: Boolean = False): AnsiString; override;
+    function GetInterchangeValue(const AInterchangeFormat: TALJSONInterchangeFormat = icfMongoShellJson): AnsiString; override;
   public
     constructor Create(const NodeName: AnsiString = ''); override;
     destructor Destroy; override;
@@ -543,7 +539,6 @@ type
     class function CreateFromJSONStream(const Stream: TStream; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeA;
     class function CreateFromJSONFile(const FileName: String; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeA; overload;
     class function CreateFromJSONFile(const FileName: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeA; overload;
-    class function CreateFromBSONString(const Str: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeA;
     class function CreateFromBSONBytes(const Bytes: TBytes; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeA;
     class function CreateFromBSONStream(const Stream: TStream; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeA;
     class function CreateFromBSONFile(const FileName: String; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeA; overload;
@@ -580,8 +575,8 @@ type
                       const OnParseStartArray: TALJSONParseArrayEventA;
                       const OnParseEndArray: TALJSONParseArrayEventA;
                       const Options: TALJSONParseOptions = []); overload;
-    class procedure ParseBSONString(
-                      const Str: AnsiString;
+    class procedure ParseBSONBytes(
+                      const Bytes: TBytes;
                       const OnParseText: TALJSONParseTextEventA;
                       const OnParseStartObject: TALJSONParseObjectEventA;
                       const OnParseEndObject: TALJSONParseObjectEventA;
@@ -654,17 +649,18 @@ procedure ALTStringsToJsonA(
             const ANameToLowerCase: Boolean = false;
             const ANullStr: AnsiString = 'null');
 
-function ALJsonEncodeFloatWithNodeSubTypeHelperA(const AValue: double): AnsiString;
-function ALJsonEncodeTextWithNodeSubTypeHelperA(const AValue: AnsiString): AnsiString;
-function ALJsonEncodeBinaryWithNodeSubTypeHelperA(const AValue: TBytes): AnsiString;
-function ALJsonEncodeObjectIDWithNodeSubTypeHelperA(const AValue: TBytes): AnsiString;
-function ALJsonEncodeBooleanWithNodeSubTypeHelperA(const AValue: Boolean): AnsiString;
-function ALJsonEncodeDateTimeA(const AValue: TDateTime): AnsiString;
-function ALJsonEncodeDateTimeWithNodeSubTypeHelperA(const AValue: TDateTime): AnsiString;
-function ALJsonEncodeJavascriptWithNodeSubTypeHelperA(const AValue: AnsiString): AnsiString;
-function ALJsonEncodeInt64WithNodeSubTypeHelperA(const AValue: Int64): AnsiString;
-function ALJsonEncodeInt32WithNodeSubTypeHelperA(const AValue: Int32): AnsiString;
-function ALJsonEncodeNullWithNodeSubTypeHelperA: AnsiString;
+function ALJsonEncodeFloatA(const AValue: double; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
+function ALJsonEncodeTextA(const AValue: AnsiString; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
+function ALJsonEncodeBinaryA(const AValue: TBytes; const ASubType: Byte; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
+function ALJsonEncodeObjectIDA(const AValue: TBytes; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
+function ALJsonEncodeBooleanA(const AValue: Boolean; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
+function ALJsonEncodeDateTimeA(const AValue: TDateTime; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
+function ALJsonEncodeNullA(const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
+function ALJsonEncodeRegExA(const AValue: AnsiString; const AOptions: TALPerlRegExOptions; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
+function ALJsonEncodeJavascriptA(const AValue: AnsiString; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
+function ALJsonEncodeInt32A(const AValue: Int32; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
+function ALJsonEncodeTimestampA(const AValue: TALBSONTimestamp; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
+function ALJsonEncodeInt64A(const AValue: Int64; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
 
 function ALJSONTryStrToRegExA(const S: AnsiString; out RegEx: AnsiString; out RegExOptions: TALPerlRegExOptions): Boolean;
 function ALJSONTryStrToBinaryA(const S: AnsiString; out Data: TBytes; out Subtype: Byte): Boolean;
@@ -762,7 +758,7 @@ type
     function GetNodeType: TALJSONNodeType; virtual; abstract;
     function GetNodeSubType: TALJSONNodeSubType; virtual; abstract;
     procedure SetNodeName(const NodeName: String);
-    function GetInterchangeValue(const SkipNodeSubTypeHelper: Boolean = False): String; virtual;
+    function GetInterchangeValue(const AInterchangeFormat: TALJSONInterchangeFormat = icfMongoShellJson): String; virtual;
     function GetJSON: String;
     procedure SetJSON(const Value: String);
     function GetBSON: TBytes;
@@ -854,10 +850,12 @@ type
     procedure SaveToJSONStream(const Stream: TStream; const Options: TALJSONSaveOptions = []); overload;
     procedure SaveToJSONFile(const FileName: String; const Encoding: TEncoding; const Options: TALJSONSaveOptions = []); overload;
     procedure SaveToJSONFile(const FileName: String; const Options: TALJSONSaveOptions = []); overload;
-    procedure SaveToJSONString(var Str: String; const Options: TALJSONSaveOptions = []);
+    procedure SaveToJSONString(var Str: String; const Options: TALJSONSaveOptions = []); overload;
+    function SaveToJSONString(const Options: TALJSONSaveOptions = []): String; overload;
     procedure SaveToBSONStream(const Stream: TStream; const Options: TALJSONSaveOptions = []);
     procedure SaveToBSONFile(const FileName: String; const Options: TALJSONSaveOptions = []);
-    procedure SaveToBSONBytes(var Bytes: TBytes; const Options: TALJSONSaveOptions = []);
+    procedure SaveToBSONBytes(var Bytes: TBytes; const Options: TALJSONSaveOptions = []); overload;
+    function SaveToBSONBytes(const Options: TALJSONSaveOptions = []): TBytes; overload;
     procedure LoadFromJSONString(const Str: String; const Options: TALJSONParseOptions = [poClearChildNodes]);
     procedure LoadFromJSONStream(const Stream: TStream; const Options: TALJSONParseOptions = [poClearChildNodes]);
     procedure LoadFromJSONFile(const FileName: String; const Options: TALJSONParseOptions = [poClearChildNodes]);
@@ -1039,7 +1037,7 @@ type
   protected
     function GetNodeType: TALJSONNodeType; override;
     function GetNodeSubType: TALJSONNodeSubType; override;
-    function GetInterchangeValue(const SkipNodeSubTypeHelper: Boolean = False): String; override;
+    function GetInterchangeValue(const AInterchangeFormat: TALJSONInterchangeFormat = icfMongoShellJson): String; override;
   public
     constructor Create(const NodeName: String = ''); override;
     destructor Destroy; override;
@@ -1193,17 +1191,18 @@ procedure ALTStringsToJsonW(
             const ANameToLowerCase: Boolean = false;
             const ANullStr: String = 'null');
 
-function ALJsonEncodeFloatWithNodeSubTypeHelperW(const AValue: double): String;
-function ALJsonEncodeTextWithNodeSubTypeHelperW(const AValue: String): String;
-function ALJsonEncodeBinaryWithNodeSubTypeHelperW(const AValue: TBytes): String;
-function ALJsonEncodeObjectIDWithNodeSubTypeHelperW(const AValue: TBytes): String;
-function ALJsonEncodeBooleanWithNodeSubTypeHelperW(const AValue: Boolean): String;
-function ALJsonEncodeDateTimeW(const AValue: TDateTime): String;
-function ALJsonEncodeDateTimeWithNodeSubTypeHelperW(const AValue: TDateTime): String;
-function ALJsonEncodeJavascriptWithNodeSubTypeHelperW(const AValue: String): String;
-function ALJsonEncodeInt64WithNodeSubTypeHelperW(const AValue: Int64): String;
-function ALJsonEncodeInt32WithNodeSubTypeHelperW(const AValue: Int32): String;
-function ALJsonEncodeNullWithNodeSubTypeHelperW: String;
+function ALJsonEncodeFloatW(const AValue: double; const AFormat: TALJSONInterchangeFormat): String; inline;
+function ALJsonEncodeTextW(const AValue: String; const AFormat: TALJSONInterchangeFormat): String; inline;
+function ALJsonEncodeBinaryW(const AValue: TBytes; const ASubType: Byte; const AFormat: TALJSONInterchangeFormat): String; inline;
+function ALJsonEncodeObjectIDW(const AValue: TBytes; const AFormat: TALJSONInterchangeFormat): String; inline;
+function ALJsonEncodeBooleanW(const AValue: Boolean; const AFormat: TALJSONInterchangeFormat): String; inline;
+function ALJsonEncodeDateTimeW(const AValue: TDateTime; const AFormat: TALJSONInterchangeFormat): String; inline;
+function ALJsonEncodeNullW(const AFormat: TALJSONInterchangeFormat): String; inline;
+function ALJsonEncodeRegExW(const AValue: String; const AOptions: TALPerlRegExOptions; const AFormat: TALJSONInterchangeFormat): String; inline;
+function ALJsonEncodeJavascriptW(const AValue: String; const AFormat: TALJSONInterchangeFormat): String; inline;
+function ALJsonEncodeInt32W(const AValue: Int32; const AFormat: TALJSONInterchangeFormat): String; inline;
+function ALJsonEncodeTimestampW(const AValue: TALBSONTimestamp; const AFormat: TALJSONInterchangeFormat): String; inline;
+function ALJsonEncodeInt64W(const AValue: Int64; const AFormat: TALJSONInterchangeFormat): String; inline;
 
 function ALJSONTryStrToRegExW(const S: String; out RegEx: String; out RegExOptions: TALPerlRegExOptions): Boolean;
 function ALJSONTryStrToBinaryW(const S: String; out Data: TBytes; out Subtype: Byte): Boolean;
@@ -1604,8 +1603,8 @@ begin
 
   // build result
   Result := true;
-  Value.W1 := LArg1; // higher 4 Bytes - increment
-  Value.W2 := LArg2; // lower  4 Bytes - timestamp
+  Value.t := LArg1;
+  Value.i := LArg2;
 end;
 
 {****************************************************************************}
@@ -1918,18 +1917,6 @@ begin
   Result := CreateFromJSONFile(String(FileName), Options);
 end;
 
-{**************************************************************************************************************************************************}
-class function TALJSONDocumentA.CreateFromBSONString(const Str: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeA;
-begin
-  Result := ALCreateJSONNodeA('', ntObject);
-  try
-    Result.LoadFromBSONString(Str, Options);
-  except
-    ALFreeAndNil(Result);
-    raise;
-  end;
-end;
-
 {***********************************************************************************************************************************************}
 class function TALJSONDocumentA.CreateFromBSONBytes(const Bytes: TBytes; const Options: TALJSONParseOptions = [poClearChildNodes]): TALJSONNodeA;
 begin
@@ -2072,9 +2059,9 @@ begin
     Options);
 end;
 
-{***********************************************}
-class procedure TALJSONDocumentA.ParseBSONString(
-                  const Str: AnsiString;
+{**********************************************}
+class procedure TALJSONDocumentA.ParseBSONBytes(
+                  const Bytes: TBytes;
                   const OnParseText: TALJSONParseTextEventA;
                   const OnParseStartObject: TALJSONParseObjectEventA;
                   const OnParseEndObject: TALJSONParseObjectEventA;
@@ -2084,8 +2071,8 @@ class procedure TALJSONDocumentA.ParseBSONString(
 begin
   var LJsonNode := ALCreateJSONNodeA('', ntObject);
   try
-    LJsonNode.ParseBSONString(
-      Str,
+    LJsonNode.ParseBSONBytes(
+      Bytes,
       OnParseText,
       OnParseStartObject,
       OnParseEndObject,
@@ -2913,7 +2900,7 @@ end;
 // we provide the helper functions NumberLong() to handle 64-bit Integers
 // and NumberInt() to handle 32-bit Integers (and some others). theses helper functions are
 // used when saving the json document.
-function TALJSONNodeA.GetInterchangeValue(const SkipNodeSubTypeHelper: Boolean = False): AnsiString;
+function TALJSONNodeA.GetInterchangeValue(const AInterchangeFormat: TALJSONInterchangeFormat = icfMongoShellJson): AnsiString;
 begin
   AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
@@ -3759,7 +3746,7 @@ Var
         end;
       end
       else begin
-        _DoParseText(index, Name, [LTimestamp.W1, LTimestamp.W2], nstTimeStamp);
+        _DoParseText(index, Name, [LTimestamp.t, LTimestamp.i], nstTimeStamp);
       end;
     end
     else Result := False;
@@ -5121,7 +5108,7 @@ Var
       end;
     end
     else begin
-      _DoParseText(Name, [LTimestamp.W1, LTimestamp.W2], NodeSubType);
+      _DoParseText(Name, [LTimestamp.t, LTimestamp.i], NodeSubType);
     end;
   end;
 
@@ -5561,7 +5548,7 @@ Var
   CurrentIndentStr: AnsiString;
   IndentStr: AnsiString;
   EncodeControlCharacters: Boolean;
-  SkipNodeSubTypeHelper: Boolean;
+  InterchangeFormat : TALJSONInterchangeFormat;
   SaveInt64AsText: Boolean;
   AutoIndentNode: Boolean;
   BufferPos: Integer;
@@ -5615,7 +5602,7 @@ Var
           _WriteStr2Buffer('"');
         end;
       end
-      else _WriteStr2Buffer(GetInterchangeValue(SkipNodeSubTypeHelper));
+      else _WriteStr2Buffer(GetInterchangeValue(InterchangeFormat));
 
     end;
   end;
@@ -5752,8 +5739,10 @@ begin
     end;
     LastWrittenChar := '{';
     EncodeControlCharacters := not (soIgnoreControlCharacters in Options);
-    SkipNodeSubTypeHelper := soSkipNodeSubTypeHelper in Options;
-    SaveInt64AsText := SkipNodeSubTypeHelper and (soSaveInt64AsText in Options);
+    if soStandardJson in Options then InterchangeFormat := icfStandardJson
+    else if soMongoExtendedJson in Options then InterchangeFormat := icfMongoExtendedJson
+    else InterchangeFormat := icfMongoShellJson;
+    SaveInt64AsText := (InterchangeFormat = icfStandardJson) and (soSaveInt64AsText in Options);
     AutoIndentNode := soNodeAutoIndent in Options;
     IndentStr := ALDefaultJsonNodeIndentA;
     CurrentIndentStr := '';
@@ -5836,14 +5825,16 @@ begin
   SaveToJSONFile(String(FileName), Options);
 end;
 
-{*************************************************}
-{Saves the JSON document to a string-type variable.
- Call SaveToJSON to save the contents of the JSON document to the string-type variable specified by JSON. SaveToJSON writes the contents of JSON document
- using 8 bits char (utf-8, iso-8859-1, etc) as an encoding system, depending on the type of the JSON parameter.
- Unlike the JSON property, which lets you write individual lines from the JSON document, SaveToJSON writes the entire text of the JSON document.}
+{***************************************************************************************************}
 procedure TALJSONNodeA.SaveToJSONString(var str: AnsiString; const Options: TALJSONSaveOptions = []);
 begin
   SaveToJSON(nil, Str, Options);
+end;
+
+{*****************************************************************************************}
+function TALJSONNodeA.SaveToJSONString(const Options: TALJSONSaveOptions = []): AnsiString;
+begin
+  SaveToJSON(nil, Result, Options);
 end;
 
 {********************************}
@@ -6305,23 +6296,16 @@ begin
   SaveToBSONFile(String(FileName), Options);
 end;
 
-{***************************************************************************************************}
-procedure TALJSONNodeA.SaveToBSONString(var str: AnsiString; const Options: TALJSONSaveOptions = []);
-begin
-  var LStream := TALStringStreamA.Create('');
-  Try
-    var Buffer: TBytes;
-    SaveToBSON(LStream, Buffer, Options);
-    Str := LStream.DataString;
-  finally
-    ALFreeAndNil(LStream);
-  end;
-end;
-
 {************************************************************************************************}
 procedure TALJSONNodeA.SaveToBSONBytes(var Bytes: TBytes; const Options: TALJSONSaveOptions = []);
 begin
   SaveToBSON(Nil, Bytes, Options);
+end;
+
+{************************************************************************************}
+function TALJSONNodeA.SaveToBSONBytes(const Options: TALJSONSaveOptions = []): TBytes;
+begin
+  SaveToBSON(Nil, Result, Options);
 end;
 
 {*************************************************************************************************************************}
@@ -6362,24 +6346,6 @@ end;
 procedure TALJSONNodeA.LoadFromJSONFile(const FileName: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]);
 begin
   LoadFromJSONFile(String(FileName), Options);
-end;
-
-{*************************************************************************************************************************}
-procedure TALJSONNodeA.LoadFromBSONString(const Str: AnsiString; const Options: TALJSONParseOptions = [poClearChildNodes]);
-begin
-  Try
-    var LCodePage: Word;
-    var LElemSize: Word;
-    var LBytes: TBytes := ALConvertStringToBytes(Str, LCodePage, LElemSize);
-    try
-      ParseBSON(nil, LBytes, False{SaxMode}, nil{OnParseText}, nil{OnParseStartObject}, nil{OnParseEndObject}, nil{OnParseStartArray}, nil{OnParseEndArray}, Options);
-    finally
-      ALRevertBytesToString(LBytes, LCodePage, LElemSize);
-    end;
-  except
-    ChildNodes.Clear;
-    raise;
-  end;
 end;
 
 {**********************************************************************************************************************}
@@ -6478,31 +6444,6 @@ procedure TALJSONNodeA.ParseJSONFile(
             const Options: TALJSONParseOptions = []);
 begin
   ParseJSONFile(String(FileName), OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
-end;
-
-{*************************************}
-procedure TALJSONNodeA.ParseBSONString(
-            const Str: AnsiString;
-            const OnParseText: TALJSONParseTextEventA;
-            const OnParseStartObject: TALJSONParseObjectEventA;
-            const OnParseEndObject: TALJSONParseObjectEventA;
-            const OnParseStartArray: TALJSONParseArrayEventA;
-            const OnParseEndArray: TALJSONParseArrayEventA;
-            const Options: TALJSONParseOptions = []);
-begin
-  Try
-    var LCodePage: Word;
-    var LElemSize: Word;
-    var LBytes: TBytes := ALConvertStringToBytes(Str, LCodePage, LElemSize);
-    try
-      ParseBSON(nil, LBytes, true{SaxMode}, OnParseText, OnParseStartObject, OnParseEndObject, OnParseStartArray, OnParseEndArray, Options);
-    finally
-      ALRevertBytesToString(LBytes, LCodePage, LElemSize);
-    end;
-  except
-    ChildNodes.Clear;
-    raise;
-  end;
 end;
 
 {************************************}
@@ -6663,86 +6604,24 @@ end;
 // we provide the helper functions NumberLong() to handle 64-bit Integers
 // and NumberInt() to handle 32-bit Integers (and some others). theses helper functions are
 // used when saving the json document.
-function TALJSONTextNodeA.GetInterchangeValue(const SkipNodeSubTypeHelper: Boolean = False): AnsiString;
-
-  {~~~~~~~~~~~~~~~~~~~~~}
-  procedure _GetObjectID;
-  begin
-    if SkipNodeSubTypeHelper then Result := '"'+ALBinToHexA(ObjectID)+'"'
-    else Result := 'ObjectId("'+ALBinToHexA(ObjectID)+'")';
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~}
-  procedure _GetBinary;
-  begin
-    if FStorageKind = skBytes then begin
-      if SkipNodeSubTypeHelper then Result := '"'+ALBase64EncodeBytesA(GetBinaryAsBytes)+'"'
-      else Result := 'BinData('+ALIntToStrA(BinarySubType)+', "'+ALBase64EncodeBytesA(GetBinaryAsBytes)+'")';
-    end
-    else begin
-      if SkipNodeSubTypeHelper then Result := '"'+ALBase64EncodeBytesA(ALGetBytesFromStream(GetBinaryAsStream))+'"'
-      else Result := 'BinData('+ALIntToStrA(BinarySubType)+', "'+ALBase64EncodeBytesA(ALGetBytesFromStream(GetBinaryAsStream))+'")';
-    end;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~}
-  procedure _GetDateTime;
-  begin
-    if SkipNodeSubTypeHelper then Result := ALFormatDateTimeA('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime)
-    else Result := ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime)
-  end;
-
-  {~~~~~~~~~~~~~~~~~~}
-  procedure _GetInt32;
-  begin
-    if SkipNodeSubTypeHelper then Result := text
-    else Result := 'NumberInt(' + text + ')'
-  end;
-
-  {~~~~~~~~~~~~~~~~~~}
-  procedure _GetInt64;
-  begin
-    if SkipNodeSubTypeHelper then Result := text
-    else Result := 'NumberLong(' + text + ')';
-  end;
-
-  {~~~~~~~~~~~~~~~~~~}
-  procedure _GetRegEx;
-  begin
-    var LRegExOptionsStr: AnsiString := '';
-    var LRegExOptions := RegExOptions;
-    if preCaseLess in LRegExOptions then LRegExOptionsStr := LRegExOptionsStr + 'i';
-    if preMultiLine in LRegExOptions then LRegExOptionsStr := LRegExOptionsStr +'m';
-    if preExtended in LRegExOptions then LRegExOptionsStr := LRegExOptionsStr +'x';
-    //'l':;
-    if preSingleLine in LRegExOptions then LRegExOptionsStr := LRegExOptionsStr + 's';
-    //'u':;
-    Result := '/'+regex+'/' + LRegExOptionsStr;
-    if SkipNodeSubTypeHelper then Result := '"' + ALJavascriptEncode(result) + '"'
-    else Result := ALJavascriptEncode(result);
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _GetTimestamp;
-  begin
-    if SkipNodeSubTypeHelper then Result := '"Timestamp('+ALIntToStrA(GetTimeStamp.W1)+', '+ALIntToStrA(GetTimeStamp.W2)+')"'
-    else Result := 'Timestamp('+ALIntToStrA(GetTimeStamp.W1)+', '+ALIntToStrA(GetTimeStamp.W2)+')';
-  end;
-
+function TALJSONTextNodeA.GetInterchangeValue(const AInterchangeFormat: TALJSONInterchangeFormat = icfMongoShellJson): AnsiString;
 begin
   case FNodeSubType of
-    nstFloat:      Result := GetText;
-    nstText:       Result := GetText;
-    nstBinary:     _GetBinary;
-    nstObjectID:   _GetObjectID;
-    nstBoolean:    Result := GetText;
-    nstDateTime:   _GetDateTime;
-    nstJavascript: Result := GetJavascript;
-    nstInt32:      _GetInt32;
-    nstInt64:      _GetInt64;
-    nstNull:       Result := GetText;
-    nstRegEx:      _GetRegEx;
-    nstTimestamp:  _GetTimestamp;
+    nstFloat: Result := ALJsonEncodeFloatA(GetFloat, AInterchangeFormat);
+    nstText: Result := ALJsonEncodeTextA(GetText, AInterchangeFormat);
+    nstBinary: begin
+      if FStorageKind = skBytes then Result := ALJsonEncodeBinaryA(GetBinaryAsBytes, GetBinarySubType, AInterchangeFormat)
+      else Result := ALJsonEncodeBinaryA(ALGetBytesFromStream(GetBinaryAsStream), GetBinarySubType, AInterchangeFormat);
+    end;
+    nstObjectID: Result := ALJsonEncodeObjectIDA(GetObjectID, AInterchangeFormat);
+    nstBoolean: Result := ALJsonEncodeBooleanA(GetBool, AInterchangeFormat);
+    nstDateTime: Result := ALJsonEncodeDateTimeA(GetDateTime, AInterchangeFormat);
+    nstNull: Result := ALJsonEncodeNullA(AInterchangeFormat);
+    nstRegEx: Result := ALJsonEncodeRegExA(GetRegEx, GetRegExOptions, AInterchangeFormat);
+    nstJavascript: Result := ALJsonEncodeJavascriptA(GetJavascript, AInterchangeFormat);
+    nstInt32: Result := ALJsonEncodeInt32A(GetInt32, AInterchangeFormat);
+    nstTimestamp: Result := ALJsonEncodeTimestampA(GetTimestamp, AInterchangeFormat);
+    nstInt64: Result := ALJsonEncodeInt64A(GetInt64, AInterchangeFormat);
     else AlJSONDocErrorA(ALJSONInvalidNodeSubType);
   end;
 end;
@@ -7894,71 +7773,130 @@ begin
 
 end;
 
-{*********************************************************************************}
-function ALJsonEncodeFloatWithNodeSubTypeHelperA(const AValue: double): AnsiString;
+{*****************************************************************************************************}
+function ALJsonEncodeFloatA(const AValue: double; const AFormat: TALJSONInterchangeFormat): AnsiString;
 begin
-  Result := ALFloatToStrA(aValue);
+  case AFormat of
+    icfStandardJson: Result := ALFloatToStrA(aValue);
+    icfMongoShellJson: Result := ALFloatToStrA(aValue);
+    icfMongoExtendedJson: Result := '{"$numberDouble":"'+ALFloatToStrA(aValue)+'"}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
 end;
 
-{************************************************************************************}
-function ALJsonEncodeTextWithNodeSubTypeHelperA(const AValue: AnsiString): AnsiString;
+{********************************************************************************************************}
+function ALJsonEncodeTextA(const AValue: AnsiString; const AFormat: TALJSONInterchangeFormat): AnsiString;
 begin
   Result := '"'+ALJavascriptEncode(aValue)+'"';
 end;
 
-{**********************************************************************************}
-function ALJsonEncodeBinaryWithNodeSubTypeHelperA(const AValue: TBytes): AnsiString;
+{****************************************************************************************************************************}
+function ALJsonEncodeBinaryA(const AValue: TBytes; const ASubType: Byte; const AFormat: TALJSONInterchangeFormat): AnsiString;
 begin
-  Result := 'BinData(0, "' + ALBase64EncodeBytesA(aValue) + '")';
+  case AFormat of
+    icfStandardJson: Result := '"'+ALBase64EncodeBytesA(AValue)+'"';
+    icfMongoShellJson: Result := 'BinData('+ALIntToStrA(ASubType)+',"'+ALBase64EncodeBytesA(aValue)+'")';
+    icfMongoExtendedJson: Result := '{"$binary":{"base64":"'+ALBase64EncodeBytesA(AValue)+'","subType":"'+ALIntToHexA(ASubType, 1)+'"}}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
 end;
 
-{************************************************************************************}
-function ALJsonEncodeObjectIDWithNodeSubTypeHelperA(const AValue: TBytes): AnsiString;
+{********************************************************************************************************}
+function ALJsonEncodeObjectIDA(const AValue: TBytes; const AFormat: TALJSONInterchangeFormat): AnsiString;
 begin
-  Result := 'ObjectId("'+ALBinToHexA(aValue)+'")';
+  case AFormat of
+    icfStandardJson: Result := '"'+ALBinToHexA(AValue)+'"';
+    icfMongoShellJson: Result := 'ObjectId("'+ALBinToHexA(aValue)+'")';
+    icfMongoExtendedJson: Result := '{"$oid":"'+ALBinToHexA(AValue)+'"}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
 end;
 
-{************************************************************************************}
-function ALJsonEncodeBooleanWithNodeSubTypeHelperA(const AValue: Boolean): AnsiString;
+{********************************************************************************************************}
+function ALJsonEncodeBooleanA(const AValue: Boolean; const AFormat: TALJSONInterchangeFormat): AnsiString;
 begin
   if aValue then Result := 'true'
   else Result := 'false';
 end;
 
-{******************************************************************}
-function ALJsonEncodeDateTimeA(const AValue: TDateTime): AnsiString;
+{***********************************************************************************************************}
+function ALJsonEncodeDateTimeA(const AValue: TDateTime; const AFormat: TALJSONInterchangeFormat): AnsiString;
 begin
-  Result := ALFormatDateTimeA('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', aValue);
+  case AFormat of
+    icfStandardJson: Result := ALFormatDateTimeA('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', AValue);
+    icfMongoShellJson: Result := 'ISODate('+ALFormatDateTimeA('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', AValue)+')';
+    icfMongoExtendedJson: Result := '{"$date":{"$numberLong":"'+ALIntToStrA(ALDateTimeToUnixMs(AValue))+'"}}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
 end;
 
-{***************************************************************************************}
-function ALJsonEncodeDateTimeWithNodeSubTypeHelperA(const AValue: TDateTime): AnsiString;
-begin
-  Result := ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue);
-end;
-
-{******************************************************************************************}
-function ALJsonEncodeJavascriptWithNodeSubTypeHelperA(const AValue: AnsiString): AnsiString;
-begin
-  Result := aValue;
-end;
-
-{********************************************************************************}
-function ALJsonEncodeInt64WithNodeSubTypeHelperA(const AValue: Int64): AnsiString;
-begin
-  Result := 'NumberLong(' + ALIntToStrA(aValue) + ')';
-end;
-
-{********************************************************************************}
-function ALJsonEncodeInt32WithNodeSubTypeHelperA(const AValue: Int32): AnsiString;
-begin
-  Result := 'NumberInt(' + ALIntToStrA(aValue) + ')';
-end;
-
-{**********************************************************}
-function ALJsonEncodeNullWithNodeSubTypeHelperA: AnsiString;
+{******************************************************************************}
+function ALJsonEncodeNullA(const AFormat: TALJSONInterchangeFormat): AnsiString;
 begin
   Result := 'null';
+end;
+
+{**********************************************************************************************************************************************}
+function ALJsonEncodeRegExA(const AValue: AnsiString; const AOptions: TALPerlRegExOptions; const AFormat: TALJSONInterchangeFormat): AnsiString;
+begin
+  var LOptions: AnsiString := '';
+  // The options must be in alphabetical order
+  if preCaseLess in AOptions then LOptions := LOptions + 'i';
+  if preMultiLine in AOptions then LOptions := LOptions +'m';
+  if preSingleLine in AOptions then LOptions := LOptions + 's';
+  if preExtended in AOptions then LOptions := LOptions +'x';
+  case AFormat of
+    icfStandardJson: Result := '"'+ALJavascriptEncode('/'+AValue+'/'+LOptions)+'"';
+    icfMongoShellJson: Result := '/'+AValue+'/'+LOptions;
+    icfMongoExtendedJson: begin
+      Result := '{"$regularExpression":{"pattern":"'+ALJavascriptEncode(AValue)+'","options":"'+LOptions+'"}}'
+    end;
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
+end;
+
+{**************************************************************************************************************}
+function ALJsonEncodeJavascriptA(const AValue: AnsiString; const AFormat: TALJSONInterchangeFormat): AnsiString;
+begin
+  case AFormat of
+    icfStandardJson: Result := '"'+ALJavascriptEncode(AValue)+'"';
+    icfMongoShellJson: Result := AValue;
+    icfMongoExtendedJson: Result := '{"$code":"'+ALJavascriptEncode(AValue)+'"}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
+end;
+
+{****************************************************************************************************}
+function ALJsonEncodeInt32A(const AValue: Int32; const AFormat: TALJSONInterchangeFormat): AnsiString;
+begin
+  case AFormat of
+    icfStandardJson: Result := ALIntToStrA(AValue);
+    icfMongoShellJson: Result := 'NumberInt('+ALIntToStrA(aValue)+')';
+    icfMongoExtendedJson: Result := '{"$numberInt":"'+ALIntToStrA(AValue)+'"}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
+end;
+
+{*******************************************************************************************************************}
+function ALJsonEncodeTimestampA(const AValue: TALBSONTimestamp; const AFormat: TALJSONInterchangeFormat): AnsiString;
+begin
+  case AFormat of
+    icfStandardJson: Result := '"Timestamp('+ALIntToStrA(AValue.t)+','+ALIntToStrA(AValue.i)+')"';
+    icfMongoShellJson: Result := 'Timestamp('+ALIntToStrA(AValue.t)+','+ALIntToStrA(AValue.i)+')';
+    icfMongoExtendedJson: Result := '{"$timestamp":{"t":'+ALIntToStrA(AValue.t)+',"i":'+ALIntToStrA(AValue.i)+'}}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
+end;
+
+{****************************************************************************************************}
+function ALJsonEncodeInt64A(const AValue: Int64; const AFormat: TALJSONInterchangeFormat): AnsiString;
+begin
+  case AFormat of
+    icfStandardJson: Result := ALIntToStrA(AValue);
+    icfMongoShellJson: Result := 'NumberLong('+ALIntToStrA(AValue)+')';
+    icfMongoExtendedJson: Result := '{"$numberLong":"'+ALIntToStrA(AValue)+'"}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
 end;
 
 {****************************************}
@@ -8346,8 +8284,8 @@ begin
 
   // build result
   Result := true;
-  Value.W1 := LArg1; // higher 4 Bytes - increment
-  Value.W2 := LArg2; // lower  4 Bytes - timestamp
+  Value.t := LArg1;
+  Value.i := LArg2;
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
@@ -9513,7 +9451,7 @@ end;
 // we provide the helper functions NumberLong() to handle 64-bit Integers
 // and NumberInt() to handle 32-bit Integers (and some others). theses helper functions are
 // used when saving the json document.
-function TALJSONNodeW.GetInterchangeValue(const SkipNodeSubTypeHelper: Boolean = False): String;
+function TALJSONNodeW.GetInterchangeValue(const AInterchangeFormat: TALJSONInterchangeFormat = icfMongoShellJson): String;
 begin
   AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
@@ -10311,7 +10249,7 @@ Var
         end;
       end
       else begin
-        _DoParseText(index, Name, [LTimestamp.W1, LTimestamp.W2], nstTimeStamp);
+        _DoParseText(index, Name, [LTimestamp.t, LTimestamp.i], nstTimeStamp);
       end;
     end
     else Result := False;
@@ -11648,7 +11586,7 @@ Var
       end;
     end
     else begin
-      _DoParseText(Name, [LTimestamp.W1, LTimestamp.W2], NodeSubType);
+      _DoParseText(Name, [LTimestamp.t, LTimestamp.i], NodeSubType);
     end;
   end;
 
@@ -12090,7 +12028,7 @@ Var
   CurrentIndentStr: String;
   IndentStr: String;
   EncodeControlCharacters: Boolean;
-  SkipNodeSubTypeHelper: Boolean;
+  InterchangeFormat : TALJSONInterchangeFormat;
   SaveInt64AsText: Boolean;
   AutoIndentNode: Boolean;
   BufferPos: Integer;
@@ -12147,7 +12085,7 @@ Var
           _WriteStr2Buffer('"');
         end;
       end
-      else _WriteStr2Buffer(GetInterchangeValue(SkipNodeSubTypeHelper));
+      else _WriteStr2Buffer(GetInterchangeValue(InterchangeFormat));
 
     end;
   end;
@@ -12284,8 +12222,10 @@ begin
     end;
     LastWrittenChar := '{';
     EncodeControlCharacters := not (soIgnoreControlCharacters in Options);
-    SkipNodeSubTypeHelper := soSkipNodeSubTypeHelper in Options;
-    SaveInt64AsText := SkipNodeSubTypeHelper and (soSaveInt64AsText in Options);
+    if soStandardJson in Options then InterchangeFormat := icfStandardJson
+    else if soMongoExtendedJson in Options then InterchangeFormat := icfMongoExtendedJson
+    else InterchangeFormat := icfMongoShellJson;
+    SaveInt64AsText := (InterchangeFormat = icfStandardJson) and (soSaveInt64AsText in Options);
     AutoIndentNode := soNodeAutoIndent in Options;
     IndentStr := ALDefaultJsonNodeIndentW;
     CurrentIndentStr := '';
@@ -12378,14 +12318,16 @@ begin
   SaveToJSONFile(FileName, TEncoding.UTF8, Options);
 end;
 
-{*************************************************}
-{Saves the JSON document to a string-type variable.
- Call SaveToJSON to save the contents of the JSON document to the string-type variable specified by JSON. SaveToJSON writes the contents of JSON document
- using 8 bits char (utf-8, iso-8859-1, etc) as an encoding system, depending on the type of the JSON parameter.
- Unlike the JSON property, which lets you write individual lines from the JSON document, SaveToJSON writes the entire text of the JSON document.}
+{***********************************************************************************************}
 procedure TALJSONNodeW.SaveToJSONString(var str: String; const Options: TALJSONSaveOptions = []);
 begin
   SaveToJSON(nil, nil, Str, Options);
+end;
+
+{*************************************************************************************}
+function TALJSONNodeW.SaveToJSONString(const Options: TALJSONSaveOptions = []): String;
+begin
+  SaveToJSON(nil, nil, Result, Options);
 end;
 
 {********************************}
@@ -12848,6 +12790,12 @@ begin
   SaveToBSON(nil, Bytes, Options);
 end;
 
+{************************************************************************************}
+function TALJSONNodeW.SaveToBSONBytes(const Options: TALJSONSaveOptions = []): TBytes;
+begin
+  SaveToBSON(nil, Result, Options);
+end;
+
 {*********************************************************************************************************************}
 procedure TALJSONNodeW.LoadFromJSONString(const Str: String; const Options: TALJSONParseOptions = [poClearChildNodes]);
 begin
@@ -13099,86 +13047,24 @@ end;
 // we provide the helper functions NumberLong() to handle 64-bit Integers
 // and NumberInt() to handle 32-bit Integers (and some others). theses helper functions are
 // used when saving the json document.
-function TALJSONTextNodeW.GetInterchangeValue(const SkipNodeSubTypeHelper: Boolean = False): String;
-
-  {~~~~~~~~~~~~~~~~~~~~~}
-  procedure _GetObjectID;
-  begin
-    if SkipNodeSubTypeHelper then Result := '"'+ALBinToHexW(ObjectID)+'"'
-    else Result := 'ObjectId("'+ALBinToHexW(ObjectID)+'")';
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~}
-  procedure _GetBinary;
-  begin
-    if FStorageKind = skBytes then begin
-      if SkipNodeSubTypeHelper then Result := '"'+ALBase64EncodeBytesW(GetBinaryAsBytes)+'"'
-      else Result := 'BinData('+ALIntToStrW(BinarySubType)+', "'+ALBase64EncodeBytesW(GetBinaryAsBytes)+'")';
-    end
-    else begin
-      if SkipNodeSubTypeHelper then Result := '"'+ALBase64EncodeBytesW(ALGetBytesFromStream(GetBinaryAsStream))+'"'
-      else Result := 'BinData('+ALIntToStrW(BinarySubType)+', "'+ALBase64EncodeBytesW(ALGetBytesFromStream(GetBinaryAsStream))+'")';
-    end;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~}
-  procedure _GetDateTime;
-  begin
-    if SkipNodeSubTypeHelper then Result := ALFormatDateTimeW('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime)
-    else Result := ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime)
-  end;
-
-  {~~~~~~~~~~~~~~~~~~}
-  procedure _GetInt32;
-  begin
-    if SkipNodeSubTypeHelper then Result := text
-    else Result := 'NumberInt(' + text + ')'
-  end;
-
-  {~~~~~~~~~~~~~~~~~~}
-  procedure _GetInt64;
-  begin
-    if SkipNodeSubTypeHelper then Result := text
-    else Result := 'NumberLong(' + text + ')';
-  end;
-
-  {~~~~~~~~~~~~~~~~~~}
-  procedure _GetRegEx;
-  begin
-    var LRegExOptionsStr: String := '';
-    var LRegExOptions := RegExOptions;
-    if preCaseLess in LRegExOptions then LRegExOptionsStr := LRegExOptionsStr + 'i';
-    if preMultiLine in LRegExOptions then LRegExOptionsStr := LRegExOptionsStr +'m';
-    if preExtended in LRegExOptions then LRegExOptionsStr := LRegExOptionsStr +'x';
-    //'l':;
-    if preSingleLine in LRegExOptions then LRegExOptionsStr := LRegExOptionsStr + 's';
-    //'u':;
-    Result := '/'+regex+'/' + LRegExOptionsStr;
-    if SkipNodeSubTypeHelper then Result := '"' + ALJavascriptEncode(result) + '"'
-    else Result := ALJavascriptEncode(result);
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _GetTimestamp;
-  begin
-    if SkipNodeSubTypeHelper then Result := '"Timestamp('+ALIntToStrW(GetTimeStamp.W1)+', '+ALIntToStrW(GetTimeStamp.W2)+')"'
-    else Result := 'Timestamp('+ALIntToStrW(GetTimeStamp.W1)+', '+ALIntToStrW(GetTimeStamp.W2)+')';
-  end;
-
+function TALJSONTextNodeW.GetInterchangeValue(const AInterchangeFormat: TALJSONInterchangeFormat = icfMongoShellJson): String;
 begin
   case FNodeSubType of
-    nstFloat:      Result := GetText;
-    nstText:       Result := GetText;
-    nstBinary:     _GetBinary;
-    nstObjectID:   _GetObjectID;
-    nstBoolean:    Result := GetText;
-    nstDateTime:   _GetDateTime;
-    nstJavascript: Result := GetJavascript;
-    nstInt32:      _GetInt32;
-    nstInt64:      _GetInt64;
-    nstNull:       Result := GetText;
-    nstRegEx:      _GetRegEx;
-    nstTimestamp:  _GetTimestamp;
+    nstFloat: Result := ALJsonEncodeFloatW(GetFloat, AInterchangeFormat);
+    nstText: Result := ALJsonEncodeTextW(GetText, AInterchangeFormat);
+    nstBinary: begin
+      if FStorageKind = skBytes then Result := ALJsonEncodeBinaryW(GetBinaryAsBytes, GetBinarySubType, AInterchangeFormat)
+      else Result := ALJsonEncodeBinaryW(ALGetBytesFromStream(GetBinaryAsStream), GetBinarySubType, AInterchangeFormat);
+    end;
+    nstObjectID: Result := ALJsonEncodeObjectIDW(GetObjectID, AInterchangeFormat);
+    nstBoolean: Result := ALJsonEncodeBooleanW(GetBool, AInterchangeFormat);
+    nstDateTime: Result := ALJsonEncodeDateTimeW(GetDateTime, AInterchangeFormat);
+    nstNull: Result := ALJsonEncodeNullW(AInterchangeFormat);
+    nstRegEx: Result := ALJsonEncodeRegExW(GetRegEx, GetRegExOptions, AInterchangeFormat);
+    nstJavascript: Result := ALJsonEncodeJavascriptW(GetJavascript, AInterchangeFormat);
+    nstInt32: Result := ALJsonEncodeInt32W(GetInt32, AInterchangeFormat);
+    nstTimestamp: Result := ALJsonEncodeTimestampW(GetTimestamp, AInterchangeFormat);
+    nstInt64: Result := ALJsonEncodeInt64W(GetInt64, AInterchangeFormat);
     else AlJSONDocErrorW(ALJSONInvalidNodeSubType);
   end;
 end;
@@ -14330,71 +14216,130 @@ begin
 
 end;
 
-{*****************************************************************************}
-function ALJsonEncodeFloatWithNodeSubTypeHelperW(const AValue: double): String;
+{*************************************************************************************************}
+function ALJsonEncodeFloatW(const AValue: double; const AFormat: TALJSONInterchangeFormat): String;
 begin
-  Result := ALFloatToStrW(aValue);
+  case AFormat of
+    icfStandardJson: Result := ALFloatToStrW(aValue);
+    icfMongoShellJson: Result := ALFloatToStrW(aValue);
+    icfMongoExtendedJson: Result := '{"$numberDouble":"'+ALFloatToStrW(aValue)+'"}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
 end;
 
-{****************************************************************************}
-function ALJsonEncodeTextWithNodeSubTypeHelperW(const AValue: String): String;
+{************************************************************************************************}
+function ALJsonEncodeTextW(const AValue: String; const AFormat: TALJSONInterchangeFormat): String;
 begin
   Result := '"'+ALJavascriptEncode(aValue)+'"';
 end;
 
-{******************************************************************************}
-function ALJsonEncodeBinaryWithNodeSubTypeHelperW(const AValue: TBytes): String;
+{************************************************************************************************************************}
+function ALJsonEncodeBinaryW(const AValue: TBytes; const ASubType: Byte; const AFormat: TALJSONInterchangeFormat): String;
 begin
-  Result := 'BinData(0, "' + ALBase64EncodeBytesW(aValue) + '")';
+  case AFormat of
+    icfStandardJson: Result := '"'+ALBase64EncodeBytesW(AValue)+'"';
+    icfMongoShellJson: Result := 'BinData('+ALIntToStrW(ASubType)+',"'+ALBase64EncodeBytesW(aValue)+'")';
+    icfMongoExtendedJson: Result := '{"$binary":{"base64":"'+ALBase64EncodeBytesW(AValue)+'","subType":"'+ALIntToHexW(ASubType, 1)+'"}}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
 end;
 
-{********************************************************************************}
-function ALJsonEncodeObjectIDWithNodeSubTypeHelperW(const AValue: TBytes): String;
+{****************************************************************************************************}
+function ALJsonEncodeObjectIDW(const AValue: TBytes; const AFormat: TALJSONInterchangeFormat): String;
 begin
-  Result := 'ObjectId("'+ALBinToHexW(aValue)+'")';
+  case AFormat of
+    icfStandardJson: Result := '"'+ALBinToHexW(AValue)+'"';
+    icfMongoShellJson: Result := 'ObjectId("'+ALBinToHexW(aValue)+'")';
+    icfMongoExtendedJson: Result := '{"$oid":"'+ALBinToHexW(AValue)+'"}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
 end;
 
-{********************************************************************************}
-function ALJsonEncodeBooleanWithNodeSubTypeHelperW(const AValue: Boolean): String;
+{****************************************************************************************************}
+function ALJsonEncodeBooleanW(const AValue: Boolean; const AFormat: TALJSONInterchangeFormat): String;
 begin
   if aValue then Result := 'true'
   else Result := 'false';
 end;
 
-{**************************************************************}
-function ALJsonEncodeDateTimeW(const AValue: TDateTime): String;
+{*******************************************************************************************************}
+function ALJsonEncodeDateTimeW(const AValue: TDateTime; const AFormat: TALJSONInterchangeFormat): String;
 begin
-  Result := ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', aValue);
+  case AFormat of
+    icfStandardJson: Result := ALFormatDateTimeW('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', AValue);
+    icfMongoShellJson: Result := 'ISODate('+ALFormatDateTimeW('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', AValue)+')';
+    icfMongoExtendedJson: Result := '{"$date":{"$numberLong":"'+ALIntToStrW(ALDateTimeToUnixMs(AValue))+'"}}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
 end;
 
-{***********************************************************************************}
-function ALJsonEncodeDateTimeWithNodeSubTypeHelperW(const AValue: TDateTime): String;
-begin
-  Result := ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue);
-end;
-
-{**********************************************************************************}
-function ALJsonEncodeJavascriptWithNodeSubTypeHelperW(const AValue: String): String;
-begin
-  Result := aValue;
-end;
-
-{****************************************************************************}
-function ALJsonEncodeInt64WithNodeSubTypeHelperW(const AValue: Int64): String;
-begin
-  Result := 'NumberLong(' + ALIntToStrW(aValue) + ')';
-end;
-
-{****************************************************************************}
-function ALJsonEncodeInt32WithNodeSubTypeHelperW(const AValue: Int32): String;
-begin
-  Result := 'NumberInt(' + ALIntToStrW(aValue) + ')';
-end;
-
-{******************************************************}
-function ALJsonEncodeNullWithNodeSubTypeHelperW: String;
+{**************************************************************************}
+function ALJsonEncodeNullW(const AFormat: TALJSONInterchangeFormat): String;
 begin
   Result := 'null';
+end;
+
+{**************************************************************************************************************************************}
+function ALJsonEncodeRegExW(const AValue: String; const AOptions: TALPerlRegExOptions; const AFormat: TALJSONInterchangeFormat): String;
+begin
+  var LOptions: String := '';
+  // The options must be in alphabetical order
+  if preCaseLess in AOptions then LOptions := LOptions + 'i';
+  if preMultiLine in AOptions then LOptions := LOptions +'m';
+  if preSingleLine in AOptions then LOptions := LOptions + 's';
+  if preExtended in AOptions then LOptions := LOptions +'x';
+  case AFormat of
+    icfStandardJson: Result := '"'+ALJavascriptEncode('/'+AValue+'/'+LOptions)+'"';
+    icfMongoShellJson: Result := '/'+AValue+'/'+LOptions;
+    icfMongoExtendedJson: begin
+      Result := '{"$regularExpression":{"pattern":"'+ALJavascriptEncode(AValue)+'","options":"'+LOptions+'"}}'
+    end;
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
+end;
+
+{******************************************************************************************************}
+function ALJsonEncodeJavascriptW(const AValue: String; const AFormat: TALJSONInterchangeFormat): String;
+begin
+  case AFormat of
+    icfStandardJson: Result := '"'+ALJavascriptEncode(AValue)+'"';
+    icfMongoShellJson: Result := AValue;
+    icfMongoExtendedJson: Result := '{"$code":"'+ALJavascriptEncode(AValue)+'"}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
+end;
+
+{************************************************************************************************}
+function ALJsonEncodeInt32W(const AValue: Int32; const AFormat: TALJSONInterchangeFormat): String;
+begin
+  case AFormat of
+    icfStandardJson: Result := ALIntToStrW(AValue);
+    icfMongoShellJson: Result := 'NumberInt('+ALIntToStrW(aValue)+')';
+    icfMongoExtendedJson: Result := '{"$numberInt":"'+ALIntToStrW(AValue)+'"}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
+end;
+
+{***************************************************************************************************************}
+function ALJsonEncodeTimestampW(const AValue: TALBSONTimestamp; const AFormat: TALJSONInterchangeFormat): String;
+begin
+  case AFormat of
+    icfStandardJson: Result := '"Timestamp('+ALIntToStrW(AValue.t)+','+ALIntToStrW(AValue.i)+')"';
+    icfMongoShellJson: Result := 'Timestamp('+ALIntToStrW(AValue.t)+','+ALIntToStrW(AValue.i)+')';
+    icfMongoExtendedJson: Result := '{"$timestamp":{"t":'+ALIntToStrW(AValue.t)+',"i":'+ALIntToStrW(AValue.i)+'}}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
+end;
+
+{************************************************************************************************}
+function ALJsonEncodeInt64W(const AValue: Int64; const AFormat: TALJSONInterchangeFormat): String;
+begin
+  case AFormat of
+    icfStandardJson: Result := ALIntToStrW(AValue);
+    icfMongoShellJson: Result := 'NumberLong('+ALIntToStrW(AValue)+')';
+    icfMongoExtendedJson: Result := '{"$numberLong":"'+ALIntToStrW(AValue)+'"}';
+    else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
+  end;
 end;
 
 initialization

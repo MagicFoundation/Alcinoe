@@ -279,6 +279,14 @@ begin
     Layout.setVisibility(TJView.JavaClass.INVISIBLE)
   else
     Layout.setVisibility(TJView.JavaClass.VISIBLE);
+  // In theory, calling requestLayout should not be necessary.
+  // However, on Android 16, showing a Dialog temporarily hides
+  // all native views on the form. When the Dialog is dismissed and
+  // visibility is restored, some views are not properly redrawn
+  // unless requestLayout is explicitly triggered. This ensures
+  // the EditView becomes visible again.
+  if FVisible and (not Layout.isInLayout) then
+    Layout.requestLayout;
 end;
 
 {*************************************************************}

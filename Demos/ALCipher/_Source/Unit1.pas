@@ -102,7 +102,7 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := string(ALStringHashMD5(ansiString(ALMemoDecryptedData.Lines.Text), true{hexEncode}));
+  ALMemoCryptedData.Lines.Text := string(ALHashMD5AsStringA(ansiString(ALMemoDecryptedData.Lines.Text), true{hexEncode}));
 
   StatusBar1.Panels[0].Text := 'ALMD5 (ansiString)';
   StatusBar1.Panels[1].Text := '';
@@ -119,7 +119,7 @@ begin
     while True do begin
       LData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       LStopWatch.Start;
-      LHash := ALStringHashMD5(LData, true{hexEncode});
+      LHash := ALHashMD5AsStringA(LData, true{hexEncode});
       LStopWatch.Stop;
       if LDictionary.TryGetValue(LHash, LTmpData) then begin
         if LTmpData <> LData then begin
@@ -164,7 +164,7 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := string(ALStringHashSHA1(ansiString(ALMemoDecryptedData.Lines.Text), true{hexEncode}));
+  ALMemoCryptedData.Lines.Text := string(ALHashSHA1AsStringA(ansiString(ALMemoDecryptedData.Lines.Text), true{hexEncode}));
 
   StatusBar1.Panels[0].Text := 'ALSHA1 (ansiString)';
   StatusBar1.Panels[1].Text := '';
@@ -181,7 +181,7 @@ begin
     while True do begin
       LData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       LStopWatch.Start;
-      LHash := ALStringHashSHA1(LData, true{hexEncode});
+      LHash := ALHashSHA1AsStringA(LData, true{hexEncode});
       LStopWatch.Stop;
       if LDictionary.TryGetValue(LHash, LTmpData) then begin
         if LTmpData <> LData then begin
@@ -208,13 +208,13 @@ end;
 {************************************************}
 procedure TForm1.ALButton12Click(Sender: TObject);
 begin
-  ALMemoCryptedData.Lines.Text := String(ALCalcHMACSHA1(AnsiString(ALMemoDecryptedData.Lines.Text), AnsiString(EditKey.Text)));
+  ALMemoCryptedData.Lines.Text := String(ALCalcHMACSHA1AsStringA(AnsiString(ALMemoDecryptedData.Lines.Text), AnsiString(EditKey.Text)));
 end;
 
 {************************************************}
 procedure TForm1.ALButton13Click(Sender: TObject);
 begin
-  ALMemoCryptedData.Lines.Text := String(ALCalcHMACMD5(AnsiString(ALMemoDecryptedData.Lines.Text), AnsiString(EditKey.Text)));
+  ALMemoCryptedData.Lines.Text := String(ALCalcHMACMD5AsStringA(AnsiString(ALMemoDecryptedData.Lines.Text), AnsiString(EditKey.Text)));
 end;
 
 {**********************************************}
@@ -238,7 +238,7 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := string(ALStringHashSHA2(ansistring(ALMemoDecryptedData.Lines.Text), THashSHA2.TSHA2Version.SHA256, true{hexEncode}));
+  ALMemoCryptedData.Lines.Text := string(ALHashSHA2AsStringA(ansistring(ALMemoDecryptedData.Lines.Text), THashSHA2.TSHA2Version.SHA256, true{hexEncode}));
 
   StatusBar1.Panels[0].Text := 'ALSHA2 256 (ansiString)';
   StatusBar1.Panels[1].Text := '';
@@ -255,7 +255,7 @@ begin
     while True do begin
       LData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       LStopWatch.Start;
-      LHash := ALStringHashSHA2(LData, THashSHA2.TSHA2Version.SHA256, true{hexEncode});
+      LHash := ALHashSHA2AsStringA(LData, THashSHA2.TSHA2Version.SHA256, true{hexEncode});
       LStopWatch.Stop;
       if LDictionary.TryGetValue(LHash, LTmpData) then begin
         if LTmpData <> LData then begin
@@ -300,7 +300,7 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := ALStringHashMD5(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
+  ALMemoCryptedData.Lines.Text := ALHashMD5AsStringW(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
 
   StatusBar1.Panels[0].Text := 'ALMD5 (Unicode)';
   StatusBar1.Panels[1].Text := '';
@@ -317,7 +317,7 @@ begin
     while True do begin
       LData := ALRandomStrW(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       LStopWatch.Start;
-      LHash := ALStringHashMD5(LData, Tencoding.UTF8);
+      LHash := ALHashMD5AsStringW(LData, Tencoding.UTF8);
       LStopWatch.Stop;
       if LDictionary.TryGetValue(LHash, LTmpData) then begin
         if LTmpData <> LData then begin
@@ -362,7 +362,7 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := ALStringHashSHA1(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
+  ALMemoCryptedData.Lines.Text := ALHashSHA1AsStringW(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
 
   StatusBar1.Panels[0].Text := 'ALSHA1 (Unicode)';
   StatusBar1.Panels[1].Text := '';
@@ -379,7 +379,7 @@ begin
     while True do begin
       LData := ALRandomStrW(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       LStopWatch.Start;
-      LHash := ALStringHashSHA1(LData, Tencoding.UTF8);
+      LHash := ALHashSHA1AsStringW(LData, Tencoding.UTF8);
       LStopWatch.Stop;
       if LDictionary.TryGetValue(LHash, LTmpData) then begin
         if LTmpData <> LData then begin
@@ -424,7 +424,7 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := string(ALStringHashSHA2(ansistring(ALMemoDecryptedData.Lines.Text), THashSHA2.TSHA2Version.SHA512, true{hexEncode}));
+  ALMemoCryptedData.Lines.Text := string(ALHashSHA2AsStringA(ansistring(ALMemoDecryptedData.Lines.Text), THashSHA2.TSHA2Version.SHA512, true{hexEncode}));
 
   StatusBar1.Panels[0].Text := 'ALSHA2 512 (ansiString)';
   StatusBar1.Panels[1].Text := '';
@@ -441,7 +441,7 @@ begin
     while True do begin
       LData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       LStopWatch.Start;
-      LHash := ALStringHashSHA2(LData, THashSHA2.TSHA2Version.SHA512, true{hexEncode});
+      LHash := ALHashSHA2AsStringA(LData, THashSHA2.TSHA2Version.SHA512, true{hexEncode});
       LStopWatch.Stop;
       if LDictionary.TryGetValue(LHash, LTmpData) then begin
         if LTmpData <> LData then begin
@@ -486,7 +486,7 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := ALStringHashSHA2(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8, THashSHA2.TSHA2Version.SHA256);
+  ALMemoCryptedData.Lines.Text := ALHashSHA2AsStringW(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8, THashSHA2.TSHA2Version.SHA256);
 
   StatusBar1.Panels[0].Text := 'ALSHA2 256 (Unicode)';
   StatusBar1.Panels[1].Text := '';
@@ -503,7 +503,7 @@ begin
     while True do begin
       LData := ALRandomStrW(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       LStopWatch.Start;
-      LHash := ALStringHashSHA2(LData, Tencoding.UTF8, THashSHA2.TSHA2Version.SHA256);
+      LHash := ALHashSHA2AsStringW(LData, Tencoding.UTF8, THashSHA2.TSHA2Version.SHA256);
       LStopWatch.Stop;
       if LDictionary.TryGetValue(LHash, LTmpData) then begin
         if LTmpData <> LData then begin
@@ -592,7 +592,7 @@ end;
 {*********************************************}
 procedure TForm1.Button2Click(Sender: TObject);
 begin
-  ALMemoCryptedData.Lines.Text := String(ALCalcHMACSHA2(AnsiString(ALMemoDecryptedData.Lines.Text), AnsiString(EditKey.Text)));
+  ALMemoCryptedData.Lines.Text := String(ALCalcHMACSHA2AsStringA(AnsiString(ALMemoDecryptedData.Lines.Text), AnsiString(EditKey.Text)));
 end;
 
 {***************************}

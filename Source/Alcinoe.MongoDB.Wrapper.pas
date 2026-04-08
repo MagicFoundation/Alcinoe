@@ -9511,6 +9511,27 @@ uses
   System.IOUtils,
   Alcinoe.Common;
 
+{*****************************}
+procedure _ALMongoDBLogHandler(
+            log_level: mongoc_log_level_t;
+            log_domain: PAnsiChar;
+            message: PAnsiChar;
+            user_data: Pvoid); cdecl;
+begin
+  var LTag := 'MongoDB.' + String(AnsiString(log_domain));
+  var LMessage := String(AnsiString(message));
+  case log_level of
+    mongoc_log_level_t.MONGOC_LOG_LEVEL_ERROR: ALLog(LTag, LMessage, TALLogType.ERROR);
+    mongoc_log_level_t.MONGOC_LOG_LEVEL_CRITICAL: ALLog(LTag, LMessage, TALLogType.ASSERT);
+    mongoc_log_level_t.MONGOC_LOG_LEVEL_WARNING: ALLog(LTag, LMessage, TALLogType.WARN);
+    mongoc_log_level_t.MONGOC_LOG_LEVEL_MESSAGE: ALLog(LTag, LMessage, TALLogType.INFO);
+    mongoc_log_level_t.MONGOC_LOG_LEVEL_INFO: ALLog(LTag, LMessage, TALLogType.INFO);
+    mongoc_log_level_t.MONGOC_LOG_LEVEL_DEBUG: ALLog(LTag, LMessage, TALLogType.DEBUG);
+    mongoc_log_level_t.MONGOC_LOG_LEVEL_TRACE: ALLog(LTag, LMessage, TALLogType.VERBOSE);
+    else ALLog(LTag, 'Unknown MongoDB log level', TALLogType.ERROR);
+  end;
+end;
+
 {**************************************************************}
 constructor TALMongoDBLibrary.Create(const ALibraryDir: String);
 
@@ -10522,6 +10543,7 @@ begin
   mongoc_client_set_usleep_impl := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_usleep_impl');
   mongoc_usleep_default_impl := GetProcAddress(Fmongoc2Lib,'mongoc_usleep_default_impl');
 
+  mongoc_log_set_handler(_ALMongoDBLogHandler, nil);
   mongoc_init;
 
 end;

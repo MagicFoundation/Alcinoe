@@ -13,7 +13,8 @@ uses
   System.Types,
   Fmx.types,
   FMX.graphics,
-  Alcinoe.fmx.Controls,
+  Alcinoe.Common,
+  Alcinoe.FMX.Controls,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.Graphics;
 
@@ -340,8 +341,7 @@ uses
   Alcinoe.StringList,
   Alcinoe.Localization,
   Alcinoe.StringUtils,
-  Alcinoe.HTML,
-  Alcinoe.Common;
+  Alcinoe.HTML;
 
 {$IFNDEF ALCompilerVersionSupported131}
   {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4392 was corrected, if yes delete the type below, and adjust the IFDEF'}

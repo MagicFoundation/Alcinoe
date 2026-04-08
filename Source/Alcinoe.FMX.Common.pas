@@ -71,28 +71,6 @@ type
   TALBitmap =   {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
   TALDrawable = {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ALGpuCanvas)}TTexture{$ELSE}Tbitmap{$ENDIF};
 
-  {~~~~~~~~~~~~~~~~~~}
-  TALImageWrapMode = (
-    /// <summary>
-    ///   The image is resized (shrunk or enlarged) to be as large as possible
-    ///   within the given width or height while preserving the aspect ratio.
-    /// </summary>
-    Fit,
-    /// <summary>
-    ///   Stretch the image to fill the entire rectangle of the control
-    /// </summary>
-    Stretch,
-    /// <summary>
-    ///   The image is shrunk in size to fully fit within the given width or
-    ///   height, but will not be enlarged.
-    /// </summary>
-    Place,
-    /// <summary>
-    ///   The image is resized to exactly fill the entire area specified by
-    ///   width and height and will be cropped if necessary.
-    /// </summary>
-    Cover);
-
 type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1404,6 +1382,7 @@ uses
   System.IOutils,
   System.UIConsts,
   System.Generics.Defaults,
+  System.Hash,
   {$IF defined(ALBackwardCompatible)}
   System.TypInfo,
   {$ENDIF}
@@ -1440,7 +1419,6 @@ uses
   FMX.Helpers.Win,
   {$ENDIF}
   {$IF defined(ALDPK)}
-  System.Hash,
   ToolsAPI,
   DesignEditors,
   {$ENDIF}
@@ -5951,7 +5929,7 @@ begin
 
   var LFontMetricsKey: TALFontMetricsKey;
   {$IF not defined(ALDPK)}
-  ALStringHashSHA1(LFontMetricsKey.FontFamily, AFontFamily, TEncoding.Utf8);
+  LFontMetricsKey.FontFamily := ALHashSHA1AsDigest(AFontFamily, TEncoding.Utf8);
   {$ELSE}
   LFontMetricsKey.FontFamily := THashFNV1a64.GetHashValue(AFontFamily);
   {$ENDIF}

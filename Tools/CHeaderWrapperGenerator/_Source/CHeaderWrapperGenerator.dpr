@@ -2548,8 +2548,42 @@ begin
 
           {$REGION 'mongodb*.h'}
           if LChoice = 5 then begin
-            LSrc := ALStringReplaceA(LSrc,'__LibraryConstructor__', 'mongoc_init;');
-            LSrc := ALStringReplaceA(LSrc,'__LibraryDestructor__','mongoc_cleanup;');
+            LSrc := ALStringReplaceA(
+                      LSrc,
+                      '{**************************************************************}'+#13#10+
+                      'constructor TALMongoDBLibrary.Create(const ALibraryDir: String);',
+                      '{*****************************}'+#13#10+
+                      'procedure _ALMongoDBLogHandler('+#13#10+
+                      '            log_level: mongoc_log_level_t;'+#13#10+
+                      '            log_domain: PAnsiChar;'+#13#10+
+                      '            message: PAnsiChar;'+#13#10+
+                      '            user_data: Pvoid); cdecl;'+#13#10+
+                      'begin'+#13#10+
+                      '  var LTag := ''MongoDB.'' + String(AnsiString(log_domain));'+#13#10+
+                      '  var LMessage := String(AnsiString(message));'+#13#10+
+                      '  case log_level of'+#13#10+
+                      '    mongoc_log_level_t.MONGOC_LOG_LEVEL_ERROR: ALLog(LTag, LMessage, TALLogType.ERROR);'+#13#10+
+                      '    mongoc_log_level_t.MONGOC_LOG_LEVEL_CRITICAL: ALLog(LTag, LMessage, TALLogType.ASSERT);'+#13#10+
+                      '    mongoc_log_level_t.MONGOC_LOG_LEVEL_WARNING: ALLog(LTag, LMessage, TALLogType.WARN);'+#13#10+
+                      '    mongoc_log_level_t.MONGOC_LOG_LEVEL_MESSAGE: ALLog(LTag, LMessage, TALLogType.INFO);'+#13#10+
+                      '    mongoc_log_level_t.MONGOC_LOG_LEVEL_INFO: ALLog(LTag, LMessage, TALLogType.INFO);'+#13#10+
+                      '    mongoc_log_level_t.MONGOC_LOG_LEVEL_DEBUG: ALLog(LTag, LMessage, TALLogType.DEBUG);'+#13#10+
+                      '    mongoc_log_level_t.MONGOC_LOG_LEVEL_TRACE: ALLog(LTag, LMessage, TALLogType.VERBOSE);'+#13#10+
+                      '    else ALLog(LTag, ''Unknown MongoDB log level'', TALLogType.ERROR);'+#13#10+
+                      '  end;'+#13#10+
+                      'end;'+#13#10+
+                      #13#10+
+                      '{**************************************************************}'+#13#10+
+                      'constructor TALMongoDBLibrary.Create(const ALibraryDir: String);');
+            LSrc := ALStringReplaceA(
+                      LSrc,
+                      '__LibraryConstructor__',
+                        'mongoc_log_set_handler(_ALMongoDBLogHandler, nil);'+#13#10+
+                      '  mongoc_init;');
+            LSrc := ALStringReplaceA(
+                      LSrc,
+                      '__LibraryDestructor__',
+                      'mongoc_cleanup;');
           end;
           {$ENDREGION}
 

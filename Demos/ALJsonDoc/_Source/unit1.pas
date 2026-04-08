@@ -108,10 +108,10 @@ begin
       LALJsonDocumentA.SaveToJSONString(LJsonStr, [soNodeAutoIndent]);
       MemoJSON.Lines.Text := String(LJSONStr);
 
-      var LBsonStr: AnsiString;
-      LALJsonDocumentA.SaveToBSONString(LBsonStr);
-      if LBsonStr <> '' then
-        MemoBSON.Lines.Text := String(ALBinToHexA(LALJsonDocumentA.BSON));
+      var LBsonBytes: TBytes;
+      LALJsonDocumentA.SaveToBSONBytes(LBsonBytes);
+      if length(LBsonBytes) > 0 then
+        MemoBSON.Lines.Text := String(ALBinToHexA(LBsonBytes));
     finally
       LALJsonDocumentA.Free;
     end;
@@ -269,7 +269,7 @@ begin
       LALJsonDocumentA.addchild('address', ntObject);
       LALJsonDocumentA.addchild('phones', ntArray);
       with LALJsonDocumentA.AddChild('regex') do begin
-        RegEx := '<TAG\b[^>]*>(.*?)</TAG>';
+        RegEx := '<TAG\b[^>]*>(.*?)<\/TAG>';
         RegExOptions := [preMultiLine, preCaseLess];
       end;
       with LALJsonDocumentA.AddChild('binary') do begin
@@ -322,7 +322,7 @@ begin
       LALJsonDocumentW.addchild('address', ntObject);
       LALJsonDocumentW.addchild('phones', ntArray);
       with LALJsonDocumentW.AddChild('regex') do begin
-        RegEx := '<TAG\b[^>]*>(.*?)</TAG>';
+        RegEx := '<TAG\b[^>]*>(.*?)<\/TAG>';
         RegExOptions := [preMultiLine, preCaseLess];
       end;
       var LBytes: Tbytes;
@@ -368,7 +368,7 @@ procedure TForm1.ButtonLoadJsonFromBsonClick(Sender: TObject);
 begin
 
   //init LBsonStr
-  var LBsonStr: AnsiString := ALHexToBin(ansiString(ALTrim(MemoBSON.Text)));
+  var LBsonBytes := ALHexToBin(ansiString(ALTrim(MemoBSON.Text)));
 
   //clear Memos
   MemoJSON.Lines.Clear;
@@ -380,7 +380,7 @@ begin
     //exemple 1 load the JSON doc in memory
     var LALJsonDocumentA := TALJSONDocumentA.Create;
     try
-      LALJsonDocumentA.LoadFromBSONString(LBsonStr, [poBinaryAsPtrStream]);
+      LALJsonDocumentA.LoadFromBSONBytes(LBsonBytes, [poBinaryAsPtrStream]);
 
       var LJsonStr: AnsiString;
       LALJsonDocumentA.SaveToJSONString(LJsonStr, [soNodeAutoIndent]);
@@ -390,8 +390,8 @@ begin
     end;
 
     //exemple 2 load the JSON doc in SAX MODE
-    TALJSONDocumentA.ParseBSONString(
-      LBsonStr,
+    TALJSONDocumentA.ParseBSONBytes(
+      LBsonBytes,
       //--
       procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
       begin
@@ -441,7 +441,7 @@ begin
     //exemple 1 load the JSON doc in memory
     var LALJsonDocumentW := TALJSONDocumentW.Create;
     try
-      LALJsonDocumentW.LoadFromBSONBytes(BytesOf(LBsonStr), [poBinaryAsPtrStream]);
+      LALJsonDocumentW.LoadFromBSONBytes(LBsonBytes, [poBinaryAsPtrStream]);
 
       var LJsonStr: String;
       LALJsonDocumentW.SaveToJSONString(LJsonStr, [soNodeAutoIndent]);
@@ -452,7 +452,7 @@ begin
 
     //exemple 2 load the JSON doc in SAX MODE
     TALJSONDocumentW.ParseBSONBytes(
-      BytesOf(LBsonStr),
+      LBsonBytes,
       //--
       procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
       begin

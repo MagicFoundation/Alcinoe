@@ -562,6 +562,8 @@ if "%ALBuildTools%"=="Y" (
 
 echo Clean %ALBaseDir%\Compiled
 
+del "%ALBaseDir%\Compiled\*.cmds" /s >nul
+
 for /r "%ALBaseDir%\Compiled" %%D in (_Source) do (
   if exist "%%D" ( rmdir /s /q "%%D" )
 )
@@ -626,14 +628,6 @@ if exist "%FileName%" del "%FileName%" /s >nul
 if exist "%FileName%" EXIT /B 1
 
 SET FileName=%ALBaseDir%\Compiled\Demos\AllDemos.groupproj
-if exist "%FileName%" del "%FileName%" /s >nul
-if exist "%FileName%" EXIT /B 1
-
-SET FileName=%ALBaseDir%\Compiled\Demos\ALLiveVideoChat\ALLiveVideoChat.groupproj
-if exist "%FileName%" del "%FileName%" /s >nul
-if exist "%FileName%" EXIT /B 1
-
-SET FileName=%ALBaseDir%\Compiled\Demos\ALLiveVideoChat\ALLiveVideoChat.groupproj.local
 if exist "%FileName%" del "%FileName%" /s >nul
 if exist "%FileName%" EXIT /B 1
 

@@ -1,3 +1,32 @@
+## 04/08/2026
+
+- Refactored hashing and HMAC helpers in `Alcinoe.Cipher`:
+  - replaced `ALStringHashMD5`, `ALStringHashSHA1`, and `ALStringHashSHA2` with the 
+    `ALHashMD5AsBytes/AsDigest/AsStringA/AsStringW`, `ALHashSHA1AsBytes/AsDigest/AsStringA/AsStringW`, 
+    and `ALHashSHA2AsBytes/AsStringA/AsStringW` families
+  - replaced `ALCalcHMACMD5`, `ALCalcHMACSHA1`, and `ALCalcHMACSHA2` with 
+    `...AsBytes` and `...AsStringA` overloads
+- Extended JSON/BSON support in `Alcinoe.JSONDoc`:
+  - added `TALJSONInterchangeFormat`
+  - added `soStandardJson` and `soMongoExtendedJson` save options
+  - added function overloads for `SaveToJSONString` and `SaveToBSONBytes`
+  - removed `SaveToBSONString`, `LoadFromBSONString`, `ParseBSONString`, 
+    and `CreateFromBSONString` in favor of `TBytes`-based BSON APIs
+  - replaced `ALJsonEncode...WithNodeSubTypeHelper*` helpers with 
+    format-aware `ALJsonEncode*` overloads
+- Updated binary/string conversion helpers in `Alcinoe.StringUtils`:
+  - renamed `ALConvertStringToBytes` to `ALBorrowStringAsBytes`
+  - renamed `ALRevertBytesToString` to `ALRestoreBytesToString`
+  - added `ALStringToBytes` and `ALBytesToString`
+  - changed `ALHexToBin` to return `TBytes`
+  - removed `ALTryBinToHex`
+- Added AnsiString overloads for `ALLog` and added `ALSameBytes` to `Alcinoe.Common`
+- Moved `TALImageWrapMode` from `Alcinoe.FMX.Common` to `Alcinoe.Common`
+- Added MongoDB log forwarding to `ALLog` and updated the C header wrapper 
+  generator to emit the MongoDB log handler automatically
+- Fixed Android native view redraw after dialogs on Android 16 by forcing 
+  `requestLayout` when views become visible again
+
 ## 03/26/2026
 
 - Renamed `Alcinoe.Mime.ContentTypes` to `Alcinoe.Mime.Types`

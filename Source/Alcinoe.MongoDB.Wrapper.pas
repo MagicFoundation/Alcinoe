@@ -9516,7 +9516,7 @@ procedure _ALMongoDBLogHandler(
             log_level: mongoc_log_level_t;
             log_domain: PAnsiChar;
             message: PAnsiChar;
-            user_data: Pvoid); cdecl;
+            user_data: PVoid); cdecl;
 begin
   var LTag := 'MongoDB.' + String(AnsiString(log_domain));
   var LMessage := String(AnsiString(message));

@@ -6,9 +6,7 @@ interface
 
 uses
   system.sysutils,
-  {$IF defined(MSWINDOWS)}
-  winapi.windows,
-  {$ELSE}
+  {$IF not defined(MSWINDOWS)}
   system.types,
   {$ENDIF}
   system.hash,
@@ -144,241 +142,15 @@ function ALGenerateGoogleOAuth2AccessToken(
            const APrivateKey: ansiString): AnsiString;
 {$ENDIF}
 
-
-////////////////////
-////// WINAPI //////
-////////////////////
-
-{$IFDEF MSWINDOWS}
-{$WARN SYMBOL_PLATFORM OFF}
-
-const
-  crypt32 = 'crypt32.dll';
-  bcrypt = 'bcrypt.dll';
-
-const
-  CRYPT_VERIFYCONTEXT = $F0000000;
-  CRYPT_NEWKEYSET = $00000008;
-  CRYPT_SILENT = $00000040;
-  //-----
-  PROV_RSA_FULL = $00000001;
-  PROV_RSA_AES = $00000018;
-  //-----
-  MS_ENHANCED_PROV_A = ansiString('Microsoft Enhanced Cryptographic Provider v1.0');
-  MS_ENHANCED_PROV_W = string('Microsoft Enhanced Cryptographic Provider v1.0');
-  //-----
-  CRYPT_STRING_BASE64HEADER = $00000000;
-  CRYPT_STRING_BASE64 = $00000001;
-  //-----
-  PUBLICKEYBLOB = $6;
-  //-----
-  CUR_BLOB_VERSION = 2;
-  //-----
-  //https://docs.microsoft.com/en-us/windows/win32/seccrypto/alg-id
-  CALG_RSA_KEYX = $0000a400;
-  CALG_SHA_256 = $0000800c;
-  //-----
-  RSA1 = $31415352;
-  //-----
-  X509_ASN_ENCODING = $00000001;
-  PKCS_7_ASN_ENCODING = $00010000;
-  //-----
-  PKCS_RSA_PRIVATE_KEY = LPCSTR(43);
-  PKCS_PRIVATE_KEY_INFO = LPCSTR(44);
-  PKCS_ENCRYPTED_PRIVATE_KEY_INFO = LPCSTR(45);
-  //-----
-  // https://docs.microsoft.com/it-it/windows/win32/seccng/cng-algorithm-identifiers
-  BCRYPT_AES_ALGORITHM    = 'AES';
-  BCRYPT_RNG_ALGORITHM    = 'RNG';
-  BCRYPT_RSA_ALGORITHM    = 'RSA';
-  BCRYPT_SHA256_ALGORITHM = 'SHA256';
-  //-----
-  BCRYPT_PAD_NONE  = $00000001;
-  BCRYPT_PAD_PKCS1 = $00000002;
-  BCRYPT_PAD_OAEP  = $00000004;
-  BCRYPT_PAD_PSS   = $00000008;
-  //-----
-  BCRYPT_RSAPUBLIC_BLOB       = 'RSAPUBLICBLOB';
-  BCRYPT_RSAPRIVATE_BLOB      = 'RSAPRIVATEBLOB';
-  BCRYPT_RSAFULLPRIVATE_BLOB  = 'RSAFULLPRIVATEBLOB';
-  //-----
-  BCRYPT_RSAPUBLIC_MAGIC      = $31415352;  // RSA1
-  BCRYPT_RSAPRIVATE_MAGIC     = $32415352;  // RSA2
-  BCRYPT_RSAFULLPRIVATE_MAGIC = $33415352;  // RSA3
-  //-----
-  STATUS_SUCCESS            = $00000000;
-
-type
-  ALG_ID = UINT;
-  HCRYPTPROV = ULONG_PTR;
-  PHCRYPTPROV = ^HCRYPTPROV;
-  HCRYPTKEY = ULONG_PTR;
-  PHCRYPTKEY = ^HCRYPTKEY;
-  HCRYPTHASH = ULONG_PTR;
-  PHCRYPTHASH = ^HCRYPTHASH;
-
-  _PUBLICKEYSTRUC = record
-    bType  : BYTE;
-    bVersion: BYTE;
-    reserved: WORD;
-    aiKeyAlg: ALG_ID;
-  end;
-  BLOBHEADER = _PUBLICKEYSTRUC;
-  PUBLICKEYSTRUC = _PUBLICKEYSTRUC;
-
-  _RSAPUBKEY = record
-    magic: DWORD;
-    bitlen: DWORD;
-    pubexp: DWORD;
-  end;
-  RSAPUBKEY  = _RSAPUBKEY;
-
-  PFN_CRYPT_ALLOC = function(cbSize: size_t): LPVOID; stdcall;
-  PFN_CRYPT_FREE = procedure(pv: LPVOID); stdcall;
-
-  PCRYPT_DECODE_PARA = ^CRYPT_DECODE_PARA;
-  _CRYPT_DECODE_PARA = record
-    cbSize: DWORD;
-    pfnAlloc: PFN_CRYPT_ALLOC; // OPTIONAL
-    pfnFree: PFN_CRYPT_FREE;   // OPTIONAL
-  end;
-  CRYPT_DECODE_PARA = _CRYPT_DECODE_PARA;
-
-  NTSTATUS = LONG;
-  BCRYPT_HANDLE = PVOID;
-  BCRYPT_ALG_HANDLE = PVOID;
-  BCRYPT_KEY_HANDLE = PVOID;
-  BCRYPT_HASH_HANDLE = PVOID;
-  BCRYPT_SECRET_HANDLE = PVOID;
-
-  //https://docs.microsoft.com/en-us/windows/win32/seccrypto/base-provider-key-blobs
-  PRIVATEKEYBLOB = record
-    PublicKeyStruc: BLOBHEADER; // A PUBLICKEYSTRUC structure.
-    RSAPubKey: RSAPUBKEY; // A RSAPUBKEY structure. The magic member must be set to 0x32415352. This hexadecimal value is the ASCII encoding of RSA2.
-    Modulus: TBytes; // The modulus. This has a value of Prime1×Prime2 and is often known as n.
-    Prime1: TBytes; // Prime number 1, often known as p.
-    Prime2: TBytes; // Prime number 2, often known as q.
-    Exponent1: TBytes; // Exponent 1. This has a numeric value of d mod (p – 1).
-    Exponent2: TBytes; // Exponent 2. This has a numeric value of d mod (q – 1).
-    Coefficient: TBytes; // Coefficient. This has a numeric value of (inverse of q) mod p.
-    PrivateExponent: TBytes; // Private exponent, often known as d.
-  end;
-
-  // https://docs.microsoft.com/it-it/windows/win32/api/bcrypt/ns-bcrypt-bcrypt_rsakey_blob
-  BCRYPT_RSAKEY_BLOB = packed record
-    Magic: ULONG;
-    BitLength: ULONG;
-    CbPublicExp: ULONG;
-    CbModulus: ULONG;
-    CbPrime1: ULONG;
-    CbPrime2: ULONG;
-  end;
-
-  BCRYPT_PKCS1_PADDING_INFO = packed record
-    pszAlgId: LPCWSTR;
-  end;
-
-function CryptStringToBinaryA(
-           pszString: LPCSTR;
-           cchString: DWORD;
-           dwFlags: DWORD;
-           pbBinary: pByte;
-           pcbBinary: PDWORD;
-           pdwSkip: PDWORD;
-           pdwFlags: PDWORD): boolean; stdcall external crypt32 delayed;
-function CryptDecodeObjectEx(
-           dwCertEncodingType: DWORD;
-           lpszStructType: LPCSTR;
-           const pbEncoded: PBYTE;
-           cbEncoded: DWORD;
-           dwFlags: DWORD;
-           pDecodePara: PCRYPT_DECODE_PARA;
-           pvStructInfo: Pointer;
-           pcbStructInfo: PDWORD): BOOL; stdcall external crypt32 delayed;
-function CryptAcquireContextA(
-           phProv: PHCRYPTPROV;
-           szContainer: LPCSTR;
-           szProvider: LPCSTR;
-           dwProvType: DWORD;
-           dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptReleaseContext(
-           hProv: HCRYPTPROV;
-           dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptGenRandom(
-           hProv: HCRYPTPROV;
-           dwLen: DWORD;
-           pbBuffer: PBYTE): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptImportKey(
-           hProv: HCRYPTPROV;
-           const pbData: PBYTE;
-           dwDataLen: DWORD;
-           hPubKey: HCRYPTKEY;
-           dwFlags: DWORD;
-           phKey: PHCRYPTKEY): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptDestroyKey(hKey: HCRYPTKEY): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptVerifySignatureA(
-           hHash: HCRYPTHASH;
-           const pbSignature: PBYTE;
-           dwSigLen: DWORD;
-           hPubKey: HCRYPTKEY;
-           szDescription: LPCSTR;
-           dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptCreateHash(
-           hProv: HCRYPTPROV;
-           Algid: ALG_ID;
-           hKey: HCRYPTKEY;
-           dwFlags: DWORD;
-           phHash: PHCRYPTHASH): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptDestroyHash(hHash: HCRYPTHASH): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptHashData(
-           hHash: HCRYPTHASH;
-           const pbData: PBYTE;
-           dwDataLen: DWORD;
-           dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptSignHashA(
-           hHash: HCRYPTHASH;
-           dwKeySpec: DWORD;
-           szDescription: LPCSTR;
-           dwFlags: DWORD;
-           pbSignature: PBYTE;
-           pdwSigLen: PDWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function BCryptOpenAlgorithmProvider(
-           out phAlgorithm: BCRYPT_ALG_HANDLE;
-           pszAlgId: LPCWSTR;
-           pszImplementation: LPCWSTR;
-           dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
-function BCryptCloseAlgorithmProvider(
-           hAlgorithm: BCRYPT_ALG_HANDLE;
-           dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
-function BCryptImportKeyPair(
-           hAlgorithm: BCRYPT_ALG_HANDLE;
-           hImportKey: BCRYPT_KEY_HANDLE;
-           pszBlobType: LPCWSTR;
-           out phKey: BCRYPT_KEY_HANDLE;
-           pbInput: PUCHAR;
-           cbInput: ULONG;
-           dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
-function BCryptDestroyKey(hKey: BCRYPT_KEY_HANDLE): NTSTATUS; stdcall; external bcrypt delayed;
-function BCryptSignHash(
-           hKey: BCRYPT_KEY_HANDLE;
-           pPaddingInfo: Pointer;
-           pbInput: PUCHAR;
-           cbInput: ULONG;
-           pbOutput: PUCHAR;
-           cbOutput: ULONG;
-           var pcbResult: ULONG;
-           dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
-
-{$WARN SYMBOL_PLATFORM ON}
-{$ENDIF MSWINDOWS}
-
 implementation
 
 uses
   {$IF defined(MSWINDOWS)}
-  System.SysConst,
+  winapi.windows,
   System.DateUtils,
   Alcinoe.WinApi.Windows,
+  Alcinoe.WinApi.WinCrypt,
+  Alcinoe.WinApi.BCrypt,
   Alcinoe.HTTP.Client.WinHTTP,
   Alcinoe.JSONDoc,
   Alcinoe.HTML,
@@ -984,10 +756,25 @@ end;
 type
   _TRSAKeyType = (PrivateKey, PublicKey, FullPrivate);
 
+{**}
+type
+  //https://docs.microsoft.com/en-us/windows/win32/seccrypto/base-provider-key-blobs
+  _PRIVATEKEYBLOB = record
+    PublicKeyStruc: BLOBHEADER; // A PUBLICKEYSTRUC structure.
+    RSAPubKey: RSAPUBKEY; // A RSAPUBKEY structure. The magic member must be set to 0x32415352. This hexadecimal value is the ASCII encoding of RSA2.
+    Modulus: TBytes; // The modulus. This has a value of Prime1×Prime2 and is often known as n.
+    Prime1: TBytes; // Prime number 1, often known as p.
+    Prime2: TBytes; // Prime number 2, often known as q.
+    Exponent1: TBytes; // Exponent 1. This has a numeric value of d mod (p – 1).
+    Exponent2: TBytes; // Exponent 2. This has a numeric value of d mod (q – 1).
+    Coefficient: TBytes; // Coefficient. This has a numeric value of (inverse of q) mod p.
+    PrivateExponent: TBytes; // Private exponent, often known as d.
+  end;
+
 {**********************}
 {$IF defined(MSWINDOWS)}
 //taken from https://github.com/MattiaVicari/Crypt4Delphi
-function _PKCS1Blob2PrivateKeyBlob(AKeyBlob: TBytes; AKeyBlobSize: DWORD): PRIVATEKEYBLOB;
+function _PKCS1Blob2PrivateKeyBlob(AKeyBlob: TBytes; AKeyBlobSize: DWORD): _PRIVATEKEYBLOB;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _CopyAndAdvance(const ASourceBuffer: TBytes; var ADestBuffer: Tbytes; var ACursor: DWORD; ASize: DWORD);
@@ -1025,7 +812,7 @@ end;
 //taken from https://github.com/MattiaVicari/Crypt4Delphi
 //transform a PRIVATEKEYBLOB in BCRYPT_RSAKEY_BLOB immediately followed by the key data
 function _PrivateKeyBlob2BcryptRSAKeyBlobAndData(
-           const APrivateKeyBlob: PRIVATEKEYBLOB;
+           const APrivateKeyBlob: _PRIVATEKEYBLOB;
            const AKeyType: _TRSAKeyType): TBytes;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1213,7 +1000,7 @@ begin
 
     // Fill in the RSAPUBKEY
     var pRsaPubKey: RSAPUBKEY;
-    pRsaPubKey.magic := RSA1;            // Public key.
+    pRsaPubKey.magic := BCRYPT_RSAPUBLIC_MAGIC;            // Public key.
     pRsaPubKey.bitlen := cbModulus * 8;  // Number of bits in the modulus.
     pRsaPubKey.pubexp := dwExponent;     // Exponent.
     Move(pRsaPubKey,pKeyBlob[sizeof(PUBLICKEYSTRUC)],sizeof(RSAPUBKEY));
@@ -1374,7 +1161,7 @@ begin
   ALCheckWinApiNTStatus(
     'BCryptOpenAlgorithmProvider',
     BCryptOpenAlgorithmProvider(
-      Algorithm, // phAlgorithm: BCRYPT_ALG_HANDLE;
+      @Algorithm, // phAlgorithm: PBCRYPT_ALG_HANDLE;
       BCRYPT_RSA_ALGORITHM, // pszAlgId: LPCWSTR;
       nil, // pszImplementation: LPCWSTR;
       0)); // dwFlags: ULONG
@@ -1388,7 +1175,7 @@ begin
         Algorithm, // hAlgorithm: BCRYPT_ALG_HANDLE;
         nil, // hImportKey: BCRYPT_KEY_HANDLE;
         BCRYPT_RSAPRIVATE_BLOB, // pszBlobType: LPCWSTR;
-        KeyHandle, // out phKey: BCRYPT_KEY_HANDLE;
+        @KeyHandle, // phKey: PBCRYPT_KEY_HANDLE;
         @RSAKeyBlobAndData[0], // pbInput: PUCHAR;
         length(RSAKeyBlobAndData), // cbInput: ULONG;
         0)); // dwFlags: ULONG
@@ -1410,7 +1197,7 @@ begin
           Length(HashData), // cbInput: ULONG;
           nil, // pbOutput: PUCHAR;
           0, // cbOutput: ULONG;
-          cbResult, // var pcbResult: ULONG;
+          @cbResult, // pcbResult: PULONG;
           BCRYPT_PAD_PKCS1)); // dwFlags: ULONG
       SetLength(result, cbResult);
       ALCheckWinApiNTStatus(
@@ -1422,7 +1209,7 @@ begin
           Length(HashData), // cbInput: ULONG;
           @result[low(result)], // pbOutput: PUCHAR;
           length(result), // cbOutput: ULONG;
-          cbResult, // var pcbResult: ULONG;
+          @cbResult, // pcbResult: PULONG;
           BCRYPT_PAD_PKCS1)); // dwFlags: ULONG
 
     finally

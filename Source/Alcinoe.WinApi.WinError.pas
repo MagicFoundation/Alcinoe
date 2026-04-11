@@ -16175,7 +16175,7 @@ const ERROR_CLUSTER_RESOURCE_VETOED_MOVE_NOT_ENOUGH_RESOURCES_ON_DESTINATION = 5
 //
 // MessageText:
 //
-// 
+//
 // A resource vetoed a move between two nodes because the source currently does not have enough resources to complete the operation.
 //
 const ERROR_CLUSTER_RESOURCE_VETOED_MOVE_NOT_ENOUGH_RESOURCES_ON_SOURCE = 5958;
@@ -16185,7 +16185,7 @@ const ERROR_CLUSTER_RESOURCE_VETOED_MOVE_NOT_ENOUGH_RESOURCES_ON_SOURCE = 5958;
 //
 // MessageText:
 //
-// 
+//
 // The requested operation can not be completed because the group is queued for an operation.
 //
 const ERROR_CLUSTER_GROUP_QUEUED = 5959;
@@ -16195,7 +16195,7 @@ const ERROR_CLUSTER_GROUP_QUEUED = 5959;
 //
 // MessageText:
 //
-// 
+//
 // The requested operation can not be completed because a resource has locked status.
 //
 const ERROR_CLUSTER_RESOURCE_LOCKED_STATUS = 5960;
@@ -16205,7 +16205,7 @@ const ERROR_CLUSTER_RESOURCE_LOCKED_STATUS = 5960;
 //
 // MessageText:
 //
-// 
+//
 // The resource cannot move to another node because a cluster shared volume vetoed the operation.
 //
 const ERROR_CLUSTER_SHARED_VOLUME_FAILOVER_NOT_ALLOWED = 5961;
@@ -16215,7 +16215,7 @@ const ERROR_CLUSTER_SHARED_VOLUME_FAILOVER_NOT_ALLOWED = 5961;
 //
 // MessageText:
 //
-// 
+//
 // A node drain is already in progress.
 //
 const ERROR_CLUSTER_NODE_DRAIN_IN_PROGRESS = 5962;
@@ -16225,7 +16225,7 @@ const ERROR_CLUSTER_NODE_DRAIN_IN_PROGRESS = 5962;
 //
 // MessageText:
 //
-// 
+//
 // Clustered storage is not connected to the node.
 //
 const ERROR_CLUSTER_DISK_NOT_CONNECTED = 5963;
@@ -16235,7 +16235,7 @@ const ERROR_CLUSTER_DISK_NOT_CONNECTED = 5963;
 //
 // MessageText:
 //
-// 
+//
 // The disk is not configured in a way to be used with CSV. CSV disks must have at least one partition that is formatted with NTFS or REFS.
 //
 const ERROR_DISK_NOT_CSV_CAPABLE = 5964;
@@ -16245,7 +16245,7 @@ const ERROR_DISK_NOT_CSV_CAPABLE = 5964;
 //
 // MessageText:
 //
-// 
+//
 // The resource must be part of the Available Storage group to complete this action.
 //
 const ERROR_RESOURCE_NOT_IN_AVAILABLE_STORAGE = 5965;
@@ -16255,7 +16255,7 @@ const ERROR_RESOURCE_NOT_IN_AVAILABLE_STORAGE = 5965;
 //
 // MessageText:
 //
-// 
+//
 // CSVFS failed operation as volume is in redirected mode.
 //
 const ERROR_CLUSTER_SHARED_VOLUME_REDIRECTED = 5966;
@@ -16265,7 +16265,7 @@ const ERROR_CLUSTER_SHARED_VOLUME_REDIRECTED = 5966;
 //
 // MessageText:
 //
-// 
+//
 // CSVFS failed operation as volume is not in redirected mode.
 //
 const ERROR_CLUSTER_SHARED_VOLUME_NOT_REDIRECTED = 5967;
@@ -16275,7 +16275,7 @@ const ERROR_CLUSTER_SHARED_VOLUME_NOT_REDIRECTED = 5967;
 //
 // MessageText:
 //
-// 
+//
 // Cluster properties cannot be returned at this time.
 //
 const ERROR_CLUSTER_CANNOT_RETURN_PROPERTIES = 5968;
@@ -16285,7 +16285,7 @@ const ERROR_CLUSTER_CANNOT_RETURN_PROPERTIES = 5968;
 //
 // MessageText:
 //
-// 
+//
 // The clustered disk resource contains software snapshot diff area that are not supported for Cluster Shared Volumes.
 //
 const ERROR_CLUSTER_RESOURCE_CONTAINS_UNSUPPORTED_DIFF_AREA_FOR_SHARED_VOLUMES = 5969;
@@ -16295,7 +16295,7 @@ const ERROR_CLUSTER_RESOURCE_CONTAINS_UNSUPPORTED_DIFF_AREA_FOR_SHARED_VOLUMES =
 //
 // MessageText:
 //
-// 
+//
 // The operation cannot be completed because the resource is in maintenance mode.
 //
 const ERROR_CLUSTER_RESOURCE_IS_IN_MAINTENANCE_MODE = 5970;
@@ -16305,7 +16305,7 @@ const ERROR_CLUSTER_RESOURCE_IS_IN_MAINTENANCE_MODE = 5970;
 //
 // MessageText:
 //
-// 
+//
 // The operation cannot be completed because of cluster affinity conflicts
 //
 const ERROR_CLUSTER_AFFINITY_CONFLICT = 5971;
@@ -16315,7 +16315,7 @@ const ERROR_CLUSTER_AFFINITY_CONFLICT = 5971;
 //
 // MessageText:
 //
-// 
+//
 // The operation cannot be completed because the resource is a replica virtual machine.
 //
 const ERROR_CLUSTER_RESOURCE_IS_REPLICA_VIRTUAL_MACHINE = 5972;
@@ -16325,7 +16325,7 @@ const ERROR_CLUSTER_RESOURCE_IS_REPLICA_VIRTUAL_MACHINE = 5972;
 //
 // MessageText:
 //
-// 
+//
 // The Cluster Functional Level could not be increased because not all nodes in the cluster support the updated version.
 //
 const ERROR_CLUSTER_UPGRADE_INCOMPATIBLE_VERSIONS = 5973;
@@ -16335,7 +16335,7 @@ const ERROR_CLUSTER_UPGRADE_INCOMPATIBLE_VERSIONS = 5973;
 //
 // MessageText:
 //
-// 
+//
 // Updating the cluster functional level failed because the cluster is running in fix quorum mode.
 // Start additional nodes which are members of the cluster until the cluster reaches quorum and the cluster will automatically
 // switch out of fix quorum mode, or stop and restart the cluster without the FixQuorum switch. Once the cluster is out
@@ -16348,7 +16348,7 @@ const ERROR_CLUSTER_UPGRADE_FIX_QUORUM_NOT_SUPPORTED = 5974;
 //
 // MessageText:
 //
-// 
+//
 // The cluster functional level has been successfully updated but not all features are available yet. Restart the cluster by
 // using the Stop-Cluster PowerShell cmdlet followed by the Start-Cluster PowerShell cmdlet and all cluster features will
 // be available.
@@ -16360,7 +16360,7 @@ const ERROR_CLUSTER_UPGRADE_RESTART_REQUIRED = 5975;
 //
 // MessageText:
 //
-// 
+//
 // The cluster is currently performing a version upgrade.
 //
 const ERROR_CLUSTER_UPGRADE_IN_PROGRESS = 5976;
@@ -16370,7 +16370,7 @@ const ERROR_CLUSTER_UPGRADE_IN_PROGRESS = 5976;
 //
 // MessageText:
 //
-// 
+//
 // The cluster did not successfully complete the version upgrade.
 //
 const ERROR_CLUSTER_UPGRADE_INCOMPLETE = 5977;
@@ -16380,7 +16380,7 @@ const ERROR_CLUSTER_UPGRADE_INCOMPLETE = 5977;
 //
 // MessageText:
 //
-// 
+//
 // The cluster node is in grace period.
 //
 const ERROR_CLUSTER_NODE_IN_GRACE_PERIOD = 5978;
@@ -16390,7 +16390,7 @@ const ERROR_CLUSTER_NODE_IN_GRACE_PERIOD = 5978;
 //
 // MessageText:
 //
-// 
+//
 // The operation has failed because CSV volume was not able to recover in time specified on this file object.
 //
 const ERROR_CLUSTER_CSV_IO_PAUSE_TIMEOUT = 5979;
@@ -16400,7 +16400,7 @@ const ERROR_CLUSTER_CSV_IO_PAUSE_TIMEOUT = 5979;
 //
 // MessageText:
 //
-// 
+//
 // The operation failed because the requested node is not currently part of active cluster membership.
 //
 const ERROR_NODE_NOT_ACTIVE_CLUSTER_MEMBER = 5980;
@@ -16410,7 +16410,7 @@ const ERROR_NODE_NOT_ACTIVE_CLUSTER_MEMBER = 5980;
 //
 // MessageText:
 //
-// 
+//
 // The operation failed because the requested cluster resource is currently unmonitored.
 //
 const ERROR_CLUSTER_RESOURCE_NOT_MONITORED = 5981;
@@ -16420,7 +16420,7 @@ const ERROR_CLUSTER_RESOURCE_NOT_MONITORED = 5981;
 //
 // MessageText:
 //
-// 
+//
 // The operation failed because a resource does not support running in an unmonitored state.
 //
 const ERROR_CLUSTER_RESOURCE_DOES_NOT_SUPPORT_UNMONITORED = 5982;
@@ -16430,7 +16430,7 @@ const ERROR_CLUSTER_RESOURCE_DOES_NOT_SUPPORT_UNMONITORED = 5982;
 //
 // MessageText:
 //
-// 
+//
 // The operation cannot be completed because a resource participates in replication.
 //
 const ERROR_CLUSTER_RESOURCE_IS_REPLICATED = 5983;
@@ -16440,7 +16440,7 @@ const ERROR_CLUSTER_RESOURCE_IS_REPLICATED = 5983;
 //
 // MessageText:
 //
-// 
+//
 // The operation failed because the requested cluster node has been isolated
 //
 const ERROR_CLUSTER_NODE_ISOLATED = 5984;
@@ -16450,7 +16450,7 @@ const ERROR_CLUSTER_NODE_ISOLATED = 5984;
 //
 // MessageText:
 //
-// 
+//
 // The operation failed because the requested cluster node has been quarantined
 //
 const ERROR_CLUSTER_NODE_QUARANTINED = 5985;
@@ -16460,7 +16460,7 @@ const ERROR_CLUSTER_NODE_QUARANTINED = 5985;
 //
 // MessageText:
 //
-// 
+//
 // The operation failed because the specified database update condition was not met
 //
 const ERROR_CLUSTER_DATABASE_UPDATE_CONDITION_FAILED = 5986;
@@ -16470,7 +16470,7 @@ const ERROR_CLUSTER_DATABASE_UPDATE_CONDITION_FAILED = 5986;
 //
 // MessageText:
 //
-// 
+//
 // A clustered space is in a degraded condition and the requested action cannot be completed at this time.
 //
 const ERROR_CLUSTER_SPACE_DEGRADED = 5987;
@@ -16480,7 +16480,7 @@ const ERROR_CLUSTER_SPACE_DEGRADED = 5987;
 //
 // MessageText:
 //
-// 
+//
 // The operation failed because token delegation for this control is not supported.
 //
 const ERROR_CLUSTER_TOKEN_DELEGATION_NOT_SUPPORTED = 5988;
@@ -16490,7 +16490,7 @@ const ERROR_CLUSTER_TOKEN_DELEGATION_NOT_SUPPORTED = 5988;
 //
 // MessageText:
 //
-// 
+//
 // The operation has failed because CSV has invalidated this file object.
 //
 const ERROR_CLUSTER_CSV_INVALID_HANDLE = 5989;
@@ -16500,7 +16500,7 @@ const ERROR_CLUSTER_CSV_INVALID_HANDLE = 5989;
 //
 // MessageText:
 //
-// 
+//
 // This operation is supported only on the CSV coordinator node.
 //
 const ERROR_CLUSTER_CSV_SUPPORTED_ONLY_ON_COORDINATOR = 5990;
@@ -16510,7 +16510,7 @@ const ERROR_CLUSTER_CSV_SUPPORTED_ONLY_ON_COORDINATOR = 5990;
 //
 // MessageText:
 //
-// 
+//
 // The cluster group set is not available for any further requests.
 //
 const ERROR_GROUPSET_NOT_AVAILABLE = 5991;
@@ -16520,7 +16520,7 @@ const ERROR_GROUPSET_NOT_AVAILABLE = 5991;
 //
 // MessageText:
 //
-// 
+//
 // The cluster group set could not be found.
 //
 const ERROR_GROUPSET_NOT_FOUND = 5992;
@@ -16530,7 +16530,7 @@ const ERROR_GROUPSET_NOT_FOUND = 5992;
 //
 // MessageText:
 //
-// 
+//
 // The action cannot be completed at this time because the cluster group set would fall below quorum and not be able to act as a provider.
 //
 const ERROR_GROUPSET_CANT_PROVIDE = 5993;
@@ -16540,7 +16540,7 @@ const ERROR_GROUPSET_CANT_PROVIDE = 5993;
 //
 // MessageText:
 //
-// 
+//
 // The specified parent fault domain is not found.
 //
 const ERROR_CLUSTER_FAULT_DOMAIN_PARENT_NOT_FOUND = 5994;
@@ -16550,7 +16550,7 @@ const ERROR_CLUSTER_FAULT_DOMAIN_PARENT_NOT_FOUND = 5994;
 //
 // MessageText:
 //
-// 
+//
 // The fault domain cannot be a child of the parent specified.
 //
 const ERROR_CLUSTER_FAULT_DOMAIN_INVALID_HIERARCHY = 5995;
@@ -16560,7 +16560,7 @@ const ERROR_CLUSTER_FAULT_DOMAIN_INVALID_HIERARCHY = 5995;
 //
 // MessageText:
 //
-// 
+//
 // Storage Spaces Direct has rejected the proposed fault domain changes because it impacts the fault tolerance of the storage.
 //
 const ERROR_CLUSTER_FAULT_DOMAIN_FAILED_S2D_VALIDATION = 5996;
@@ -16570,7 +16570,7 @@ const ERROR_CLUSTER_FAULT_DOMAIN_FAILED_S2D_VALIDATION = 5996;
 //
 // MessageText:
 //
-// 
+//
 // Storage Spaces Direct has rejected the proposed fault domain changes because it reduces the storage connected to the system.
 //
 const ERROR_CLUSTER_FAULT_DOMAIN_S2D_CONNECTIVITY_LOSS = 5997;
@@ -16580,7 +16580,7 @@ const ERROR_CLUSTER_FAULT_DOMAIN_S2D_CONNECTIVITY_LOSS = 5997;
 //
 // MessageText:
 //
-// 
+//
 // Cluster infrastructure file server creation failed because a valid non-empty file server name was not provided.
 //
 const ERROR_CLUSTER_INVALID_INFRASTRUCTURE_FILESERVER_NAME = 5998;
@@ -16590,7 +16590,7 @@ const ERROR_CLUSTER_INVALID_INFRASTRUCTURE_FILESERVER_NAME = 5998;
 //
 // MessageText:
 //
-// 
+//
 // The action cannot be completed because the cluster set management cluster is unreachable.
 //
 const ERROR_CLUSTERSET_MANAGEMENT_CLUSTER_UNREACHABLE = 5999;
@@ -16893,7 +16893,7 @@ const SCHED_E_SERVICE_NOT_LOCALSYSTEM = 6200;
 //
 // MessageText:
 //
-// 
+//
 // The object cannot be deleted from the local cluster because it is registered with the cluster set.
 //
 const ERROR_CLUSTER_OBJECT_IS_CLUSTER_SET_VM = 6250;
@@ -36957,7 +36957,7 @@ const SEC_E_ENCRYPT_FAILURE: HRESULT = HRESULT($80090329);
 // MessageText:
 //
 // The specified data could not be decrypted.
-// 
+//
 //
 const SEC_E_DECRYPT_FAILURE: HRESULT = HRESULT($80090330);
 
@@ -37919,7 +37919,7 @@ const CRYPT_E_OBJECT_LOCATOR_OBJECT_NOT_FOUND: HRESULT = HRESULT($8009202D);
 // MessageText:
 //
 // OSS Certificate encode/decode error code base
-// 
+//
 // See asn1code.h for a definition of the OSS runtime errors. The OSS error values are offset by CRYPT_E_OSS_ERROR.
 //
 const CRYPT_E_OSS_ERROR: HRESULT = HRESULT($80093000);
@@ -54302,7 +54302,7 @@ const VM_E_MANAGEMENT_VTL_RELOAD_NO_SAVED_STATE: HRESULT = HRESULT($C0370804);
 // MessageText:
 //
 // Received an invalid or unexpected management VTL save notification.
-// 
+//
 //
 const VM_E_MANAGEMENT_VTL_RELOAD_INVALID_SAVE_NOTIFICATION_RECEIVED: HRESULT = HRESULT($C0370805);
 

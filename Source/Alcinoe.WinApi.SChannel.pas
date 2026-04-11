@@ -581,7 +581,7 @@ const SCH_MACHINE_CERT_HASH = $00000001;
 //      handshake with an error if the chain has any issues. Rather, the
 //      client is expected to retrieve the the result of the chain build
 //      using SECPKG_ATTR_CERT_CHECK_RESULT at any point after
-//      receiving the server certificate or by using 
+//      receiving the server certificate or by using
 //      SECPKG_ATTR_CERT_CHECK_RESULT_INPROC after the handshake
 //      has concluded.
 //

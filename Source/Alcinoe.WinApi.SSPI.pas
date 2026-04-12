@@ -151,8 +151,8 @@ type
   PSecPkgInfoA = ^_SecPkgInfoA;
   PPSecPkgInfoA = ^PSecPkgInfoA;
 
-type SecPkgInfo = SecPkgInfoW; // ntifs
-type PSecPkgInfo = PSecPkgInfoW; // ntifs
+// #define SecPkgInfo SecPkgInfoW // ntifs
+// #define PSecPkgInfo PSecPkgInfoW // ntifs
 
 // begin_ntifs
 
@@ -676,8 +676,8 @@ type
   SecPkgCredentials_NamesA = _SecPkgCredentials_NamesA;
   PSecPkgCredentials_NamesA = ^_SecPkgCredentials_NamesA;
 
-type SecPkgCredentials_Names = SecPkgCredentials_NamesW; // ntifs
-type PSecPkgCredentials_Names = PSecPkgCredentials_NamesW; // ntifs
+// #define SecPkgCredentials_Names SecPkgCredentials_NamesW // ntifs
+// #define PSecPkgCredentials_Names PSecPkgCredentials_NamesW // ntifs
 
 // begin_ntifs
 
@@ -700,8 +700,8 @@ type
   SecPkgCredentials_SSIProviderA = _SecPkgCredentials_SSIProviderA;
   PSecPkgCredentials_SSIProviderA = ^_SecPkgCredentials_SSIProviderA;
 
-type SecPkgCredentials_SSIProvider = SecPkgCredentials_SSIProviderW; // ntifs
-type PSecPkgCredentials_SSIProvider = PSecPkgCredentials_SSIProviderW; // ntifs
+// #define SecPkgCredentials_SSIProvider SecPkgCredentials_SSIProviderW // ntifs
+// #define PSecPkgCredentials_SSIProvider PSecPkgCredentials_SSIProviderW // ntifs
 
 // begin_ntifs
 
@@ -920,8 +920,8 @@ type
   SecPkgContext_NamesA = _SecPkgContext_NamesA;
   PSecPkgContext_NamesA = ^_SecPkgContext_NamesA;
 
-type SecPkgContext_Names = SecPkgContext_NamesW; // ntifs
-type PSecPkgContext_Names = PSecPkgContext_NamesW; // ntifs
+// #define SecPkgContext_Names SecPkgContext_NamesW // ntifs
+// #define PSecPkgContext_Names PSecPkgContext_NamesW // ntifs
 
 // begin_ntifs
 
@@ -969,8 +969,8 @@ type
 
 // end_ntifs
 
-type SecPkgContext_KeyInfo = SecPkgContext_KeyInfoW; // ntifs
-type PSecPkgContext_KeyInfo = PSecPkgContext_KeyInfoW; // ntifs
+// #define SecPkgContext_KeyInfo SecPkgContext_KeyInfoW // ntifs
+// #define PSecPkgContext_KeyInfo PSecPkgContext_KeyInfoW // ntifs
 
 type
   _SecPkgContext_AuthorityA = record
@@ -990,8 +990,8 @@ type
 
 // end_ntifs
 
-type SecPkgContext_Authority = SecPkgContext_AuthorityW; // ntifs
-type PSecPkgContext_Authority = PSecPkgContext_AuthorityW; // ntifs
+// #define SecPkgContext_Authority SecPkgContext_AuthorityW // ntifs
+// #define PSecPkgContext_Authority PSecPkgContext_AuthorityW // ntifs
 
 type
   _SecPkgContext_ProtoInfoA = record
@@ -1015,8 +1015,8 @@ type
 
 // end_ntifs
 
-type SecPkgContext_ProtoInfo = SecPkgContext_ProtoInfoW; // ntifs
-type PSecPkgContext_ProtoInfo = PSecPkgContext_ProtoInfoW; // ntifs
+// #define SecPkgContext_ProtoInfo SecPkgContext_ProtoInfoW // ntifs
+// #define PSecPkgContext_ProtoInfo PSecPkgContext_ProtoInfoW // ntifs
 
 // begin_ntifs
 
@@ -1089,8 +1089,8 @@ type
 
 // end_ntifs
 
-type SecPkgContext_PackageInfo = SecPkgContext_PackageInfoW; // ntifs
-type PSecPkgContext_PackageInfo = PSecPkgContext_PackageInfoW; // ntifs
+// #define SecPkgContext_PackageInfo SecPkgContext_PackageInfoW // ntifs
+// #define PSecPkgContext_PackageInfo PSecPkgContext_PackageInfoW // ntifs
 
 type
   _SecPkgContext_NegotiationInfoA = record
@@ -1111,8 +1111,8 @@ type
 
 // end_ntifs
 
-type SecPkgContext_NegotiationInfo = SecPkgContext_NegotiationInfoW;
-type PSecPkgContext_NegotiationInfo = PSecPkgContext_NegotiationInfoW;
+// #define SecPkgContext_NegotiationInfo SecPkgContext_NegotiationInfoW
+// #define PSecPkgContext_NegotiationInfo PSecPkgContext_NegotiationInfoW
 
 const SECPKG_NEGOTIATION_COMPLETE = 0;
 const SECPKG_NEGOTIATION_OPTIMISTIC = 1;
@@ -1136,8 +1136,8 @@ type
   SecPkgContext_NativeNamesA = _SecPkgContext_NativeNamesA;
   PSecPkgContext_NativeNamesA = ^_SecPkgContext_NativeNamesA;
 
-type SecPkgContext_NativeNames = SecPkgContext_NativeNamesW; // ntifs
-type PSecPkgContext_NativeNames = PSecPkgContext_NativeNamesW; // ntifs
+// #define SecPkgContext_NativeNames SecPkgContext_NativeNamesW // ntifs
+// #define PSecPkgContext_NativeNames PSecPkgContext_NativeNamesW // ntifs
 
 // begin_ntifs
 
@@ -1159,8 +1159,8 @@ type
   SecPkgContext_CredentialNameA = _SecPkgContext_CredentialNameA;
   PSecPkgContext_CredentialNameA = ^_SecPkgContext_CredentialNameA;
 
-type SecPkgContext_CredentialName = SecPkgContext_CredentialNameW; // ntifs
-type PSecPkgContext_CredentialName = PSecPkgContext_CredentialNameW; // ntifs
+// #define SecPkgContext_CredentialName SecPkgContext_CredentialNameW // ntifs
+// #define PSecPkgContext_CredentialName PSecPkgContext_CredentialNameW // ntifs
 
 type
   _SecPkgContext_AccessToken = record
@@ -1314,7 +1314,7 @@ type
     param7: PCredHandle;
     param8: PTimeStamp): SECURITY_STATUS; stdcall;
 
-type AcquireCredentialsHandle = AcquireCredentialsHandleW; // ntifs
+// #define AcquireCredentialsHandle AcquireCredentialsHandleW // ntifs
 // #define ACQUIRE_CREDENTIALS_HANDLE_FN ACQUIRE_CREDENTIALS_HANDLE_FN_W // ntifs
 
 // begin_ntifs
@@ -1368,7 +1368,7 @@ type
     param6: Pvoid;
     param7: PTimeStamp): SECURITY_STATUS; stdcall;
 
-type AddCredentials = AddCredentialsW;
+// #define AddCredentials AddCredentialsW
 // #define ADD_CREDENTIALS_FN ADD_CREDENTIALS_FN_W
 
 ////////////////////////////////////////////////////////////////////////
@@ -1425,7 +1425,7 @@ type
     param6: ULONG;
     param7: PSecBufferDesc): SECURITY_STATUS; stdcall;
 
-type ChangeAccountPassword = ChangeAccountPasswordW;
+// #define ChangeAccountPassword ChangeAccountPasswordW
 // #define CHANGE_PASSWORD_FN CHANGE_PASSWORD_FN_W
 
 ////////////////////////////////////////////////////////////////////////
@@ -1494,7 +1494,7 @@ type
     param10: PULONG;
     param11: PTimeStamp): SECURITY_STATUS; stdcall;
 
-type InitializeSecurityContext = InitializeSecurityContextW; // ntifs
+// #define InitializeSecurityContext InitializeSecurityContextW // ntifs
 // #define INITIALIZE_SECURITY_CONTEXT_FN INITIALIZE_SECURITY_CONTEXT_FN_W // ntifs
 
 // begin_ntifs
@@ -1620,9 +1620,9 @@ type
     param2: Pvoid;
     param3: ULONG): SECURITY_STATUS; stdcall;
 
-type QueryContextAttributes = QueryContextAttributesW; // ntifs
+// #define QueryContextAttributes QueryContextAttributesW // ntifs
 // #define QUERY_CONTEXT_ATTRIBUTES_FN QUERY_CONTEXT_ATTRIBUTES_FN_W // ntifs
-type QueryContextAttributesEx = QueryContextAttributesExW; // ntifs
+// #define QueryContextAttributesEx QueryContextAttributesExW // ntifs
 // #define QUERY_CONTEXT_ATTRIBUTES_EX_FN QUERY_CONTEXT_ATTRIBUTES_EX_FN_W // ntifs
 
 // begin_ntifs
@@ -1655,7 +1655,7 @@ type
     param2: Pvoid;
     param3: ULONG): SECURITY_STATUS; stdcall;
 
-type SetContextAttributes = SetContextAttributesW; // ntifs
+// #define SetContextAttributes SetContextAttributesW // ntifs
 // #define SET_CONTEXT_ATTRIBUTES_FN SET_CONTEXT_ATTRIBUTES_FN_W // ntifs
 
 // begin_ntifs
@@ -1710,9 +1710,9 @@ type
     param2: Pvoid;
     param3: ULONG): SECURITY_STATUS; stdcall;
 
-type QueryCredentialsAttributes = QueryCredentialsAttributesW; // ntifs
+// #define QueryCredentialsAttributes QueryCredentialsAttributesW // ntifs
 // #define QUERY_CREDENTIALS_ATTRIBUTES_FN QUERY_CREDENTIALS_ATTRIBUTES_FN_W // ntifs
-type QueryCredentialsAttributesEx = QueryCredentialsAttributesExW; // ntifs
+// #define QueryCredentialsAttributesEx QueryCredentialsAttributesExW // ntifs
 // #define QUERY_CREDENTIALS_ATTRIBUTES_EX_FN QUERY_CREDENTIALS_ATTRIBUTES_EX_FN_W // ntifs
 
 // begin_ntifs
@@ -1745,7 +1745,7 @@ type
     param2: Pvoid;
     param3: ULONG): SECURITY_STATUS; stdcall;
 
-type SetCredentialsAttributes = SetCredentialsAttributesW; // ntifs
+// #define SetCredentialsAttributes SetCredentialsAttributesW // ntifs
 // #define SET_CREDENTIALS_ATTRIBUTES_FN SET_CREDENTIALS_ATTRIBUTES_FN_W // ntifs
 
 // begin_ntifs
@@ -1874,7 +1874,7 @@ type
     param0: PULONG;
     param1: PPSecPkgInfoA): SECURITY_STATUS; stdcall;
 
-type EnumerateSecurityPackages = EnumerateSecurityPackagesW; // ntifs
+// #define EnumerateSecurityPackages EnumerateSecurityPackagesW // ntifs
 // #define ENUMERATE_SECURITY_PACKAGES_FN ENUMERATE_SECURITY_PACKAGES_FN_W // ntifs
 
 // begin_ntifs
@@ -1899,7 +1899,7 @@ type
     param0: PSEC_CHAR;
     param1: PPSecPkgInfoA): SECURITY_STATUS; stdcall;
 
-type QuerySecurityPackageInfo = QuerySecurityPackageInfoW; // ntifs
+// #define QuerySecurityPackageInfo QuerySecurityPackageInfoW // ntifs
 // #define QUERY_SECURITY_PACKAGE_INFO_FN QUERY_SECURITY_PACKAGE_INFO_FN_W // ntifs
 
 type
@@ -1979,7 +1979,7 @@ type
     param2: Pvoid;
     param3: PCtxtHandle): SECURITY_STATUS; stdcall;
 
-type ImportSecurityContext = ImportSecurityContextW; // ntifs
+// #define ImportSecurityContext ImportSecurityContextW // ntifs
 // #define IMPORT_SECURITY_CONTEXT_FN IMPORT_SECURITY_CONTEXT_FN_W // ntifs
 
 // begin_ntifs
@@ -2003,7 +2003,7 @@ const SECURITY_ENTRYPOINT_ANSI = SECURITY_ENTRYPOINT_ANSIW;
 
 // begin_ntifs
 
-type FreeCredentialHandle = FreeCredentialsHandle;
+// #define FreeCredentialHandle FreeCredentialsHandle
 
 type
   _SECURITY_FUNCTION_TABLE_W = record
@@ -2087,8 +2087,8 @@ type
   SecurityFunctionTableA = _SECURITY_FUNCTION_TABLE_A;
   PSecurityFunctionTableA = ^_SECURITY_FUNCTION_TABLE_A;
 
-type SecurityFunctionTable = SecurityFunctionTableW; // ntifs
-type PSecurityFunctionTable = PSecurityFunctionTableW; // ntifs
+// #define SecurityFunctionTable SecurityFunctionTableW // ntifs
+// #define PSecurityFunctionTable PSecurityFunctionTableW // ntifs
 
 // #define SECURITY_
 
@@ -2292,8 +2292,8 @@ type
   SEC_WINNT_AUTH_IDENTITY_A = _SEC_WINNT_AUTH_IDENTITY_A;
   PSEC_WINNT_AUTH_IDENTITY_A = ^_SEC_WINNT_AUTH_IDENTITY_A;
 
-type SEC_WINNT_AUTH_IDENTITY = SEC_WINNT_AUTH_IDENTITY_W; // ntifs
-type PSEC_WINNT_AUTH_IDENTITY = PSEC_WINNT_AUTH_IDENTITY_W; // ntifs
+// #define SEC_WINNT_AUTH_IDENTITY SEC_WINNT_AUTH_IDENTITY_W // ntifs
+// #define PSEC_WINNT_AUTH_IDENTITY PSEC_WINNT_AUTH_IDENTITY_W // ntifs
 // #define _SEC_WINNT_AUTH_IDENTITY _SEC_WINNT_AUTH_IDENTITY_W // ntifs
 
 // begin_ntifs
@@ -2341,8 +2341,8 @@ type
   SEC_WINNT_AUTH_IDENTITY_EXA = _SEC_WINNT_AUTH_IDENTITY_EXA;
   PSEC_WINNT_AUTH_IDENTITY_EXA = ^_SEC_WINNT_AUTH_IDENTITY_EXA;
 
-type SEC_WINNT_AUTH_IDENTITY_EX = SEC_WINNT_AUTH_IDENTITY_EXW; // ntifs
-type PSEC_WINNT_AUTH_IDENTITY_EX = PSEC_WINNT_AUTH_IDENTITY_EXW; // ntifs
+// #define SEC_WINNT_AUTH_IDENTITY_EX SEC_WINNT_AUTH_IDENTITY_EXW // ntifs
+// #define PSEC_WINNT_AUTH_IDENTITY_EX PSEC_WINNT_AUTH_IDENTITY_EXW // ntifs
 
 // begin_ntifs
 

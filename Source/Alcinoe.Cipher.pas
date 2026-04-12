@@ -752,6 +752,8 @@ end;
 ////// Signature //////
 ///////////////////////
 
+{$IF defined(MSWINDOWS)}
+
 {**}
 type
   _TRSAKeyType = (PrivateKey, PublicKey, FullPrivate);
@@ -770,6 +772,8 @@ type
     Coefficient: TBytes; // Coefficient. This has a numeric value of (inverse of q) mod p.
     PrivateExponent: TBytes; // Private exponent, often known as d.
   end;
+
+{$ENDIF}
 
 {**********************}
 {$IF defined(MSWINDOWS)}

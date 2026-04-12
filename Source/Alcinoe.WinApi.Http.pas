@@ -675,7 +675,7 @@ type
 // are less commonly requested.
 //
 
-const HTTP_REQUEST_INFO_FLAG_INITIAL_TTL = ($00000001ULL);
+const HTTP_REQUEST_INFO_FLAG_INITIAL_TTL = ($00000001);
 
 type
   _HTTP_REQUEST_INFO_PROPERTY_INFO = record

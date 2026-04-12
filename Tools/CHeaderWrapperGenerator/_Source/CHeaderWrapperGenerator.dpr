@@ -471,8 +471,13 @@ begin
                 (ALIsNumeric(Lvalue)) or
                 (alposA('const '+Lvalue+' = ', LLstSrc.Text) > 0)) then begin // const SP_PROT_TLS1_SERVER = $00000040;
                                                                               // const SP_PROT_TLS1_0_SERVER = SP_PROT_TLS1_SERVER;
-              if (AlposA('0x',Lvalue) = 1) and (AlposA('L',Lvalue) = Length(Lvalue)) or
-                 ((ALPosA('L', LValue) = length(Lvalue)) and (ALIsNumeric(AlcopyStr(Lvalue, 1, length(LValue)-1)))) then
+              if (AlposA('(0x',Lvalue) = 1) and (AlposA('ULL)',Lvalue) = Length(Lvalue) - 3) or
+                 (AlposA('0x',Lvalue) = 1) and (AlposA('ULL',Lvalue) = Length(Lvalue) - 2) or
+                 ((ALPosA('ULL', LValue) = length(Lvalue) - 2) and (ALIsNumeric(AlcopyStr(Lvalue, 1, length(LValue) - 3)))) then
+                LValue := ALStringReplaceA(Lvalue, 'ULL', '', [RfIgnoreCase]); // 0x800000001ULL => 0x800000001
+              if (AlposA('(0x',Lvalue) = 1) and (AlposA('L)',Lvalue) = Length(Lvalue) - 1) or
+                 (AlposA('0x',Lvalue) = 1) and (AlposA('L',Lvalue) = Length(Lvalue)) or
+                 ((ALPosA('L', LValue) = length(Lvalue)) and (ALIsNumeric(AlcopyStr(Lvalue, 1, length(LValue) - 1)))) then
                 LValue := ALStringReplaceA(Lvalue, 'L', '', [RfIgnoreCase]); // 0x800000001L => 0x800000001
               LValue := ALStringReplaceA(Lvalue, '0x', '$', [RfIgnoreCase]); // $00000001
               LValue := ALStringReplaceA(Lvalue, ' | ', ' or '); // (HTTP_AUTH_ENABLE_BASIC or HTTP_AUTH_ENABLE_DIGEST)
@@ -496,13 +501,13 @@ begin
               else
                 LLstSrc[I] := alTrim(LNewLine + ' ' + LComment); // const SECBUFFER_EMPTY = $00000001; // Undefined, replaced by provider
             end
-            else if (AlposA('(',LLst[2]) <= 0) and
-                    ((alposA(' '+Lvalue+' ;', LLstSrc.Text) > 0) or
-                     (alposA(' '+Lvalue+',', LLstSrc.Text) > 0) or // } NCRYPT_ISOLATED_KEY_ATTESTED_ATTRIBUTES, * PNCRYPT_ISOLATED_KEY_ATTESTED_ATTRIBUTES;
-                     (alposA(' '+Lvalue+';', LLstSrc.Text) > 0)) then begin // } NCRYPT_ISOLATED_KEY_ATTESTED_ATTRIBUTES, * PNCRYPT_ISOLATED_KEY_ATTESTED_ATTRIBUTES;
-              var LNewLine := alTrim('type ' + LLst[2] + ' = ' + LValue + ';');
-              LLstSrc[I] := alTrim(LNewLine + ' ' + LComment);
-            end
+            //else if (AlposA('(',LLst[2]) <= 0) and
+            //        ((alposA(' '+Lvalue+' ;', LLstSrc.Text) > 0) or
+            //         (alposA(' '+Lvalue+',', LLstSrc.Text) > 0) or // } NCRYPT_ISOLATED_KEY_ATTESTED_ATTRIBUTES, * PNCRYPT_ISOLATED_KEY_ATTESTED_ATTRIBUTES;
+            //         (alposA(' '+Lvalue+';', LLstSrc.Text) > 0)) then begin // } NCRYPT_ISOLATED_KEY_ATTESTED_ATTRIBUTES, * PNCRYPT_ISOLATED_KEY_ATTESTED_ATTRIBUTES;
+            //  var LNewLine := alTrim('type ' + LLst[2] + ' = ' + LValue + ';');
+            //  LLstSrc[I] := alTrim(LNewLine + ' ' + LComment);
+            //end
             else
               LLstSrc[I] := LLine + ALIfThenA(LComment <> '', ' ' + LComment);
           end;

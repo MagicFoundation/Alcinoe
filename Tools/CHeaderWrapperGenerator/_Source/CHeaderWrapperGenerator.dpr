@@ -2239,6 +2239,7 @@ begin
             while alposA('  ', LSrc) > 0 do
               LSrc := ALStringReplaceA(LSrc,'  ', ' ');
 
+            LSrc := RemoveSalAnnotation(LSrc, '_Field_size_part_');
             LSrc := RemoveSalAnnotation(LSrc, '_Field_size_bytes_');
             LSrc := RemoveSalAnnotation(LSrc, '_Field_size_');
             LSrc := RemoveSalAnnotation(LSrc, '_In_reads_bytes_opt_');
@@ -2255,8 +2256,8 @@ begin
             LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_to_opt_');
             LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_to_');
             LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_to_opt_');
-            LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_opt_');
             LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_all_opt_');
+            LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_opt_');
             LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_all_');
             LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_');
             LSrc := RemoveSalAnnotation(LSrc, '_Out_opt_');
@@ -2268,10 +2269,10 @@ begin
             LSrc := RemoveSalAnnotation(LSrc, '_Inout_updates_');
             LSrc := RemoveSalAnnotation(LSrc, '_Inout_opt_');
             LSrc := RemoveSalAnnotation(LSrc, '_Inout_');
-            LSrc := RemoveSalAnnotation(LSrc, '_In_opt_');
             LSrc := RemoveSalAnnotation(LSrc, '_In_opt_z_');
-            LSrc := RemoveSalAnnotation(LSrc, '_In_');
+            LSrc := RemoveSalAnnotation(LSrc, '_In_opt_');
             LSrc := RemoveSalAnnotation(LSrc, '_In_z_');
+            LSrc := RemoveSalAnnotation(LSrc, '_In_');
             LSrc := RemoveSalAnnotation(LSrc, '_Return_type_success_');
             LSrc := RemoveSalAnnotation(LSrc, '_Field_range_');
             LSrc := RemoveSalAnnotation(LSrc, '_Success_');

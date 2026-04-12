@@ -537,9 +537,7 @@ type
     dwMagic: ULONG;
     dwKeyType: ULONG;
     NumBlobs: UCHAR;
-    MAX_HYBRID_KEY_EXCHANGE_BLOBS): _Field_size_part_(NumBlobs,;
     rgwszBlobTypes: array[0..MAX_HYBRID_KEY_EXCHANGE_BLOBS-1] of PCWSTR;
-    MAX_HYBRID_KEY_EXCHANGE_BLOBS): _Field_size_part_(NumBlobs,;
     rgbBlobs: array[0..MAX_HYBRID_KEY_EXCHANGE_BLOBS-1] of PUCHAR;
   end;
   PTLS_HYBRID_KEYEXCHANGE_BLOB = ^TLS_HYBRID_KEYEXCHANGE_BLOB;

@@ -2340,6 +2340,7 @@ begin
             LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WINBLUE)');
             LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WINTHRESHOLD)');
             LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WIN11_ZN)');
+            LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WIN11_DT)');
             LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION > NTDDI_WINBLUE || (NTDDI_VERSION == NTDDI_WINBLUE && defined(WINBLUE_KBSPRING14)))');
             LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION <= NTDDI_WINXP)');
             LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION < NTDDI_WINXP)');

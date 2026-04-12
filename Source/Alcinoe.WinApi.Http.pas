@@ -96,7 +96,9 @@ type
     // Used for manipulating Url Group to Delegate Request Queue association.
     HttpServerDelegationProperty = 16,
     // Used to configure fast forwarding support.
-    HttpServerFastForwardingProperty = 18);
+    HttpServerFastForwardingProperty = 18,
+    // Used to enable optional request info fields.
+    HttpServerRequestInfoProperty = 19);
   HTTP_SERVER_PROPERTY = _HTTP_SERVER_PROPERTY;
   PHTTP_SERVER_PROPERTY = ^_HTTP_SERVER_PROPERTY;
 
@@ -666,6 +668,22 @@ type
   end;
   HTTP_PROTECTION_LEVEL_INFO = _HTTP_PROTECTION_LEVEL_INFO;
   PHTTP_PROTECTION_LEVEL_INFO = ^_HTTP_PROTECTION_LEVEL_INFO;
+
+//
+// Used with HttpServerRequestInfoProperty. These flags will identify optional request
+// info fields not normally supplied; these fields are only populated on-demand as they
+// are less commonly requested.
+//
+
+const HTTP_REQUEST_INFO_FLAG_INITIAL_TTL = ($00000001ULL);
+
+type
+  _HTTP_REQUEST_INFO_PROPERTY_INFO = record
+    Flags: HTTP_PROPERTY_FLAGS;
+    RequestInfoFlags: ULONGLONG;
+  end;
+  HTTP_REQUEST_INFO_PROPERTY_INFO = _HTTP_REQUEST_INFO_PROPERTY_INFO;
+  PHTTP_REQUEST_INFO_PROPERTY_INFO = ^_HTTP_REQUEST_INFO_PROPERTY_INFO;
 
 //
 // Definitions for request queue manipulation.
@@ -2557,7 +2575,8 @@ type
     HttpFeatureDscp = 14,
     HttpFeatureQueryCipherInfo = 15,
     HttpFeatureQueryInitialPacketTtl = 16,
-    HttpFeatureLast = 17,
+    HttpFeatureTlsHandshakePerformanceCounters = 17,
+    HttpFeatureLast = 18,
     HttpFeaturemax = Integer($FFFFFFFF));
   HTTP_FEATURE_ID = _HTTP_FEATURE_ID;
   PHTTP_FEATURE_ID = ^_HTTP_FEATURE_ID;

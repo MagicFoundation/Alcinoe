@@ -3553,9 +3553,6 @@ const ERROR_CANT_ATTACH_TO_DEV_VOLUME = 478;
 const ERROR_MEMORY_DECOMPRESSION_FAILURE = 479;
 
 //
-// **** Available SYSTEM error codes ****
-//
-//
 // MessageId: ERROR_PNP_QUERY_REMOVE_DEVICE_TIMEOUT
 //
 // MessageText:
@@ -3907,6 +3904,15 @@ const ERROR_MEMORY_DECOMPRESSION_HW_ERROR = 520;
 const ERROR_VOLUME_ROLLBACK_DETECTED = 521;
 
 //
+// MessageId: ERROR_INVALID_OPLOCK_REQUEST
+//
+// MessageText:
+//
+// An invalid combination of oplock level and flags was specified for an oplock request.
+//
+const ERROR_INVALID_OPLOCK_REQUEST = 522;
+
+//
 // MessageId: ERROR_CLOUD_FILE_HYDRATION_NOT_AVAILABLE
 //
 // MessageText:
@@ -3914,6 +3920,15 @@ const ERROR_VOLUME_ROLLBACK_DETECTED = 521;
 // Cloud file cannot be retrieved from your cloud provider. Try again after responding to your cloud provider's request for action.
 //
 const ERROR_CLOUD_FILE_HYDRATION_NOT_AVAILABLE = 523;
+
+//
+// MessageId: ERROR_CIMFS_VERIFICATION_FAILED
+//
+// MessageText:
+//
+// An integrity violation was detected when accessing a verified CIM.
+//
+const ERROR_CIMFS_VERIFICATION_FAILED = 524;
 
 //
 // MessageId: ERROR_SYSTEM_FILE_NOT_SUPPORTED
@@ -6328,7 +6343,7 @@ const ERROR_OPLOCK_SWITCHED_TO_NEW_HANDLE = 800;
 //
 // MessageText:
 //
-// An oplock of the requested level cannot be granted.  An oplock of a lower level may be available.
+// The oplock request cannot be satisfied as specified. The output buffer contains more details.
 //
 const ERROR_CANNOT_GRANT_REQUESTED_OPLOCK = 801;
 
@@ -6494,6 +6509,18 @@ const ERROR_FT_READ_FROM_COPY_FAILURE = 818;
 // The section creation request was failed because it would have been satisfied with a direct map and the caller explicitly signified this was not wanted.
 //
 const ERROR_SECTION_DIRECT_MAP_ONLY = 819;
+
+//
+// MessageId: ERROR_LINUX_SUBSYSTEM_UPDATE_REQUIRED_LIFTED_REQUIRED
+//
+// MessageText:
+//
+// The inbox version of the Windows Subsystem For Linux has been disabled by group policy.
+// To install WSL from the store, run 'wsl.exe --update' or visit https://aka.ms/wslstorepage
+// Installing WSL from the Microsoft Store will give you the latest WSL updates, faster.
+// For more information please visit https://aka.ms/wslstoreinfo
+//
+const ERROR_LINUX_SUBSYSTEM_UPDATE_REQUIRED_LIFTED_REQUIRED = 820;
 
 //
 // **** Available SYSTEM error codes ****
@@ -16952,6 +16979,33 @@ const ERROR_CNU_RUN_NOT_IN_PROGRESS = 6255;
 // Cluster native update not ready - run Enable-ClusterNativeUpdate to load.
 //
 const ERROR_CNU_NOT_READY = 6256;
+
+//
+// MessageId: ERROR_CNU_RUN_INIT_FAILED
+//
+// MessageText:
+//
+// There were errors trying to initialize a new cluster native update run.
+//
+const ERROR_CNU_RUN_INIT_FAILED = 6257;
+
+//
+// MessageId: ERROR_CNU_RUN_PREPARE_CLUSTER_FAILED
+//
+// MessageText:
+//
+// There were errors while preparing for cluster native update run.
+//
+const ERROR_CNU_RUN_PREPARE_CLUSTER_FAILED = 6258;
+
+//
+// MessageId: ERROR_CNU_RUN_PROCESS_CLUSTER_FAILED
+//
+// MessageText:
+//
+// There were errors while processing nodes in a cluster native update run.
+//
+const ERROR_CNU_RUN_PROCESS_CLUSTER_FAILED = 6259;
 
 ///////////////////////////////////////////////////
 //                                               //
@@ -29799,6 +29853,24 @@ const ERROR_PACKAGE_MANIFEST_NOT_FOUND = 15678;
 //
 const ERROR_DEPLOYMENT_BLOCKED_BY_REMOVEDEFAULTPACKAGES_POLICY = 15679;
 
+//
+// MessageId: ERROR_URI_BLOCKED_BY_POLICY_MSIXALLOWEDZONES
+//
+// MessageText:
+//
+// The source uri is blocked by MsixAllowedZones policy. Please contact your system administrator.
+//
+const ERROR_URI_BLOCKED_BY_POLICY_MSIXALLOWEDZONES = 15680;
+
+//
+// MessageId: ERROR_URI_RECOMMENDED_BLOCK_BY_SMARTSCREEN
+//
+// MessageText:
+//
+// The source uri is recommended to be blocked by SmartScreen. Please contact your system administrator.
+//
+const ERROR_URI_RECOMMENDED_BLOCK_BY_SMARTSCREEN = 15681;
+
 //////////////////////////
 //                      //
 // AppModel Error Codes //
@@ -36587,7 +36659,7 @@ const NTE_NOT_ACTIVE_CONSOLE: HRESULT = HRESULT($80090038);
 //
 // MessageText:
 //
-// VBS key isolation is not available.
+// VBS key protection is not available.
 //
 const NTE_VBS_UNAVAILABLE: HRESULT = HRESULT($80090039);
 
@@ -50609,7 +50681,7 @@ const FVE_E_KEY_ROTATION_NOT_ENABLED: HRESULT = HRESULT($803100DF);
 //
 // MessageText:
 //
-// BitLocker recovery password key rotation could not be performed because the device is neither Azure AD joined nor Hybrid Azure AD joined.
+// BitLocker recovery password key rotation could not be performed because the device is neither Entra ID joined nor Hybrid Entra ID joined.
 //
 const FVE_E_DEVICE_NOT_JOINED_AAD: HRESULT = HRESULT($803100E0);
 
@@ -50690,7 +50762,7 @@ const FVE_E_UPDATE_INVALID_CONFIG: HRESULT = HRESULT($803100E8);
 //
 // MessageText:
 //
-// The AAD request has failed and it has been advised to backoff to prevent throttling. Device will retry soon.
+// The Entra ID request has failed and it has been advised to backoff to prevent throttling. Device will retry soon.
 //
 const FVE_E_AAD_SERVER_FAIL_RETRY_AFTER_AAD: HRESULT = HRESULT($803100E9);
 
@@ -50699,7 +50771,7 @@ const FVE_E_AAD_SERVER_FAIL_RETRY_AFTER_AAD: HRESULT = HRESULT($803100E9);
 //
 // MessageText:
 //
-// The AAD request has failed due to server issues and it has been advised to backoff to prevent throttling. Device will retry soon.
+// The Entra ID request has failed due to server issues and it has been advised to backoff to prevent throttling. Device will retry soon.
 //
 const FVE_E_AAD_SERVER_FAIL_BACKOFF_AAD: HRESULT = HRESULT($803100EA);
 
@@ -51010,6 +51082,15 @@ const FVE_E_TPMPV2_USED_FAILURE: HRESULT = HRESULT($C031010B);
 const FVE_E_NO_TPM_BINDINGS: HRESULT = HRESULT($C031010C);
 
 //
+// MessageId: FVE_E_BOOT_CRIT_DEVICE_UNEXPECTED_BEHAVIOR
+//
+// MessageText:
+//
+// Boot critical volume device has been found to exhibit unexpected behavior such as device surprise removal or arrivial. This may lead to improper behavior of BitLocker Drive Encryption.
+//
+const FVE_E_BOOT_CRIT_DEVICE_UNEXPECTED_BEHAVIOR: HRESULT = HRESULT($C031010D);
+
+//
 // MessageId: FVE_E_FW_UPDATE_PCRS_BLOCK
 //
 // MessageText:
@@ -51082,13 +51163,40 @@ const FVE_E_HARDWARE_CRYPTO_ACCELERATOR_NOT_FIPS_COMPLIANT: HRESULT = HRESULT($C
 const FVE_E_HARDWARE_CRYPTO_KEY_MANAGER_NOT_FIPS_COMPLIANT: HRESULT = HRESULT($C0310115);
 
 //
+// MessageId: FVE_E_NOT_ALLOWED_ON_EPHEMERAL_VOLUME
+//
+// MessageText:
+//
+// The operation is not allowed on an ephemeral volume.
+//
+const FVE_E_NOT_ALLOWED_ON_EPHEMERAL_VOLUME: HRESULT = HRESULT($C0310116);
+
+//
+// MessageId: FVE_E_UNTRUSTED_OFFLOAD_STORAGE
+//
+// MessageText:
+//
+// The operation is not allowed on the volume when untrusted crypto offload storage protection is enabled.
+//
+const FVE_E_UNTRUSTED_OFFLOAD_STORAGE: HRESULT = HRESULT($C0310117);
+
+//
 // MessageId: FVE_E_TPM_PCRS_DO_NOT_MATCH_LOG
 //
 // MessageText:
 //
 // The TPM PCR values did not match what was calculated from the TCG log.
 //
-const FVE_E_TPM_PCRS_DO_NOT_MATCH_LOG: HRESULT = HRESULT($C0310116);
+const FVE_E_TPM_PCRS_DO_NOT_MATCH_LOG: HRESULT = HRESULT($C0310118);
+
+//
+// MessageId: FVE_E_MISSING_PROTECTORS
+//
+// MessageText:
+//
+// The volume is not configured with protectors required to complete the operation.
+//
+const FVE_E_MISSING_PROTECTORS: HRESULT = HRESULT($C0310119);
 
 //
 // =======================================================
@@ -52748,7 +52856,7 @@ const WS_E_SECURITY_SYSTEM_FAILURE: HRESULT = HRESULT($803D0023);
 //
 // MessageText:
 //
-// An attempt to retrieve debugging data failed because none was available.
+// An attempt to retrieve data failed because none was available.
 //
 // #define ERROR_HV_NO_DATA _NDIS_ERROR_TYPEDEF_(0xC035001BL)
 
@@ -52904,6 +53012,15 @@ const WS_E_SECURITY_SYSTEM_FAILURE: HRESULT = HRESULT($803D0023);
 // The supplied page request specifies a memory access that the guest does not have permissions to perform.
 //
 // #define ERROR_HV_PAGE_REQUEST_INVALID _NDIS_ERROR_TYPEDEF_(0xC0350060L)
+
+//
+// MessageId: ERROR_HV_DEVICE_ALREADY_IN_DOMAIN
+//
+// MessageText:
+//
+// The device is already attached to the device domain.
+//
+// #define ERROR_HV_DEVICE_ALREADY_IN_DOMAIN _NDIS_ERROR_TYPEDEF_(0xC0350066L)
 
 //
 // MessageId: ERROR_HV_INVALID_CPU_GROUP_ID
@@ -53507,6 +53624,249 @@ const WS_E_SECURITY_SYSTEM_FAILURE: HRESULT = HRESULT($803D0023);
 // #define ERROR_VID_PROCESS_ALREADY_SET _NDIS_ERROR_TYPEDEF_(0xC0370030L)
 
 //
+// MessageId: ERROR_VID_PARTITION_INVARIANTS_MISMATCH
+//
+// MessageText:
+//
+// The partition invariants for the restoring partition do not match the partition invariants from the original partition.
+//
+// #define ERROR_VID_PARTITION_INVARIANTS_MISMATCH _NDIS_ERROR_TYPEDEF_(0xC0370031L)
+
+//
+// MessageId: ERROR_VID_MEMORY_BLOCK_INVARIANTS_MISMATCH
+//
+// MessageText:
+//
+// The invariants for the restoring memory block do not match the invariants from the original memory block.
+//
+// #define ERROR_VID_MEMORY_BLOCK_INVARIANTS_MISMATCH _NDIS_ERROR_TYPEDEF_(0xC0370032L)
+
+//
+// MessageId: ERROR_VID_MEMORY_BLOCK_RESTORE_STATE_MISMATCH
+//
+// MessageText:
+//
+// The state for the restoring memory block does not match the state from the original memory block.
+//
+// #define ERROR_VID_MEMORY_BLOCK_RESTORE_STATE_MISMATCH _NDIS_ERROR_TYPEDEF_(0xC0370033L)
+
+//
+// MessageId: ERROR_VID_KSR_PERSISTED_ITEMS_STILL_REGISTERED
+//
+// MessageText:
+//
+// Persisted items were still registered after attempting to free persisted data.
+//
+// #define ERROR_VID_KSR_PERSISTED_ITEMS_STILL_REGISTERED _NDIS_ERROR_TYPEDEF_(0xC0370034L)
+
+//
+// MessageId: ERROR_VID_MEMORY_PARTITION_SETUP_FAILED
+//
+// MessageText:
+//
+// Setup for the memory partition failed.
+//
+// #define ERROR_VID_MEMORY_PARTITION_SETUP_FAILED _NDIS_ERROR_TYPEDEF_(0xC0370035L)
+
+//
+// MessageId: ERROR_VID_MEMORY_RESERVE_NOT_ENABLED
+//
+// MessageText:
+//
+// The memory reserve was not enabled.
+//
+// #define ERROR_VID_MEMORY_RESERVE_NOT_ENABLED _NDIS_ERROR_TYPEDEF_(0xC0370036L)
+
+//
+// MessageId: ERROR_VID_MEMORY_BLOCK_PAGECOUNT_MISMATCH
+//
+// MessageText:
+//
+// The restoring memory block's KSR page count does not match the persisted memory block's KSR page count.
+//
+// #define ERROR_VID_MEMORY_BLOCK_PAGECOUNT_MISMATCH _NDIS_ERROR_TYPEDEF_(0xC0370037L)
+
+//
+// MessageId: ERROR_VID_KSR_IOHANDLER_PROPERTY_MISMATCH
+//
+// MessageText:
+//
+// The restoring IO handler's properties do not match the persisted IO handler's properties.
+//
+// #define ERROR_VID_KSR_IOHANDLER_PROPERTY_MISMATCH _NDIS_ERROR_TYPEDEF_(0xC0370038L)
+
+//
+// MessageId: ERROR_VID_KSR_MSR_HANDLER_PROPERTY_MISMATCH
+//
+// MessageText:
+//
+// The restoring MSR handler's properties do not match the persisted MSR handler's properties.
+//
+// #define ERROR_VID_KSR_MSR_HANDLER_PROPERTY_MISMATCH _NDIS_ERROR_TYPEDEF_(0xC0370039L)
+
+//
+// MessageId: ERROR_VID_KSR_MEMORY_PARTITION_STATE_SIZE_MISMATCH
+//
+// MessageText:
+//
+// The size of the preserved KSR memory partition state structure does not match the size of the current KSR memory partition state structure.
+//
+// #define ERROR_VID_KSR_MEMORY_PARTITION_STATE_SIZE_MISMATCH _NDIS_ERROR_TYPEDEF_(0xC037003AL)
+
+//
+// MessageId: ERROR_VID_KSR_METADATA_MISMATCH
+//
+// MessageText:
+//
+// The preserved KSR metadata does not match the current KSR metadata.
+//
+// #define ERROR_VID_KSR_METADATA_MISMATCH _NDIS_ERROR_TYPEDEF_(0xC037003BL)
+
+//
+// MessageId: ERROR_VID_KSR_TOTAL_PAGE_COUNT_MISMATCH
+//
+// MessageText:
+//
+// There is a mismatch between the actual amount of KSR pages that were backed and the expected amount of backed KSR pages.
+//
+// #define ERROR_VID_KSR_TOTAL_PAGE_COUNT_MISMATCH _NDIS_ERROR_TYPEDEF_(0xC037003CL)
+
+//
+// MessageId: ERROR_VID_MBP_ARRAY_NOT_PERSISTED
+//
+// MessageText:
+//
+// The MBP array was required to be persisted, but was not.
+//
+// #define ERROR_VID_MBP_ARRAY_NOT_PERSISTED _NDIS_ERROR_TYPEDEF_(0xC037003DL)
+
+//
+// MessageId: ERROR_VID_KSR_INVALID_PERSIST_ID
+//
+// MessageText:
+//
+// The KSR persistence ID was invalid.
+//
+// #define ERROR_VID_KSR_INVALID_PERSIST_ID _NDIS_ERROR_TYPEDEF_(0xC037003EL)
+
+//
+// MessageId: ERROR_VID_KSR_INVALID_PERSISTENCE_OPTIONS
+//
+// MessageText:
+//
+// An invalid combination of persistence options was specified.
+//
+// #define ERROR_VID_KSR_INVALID_PERSISTENCE_OPTIONS _NDIS_ERROR_TYPEDEF_(0xC037003FL)
+
+//
+// MessageId: ERROR_VID_GPA_RANGE_INVALID_FLAGS
+//
+// MessageText:
+//
+// An invalid or incompatible combination of GPA flags was specified.
+//
+// #define ERROR_VID_GPA_RANGE_INVALID_FLAGS _NDIS_ERROR_TYPEDEF_(0xC0370040L)
+
+//
+// MessageId: ERROR_VID_MEMORY_BLOCK_INVALID_FLAGS
+//
+// MessageText:
+//
+// An invalid or incompatible combination of memory block flags was specified.
+//
+// #define ERROR_VID_MEMORY_BLOCK_INVALID_FLAGS _NDIS_ERROR_TYPEDEF_(0xC0370041L)
+
+//
+// MessageId: ERROR_VID_KSR_ALREADY_PERSISTED
+//
+// MessageText:
+//
+// The item has already been persisted.
+//
+// #define ERROR_VID_KSR_ALREADY_PERSISTED _NDIS_ERROR_TYPEDEF_(0xC0370042L)
+
+//
+// MessageId: ERROR_VID_KSR_ALREADY_UNPERSISTED
+//
+// MessageText:
+//
+// The item has already been unpersisted.
+//
+// #define ERROR_VID_KSR_ALREADY_UNPERSISTED _NDIS_ERROR_TYPEDEF_(0xC0370043L)
+
+//
+// MessageId: ERROR_VID_KSR_PERSISTENCE_DISALLOWED
+//
+// MessageText:
+//
+// The item is not allowed to be persisted.
+//
+// #define ERROR_VID_KSR_PERSISTENCE_DISALLOWED _NDIS_ERROR_TYPEDEF_(0xC0370044L)
+
+//
+// MessageId: ERROR_VID_KSR_CLIENT_TYPE_MISMATCH
+//
+// MessageText:
+//
+// The client type does match the memory block creator mode.
+//
+// #define ERROR_VID_KSR_CLIENT_TYPE_MISMATCH _NDIS_ERROR_TYPEDEF_(0xC0370045L)
+
+//
+// MessageId: ERROR_VID_KSR_INVALID_STATE
+//
+// MessageText:
+//
+// The KSR state was invalid for the operation attempted.
+//
+// #define ERROR_VID_KSR_INVALID_STATE _NDIS_ERROR_TYPEDEF_(0xC0370046L)
+
+//
+// MessageId: ERROR_VID_KSR_NOT_READY
+//
+// MessageText:
+//
+// The system is not ready to perform KSR.
+//
+// #define ERROR_VID_KSR_NOT_READY _NDIS_ERROR_TYPEDEF_(0xC0370047L)
+
+//
+// MessageId: ERROR_VID_GPA_RANGE_OVERLAP_PROHIBITED
+//
+// MessageText:
+//
+// The GPA range overlap is prohibited.
+//
+// #define ERROR_VID_GPA_RANGE_OVERLAP_PROHIBITED _NDIS_ERROR_TYPEDEF_(0xC0370048L)
+
+//
+// MessageId: ERROR_VID_PARTITION_NOT_HIERARCHICAL_HOST
+//
+// MessageText:
+//
+// The specified partition is not a hierarchical host.
+//
+// #define ERROR_VID_PARTITION_NOT_HIERARCHICAL_HOST _NDIS_ERROR_TYPEDEF_(0xC0370049L)
+
+//
+// MessageId: ERROR_VID_GPA_RANGE_INVARIANTS_MISMATCH
+//
+// MessageText:
+//
+// The GPA range invariants for the restoring GPA range do not match the GPA range invariants from the original GPA range.
+//
+// #define ERROR_VID_GPA_RANGE_INVARIANTS_MISMATCH _NDIS_ERROR_TYPEDEF_(0xC037004AL)
+
+//
+// MessageId: ERROR_VID_KSR_PSCI_HANDLER_PROPERTY_MISMATCH
+//
+// MessageText:
+//
+// The restoring PSCI handler's properties do not match the persisted PSCI handler's properties.
+//
+// #define ERROR_VID_KSR_PSCI_HANDLER_PROPERTY_MISMATCH _NDIS_ERROR_TYPEDEF_(0xC037004BL)
+
+//
 // Host compute service errors (0x0100-0x01ff)
 //
 //
@@ -53979,6 +54339,15 @@ const HCS_E_SYSTEM_NOT_CONFIGURED_FOR_OPERATION: HRESULT = HRESULT($80370120);
 // The operation has already been cancelled.
 //
 const HCS_E_OPERATION_ALREADY_CANCELLED: HRESULT = HRESULT($80370121);
+
+//
+// MessageId: HCS_E_INVALID_PROCESSOR_TOPOLOGY
+//
+// MessageText:
+//
+// The processor topology is invalid.
+//
+const HCS_E_INVALID_PROCESSOR_TOPOLOGY: HRESULT = HRESULT($80370122);
 
 //
 // Virtual networking errors (0x0200-0x02ff)
@@ -58977,7 +59346,7 @@ const DXGI_ERROR_INVALID_CALL: HRESULT = HRESULT($887A0001);
 //
 // MessageText:
 //
-// The object was not found. If calling IDXGIFactory::EnumAdaptes, there is no adapter with the specified ordinal.
+// The object was not found. If calling IDXGIFactory::EnumAdapters, there is no adapter with the specified ordinal.
 //
 const DXGI_ERROR_NOT_FOUND: HRESULT = HRESULT($887A0002);
 
@@ -66396,6 +66765,15 @@ const UNIONFS_E_NESTED_UNION: HRESULT = HRESULT($8925000B);
 // An attempt was made to create a new union root as an ancestor or descendant of an existing union root, but the new union is not configured to allow nesting.
 //
 const UNIONFS_E_NESTED_UNION_NOT_ALLOWED: HRESULT = HRESULT($8925000C);
+
+//
+// MessageId: UNIONFS_E_BOOT_LAYER_NOT_ATTACHED
+//
+// MessageText:
+//
+// UnionFS failed to attach to a boot layer.
+//
+const UNIONFS_E_BOOT_LAYER_NOT_ATTACHED: HRESULT = HRESULT($8925000D);
 
 //
 // PRM Error codes

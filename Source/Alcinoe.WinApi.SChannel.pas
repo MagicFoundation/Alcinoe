@@ -417,8 +417,8 @@ type
 // or include Ntdef.h, SubAuth.h or Winternl.h.
 
 // These values distinguish between the different RSA padding modes and can
-// be specified in the CRYPTO_SETTINGS strCngAlgId field, in addition to the
-// CNG algorithm identifiers.
+// be specified in the CRYPTO_SETTINGS strCngAlgId field, in lieu of a
+// CNG algorithm identifier.
 const SCHANNEL_RSA_PSS_PADDING_ALGORITHM = 'SCH_RSA_PSS_PAD';
 const SCHANNEL_RSA_PKCS_PADDING_ALGORITHM = 'SCH_RSA_PKCS_PAD';
 

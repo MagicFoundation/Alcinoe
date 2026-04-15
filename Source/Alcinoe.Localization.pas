@@ -201,6 +201,10 @@ type
     ///   Returns a locale for the specified IETF BCP 47 language tag string.
     /// </summary>
     class function Create(const ALanguageTag: String): TALLocaleW; overload; static;
+    /// <summary>
+    ///   Returns the locale as a BCP 47 language tag, for example "fr-FR".
+    /// </summary>
+    function ToLanguageTag: String;
   end;
 
   /// <summary>
@@ -323,6 +327,10 @@ type
     ///   Returns a locale for the specified IETF BCP 47 language tag string.
     /// </summary>
     class function Create(const ALanguageTag: AnsiString): TALLocaleA; overload; static;
+    /// <summary>
+    ///   Returns the locale as a BCP 47 language tag, for example "fr-FR".
+    /// </summary>
+    function ToLanguageTag: AnsiString;
   end;
 
   {*****************************}
@@ -1519,6 +1527,59 @@ begin
 
 end;
 
+{****************************************}
+function TALLocaleW.ToLanguageTag: String;
+begin
+
+  // Language subtag
+  // A 2-or-3-character code that defines the basic language, typically
+  // written in all lowercase. For example, the language code for
+  // English is en, and the code for Badeshi is bdz.
+  if Language <> '' then
+    Result := ALLowerCase(Language)
+  else
+    Result := '';
+
+  // langtag must start with either language or privateuse
+  if Result <> '' then begin
+
+    // Script subtag Optional
+    // This subtag defines the writing system used for the language, and is always
+    // 4 characters long, with the first letter capitalized. For example,
+    // French-in-Braille is fr-Brai and Japanese written with the
+    // Katakana alphabet is ja-Kana.
+    if Script <> '' then
+      Result := Result + '-' + ALTitleCase(Script);
+
+    // Region subtag Optional
+    // This subtag defines a dialect of the base language from a particular
+    // location and is either two upper-case letters matching a country code or
+    // three numbers matching a non-country area. For example, es-ES is for
+    // Spanish as spoken in Spain, and es-013 is Spanish as spoken in Central
+    // America. "International Spanish" would just be es.
+    if Region <> '' then
+      Result := Result + '-' + ALUpperCase(Region);
+
+    // variant
+    for var I := Low(Variants) to High(Variants) do
+      if Variants[I] <> '' then
+        Result := Result + '-' + ALLowerCase(Variants[I]);
+
+    // extension
+    for var I := Low(Extensions) to High(Extensions) do
+      if Extensions[I] <> '' then
+        Result := Result + '-' + ALLowerCase(Extensions[I]);
+
+  end;
+
+  // privateuse
+  if Privateuse <> '' then begin
+    if Result <> '' then Result := Result + '-';
+    Result := Result + ALLowerCase(Privateuse);
+  end;
+
+end;
+
 {*******************************************}
 class function TALLocaleA.Create: TALLocaleA;
 begin
@@ -1673,6 +1734,59 @@ begin
 
   // RegionID
   Result.RegionID := ALRegionCodeToID(Result.Region);
+
+end;
+
+{********************************************}
+function TALLocaleA.ToLanguageTag: AnsiString;
+begin
+
+  // Language subtag
+  // A 2-or-3-character code that defines the basic language, typically
+  // written in all lowercase. For example, the language code for
+  // English is en, and the code for Badeshi is bdz.
+  if Language <> '' then
+    Result := ALLowerCase(Language)
+  else
+    Result := '';
+
+  // langtag must start with either language or privateuse
+  if Result <> '' then begin
+
+    // Script subtag Optional
+    // This subtag defines the writing system used for the language, and is always
+    // 4 characters long, with the first letter capitalized. For example,
+    // French-in-Braille is fr-Brai and Japanese written with the
+    // Katakana alphabet is ja-Kana.
+    if Script <> '' then
+      Result := Result + '-' + ALTitleCase(Script);
+
+    // Region subtag Optional
+    // This subtag defines a dialect of the base language from a particular
+    // location and is either two upper-case letters matching a country code or
+    // three numbers matching a non-country area. For example, es-ES is for
+    // Spanish as spoken in Spain, and es-013 is Spanish as spoken in Central
+    // America. "International Spanish" would just be es.
+    if Region <> '' then
+      Result := Result + '-' + ALUpperCase(Region);
+
+    // variant
+    for var I := Low(Variants) to High(Variants) do
+      if Variants[I] <> '' then
+        Result := Result + '-' + ALLowerCase(Variants[I]);
+
+    // extension
+    for var I := Low(Extensions) to High(Extensions) do
+      if Extensions[I] <> '' then
+        Result := Result + '-' + ALLowerCase(Extensions[I]);
+
+  end;
+
+  // privateuse
+  if Privateuse <> '' then begin
+    if Result <> '' then Result := Result + '-';
+    Result := Result + ALLowerCase(Privateuse);
+  end;
 
 end;
 
@@ -2017,9 +2131,9 @@ end;
 {********************************}
 Destructor TALPluralRules.Destroy;
 begin
-  inherited;
   ALFreeAndNil(FCardinalPluralCategoryFuncByLanguages);
   ALFreeAndNil(FOrdinalPluralCategoryFuncByLanguages);
+  inherited;
 end;
 
 {*************}

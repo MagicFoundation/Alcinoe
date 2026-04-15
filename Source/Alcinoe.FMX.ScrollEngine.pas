@@ -2184,9 +2184,9 @@ end;
 {*********************************}
 destructor TALOverScroller.Destroy;
 begin
-  inherited Destroy;
   ALFreeAndNil(FScrollerX);
   ALFreeAndNil(FScrollerY);
+  inherited;
 end;
 
 {******************************************************************************}

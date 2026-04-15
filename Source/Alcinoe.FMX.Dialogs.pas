@@ -1478,6 +1478,35 @@ begin
                      - ADialog.Container.padding.Right);
   end;
 
+  // MaxWidth on RadioButton/CheckBox labels so long text wraps instead of
+  // growing the dialog container beyond LMaxDialogContainerWidth.
+  var LAdjustOptionLabelMaxWidth :=
+    procedure(const AControl: TALControl)
+    begin
+      if not (AControl.Parent is TControl) then exit;
+      var LLayout := TControl(AControl.Parent);
+      for var J := 0 to LLayout.ControlsCount - 1 do
+        if LLayout.Controls[J] is TALText then begin
+          var LLabel := TALText(LLayout.Controls[J]);
+          LLabel.MaxWidth := LMaxDialogContainerWidth
+                           - ADialog.Content.Padding.Left
+                           - ADialog.Content.Padding.Right
+                           - LLayout.Margins.Left
+                           - LLayout.Margins.Right
+                           - AControl.Width
+                           - AControl.Margins.Left
+                           - AControl.Margins.Right
+                           - LLabel.Margins.Left;
+          break;
+        end;
+    end;
+  var LRadioButtons := ADialog.GetRadioButtons;
+  for var I := low(LRadioButtons) to High(LRadioButtons) do
+    LAdjustOptionLabelMaxWidth(LRadioButtons[I]);
+  var LCheckBoxes := ADialog.GetCheckBoxes;
+  for var I := low(LCheckBoxes) to High(LCheckBoxes) do
+    LAdjustOptionLabelMaxWidth(LCheckBoxes[I]);
+
   // BeginUpdate was called when the dialog was created.
   // Calling EndUpdate now will adjust the size of all text.
   ADialog.EndUpdate;

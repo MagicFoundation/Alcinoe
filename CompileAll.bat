@@ -447,7 +447,7 @@ if "%Alcinoe_Mac_Connection_Profile_Name%"=="" GOTO CREATE_COMPILED_ARCHIVES
 
 SET ALTOOL_USERNAME=
 for /f "usebackq delims=" %%i in (
-  `powershell -NoProfile -ExecutionPolicy Bypass -File "%ALBaseDir%\Tools\GetWindowsCredential\GetWindowsCredential.ps1" -TargetName "alcinoe.altool" -Field UserName`
+  `powershell -NoProfile -ExecutionPolicy Bypass -File "%ALBaseDir%\Tools\WindowsCredentialScripts\GetWindowsCredential.ps1" -TargetName "alcinoe.altool" -Field UserName`
 ) do set ALTOOL_USERNAME=%%i
 
 SET ALTOOL_PASSWORD=

@@ -6,10 +6,10 @@ REM To deploy the app to the Apple Store, set the following environment variable
 REM   * Alcinoe_Mac_Host=IP address of the Mac computer used for deployment.
 REM   * Alcinoe_Mac_Username=Username of the account on the Mac computer.
 REM   * Alcinoe_Mac_Connection_Profile_Name=Name of the PAServer connection profile.
-REM   * Alcinoe_EnvOptions_iOSDevice64_DevAppStore=Retrieve this value from: C:\Users\{UserName}\AppData\Roaming\Embarcadero\BDS\xx.0\EnvOptions.proj (after deploying the app from the IDE).
-REM   * Alcinoe_EnvOptions_iOSDevice64_DevTeamIdAppStore=Retrieve this value from: C:\Users\{UserName}\AppData\Roaming\Embarcadero\BDS\xx.0\EnvOptions.proj (after deploying the app from the IDE).
-REM   * Alcinoe_ALFmxControlsDemo_EnvOptions_iOSDevice64_MobileProvisionAppStore=Retrieve this value from: C:\Users\{UserName}\AppData\Roaming\Embarcadero\BDS\xx.0\EnvOptions.proj (after deploying the app from the IDE).
-REM   * Alcinoe_ALFmxDynamicListBoxDemo_EnvOptions_iOSDevice64_MobileProvisionAppStore=Retrieve this value from: C:\Users\{UserName}\AppData\Roaming\Embarcadero\BDS\xx.0\EnvOptions.proj (after deploying the app from the IDE).
+REM   * Alcinoe_EnvOptions_iOSDevice64_DevAppStore=Retrieve this value from: C:\Users\{Username}\AppData\Roaming\Embarcadero\BDS\xx.0\EnvOptions.proj (after deploying the app from the IDE).
+REM   * Alcinoe_EnvOptions_iOSDevice64_DevTeamIdAppStore=Retrieve this value from: C:\Users\{Username}\AppData\Roaming\Embarcadero\BDS\xx.0\EnvOptions.proj (after deploying the app from the IDE).
+REM   * Alcinoe_ALFmxControlsDemo_EnvOptions_iOSDevice64_MobileProvisionAppStore=Retrieve this value from: C:\Users\{Username}\AppData\Roaming\Embarcadero\BDS\xx.0\EnvOptions.proj (after deploying the app from the IDE).
+REM   * Alcinoe_ALFmxDynamicListBoxDemo_EnvOptions_iOSDevice64_MobileProvisionAppStore=Retrieve this value from: C:\Users\{Username}\AppData\Roaming\Embarcadero\BDS\xx.0\EnvOptions.proj (after deploying the app from the IDE).
 REM 
 REM You must also generate an app-specific password for ALTool. Follow these steps:
 REM  1. Generate an App-Specific Password:
@@ -18,12 +18,10 @@ REM     * In your account settings, navigate to the Security section.
 REM     * Locate the option to generate an app-specific password, then click "Create an app-specific password."
 REM     * Follow the on-screen instructions and provide a label ^(e.g., "altool"^) for your reference.
 REM  2. Store the Username/Password Pair in Windows Credential Manager:
-REM     * Open Credential Manager from the Control Panel.
-REM     * Select the Windows Credentials tab.
-REM     * Click "Add a generic credential."
-REM     * Internet or network address: alcinoe.altool
-REM     * User Name:{UserName} 
-REM     * Password:{Password} 
+REM     * Launch {Alcinoe}\Tools\WindowsCredentialScripts\GetWindowsCredential.ps1
+REM     * TargetName: alcinoe.altool
+REM     * Username: {Username} 
+REM     * Password: {Password} 
 
 REM -------------------
 REM Choose the compiler
@@ -447,12 +445,12 @@ if "%Alcinoe_Mac_Connection_Profile_Name%"=="" GOTO CREATE_COMPILED_ARCHIVES
 
 SET ALTOOL_USERNAME=
 for /f "usebackq delims=" %%i in (
-  `powershell -NoProfile -ExecutionPolicy Bypass -File "%ALBaseDir%\Tools\WindowsCredentialScripts\GetWindowsCredential.ps1" -TargetName "alcinoe.altool" -Field UserName`
+  `powershell -NoProfile -ExecutionPolicy Bypass -File "%ALBaseDir%\Tools\WindowsCredentialScripts\GetWindowsCredential.ps1" -TargetName "alcinoe.altool" -Field Username`
 ) do set ALTOOL_USERNAME=%%i
 
 SET ALTOOL_PASSWORD=
 for /f "usebackq delims=" %%i in (
-  `powershell -NoProfile -ExecutionPolicy Bypass -File "%ALBaseDir%\Tools\GetWindowsCredential\GetWindowsCredential.ps1" -TargetName "alcinoe.altool" -Field Password`
+  `powershell -NoProfile -ExecutionPolicy Bypass -File "%ALBaseDir%\Tools\WindowsCredentialScripts\GetWindowsCredential.ps1" -TargetName "alcinoe.altool" -Field Password`
 ) do set ALTOOL_PASSWORD=%%i
 
 If "%ALTOOL_PASSWORD%"=="" (
@@ -463,12 +461,10 @@ If "%ALTOOL_PASSWORD%"=="" (
   Echo     * Locate the option to generate an app-specific password, then click "Create an app-specific password."
   Echo     * Follow the on-screen instructions and provide a label ^(e.g., "altool"^) for your reference.
   Echo  2. Store the Username/Password Pair in Windows Credential Manager:
-  Echo     * Open Credential Manager from the Control Panel.
-  Echo     * Select the Windows Credentials tab.
-  Echo     * Click "Add a generic credential."
-  Echo     * Internet or network address: alcinoe.altool
-  Echo     * User Name:{UserName} 
-  Echo     * Password:{Password} 
+  Echo     * Launch {Alcinoe}\Tools\WindowsCredentialScripts\GetWindowsCredential.ps1
+  Echo     * TargetName: alcinoe.altool
+  Echo     * Username: {Username} 
+  Echo     * Password: {Password} 
   GOTO ERROR
 )
 

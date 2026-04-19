@@ -1,30 +1,43 @@
-# Windows Manager Credential Extractor Script
+## GetWindowsCredential.ps1
 
-This PowerShell script retrieves a stored Windows generic credential by 
-its target name and returns either the username or the password based 
-on the specified `-Field` parameter; 
+This PowerShell script retrieves a stored Windows generic credential 
+by its target name and returns either the username or password via 
+the `-Field` parameter.
 
-it accepts two mandatory parameters: `-TargetName` (the name of the credential) 
-and `-Field` (which must be either "UserName" or "Password"), utilizes 
-embedded C# code to call Windows Credential API functions such 
-as `CredRead` and `CredFree` to read the credential data, converts the 
-password from a UTF-16 encoded blob if present, and outputs the requested 
-information, all while requiring a Windows system with PowerShell 5.1 or 
-later and proper permissions.
+It requires:
+- `-TargetName`: credential name
+- `-Field`: `Username` or `Password`
 
-To Store a Username/Password Pair in Windows Credential Manager:
-  - Open Credential Manager from the Control Panel.
-  - Select the Windows Credentials tab.
-  - Click "Add a generic credential."
-  - Internet or network address: {TargetName}
-  - User Name:{UserName} 
-  - Password:{Password} 
-    
-Exemple:
+It uses embedded C# (`CredRead`, `CredFree`) to access the Windows 
+Credential API and interprets both username and password as UTF-8 
+encoded values before returning the result.
 
+Usage:
+
+```powershell
+.\GetWindowsCredential.ps1 -TargetName "MyTargetName" -Field Username
+.\GetWindowsCredential.ps1 -TargetName "MyTargetName" -Field Password
 ```
+
+Example:
+
+```cmd
 SET PASSWORD=
 for /f "usebackq delims=" %%i in (
   `powershell -NoProfile -ExecutionPolicy Bypass -File "GetWindowsCredential.ps1" -TargetName "MyTargetName" -Field Password`
 ) do set PASSWORD=%%i
+```
+
+
+## SetWindowsCredential.ps1
+
+This PowerShell script stores a Windows generic credential in Credential 
+Manager. It prompts for target name, username, and password, then uses 
+embedded C# (`CredWrite`) to store the credential. Both username and 
+password are stored using UTF-8 encoding.
+
+Usage:
+
+```powershell
+.\SetWindowsCredential.ps1 -TargetName "MyTargetName" -Username "MyUsername" -Password "MyPassword"
 ```

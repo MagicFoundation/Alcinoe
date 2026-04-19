@@ -246,8 +246,16 @@ Write-Host "Selected $levelLabel log level" -ForegroundColor Gray
 
 Write-Host ""
 
-$filterText = Prompt-Read "Filter text (optional)"
-$filterRegex = [regex]::Escape($filterText)
+$filterText = Prompt-Read "Filter text / RegEx (optional)"
+$filterRegex = $filterText
+if (-not [string]::IsNullOrWhiteSpace($filterText)) {
+    try {
+        [void][regex]::new($filterText)
+    } catch {
+        Write-Host "Invalid RegEx pattern - treating as literal text." -ForegroundColor Yellow
+        $filterRegex = [regex]::Escape($filterText)
+    }
+}
 
 # --------------------- Setup Console ---------------------
 $oldBg = $Host.UI.RawUI.BackgroundColor

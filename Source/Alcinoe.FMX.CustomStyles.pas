@@ -2,7 +2,7 @@
 
 // To define custom styles, copy this unit into the .\CustomStyles subdirectory
 // and then modify it to include your custom style. After making changes,
-// recompile the package using {Alcinoe}\CompileAll.bat
+// recompile the package using {Alcinoe}\BuildAll.bat
 
 interface
 

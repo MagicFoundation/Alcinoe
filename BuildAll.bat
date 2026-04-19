@@ -326,7 +326,7 @@ goto BUILD_JARS
 
 :DO_BUILD_JARS
 
-call "%ALBaseDir%\compileJar.bat"
+call "%ALBaseDir%\BuildJars.bat"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 

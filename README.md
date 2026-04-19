@@ -161,7 +161,7 @@ forced to apply patches to the original Delphi source files:
 Install Alcinoe
 ---------------
 
-To set up Alcinoe, start by running the [CompileAll.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/CompileAll.bat)
+To set up Alcinoe, start by running the [BuildAll.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/BuildAll.bat)
 script. This batch file performs a series of tasks, 
 including retrieving and patching the original Delphi 
 source code, downloading the necessary iOS/Android 

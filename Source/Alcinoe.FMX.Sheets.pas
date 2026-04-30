@@ -1518,7 +1518,9 @@ begin
      (TAlphaColorRec(Container.Fill.Color).A = $FF) then begin
     case DockEdge of
       TALSheet.TDockEdge.Left: begin
-        if CompareValue(Container.Margins.Left, FSafeAreaInsets.Left, TEpsilon.Position) <= 0 then begin
+        if (CompareValue(Container.Margins.Left, FSafeAreaInsets.Left, TEpsilon.Position) <= 0) and
+           (TCorner.TopLeft not in Container.Corners) and
+           (TCorner.bottomLeft not in Container.Corners) then begin
           var LRect := Container.BoundsRect;
           LRect.Offset(0, -LRect.Width);
           LRect.Left := -65535;
@@ -1535,7 +1537,9 @@ begin
         end;
       end;
       TALSheet.TDockEdge.Right: begin
-        if CompareValue(Container.Margins.Right, FSafeAreaInsets.Right, TEpsilon.Position) <= 0 then begin
+        if (CompareValue(Container.Margins.Right, FSafeAreaInsets.Right, TEpsilon.Position) <= 0) and
+           (TCorner.TopRight not in Container.Corners) and
+           (TCorner.bottomRight not in Container.Corners) then begin
           var LRect := Container.BoundsRect;
           LRect.Offset(0, LRect.Width);
           LRect.Right := 65535;
@@ -1552,7 +1556,9 @@ begin
         end;
       end;
       TALSheet.TDockEdge.Top: begin
-        if CompareValue(Container.Margins.Top, FSafeAreaInsets.Top, TEpsilon.Position) <= 0 then begin
+        if (CompareValue(Container.Margins.Top, FSafeAreaInsets.Top, TEpsilon.Position) <= 0) and
+           (TCorner.TopLeft not in Container.Corners) and
+           (TCorner.TopRight not in Container.Corners) then begin
           var LRect := Container.BoundsRect;
           LRect.Offset(0, -LRect.Height);
           LRect.Top := -65535;
@@ -1569,7 +1575,9 @@ begin
         end;
       end;
       TALSheet.TDockEdge.Bottom: begin
-        if CompareValue(Container.Margins.Bottom, FSafeAreaInsets.Bottom, TEpsilon.Position) <= 0 then begin
+        if (CompareValue(Container.Margins.Bottom, FSafeAreaInsets.Bottom, TEpsilon.Position) <= 0) and
+           (TCorner.BottomLeft not in Container.Corners) and
+           (TCorner.bottomRight not in Container.Corners) then begin
           var LRect := Container.BoundsRect;
           LRect.Offset(0, LRect.Height);
           LRect.Bottom := 65535;

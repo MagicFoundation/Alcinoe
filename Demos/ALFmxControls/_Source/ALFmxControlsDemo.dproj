@@ -6,7 +6,7 @@
     <MainSource>ALFmxControlsDemo.dpr</MainSource>
     <Base>True</Base>
     <Config Condition="'$(Config)'==''">Debug</Config>
-    <Platform Condition="'$(Platform)'==''">iOSDevice64</Platform>
+    <Platform Condition="'$(Platform)'==''">Android64</Platform>
     <TargetedPlatforms>693267</TargetedPlatforms>
     <AppType>Application</AppType>
   </PropertyGroup>

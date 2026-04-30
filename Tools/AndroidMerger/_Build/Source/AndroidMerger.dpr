@@ -2553,30 +2553,33 @@ begin
           for var I := LDeploymentNode.ChildNodes.Count - 1 downto 0 do begin
             var LDeployFileNode := LDeploymentNode.ChildNodes[i];
             if ALSameTextA(LDeployFileNode.NodeName, 'DeployFile') then begin
-              if ALSameTextA(LDeployFileNode.Attributes['Class'], 'File') then begin
-                if LDeployFileNode.ChildNodes.Count = 0 then raise Exception.Create('Error A892E02E-A8BA-4003-AEF1-A81271AD0A9F');
-                for Var J := LDeployFileNode.ChildNodes.Count - 1 downto 0 do begin
-                  var LPlatformNode := LDeployFileNode.ChildNodes[j];
-                  if not ALSameTextA(LPlatformNode.NodeName, 'Platform') then raise Exception.Create('Error 65714071-86F2-4796-82F8-9F01C5C9824B');
-                  var LName := LPlatformNode.Attributes['Name'];
-                  if LName = '' then raise Exception.Create('Error 42C3C299-BA31-4B17-9EA4-8320E0048848');
-                  if (LPlatforms.IndexOf(LName) >= 0) then begin
-                    Var LremoteDirNode := LPlatformNode.ChildNodes.FindNode('RemoteDir');
-                    if (LremoteDirNode <> nil) and
-                       ((ALPosIgnoreCaseA('res\', LremoteDirNode.Text) = 1) or
-                        (ALSameTextA('res', LremoteDirNode.Text)) or
-                        (ALPosIgnoreCaseA('library\lib\arm64-v8a', LremoteDirNode.Text) = 1) or
-                        (ALPosIgnoreCaseA('library\lib\armeabi-v7a', LremoteDirNode.Text) = 1)) then begin
-                      LDeployFileNode.ChildNodes.Delete(j);
-                      continue;
+              var LConfig := LDeployFileNode.Attributes['Configuration'];
+              if (LConfig = '') or (LConfigs.IndexOf(LConfig) >= 0) then begin
+                if ALSameTextA(LDeployFileNode.Attributes['Class'], 'File') then begin
+                  if LDeployFileNode.ChildNodes.Count = 0 then raise Exception.Create('Error A892E02E-A8BA-4003-AEF1-A81271AD0A9F');
+                  for Var J := LDeployFileNode.ChildNodes.Count - 1 downto 0 do begin
+                    var LPlatformNode := LDeployFileNode.ChildNodes[j];
+                    if not ALSameTextA(LPlatformNode.NodeName, 'Platform') then raise Exception.Create('Error 65714071-86F2-4796-82F8-9F01C5C9824B');
+                    var LName := LPlatformNode.Attributes['Name'];
+                    if LName = '' then raise Exception.Create('Error 42C3C299-BA31-4B17-9EA4-8320E0048848');
+                    if (LPlatforms.IndexOf(LName) >= 0) then begin
+                      Var LremoteDirNode := LPlatformNode.ChildNodes.FindNode('RemoteDir');
+                      if (LremoteDirNode <> nil) and
+                         ((ALPosIgnoreCaseA('res\', LremoteDirNode.Text) = 1) or
+                          (ALSameTextA('res', LremoteDirNode.Text)) or
+                          (ALPosIgnoreCaseA('library\lib\arm64-v8a', LremoteDirNode.Text) = 1) or
+                          (ALPosIgnoreCaseA('library\lib\armeabi-v7a', LremoteDirNode.Text) = 1)) then begin
+                        LDeployFileNode.ChildNodes.Delete(j);
+                        continue;
+                      end;
                     end;
                   end;
-                end;
-                if LDeployFileNode.ChildNodes.Count = 0 then
+                  if LDeployFileNode.ChildNodes.Count = 0 then
+                    LDeploymentNode.ChildNodes.Delete(i);
+                end
+                else if LDeployFilesToDeactivate.IndexOfName(LDeployFileNode.Attributes['Class']) >= 0 then begin
                   LDeploymentNode.ChildNodes.Delete(i);
-              end
-              else if LDeployFilesToDeactivate.IndexOfName(LDeployFileNode.Attributes['Class']) >= 0 then begin
-                LDeploymentNode.ChildNodes.Delete(i);
+                end;
               end;
             end
           end;

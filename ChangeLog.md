@@ -1,3 +1,35 @@
+## 04/30/2026
+
+- Extended hexadecimal and Base64 helpers in `Alcinoe.StringUtils`:
+  - added `ALTryHexToInt32/UInt32/Int64/UInt64` and `ALHexToInt32/UInt32/Int64/UInt64`
+  - added optional lowercase output support to `ALIntToHexA/W` and `ALBinToHexA/W`
+  - added URL-safe Base64 helpers for strings and bytes, plus MIME byte-decode overloads
+- Updated JSON/BSON formatting in `Alcinoe.JSONDoc`:
+  - added `TALJSONNodeListA/W.Extract(Name)`
+  - made `ALJsonEncode...A/W` interchange-format parameters default to Mongo Extended JSON
+  - changed ObjectID and BSON binary subtype JSON output to use lowercase hexadecimal
+- Updated hash, HMAC, and OAuth helpers in `Alcinoe.Cipher`:
+  - hash and HMAC string helpers now emit lowercase hexadecimal
+  - renamed `ALVerifyRSA256Signature`/`ALRSA256Sign` to `ALVerifyRS256Signature`/`ALRS256Sign`
+  - changed RS256 signing and verification to use `TBytes` inputs/results
+  - added `ALTryGetGenericWinCredential` and `ALGetGenericWinCredential`
+- Renamed `TALErrorReporting` to `TALErrorReporter` and updated demos/references accordingly
+- Improved Firebase Cloud Messaging on iOS:
+  - added guarded `ALFIRAppConfigure`
+  - disabled Firebase app delegate swizzling in the notification demo plist
+- Updated `TALNotificationService`:
+  - added `RegisterForRemoteNotifications`
+  - changed `TPushProvider` values from `FCM, APNs, PushKit` to `FCM, APNS, HMS`
+- Improved FMX layout/platform helpers:
+  - added semantic-version packing helpers and `ALGetSafeAreaInsets`
+  - tracks the last requested Android system bar colors so restore/capture is stable in edge-to-edge modes
+  - updated sheets to account for safe-area insets and platform keyboard height differences
+  - fixed HTML decoding for ellipsis text in break-text rendering
+- improved edit and memo placeholder vertical positioning/line-height handling
+- initialized dynamic list box touch handling only once the main content becomes visible
+- Added Android 13 back-invocation JNI wrappers in `Alcinoe.Androidapi.Window` and exposed `JALActivity.getOnBackInvokedDispatcher`
+- Updated `AndroidMerger` deploy-file cleanup to respect the selected deployment configurations
+
 ## 04/08/2026
 
 - Refactored hashing and HMAC helpers in `Alcinoe.Cipher`:

@@ -61,6 +61,7 @@ uses
   Alcinoe.AndroidApi.Security,
   Alcinoe.AndroidApi.WebKit,
   Alcinoe.AndroidApi.Widget,
+  Alcinoe.Androidapi.Window,
   Alcinoe.Androidapi.GraphicsContentViewText,
   Alcinoe.FMX.NativeView.Android,
   {$ENDIF}

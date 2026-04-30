@@ -111,7 +111,7 @@ begin
       var LBsonBytes: TBytes;
       LALJsonDocumentA.SaveToBSONBytes(LBsonBytes);
       if length(LBsonBytes) > 0 then
-        MemoBSON.Lines.Text := String(ALBinToHexA(LBsonBytes));
+        MemoBSON.Lines.Text := String(ALBinToHexA(LBsonBytes, True{ALowerCase}));
     finally
       LALJsonDocumentA.Free;
     end;
@@ -127,7 +127,7 @@ begin
           nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
           nstObject: ;
           nstArray: ;
-          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBinToHexW(TBytes(Args[0].VPointer)));
+          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBinToHexW(TBytes(Args[0].VPointer, True{ALowerCase})));
           nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
           nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
           nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'null');
@@ -174,7 +174,7 @@ begin
 
       var LBsonBytes := LALJsonDocumentW.BSON;
       if length(LBsonBytes) > 0 then
-        MemoBSON.Lines.Text := ALBinToHexW(LALJsonDocumentW.BSON);
+        MemoBSON.Lines.Text := ALBinToHexW(LALJsonDocumentW.BSON, True{ALowerCase});
     finally
       LALJsonDocumentW.Free;
     end;
@@ -190,7 +190,7 @@ begin
           nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(Args[0].VUnicodeString));
           nstObject: ;
           nstArray: ;
-          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBinToHexW(TBytes(Args[0].VPointer)));
+          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBinToHexW(TBytes(Args[0].VPointer, True{ALowerCase})));
           nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
           nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
           nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'null');
@@ -282,7 +282,7 @@ begin
       LALJsonDocumentA.SaveToJSONString(LJsonStr, [soNodeAutoIndent]);
       MemoJSON.Lines.Text := String(LJSONStr);
 
-      MemoBSON.Lines.Text := String(ALBinToHexA(LALJsonDocumentA.BSON));
+      MemoBSON.Lines.Text := String(ALBinToHexA(LALJsonDocumentA.BSON, True{ALowerCase}));
     finally
       LALJsonDocumentA.Free;
     end;
@@ -355,7 +355,7 @@ begin
       LALJsonDocumentW.SaveToJSONString(LJsonStr, [soNodeAutoIndent]);
       MemoJSON.Lines.Text := LJSONStr;
 
-      MemoBSON.Lines.Text := ALBinToHexW(LALJsonDocumentW.BSON);
+      MemoBSON.Lines.Text := ALBinToHexW(LALJsonDocumentW.BSON, True{ALowerCase});
     finally
       LALJsonDocumentW.Free;
     end;
@@ -400,7 +400,7 @@ begin
           nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
           nstObject: ;
           nstArray: ;
-          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBinToHexW(TBytes(Args[0].VPointer)));
+          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBinToHexW(TBytes(Args[0].VPointer, True{ALowerCase})));
           nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
           nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
           nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'null');
@@ -461,7 +461,7 @@ begin
           nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(Args[0].VUnicodeString));
           nstObject: ;
           nstArray: ;
-          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBinToHexW(TBytes(Args[0].VPointer)));
+          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBinToHexW(TBytes(Args[0].VPointer, True{ALowerCase})));
           nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
           nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
           nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'null');

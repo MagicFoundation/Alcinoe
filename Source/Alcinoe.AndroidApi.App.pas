@@ -9,7 +9,8 @@ uses
   Androidapi.JNI.Media,
   Androidapi.JNI.App,
   Androidapi.JNI.Net,
-  Androidapi.JNI.JavaTypes;
+  Androidapi.JNI.JavaTypes,
+  Alcinoe.AndroidApi.Window;
 
 type
 
@@ -17,6 +18,7 @@ type
   JUiModeManager = interface;
   JALNotification = interface;
   JALNotificationChannel = interface;
+  JALActivity = interface;
 
   {*******************************************}
   JUiModeManagerClass = interface(JObjectClass)
@@ -67,6 +69,20 @@ type
   end;
   TJALNotificationChannel = class(TJavaGenericImport<JALNotificationChannelClass, JALNotificationChannel>) end;
 
+  {*************************************}
+  {$IFNDEF ALCompilerVersionSupported131}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5362 has been resolved. If resolved, remove the class definition below.'}
+  {$ENDIF}
+  JALActivityClass = interface(JActivityClass)
+    ['{F06964FE-D712-43C3-ABB9-EE2E0E10B35E}']
+  end;
+  [JavaSignature('android/app/Activity')]
+  JALActivity = interface(JActivity)
+    ['{D516DF48-E79C-4BFE-89D8-881091941BF0}']
+    function getOnBackInvokedDispatcher: JOnBackInvokedDispatcher; cdecl;
+  end;
+  TJALActivity = class(TJavaGenericImport<JALActivityClass, JALActivity>) end;
+
 implementation
 
 uses
@@ -78,6 +94,7 @@ begin
   TRegTypes.RegisterType('Alcinoe.AndroidApi.App.JUiModeManager', TypeInfo(Alcinoe.AndroidApi.App.JUiModeManager));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.App.JALNotification', TypeInfo(Alcinoe.AndroidApi.App.JALNotification));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.App.JALNotificationChannel', TypeInfo(Alcinoe.AndroidApi.App.JALNotificationChannel));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.App.JALActivity', TypeInfo(Alcinoe.AndroidApi.App.JALActivity));
 end;
 
 initialization

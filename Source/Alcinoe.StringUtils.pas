@@ -347,40 +347,65 @@ function  ALUIntToStrA(Value: Cardinal): AnsiString; overload;
 function  ALUIntToStrA(Value: UInt64): AnsiString; overload;
 function  ALUIntToStrW(Value: Cardinal): String; overload; inline;
 function  ALUIntToStrW(Value: UInt64): String; overload; inline;
-function  ALIntToHexA(Value: Integer; Digits: Integer): AnsiString; overload;
-function  ALIntToHexA(Value: Int64; Digits: Integer): AnsiString; overload;
-function  ALIntToHexA(Value: UInt64; Digits: Integer): AnsiString; overload;
-function  ALIntToHexW(Value: Integer; Digits: Integer): String; inline; overload;
-function  ALIntToHexW(Value: Int64; Digits: Integer): String; inline; overload;
-function  ALIntToHexW(Value: UInt64; Digits: Integer): String; inline; overload;
-function  ALBinToHexA(const aBin: AnsiString): AnsiString; overload;
-function  ALBinToHexA(const aBin: TBytes): AnsiString; overload;
-Function  ALBinToHexA(const aBin; aBinSize: Integer): AnsiString; overload;
-Function  ALBinToHexW(const aBin: TBytes): String; overload;
-Function  ALBinToHexW(const aBin; aBinSize: Integer): String; overload;
-Function  ALTryHexToBin(const aHex: AnsiString; out Value: AnsiString): boolean; overload;
-Function  ALTryHexToBin(const aHex: AnsiString; out Value: TBytes): boolean; overload;
-Function  ALTryHexToBin(const aHex: String; out Value: TBytes): boolean; overload;
-Function  ALHexToBin(const aHex: AnsiString): TBytes; overload;
-Function  ALHexToBin(const aHex: String): TBytes; overload;
+function  ALTryHexToInt32(const S: AnsiString; out Value: Int32): Boolean; overload;
+function  ALTryHexToUInt32(const S: AnsiString; out Value: UInt32): Boolean; overload;
+function  ALTryHexToInt64(const S: AnsiString; out Value: Int64): Boolean; overload;
+function  ALTryHexToUInt64(const S: AnsiString; out Value: UInt64): Boolean; overload;
+function  ALTryHexToInt32(const S: String; out Value: Int32): Boolean; overload;
+function  ALTryHexToUInt32(const S: String; out Value: UInt32): Boolean; overload;
+function  ALTryHexToInt64(const S: String; out Value: Int64): Boolean; overload;
+function  ALTryHexToUInt64(const S: String; out Value: UInt64): Boolean; overload;
+function  ALHexToInt32(const S: AnsiString): Int32; overload;
+function  ALHexToUInt32(const S: AnsiString): UInt32; overload;
+function  ALHexToInt64(const S: AnsiString): Int64; overload;
+function  ALHexToUInt64(const S: AnsiString): UInt64; overload;
+function  ALHexToInt32(const S: String): Int32; overload;
+function  ALHexToUInt32(const S: String): UInt32; overload;
+function  ALHexToInt64(const S: String): Int64; overload;
+function  ALHexToUInt64(const S: String): UInt64; overload;
+function  ALIntToHexA(Value: Int32; const ADigits: Integer = SizeOf(Int32)*2; const ALowerCase: Boolean = False): AnsiString; overload; inline;
+function  ALIntToHexA(Value: UInt32; const ADigits: Integer = SizeOf(UInt32)*2; const ALowerCase: Boolean = False): AnsiString; overload;
+function  ALIntToHexA(Value: Int64; const ADigits: Integer = SizeOf(Int64)*2; const ALowerCase: Boolean = False): AnsiString; overload; inline;
+function  ALIntToHexA(Value: UInt64; const ADigits: Integer = SizeOf(UInt64)*2; const ALowerCase: Boolean = False): AnsiString; overload;
+function  ALIntToHexW(Value: Int32; const ADigits: Integer = SizeOf(Int32)*2; const ALowerCase: Boolean = False): string; overload; inline;
+function  ALIntToHexW(Value: UInt32; const ADigits: Integer = SizeOf(UInt32)*2; const ALowerCase: Boolean = False): string; overload;
+function  ALIntToHexW(Value: Int64; const ADigits: Integer = SizeOf(Int64)*2; const ALowerCase: Boolean = False): string; overload; inline;
+function  ALIntToHexW(Value: UInt64; const ADigits: Integer = SizeOf(UInt64)*2; const ALowerCase: Boolean = False): string; overload;
+function  ALBinToHexA(const ABin: AnsiString; const ALowerCase: Boolean = False): AnsiString; overload;
+function  ALBinToHexA(const ABin: TBytes; const ALowerCase: Boolean = False): AnsiString; overload;
+Function  ALBinToHexA(const ABin; ABinSize: Integer; const ALowerCase: Boolean = False): AnsiString; overload;
+Function  ALBinToHexW(const ABin: TBytes; const ALowerCase: Boolean = False): String; overload;
+Function  ALBinToHexW(const ABin; ABinSize: Integer; const ALowerCase: Boolean = False): String; overload;
+Function  ALTryHexToBin(const AHex: AnsiString; out Value: AnsiString): boolean; overload;
+Function  ALTryHexToBin(const AHex: AnsiString; out Value: TBytes): boolean; overload;
+Function  ALTryHexToBin(const AHex: String; out Value: TBytes): boolean; overload;
+Function  ALHexToBin(const AHex: AnsiString): TBytes; overload;
+Function  ALHexToBin(const AHex: String): TBytes; overload;
 function  ALIntToBitA(value: Integer; digits: integer): ansistring;
 function  AlBitToInt(Value: ansiString): Integer;
 function  ALBase64EncodeString(const P: PansiChar; const ln: Integer): AnsiString; overload;
 function  ALBase64EncodeString(const S: AnsiString): AnsiString; overload;
 Function  ALBase64EncodeString(const S: String; const AEncoding: TEncoding = nil): String; overload;
-function  ALBase64DecodeString(const P: PansiChar; const ln: Integer): AnsiString; overload;
-function  ALBase64DecodeString(const S: AnsiString): AnsiString; overload;
-Function  ALBase64DecodeString(const S: String; const AEncoding: TEncoding = nil): String; overload;
-function  ALBase64EncodeStringMIME(const S: AnsiString): AnsiString;
-function  ALBase64DecodeStringMIME(const S: AnsiString): AnsiString;
-function  ALURLBase64EncodeString(const S: AnsiString; const aDoOnlyUrlEncode: boolean = false): AnsiString;
-function  ALURLBase64DecodeString(const S: AnsiString; const aDoOnlyUrlDecode: boolean = false): AnsiString;
 Function  ALBase64EncodeBytesA(const Bytes: TBytes): AnsiString; overload;
 Function  ALBase64EncodeBytesA(const Bytes: pointer; const Size: Integer): AnsiString; overload;
 Function  ALBase64EncodeBytesW(const Bytes: TBytes): String; overload;
 Function  ALBase64EncodeBytesW(const Bytes: pointer; const Size: Integer): String; overload;
+function  ALBase64EncodeStringMIME(const S: AnsiString): AnsiString;
+function  ALURLBase64EncodeString(const S: AnsiString): AnsiString; overload;
+function  ALURLBase64EncodeString(const S: String; const AEncoding: TEncoding = nil): String; overload;
+function  ALURLBase64EncodeBytesA(const Bytes: TBytes): AnsiString;
+function  ALURLBase64EncodeBytesW(const Bytes: TBytes): String;
+function  ALBase64DecodeString(const P: PansiChar; const ln: Integer): AnsiString; overload;
+function  ALBase64DecodeString(const S: AnsiString): AnsiString; overload;
+Function  ALBase64DecodeString(const S: String; const AEncoding: TEncoding = nil): String; overload;
 Function  ALBase64DecodeBytes(const S: AnsiString): TBytes; overload;
 Function  ALBase64DecodeBytes(const S: String): TBytes; overload;
+function  ALBase64DecodeStringMIME(const S: AnsiString): AnsiString;
+Function  ALBase64DecodeBytesMIME(const S: AnsiString): TBytes; overload;
+Function  ALBase64DecodeBytesMIME(const S: String): TBytes; overload;
+function  ALURLBase64DecodeString(const S: AnsiString): AnsiString;
+function  ALURLBase64DecodeBytes(const S: AnsiString): TBytes; overload;
+function  ALURLBase64DecodeBytes(const S: String): TBytes; overload;
 function  ALIsAlphaString(const S: AnsiString): Boolean; overload;
 function  ALIsAlphaString(const S: string): Boolean; overload;
 function  ALIsAlphaNumeric(const S: AnsiString): Boolean; overload;
@@ -5477,34 +5502,366 @@ begin
   Result := System.SysUtils.UIntToStr(Value);
 end;
 
-{***}
-const
-  ALTwoHexLookup: packed array[0..255] of array[1..2] of AnsiChar =
-  ('00','01','02','03','04','05','06','07','08','09','0A','0B','0C','0D','0E','0F',
-   '10','11','12','13','14','15','16','17','18','19','1A','1B','1C','1D','1E','1F',
-   '20','21','22','23','24','25','26','27','28','29','2A','2B','2C','2D','2E','2F',
-   '30','31','32','33','34','35','36','37','38','39','3A','3B','3C','3D','3E','3F',
-   '40','41','42','43','44','45','46','47','48','49','4A','4B','4C','4D','4E','4F',
-   '50','51','52','53','54','55','56','57','58','59','5A','5B','5C','5D','5E','5F',
-   '60','61','62','63','64','65','66','67','68','69','6A','6B','6C','6D','6E','6F',
-   '70','71','72','73','74','75','76','77','78','79','7A','7B','7C','7D','7E','7F',
-   '80','81','82','83','84','85','86','87','88','89','8A','8B','8C','8D','8E','8F',
-   '90','91','92','93','94','95','96','97','98','99','9A','9B','9C','9D','9E','9F',
-   'A0','A1','A2','A3','A4','A5','A6','A7','A8','A9','AA','AB','AC','AD','AE','AF',
-   'B0','B1','B2','B3','B4','B5','B6','B7','B8','B9','BA','BB','BC','BD','BE','BF',
-   'C0','C1','C2','C3','C4','C5','C6','C7','C8','C9','CA','CB','CC','CD','CE','CF',
-   'D0','D1','D2','D3','D4','D5','D6','D7','D8','D9','DA','DB','DC','DD','DE','DF',
-   'E0','E1','E2','E3','E4','E5','E6','E7','E8','E9','EA','EB','EC','ED','EE','EF',
-   'F0','F1','F2','F3','F4','F5','F6','F7','F8','F9','FA','FB','FC','FD','FE','FF');
+{*************************************************************************}
+function ALTryHexToUInt32(const S: AnsiString; out Value: UInt32): Boolean;
+begin
+  Value := 0;
+  Result := False;
+  if S = '' then Exit;
+  for var I := 1 to Length(S) do begin
+    var Digit: UInt32;
+    var C: AnsiChar := S[I];
+    case C of
+      '0'..'9': Digit := Ord(C) - Ord('0');
+      'A'..'F': Digit := Ord(C) - Ord('A') + 10;
+      'a'..'f': Digit := Ord(C) - Ord('a') + 10;
+    else
+      Exit;
+    end;
+    if Value > (High(UInt32) - Digit) shr 4 then Exit; // overflow
+    Value := (Value shl 4) or Digit;
+  end;
+  Result := True;
+end;
 
-{***************************************************************}
-function _ALIntToHex(Value: UInt64; Digits: Integer): AnsiString;
+{***********************************************************************}
+function ALTryHexToInt32(const S: AnsiString; out Value: Int32): Boolean;
+begin
+  var U: UInt32;
+  Result := ALTryHexToUInt32(S, U);
+  if Result then
+    Value := Int32(U);
+end;
+
+{*************************************************************************}
+function ALTryHexToUInt64(const S: AnsiString; out Value: UInt64): Boolean;
+begin
+  Value := 0;
+  Result := False;
+  if S = '' then Exit;
+  for var I := 1 to Length(S) do begin
+    var Digit: UInt64;
+    var C: AnsiChar := S[I];
+    case C of
+      '0'..'9': Digit := Ord(C) - Ord('0');
+      'A'..'F': Digit := Ord(C) - Ord('A') + 10;
+      'a'..'f': Digit := Ord(C) - Ord('a') + 10;
+    else
+      Exit;
+    end;
+    if Value > (High(UInt64) - Digit) shr 4 then Exit; // overflow
+    Value := (Value shl 4) or Digit;
+  end;
+  Result := True;
+end;
+
+{***********************************************************************}
+function ALTryHexToInt64(const S: AnsiString; out Value: Int64): Boolean;
+begin
+  var U: UInt64;
+  Result := ALTryHexToUInt64(S, U);
+  if Result then
+    Value := Int64(U);
+end;
+
+{*********************************************************************}
+function ALTryHexToUInt32(const S: String; out Value: UInt32): Boolean;
+begin
+  Value := 0;
+  Result := False;
+  if S = '' then Exit;
+  for var I := 1 to Length(S) do begin
+    var Digit: UInt32;
+    var C: Char := S[I];
+    case C of
+      '0'..'9': Digit := Ord(C) - Ord('0');
+      'A'..'F': Digit := Ord(C) - Ord('A') + 10;
+      'a'..'f': Digit := Ord(C) - Ord('a') + 10;
+    else
+      Exit;
+    end;
+    if Value > (High(UInt32) - Digit) shr 4 then Exit; // overflow
+    Value := (Value shl 4) or Digit;
+  end;
+  Result := True;
+end;
+
+{*******************************************************************}
+function ALTryHexToInt32(const S: String; out Value: Int32): Boolean;
+begin
+  var U: UInt32;
+  Result := ALTryHexToUInt32(S, U);
+  if Result then
+    Value := Int32(U);
+end;
+
+{*********************************************************************}
+function ALTryHexToUInt64(const S: String; out Value: UInt64): Boolean;
+begin
+  Value := 0;
+  Result := False;
+  if S = '' then Exit;
+  for var I := 1 to Length(S) do begin
+    var Digit: UInt64;
+    var C: Char := S[I];
+    case C of
+      '0'..'9': Digit := Ord(C) - Ord('0');
+      'A'..'F': Digit := Ord(C) - Ord('A') + 10;
+      'a'..'f': Digit := Ord(C) - Ord('a') + 10;
+    else
+      Exit;
+    end;
+    if Value > (High(UInt64) - Digit) shr 4 then Exit; // overflow
+    Value := (Value shl 4) or Digit;
+  end;
+  Result := True;
+end;
+
+{*******************************************************************}
+function ALTryHexToInt64(const S: String; out Value: Int64): Boolean;
+begin
+  var U: UInt64;
+  Result := ALTryHexToUInt64(S, U);
+  if Result then
+    Value := Int64(U);
+end;
+
+{*************************************************}
+function  ALHexToInt32(const S: AnsiString): Int32;
+begin
+  if not ALTryHexToInt32(S, Result) then
+    raise Exception.CreateFmt('''%s'' is not a valid hexadecimal Int32 value', [S]);
+end;
+
+{***************************************************}
+function  ALHexToUInt32(const S: AnsiString): UInt32;
+begin
+  if not ALTryHexToUInt32(S, Result) then
+    raise Exception.CreateFmt('''%s'' is not a valid hexadecimal UInt32 value', [S]);
+end;
+
+{*************************************************}
+function  ALHexToInt64(const S: AnsiString): Int64;
+begin
+  if not ALTryHexToInt64(S, Result) then
+    raise Exception.CreateFmt('''%s'' is not a valid hexadecimal Int64 value', [S]);
+end;
+
+{***************************************************}
+function  ALHexToUInt64(const S: AnsiString): UInt64;
+begin
+  if not ALTryHexToUInt64(S, Result) then
+    raise Exception.CreateFmt('''%s'' is not a valid hexadecimal UInt64 value', [S]);
+end;
+
+{*********************************************}
+function  ALHexToInt32(const S: String): Int32;
+begin
+  if not ALTryHexToInt32(S, Result) then
+    raise Exception.CreateFmt('''%s'' is not a valid hexadecimal Int32 value', [S]);
+end;
+
+{***********************************************}
+function  ALHexToUInt32(const S: String): UInt32;
+begin
+  if not ALTryHexToUInt32(S, Result) then
+    raise Exception.CreateFmt('''%s'' is not a valid hexadecimal UInt32 value', [S]);
+end;
+
+{*********************************************}
+function  ALHexToInt64(const S: String): Int64;
+begin
+  if not ALTryHexToInt64(S, Result) then
+    raise Exception.CreateFmt('''%s'' is not a valid hexadecimal Int64 value', [S]);
+end;
+
+{***********************************************}
+function  ALHexToUInt64(const S: String): UInt64;
+begin
+  if not ALTryHexToUInt64(S, Result) then
+    raise Exception.CreateFmt('''%s'' is not a valid hexadecimal UInt64 value', [S]);
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils._TwoChar is still the same and adjust the IFDEF'}
+{$ENDIF}
+type
+  _ALTwoCharA = packed record
+    case Integer of
+      0:(ch: array[1..2] of AnsiChar);
+      1:(u16: UInt16);
+  end;
+  _ALTwoCharW = packed record
+    case Integer of
+      0:(ch: array[1..2] of Char);
+      1:(u32: UInt32);
+  end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils.TwoHexLookup and system.SysUtils.OneHexLookup are still the same and adjust the IFDEF'}
+{$ENDIF}
+const
+  ALTwoHexLookupUpA : packed array[0..255] of _ALTwoCharA =
+  (
+   (ch:'00'),(ch:'01'),(ch:'02'),(ch:'03'),(ch:'04'),(ch:'05'),(ch:'06'),(ch:'07'),(ch:'08'),(ch:'09'),(ch:'0A'),(ch:'0B'),(ch:'0C'),(ch:'0D'),(ch:'0E'),(ch:'0F'),
+   (ch:'10'),(ch:'11'),(ch:'12'),(ch:'13'),(ch:'14'),(ch:'15'),(ch:'16'),(ch:'17'),(ch:'18'),(ch:'19'),(ch:'1A'),(ch:'1B'),(ch:'1C'),(ch:'1D'),(ch:'1E'),(ch:'1F'),
+   (ch:'20'),(ch:'21'),(ch:'22'),(ch:'23'),(ch:'24'),(ch:'25'),(ch:'26'),(ch:'27'),(ch:'28'),(ch:'29'),(ch:'2A'),(ch:'2B'),(ch:'2C'),(ch:'2D'),(ch:'2E'),(ch:'2F'),
+   (ch:'30'),(ch:'31'),(ch:'32'),(ch:'33'),(ch:'34'),(ch:'35'),(ch:'36'),(ch:'37'),(ch:'38'),(ch:'39'),(ch:'3A'),(ch:'3B'),(ch:'3C'),(ch:'3D'),(ch:'3E'),(ch:'3F'),
+   (ch:'40'),(ch:'41'),(ch:'42'),(ch:'43'),(ch:'44'),(ch:'45'),(ch:'46'),(ch:'47'),(ch:'48'),(ch:'49'),(ch:'4A'),(ch:'4B'),(ch:'4C'),(ch:'4D'),(ch:'4E'),(ch:'4F'),
+   (ch:'50'),(ch:'51'),(ch:'52'),(ch:'53'),(ch:'54'),(ch:'55'),(ch:'56'),(ch:'57'),(ch:'58'),(ch:'59'),(ch:'5A'),(ch:'5B'),(ch:'5C'),(ch:'5D'),(ch:'5E'),(ch:'5F'),
+   (ch:'60'),(ch:'61'),(ch:'62'),(ch:'63'),(ch:'64'),(ch:'65'),(ch:'66'),(ch:'67'),(ch:'68'),(ch:'69'),(ch:'6A'),(ch:'6B'),(ch:'6C'),(ch:'6D'),(ch:'6E'),(ch:'6F'),
+   (ch:'70'),(ch:'71'),(ch:'72'),(ch:'73'),(ch:'74'),(ch:'75'),(ch:'76'),(ch:'77'),(ch:'78'),(ch:'79'),(ch:'7A'),(ch:'7B'),(ch:'7C'),(ch:'7D'),(ch:'7E'),(ch:'7F'),
+   (ch:'80'),(ch:'81'),(ch:'82'),(ch:'83'),(ch:'84'),(ch:'85'),(ch:'86'),(ch:'87'),(ch:'88'),(ch:'89'),(ch:'8A'),(ch:'8B'),(ch:'8C'),(ch:'8D'),(ch:'8E'),(ch:'8F'),
+   (ch:'90'),(ch:'91'),(ch:'92'),(ch:'93'),(ch:'94'),(ch:'95'),(ch:'96'),(ch:'97'),(ch:'98'),(ch:'99'),(ch:'9A'),(ch:'9B'),(ch:'9C'),(ch:'9D'),(ch:'9E'),(ch:'9F'),
+   (ch:'A0'),(ch:'A1'),(ch:'A2'),(ch:'A3'),(ch:'A4'),(ch:'A5'),(ch:'A6'),(ch:'A7'),(ch:'A8'),(ch:'A9'),(ch:'AA'),(ch:'AB'),(ch:'AC'),(ch:'AD'),(ch:'AE'),(ch:'AF'),
+   (ch:'B0'),(ch:'B1'),(ch:'B2'),(ch:'B3'),(ch:'B4'),(ch:'B5'),(ch:'B6'),(ch:'B7'),(ch:'B8'),(ch:'B9'),(ch:'BA'),(ch:'BB'),(ch:'BC'),(ch:'BD'),(ch:'BE'),(ch:'BF'),
+   (ch:'C0'),(ch:'C1'),(ch:'C2'),(ch:'C3'),(ch:'C4'),(ch:'C5'),(ch:'C6'),(ch:'C7'),(ch:'C8'),(ch:'C9'),(ch:'CA'),(ch:'CB'),(ch:'CC'),(ch:'CD'),(ch:'CE'),(ch:'CF'),
+   (ch:'D0'),(ch:'D1'),(ch:'D2'),(ch:'D3'),(ch:'D4'),(ch:'D5'),(ch:'D6'),(ch:'D7'),(ch:'D8'),(ch:'D9'),(ch:'DA'),(ch:'DB'),(ch:'DC'),(ch:'DD'),(ch:'DE'),(ch:'DF'),
+   (ch:'E0'),(ch:'E1'),(ch:'E2'),(ch:'E3'),(ch:'E4'),(ch:'E5'),(ch:'E6'),(ch:'E7'),(ch:'E8'),(ch:'E9'),(ch:'EA'),(ch:'EB'),(ch:'EC'),(ch:'ED'),(ch:'EE'),(ch:'EF'),
+   (ch:'F0'),(ch:'F1'),(ch:'F2'),(ch:'F3'),(ch:'F4'),(ch:'F5'),(ch:'F6'),(ch:'F7'),(ch:'F8'),(ch:'F9'),(ch:'FA'),(ch:'FB'),(ch:'FC'),(ch:'FD'),(ch:'FE'),(ch:'FF')
+  );
+  ALTwoHexLookupLoA : packed array[0..255] of _ALTwoCharA =
+  (
+   (ch:'00'),(ch:'01'),(ch:'02'),(ch:'03'),(ch:'04'),(ch:'05'),(ch:'06'),(ch:'07'),(ch:'08'),(ch:'09'),(ch:'0a'),(ch:'0b'),(ch:'0c'),(ch:'0d'),(ch:'0e'),(ch:'0f'),
+   (ch:'10'),(ch:'11'),(ch:'12'),(ch:'13'),(ch:'14'),(ch:'15'),(ch:'16'),(ch:'17'),(ch:'18'),(ch:'19'),(ch:'1a'),(ch:'1b'),(ch:'1c'),(ch:'1d'),(ch:'1e'),(ch:'1f'),
+   (ch:'20'),(ch:'21'),(ch:'22'),(ch:'23'),(ch:'24'),(ch:'25'),(ch:'26'),(ch:'27'),(ch:'28'),(ch:'29'),(ch:'2a'),(ch:'2b'),(ch:'2c'),(ch:'2d'),(ch:'2e'),(ch:'2f'),
+   (ch:'30'),(ch:'31'),(ch:'32'),(ch:'33'),(ch:'34'),(ch:'35'),(ch:'36'),(ch:'37'),(ch:'38'),(ch:'39'),(ch:'3a'),(ch:'3b'),(ch:'3c'),(ch:'3d'),(ch:'3e'),(ch:'3f'),
+   (ch:'40'),(ch:'41'),(ch:'42'),(ch:'43'),(ch:'44'),(ch:'45'),(ch:'46'),(ch:'47'),(ch:'48'),(ch:'49'),(ch:'4a'),(ch:'4b'),(ch:'4c'),(ch:'4d'),(ch:'4e'),(ch:'4f'),
+   (ch:'50'),(ch:'51'),(ch:'52'),(ch:'53'),(ch:'54'),(ch:'55'),(ch:'56'),(ch:'57'),(ch:'58'),(ch:'59'),(ch:'5a'),(ch:'5b'),(ch:'5c'),(ch:'5d'),(ch:'5e'),(ch:'5f'),
+   (ch:'60'),(ch:'61'),(ch:'62'),(ch:'63'),(ch:'64'),(ch:'65'),(ch:'66'),(ch:'67'),(ch:'68'),(ch:'69'),(ch:'6a'),(ch:'6b'),(ch:'6c'),(ch:'6d'),(ch:'6e'),(ch:'6f'),
+   (ch:'70'),(ch:'71'),(ch:'72'),(ch:'73'),(ch:'74'),(ch:'75'),(ch:'76'),(ch:'77'),(ch:'78'),(ch:'79'),(ch:'7a'),(ch:'7b'),(ch:'7c'),(ch:'7d'),(ch:'7e'),(ch:'7f'),
+   (ch:'80'),(ch:'81'),(ch:'82'),(ch:'83'),(ch:'84'),(ch:'85'),(ch:'86'),(ch:'87'),(ch:'88'),(ch:'89'),(ch:'8a'),(ch:'8b'),(ch:'8c'),(ch:'8d'),(ch:'8e'),(ch:'8f'),
+   (ch:'90'),(ch:'91'),(ch:'92'),(ch:'93'),(ch:'94'),(ch:'95'),(ch:'96'),(ch:'97'),(ch:'98'),(ch:'99'),(ch:'9a'),(ch:'9b'),(ch:'9c'),(ch:'9d'),(ch:'9e'),(ch:'9f'),
+   (ch:'a0'),(ch:'a1'),(ch:'a2'),(ch:'a3'),(ch:'a4'),(ch:'a5'),(ch:'a6'),(ch:'a7'),(ch:'a8'),(ch:'a9'),(ch:'aa'),(ch:'ab'),(ch:'ac'),(ch:'ad'),(ch:'ae'),(ch:'af'),
+   (ch:'b0'),(ch:'b1'),(ch:'b2'),(ch:'b3'),(ch:'b4'),(ch:'b5'),(ch:'b6'),(ch:'b7'),(ch:'b8'),(ch:'b9'),(ch:'ba'),(ch:'bb'),(ch:'bc'),(ch:'bd'),(ch:'be'),(ch:'bf'),
+   (ch:'c0'),(ch:'c1'),(ch:'c2'),(ch:'c3'),(ch:'c4'),(ch:'c5'),(ch:'c6'),(ch:'c7'),(ch:'c8'),(ch:'c9'),(ch:'ca'),(ch:'cb'),(ch:'cc'),(ch:'cd'),(ch:'ce'),(ch:'cf'),
+   (ch:'d0'),(ch:'d1'),(ch:'d2'),(ch:'d3'),(ch:'d4'),(ch:'d5'),(ch:'d6'),(ch:'d7'),(ch:'d8'),(ch:'d9'),(ch:'da'),(ch:'db'),(ch:'dc'),(ch:'dd'),(ch:'de'),(ch:'df'),
+   (ch:'e0'),(ch:'e1'),(ch:'e2'),(ch:'e3'),(ch:'e4'),(ch:'e5'),(ch:'e6'),(ch:'e7'),(ch:'e8'),(ch:'e9'),(ch:'ea'),(ch:'eb'),(ch:'ec'),(ch:'ed'),(ch:'ee'),(ch:'ef'),
+   (ch:'f0'),(ch:'f1'),(ch:'f2'),(ch:'f3'),(ch:'f4'),(ch:'f5'),(ch:'f6'),(ch:'f7'),(ch:'f8'),(ch:'f9'),(ch:'fa'),(ch:'fb'),(ch:'fc'),(ch:'fd'),(ch:'fe'),(ch:'ff')
+  );
+  ALTwoHexLookupUpW : packed array[0..255] of _ALTwoCharW =
+  (
+   (ch:'00'),(ch:'01'),(ch:'02'),(ch:'03'),(ch:'04'),(ch:'05'),(ch:'06'),(ch:'07'),(ch:'08'),(ch:'09'),(ch:'0A'),(ch:'0B'),(ch:'0C'),(ch:'0D'),(ch:'0E'),(ch:'0F'),
+   (ch:'10'),(ch:'11'),(ch:'12'),(ch:'13'),(ch:'14'),(ch:'15'),(ch:'16'),(ch:'17'),(ch:'18'),(ch:'19'),(ch:'1A'),(ch:'1B'),(ch:'1C'),(ch:'1D'),(ch:'1E'),(ch:'1F'),
+   (ch:'20'),(ch:'21'),(ch:'22'),(ch:'23'),(ch:'24'),(ch:'25'),(ch:'26'),(ch:'27'),(ch:'28'),(ch:'29'),(ch:'2A'),(ch:'2B'),(ch:'2C'),(ch:'2D'),(ch:'2E'),(ch:'2F'),
+   (ch:'30'),(ch:'31'),(ch:'32'),(ch:'33'),(ch:'34'),(ch:'35'),(ch:'36'),(ch:'37'),(ch:'38'),(ch:'39'),(ch:'3A'),(ch:'3B'),(ch:'3C'),(ch:'3D'),(ch:'3E'),(ch:'3F'),
+   (ch:'40'),(ch:'41'),(ch:'42'),(ch:'43'),(ch:'44'),(ch:'45'),(ch:'46'),(ch:'47'),(ch:'48'),(ch:'49'),(ch:'4A'),(ch:'4B'),(ch:'4C'),(ch:'4D'),(ch:'4E'),(ch:'4F'),
+   (ch:'50'),(ch:'51'),(ch:'52'),(ch:'53'),(ch:'54'),(ch:'55'),(ch:'56'),(ch:'57'),(ch:'58'),(ch:'59'),(ch:'5A'),(ch:'5B'),(ch:'5C'),(ch:'5D'),(ch:'5E'),(ch:'5F'),
+   (ch:'60'),(ch:'61'),(ch:'62'),(ch:'63'),(ch:'64'),(ch:'65'),(ch:'66'),(ch:'67'),(ch:'68'),(ch:'69'),(ch:'6A'),(ch:'6B'),(ch:'6C'),(ch:'6D'),(ch:'6E'),(ch:'6F'),
+   (ch:'70'),(ch:'71'),(ch:'72'),(ch:'73'),(ch:'74'),(ch:'75'),(ch:'76'),(ch:'77'),(ch:'78'),(ch:'79'),(ch:'7A'),(ch:'7B'),(ch:'7C'),(ch:'7D'),(ch:'7E'),(ch:'7F'),
+   (ch:'80'),(ch:'81'),(ch:'82'),(ch:'83'),(ch:'84'),(ch:'85'),(ch:'86'),(ch:'87'),(ch:'88'),(ch:'89'),(ch:'8A'),(ch:'8B'),(ch:'8C'),(ch:'8D'),(ch:'8E'),(ch:'8F'),
+   (ch:'90'),(ch:'91'),(ch:'92'),(ch:'93'),(ch:'94'),(ch:'95'),(ch:'96'),(ch:'97'),(ch:'98'),(ch:'99'),(ch:'9A'),(ch:'9B'),(ch:'9C'),(ch:'9D'),(ch:'9E'),(ch:'9F'),
+   (ch:'A0'),(ch:'A1'),(ch:'A2'),(ch:'A3'),(ch:'A4'),(ch:'A5'),(ch:'A6'),(ch:'A7'),(ch:'A8'),(ch:'A9'),(ch:'AA'),(ch:'AB'),(ch:'AC'),(ch:'AD'),(ch:'AE'),(ch:'AF'),
+   (ch:'B0'),(ch:'B1'),(ch:'B2'),(ch:'B3'),(ch:'B4'),(ch:'B5'),(ch:'B6'),(ch:'B7'),(ch:'B8'),(ch:'B9'),(ch:'BA'),(ch:'BB'),(ch:'BC'),(ch:'BD'),(ch:'BE'),(ch:'BF'),
+   (ch:'C0'),(ch:'C1'),(ch:'C2'),(ch:'C3'),(ch:'C4'),(ch:'C5'),(ch:'C6'),(ch:'C7'),(ch:'C8'),(ch:'C9'),(ch:'CA'),(ch:'CB'),(ch:'CC'),(ch:'CD'),(ch:'CE'),(ch:'CF'),
+   (ch:'D0'),(ch:'D1'),(ch:'D2'),(ch:'D3'),(ch:'D4'),(ch:'D5'),(ch:'D6'),(ch:'D7'),(ch:'D8'),(ch:'D9'),(ch:'DA'),(ch:'DB'),(ch:'DC'),(ch:'DD'),(ch:'DE'),(ch:'DF'),
+   (ch:'E0'),(ch:'E1'),(ch:'E2'),(ch:'E3'),(ch:'E4'),(ch:'E5'),(ch:'E6'),(ch:'E7'),(ch:'E8'),(ch:'E9'),(ch:'EA'),(ch:'EB'),(ch:'EC'),(ch:'ED'),(ch:'EE'),(ch:'EF'),
+   (ch:'F0'),(ch:'F1'),(ch:'F2'),(ch:'F3'),(ch:'F4'),(ch:'F5'),(ch:'F6'),(ch:'F7'),(ch:'F8'),(ch:'F9'),(ch:'FA'),(ch:'FB'),(ch:'FC'),(ch:'FD'),(ch:'FE'),(ch:'FF')
+  );
+  ALTwoHexLookupLoW : packed array[0..255] of _ALTwoCharW =
+  (
+   (ch:'00'),(ch:'01'),(ch:'02'),(ch:'03'),(ch:'04'),(ch:'05'),(ch:'06'),(ch:'07'),(ch:'08'),(ch:'09'),(ch:'0a'),(ch:'0b'),(ch:'0c'),(ch:'0d'),(ch:'0e'),(ch:'0f'),
+   (ch:'10'),(ch:'11'),(ch:'12'),(ch:'13'),(ch:'14'),(ch:'15'),(ch:'16'),(ch:'17'),(ch:'18'),(ch:'19'),(ch:'1a'),(ch:'1b'),(ch:'1c'),(ch:'1d'),(ch:'1e'),(ch:'1f'),
+   (ch:'20'),(ch:'21'),(ch:'22'),(ch:'23'),(ch:'24'),(ch:'25'),(ch:'26'),(ch:'27'),(ch:'28'),(ch:'29'),(ch:'2a'),(ch:'2b'),(ch:'2c'),(ch:'2d'),(ch:'2e'),(ch:'2f'),
+   (ch:'30'),(ch:'31'),(ch:'32'),(ch:'33'),(ch:'34'),(ch:'35'),(ch:'36'),(ch:'37'),(ch:'38'),(ch:'39'),(ch:'3a'),(ch:'3b'),(ch:'3c'),(ch:'3d'),(ch:'3e'),(ch:'3f'),
+   (ch:'40'),(ch:'41'),(ch:'42'),(ch:'43'),(ch:'44'),(ch:'45'),(ch:'46'),(ch:'47'),(ch:'48'),(ch:'49'),(ch:'4a'),(ch:'4b'),(ch:'4c'),(ch:'4d'),(ch:'4e'),(ch:'4f'),
+   (ch:'50'),(ch:'51'),(ch:'52'),(ch:'53'),(ch:'54'),(ch:'55'),(ch:'56'),(ch:'57'),(ch:'58'),(ch:'59'),(ch:'5a'),(ch:'5b'),(ch:'5c'),(ch:'5d'),(ch:'5e'),(ch:'5f'),
+   (ch:'60'),(ch:'61'),(ch:'62'),(ch:'63'),(ch:'64'),(ch:'65'),(ch:'66'),(ch:'67'),(ch:'68'),(ch:'69'),(ch:'6a'),(ch:'6b'),(ch:'6c'),(ch:'6d'),(ch:'6e'),(ch:'6f'),
+   (ch:'70'),(ch:'71'),(ch:'72'),(ch:'73'),(ch:'74'),(ch:'75'),(ch:'76'),(ch:'77'),(ch:'78'),(ch:'79'),(ch:'7a'),(ch:'7b'),(ch:'7c'),(ch:'7d'),(ch:'7e'),(ch:'7f'),
+   (ch:'80'),(ch:'81'),(ch:'82'),(ch:'83'),(ch:'84'),(ch:'85'),(ch:'86'),(ch:'87'),(ch:'88'),(ch:'89'),(ch:'8a'),(ch:'8b'),(ch:'8c'),(ch:'8d'),(ch:'8e'),(ch:'8f'),
+   (ch:'90'),(ch:'91'),(ch:'92'),(ch:'93'),(ch:'94'),(ch:'95'),(ch:'96'),(ch:'97'),(ch:'98'),(ch:'99'),(ch:'9a'),(ch:'9b'),(ch:'9c'),(ch:'9d'),(ch:'9e'),(ch:'9f'),
+   (ch:'a0'),(ch:'a1'),(ch:'a2'),(ch:'a3'),(ch:'a4'),(ch:'a5'),(ch:'a6'),(ch:'a7'),(ch:'a8'),(ch:'a9'),(ch:'aa'),(ch:'ab'),(ch:'ac'),(ch:'ad'),(ch:'ae'),(ch:'af'),
+   (ch:'b0'),(ch:'b1'),(ch:'b2'),(ch:'b3'),(ch:'b4'),(ch:'b5'),(ch:'b6'),(ch:'b7'),(ch:'b8'),(ch:'b9'),(ch:'ba'),(ch:'bb'),(ch:'bc'),(ch:'bd'),(ch:'be'),(ch:'bf'),
+   (ch:'c0'),(ch:'c1'),(ch:'c2'),(ch:'c3'),(ch:'c4'),(ch:'c5'),(ch:'c6'),(ch:'c7'),(ch:'c8'),(ch:'c9'),(ch:'ca'),(ch:'cb'),(ch:'cc'),(ch:'cd'),(ch:'ce'),(ch:'cf'),
+   (ch:'d0'),(ch:'d1'),(ch:'d2'),(ch:'d3'),(ch:'d4'),(ch:'d5'),(ch:'d6'),(ch:'d7'),(ch:'d8'),(ch:'d9'),(ch:'da'),(ch:'db'),(ch:'dc'),(ch:'dd'),(ch:'de'),(ch:'df'),
+   (ch:'e0'),(ch:'e1'),(ch:'e2'),(ch:'e3'),(ch:'e4'),(ch:'e5'),(ch:'e6'),(ch:'e7'),(ch:'e8'),(ch:'e9'),(ch:'ea'),(ch:'eb'),(ch:'ec'),(ch:'ed'),(ch:'ee'),(ch:'ef'),
+   (ch:'f0'),(ch:'f1'),(ch:'f2'),(ch:'f3'),(ch:'f4'),(ch:'f5'),(ch:'f6'),(ch:'f7'),(ch:'f8'),(ch:'f9'),(ch:'fa'),(ch:'fb'),(ch:'fc'),(ch:'fd'),(ch:'fe'),(ch:'ff')
+  );
+  ALOneHexLookupUpA : packed array[0..$F] of AnsiChar = '0123456789ABCDEF';
+  ALOneHexLookupLoA : packed array[0..$F] of AnsiChar = '0123456789abcdef';
+  ALOneHexLookupUpW : packed array[0..$F] of Char = '0123456789ABCDEF';
+  ALOneHexLookupLoW : packed array[0..$F] of Char = '0123456789abcdef';
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils._UInt32ToHexString is still the same and adjust the IFDEF'}
+{$ENDIF}
+function _ALUInt32ToHexStringA(UValue: UInt32; Digits: Integer; NewLen: Integer; FillCh: AnsiChar; LowerCase: Boolean): AnsiString;
 var
-  I32   : Integer;
-  I, J  : UInt64;
-  P     : Integer;
-  NewLen: Integer;
-  Sb    : TArray<ansiChar>;
+  P: PAnsiChar;
+  i: Integer;
+begin
+  if Digits < NewLen then
+    Digits := NewLen;
+
+  SetLength(Result, Digits);
+  P := Pointer(Result);
+  for i := 1 to Digits - NewLen do
+  begin
+    P^ := FillCh;
+    Inc(P);
+  end;
+  P := @P[NewLen];
+
+  while NewLen > 1 do
+  begin
+    Dec(P, 2);
+    Dec(NewLen, 2);
+    if LowerCase then PWord(P)^ := ALTwoHexLookupLoA[Byte(UValue)].u16
+    else PWord(P)^ := ALTwoHexLookupUpA[Byte(UValue)].u16;
+    UValue := UValue shr 8;
+  end;
+  if NewLen = 1 then begin
+    if LowerCase then P[-1] := ALOneHexLookupLoA[Byte(UValue) and $F]
+    else P[-1] := ALOneHexLookupUpA[Byte(UValue) and $F];
+  end;
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils._UInt64ToHexString is still the same and adjust the IFDEF'}
+{$ENDIF}
+function _ALUInt64ToHexStringA(UValue: UInt64; Digits: Integer; NewLen: Integer; FillCh: AnsiChar; LowerCase: Boolean): AnsiString;
+var
+  P: PAnsiChar;
+  i: Integer;
+begin
+  if Digits < NewLen then
+    Digits := NewLen;
+
+  SetLength(Result, Digits);
+  P := Pointer(Result);
+  for i := 1 to Digits - NewLen do
+  begin
+    P^ := FillCh;
+    Inc(P);
+  end;
+  P := @P[NewLen];
+
+  while NewLen > 1 do
+  begin
+    Dec(P, 2);
+    Dec(NewLen, 2);
+    if LowerCase then PWord(P)^ := ALTwoHexLookupLoA[Byte(UValue)].u16
+    else PWord(P)^ := ALTwoHexLookupUpA[Byte(UValue)].u16;
+    UValue := UValue shr 8;
+  end;
+  if NewLen = 1 then begin
+    if LowerCase then P[-1] := ALOneHexLookupLoA[Byte(UValue) and $F]
+    else P[-1] := ALOneHexLookupUpA[Byte(UValue) and $F];
+  end;
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils.IntToHex is still the same and adjust the IFDEF'}
+{$ENDIF}
+function ALIntToHexA(Value: UInt32; const ADigits: Integer = SizeOf(UInt32)*2; const ALowerCase: Boolean = False): AnsiString;
+var
+  I      : UInt32;
+  NewLen : Integer;
 begin
   NewLen := 1;
   I := Value shr 4;
@@ -5513,155 +5870,271 @@ begin
     Inc(NewLen);
     I := I shr 4;
   end;
-  if Digits > NewLen then
-  begin
-    SetLength(Sb, Digits);
-    for I32 := 0 to (Digits - NewLen) - 1 do
-      Sb[I32] := '0';
-    P := Digits - NewLen;
-  end
-  else
-  begin
-    SetLength(Sb, NewLen);
-    P := 0;
-  end;
-  I := Value;
-  while NewLen > 2 do
-  begin
-    J := I and $FF;
-    I := I shr 8;
-    Dec(NewLen, 2);
-    Sb[P + NewLen] := AlTwoHexLookup[J][1];
-    Sb[P + NewLen + 1] := AlTwoHexLookup[J][2];
-
-  end;
-  if NewLen = 2 then
-  begin
-    Sb[P] := AlTwoHexLookup[I][1];
-    Sb[P+1] := AlTwoHexLookup[I][2];
-  end
-  else
-    Sb[P] := AlTwoHexLookup[I][2];
-
-  //Result := String.Create(Sb);
-  SetLength(Result, Length(Sb));
-  alMove(Sb[0], PansiChar(Result)^, Length(Sb));
+  Result := _ALUInt32ToHexStringA(Value, ADigits, NewLen, '0', ALowerCase);
 end;
 
-{****************************************************************}
-function ALIntToHexA(Value: Integer; Digits: Integer): AnsiString;
-begin
-  Result := _ALIntToHex(Cardinal(Value), Digits);
-end;
-
-{**************************************************************}
-function ALIntToHexA(Value: Int64; Digits: Integer): AnsiString;
-begin
-  Result := _ALIntToHex(Value, digits);
-end;
-
-{***************************************************************}
-function ALIntToHexA(Value: UInt64; Digits: Integer): AnsiString;
-begin
-  Result := _ALIntToHex(Value, digits);
-end;
-
-{*************************************************************}
-function  ALIntToHexW(Value: Integer; Digits: Integer): String;
-begin
-  Result := IntToHex(Value, Digits);
-end;
-
-{***********************************************************}
-function  ALIntToHexW(Value: Int64; Digits: Integer): String;
-begin
-  Result := IntToHex(Value, Digits);
-end;
-
-{************************************************************}
-function  ALIntToHexW(Value: UInt64; Digits: Integer): String;
-begin
-  Result := IntToHex(Value, Digits);
-end;
-
-{******************************************************************}
-procedure _ALBinToHex(Buffer: PByte; Text: PByte; BufSize: Integer);
-const
-  B2HConvert: array[0..15] of Byte = ($30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $61, $62, $63, $64, $65, $66);
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils.IntToHex is still the same and adjust the IFDEF'}
+{$ENDIF}
+function ALIntToHexA(Value: UInt64; const ADigits: Integer = SizeOf(UInt64)*2; const ALowerCase: Boolean = False): AnsiString;
 var
-  I: Integer;
+  I      : UInt64;
+  NewLen : Integer;
 begin
-  for I := 0  to BufSize - 1 do
+  NewLen := 1;
+  I := Value shr 4;
+  while I > 0 do
   begin
-    Text[I * 2] := B2HConvert[Buffer[I] shr 4];
-    Text[I * 2 + 1] := B2HConvert[Buffer[I] and $0F];
+    Inc(NewLen);
+    I := I shr 4;
+  end;
+  Result := _ALUInt64ToHexStringA(Value, ADigits, NewLen, '0', ALowerCase);
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils.IntToHex is still the same and adjust the IFDEF'}
+{$ENDIF}
+function ALIntToHexA(Value: Int32; const ADigits: Integer = SizeOf(Int32)*2; const ALowerCase: Boolean = False): AnsiString;
+begin
+  Result := ALIntToHexA(UInt32(Value), ADigits, ALowerCase);
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils.IntToHex is still the same and adjust the IFDEF'}
+{$ENDIF}
+function ALIntToHexA(Value: Int64; const ADigits: Integer = SizeOf(Int64)*2; const ALowerCase: Boolean = False): AnsiString;
+begin
+  Result := ALIntToHexA(UInt64(Value), ADigits, ALowerCase);
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils._UInt32ToHexString is still the same and adjust the IFDEF'}
+{$ENDIF}
+function _ALUInt32ToHexStringW(UValue: UInt32; Digits: Integer; NewLen: Integer; FillCh: Char; LowerCase: Boolean): String;
+var
+  P: PChar;
+  i: Integer;
+begin
+  if Digits < NewLen then
+    Digits := NewLen;
+
+  SetLength(Result, Digits);
+  P := Pointer(Result);
+  for i := 1 to Digits - NewLen do
+  begin
+    P^ := FillCh;
+    Inc(P);
+  end;
+  P := @P[NewLen];
+
+  while NewLen > 1 do
+  begin
+    Dec(P, 2);
+    Dec(NewLen, 2);
+    if LowerCase then PCardinal(P)^ := ALTwoHexLookupLoW[Byte(UValue)].u32
+    else PCardinal(P)^ := ALTwoHexLookupUpW[Byte(UValue)].u32;
+    UValue := UValue shr 8;
+  end;
+  if NewLen = 1 then begin
+    if LowerCase then P[-1] := ALOneHexLookupLoW[Byte(UValue) and $F]
+    else P[-1] := ALOneHexLookupUpW[Byte(UValue) and $F];
   end;
 end;
 
-{********************************************************}
-Function  ALBinToHexA(const aBin: AnsiString): AnsiString;
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils._UInt64ToHexString is still the same and adjust the IFDEF'}
+{$ENDIF}
+function _ALUInt64ToHexStringW(UValue: UInt64; Digits: Integer; NewLen: Integer; FillCh: Char; LowerCase: Boolean): String;
+var
+  P: PChar;
+  i: Integer;
+begin
+  if Digits < NewLen then
+    Digits := NewLen;
+
+  SetLength(Result, Digits);
+  P := Pointer(Result);
+  for i := 1 to Digits - NewLen do
+  begin
+    P^ := FillCh;
+    Inc(P);
+  end;
+  P := @P[NewLen];
+
+  while NewLen > 1 do
+  begin
+    Dec(P, 2);
+    Dec(NewLen, 2);
+    if LowerCase then PCardinal(P)^ := ALTwoHexLookupLoW[Byte(UValue)].u32
+    else PCardinal(P)^ := ALTwoHexLookupUpW[Byte(UValue)].u32;
+    UValue := UValue shr 8;
+  end;
+  if NewLen = 1 then begin
+    if LowerCase then P[-1] := ALOneHexLookupLoW[Byte(UValue) and $F]
+    else P[-1] := ALOneHexLookupUpW[Byte(UValue) and $F];
+  end;
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils.IntToHex is still the same and adjust the IFDEF'}
+{$ENDIF}
+function ALIntToHexW(Value: UInt32; const ADigits: Integer = SizeOf(UInt32)*2; const ALowerCase: Boolean = False): String;
+var
+  I      : UInt32;
+  NewLen : Integer;
+begin
+  NewLen := 1;
+  I := Value shr 4;
+  while I > 0 do
+  begin
+    Inc(NewLen);
+    I := I shr 4;
+  end;
+  Result := _ALUInt32ToHexStringW(Value, ADigits, NewLen, '0', ALowerCase);
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils.IntToHex is still the same and adjust the IFDEF'}
+{$ENDIF}
+function ALIntToHexW(Value: UInt64; const ADigits: Integer = SizeOf(UInt64)*2; const ALowerCase: Boolean = False): String;
+var
+  I      : UInt64;
+  NewLen : Integer;
+begin
+  NewLen := 1;
+  I := Value shr 4;
+  while I > 0 do
+  begin
+    Inc(NewLen);
+    I := I shr 4;
+  end;
+  Result := _ALUInt64ToHexStringW(Value, ADigits, NewLen, '0', ALowerCase);
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils.IntToHex is still the same and adjust the IFDEF'}
+{$ENDIF}
+function ALIntToHexW(Value: Int32; const ADigits: Integer = SizeOf(Int32)*2; const ALowerCase: Boolean = False): String;
+begin
+  Result := ALIntToHexW(UInt32(Value), ADigits, ALowerCase);
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if system.SysUtils.IntToHex is still the same and adjust the IFDEF'}
+{$ENDIF}
+function ALIntToHexW(Value: Int64; const ADigits: Integer = SizeOf(Int64)*2; const ALowerCase: Boolean = False): String;
+begin
+  Result := ALIntToHexW(UInt64(Value), ADigits, ALowerCase);
+end;
+
+{*******************************************************************************************}
+procedure _ALBinToHexA(Buffer: PByte; Text: PAnsiChar; BufSize: Integer; LowerCase: Boolean);
+begin
+  if LowerCase then begin
+    for var I := 0  to BufSize - 1 do begin
+      Text[I * 2] := ALOneHexLookupLoA[Buffer[I] shr 4];
+      Text[I * 2 + 1] := ALOneHexLookupLoA[Buffer[I] and $0F];
+    end;
+  end
+  else begin
+    for var I := 0  to BufSize - 1 do begin
+      Text[I * 2] := ALOneHexLookupUpA[Buffer[I] shr 4];
+      Text[I * 2 + 1] := ALOneHexLookupUpA[Buffer[I] and $0F];
+    end;
+  end;
+end;
+
+{*******************************************************************************************}
+Function  ALBinToHexA(const ABin: AnsiString; const ALowerCase: Boolean = False): AnsiString;
 begin
   var LBinSize := Length(aBin);
   if LBinSize = 0 then exit('');
   setlength(Result,LBinSize * 2);
-  _ALBinToHex(
+  _ALBinToHexA(
     PByte(@aBin[low(aBin)]),
-    PByte(@Result[low(Result)]),
-    LBinSize);
+    PAnsiChar(Result),
+    LBinSize,
+    ALowerCase);
 end;
 
-{****************************************************}
-Function  ALBinToHexA(const aBin: TBytes): AnsiString;
+{***************************************************************************************}
+Function  ALBinToHexA(const ABin: TBytes; const ALowerCase: Boolean = False): AnsiString;
 begin
   var LBinSize := Length(aBin);
   if LBinSize = 0 then exit('');
   setlength(Result,LBinSize * 2);
-  _ALBinToHex(
+  _ALBinToHexA(
     PByte(@aBin[low(aBin)]),
-    PByte(@Result[low(Result)]),
-    LBinSize);
+    PAnsiChar(Result),
+    LBinSize,
+    ALowerCase);
 end;
 
-{***************************************************************}
-Function  ALBinToHexA(const aBin; aBinSize: Integer): AnsiString;
+{**************************************************************************************************}
+Function  ALBinToHexA(const ABin; ABinSize: Integer; const ALowerCase: Boolean = False): AnsiString;
 begin
   if aBinSize = 0 then exit('');
   setlength(Result, aBinSize * 2);
-  _ALBinToHex(
+  _ALBinToHexA(
     PByte(@aBin),
-    PByte(@Result[low(Result)]),
-    aBinSize);
+    PAnsiChar(Result),
+    aBinSize,
+    ALowerCase);
 end;
 
-{************************************************}
-Function  ALBinToHexW(const aBin: TBytes): String;
+{***************************************************************************************}
+procedure _ALBinToHexW(Buffer: PByte; Text: PChar; BufSize: Integer; LowerCase: Boolean);
+begin
+  if LowerCase then begin
+    for var I := 0  to BufSize - 1 do begin
+      Text[I * 2] := ALOneHexLookupLoW[Buffer[I] shr 4];
+      Text[I * 2 + 1] := ALOneHexLookupLoW[Buffer[I] and $0F];
+    end;
+  end
+  else begin
+    for var I := 0  to BufSize - 1 do begin
+      Text[I * 2] := ALOneHexLookupUpW[Buffer[I] shr 4];
+      Text[I * 2 + 1] := ALOneHexLookupUpW[Buffer[I] and $0F];
+    end;
+  end;
+end;
+
+{***********************************************************************************}
+Function  ALBinToHexW(const ABin: TBytes; const ALowerCase: Boolean = False): String;
 begin
   var LBinSize := Length(aBin);
   if LBinSize = 0 then exit('');
-  var LBufOut: TBytes;
-  setlength(LBufOut,LBinSize * 2);
-  _ALBintoHex(
-    Pbyte(@aBin[0]), // Buffer: TBytes
-    Pbyte(@LBufOut[0]), // Text: TBytes;
-    LBinSize); // Count: Integer
-  Result := Tencoding.UTF8.GetString(LBufOut); // UTF8 is good because LBufOut must contain only low ascii chars
+  setlength(Result,LBinSize * 2);
+  _ALBinToHexW(
+    PByte(@aBin[low(aBin)]),
+    PChar(Result),
+    LBinSize,
+    ALowerCase);
 end;
 
-{***********************************************************}
-Function  ALBinToHexW(const aBin; aBinSize: Integer): String;
+{**********************************************************************************************}
+Function  ALBinToHexW(const ABin; ABinSize: Integer; const ALowerCase: Boolean = False): String;
 begin
   if aBinSize = 0 then exit('');
-  var LBufOut: TBytes;
-  setlength(LBufOut,aBinSize * 2);
-  _ALBintoHex(
-    Pbyte(@aBin), // Buffer: TBytes
-    Pbyte(@LBufOut[0]), // Text: TBytes;
-    aBinSize); // Count: Integer
-  Result := Tencoding.UTF8.GetString(LBufOut); // UTF8 is good because LBufOut must contain only low ascii chars
+  setlength(Result, aBinSize * 2);
+  _ALBinToHexW(
+    PByte(@aBin),
+    PChar(Result),
+    aBinSize,
+    ALowerCase);
 end;
 
 {******************************************************************************}
-Function  ALTryHexToBin(const aHex: AnsiString; out Value: AnsiString): boolean;
+Function  ALTryHexToBin(const AHex: AnsiString; out Value: AnsiString): boolean;
 begin
   var l := length(aHex);
   If L = 0 then begin
@@ -5674,7 +6147,7 @@ begin
 end;
 
 {**************************************************************************}
-Function  ALTryHexToBin(const aHex: AnsiString; out Value: TBytes): boolean;
+Function  ALTryHexToBin(const AHex: AnsiString; out Value: TBytes): boolean;
 begin
   var l := length(aHex);
   If L = 0 then begin
@@ -5687,7 +6160,7 @@ begin
 end;
 
 {**********************************************************************}
-Function  ALTryHexToBin(const aHex: String; out Value: TBytes): boolean;
+Function  ALTryHexToBin(const AHex: String; out Value: TBytes): boolean;
 begin
   var l := length(aHex);
   If L = 0 then begin
@@ -5705,14 +6178,14 @@ begin
 end;
 
 {***************************************************}
-Function  ALHexToBin(const aHex: AnsiString): TBytes;
+Function  ALHexToBin(const AHex: AnsiString): TBytes;
 begin
   if not ALTryHexToBin(aHex, Result) then
     raise Exception.Create('Bad hex value');
 end;
 
 {***********************************************}
-Function  ALHexToBin(const aHex: String): TBytes;
+Function  ALHexToBin(const AHex: String): TBytes;
 begin
   if not ALTryHexToBin(aHex, Result) then
     raise Exception.Create('Bad hex value');
@@ -5998,29 +6471,38 @@ begin
   result := _GetBase64Encoding.EncodeBytesToString(BufIn);
 end;
 
-{********************************************************************************}
-function  ALBase64DecodeString(const P: PansiChar; const ln: Integer): AnsiString;
-begin
-  if ln=0 then exit('');
-  if not Base64ToBinSafe(P,ln,result) then
-    raise Exception.Create(sInvalidbase64String);
-end;
-
 {**************************************************************}
-function  ALBase64DecodeString(const S: AnsiString): AnsiString;
+Function  ALBase64EncodeBytesA(const Bytes: TBytes): AnsiString;
+var len: integer;
 begin
-  if S='' then exit('');
-  if not Base64ToBinSafe(pointer(s),length(s),result) then
-    raise Exception.Create(sInvalidbase64String);
+  result := '';
+  len := length(Bytes);
+  if len=0 then
+    exit;
+  SetString(result,nil,BinToBase64Length(len));
+  Base64Encode(pointer(result),pointer(Bytes),len);
 end;
 
-{****************************************************************************************}
-Function  ALBase64DecodeString(const S: String; const AEncoding: TEncoding = nil): String;
-var BufOut: TBytes;
+{************************************************************************************}
+Function  ALBase64EncodeBytesA(const Bytes: pointer; const Size: Integer): AnsiString;
 begin
-  BufOut := _GetBase64Encoding.DecodeStringToBytes(S);
-  if assigned(AEncoding) then result := AEncoding.GetString(BufOut)
-  else result := TEncoding.unicode.GetString(BufOut);
+  result := '';
+  if Size=0 then
+    exit;
+  SetString(result,nil,BinToBase64Length(Size));
+  Base64Encode(pointer(result),Bytes,Size);
+end;
+
+{**********************************************************}
+Function  ALBase64EncodeBytesW(const Bytes: TBytes): String;
+begin
+  result := _GetBase64Encoding.EncodeBytesToString(Bytes);
+end;
+
+{********************************************************************************}
+Function  ALBase64EncodeBytesW(const Bytes: pointer; const Size: Integer): String;
+begin
+  result := _GetBase64Encoding.EncodeBytesToString(Bytes, Size);
 end;
 
 {*********************}
@@ -6061,20 +6543,8 @@ end;
   {$ZEROBASEDSTRINGS ON}
 {$ENDIF}
 
-{******************************************************************}
-function  ALBase64DecodeStringMIME(const S: AnsiString): AnsiString;
-begin
-
-  //https://en.wikipedia.org/wiki/Base64
-  //MIME specifies that any extra-alphabetic characters must be ignored by a
-  //compliant decoder, but here we just ignore the #13#10
-
-  result := ALBase64DecodeString(AlStringReplaceA(s, #13#10, '', [rfReplaceAll]));
-
-end;
-
-{**********************************************************************************************************}
-function  ALURLBase64EncodeString(const S: AnsiString; const aDoOnlyUrlEncode: boolean = false): AnsiString;
+{*****************************************************************}
+function  ALURLBase64EncodeString(const S: AnsiString): AnsiString;
 begin
 
   //It’s often more convenient to manage data in text format rather than binary data
@@ -6099,57 +6569,63 @@ begin
   //the padding characters. I’ve been using this for some time now and am quite
   //happy with it as a replacement for base64 encoding.
 
-  if aDoOnlyUrlEncode then result := S
-  else result := ALBase64EncodeString(s);
+  Result := ALBase64EncodeString(s);
   Result := ALStringReplaceA(Result, '+', '-', [rfReplaceALL]);
   Result := ALStringReplaceA(Result, '/', '_', [rfReplaceALL]);
   Result := ALStringReplaceA(Result, '=', '',  [rfReplaceALL]);
 
 end;
 
-{**********************************************************************************************************}
-function  ALURLBase64DecodeString(const S: AnsiString; const aDoOnlyUrlDecode: boolean = false): AnsiString;
+{*******************************************************************************************}
+function  ALURLBase64EncodeString(const S: String; const AEncoding: TEncoding = nil): String;
 begin
-  result := ALStringReplaceA(S,      '-', '+', [rfReplaceALL]);
-  result := ALStringReplaceA(result, '_', '/', [rfReplaceALL]);
-  while length(result) mod 4 <> 0 do
-    result := result + '=';
-  if aDoOnlyUrlDecode then exit;
-  result := ALBase64DecodeString(result);
+  Result := ALBase64EncodeString(s, AEncoding);
+  Result := ALStringReplaceW(Result, '+', '-', [rfReplaceALL]);
+  Result := ALStringReplaceW(Result, '/', '_', [rfReplaceALL]);
+  Result := ALStringReplaceW(Result, '=', '',  [rfReplaceALL]);
 end;
 
-{**************************************************************}
-Function  ALBase64EncodeBytesA(const Bytes: TBytes): AnsiString;
-var len: integer;
+{*****************************************************************}
+function  ALURLBase64EncodeBytesA(const Bytes: TBytes): AnsiString;
 begin
-  result := '';
-  len := length(Bytes);
-  if len=0 then
-    exit;
-  SetString(result,nil,BinToBase64Length(len));
-  Base64Encode(pointer(result),pointer(Bytes),len);
+  Result := ALBase64EncodeBytesA(Bytes);
+  Result := ALStringReplaceA(Result, '+', '-', [rfReplaceALL]);
+  Result := ALStringReplaceA(Result, '/', '_', [rfReplaceALL]);
+  Result := ALStringReplaceA(Result, '=', '',  [rfReplaceALL]);
 end;
 
-{************************************************************************************}
-Function  ALBase64EncodeBytesA(const Bytes: pointer; const Size: Integer): AnsiString;
+{*************************************************************}
+function  ALURLBase64EncodeBytesW(const Bytes: TBytes): String;
 begin
-  result := '';
-  if Size=0 then
-    exit;
-  SetString(result,nil,BinToBase64Length(Size));
-  Base64Encode(pointer(result),Bytes,Size);
-end;
-
-{**********************************************************}
-Function  ALBase64EncodeBytesW(const Bytes: TBytes): String;
-begin
-  result := _GetBase64Encoding.EncodeBytesToString(Bytes);
+  Result := ALBase64EncodeBytesW(Bytes);
+  Result := ALStringReplaceW(Result, '+', '-', [rfReplaceALL]);
+  Result := ALStringReplaceW(Result, '/', '_', [rfReplaceALL]);
+  Result := ALStringReplaceW(Result, '=', '',  [rfReplaceALL]);
 end;
 
 {********************************************************************************}
-Function  ALBase64EncodeBytesW(const Bytes: pointer; const Size: Integer): String;
+function  ALBase64DecodeString(const P: PansiChar; const ln: Integer): AnsiString;
 begin
-  result := _GetBase64Encoding.EncodeBytesToString(Bytes, Size);
+  if ln=0 then exit('');
+  if not Base64ToBinSafe(P,ln,result) then
+    raise Exception.Create(sInvalidbase64String);
+end;
+
+{**************************************************************}
+function  ALBase64DecodeString(const S: AnsiString): AnsiString;
+begin
+  if S='' then exit('');
+  if not Base64ToBinSafe(pointer(s),length(s),result) then
+    raise Exception.Create(sInvalidbase64String);
+end;
+
+{****************************************************************************************}
+Function  ALBase64DecodeString(const S: String; const AEncoding: TEncoding = nil): String;
+var BufOut: TBytes;
+begin
+  BufOut := _GetBase64Encoding.DecodeStringToBytes(S);
+  if assigned(AEncoding) then result := AEncoding.GetString(BufOut)
+  else result := TEncoding.unicode.GetString(BufOut);
 end;
 
 {*********************************************************}
@@ -6164,6 +6640,75 @@ end;
 Function  ALBase64DecodeBytes(const S: String): TBytes;
 begin
   result := _GetBase64Encoding.DecodeStringToBytes(S);
+end;
+
+{******************************************************************}
+function  ALBase64DecodeStringMIME(const S: AnsiString): AnsiString;
+begin
+
+  //https://en.wikipedia.org/wiki/Base64
+  //MIME specifies that any extra-alphabetic characters must be ignored by a
+  //compliant decoder, but here we just ignore the #13#10
+
+  result := ALBase64DecodeString(AlStringReplaceA(s, #13#10, '', [rfReplaceAll]));
+
+end;
+
+{*************************************************************}
+Function  ALBase64DecodeBytesMIME(const S: AnsiString): TBytes;
+begin
+
+  //https://en.wikipedia.org/wiki/Base64
+  //MIME specifies that any extra-alphabetic characters must be ignored by a
+  //compliant decoder, but here we just ignore the #13#10
+
+  result := ALBase64DecodeBytes(AlStringReplaceA(s, #13#10, '', [rfReplaceAll]));
+
+end;
+
+{*********************************************************}
+Function  ALBase64DecodeBytesMIME(const S: String): TBytes;
+begin
+
+  //https://en.wikipedia.org/wiki/Base64
+  //MIME specifies that any extra-alphabetic characters must be ignored by a
+  //compliant decoder, but here we just ignore the #13#10
+
+  result := ALBase64DecodeBytes(AlStringReplaceW(s, #13#10, '', [rfReplaceAll]));
+
+end;
+
+{*****************************************************************}
+function  ALURLBase64DecodeString(const S: AnsiString): AnsiString;
+begin
+  var LTmp := S;
+  LTmp := ALStringReplaceA(S,    '-', '+', [rfReplaceALL]);
+  LTmp := ALStringReplaceA(LTmp, '_', '/', [rfReplaceALL]);
+  while length(LTmp) mod 4 <> 0 do
+    LTmp := LTmp + '=';
+  result := ALBase64DecodeString(LTmp);
+end;
+
+{************************************************************}
+function  ALURLBase64DecodeBytes(const S: AnsiString): TBytes;
+begin
+  var LTmp := S;
+  LTmp := ALStringReplaceA(S,    '-', '+', [rfReplaceALL]);
+  LTmp := ALStringReplaceA(LTmp, '_', '/', [rfReplaceALL]);
+  while length(LTmp) mod 4 <> 0 do
+    LTmp := LTmp + '=';
+  result := ALBase64DecodeBytes(LTmp);
+end;
+
+{********************************************************}
+function  ALURLBase64DecodeBytes(const S: String): TBytes;
+begin
+  var LTmp := S;
+  LTmp := ALStringReplaceW(S,    '-', '+', [rfReplaceALL]);
+  LTmp := ALStringReplaceW(LTmp, '_', '/', [rfReplaceALL]);
+  while length(LTmp) mod 4 <> 0 do
+    LTmp := LTmp + '=';
+  result := ALBase64DecodeBytes(LTmp);
 end;
 
 {******************************************************}

@@ -172,7 +172,7 @@ type
         constructor Create(const APayload: TALStringListW);
         property Payload: TALStringListW read FPayload;
       end;
-      // -------------------------
+      // ----------------
       // TGetTokenMessage
       TGetTokenMessage = class(TMessage)
       private
@@ -183,7 +183,7 @@ type
         property Token: String read FToken;
         property ErrorMessage: String read FErrorMessage;
       end;
-      // -------------------------
+      // -------------------
       // TDeleteTokenMessage
       TDeleteTokenMessage = class(TMessage)
       private
@@ -194,7 +194,7 @@ type
         property IsSuccessful: Boolean read FIsSuccessful;
         property ErrorMessage: String read FErrorMessage;
       end;
-      // -------------------------
+      // --------------------
       // TTokenRefreshMessage
       TTokenRefreshMessage = class(TMessage)
       private
@@ -214,32 +214,36 @@ type
       end;
       // -------------
       // TPushProvider
-      TPushProvider = (FCM, APNs, PushKit);
+      TPushProvider = (FCM, APNS, HMS);
   private
     FPushProvider: TPushProvider;
     FFirebaseMessaging: TALFirebaseMessaging;
     FLastGeneratedUniqueID: integer;
     FIsRequestingNotificationPermission: Boolean;
-    procedure HandleGetToken(const AToken: String; const AErrorMessage: String);
-    procedure HandleDeleteToken(const AIsSuccessful: Boolean; const AErrorMessage: String);
-    procedure HandleTokenRefresh(const AToken: String);
-    procedure HandleMessageReceived(const APayload: TALStringListW);
-    {$HINTS OFF}
+  private
+    {$IF defined(ANDROID)}
     function GenerateUniqueID: integer;
-    {$HINTS ON}
+    {$ENDIF}
+  protected
+    procedure HandleGetToken(const AToken: String; const AErrorMessage: String); virtual;
+    procedure HandleDeleteToken(const AIsSuccessful: Boolean; const AErrorMessage: String); virtual;
+    procedure HandleTokenRefresh(const AToken: String); virtual;
+    procedure HandleMessageReceived(const APayload: TALStringListW); virtual;
+    procedure HandlePermissionResult(const AGranted: Boolean); virtual;
   public
     class var TmpPath: String;
   public
     constructor Create(const APushProvider: TPushProvider = TPushProvider.FCM); virtual;
     destructor Destroy; override;
+    procedure RegisterForRemoteNotifications; virtual;
     procedure RequestNotificationPermission; virtual;
     procedure CreateNotificationChannel(const ANotificationChannel: TALNotificationChannel); virtual;
     procedure SetBadgeCount(const ANewValue: integer); virtual;
     procedure ShowNotification(const ANotification: TALNotification); virtual;
-    procedure GetToken;
-    procedure DeleteToken;
-    procedure removeAllDeliveredNotifications;
-    property PushProvider: TPushProvider read FPushProvider write FPushProvider;
+    procedure GetToken; virtual;
+    procedure DeleteToken; virtual;
+    procedure removeAllDeliveredNotifications; virtual;
+    property PushProvider: TPushProvider read FPushProvider;
     /// <summary>
     ///   Set to true in RequestNotificationPermission and set to false in OnAuthorizationRefused/OnAuthorizationGranted
     /// </summary>
@@ -590,6 +594,18 @@ begin
   result := FInstance <> nil;
 end;
 
+{**************************************************************}
+procedure TALNotificationService.RegisterForRemoteNotifications;
+begin
+
+  {$REGION 'IOS'}
+  {$IF defined(IOS)}
+  SharedApplication.registerForRemoteNotifications;
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
 {*************************************************************}
 procedure TALNotificationService.RequestNotificationPermission;
 begin
@@ -612,7 +628,7 @@ begin
   end
   else begin
     FIsRequestingNotificationPermission := False;
-    TMessageManager.DefaultManager.SendMessage(nil, TNotificationPermissionResultMessage.create(True{AGranted}));
+    HandlePermissionResult(True{AGranted});
   end;
   {$ENDIF}
   {$ENDREGION}
@@ -623,7 +639,13 @@ begin
                   UNAuthorizationOptionAlert or
                   UNAuthorizationOptionBadge;
   TUNUserNotificationCenter.OCClass.currentNotificationCenter.requestAuthorizationWithOptions(LOptions{options}, UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler{completionHandler});
-  SharedApplication.registerForRemoteNotifications;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'MACOS/WINDOWS'}
+  {$IF defined(MSWINDOWS) or defined(ALMACOS)}
+  FIsRequestingNotificationPermission := False;
+  HandlePermissionResult(False{AGranted});
   {$ENDIF}
   {$ENDREGION}
 
@@ -937,12 +959,14 @@ begin
 
 end;
 
-{********************************************************}
+{********************}
+{$IF defined(ANDROID)}
 function TALNotificationService.GenerateUniqueID: integer;
 begin
   inc(FLastGeneratedUniqueID);
   result := FLastGeneratedUniqueID;
 end;
+{$ENDIF}
 
 {*************************************************************************************************}
 procedure TALNotificationService.HandleGetToken(const AToken: String; const AErrorMessage: String);
@@ -966,6 +990,12 @@ end;
 procedure TALNotificationService.HandleMessageReceived(const APayload: TALStringListW);
 begin
   TMessageManager.DefaultManager.SendMessage(nil, TNotificationReceivedMessage.create(aPayload));
+end;
+
+{*******************************************************************************}
+procedure TALNotificationService.HandlePermissionResult(const AGranted: Boolean);
+begin
+  TMessageManager.DefaultManager.SendMessage(nil, TNotificationPermissionResultMessage.create(AGranted));
 end;
 
 {$REGION ' ANDROID'}
@@ -1009,14 +1039,14 @@ begin
       allog('TALNotificationService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(False));
       {$ENDIF}
       FIsRequestingNotificationPermission := False;
-      TMessageManager.DefaultManager.SendMessage(nil, TNotificationPermissionResultMessage.create(False{AGranted}));
+      HandlePermissionResult(False{AGranted});
     end
     else begin
       {$IFDEF DEBUG}
       allog('TALNotificationService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(True));
       {$ENDIF}
       FIsRequestingNotificationPermission := False;
-      TMessageManager.DefaultManager.SendMessage(nil, TNotificationPermissionResultMessage.create(True{AGranted}));
+      HandlePermissionResult(True{AGranted});
     end;
 
   end;
@@ -1051,7 +1081,7 @@ begin
      procedure
      begin
        FIsRequestingNotificationPermission := False;
-       TMessageManager.DefaultManager.SendMessage(nil, TNotificationPermissionResultMessage.create(False{AGranted}));
+       HandlePermissionResult(False{AGranted});
      end);
   end
   else begin
@@ -1059,7 +1089,7 @@ begin
      procedure
      begin
        FIsRequestingNotificationPermission := False;
-       TMessageManager.DefaultManager.SendMessage(nil, TNotificationPermissionResultMessage.create(True{AGranted}));
+       HandlePermissionResult(True{AGranted});
      end);
   end;
 

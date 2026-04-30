@@ -102,7 +102,6 @@ procedure libclangrtiosLoader; cdecl; external '/usr/lib/clang/lib/darwin/libcla
 {$ELSE}
 procedure libclangrtiosLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a';
 {$ENDIF}
-procedure libcLoader; cdecl; external '/usr/lib/libc++.dylib';
 procedure libvDSPLoader; cdecl; external '/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libvDSP.dylib';
 procedure libvMiscLoader; cdecl; external '/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libvMisc.dylib';
 
@@ -138,5 +137,12 @@ procedure libswiftAVFoundationLoader; cdecl; external '/usr/lib/swift/libswiftAV
 procedure libswiftCoreMediaLoader; cdecl; external '/usr/lib/swift/libswiftCoreMedia.dylib';
 procedure libswiftsimdLoader; cdecl; external '/usr/lib/swift/libswiftsimd.dylib';
 procedure libswiftCoreLocationLoader; cdecl; external '/usr/lib/swift/libswiftCoreLocation.dylib';
+procedure libswiftErrnoLoader; cdecl; external '/usr/lib/swift/libswift_errno.dylib';
+procedure libswiftMathLoader; cdecl; external '/usr/lib/swift/libswift_math.dylib';
+procedure libswiftSignalLoader; cdecl; external '/usr/lib/swift/libswift_signal.dylib';
+procedure libswiftStdioLoader; cdecl; external '/usr/lib/swift/libswift_stdio.dylib';
+procedure libswiftTimeLoader; cdecl; external '/usr/lib/swift/libswift_time.dylib';
+procedure libswiftsysTimeLoader; cdecl; external '/usr/lib/swift/libswiftsys_time.dylib';
+procedure libswiftUnistdLoader; cdecl; external '/usr/lib/swift/libswiftunistd.dylib';
 
 end.

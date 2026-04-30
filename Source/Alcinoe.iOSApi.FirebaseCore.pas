@@ -26,11 +26,15 @@ uses
 
 type
 
+  {*****************}
+  FIRApp = interface;
+
   {****************************************************************************************}
   //https://firebase.google.com/docs/reference/ios/firebasecore/api/reference/Classes/FIRApp
   FIRAppClass = interface(NSObjectClass)
   ['{37BEFC11-8AE6-4312-971D-53BF9D8DB22A}']
     {class} procedure configure; cdecl;
+    {class} function defaultApp: FIRApp; cdecl;
   end;
   FIRApp = interface(NSObject)
   ['{69F89279-48F0-4276-B337-37FE79821507}']

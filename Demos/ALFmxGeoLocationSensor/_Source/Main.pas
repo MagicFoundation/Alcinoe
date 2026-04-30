@@ -88,7 +88,7 @@ uses
 procedure TForm1.FormCreate(Sender: TObject);
 begin
 
-  TALErrorReporting.Instance;
+  TALErrorReporter.Instance;
 
   FGeoLocationSensor := TALGeoLocationSensor.Create(true{AUseGooglePlayServicesIfAvailable});
   FGeoLocationSensor.OnGeoLocationUpdate := OnGeoLocationSensorGeoLocationUpdate;

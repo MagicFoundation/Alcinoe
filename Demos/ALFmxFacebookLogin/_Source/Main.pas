@@ -65,7 +65,7 @@ implementation
 procedure TForm1.FormCreate(Sender: TObject);
 begin
 
-  TALErrorReporting.Instance;
+  TALErrorReporter.Instance;
 
   fFaceBookLogin := TalFacebookLogin.Create;
   fFaceBookLogin.onCancel := onFaceBookLoginCancel;

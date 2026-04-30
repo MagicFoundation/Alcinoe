@@ -26,6 +26,18 @@ uses
 
 type
 
+  {************************************}
+  FIRMessagingAPNSTokenType = NSInteger;
+
+const
+
+  {***********************************}
+  FIRMessagingAPNSTokenTypeUnknown = 0;
+  FIRMessagingAPNSTokenTypeSandbox = 1;
+  FIRMessagingAPNSTokenTypeProd = 2;
+
+type
+
   {***********************}
   FIRMessaging = interface;
 
@@ -33,7 +45,16 @@ type
   //https://firebase.google.com/docs/reference/ios/firebasemessaging/api/reference/Protocols/FIRMessagingDelegate.html
   FIRMessagingDelegate = interface(IObjectiveC)
   ['{9784786A-515F-41F0-84C3-8F298623275E}']
-    procedure messaging(messaging: FIRMessaging; fcmToken: NSString); cdecl;
+    procedure messaging(messaging: FIRMessaging; didReceiveRegistrationToken: NSString); cdecl;
+  end;
+
+  {*******************************************************************************************************************}
+  //https://firebase.google.com/docs/reference/ios/firebasemessaging/api/reference/Classes/FIRMessagingMessageInfo.html
+  FIRMessagingMessageInfoClass = interface(NSObjectClass)
+  ['{163EC455-1240-4524-9C63-EBF04E7FE67F}']
+  end;
+  FIRMessagingMessageInfo = interface(NSObject)
+  ['{5172B797-F014-4A90-8690-4A255D493B7B}']
   end;
 
   {*********************************************************************************************}
@@ -44,14 +65,19 @@ type
   //https://firebase.google.com/docs/reference/ios/firebasemessaging/api/reference/Classes/FIRMessaging
   FIRMessagingClass = interface(NSObjectClass)
   ['{FC9DDBCE-4C91-4DE4-B2FC-80289562D9F5}']
-    {class} function messaging : Pointer{instancetype}; cdecl;
+    {class} function messaging: FIRMessaging; cdecl;
   end;
   FIRMessaging = interface(NSObject)
   ['{FCF96F2C-513B-409C-87D7-3FFE504EA79D}']
     procedure setDelegate(delegate: FIRMessagingDelegate); cdecl;
-    function delegate : FIRMessagingDelegate; cdecl;
+    function delegate: FIRMessagingDelegate; cdecl;
+    procedure setAPNSToken(APNSToken: NSData); cdecl; overload;
+    procedure setAPNSToken(apnsToken: NSData; &type: FIRMessagingAPNSTokenType); cdecl; overload;
+    function APNSToken: NSData; cdecl;
+    function FCMToken: NSString; cdecl;
     procedure tokenWithCompletion(completion: TFIRMessagingTokenWithCompletionHandler); cdecl;
     procedure deleteTokenWithCompletion(completion: TFIRMessagingDeleteTokenWithCompletionHandler); cdecl;
+    function appDidReceiveMessage(message: NSDictionary): FIRMessagingMessageInfo; cdecl;
   end;
   TFIRMessaging = class(TOCGenericImport<FIRMessagingClass, FIRMessaging>) end;
 

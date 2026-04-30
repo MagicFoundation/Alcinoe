@@ -370,7 +370,7 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   ALLog('TForm1.FormCreate', TalLogType.verbose);
-  TALErrorReporting.Instance;
+  TALErrorReporter.Instance;
   fWebRTC := nil;
 end;
 

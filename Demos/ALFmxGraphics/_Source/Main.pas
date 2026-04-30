@@ -132,7 +132,7 @@ uses
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
 
-  TALErrorReporting.Instance;
+  TALErrorReporter.Instance;
 
   HideStatusLabels;
 

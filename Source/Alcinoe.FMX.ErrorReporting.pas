@@ -11,18 +11,18 @@ uses
 
 type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~}
-  TALErrorReporting = class
+  {~~~~~~~~~~~~~~~~~~~~~~}
+  TALErrorReporter = class
   private
-    class function CreateInstance: TALErrorReporting;
-    class function GetInstance: TALErrorReporting; static;
+    class function CreateInstance: TALErrorReporter;
+    class function GetInstance: TALErrorReporter; static;
   protected
-    class var FInstance: TALErrorReporting;
+    class var FInstance: TALErrorReporter;
   public
     type
-      TCreateInstanceFunc = function: TALErrorReporting;
+      TCreateInstanceFunc = function: TALErrorReporter;
     class var CreateInstanceFunc: TCreateInstanceFunc;
-    class property Instance: TALErrorReporting read GetInstance;
+    class property Instance: TALErrorReporter read GetInstance;
     class function HasInstance: Boolean; inline;
   public
     constructor Create; virtual;
@@ -38,8 +38,8 @@ uses
   Grijjy.ErrorReporting,
   Alcinoe.StringUtils;
 
-{***********************************}
-constructor TALErrorReporting.Create;
+{**********************************}
+constructor TALErrorReporter.Create;
 begin
   inherited Create;
   TgoExceptionReporter.MaxCallStackDepth := 50;
@@ -48,22 +48,22 @@ begin
   ALCustomLogExceptionProc := CustomLogException;
 end;
 
-{***********************************}
-destructor TALErrorReporting.Destroy;
+{**********************************}
+destructor TALErrorReporter.Destroy;
 begin
   TMessageManager.DefaultManager.Unsubscribe(TgoExceptionReportMessage, HandleExceptionReportMessage);
   ALCustomLogExceptionProc := nil;
   inherited Destroy;
 end;
 
-{*****************************************************************}
-class function TALErrorReporting.CreateInstance: TALErrorReporting;
+{***************************************************************}
+class function TALErrorReporter.CreateInstance: TALErrorReporter;
 begin
-  result := TALErrorReporting.Create;
+  result := TALErrorReporter.Create;
 end;
 
-{**************************************************************}
-class function TALErrorReporting.GetInstance: TALErrorReporting;
+{************************************************************}
+class function TALErrorReporter.GetInstance: TALErrorReporter;
 begin
   if FInstance = nil then begin
     var LInstance := CreateInstanceFunc;
@@ -74,20 +74,20 @@ end;
 
 {*************}
 //[MultiThread]
-class function TALErrorReporting.HasInstance: Boolean;
+class function TALErrorReporter.HasInstance: Boolean;
 begin
   result := FInstance <> nil;
 end;
 
-{*************************************************************************************************}
-procedure TALErrorReporting.HandleExceptionReportMessage(const Sender: TObject; const M: TMessage);
+{************************************************************************************************}
+procedure TALErrorReporter.HandleExceptionReportMessage(const Sender: TObject; const M: TMessage);
 begin
   var LExceptionReport := TgoExceptionReportMessage(M).Report;
   ALLog('Unhandled Exception', ALAdjustLineBreaks(LExceptionReport.Report), TALLogType.ERROR);
 end;
 
-{*************************************************************************************************************}
-procedure TALErrorReporting.CustomLogException(Const Tag: String; Const E: Exception; const &Type: TalLogType);
+{************************************************************************************************************}
+procedure TALErrorReporter.CustomLogException(Const Tag: String; Const E: Exception; const &Type: TalLogType);
 begin
   Var LExceptionReport := TgoExceptionReporter.BuildExceptionReport(E, ExceptAddr);
   if LExceptionReport = nil then
@@ -100,13 +100,13 @@ initialization
   {$IF defined(DEBUG)}
   ALLog('Alcinoe.FMX.ErrorReporting','initialization');
   {$ENDIF}
-  TALErrorReporting.FInstance := nil;
-  TALErrorReporting.CreateInstanceFunc := @TALErrorReporting.CreateInstance;
+  TALErrorReporter.FInstance := nil;
+  TALErrorReporter.CreateInstanceFunc := @TALErrorReporter.CreateInstance;
 
 finalization
   {$IF defined(DEBUG)}
   ALLog('Alcinoe.FMX.ErrorReporting','finalization');
   {$ENDIF}
-  ALFreeAndNil(TALErrorReporting.FInstance);
+  ALFreeAndNil(TALErrorReporter.FInstance);
 
 end.

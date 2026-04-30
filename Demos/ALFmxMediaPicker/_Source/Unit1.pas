@@ -89,7 +89,7 @@ end;
 {*******************************************}
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  TALErrorReporting.Instance;
+  TALErrorReporter.Instance;
   TALStyleManager.Instance.ApplyLoadingOverlayManagerStyle('Material3.LoadingOverlayManager', TALLoadingOverlayManager.Instance);
   TALStyleManager.Instance.ApplyDialogManagerStyle('Material3.DialogManager', TALDialogManager.Instance, 18{AFontSize});
   ALSetSystemBarsColor(

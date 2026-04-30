@@ -144,6 +144,7 @@ type
     function Delete(const Index: Integer): Integer; overload;
     function Delete(const Name: AnsiString): Integer; overload;
     function Extract(const index: Integer): TALJSONNodeA; overload;
+    function Extract(const Name: AnsiString): TALJSONNodeA; overload;
     function Extract(const Node: TALJSONNodeA): TALJSONNodeA; overload;
     procedure Exchange(Index1, Index2: Integer);
     function FindNode(const NodeName: AnsiString; const Direction: TDirection = TDirection.FromBeginning): TALJSONNodeA;
@@ -651,18 +652,18 @@ procedure ALTStringsToJsonA(
             const ANameToLowerCase: Boolean = false;
             const ANullStr: AnsiString = 'null');
 
-function ALJsonEncodeFloatA(const AValue: double; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
-function ALJsonEncodeTextA(const AValue: AnsiString; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
-function ALJsonEncodeBinaryA(const AValue: TBytes; const ASubType: Byte; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
-function ALJsonEncodeObjectIDA(const AValue: TBytes; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
-function ALJsonEncodeBooleanA(const AValue: Boolean; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
-function ALJsonEncodeDateTimeA(const AValue: TDateTime; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
-function ALJsonEncodeNullA(const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
-function ALJsonEncodeRegExA(const AValue: AnsiString; const AOptions: TALPerlRegExOptions; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
-function ALJsonEncodeJavascriptA(const AValue: AnsiString; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
-function ALJsonEncodeInt32A(const AValue: Int32; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
-function ALJsonEncodeTimestampA(const AValue: TALBSONTimestamp; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
-function ALJsonEncodeInt64A(const AValue: Int64; const AFormat: TALJSONInterchangeFormat): AnsiString; inline;
+function ALJsonEncodeFloatA(const AValue: double; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString; inline;
+function ALJsonEncodeTextA(const AValue: AnsiString; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString; inline;
+function ALJsonEncodeBinaryA(const AValue: TBytes; const ASubType: Byte; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString; inline;
+function ALJsonEncodeObjectIDA(const AValue: TBytes; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString; inline;
+function ALJsonEncodeBooleanA(const AValue: Boolean; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString; inline;
+function ALJsonEncodeDateTimeA(const AValue: TDateTime; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString; inline;
+function ALJsonEncodeNullA(const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString; inline;
+function ALJsonEncodeRegExA(const AValue: AnsiString; const AOptions: TALPerlRegExOptions; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString; inline;
+function ALJsonEncodeJavascriptA(const AValue: AnsiString; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString; inline;
+function ALJsonEncodeInt32A(const AValue: Int32; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString; inline;
+function ALJsonEncodeTimestampA(const AValue: TALBSONTimestamp; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString; inline;
+function ALJsonEncodeInt64A(const AValue: Int64; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString; inline;
 
 function ALJSONTryStrToRegExA(const S: AnsiString; out RegEx: AnsiString; out RegExOptions: TALPerlRegExOptions): Boolean;
 function ALJSONTryStrToBinaryA(const S: AnsiString; out Data: TBytes; out Subtype: Byte): Boolean;
@@ -726,6 +727,7 @@ type
     function Delete(const Index: Integer): Integer; overload;
     function Delete(const Name: String): Integer; overload;
     function Extract(const index: Integer): TALJSONNodeW; overload;
+    function Extract(const Name: String): TALJSONNodeW; overload;
     function Extract(const Node: TALJSONNodeW): TALJSONNodeW; overload;
     procedure Exchange(Index1, Index2: Integer);
     function FindNode(const NodeName: String; const Direction: TDirection = TDirection.FromBeginning): TALJSONNodeW;
@@ -1195,18 +1197,18 @@ procedure ALTStringsToJsonW(
             const ANameToLowerCase: Boolean = false;
             const ANullStr: String = 'null');
 
-function ALJsonEncodeFloatW(const AValue: double; const AFormat: TALJSONInterchangeFormat): String; inline;
-function ALJsonEncodeTextW(const AValue: String; const AFormat: TALJSONInterchangeFormat): String; inline;
-function ALJsonEncodeBinaryW(const AValue: TBytes; const ASubType: Byte; const AFormat: TALJSONInterchangeFormat): String; inline;
-function ALJsonEncodeObjectIDW(const AValue: TBytes; const AFormat: TALJSONInterchangeFormat): String; inline;
-function ALJsonEncodeBooleanW(const AValue: Boolean; const AFormat: TALJSONInterchangeFormat): String; inline;
-function ALJsonEncodeDateTimeW(const AValue: TDateTime; const AFormat: TALJSONInterchangeFormat): String; inline;
-function ALJsonEncodeNullW(const AFormat: TALJSONInterchangeFormat): String; inline;
-function ALJsonEncodeRegExW(const AValue: String; const AOptions: TALPerlRegExOptions; const AFormat: TALJSONInterchangeFormat): String; inline;
-function ALJsonEncodeJavascriptW(const AValue: String; const AFormat: TALJSONInterchangeFormat): String; inline;
-function ALJsonEncodeInt32W(const AValue: Int32; const AFormat: TALJSONInterchangeFormat): String; inline;
-function ALJsonEncodeTimestampW(const AValue: TALBSONTimestamp; const AFormat: TALJSONInterchangeFormat): String; inline;
-function ALJsonEncodeInt64W(const AValue: Int64; const AFormat: TALJSONInterchangeFormat): String; inline;
+function ALJsonEncodeFloatW(const AValue: double; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String; inline;
+function ALJsonEncodeTextW(const AValue: String; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String; inline;
+function ALJsonEncodeBinaryW(const AValue: TBytes; const ASubType: Byte; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String; inline;
+function ALJsonEncodeObjectIDW(const AValue: TBytes; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String; inline;
+function ALJsonEncodeBooleanW(const AValue: Boolean; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String; inline;
+function ALJsonEncodeDateTimeW(const AValue: TDateTime; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String; inline;
+function ALJsonEncodeNullW(const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String; inline;
+function ALJsonEncodeRegExW(const AValue: String; const AOptions: TALPerlRegExOptions; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String; inline;
+function ALJsonEncodeJavascriptW(const AValue: String; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String; inline;
+function ALJsonEncodeInt32W(const AValue: Int32; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String; inline;
+function ALJsonEncodeTimestampW(const AValue: TALBSONTimestamp; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String; inline;
+function ALJsonEncodeInt64W(const AValue: Int64; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String; inline;
 
 function ALJSONTryStrToRegExW(const S: String; out RegEx: String; out RegExOptions: TALPerlRegExOptions): Boolean;
 function ALJSONTryStrToBinaryW(const S: String; out Data: TBytes; out Subtype: Byte): Boolean;
@@ -7478,17 +7480,6 @@ begin
 end;
 
 {***********************************************************}
-{Removes a specified object from the list without freeing it.
- Call Extract to remove an object from the list without freeing the object itself.
- After an object is removed, all the objects that follow it are moved up in index position and Count is decremented.}
-function TALJSONNodeListA.Extract(const Node: TALJSONNodeA): TALJSONNodeA;
-begin
-  Result := nil;
-  var I := IndexOf(Node);
-  if I >= 0 then Result := Extract(i);
-end;
-
-{***********************************************************}
 procedure TALJSONNodeListA.Exchange(Index1, Index2: Integer);
 begin
   if (Index1 < 0) or (Index1 >= FCount) then AlJSONDocErrorA(ALJSONListIndexError, [Index1]);
@@ -7507,6 +7498,28 @@ begin
   Result := Get(index);
   FList[index] := nil;
   Delete(index);
+end;
+
+{***********************************************************}
+{Removes a specified object from the list without freeing it.
+ Call Extract to remove an object from the list without freeing the object itself.
+ After an object is removed, all the objects that follow it are moved up in index position and Count is decremented.}
+function TALJSONNodeListA.Extract(const Name: AnsiString): TALJSONNodeA;
+begin
+  Result := nil;
+  var I := IndexOf(Name);
+  if I >= 0 then Result := Extract(i);
+end;
+
+{***********************************************************}
+{Removes a specified object from the list without freeing it.
+ Call Extract to remove an object from the list without freeing the object itself.
+ After an object is removed, all the objects that follow it are moved up in index position and Count is decremented.}
+function TALJSONNodeListA.Extract(const Node: TALJSONNodeA): TALJSONNodeA;
+begin
+  Result := nil;
+  var I := IndexOf(Node);
+  if I >= 0 then Result := Extract(i);
 end;
 
 {*********************************************}
@@ -7799,8 +7812,8 @@ begin
 
 end;
 
-{*****************************************************************************************************}
-function ALJsonEncodeFloatA(const AValue: double; const AFormat: TALJSONInterchangeFormat): AnsiString;
+{*****************************************************************************************************************************************************}
+function ALJsonEncodeFloatA(const AValue: double; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString;
 begin
   case AFormat of
     icfStandardJson: Result := ALFloatToStrA(aValue);
@@ -7810,43 +7823,43 @@ begin
   end;
 end;
 
-{********************************************************************************************************}
-function ALJsonEncodeTextA(const AValue: AnsiString; const AFormat: TALJSONInterchangeFormat): AnsiString;
+{********************************************************************************************************************************************************}
+function ALJsonEncodeTextA(const AValue: AnsiString; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString;
 begin
   Result := '"'+ALJavascriptEncode(aValue)+'"';
 end;
 
-{****************************************************************************************************************************}
-function ALJsonEncodeBinaryA(const AValue: TBytes; const ASubType: Byte; const AFormat: TALJSONInterchangeFormat): AnsiString;
+{****************************************************************************************************************************************************************************}
+function ALJsonEncodeBinaryA(const AValue: TBytes; const ASubType: Byte; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString;
 begin
   case AFormat of
     icfStandardJson: Result := '"'+ALBase64EncodeBytesA(AValue)+'"';
     icfMongoShellJson: Result := 'BinData('+ALIntToStrA(ASubType)+',"'+ALBase64EncodeBytesA(aValue)+'")';
-    icfMongoExtendedJson: Result := '{"$binary":{"base64":"'+ALBase64EncodeBytesA(AValue)+'","subType":"'+ALIntToHexA(ASubType, 1)+'"}}';
+    icfMongoExtendedJson: Result := '{"$binary":{"base64":"'+ALBase64EncodeBytesA(AValue)+'","subType":"'+ALIntToHexA(ASubType, 1, True{ALowerCase})+'"}}';
     else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
   end;
 end;
 
-{********************************************************************************************************}
-function ALJsonEncodeObjectIDA(const AValue: TBytes; const AFormat: TALJSONInterchangeFormat): AnsiString;
+{********************************************************************************************************************************************************}
+function ALJsonEncodeObjectIDA(const AValue: TBytes; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString;
 begin
   case AFormat of
-    icfStandardJson: Result := '"'+ALBinToHexA(AValue)+'"';
-    icfMongoShellJson: Result := 'ObjectId("'+ALBinToHexA(aValue)+'")';
-    icfMongoExtendedJson: Result := '{"$oid":"'+ALBinToHexA(AValue)+'"}';
+    icfStandardJson: Result := '"'+ALBinToHexA(AValue, True{ALowerCase})+'"';
+    icfMongoShellJson: Result := 'ObjectId("'+ALBinToHexA(aValue, True{ALowerCase})+'")';
+    icfMongoExtendedJson: Result := '{"$oid":"'+ALBinToHexA(AValue, True{ALowerCase})+'"}';
     else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
   end;
 end;
 
-{********************************************************************************************************}
-function ALJsonEncodeBooleanA(const AValue: Boolean; const AFormat: TALJSONInterchangeFormat): AnsiString;
+{********************************************************************************************************************************************************}
+function ALJsonEncodeBooleanA(const AValue: Boolean; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString;
 begin
   if aValue then Result := 'true'
   else Result := 'false';
 end;
 
-{***********************************************************************************************************}
-function ALJsonEncodeDateTimeA(const AValue: TDateTime; const AFormat: TALJSONInterchangeFormat): AnsiString;
+{***********************************************************************************************************************************************************}
+function ALJsonEncodeDateTimeA(const AValue: TDateTime; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString;
 begin
   case AFormat of
     icfStandardJson: Result := ALFormatDateTimeA('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', AValue);
@@ -7856,14 +7869,14 @@ begin
   end;
 end;
 
-{******************************************************************************}
-function ALJsonEncodeNullA(const AFormat: TALJSONInterchangeFormat): AnsiString;
+{******************************************************************************************************************************}
+function ALJsonEncodeNullA(const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString;
 begin
   Result := 'null';
 end;
 
-{**********************************************************************************************************************************************}
-function ALJsonEncodeRegExA(const AValue: AnsiString; const AOptions: TALPerlRegExOptions; const AFormat: TALJSONInterchangeFormat): AnsiString;
+{**********************************************************************************************************************************************************************************************}
+function ALJsonEncodeRegExA(const AValue: AnsiString; const AOptions: TALPerlRegExOptions; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString;
 begin
   var LOptions: AnsiString := '';
   // The options must be in alphabetical order
@@ -7881,8 +7894,8 @@ begin
   end;
 end;
 
-{**************************************************************************************************************}
-function ALJsonEncodeJavascriptA(const AValue: AnsiString; const AFormat: TALJSONInterchangeFormat): AnsiString;
+{**************************************************************************************************************************************************************}
+function ALJsonEncodeJavascriptA(const AValue: AnsiString; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString;
 begin
   case AFormat of
     icfStandardJson: Result := '"'+ALJavascriptEncode(AValue)+'"';
@@ -7892,8 +7905,8 @@ begin
   end;
 end;
 
-{****************************************************************************************************}
-function ALJsonEncodeInt32A(const AValue: Int32; const AFormat: TALJSONInterchangeFormat): AnsiString;
+{****************************************************************************************************************************************************}
+function ALJsonEncodeInt32A(const AValue: Int32; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString;
 begin
   case AFormat of
     icfStandardJson: Result := ALIntToStrA(AValue);
@@ -7903,8 +7916,8 @@ begin
   end;
 end;
 
-{*******************************************************************************************************************}
-function ALJsonEncodeTimestampA(const AValue: TALBSONTimestamp; const AFormat: TALJSONInterchangeFormat): AnsiString;
+{*******************************************************************************************************************************************************************}
+function ALJsonEncodeTimestampA(const AValue: TALBSONTimestamp; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString;
 begin
   case AFormat of
     icfStandardJson: Result := '"Timestamp('+ALIntToStrA(AValue.t)+','+ALIntToStrA(AValue.i)+')"';
@@ -7914,8 +7927,8 @@ begin
   end;
 end;
 
-{****************************************************************************************************}
-function ALJsonEncodeInt64A(const AValue: Int64; const AFormat: TALJSONInterchangeFormat): AnsiString;
+{****************************************************************************************************************************************************}
+function ALJsonEncodeInt64A(const AValue: Int64; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): AnsiString;
 begin
   case AFormat of
     icfStandardJson: Result := ALIntToStrA(AValue);
@@ -13943,17 +13956,6 @@ begin
 end;
 
 {***********************************************************}
-{Removes a specified object from the list without freeing it.
- Call Extract to remove an object from the list without freeing the object itself.
- After an object is removed, all the objects that follow it are moved up in index position and Count is decremented.}
-function TALJSONNodeListW.Extract(const Node: TALJSONNodeW): TALJSONNodeW;
-begin
-  Result := nil;
-  var I := IndexOf(Node);
-  if I >= 0 then Result := Extract(i);
-end;
-
-{***********************************************************}
 procedure TALJSONNodeListW.Exchange(Index1, Index2: Integer);
 begin
   if (Index1 < 0) or (Index1 >= FCount) then ALJSONDocErrorW(ALJSONListIndexError, [Index1]);
@@ -13972,6 +13974,28 @@ begin
   Result := Get(index);
   FList[index] := nil;
   Delete(index);
+end;
+
+{***********************************************************}
+{Removes a specified object from the list without freeing it.
+ Call Extract to remove an object from the list without freeing the object itself.
+ After an object is removed, all the objects that follow it are moved up in index position and Count is decremented.}
+function TALJSONNodeListW.Extract(const Name: String): TALJSONNodeW;
+begin
+  Result := nil;
+  var I := IndexOf(Name);
+  if I >= 0 then Result := Extract(i);
+end;
+
+{***********************************************************}
+{Removes a specified object from the list without freeing it.
+ Call Extract to remove an object from the list without freeing the object itself.
+ After an object is removed, all the objects that follow it are moved up in index position and Count is decremented.}
+function TALJSONNodeListW.Extract(const Node: TALJSONNodeW): TALJSONNodeW;
+begin
+  Result := nil;
+  var I := IndexOf(Node);
+  if I >= 0 then Result := Extract(i);
 end;
 
 {*********************************************}
@@ -14264,8 +14288,8 @@ begin
 
 end;
 
-{*************************************************************************************************}
-function ALJsonEncodeFloatW(const AValue: double; const AFormat: TALJSONInterchangeFormat): String;
+{*************************************************************************************************************************************************}
+function ALJsonEncodeFloatW(const AValue: double; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String;
 begin
   case AFormat of
     icfStandardJson: Result := ALFloatToStrW(aValue);
@@ -14275,43 +14299,43 @@ begin
   end;
 end;
 
-{************************************************************************************************}
-function ALJsonEncodeTextW(const AValue: String; const AFormat: TALJSONInterchangeFormat): String;
+{************************************************************************************************************************************************}
+function ALJsonEncodeTextW(const AValue: String; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String;
 begin
   Result := '"'+ALJavascriptEncode(aValue)+'"';
 end;
 
-{************************************************************************************************************************}
-function ALJsonEncodeBinaryW(const AValue: TBytes; const ASubType: Byte; const AFormat: TALJSONInterchangeFormat): String;
+{************************************************************************************************************************************************************************}
+function ALJsonEncodeBinaryW(const AValue: TBytes; const ASubType: Byte; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String;
 begin
   case AFormat of
     icfStandardJson: Result := '"'+ALBase64EncodeBytesW(AValue)+'"';
     icfMongoShellJson: Result := 'BinData('+ALIntToStrW(ASubType)+',"'+ALBase64EncodeBytesW(aValue)+'")';
-    icfMongoExtendedJson: Result := '{"$binary":{"base64":"'+ALBase64EncodeBytesW(AValue)+'","subType":"'+ALIntToHexW(ASubType, 1)+'"}}';
+    icfMongoExtendedJson: Result := '{"$binary":{"base64":"'+ALBase64EncodeBytesW(AValue)+'","subType":"'+ALIntToHexW(ASubType, 1, True{ALowerCase})+'"}}';
     else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
   end;
 end;
 
-{****************************************************************************************************}
-function ALJsonEncodeObjectIDW(const AValue: TBytes; const AFormat: TALJSONInterchangeFormat): String;
+{****************************************************************************************************************************************************}
+function ALJsonEncodeObjectIDW(const AValue: TBytes; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String;
 begin
   case AFormat of
-    icfStandardJson: Result := '"'+ALBinToHexW(AValue)+'"';
-    icfMongoShellJson: Result := 'ObjectId("'+ALBinToHexW(aValue)+'")';
-    icfMongoExtendedJson: Result := '{"$oid":"'+ALBinToHexW(AValue)+'"}';
+    icfStandardJson: Result := '"'+ALBinToHexW(AValue, True{ALowerCase})+'"';
+    icfMongoShellJson: Result := 'ObjectId("'+ALBinToHexW(aValue, True{ALowerCase})+'")';
+    icfMongoExtendedJson: Result := '{"$oid":"'+ALBinToHexW(AValue, True{ALowerCase})+'"}';
     else raise Exception.Create('Unsupported TALJSONInterchangeFormat');
   end;
 end;
 
-{****************************************************************************************************}
-function ALJsonEncodeBooleanW(const AValue: Boolean; const AFormat: TALJSONInterchangeFormat): String;
+{****************************************************************************************************************************************************}
+function ALJsonEncodeBooleanW(const AValue: Boolean; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String;
 begin
   if aValue then Result := 'true'
   else Result := 'false';
 end;
 
-{*******************************************************************************************************}
-function ALJsonEncodeDateTimeW(const AValue: TDateTime; const AFormat: TALJSONInterchangeFormat): String;
+{*******************************************************************************************************************************************************}
+function ALJsonEncodeDateTimeW(const AValue: TDateTime; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String;
 begin
   case AFormat of
     icfStandardJson: Result := ALFormatDateTimeW('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', AValue);
@@ -14321,14 +14345,14 @@ begin
   end;
 end;
 
-{**************************************************************************}
-function ALJsonEncodeNullW(const AFormat: TALJSONInterchangeFormat): String;
+{**************************************************************************************************************************}
+function ALJsonEncodeNullW(const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String;
 begin
   Result := 'null';
 end;
 
-{**************************************************************************************************************************************}
-function ALJsonEncodeRegExW(const AValue: String; const AOptions: TALPerlRegExOptions; const AFormat: TALJSONInterchangeFormat): String;
+{**************************************************************************************************************************************************************************************}
+function ALJsonEncodeRegExW(const AValue: String; const AOptions: TALPerlRegExOptions; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String;
 begin
   var LOptions: String := '';
   // The options must be in alphabetical order
@@ -14346,8 +14370,8 @@ begin
   end;
 end;
 
-{******************************************************************************************************}
-function ALJsonEncodeJavascriptW(const AValue: String; const AFormat: TALJSONInterchangeFormat): String;
+{******************************************************************************************************************************************************}
+function ALJsonEncodeJavascriptW(const AValue: String; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String;
 begin
   case AFormat of
     icfStandardJson: Result := '"'+ALJavascriptEncode(AValue)+'"';
@@ -14357,8 +14381,8 @@ begin
   end;
 end;
 
-{************************************************************************************************}
-function ALJsonEncodeInt32W(const AValue: Int32; const AFormat: TALJSONInterchangeFormat): String;
+{************************************************************************************************************************************************}
+function ALJsonEncodeInt32W(const AValue: Int32; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String;
 begin
   case AFormat of
     icfStandardJson: Result := ALIntToStrW(AValue);
@@ -14368,8 +14392,8 @@ begin
   end;
 end;
 
-{***************************************************************************************************************}
-function ALJsonEncodeTimestampW(const AValue: TALBSONTimestamp; const AFormat: TALJSONInterchangeFormat): String;
+{***************************************************************************************************************************************************************}
+function ALJsonEncodeTimestampW(const AValue: TALBSONTimestamp; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String;
 begin
   case AFormat of
     icfStandardJson: Result := '"Timestamp('+ALIntToStrW(AValue.t)+','+ALIntToStrW(AValue.i)+')"';
@@ -14379,8 +14403,8 @@ begin
   end;
 end;
 
-{************************************************************************************************}
-function ALJsonEncodeInt64W(const AValue: Int64; const AFormat: TALJSONInterchangeFormat): String;
+{************************************************************************************************************************************************}
+function ALJsonEncodeInt64W(const AValue: Int64; const AFormat: TALJSONInterchangeFormat = TALJSONInterchangeFormat.icfMongoExtendedJson): String;
 begin
   case AFormat of
     icfStandardJson: Result := ALIntToStrW(AValue);

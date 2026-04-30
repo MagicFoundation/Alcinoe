@@ -1,4 +1,4 @@
-unit Alcinoe.Cipher;
+ï»¿unit Alcinoe.Cipher;
 
 interface
 
@@ -99,7 +99,7 @@ function ALCalcHMACSHA2AsStringA(const AData, AKey: AnsiString; const AHashVersi
 {$IFDEF MSWINDOWS}
 procedure ALRandomBytes(const ADest; const ALen: Cardinal); overload;
 function ALRandomBytes(const ALen: Cardinal): TBytes; overload;
-function ALRandomByteStr(const ALen: Cardinal): ansiString;
+function ALRandomByteStr(const ALen: Cardinal): AnsiString;
 {$ENDIF}
 var ALRandom32: function(const ARange: Cardinal): cardinal;
 var ALRandom64: function(const ARange: UInt64): UInt64;
@@ -109,9 +109,9 @@ var ALRandom64: function(const ARange: UInt64): UInt64;
 ////// Fnv1a //////
 ///////////////////
 
-function ALFnv1aInt32(const AStr: ansiString): int32; overload; inline;
+function ALFnv1aInt32(const AStr: AnsiString): int32; overload; inline;
 function ALFnv1aInt32(const AStr: String; const AEncoding: TEncoding): int32; overload; inline;
-function ALFnv1aInt64(const AStr: ansiString): Int64; overload; inline;
+function ALFnv1aInt64(const AStr: AnsiString): Int64; overload; inline;
 function ALFnv1aInt64(const AStr: String; const AEncoding: TEncoding): Int64; overload; inline;
 
 
@@ -120,14 +120,14 @@ function ALFnv1aInt64(const AStr: String; const AEncoding: TEncoding): Int64; ov
 ///////////////////////
 
 {$IF defined(MSWINDOWS)}
-function ALVerifyRSA256Signature(
-           const AData: AnsiString; // bytes string
-           const ASignature: AnsiString; // bytes string
-           const ABase64PubKeyModulus: ansiString;
-           const ABase64PubKeyExponent: ansiString): boolean;
-function ALRSA256Sign(
-           const AData: AnsiString; // bytes string
-           const APemPrivateKey: AnsiString): ansiString; // byte string result
+function ALVerifyRS256Signature(
+           const AData: TBytes;
+           const ASignature: TBytes;
+           const APubKeyModulus: TBytes;
+           const APubKeyExponent: TBytes): boolean;
+function ALRS256Sign(
+           const AData: TBytes;
+           const APemPrivateKey: AnsiString): TBytes;
 {$ENDIF}
 
 
@@ -137,17 +137,38 @@ function ALRSA256Sign(
 
 {$IF defined(MSWINDOWS)}
 function ALGenerateGoogleOAuth2AccessToken(
-           const AServiceAccountEmail: ansiString;
-           const AScope: ansiString;
-           const APrivateKey: ansiString): AnsiString;
+           const AServiceAccountEmail: AnsiString;
+           const AScope: AnsiString;
+           const APrivateKey: AnsiString): AnsiString;
+{$ENDIF}
+
+
+//////////////////////////////////////
+////// Windows Credential Vault //////
+//////////////////////////////////////
+
+{$IF defined(MSWINDOWS)}
+function ALTryGetGenericWinCredential(
+           const ATargetName: AnsiString;
+           out AUserName: AnsiString;
+           out APassword: AnsiString): Boolean;
+procedure ALGetGenericWinCredential(
+            const ATargetName: AnsiString;
+            out AUserName: AnsiString;
+            out APassword: AnsiString);
 {$ENDIF}
 
 implementation
 
 uses
   {$IF defined(MSWINDOWS)}
-  winapi.windows,
+  WinApi.windows,
+  WinApi.WinCred,
   System.DateUtils,
+  System.AnsiStrings,
+  System.Generics.Collections,
+  System.SyncObjs,
+  System.Math,
   Alcinoe.WinApi.Windows,
   Alcinoe.WinApi.WinCrypt,
   Alcinoe.WinApi.BCrypt,
@@ -213,7 +234,7 @@ end;
 function ALHashMD5AsStringA(const AData: TBytes; const AHexEncode: boolean = true): AnsiString;
 begin
   var LBytes := ALHashMD5AsBytes(AData);
-  if AHexEncode then result := ALBinToHexA(LBytes)
+  if AHexEncode then result := ALBinToHexA(LBytes, True{ALowerCase})
   else Result := ALBytesToString(LBytes);
 end;
 
@@ -221,7 +242,7 @@ end;
 function ALHashMD5AsStringA(const AData: AnsiString; const AHexEncode: boolean = true): AnsiString;
 begin
   var LBytes := ALHashMD5AsBytes(AData);
-  if AHexEncode then result := ALBinToHexA(LBytes)
+  if AHexEncode then result := ALBinToHexA(LBytes, True{ALowerCase})
   else Result := ALBytesToString(LBytes);
 end;
 
@@ -229,14 +250,14 @@ end;
 function ALHashMD5AsStringW(const AData: TBytes): String;
 begin
   var LBytes := ALHashMD5AsBytes(AData);
-  Result := ALBinToHexW(LBytes);
+  Result := ALBinToHexW(LBytes, True{ALowerCase});
 end;
 
 {***********************************************************************************}
 function ALHashMD5AsStringW(const AData: String; const AEncoding: TEncoding): String;
 begin
   var LBytes := ALHashMD5AsBytes(AData, AEncoding);
-  Result := ALBinToHexW(LBytes);
+  Result := ALBinToHexW(LBytes, True{ALowerCase});
 end;
 
 
@@ -293,7 +314,7 @@ end;
 function ALHashSHA1AsStringA(const AData: TBytes; const AHexEncode: boolean = true): AnsiString;
 begin
   var LBytes := ALHashSHA1AsBytes(AData);
-  if AHexEncode then result := ALBinToHexA(LBytes)
+  if AHexEncode then result := ALBinToHexA(LBytes, True{ALowerCase})
   else Result := ALBytesToString(LBytes);
 end;
 
@@ -301,7 +322,7 @@ end;
 function ALHashSHA1AsStringA(const AData: AnsiString; const AHexEncode: boolean = true): AnsiString;
 begin
   var LBytes := ALHashSHA1AsBytes(AData);
-  if AHexEncode then result := ALBinToHexA(LBytes)
+  if AHexEncode then result := ALBinToHexA(LBytes, True{ALowerCase})
   else Result := ALBytesToString(LBytes);
 end;
 
@@ -309,14 +330,14 @@ end;
 function ALHashSHA1AsStringW(const AData: TBytes): String;
 begin
   var LBytes := ALHashSHA1AsBytes(AData);
-  Result := ALBinToHexW(LBytes);
+  Result := ALBinToHexW(LBytes, True{ALowerCase});
 end;
 
 {************************************************************************************}
 function ALHashSHA1AsStringW(const AData: String; const AEncoding: TEncoding): String;
 begin
   var LBytes := ALHashSHA1AsBytes(AData, AEncoding);
-  Result := ALBinToHexW(LBytes);
+  Result := ALBinToHexW(LBytes, True{ALowerCase});
 end;
 
 
@@ -352,7 +373,7 @@ end;
 function ALHashSHA2AsStringA(const AData: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
 begin
   var LBytes := ALHashSHA2AsBytes(AData, AHashVersion);
-  if AHexEncode then result := ALBinToHexA(LBytes)
+  if AHexEncode then result := ALBinToHexA(LBytes, True{ALowerCase})
   else Result := ALBytesToString(LBytes);
 end;
 
@@ -360,7 +381,7 @@ end;
 function ALHashSHA2AsStringA(const AData: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
 begin
   var LBytes := ALHashSHA2AsBytes(AData, AHashVersion);
-  if AHexEncode then result := ALBinToHexA(LBytes)
+  if AHexEncode then result := ALBinToHexA(LBytes, True{ALowerCase})
   else Result := ALBytesToString(LBytes);
 end;
 
@@ -368,14 +389,14 @@ end;
 function ALHashSHA2AsStringW(const AData: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String;
 begin
   var LBytes := ALHashSHA2AsBytes(AData, AHashVersion);
-  Result := ALBinToHexW(LBytes);
+  Result := ALBinToHexW(LBytes, True{ALowerCase});
 end;
 
 {****************************************************************************************************************************************************************}
 function ALHashSHA2AsStringW(const AData: String; const AEncoding: TEncoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String;
 begin
   var LBytes := ALHashSHA2AsBytes(AData, AEncoding, AHashVersion);
-  Result := ALBinToHexW(LBytes);
+  Result := ALBinToHexW(LBytes, True{ALowerCase});
 end;
 
 
@@ -405,7 +426,7 @@ end;
 function ALCalcHMACMD5AsStringA(const AData: TBytes; const AKey: TBytes; const AHexEncode: boolean = true): AnsiString;
 begin
   var LMac := ALCalcHMACMD5AsBytes(AData, AKey);
-  if AHexEncode then Result := ALBinToHexA(LMac)
+  if AHexEncode then Result := ALBinToHexA(LMac, True{ALowerCase})
   else Result := ALBytesToString(LMac);
 end;
 
@@ -413,7 +434,7 @@ end;
 function ALCalcHMACMD5AsStringA(const AData: AnsiString; const AKey: TBytes; const AHexEncode: boolean = true): AnsiString;
 begin
   var LMac := ALCalcHMACMD5AsBytes(AData, AKey);
-  if AHexEncode then Result := ALBinToHexA(LMac)
+  if AHexEncode then Result := ALBinToHexA(LMac, True{ALowerCase})
   else Result := ALBytesToString(LMac);
 end;
 
@@ -421,7 +442,7 @@ end;
 function ALCalcHMACMD5AsStringA(const AData, AKey: AnsiString; const AHexEncode: boolean = true): AnsiString;
 begin
   var LMac := ALCalcHMACMD5AsBytes(AData, AKey);
-  if AHexEncode then Result := ALBinToHexA(LMac)
+  if AHexEncode then Result := ALBinToHexA(LMac, True{ALowerCase})
   else Result := ALBytesToString(LMac);
 end;
 
@@ -447,7 +468,7 @@ end;
 function ALCalcHMACSHA1AsStringA(const AData: TBytes; const AKey: TBytes; const AHexEncode: boolean = true): AnsiString;
 begin
   var LMac := ALCalcHMACSHA1AsBytes(AData, AKey);
-  if AHexEncode then Result := ALBinToHexA(LMac)
+  if AHexEncode then Result := ALBinToHexA(LMac, True{ALowerCase})
   else Result := ALBytesToString(LMac);
 end;
 
@@ -455,7 +476,7 @@ end;
 function ALCalcHMACSHA1AsStringA(const AData: AnsiString; const AKey: TBytes; const AHexEncode: boolean = true): AnsiString;
 begin
   var LMac := ALCalcHMACSHA1AsBytes(AData, AKey);
-  if AHexEncode then Result := ALBinToHexA(LMac)
+  if AHexEncode then Result := ALBinToHexA(LMac, True{ALowerCase})
   else Result := ALBytesToString(LMac);
 end;
 
@@ -463,7 +484,7 @@ end;
 function ALCalcHMACSHA1AsStringA(const AData, AKey: AnsiString; const AHexEncode: boolean = true): AnsiString;
 begin
   var LMac := ALCalcHMACSHA1AsBytes(AData, AKey);
-  if AHexEncode then Result := ALBinToHexA(LMac)
+  if AHexEncode then Result := ALBinToHexA(LMac, True{ALowerCase})
   else Result := ALBytesToString(LMac);
 end;
 
@@ -489,7 +510,7 @@ end;
 function ALCalcHMACSHA2AsStringA(const AData: TBytes; const AKey: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
 begin
   var LMac := ALCalcHMACSHA2AsBytes(AData, AKey, AHashVersion);
-  if AHexEncode then Result := ALBinToHexA(LMac)
+  if AHexEncode then Result := ALBinToHexA(LMac, True{ALowerCase})
   else Result := ALBytesToString(LMac);
 end;
 
@@ -497,7 +518,7 @@ end;
 function ALCalcHMACSHA2AsStringA(const AData: AnsiString; const AKey: TBytes; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
 begin
   var LMac := ALCalcHMACSHA2AsBytes(AData, AKey, AHashVersion);
-  if AHexEncode then Result := ALBinToHexA(LMac)
+  if AHexEncode then Result := ALBinToHexA(LMac, True{ALowerCase})
   else Result := ALBytesToString(LMac);
 end;
 
@@ -505,7 +526,7 @@ end;
 function ALCalcHMACSHA2AsStringA(const AData, AKey: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const AHexEncode: boolean = true): AnsiString;
 begin
   var LMac := ALCalcHMACSHA2AsBytes(AData, AKey, AHashVersion);
-  if AHexEncode then Result := ALBinToHexA(LMac)
+  if AHexEncode then Result := ALBinToHexA(LMac, True{ALowerCase})
   else Result := ALBytesToString(LMac);
 end;
 
@@ -669,7 +690,7 @@ function ALRandom32_Default(const ARange: Cardinal): cardinal;
 begin
   {$IFDEF MSWINDOWS}
   var LBytes := ALRandomBytes(sizeOf(result));
-  move(LBytes[0],result,sizeOf(result));
+  ALMove(LBytes[0],result,sizeOf(result));
   result := result mod ARange;
   {$ELSE}
   result := cardinal(Random(integer(ARange)));
@@ -681,7 +702,7 @@ function ALRandom64_Default(const ARange: UInt64): UInt64;
 begin
   {$IFDEF MSWINDOWS}
   var LBytes := ALRandomBytes(sizeOf(result));
-  move(LBytes[0],result,sizeOf(result));
+  ALMove(LBytes[0],result,sizeOf(result));
   result := result mod ARange;
   {$ELSE}
   Result := (UInt64(Random(ALMAXInt)) shl 32) or ((UInt64(Random(ALMAXInt)) shl 32) shr 32);
@@ -699,7 +720,7 @@ end;
 //http://programmers.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
 //https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
 //http://www.isthe.com/chongo/tech/comp/fnv/index.html#FNV-param
-function ALFnv1aInt64(const AStr: ansiString): Int64;
+function ALFnv1aInt64(const AStr: AnsiString): Int64;
 begin
    Result := Int64(14695981039346656037);
    for var i := low(AStr) to high(AStr) do
@@ -724,7 +745,7 @@ end;
 
 {***********************}
 {$Q-} {Overflow Checking}
-function ALFnv1aInt32(const AStr: ansiString): int32;
+function ALFnv1aInt32(const AStr: AnsiString): int32;
 begin
    Result := int32(2166136261);
    for var i := low(AStr) to high(AStr) do
@@ -752,171 +773,18 @@ end;
 ////// Signature //////
 ///////////////////////
 
-{$IF defined(MSWINDOWS)}
-
-{**}
-type
-  _TRSAKeyType = (PrivateKey, PublicKey, FullPrivate);
-
-{**}
-type
-  //https://docs.microsoft.com/en-us/windows/win32/seccrypto/base-provider-key-blobs
-  _PRIVATEKEYBLOB = record
-    PublicKeyStruc: BLOBHEADER; // A PUBLICKEYSTRUC structure.
-    RSAPubKey: RSAPUBKEY; // A RSAPUBKEY structure. The magic member must be set to 0x32415352. This hexadecimal value is the ASCII encoding of RSA2.
-    Modulus: TBytes; // The modulus. This has a value of Prime1×Prime2 and is often known as n.
-    Prime1: TBytes; // Prime number 1, often known as p.
-    Prime2: TBytes; // Prime number 2, often known as q.
-    Exponent1: TBytes; // Exponent 1. This has a numeric value of d mod (p – 1).
-    Exponent2: TBytes; // Exponent 2. This has a numeric value of d mod (q – 1).
-    Coefficient: TBytes; // Coefficient. This has a numeric value of (inverse of q) mod p.
-    PrivateExponent: TBytes; // Private exponent, often known as d.
-  end;
-
-{$ENDIF}
-
 {**********************}
 {$IF defined(MSWINDOWS)}
-//taken from https://github.com/MattiaVicari/Crypt4Delphi
-function _PKCS1Blob2PrivateKeyBlob(AKeyBlob: TBytes; AKeyBlobSize: DWORD): _PRIVATEKEYBLOB;
+function ALVerifyRS256Signature(
+           const AData: TBytes;
+           const ASignature: TBytes;
+           const APubKeyModulus: TBytes;
+           const APubKeyExponent: TBytes): boolean;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _CopyAndAdvance(const ASourceBuffer: TBytes; var ADestBuffer: Tbytes; var ACursor: DWORD; ASize: DWORD);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure BigEndianToLittleEndian(var AArr: TBytes);
   begin
-    setlength(ADestBuffer, ASize);
-    if ASize = 0 then exit;
-    if aSize + ACursor > AKeyBlobSize then
-      raise Exception.Create('Mismatch between the Key blob size and Private key structure size');
-    ALMove(ASourceBuffer[ACursor], ADestBuffer[0], ASize);
-    Inc(ACursor, ASize);
-  end;
-
-begin
-  var Cursor: DWORD := SizeOf(Result.PublicKeyStruc) + SizeOf(Result.RSAPubKey);
-  ALMove(AKeyBlob[0], Result, Cursor);
-  //-----
-  var CbModulus: DWORD := Result.RSAPubKey.Bitlen div 8;
-  var CbPrime: DWORD := Result.RSAPubKey.Bitlen div 16;
-  //-----
-  _CopyAndAdvance(AKeyBlob, Result.Modulus, Cursor, CbModulus);
-  _CopyAndAdvance(AKeyBlob, Result.Prime1, Cursor, CbPrime);
-  _CopyAndAdvance(AKeyBlob, Result.Prime2, Cursor, CbPrime);
-  _CopyAndAdvance(AKeyBlob, Result.Exponent1, Cursor, CbPrime);
-  _CopyAndAdvance(AKeyBlob, Result.Exponent2, Cursor, CbPrime);
-  _CopyAndAdvance(AKeyBlob, Result.Coefficient, Cursor, CbPrime);
-  _CopyAndAdvance(AKeyBlob, Result.PrivateExponent, Cursor, CbModulus);
-  //-----
-  if Cursor <> AKeyBlobSize then
-    raise Exception.Create('Mismatch between the Key blob size and Private key structure size');
-end;
-{$ENDIF}
-
-{**********************}
-{$IF defined(MSWINDOWS)}
-//taken from https://github.com/MattiaVicari/Crypt4Delphi
-//transform a PRIVATEKEYBLOB in BCRYPT_RSAKEY_BLOB immediately followed by the key data
-function _PrivateKeyBlob2BcryptRSAKeyBlobAndData(
-           const APrivateKeyBlob: _PRIVATEKEYBLOB;
-           const AKeyType: _TRSAKeyType): TBytes;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _ReverseMemCopy(const Source; var Dest; Count: Integer);
-  begin
-    var S: PByte := PByte(@Source);
-    var D: PByte := PByte(@Dest);
-    for var I := 0 to Count - 1 do
-      D[Count - 1 - I] := S[I];
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _CheckAndCopyToBuffer(const ASourceBuffer: TBytes; var ACursor: DWORD);
-  begin
-    if (Length(ASourceBuffer) > 0) then begin
-      _ReverseMemCopy(ASourceBuffer[0], Result[ACursor], Length(ASourceBuffer));
-      Inc(ACursor, Length(ASourceBuffer));
-    end;
-  end;
-
-begin
-
-  var CbModulus: DWORD := (APrivateKeyBlob.RSAPubKey.Bitlen + 7) div 8;
-  if CbModulus <> DWORD(Length(APrivateKeyBlob.Modulus)) then raise Exception.Create('Modulus size doesn''t match');
-
-  var CbExp: DWORD;
-  if APrivateKeyBlob.RSAPubKey.PubExp and $FF000000 > 0 then CbExp := 4
-  else if APrivateKeyBlob.RSAPubKey.PubExp and $00FF0000 > 0 then CbExp := 3
-  else if APrivateKeyBlob.RSAPubKey.PubExp and $0000FF00 > 0 then CbExp := 2
-  else CbExp := 1;
-
-  var RSAKeyBlob: BCRYPT_RSAKEY_BLOB;
-  RSAKeyBlob.BitLength := APrivateKeyBlob.RSAPubKey.Bitlen;
-  case AKeyType of
-    _TRSAKeyType.PrivateKey: RSAKeyBlob.Magic :=  BCRYPT_RSAPRIVATE_MAGIC;
-    _TRSAKeyType.PublicKey: RSAKeyBlob.Magic :=  BCRYPT_RSAPUBLIC_MAGIC;
-    _TRSAKeyType.FullPrivate: RSAKeyBlob.Magic :=  BCRYPT_RSAFULLPRIVATE_MAGIC;
-    else raise Exception.Create('Key type unknown');
-  end;
-  RSAKeyBlob.cbPublicExp := CbExp;
-  RSAKeyBlob.cbModulus := CbModulus;
-  RSAKeyBlob.cbPrime1 := Length(APrivateKeyBlob.Prime1);
-  RSAKeyBlob.cbPrime2 := Length(APrivateKeyBlob.Prime2);
-
-  var RSACursor: DWORD := 0;
-  var CbResult: DWORD := SizeOf(RSAKeyBlob) + RSAKeyBlob.cbPublicExp;
-
-  inc(CbResult, length(APrivateKeyBlob.Modulus));
-  if AKeyType in [_TRSAKeyType.PrivateKey, _TRSAKeyType.FullPrivate] then begin
-    inc(CbResult, length(APrivateKeyBlob.Prime1));
-    inc(CbResult, length(APrivateKeyBlob.Prime2));
-    if AKeyType = _TRSAKeyType.FullPrivate then begin
-      inc(CbResult, length(APrivateKeyBlob.Exponent1));
-      inc(CbResult, length(APrivateKeyBlob.Exponent2));
-      inc(CbResult, length(APrivateKeyBlob.Coefficient));
-      inc(CbResult, length(APrivateKeyBlob.PrivateExponent));
-    end;
-  end;
-
-  SetLength(Result, CbResult);
-
-  // Header information
-  Move(RSAKeyBlob, Result[RSACursor], SizeOf(RSAKeyBlob));
-  Inc(RSACursor, SizeOf(RSAKeyBlob));
-
-  // Public exponent
-  _ReverseMemCopy(APrivateKeyBlob.RSAPubKey.PubExp, Result[RSACursor], RSAKeyBlob.cbPublicExp);
-  Inc(RSACursor, RSAKeyBlob.cbPublicExp);
-
-  // Other components
-  _CheckAndCopyToBuffer(APrivateKeyBlob.Modulus, RSACursor);
-  if AKeyType in [_TRSAKeyType.PrivateKey, _TRSAKeyType.FullPrivate] then begin
-    _CheckAndCopyToBuffer(APrivateKeyBlob.Prime1, RSACursor);
-    _CheckAndCopyToBuffer(APrivateKeyBlob.Prime2, RSACursor);
-    if AKeyType = _TRSAKeyType.FullPrivate then begin
-      _CheckAndCopyToBuffer(APrivateKeyBlob.Exponent1, RSACursor);
-      _CheckAndCopyToBuffer(APrivateKeyBlob.Exponent2, RSACursor);
-      _CheckAndCopyToBuffer(APrivateKeyBlob.Coefficient, RSACursor);
-      _CheckAndCopyToBuffer(APrivateKeyBlob.PrivateExponent, RSACursor);
-    end;
-  end;
-
-  if RSACursor <> CbResult then
-    raise Exception.Create('Mismatch between the size of the RSA key blob and the source key blob');
-
-end;
-{$ENDIF}
-
-{**********************}
-{$IF defined(MSWINDOWS)}
-function ALVerifyRSA256Signature(
-           const AData: AnsiString; // bytes string
-           const ASignature: AnsiString; // bytes string
-           const ABase64PubKeyModulus: ansiString;
-           const ABase64PubKeyExponent: ansiString): boolean;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _bigEndianToLittleEndian(var AArr: TBytes);
-  begin
-    var J: integer := Length(AArr) - 1;
+    var J: integer := high(AArr);
     var i: integer := low(AArr);
     while i < J do begin
       var B: Byte := AArr[i];
@@ -929,63 +797,38 @@ function ALVerifyRSA256Signature(
 
 begin
 
-  //init pModulus / cbModulus
-  var cbModulus: DWORD;
-  if not CryptStringToBinaryA(
-           PansiChar(ABase64PubKeyModulus), // pszString: LPCSTR;
-           length(ABase64PubKeyModulus), // cchString: DWORD;
-           CRYPT_STRING_BASE64, // dwFlags: DWORD;
-           nil, // pbBinary: pByte;
-           @cbModulus, // pcbBinary: PDWORD;
-           nil, // pdwSkip: PDWORD;
-           nil) then raiseLastOsError; // pdwFlags: PDWORD
-  var pModulus: TBytes;
-  setlength(pModulus, cbModulus);
-  if not CryptStringToBinaryA(
-           PansiChar(ABase64PubKeyModulus), // pszString: LPCSTR;
-           length(ABase64PubKeyModulus), // cchString: DWORD;
-           CRYPT_STRING_BASE64, // dwFlags: DWORD;
-           @pModulus[0], // pbBinary: pByte;
-           @cbModulus, // pcbBinary: PDWORD;
-           nil, // pdwSkip: PDWORD;
-           nil) then raiseLastOsError; // pdwFlags: PDWORD
-  _bigEndianToLittleEndian(pModulus);
+  if Length(AData) = 0 then raise Exception.Create('Cannot verify RS256 signature: data is empty.');
+  if Length(ASignature) = 0 then raise Exception.Create('Cannot verify RS256 signature: signature is empty.');
+  if Length(APubKeyModulus) = 0 then raise Exception.Create('Cannot verify RS256 signature: RSA public modulus is empty.');
+  if Length(APubKeyExponent) = 0 then raise Exception.Create('Cannot verify RS256 signature: RSA public exponent is empty.');
 
-  //init pExponent / cbExponent
-  var cbExponent: DWORD;
-  if not CryptStringToBinaryA(
-           PansiChar(ABase64PubKeyExponent), // pszString: LPCSTR;
-           length(ABase64PubKeyExponent), // cchString: DWORD;
-           CRYPT_STRING_BASE64, // dwFlags: DWORD;
-           nil, // pbBinary: pByte;
-           @cbExponent, // pcbBinary: PDWORD;
-           nil, // pdwSkip: PDWORD;
-           nil) then raiseLastOsError; // pdwFlags: PDWORD
-  var pExponent: TBytes;
-  setlength(pExponent, cbExponent);
-  if not CryptStringToBinaryA(
-           PansiChar(ABase64PubKeyExponent), // pszString: LPCSTR;
-           length(ABase64PubKeyExponent), // cchString: DWORD;
-           CRYPT_STRING_BASE64, // dwFlags: DWORD;
-           @pExponent[0], // pbBinary: pByte;
-           @cbExponent, // pcbBinary: PDWORD;
-           nil, // pdwSkip: PDWORD;
-           nil) then raiseLastOsError; // pdwFlags: PDWORD
-  _bigEndianToLittleEndian(pExponent);
-  var dwExponent: Dword;
-  if cbExponent > sizeof(dwExponent) then
-    raise Exception.CreateFmt('Wrong exponent (%s)',[ABase64PubKeyExponent]);
-  dwExponent := 0;
-  move(pExponent[0], dwExponent, cbExponent);
+  var cbModulus: DWORD := Length(APubKeyModulus);
+  var cbExponent: DWORD := Length(APubKeyExponent);
 
-  //acquire a handle to a particular key container
+  if Length(ASignature) <> Integer(cbModulus) then
+    Exit(False);
+
+  var pModulus := Copy(APubKeyModulus);
+  BigEndianToLittleEndian(pModulus);
+
+  var pExponent := Copy(APubKeyExponent);
+  BigEndianToLittleEndian(pExponent);
+
+  if cbExponent > SizeOf(DWORD) then
+    raise Exception.Create('Cannot verify RS256 signature: RSA public exponent is larger than 32 bits.');
+
+  var dwExponent: DWORD := 0;
+  ALMove(pExponent[0], dwExponent, cbExponent);
+
   var hProv: HCRYPTPROV;
-  if (not CryptAcquireContextA(
-            @hProv, // phProv: PHCRYPTPROV;
-            nil, // pszContainer: PAnsiChar;
-            nil, // pszProvider: PAnsiChar;
-            PROV_RSA_AES, // dwProvType: DWORD;
-            CRYPT_VERIFYCONTEXT)) then raiselastOsError; // dwFlags: DWORD
+  ALCheckWinApiBoolean(
+    'CryptAcquireContextA',
+    CryptAcquireContextA(
+      @hProv, // phProv: PHCRYPTPROV;
+      nil, // pszContainer: PAnsiChar;
+      nil, // pszProvider: PAnsiChar;
+      PROV_RSA_AES, // dwProvType: DWORD;
+      CRYPT_VERIFYCONTEXT)); // dwFlags: DWORD
   try
 
     // create the pKeyBlob
@@ -999,52 +842,56 @@ begin
     pPublicKey.bType := PUBLICKEYBLOB;
     pPublicKey.bVersion := CUR_BLOB_VERSION;  // Always use this value.
     pPublicKey.reserved := 0;                 // Must be zero.
-    pPublicKey.aiKeyAlg := CALG_RSA_KEYX;     // RSA public-key key exchange.
-    Move(pPublicKey,pKeyBlob[0],sizeof(PUBLICKEYSTRUC));
+    pPublicKey.aiKeyAlg := CALG_RSA_SIGN;     // RSA signature verification.
+    ALMove(pPublicKey,pKeyBlob[0],sizeof(PUBLICKEYSTRUC));
 
     // Fill in the RSAPUBKEY
     var pRsaPubKey: RSAPUBKEY;
     pRsaPubKey.magic := BCRYPT_RSAPUBLIC_MAGIC;            // Public key.
     pRsaPubKey.bitlen := cbModulus * 8;  // Number of bits in the modulus.
     pRsaPubKey.pubexp := dwExponent;     // Exponent.
-    Move(pRsaPubKey,pKeyBlob[sizeof(PUBLICKEYSTRUC)],sizeof(RSAPUBKEY));
+    ALMove(pRsaPubKey,pKeyBlob[sizeof(PUBLICKEYSTRUC)],sizeof(RSAPUBKEY));
 
     // Fill in the modulus
-    Move(pModulus[0],pKeyBlob[sizeof(PUBLICKEYSTRUC)+sizeof(RSAPUBKEY)],cbModulus);
+    ALMove(pModulus[0],pKeyBlob[sizeof(PUBLICKEYSTRUC)+sizeof(RSAPUBKEY)],cbModulus);
 
     // Now import the key.
     var hRSAKey: HCRYPTKEY;
-    if not CryptImportKey(
-             hProv, // hProv: HCRYPTPROV;
-             @pKeyBlob[0], // const pbData: PBYTE;
-             cbKeyBlob, // dwDataLen: DWORD;
-             0, // hPubKey: HCRYPTKEY;
-             0, // dwFlags: DWORD;
-             @hRSAKey) then raiseLastOsError; // phKey: PHCRYPTKEY
+    ALCheckWinApiBoolean(
+      'CryptImportKey',
+      CryptImportKey(
+        hProv, // hProv: HCRYPTPROV;
+        @pKeyBlob[0], // const pbData: PBYTE;
+        cbKeyBlob, // dwDataLen: DWORD;
+        0, // hPubKey: HCRYPTKEY;
+        0, // dwFlags: DWORD;
+        @hRSAKey)); // phKey: PHCRYPTKEY
     try
 
       //initiates the hashing of a stream of data.
       var hHash: HCRYPTHASH;
-      if not CryptCreateHash(
-               hProv, // hProv: HCRYPTPROV;
-               CALG_SHA_256, // Algid: ALG_ID;
-               0, // hKey: HCRYPTKEY;
-               0, // dwFlags: DWORD;
-               @hHash) then raiseLastOsError;
+      ALCheckWinApiBoolean(
+        'CryptCreateHash',
+        CryptCreateHash(
+          hProv, // hProv: HCRYPTPROV;
+          CALG_SHA_256, // Algid: ALG_ID;
+          0, // hKey: HCRYPTKEY;
+          0, // dwFlags: DWORD;
+          @hHash));
       try
 
         //adds data to a specified hash object.
-        if not CryptHashData(
-                 hHash, // hHash: HCRYPTHASH;
-                 pbyte(AData), // const pbData: PBYTE;
-                 length(AData), // dwDataLen: DWORD;
-                 0) then raiseLastOsError; // dwFlags: DWORD
+        ALCheckWinApiBoolean(
+          'CryptHashData',
+          CryptHashData(
+            hHash, // hHash: HCRYPTHASH;
+            pbyte(AData), // const pbData: PBYTE;
+            length(AData), // dwDataLen: DWORD;
+            0)); // dwFlags: DWORD
 
         //verifies the signature
-        var pSignature: TBytes;
-        setlength(pSignature, length(ASignature));
-        Move(Pointer(ASignature)^, Pointer(pSignature)^, Length(ASignature));
-        _bigEndianToLittleEndian(pSignature);
+        var pSignature := copy(ASignature);
+        BigEndianToLittleEndian(pSignature);
         if not CryptVerifySignatureA(
                  hHash, // hHash: HCRYPTHASH;
                  @pSignature[0], // const pbSignature: PBYTE;
@@ -1060,174 +907,209 @@ begin
         Result := True;
 
       finally
-        if not CryptDestroyHash(hHash) then raiseLastOsError;
+        ALCheckWinApiBoolean(
+          'CryptDestroyHash',
+          CryptDestroyHash(hHash));
       end;
 
     finally
-      if not CryptDestroyKey(hRSAKey) then raiseLastOsError;
+      ALCheckWinApiBoolean(
+        'CryptDestroyKey',
+        CryptDestroyKey(hRSAKey));
     end;
 
   finally
-    if not CryptReleaseContext(hProv,0) then raiseLastOsError;
+    ALCheckWinApiBoolean(
+      'CryptReleaseContext',
+      CryptReleaseContext(hProv,0));
   end;
+
 end;
 {$ENDIF}
 
 {**********************}
 {$IF defined(MSWINDOWS)}
-function ALRSA256Sign(
-           const AData: AnsiString; // bytes string
-           const APemPrivateKey: AnsiString): ansiString; // byte string result
-begin
+function ALRS256Sign(
+           const AData: TBytes;
+           const APemPrivateKey: AnsiString): TBytes;
 
-  //convert PKCS#8 to PKCS#1
-  //!! this could be (surelly) done in a much efficient way !!
-  //https://tls.mbed.org/kb/cryptography/asn1-key-structures-in-der-and-pem
-  //https://stackoverflow.com/questions/64519072/how-to-import-a-pkcs8-with-cryptoapi/64520116#64520116
-  //https://docs.microsoft.com/en-us/windows/win32/seccrypto/constants-for-cryptencodeobject-and-cryptdecodeobject
-  if ALPosA('-----BEGIN PRIVATE KEY-----', APemPrivateKey) = 1 then begin
-
-    var P1: Integer := ALPosA('-----',APemPrivateKey);
-    if P1 <= 0 then raiseLastOsError;
-    inc(P1,5{length('-----')});
-    P1 := ALPosA('-----',APemPrivateKey, P1);
-    if P1 <= 0 then raiseLastOsError;
-    inc(P1,5{length('-----')});
-
-    var P2: integer := ALPosA('-----',APemPrivateKey, P1);
-    if P2 <= 0 then raiseLastOsError;
-
-    var S1: ansiString := ALCopyStr(APemPrivateKey, P1, P2-P1);
-    S1 := ALBase64DecodeString(S1);
-    Delete(S1,1,26); // << !! on the pen I tested it's was 26 I m absolutely not sure it's will be always the case !!
-    S1 := ALBase64EncodeString(S1);
-    result := ALRSA256Sign(
-                AData,
-                '-----BEGIN RSA PRIVATE KEY-----' +
-                S1 +
-                '-----END RSA PRIVATE KEY-----');
-    exit;
-
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  function TryExtractPemDer(
+             const APem: AnsiString;
+             const ABeginMarker: AnsiString;
+             const AEndMarker: AnsiString;
+             out ADer: TBytes): Boolean;
+  begin
+    var P1 := ALPosA(ABeginMarker, APem);
+    if P1 <= 0 then Exit(False);
+    Inc(P1, Length(ABeginMarker));
+    var P2 := ALPosA(AEndMarker, APem, P1);
+    if P2 <= 0 then Exit(False);
+    Result := True;
+    ADer := ALBase64DecodeBytesMIME(ALCopyStr(APem, P1, P2 - P1));
   end;
 
-  //init PrivKey
-  var cbPrivKey: DWORD;
-  if not CryptStringToBinaryA(
-           PansiChar(APemPrivateKey), // pszString: LPCSTR;
-           length(APemPrivateKey), // cchString: DWORD;
-           CRYPT_STRING_BASE64HEADER, // dwFlags: DWORD;
-           nil, // pbBinary: pByte;
-           @cbPrivKey, // pcbBinary: PDWORD;
-           nil, // pdwSkip: PDWORD;
-           nil) then raiseLastOsError; // pdwFlags: PDWORD
-  var PrivKey: TBytes;
-  setlength(PrivKey, cbPrivKey);
-  if not CryptStringToBinaryA(
-           PansiChar(APemPrivateKey), // pszString: LPCSTR;
-           length(APemPrivateKey), // cchString: DWORD;
-           CRYPT_STRING_BASE64HEADER, // dwFlags: DWORD;
-           @PrivKey[0], // pbBinary: pByte;
-           @cbPrivKey, // pcbBinary: PDWORD;
-           nil, // pdwSkip: PDWORD;
-           nil) then raiseLastOsError; // pdwFlags: PDWORD
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function DecodePkcs8ToPkcs1Der(const APkcs8Der: TBytes): TBytes;
+  begin
+    if Length(APkcs8Der) = 0 then raise Exception.Create('PKCS#8 key is empty');
 
-  //init KeyBlob
-  var cbKeyBlob: DWord;
-  if not CryptDecodeObjectEx(
-           X509_ASN_ENCODING or PKCS_7_ASN_ENCODING, // dwCertEncodingType: DWORD;
-           PKCS_RSA_PRIVATE_KEY, // lpszStructType: LPCSTR;
-           @PrivKey[0], // const pbEncoded: PBYTE;
-           cbPrivKey, // cbEncoded: DWORD;
-           0, // dwFlags: DWORD;
-           nil, // pDecodePara: PCRYPT_DECODE_PARA;
-           nil, // pvStructInfo: Pointer;
-           @cbKeyBlob) then raiseLastOsError; // pcbStructInfo: PDWORD
-  var KeyBlob: Tbytes;
-  setlength(KeyBlob, cbKeyBlob);
-  if not CryptDecodeObjectEx(
-           X509_ASN_ENCODING or PKCS_7_ASN_ENCODING, // dwCertEncodingType: DWORD;
-           PKCS_RSA_PRIVATE_KEY, // lpszStructType: LPCSTR;
-           @PrivKey[0], // const pbEncoded: PBYTE;
-           cbPrivKey, // cbEncoded: DWORD;
-           0, // dwFlags: DWORD;
-           nil, // pDecodePara: PCRYPT_DECODE_PARA;
-           @KeyBlob[0], // pvStructInfo: Pointer;
-           @cbKeyBlob) then raiseLastOsError; // pcbStructInfo: PDWORD
+    var LPrivateKeyInfo: PCRYPT_PRIVATE_KEY_INFO := nil;
+    var LSize: DWORD := 0;
+    ALCheckWinApiBoolean(
+      'CryptDecodeObjectEx',
+      CryptDecodeObjectEx(
+        X509_ASN_ENCODING or PKCS_7_ASN_ENCODING, // dwCertEncodingType: DWORD;
+        PKCS_PRIVATE_KEY_INFO, // lpszStructType: LPCSTR;
+        @APkcs8Der[0], // pbEncoded: PBYTE;
+        Length(APkcs8Der), // cbEncoded: DWORD;
+        CRYPT_DECODE_ALLOC_FLAG, // dwFlags: DWORD;
+        nil, // pDecodePara: PCRYPT_DECODE_PARA;
+        @LPrivateKeyInfo, // pvStructInfo: Pvoid;
+        @LSize)); // pcbStructInfo: PDWORD
+    if LPrivateKeyInfo = nil then raise Exception.Create('Failed to decode PKCS#8 private key');
+    try
 
-  //init RSAKeyBlobAndData
-  var RSAKeyBlobAndData: TBytes;
-  RSAKeyBlobAndData := _PrivateKeyBlob2BcryptRSAKeyBlobAndData(
-                         _PKCS1Blob2PrivateKeyBlob(KeyBlob, cbKeyBlob),
-                         _TRSAKeyType.PrivateKey);
+      if not ALSameTextA(LPrivateKeyInfo.Algorithm.pszObjId, szOID_RSA_RSA) then
+        raise Exception.CreateFmt('Unsupported private key algorithm OID: %s', [AnsiString(LPrivateKeyInfo.Algorithm.pszObjId)]);
 
-  //loads and initializes a CNG provider
-  var Algorithm: BCRYPT_ALG_HANDLE;
+      if (LPrivateKeyInfo.PrivateKey.cbData = 0) or
+         (LPrivateKeyInfo.PrivateKey.pbData = nil) then
+        raise Exception.Create('PKCS#8 private key does not contain an RSA private key');
+
+      SetLength(Result, LPrivateKeyInfo.PrivateKey.cbData);
+      ALMove(LPrivateKeyInfo.PrivateKey.pbData^, Result[0], LPrivateKeyInfo.PrivateKey.cbData);
+
+    finally
+      ALCheckWinApiBoolean(
+        'LocalFree',
+        LocalFree(HLOCAL(LPrivateKeyInfo)) = 0);
+    end;
+  end;
+
+begin
+
+  if APemPrivateKey = '' then raise Exception.Create('Private key is empty');
+  if length(AData) = 0 then raise Exception.Create('Data to sign is empty');
+
+  var LPKCS1Der: TBytes;
+  var LKeyDer: TBytes;
+
+  // PKCS#8
+  if TryExtractPemDer(
+       APemPrivateKey,
+       '-----BEGIN PRIVATE KEY-----',
+       '-----END PRIVATE KEY-----',
+       LKeyDer) then LPKCS1Der := DecodePkcs8ToPkcs1Der(LKeyDer)
+
+  // PKCS#1
+  else if not TryExtractPemDer(
+                APemPrivateKey,
+                '-----BEGIN RSA PRIVATE KEY-----',
+                '-----END RSA PRIVATE KEY-----',
+                LPKCS1Der) then
+    raise Exception.Create('Unsupported PEM format. Expected BEGIN PRIVATE KEY or BEGIN RSA PRIVATE KEY');
+
+  if Length(LPKCS1Der) = 0 then
+    raise Exception.Create('Decoded RSA private key is empty');
+
+  // PKCS#1 DER -> CryptoAPI PRIVATEKEYBLOB
+  var LKeyBlob: TBytes;
+  var LKeyBlobSize: DWORD := 0;
+  ALCheckWinApiBoolean(
+    'CryptDecodeObjectEx',
+    CryptDecodeObjectEx(
+      X509_ASN_ENCODING or PKCS_7_ASN_ENCODING, // dwCertEncodingType: DWORD;
+      PKCS_RSA_PRIVATE_KEY, // lpszStructType: LPCSTR;
+      @LPKCS1Der[0], // pbEncoded: PBYTE;
+      Length(LPKCS1Der), // cbEncoded: DWORD;
+      0, // dwFlags: DWORD;
+      nil, // pDecodePara: PCRYPT_DECODE_PARA;
+      nil, // pvStructInfo: Pvoid;
+      @LKeyBlobSize)); // pcbStructInfo: PDWORD
+  if LKeyBlobSize = 0 then raise Exception.Create('Failed to decode RSA private key blob size');
+
+  SetLength(LKeyBlob, LKeyBlobSize);
+  ALCheckWinApiBoolean(
+    'CryptDecodeObjectEx',
+    CryptDecodeObjectEx(
+      X509_ASN_ENCODING or PKCS_7_ASN_ENCODING, // dwCertEncodingType: DWORD;
+      PKCS_RSA_PRIVATE_KEY, // lpszStructType: LPCSTR;
+      @LPKCS1Der[0], // pbEncoded: PBYTE;
+      Length(LPKCS1Der), // cbEncoded: DWORD;
+      0, // dwFlags: DWORD;
+      nil, // pDecodePara: PCRYPT_DECODE_PARA;
+      @LKeyBlob[0], // pvStructInfo: Pvoid;
+      @LKeyBlobSize)); // pcbStructInfo: PDWORD
+  if Length(LKeyBlob) <> Integer(LKeyBlobSize) then
+    raise Exception.CreateFmt('Decoded RSA private key blob size mismatch (expected %d bytes, got %d bytes)', [LKeyBlobSize, Length(LKeyBlob)]);
+
+  var LAlgorithm: BCRYPT_ALG_HANDLE := nil;
   ALCheckWinApiNTStatus(
     'BCryptOpenAlgorithmProvider',
     BCryptOpenAlgorithmProvider(
-      @Algorithm, // phAlgorithm: PBCRYPT_ALG_HANDLE;
+      @LAlgorithm, // phAlgorithm: PBCRYPT_ALG_HANDLE;
       BCRYPT_RSA_ALGORITHM, // pszAlgId: LPCWSTR;
       nil, // pszImplementation: LPCWSTR;
       0)); // dwFlags: ULONG
-
   try
 
-    var KeyHandle: BCRYPT_KEY_HANDLE;
+    var LKeyHandle: BCRYPT_KEY_HANDLE := nil;
     ALCheckWinApiNTStatus(
       'BCryptImportKeyPair',
       BCryptImportKeyPair(
-        Algorithm, // hAlgorithm: BCRYPT_ALG_HANDLE;
+        LAlgorithm, // hAlgorithm: BCRYPT_ALG_HANDLE;
         nil, // hImportKey: BCRYPT_KEY_HANDLE;
-        BCRYPT_RSAPRIVATE_BLOB, // pszBlobType: LPCWSTR;
-        @KeyHandle, // phKey: PBCRYPT_KEY_HANDLE;
-        @RSAKeyBlobAndData[0], // pbInput: PUCHAR;
-        length(RSAKeyBlobAndData), // cbInput: ULONG;
+        LEGACY_RSAPRIVATE_BLOB, // pszBlobType: LPCWSTR;
+        @LKeyHandle, // phKey: PBCRYPT_KEY_HANDLE;
+        @LKeyBlob[0], // pbInput: PUCHAR;
+        Length(LKeyBlob), // cbInput: ULONG;
         0)); // dwFlags: ULONG
     try
 
-      //init HashData
-      var HashData := ALHashSHA2AsStringA(AData, THashSHA2.TSHA2Version.SHA256, false{aHexEncode});
-      var PaddingInfo: BCRYPT_PKCS1_PADDING_INFO;
-      PaddingInfo.pszAlgId := BCRYPT_SHA256_ALGORITHM;
+      var LHashData := ALHashSHA2AsBytes(AData, THashSHA2.TSHA2Version.SHA256);
+      var LPaddingInfo: BCRYPT_PKCS1_PADDING_INFO;
+      LPaddingInfo.pszAlgId := BCRYPT_SHA256_ALGORITHM;
 
-      //sign the data
-      var cbResult: Dword;
+      var LSignatureSize: DWORD := 0;
       ALCheckWinApiNTStatus(
         'BCryptSignHash',
         BCryptSignHash(
-          KeyHandle, // hKey: BCRYPT_KEY_HANDLE;
-          @PaddingInfo, // pPaddingInfo: Pointer;
-          PUchar(HashData), // pbInput: PUCHAR;
-          Length(HashData), // cbInput: ULONG;
+          LKeyHandle, // hKey: BCRYPT_KEY_HANDLE;
+          @LPaddingInfo, // pPaddingInfo: PVOID;
+          PUCHAR(LHashData), // pbInput: PUCHAR;
+          Length(LHashData), // cbInput: ULONG;
           nil, // pbOutput: PUCHAR;
           0, // cbOutput: ULONG;
-          @cbResult, // pcbResult: PULONG;
+          @LSignatureSize, // pcbResult: PULONG;
           BCRYPT_PAD_PKCS1)); // dwFlags: ULONG
-      SetLength(result, cbResult);
+      if LSignatureSize = 0 then raise Exception.Create('BCryptSignHash returned an empty signature');
+
+      SetLength(Result, LSignatureSize);
       ALCheckWinApiNTStatus(
         'BCryptSignHash',
         BCryptSignHash(
-          KeyHandle, // hKey: BCRYPT_KEY_HANDLE;
-          @PaddingInfo, // pPaddingInfo: Pointer;
-          PUchar(HashData), // pbInput: PUCHAR;
-          Length(HashData), // cbInput: ULONG;
-          @result[low(result)], // pbOutput: PUCHAR;
-          length(result), // cbOutput: ULONG;
-          @cbResult, // pcbResult: PULONG;
+          LKeyHandle, // hKey: BCRYPT_KEY_HANDLE;
+          @LPaddingInfo, // pPaddingInfo: PVOID;
+          PUCHAR(LHashData), // pbInput: PUCHAR;
+          Length(LHashData), // cbInput: ULONG;
+          PUCHAR(Result), // pbOutput: PUCHAR;
+          Length(Result), // cbOutput: ULONG;
+          @LSignatureSize, // pcbResult: PULONG;
           BCRYPT_PAD_PKCS1)); // dwFlags: ULONG
+      if Length(Result) <> Integer(LSignatureSize) then
+        raise Exception.CreateFmt('BCryptSignHash returned inconsistent signature size (expected %d bytes, got %d bytes)', [Length(Result), LSignatureSize]);
 
     finally
       ALCheckWinApiNTStatus(
         'BCryptDestroyKey',
-        BCryptDestroyKey(KeyHandle)); // hKey: BCRYPT_KEY_HANDLE
+        BCryptDestroyKey(LKeyHandle));
     end;
 
   finally
     ALCheckWinApiNTStatus(
       'BCryptCloseAlgorithmProvider',
-      BCryptCloseAlgorithmProvider(
-        Algorithm, // hAlgorithm: BCRYPT_ALG_HANDLE;
-        0)); // dwFlags: ULONG
+      BCryptCloseAlgorithmProvider(LAlgorithm, 0));
   end;
 
 end;
@@ -1241,38 +1123,63 @@ end;
 {**********************}
 {$IF defined(MSWINDOWS)}
 var
-  _GoogleOAuth2AccessTokens: TALNVStringListA;
+  ALGoogleOAuth2Lock: TLightweightMREW;
+  ALGoogleOAuth2AccessTokens: TDictionary<AnsiString, TPair<AnsiString, TDateTime>>;
 {$ENDIF}
 
 {**********************}
 {$IF defined(MSWINDOWS)}
 function ALGenerateGoogleOAuth2AccessToken(
-           const AServiceAccountEmail: ansiString;
-           const AScope: ansiString;
-           const APrivateKey: ansiString): AnsiString;
+           const AServiceAccountEmail: AnsiString;
+           const AScope: AnsiString;
+           const APrivateKey: AnsiString): AnsiString;
 begin
 
-  //lock the access
-  ALMonitorEnter(_GoogleOAuth2AccessTokens{$IF defined(DEBUG)}, 'ALGenerateGoogleOAuth2AccessToken'{$ENDIF});
-  Try
+  // Build the cache key from the service account email and the requested scope.
+  // If a valid token already exists for this pair, we reuse it.
+  var LKey := AServiceAccountEmail + #30{record separator} + AScope;
 
-    var LTokensListKey := AServiceAccountEmail + #30{record separator} + AScope;
-    Var I := _GoogleOAuth2AccessTokens.IndexOfName(LTokensListKey);
-    if I >= 0 then begin
-      if UnixToDateTime({$IF defined(WIN64)}int64{$ELSE}integer{$ENDIF}(_GoogleOAuth2AccessTokens.Objects[i])) > ALUTCNow then begin
-        result := _GoogleOAuth2AccessTokens.ValueFromIndex[i];
-        Exit;
-      end;
-      _GoogleOAuth2AccessTokens.Delete(i);
+  // First try under a read lock to avoid unnecessary blocking.
+  ALGoogleOAuth2Lock.BeginRead;
+  try
+    var LPair: TPair<AnsiString, TDateTime>;
+    if ALGoogleOAuth2AccessTokens.TryGetValue(LKey, LPair) and (LPair.Value > ALUTCNow) then begin
+      result := LPair.Key;
+      Exit;
+    end;
+  finally
+    ALGoogleOAuth2Lock.EndRead;
+  end;
+
+  // No valid cached token was found.
+  // Switch to write lock so we can safely generate and store a new one.
+  ALGoogleOAuth2Lock.BeginWrite;
+  try
+
+    // Double-check after acquiring the write lock, because another thread
+    // may have generated and stored the token while we were waiting.
+    var LPair: TPair<AnsiString, TDateTime>;
+    if ALGoogleOAuth2AccessTokens.TryGetValue(LKey, LPair) and (LPair.Value > ALUTCNow) then begin
+      result := LPair.Key;
+      Exit;
     end;
 
-    //Using OAuth 2.0 for Server to Server Applications
-    //https://developers.google.com/identity/protocols/oauth2/service-account#httprest
+    //
+    // Using OAuth 2.0 for Server to Server Applications
+    // https://developers.google.com/identity/protocols/oauth2/service-account#httprest
+    //
 
-    //Forming the JWT header
-    var LJWT := ansiString('eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9'); // Base64url representation of {"alg":"RS256","typ":"JWT"}
+    // JWT header:
+    // {"alg":"RS256","typ":"JWT"}
+    // already encoded as Base64URL.
+    var LJWT := AnsiString('eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9');
 
-    //Forming the JWT claim set
+    // Build the JWT claim set.
+    // - iss   : service account email
+    // - scope : requested Google API scope(s)
+    // - aud   : token endpoint
+    // - exp   : expiration time, max 1 hour after iat
+    // - iat   : issued-at time
     var LNow := ALUtcNow;
     var LJWTclaim := '{'+
                        '"iss":"'+ALJavascriptEncode(AServiceAccountEmail)+'",'+ // The email address of the service account
@@ -1281,52 +1188,53 @@ begin
                        '"exp":'+ALIntToStrA(DateTimeToUnix(IncHour(LNow,1)))+','+ // The expiration time of the assertion, specified as seconds since 00:00:00 UTC, January 1, 1970. This value has a maximum of 1 hour after the issued time.
                        '"iat":'+ALIntToStrA(DateTimeToUnix(LNow))+ // The time the assertion was issued, specified as seconds since 00:00:00 UTC, January 1, 1970.
                      '}';
+
+    // Append the Base64URL-encoded claim set to the JWT header.
     LJWT := LJWT + '.' + ALURLBase64EncodeString(LJWTclaim);
 
-    //Computing the signature
-    LJWT := LJWT + '.' + ALURLBase64EncodeString(ALRSA256Sign(LJWT,APrivateKey));
+    // Sign "<header>.<claimset>" using RS256 with the private key,
+    // then append the Base64URL-encoded signature.
+    LJWT := LJWT + '.' + ALURLBase64EncodeBytesA(ALRS256Sign(ALStringToBytes(LJWT),APrivateKey));
 
-    //Making the access token request
-    var LWinHttpClient := TAlWinHTTPClient.Create;
+    // Prepare the HTTP client and request objects.
+    var LWinHttpClient := ALCreateWinHttpClient;
     var LRequestFields := TALNVStringListA.Create;
     var LJsonDoc := TALJSONDocumentA.Create;
     try
 
-      //init the aWinHttpClient
-      LWinHttpClient.ConnectTimeout := 60000;
-      LWinHttpClient.SendTimeout := 60000;
-      LWinHttpClient.ReceiveTimeout := 60000;
-
-      //init LRequestFields
+      // Build the application/x-www-form-urlencoded POST body expected by Google.
       LRequestFields.AddNameValue('grant_type', 'urn:ietf:params:oauth:grant-type:jwt-bearer');
       LRequestFields.AddNameValue('assertion', LJWT);
 
-      //Renew the token
+      // Request the OAuth2 access token from Google.
       var LHTTPClientResponse := LWinHttpClient.PostFormUrlEncoded('https://oauth2.googleapis.com/token', LRequestFields);
       Try
 
+        // Google should return HTTP 200 on success.
         if LHTTPClientResponse.StatusCode <> 200 then
-          raise Exception.CreateFmt('Google OAuth2 token request failed: %d', [LHTTPClientResponse.StatusCode]);
+          raise Exception.CreateFmt('Google OAuth2 token request failed (HTTP %d)', [LHTTPClientResponse.StatusCode]);
 
-        //Handling the response
-        //{
-        //  "access_token": "1/8xbJqaOZXSUZbHLl5EOtu1pxz3fmmetKx9W8CV4t79M",
-        //  "scope": "https://www.googleapis.com/auth/prediction"
-        //  "token_type": "Bearer",
-        //  "expires_in": 3600
-        //}
+        // Expected successful response example:
+        // {
+        //   "access_token": "...",
+        //   "scope": "...",
+        //   "token_type": "Bearer",
+        //   "expires_in": 3600
+        // }
         LJsonDoc.LoadFromJSONString(LHTTPClientResponse.BodyString);
-        Result := LJsonDoc.GetChildValueText('access_token', '');
-        if result = '' then raise Exception.Create('Error 8CBF4FB7-7878-4225-A26D-14369A49081A');
 
-        //update _GoogleOAuth2AccessTokens
-        _GoogleOAuth2AccessTokens.AddNameValueObject(
-          LTokensListKey,
-          result,
-          pointer(
-            {$IF defined(WIN64)}int64{$ELSE}integer{$ENDIF}(
-              DateTimeToUnix(
-                IncSecond(ALUtcNow, LJsonDoc.GetChildValueInt32('expires_in', 0) div 2)))));
+        // Extract the access token from the JSON response.
+        Result := LJsonDoc.GetChildValueText('access_token', '');
+        if result = '' then raise Exception.Create('Google OAuth2 token response does not contain an access token');
+
+        // Cache the token with an expiration time shorter than the real one.
+        // Here we keep only half of the official lifetime as a safety margin.
+        LPair.Key := result;
+        var LExpireID: Int32 := LJsonDoc.GetChildValueInt32('expires_in', 0);
+        LPair.Value := max(
+                         IncMinute(IncSecond(ALUtcNow, LExpireID), -15),
+                         IncSecond(ALUtcNow, LExpireID div 2));
+        ALGoogleOAuth2AccessTokens.AddOrSetValue(LKey, LPair);
 
       finally
         ALFreeAndNil(LHTTPClientResponse);
@@ -1334,14 +1242,66 @@ begin
 
     finally
       alfreeAndNil(LJsonDoc);
-      alFreeAndNil(LWinHttpClient);
       alFreeAndNil(LRequestFields);
+      alFreeAndNil(LWinHttpClient);
     end;
 
   finally
-    ALMonitorExit(_GoogleOAuth2AccessTokens{$IF defined(DEBUG)}, 'ALGenerateGoogleOAuth2AccessToken'{$ENDIF});
+    ALGoogleOAuth2Lock.EndWrite;
   end;
 
+end;
+{$ENDIF}
+
+
+//////////////////////////////////////
+////// Windows Credential Vault //////
+//////////////////////////////////////
+
+{**********************}
+{$IF defined(MSWINDOWS)}
+function ALTryGetGenericWinCredential(
+           const ATargetName: AnsiString;
+           out AUserName: AnsiString;
+           out APassword: AnsiString): Boolean;
+begin
+  var LCred: PCREDENTIALA := nil;
+  Result := CredReadA(
+              PAnsiChar(ATargetName), // TargetName: LPCSTR
+              CRED_TYPE_GENERIC, // &Type: DWORD;
+              0, // Flags: DWORD;
+              LCred); // out Credential: PCREDENTIALA
+  if not Result then exit;
+  try
+    AUsername := LCred.UserName;
+    if (LCred.CredentialBlob <> nil) and
+       (LCred.CredentialBlobSize > 0) then begin
+      SetString(
+        APassword,
+        PAnsiChar(LCred.CredentialBlob),
+        LCred.CredentialBlobSize);
+    end
+    else
+      APassword := '';
+  finally
+    if LCred <> nil then CredFree(LCred);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWINDOWS)}
+procedure ALGetGenericWinCredential(
+            const ATargetName: AnsiString;
+            out AUserName: AnsiString;
+            out APassword: AnsiString);
+begin
+  ALCheckWinApiBoolean(
+    'CredReadW',
+    ALTryGetGenericWinCredential(
+      ATargetName, // const ATargetName: AnsiString;
+      AUserName, // out AUserName: AnsiString;
+      APassword)); // out APassword: AnsiString) then
 end;
 {$ENDIF}
 
@@ -1413,10 +1373,8 @@ initialization
   {$ENDIF ALCPUXASM}
 
   {$IF defined(MSWINDOWS)}
-  _GoogleOAuth2AccessTokens := TALNVStringListA.Create;
-  _GoogleOAuth2AccessTokens.NameValueSeparator := #31; // Unit separator
-  _GoogleOAuth2AccessTokens.Duplicates := DupError;
-  _GoogleOAuth2AccessTokens.Sorted := True;
+  //ALGoogleOAuth2Lock := ?? There is no TLightweightMREW.Create; initialization is done through the TLightweightMREW.Initialize class operator instead
+  ALGoogleOAuth2AccessTokens := TDictionary<AnsiString, TPair<AnsiString, TDateTime>>.Create;
   {$ENDIF}
 
 finalization
@@ -1424,7 +1382,7 @@ finalization
   ALLog('Alcinoe.Cipher','finalization');
   {$ENDIF}
   {$IF defined(MSWINDOWS)}
-  AlFreeAndNil(_GoogleOAuth2AccessTokens);
+  AlFreeAndNil(ALGoogleOAuth2AccessTokens);
   {$ENDIF}
 
 end.

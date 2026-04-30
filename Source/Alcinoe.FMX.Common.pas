@@ -1061,6 +1061,9 @@ function ALKeychainReadBytes(const AService: String; const AAccount: string; out
 procedure ALKeychainWriteBytes(const AService: String; const AAccount: string; const ABytes: TBytes);
 {$ENDIF}
 function  ALGetAppVersion: String;
+function  ALSemanticVersionToInt64(const AVersion: string): Int64;
+function  ALInt64ToSemanticVersionA(const AVersion: Int64): AnsiString; overload;
+function  ALInt64ToSemanticVersionW(const AVersion: Int64): string; overload;
 function  ALGetPlatform: String;
 function  ALGetDeviceID: String;
 function  ALCreateResourceStream(const AResourceName: String): TResourceStream;
@@ -1089,6 +1092,14 @@ type
   private
     class var CapturedCount: Integer;
   public
+    class var StatusBarColor: TAlphaColor;
+    class var NavigationBarColor: TAlphaColor;
+    class var StatusBarUseLightIcons: Boolean;
+    class var NavigationBarUseLightIcons: Boolean;
+  end;
+  TALLastSetSystemBarsColor = record
+  public
+    class var HasBeenSet: Boolean;
     class var StatusBarColor: TAlphaColor;
     class var NavigationBarColor: TAlphaColor;
     class var StatusBarUseLightIcons: Boolean;
@@ -1361,6 +1372,7 @@ var
   ALScreenScale: Single;
 procedure ALInitScreenScale;
 function ALGetScreenScale: Single; Inline;
+function ALGetSafeAreaInsets: TRectF;
 
 var
   ALHasTouchScreen: Boolean;
@@ -6205,6 +6217,52 @@ begin
   {$ENDIF}
 end;
 
+{***************************************************************}
+function ALSemanticVersionToInt64(const AVersion: string): Int64;
+begin
+  var LParts := AVersion.Split(['.']);
+  if Length(LParts) <> 3 then
+    raise Exception.CreateFmt('Invalid version format: "%s". Expected x.x.x', [AVersion]);
+  var LMajor: Int64 := ALStrToInt64(LParts[0]);
+  var LMinor: Int64 := ALStrToInt64(LParts[1]);
+  var LPatch: Int64 := ALStrToInt64(LParts[2]);
+  if (LMajor < 0) or (LMajor > 999999) or
+     (LMinor < 0) or (LMinor > 999999) or
+     (LPatch < 0) or (LPatch > 999999) then
+    raise Exception.CreateFmt('Invalid version value: "%s". Each part must be between 0 and 999999.', [AVersion]);
+  Result := (LMajor * 1000000000000) +
+            (LMinor * 1000000) +
+            LPatch;
+end;
+
+{********************************************************************}
+function ALInt64ToSemanticVersionA(const AVersion: Int64): AnsiString;
+begin
+  const CPartBase: Int64 = 1000000;
+  if (AVersion < 0) or (AVersion > 999999999999999999) then
+    raise Exception.CreateFmt('Invalid packed version: %d.', [AVersion]);
+  var LMajor: Int64 := AVersion div (CPartBase * CPartBase);
+  var LMinor: Int64 := (AVersion div CPartBase) mod CPartBase;
+  var LPatch: Int64 := AVersion mod CPartBase;
+  Result := ALIntToStrA(LMajor) + '.' +
+            ALIntToStrA(LMinor) + '.' +
+            ALIntToStrA(LPatch);
+end;
+
+{****************************************************************}
+function ALInt64ToSemanticVersionW(const AVersion: Int64): string;
+begin
+  const CPartBase: Int64 = 1000000;
+  if (AVersion < 0) or (AVersion > 999999999999999999) then
+    raise Exception.CreateFmt('Invalid packed version: %d.', [AVersion]);
+  var LMajor: Int64 := AVersion div (CPartBase * CPartBase);
+  var LMinor: Int64 := (AVersion div CPartBase) mod CPartBase;
+  var LPatch: Int64 := AVersion mod CPartBase;
+  Result := ALIntToStrW(LMajor) + '.' +
+            ALIntToStrW(LMinor) + '.' +
+            ALIntToStrW(LPatch);
+end;
+
 {******************************}
 function  ALGetPlatform: String;
 begin
@@ -6551,14 +6609,19 @@ procedure ALCaptureSystemBarsColor;
 begin
   Inc(TALCapturedSystemBarsColor.CapturedCount);
   If TALCapturedSystemBarsColor.CapturedCount > 1 then exit;
-  {$IF defined(DEBUG)}
-  ALLog('ALCaptureSystemBarsColor');
-  {$ENDIF}
   ALGetSystemBarsColor(
     TALCapturedSystemBarsColor.StatusBarColor,
     TALCapturedSystemBarsColor.NavigationBarColor,
     TALCapturedSystemBarsColor.StatusBarUseLightIcons,
     TALCapturedSystemBarsColor.NavigationBarUseLightIcons);
+  {$IF defined(DEBUG)}
+  ALLog(
+    'ALCaptureSystemBarsColor',
+    'AStatusBarColor: '+ ALIntToHexW(TALCapturedSystemBarsColor.StatusBarColor) + ' | '+
+    'ANavigationBarColor: '+ ALIntToHexW(TALCapturedSystemBarsColor.NavigationBarColor) + ' | '+
+    'AStatusBarUseLightIcons: ' + ALBoolToStrW(TALCapturedSystemBarsColor.StatusBarUseLightIcons, 'true', 'false') + ' | '+
+    'ANavigationBarUseLightIcons: ' + ALBoolToStrW(TALCapturedSystemBarsColor.NavigationBarUseLightIcons, 'true', 'false'));
+  {$ENDIF}
 end;
 
 {*********************************}
@@ -6568,7 +6631,12 @@ begin
   Dec(TALCapturedSystemBarsColor.CapturedCount);
   if TALCapturedSystemBarsColor.CapturedCount > 0 then exit;
   {$IF defined(DEBUG)}
-  ALLog('ALRestoreSystemBarsColor');
+  ALLog(
+    'ALRestoreSystemBarsColor',
+    'AStatusBarColor: '+ ALIntToHexW(TALCapturedSystemBarsColor.StatusBarColor) + ' | '+
+    'ANavigationBarColor: '+ ALIntToHexW(TALCapturedSystemBarsColor.NavigationBarColor) + ' | '+
+    'AStatusBarUseLightIcons: ' + ALBoolToStrW(TALCapturedSystemBarsColor.StatusBarUseLightIcons, 'true', 'false') + ' | '+
+    'ANavigationBarUseLightIcons: ' + ALBoolToStrW(TALCapturedSystemBarsColor.NavigationBarUseLightIcons, 'true', 'false'));
   {$ENDIF}
   ALSetSystemBarsColor(
     TALCapturedSystemBarsColor.StatusBarColor,
@@ -6586,6 +6654,25 @@ procedure ALGetSystemBarsColor(
             out AStatusBarColor, ANavigationBarColor: TAlphaColor;
             out AStatusBarUseLightIcons, ANavigationBarUseLightIcons: Boolean);
 begin
+
+
+  //
+  // On Android, the native value returned by getStatusBarColor/getNavigationBarColor
+  // is not always the value previously passed to setStatusBarColor/setNavigationBarColor.
+  // In edge-to-edge / translucent system bar modes, Android may report transparent
+  // (00000000), even though the requested color is visually applied through the
+  // content behind the system bar or through a system contrast scrim.
+  // For this reason, once ALSetSystemBarsColor has been called, we return the last
+  // requested values instead of the native values reported by Android.
+  //
+
+  if TALLastSetSystemBarsColor.HasBeenSet then begin
+    AStatusBarColor := TALLastSetSystemBarsColor.StatusBarColor;
+    ANavigationBarColor := TALLastSetSystemBarsColor.NavigationBarColor;
+    AStatusBarUseLightIcons := TALLastSetSystemBarsColor.StatusBarUseLightIcons;
+    ANavigationBarUseLightIcons := TALLastSetSystemBarsColor.NavigationBarUseLightIcons;
+    exit;
+  end;
 
   {$IF defined(ANDROID)}
   var LWindow := TAndroidHelper.Activity.getWindow;
@@ -6620,6 +6707,21 @@ procedure ALSetSystemBarsColor(
             const AStatusBarColor, ANavigationBarColor: TAlphaColor;
             const AStatusBarUseLightIcons, ANavigationBarUseLightIcons: Boolean);
 begin
+
+  {$IF defined(DEBUG)}
+  ALLog(
+    'ALSetSystemBarsColor',
+    'AStatusBarColor: '+ ALIntToHexW(AStatusBarColor) + ' | '+
+    'ANavigationBarColor: '+ ALIntToHexW(ANavigationBarColor) + ' | '+
+    'AStatusBarUseLightIcons: ' + ALBoolToStrW(AStatusBarUseLightIcons, 'true', 'false') + ' | '+
+    'ANavigationBarUseLightIcons: ' + ALBoolToStrW(ANavigationBarUseLightIcons, 'true', 'false'));
+  {$ENDIF}
+
+  TALLastSetSystemBarsColor.HasBeenSet := true;
+  TALLastSetSystemBarsColor.StatusBarColor := AStatusBarColor;
+  TALLastSetSystemBarsColor.NavigationBarColor := ANavigationBarColor;
+  TALLastSetSystemBarsColor.StatusBarUseLightIcons := AStatusBarUseLightIcons;
+  TALLastSetSystemBarsColor.NavigationBarUseLightIcons := ANavigationBarUseLightIcons;
 
   {$IF defined(ANDROID)}
   // https://stackoverflow.com/questions/64481841/android-api-level-30-setsystembarsappearance-doesnt-overwrite-theme-data
@@ -6980,6 +7082,19 @@ begin
   end;
 end;
 
+{***********************************}
+function ALGetSafeAreaInsets: TRectF;
+begin
+  var LForm := Screen.ActiveForm;
+  if LForm = nil then LForm := Application.MainForm;
+  if LForm = nil then Raise Exception.Create('Error 4BCA940A-A899-48F3-B37B-B30049284723');
+  var LSafeAreaService: IFMXWindowSafeAreaService;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXWindowSafeAreaService, LSafeAreaService) then
+    Result := LSafeAreaService.GetSafeAreaInsets(LForm)
+  else
+    Result := TRectF.Empty;
+end;
+
 {*****************************}
 procedure ALInitHasTouchScreen;
 begin
@@ -7067,6 +7182,11 @@ initialization
   TALCapturedSystemBarsColor.NavigationBarColor := TAlphaColors.Null;
   TALCapturedSystemBarsColor.StatusBarUseLightIcons := False;
   TALCapturedSystemBarsColor.NavigationBarUseLightIcons := False;
+  TALLastSetSystemBarsColor.HasBeenSet := False;
+  TALLastSetSystemBarsColor.StatusBarColor := TAlphaColors.Null;
+  TALLastSetSystemBarsColor.NavigationBarColor := TAlphaColors.Null;
+  TALLastSetSystemBarsColor.StatusBarUseLightIcons := False;
+  TALLastSetSystemBarsColor.NavigationBarUseLightIcons := False;
 
 finalization
   {$IF defined(DEBUG)}

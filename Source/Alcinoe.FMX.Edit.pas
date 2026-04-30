@@ -6438,8 +6438,8 @@ begin
       else if LabelTextSettings.Layout = TLabelTextLayout.floating then begin
         case TextSettings.VertAlign of
           TALTextVertAlign.Center: LPos.y := LNativeViewBoundsRect.Top + ((LNativeViewBoundsRect.Height - LPromptTextDrawableRect.Height) / 2);
-          TALTextVertAlign.Leading: LPos.y := LNativeViewBoundsRect.Top;
-          TALTextVertAlign.Trailing: LPos.y := LNativeViewBoundsRect.Top + LNativeViewBoundsRect.Height - LPromptTextDrawableRect.Height;
+          TALTextVertAlign.Leading: LPos.y := LNativeViewBoundsRect.Top + ((GetLineHeight - LPromptTextDrawableRect.Height) / 2);
+          TALTextVertAlign.Trailing: LPos.y := LNativeViewBoundsRect.Top + LNativeViewBoundsRect.Height - LPromptTextDrawableRect.Height - ((GetLineHeight - LPromptTextDrawableRect.Height) / 2);
           Else
             Raise Exception.Create('Error 28B2F8BC-B4C5-4F22-8E21-681AA1CA3C23')
         end;
@@ -6483,8 +6483,8 @@ begin
     else begin
       case TextSettings.VertAlign of
         TALTextVertAlign.Center: LPos.y := LNativeViewBoundsRect.Top + ((LNativeViewBoundsRect.Height - LPromptTextDrawableRect.Height) / 2);
-        TALTextVertAlign.Leading: LPos.y := LNativeViewBoundsRect.Top;
-        TALTextVertAlign.Trailing: LPos.y := LNativeViewBoundsRect.Top + LNativeViewBoundsRect.Height - LPromptTextDrawableRect.Height;
+        TALTextVertAlign.Leading: LPos.y := LNativeViewBoundsRect.Top + ((GetLineHeight - LPromptTextDrawableRect.Height) / 2);
+        TALTextVertAlign.Trailing: LPos.y := LNativeViewBoundsRect.Top + LNativeViewBoundsRect.Height - LPromptTextDrawableRect.Height - ((GetLineHeight - LPromptTextDrawableRect.Height) / 2);
         Else
           Raise Exception.Create('Error 84D5B492-1F70-43A0-AB68-D30C70D260BC')
       end;

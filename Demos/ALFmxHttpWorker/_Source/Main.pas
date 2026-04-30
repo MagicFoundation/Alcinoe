@@ -65,7 +65,7 @@ uses
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   ALLog('TMainForm.FormCreate');
-  TALErrorReporting.Instance;
+  TALErrorReporter.Instance;
   TMessageManager.DefaultManager.SubscribeToMessage(TALHttpWorker.TWorkResultMessage, HttpWorkResultHandler);
   TALStyleManager.Instance.ApplySnackbarManagerStyle('Material3.SnackbarManager', TALSnackbarManager.Instance, 18{AFontSize});
   {$IF defined(MSWindows) or defined(ALMacOS)}

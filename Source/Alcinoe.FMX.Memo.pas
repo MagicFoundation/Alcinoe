@@ -953,18 +953,68 @@ begin
     // TextColor
     View.setTextColor(AlphaColorToUIColor(TextSettings.Font.Color));
 
-    // PlaceHolder Text Color
-    var LUIColor: UIColor;
-    if PromptTextColor <> tAlphaColors.Null then LUIColor := AlphaColorToUIColor(PromptTextColor)
-    else LUIColor := AlphaColorToUIColor(
-                       TAlphaColorF.Create(
-                         ALSetColorAlpha(TextSettings.Font.Color, 0.5)).
-                           PremultipliedAlpha.
-                           ToAlphaColor);
-    FPlaceholderLabel.setTextColor(LUIColor);
+    // PlaceHolder
+    var LText := FPlaceholderLabel.text;
+    if LText <> nil then begin
+      var LObjects := TNSMutableArray.Create;
+      var LForKeys := TNSMutableArray.Create;
+      try
 
-    // PlaceHolder Font
-    FPlaceholderLabel.setfont(TUIFont.Wrap(LFontRef));
+        LObjects.addObject(NSObjectToID(TUIFont.Wrap(LFontRef)));
+        LForKeys.addObject(NSObjectToID(NSFontAttributeName));
+
+        var LUIColor: UIColor;
+        if PromptTextColor <> tAlphaColors.Null then LUIColor := AlphaColorToUIColor(PromptTextColor)
+        else LUIColor := AlphaColorToUIColor(
+                           TAlphaColorF.Create(
+                             ALSetColorAlpha(TextSettings.Font.Color, 0.5)).
+                               PremultipliedAlpha.
+                               ToAlphaColor);
+
+        LObjects.addObject(NSObjectToID(LUIColor));
+        LForKeys.addObject(NSObjectToID(NSForegroundColorAttributeName));
+
+        if CompareValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) > 0 then begin
+          var LParagraphStyle := TNSMutableParagraphStyle.Alloc;
+          try
+            LParagraphStyle.init;
+            LParagraphStyle.setMinimumLineHeight(textsettings.Font.Size * LTmpLineHeightMultiplier);
+            LParagraphStyle.setMaximumLineHeight(textsettings.Font.Size * LTmpLineHeightMultiplier);
+
+            LObjects.addObject(NSObjectToID(LParagraphStyle));
+            LForKeys.addObject(NSObjectToID(NSParagraphStyleAttributeName));
+            var LAttrs := TNSDictionary.Wrap(TNSDictionary.OCClass.dictionaryWithObjects(LObjects, LForKeys));
+            var LAttrText := TNSAttributedString.Alloc;
+            try
+              LAttrText.initWithString(LText, LAttrs);
+              FPlaceholderLabel.setAttributedText(LAttrText);
+            finally
+              LAttrText.release;
+            end;
+          finally
+            LParagraphStyle.release;
+          end;
+
+        end
+        else begin
+
+          var LAttrs := TNSDictionary.Wrap(TNSDictionary.OCClass.dictionaryWithObjects(LObjects, LForKeys));
+          var LAttrText := TNSAttributedString.Alloc;
+          try
+            LAttrText.initWithString(LText, LAttrs);
+            FPlaceholderLabel.setAttributedText(LAttrText);
+          finally
+            LAttrText.release;
+          end;
+
+        end;
+
+      finally
+        LObjects.release;
+        LForKeys.release;
+      end;
+    end;
+
     FPlaceholderLabel.sizeToFit;
 
   finally
@@ -1807,7 +1857,14 @@ begin
         var LLineHeight: Single := GetLineHeight;
         if AutoAlignToPixel then LLineHeight := ALAlignDimensionToPixelRound(LLineHeight, ALGetScreenScale, TEpsilon.Position);
 
-        var LAdjustement: Single := ((LLineHeight / 100) * 25);
+        var LAdjustement: Single;
+        {$IF defined(IOS)}
+        // On iOS, without this small adjustment, the edit control may slightly shift
+        // when text is entered.
+        LAdjustement := 1;
+        {$ELSE}
+        LAdjustement := 0;
+        {$ENDIF}
         if AutoAlignToPixel then LAdjustement := ALAlignDimensionToPixelRound(LAdjustement, ALGetScreenScale, TEpsilon.Position);
 
         If LInlinedLabelText then begin

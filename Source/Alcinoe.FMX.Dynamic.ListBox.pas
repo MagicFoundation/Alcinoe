@@ -235,6 +235,7 @@ type
             procedure Realign(const AStartIndex: integer); overload;
             procedure AdjustSize; override;
             procedure DoResized; override;
+            procedure VisibleChanged; override;
             function GetFirstVisibleObjectIndex: Integer; override;
             function GetLastVisibleObjectIndex: Integer; override;
             function PaintChildrenOnly: Boolean; override;
@@ -695,6 +696,7 @@ type
         property BottomBar: TBottomBar read FBottomBar;
         property PullToRefreshIndicator: TBasePullToRefreshIndicator read FPullToRefreshIndicator;
         property LoadMoreIndicator: TLoadMoreIndicator read FLoadMoreIndicator;
+        property LoadMoreRetryButton: TLoadMoreRetryButton read FLoadMoreRetryButton;
         property OnDownloadItems: TDownloadItemsEvent read FOnDownloadItems write FOnDownloadItems; // [MultiThread]
         property OnCreateItem: TCreateItemEvent read FOnCreateItem write FOnCreateItem; // [MultiThread]
         property OnCreateItemMainContent: TItem.TCreateMainContentEvent read FOnCreateItemMainContent write FOnCreateItemMainContent; // [MultiThread]
@@ -2125,6 +2127,13 @@ begin
   end;
 end;
 
+{************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.VisibleChanged;
+begin
+  inherited;
+  if Visible then Owner.ScrollEngine.TouchMode := TALScrollEngine.TTouchMode.Auto;
+end;
+
 {********************************************************************************}
 function TALDynamicListBox.TView.TMainContent.GetFirstVisibleObjectIndex: Integer;
 begin
@@ -2506,6 +2515,7 @@ begin
   //--
   FScrollEngine := TALScrollEngine.Create;
   FScrollEngine.TouchTracking := [TTVertical];
+  FScrollEngine.TouchMode := TALScrollEngine.TTouchMode.Disabled;
   FScrollEngine.OnChanged := ScrollEngineChanged;
   FScrollEngine.OnStart := ScrollEngineStart;
   FScrollEngine.OnStop := ScrollEngineStop;

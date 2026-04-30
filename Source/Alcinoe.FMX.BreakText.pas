@@ -2048,6 +2048,7 @@ begin
                   LCurrText := ALCopyStr(LOptions.EllipsisText, 3, maxint)
                 else
                   LCurrText := LOptions.EllipsisText;
+                ALHtmlDecodeInPlace(LCurrText);
                 LCurrImgSrc := '';
                 LcurrImgWidth := 0;
                 LcurrImgHeight := 0;
@@ -3111,6 +3112,7 @@ begin
                 LCurrText := ALCopyStr(LOptions.EllipsisText, 3, maxint)
               else
                 LCurrText := LOptions.EllipsisText;
+              ALHtmlDecodeInPlace(LCurrText);
               LCurrImgSrc := '';
               LcurrImgWidth := 0;
               LcurrImgHeight := 0;

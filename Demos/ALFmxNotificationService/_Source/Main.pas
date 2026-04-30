@@ -142,7 +142,7 @@ const
 {*******************************************}
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  TALErrorReporting.Instance;
+  TALErrorReporter.Instance;
   FBadge := 0;
   TMessageManager.DefaultManager.SubscribeToMessage(TALNotificationService.TNotificationReceivedMessage, NotificationReceivedMessageHandler);
   TMessageManager.DefaultManager.SubscribeToMessage(TALNotificationService.TGetTokenMessage, GetTokenMessageHandler);

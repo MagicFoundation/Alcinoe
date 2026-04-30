@@ -247,7 +247,7 @@
     <iPhone_Notification40>$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png</iPhone_Notification40>
     <iPhone_Setting58>$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png</iPhone_Setting58>
     <iPad_Notification40>$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png</iPad_Notification40>
-    <DCC_LinkerOptions>-ObjC -rpath /usr/lib/swift</DCC_LinkerOptions>
+    <DCC_LinkerOptions>-ObjC</DCC_LinkerOptions>
     <DCC_FrameworkPath>..\..\..\Libraries\ios\Firebase\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;..\..\..\Libraries\ios\Firebase\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64;..\..\..\Libraries\ios\Firebase\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;..\..\..\Libraries\ios\Firebase\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64;..\..\..\Libraries\ios\Firebase\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64;..\..\..\Libraries\ios\Firebase\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64;..\..\..\Libraries\ios\Firebase\FirebaseAnalytics\nanopb.xcframework\ios-arm64;..\..\..\Libraries\ios\Firebase\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64;$(DCC_FrameworkPath)</DCC_FrameworkPath>
     <VerInfo_MajorVer>13</VerInfo_MajorVer>
     <VerInfo_Build>335</VerInfo_Build>

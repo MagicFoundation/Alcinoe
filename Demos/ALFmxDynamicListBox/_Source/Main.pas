@@ -139,7 +139,7 @@ uses
 {**********************************************}
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
-  TALErrorReporting.Instance;
+  TALErrorReporter.Instance;
   TALGuardianThread.Instance;
   ALGlobalClickSoundEnabled := True;
   {$IF defined(DEBUG)}

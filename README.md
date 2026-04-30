@@ -103,6 +103,7 @@ Please request the resolution of these quality reports. Due
 to the unresolved issues from Embarcadero, we have been 
 forced to apply patches to the original Delphi source files:
 
+* [iOS Deployment via PAServer Fails for App Extensions (.appex)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5343)
 * [iOS: Missing application:handleEventsForBackgroundURLSession:completionHandler: delegate in FMX](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4669)
 * [FMX Android: Zoom gesture (TInteractiveGesture.Zoom) only fires on very fast pinches](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4509)
 * [Enhance MouseEvent Handling by Providing Access to MotionEvent (Android) and UIEvent (iOS)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002)

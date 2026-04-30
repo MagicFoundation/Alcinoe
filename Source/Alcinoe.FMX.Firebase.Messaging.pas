@@ -48,23 +48,31 @@ Setup (IOS)
    $(SDKROOT)/../../../../../Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/iphonesimulator  |  *         |  Library path  |  no
    $(SDKROOT)/../../../../../Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.5/iphonesimulator  |  *         |  Library path  |  no
 
-4) In the Project > Option > Building > Delphi Compiler > Linking >
-   Options passed to the LD linker add -rpath /usr/lib/swift
-   this because of this bug: https://quality.embarcadero.com/browse/RSP-38700
-
-5) You must deploy the GoogleService-Info.plist to the root of the app. You
+4) You must deploy the GoogleService-Info.plist to the root of the app. You
    can use DeployMan for this. you can see an exemple in
    <Alcinoe>\Demos\ALFmxNotificationService\_source\ios\DeployMan.bat.
    All info regarding generating the GoogleService-Info.plist can be found at
    https://firebase.google.com/docs/ios/setup
 
-6) If you want the iOS app to be able to receive data notification in
+5) If you want the iOS app to be able to receive data notification in
    background you must add in info.plist.TemplateiOS.xml
 
      <key>UIBackgroundModes</key>
      <array>
        <string>remote-notification</string>
      </array>
+
+6) Disable method swizzling because we sometimes see the following warning
+   in the logs:
+
+   10.12.0 - [GoogleUtilities/AppDelegateSwizzler][I-SWZ001014] App Delegate does not conform to UIApplicationDelegate protocol.
+
+   To avoid any unexpected behavior, we handle all delegate methods manually
+   instead of relying on Firebase’s automatic swizzling (see:
+   https://firebase.google.com/docs/cloud-messaging/ios/get-started#method-swizzling-in-fcm).
+
+    <key>FirebaseAppDelegateProxyEnabled</key>
+    <false/>
 
 7) If you want to show an image in an ios alert, you must add a service
    extension to the project.
@@ -78,14 +86,38 @@ Setup (IOS)
    * Replace in <alcinoe>\References\iOSNotification\iOSNotification.xcodeproj\project.pbxproj
      all occurences of io.magicfoundation.alcinoe.alfmxnotificationservicedemo by the bundle identifiers
      of your delphi app
+   * Replace in <alcinoe>\References\iOSNotification\iOSNotification.xcodeproj\project.pbxproj
+     all occurences of D2AVVF3775 by you Apple Team ID
    * Copy the content of <alcinoe>\References\iOSNotification\ somewhere in
      the macos. ex: /Users/<username>/Documents/iOSNotification
    * In the macos run
-     xcodebuild -project /Users/<username>/Documents/iOSNotification/iOSNotification.xcodeproj -scheme iOSNotification -configuration Release -sdk iphoneos CONFIGURATION_BUILD_DIR=/Users/<username>/Documents/Compiled
+       xcodebuild \
+        -project /Users/<username>/Documents/iOSNotification/iOSNotification.xcodeproj \
+        -target NotificationService \
+        -configuration Release \
+        -sdk iphoneos \
+        OBJROOT=/Users/<username>/Documents/Intermediates \
+        CONFIGURATION_BUILD_DIR=/Users/<username>/Documents/Compiled \
+        CODE_SIGNING_ALLOWED=NO
    * Copy the content of /Users/<username>/Documents/Compiled/iOSNotification.app/PlugIns/
      in a local folder to your project and with DeployMan instruct the dproj
      to deploy those file with your app. see an exemple of the DeployMan
      command in <Alcinoe>\Demos\ALFmxNotificationService\_source\ios\DeployMan.bat
+   * You may then run into the issue described in RSS-5343:
+     https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5343
+     As a workaround, I copy a valid exportOptions.plist to the Mac:
+       /Users/<username>/PAServer/scratch-dir/exportOptions.plist
+     Then I run the following command on the Mac before deploying the app normally:
+       while true; do
+         TARGET="/Users/<username>/PAServer/scratch-dir/<username>-VMWare/<MyApp>.archive/exportOptions.plist"
+         SOURCE="/Users/<username>/PAServer/scratch-dir/exportOptions.plist"
+         if [ -f "$TARGET" ]; then
+           cp "$SOURCE" "$TARGET"
+           echo "exportOptions.plist replaced"
+           break
+         fi
+         sleep 0.01
+       done
 
    Or You can create the app extension in the following way:
    * Launch Xcode and select "create a new xcode project"
@@ -237,6 +269,10 @@ interface
 
 {$I Alcinoe.inc}
 
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5343 is corrected and if yes remove all occurrences of RSS-5343 from the codebase'}
+{$ENDIF}
+
 uses
   system.Classes,
   system.Messaging,
@@ -350,7 +386,7 @@ type
           FFirebaseMessaging: TALFirebaseMessaging;
         public
           constructor Create(const AFirebaseMessaging: TALFirebaseMessaging);
-          procedure messaging(messaging: FIRMessaging; fcmToken: NSString); cdecl;
+          procedure messaging(messaging: FIRMessaging; didReceiveRegistrationToken: NSString); cdecl;
         end;
     private
       fFIRMessagingDelegate: TFIRMessagingDelegate;
@@ -358,8 +394,12 @@ type
       procedure FIRMessagingDeleteTokenWithCompletionHandler(error: NSError);
     //Message handler
     private
+      class var CanRegisterForRemoteNotifications: Boolean;
       procedure applicationDidReceiveRemoteNotification(const Sender: TObject; const M: TMessage);
+      procedure applicationDidRegisterForRemoteNotificationsWithDeviceToken(const Sender: TObject; const M: TMessage);
       procedure applicationDidFailToRegisterForRemoteNotificationsWithError(const Sender: TObject; const M: TMessage);
+      procedure InstanceApplicationEventHandler(const Sender: TObject; const M: TMessage);
+      class procedure ClassApplicationEventHandler(const Sender: TObject; const M: TMessage);
 
     {$ENDIF}
     {$ENDREGION}
@@ -372,8 +412,6 @@ type
       TMessageReceivedEvent = procedure(const APayload: TALStringListW) of object;
   private
     FDeliveredMessageIDs: TDictionary<String,boolean>;
-    FGetTokenTaskIsRunning: Boolean;
-    FDeleteTokenTaskIsRunning: Boolean;
     fOnGetToken: TGetTokenEvent;
     fOnDeleteToken: TDeleteTokenEvent;
     fOnTokenRefresh: TTokenRefreshEvent;
@@ -417,6 +455,7 @@ uses
   Macapi.ObjCRuntime,
   iOSapi.CocoaTypes,
   FMX.Helpers.iOS,
+  Alcinoe.iOSApi.FirebaseCore,
   {$ENDIF}
   Alcinoe.StringUtils,
   Alcinoe.Common;
@@ -426,13 +465,11 @@ constructor TALFirebaseMessaging.Create;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.Create', 'begin');
+  allog('TALFirebaseMessaging.Create');
   {$ENDIF}
 
   inherited Create;
   FDeliveredMessageIDs := TDictionary<String,boolean>.create;
-  FGetTokenTaskIsRunning := False;
-  FDeleteTokenTaskIsRunning := False;
   fOnGetToken := nil;
   fOnDeleteToken := nil;
   fOnTokenRefresh := nil;
@@ -440,20 +477,25 @@ begin
 
   {$REGION 'ANDROID'}
   {$IF defined(android)}
+
   FNewMessageObserver := TNewMessageObserver.Create(self);
   FNewTokenObserver := TNewTokenObserver.Create(self);
   FGetTokenTaskCompleteListener := nil;
   FDeleteTokenTaskCompleteListener := nil;
   TMessageManager.DefaultManager.SubscribeToMessage(TPushStartupNotificationMessage, ReceiveStartupNotificationMessage);
-  //as fOnMessageReceived and fOnTokenRefresh = nil right now then calling observeForever
-  //will do nothing even if FNewMessageObserver/FNewTokenObserver contain new data
+  // As fOnMessageReceived and fOnTokenRefresh = nil right now then calling observeForever
+  // will do nothing even if FNewMessageObserver/FNewTokenObserver contain new data
   TJALFirebaseMessagingService.JavaClass.newMessageDispatcher.observeForever(FNewMessageObserver);
   TJALFirebaseMessagingService.JavaClass.newTokenDispatcher.observeForever(FNewTokenObserver);
+
   {$ENDIF}
   {$ENDREGION}
 
   {$REGION 'IOS'}
   {$IF defined(IOS)}
+
+  ALFIRAppConfigure;
+
   fUserNotificationCenterDelegate := TUserNotificationCenterDelegate.Create(self);
   {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4344 is corrected and if yes remove .GetObjectID below'}
@@ -461,24 +503,26 @@ begin
   TUNUserNotificationCenter.OCClass.currentNotificationCenter.setdelegate(fUserNotificationCenterDelegate.GetObjectID);
   //--
   fFIRMessagingDelegate := TFIRMessagingDelegate.Create(self);
-  TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).setDelegate(fFIRMessagingDelegate);
+  TFIRMessaging.OCClass.messaging.setDelegate(fFIRMessagingDelegate);
   //--
   TMessageManager.DefaultManager.SubscribeToMessage(TPushRemoteNotificationMessage, applicationDidReceiveRemoteNotification);
+  TMessageManager.DefaultManager.SubscribeToMessage(TPushDeviceTokenMessage, applicationDidRegisterForRemoteNotificationsWithDeviceToken);
   TMessageManager.DefaultManager.SubscribeToMessage(TPushFailToRegisterMessage, applicationdidFailToRegisterForRemoteNotificationsWithError);
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, InstanceApplicationEventHandler);
+  //--
+  if TALFirebaseMessaging.CanRegisterForRemoteNotifications then SharedApplication.registerForRemoteNotifications;
+  TALFirebaseMessaging.CanRegisterForRemoteNotifications := True;
+
   {$ENDIF}
   {$ENDREGION}
 
-  //Deliver the TALFirebaseMessaging.StartupNotificationMessage
-  //I do it in ForceQueue because i don't want this event to be executed during
-  //the oncreate procedure, but in annother distinct synch loop. also because
-  //right now fOnMessageReceived=nil and fOnTokenRefresh=nil. not a big deal
-  //to use Forcequeue because DeliverStartupNotificationMessages is a CLASS procedure
+  // Deliver the TALFirebaseMessaging.StartupNotificationMessage
+  // I do it in ForceQueue because i don't want this event to be executed during
+  // the oncreate procedure, but in annother distinct synch loop. also because
+  // right now fOnMessageReceived=nil and fOnTokenRefresh=nil. not a big deal
+  // to use Forcequeue because DeliverStartupNotificationMessages is a CLASS procedure
   TALFirebaseMessaging.CanDeliverStartupNotificationMessages := True;
   TThread.ForceQueue(nil, DeliverStartupNotificationMessages);
-
-  {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.Create', 'end');
-  {$ENDIF}
 
 end;
 
@@ -489,11 +533,6 @@ begin
   {$IFDEF DEBUG}
   allog('TALFirebaseMessaging.Destroy');
   {$ENDIF}
-
-  if FGetTokenTaskIsRunning then
-    raise Exception.Create('You cannot Destroy a TALFirebaseMessaging Instance when a GetToken task is running');
-  if FDeleteTokenTaskIsRunning then
-    raise Exception.Create('You cannot Destroy a TALFirebaseMessaging Instance when a DeleteToken task is running');
 
   TALFirebaseMessaging.CanDeliverStartupNotificationMessages := False;
 
@@ -514,11 +553,13 @@ begin
   TUNUserNotificationCenter.OCClass.currentNotificationCenter.setdelegate(nil);
   alfreeAndNil(fUserNotificationCenterDelegate);
   //---
-  TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).setDelegate(nil);
+  TFIRMessaging.OCClass.messaging.setDelegate(nil);
   alFreeAndNil(fFIRMessagingDelegate);
   //---
   TMessageManager.DefaultManager.Unsubscribe(TPushRemoteNotificationMessage, applicationDidReceiveRemoteNotification);
+  TMessageManager.DefaultManager.Unsubscribe(TPushDeviceTokenMessage, applicationDidRegisterForRemoteNotificationsWithDeviceToken);
   TMessageManager.DefaultManager.Unsubscribe(TPushFailToRegisterMessage, applicationDidFailToRegisterForRemoteNotificationsWithError);
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, InstanceApplicationEventHandler);
   {$ENDIF}
   {$ENDREGION}
 
@@ -527,18 +568,18 @@ begin
 
 end;
 
-{******************************************************************}
-//Returns the FCM registration token for this Firebase project. This
-//creates a Firebase Installations ID, if one does not exist, and sends
-//information about the application and the device where it's running to the
-//Firebase backend. See deleteToken for information on deleting the token
-//and the Firebase Installations ID.
+{*******************************************************************}
+// Returns the FCM registration token for this Firebase project. This
+// creates a Firebase Installations ID, if one does not exist, and sends
+// information about the application and the device where it's running to the
+// Firebase backend. See deleteToken for information on deleting the token
+// and the Firebase Installations ID.
 procedure TALFirebaseMessaging.GetToken;
 begin
 
-  if FGetTokenTaskIsRunning then Exit;
-  FGetTokenTaskIsRunning := true;
-  if FDeleteTokenTaskIsRunning then exit;
+  {$IFDEF DEBUG}
+  allog('TALFirebaseMessaging.GetToken');
+  {$ENDIF}
 
   {$REGION 'android'}
   {$IF defined(android)}
@@ -550,23 +591,23 @@ begin
 
   {$REGION 'IOS'}
   {$IF defined(IOS)}
-  TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).tokenWithCompletion(FIRMessagingTokenWithCompletionHandler);
+  TFIRMessaging.OCClass.messaging.tokenWithCompletion(FIRMessagingTokenWithCompletionHandler);
   {$ENDIF}
   {$ENDREGION}
 
 end;
 
-{*************************************************************}
-//Deletes the FCM registration token for this Firebase project.
-//Note that this does not delete the Firebase Installations ID
-//that may have been created when generating the token. See
-//FirebaseInstallations.delete() for deleting that.
+{**************************************************************}
+// Deletes the FCM registration token for this Firebase project.
+// Note that this does not delete the Firebase Installations ID
+// that may have been created when generating the token. See
+// FirebaseInstallations.delete() for deleting that.
 procedure TALFirebaseMessaging.DeleteToken;
 begin
 
-  if FDeleteTokenTaskIsRunning then Exit;
-  FDeleteTokenTaskIsRunning := true;
-  if FGetTokenTaskIsRunning then exit;
+  {$IFDEF DEBUG}
+  allog('TALFirebaseMessaging.DeleteToken');
+  {$ENDIF}
 
   {$REGION 'android'}
   {$IF defined(android)}
@@ -578,7 +619,7 @@ begin
 
   {$REGION 'IOS'}
   {$IF defined(IOS)}
-  TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).deleteTokenWithCompletion(FIRMessagingDeleteTokenWithCompletionHandler);
+  TFIRMessaging.OCClass.messaging.deleteTokenWithCompletion(FIRMessagingDeleteTokenWithCompletionHandler);
   {$ENDIF}
   {$ENDREGION}
 
@@ -587,19 +628,25 @@ end;
 {******************************************************************}
 procedure TALFirebaseMessaging.doTokenRefresh(const AToken: String);
 begin
+
+  {$IFDEF DEBUG}
+  allog('TALFirebaseMessaging.doTokenRefresh', AToken);
+  {$ENDIF}
+
   if assigned(fOnTokenRefresh) then
     fOnTokenRefresh(aToken);
+
 end;
 
 {*******************************************************************************}
 procedure TALFirebaseMessaging.doMessageReceived(const APayload: TALStringListW);
 begin
   if assigned(fOnMessageReceived) then begin
-    //under ios, when the app is not running and the user click on an alert notification
-    //then the app at the launch time will fire TPushStartupNotificationMessage and
-    //also sometime (dependly when we create the TALFirebaseMessaging instance) also
-    //userNotificationCenter:center::response:completionHandler. so this is because
-    //we must deduplicate notification throught FDeliveredMessageIDs
+    // under ios, when the app is not running and the user click on an alert notification
+    // then the app at the launch time will fire TPushStartupNotificationMessage and
+    // also sometime (dependly when we create the TALFirebaseMessaging instance) also
+    // userNotificationCenter:center::response:completionHandler. so this is because
+    // we must deduplicate notification throught FDeliveredMessageIDs
     var LMessageId: String := '';
     for var LMessageIdKey in MessageIdKeys do begin
       LMessageId := aPayload.Values[LMessageIdKey];
@@ -647,12 +694,12 @@ begin
   end;
 end;
 
-{**********************************}
-//On android this handler is called:
-//  * On any ApplicationEvent with TApplicationEventMessage message and we care only about TApplicationEvent.FinishedLaunching
-//  * On Activity.onNewIntent with TMessageReceivedNotification message.
-//On iOS this handler is called:
-//  * On applicationDidFinishLaunchingWithOptions with TPushStartupNotificationMessage message
+{***********************************}
+// On android this handler is called:
+//   * On any ApplicationEvent with TApplicationEventMessage message and we care only about TApplicationEvent.FinishedLaunching
+//   * On Activity.onNewIntent with TMessageReceivedNotification message.
+// On iOS this handler is called:
+//   * On applicationDidFinishLaunchingWithOptions with TPushStartupNotificationMessage message
 class procedure TALFirebaseMessaging.StartupNotificationMessageHandler(const Sender: TObject; const M: TMessage);
 begin
 
@@ -682,9 +729,9 @@ begin
   else if (M is TMessageReceivedNotification) then begin
     var LIntent := TMessageReceivedNotification(M).Value;
     if LIntent <> nil then begin
-      //don't ask me why but the FMXNativeActivity put all the infos
-      //inside "fcm" when it's detect that the intent comme from
-      //firebase cloud messaging
+      // don't ask me why but the FMXNativeActivity put all the infos
+      // inside "fcm" when it's detect that the intent comme from
+      // firebase cloud messaging
       LBundle := LIntent.getBundleExtra(StringToJString('fcm'));
       if LBundle = nil then LBundle := LIntent.getExtras;
     end;
@@ -762,9 +809,9 @@ begin
 
         {$REGION 'IOS'}
         {$IF defined(IOS)}
-        //under ios data message can (if you are lucky) wake up the app and fire this method
-        //so we must detect if it's an alert or a pure data message. I use content-available that I
-        //think will be only present in data message
+        // under ios data message can (if you are lucky) wake up the app and fire this method
+        // so we must detect if it's an alert or a pure data message. I use content-available that I
+        // think will be only present in data message
         if LJsonDoc.GetChildValueFloat(['aps', 'content-available'], 0) = 0 then
           LJsonDoc.SetChildValueText('alcinoe.notification_clicked', '1');
         var LPushRemoteNotificationMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJsonDoc.JSON));
@@ -847,13 +894,9 @@ begin
     'Error: ' + LErrorMessage,
     LLogType);
   {$ENDIF}
-  FFirebaseMessaging.FGetTokenTaskIsRunning := False;
-  var LDoDeleteToken := FFirebaseMessaging.FDeleteTokenTaskIsRunning;
-  FFirebaseMessaging.FDeleteTokenTaskIsRunning := False;
   if assigned(FFirebaseMessaging.fOnGetToken) then
     FFirebaseMessaging.fOnGetToken(LToken, LErrorMessage);
   if LIsSuccessful then FFirebaseMessaging.doTokenRefresh(LToken);
-  if LDoDeleteToken then FFirebaseMessaging.DeleteToken;
 end;
 
 {***********************************************************************************************************************}
@@ -880,13 +923,9 @@ begin
     'Error: ' + LErrorMessage,
     LLogType);
   {$ENDIF}
-  FFirebaseMessaging.FDeleteTokenTaskIsRunning := False;
-  var LDoGetToken := FFirebaseMessaging.FGetTokenTaskIsRunning;
-  FFirebaseMessaging.FGetTokenTaskIsRunning := False;
   if assigned(FFirebaseMessaging.fOnDeleteToken) then
     FFirebaseMessaging.fOnDeleteToken(LIsSuccessful, LErrorMessage);
   if LIsSuccessful then FFirebaseMessaging.doTokenRefresh('');
-  if LDoGetToken then FFirebaseMessaging.GetToken;
 end;
 
 {*********************************************************************************************************}
@@ -955,6 +994,9 @@ begin
     allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:didReceiveNotificationResponse:withCompletionHandler', 'Message: ' + LJsonDoc.JSON);
     {$ENDIF}
 
+    // https://firebase.google.com/docs/cloud-messaging/ios/receive-messages#handle-messages-swizzling-disabled
+    TFIRMessaging.OCClass.messaging.appDidReceiveMessage(didReceiveNotificationResponse.notification.request.content.userInfo);
+
     LJsonDoc.SetChildValueText('alcinoe.notification_clicked', '1');
     var LMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJsonDoc.JSON));
     TMessageManager.DefaultManager.SendMessage(nil, LMessage);
@@ -982,6 +1024,9 @@ begin
     {$IFDEF DEBUG}
     allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:willPresentNotification:withCompletionHandler', LJsonStr);
     {$ENDIF}
+
+    // https://firebase.google.com/docs/cloud-messaging/ios/receive-messages#handle-messages-swizzling-disabled
+    TFIRMessaging.OCClass.messaging.appDidReceiveMessage(willPresentNotification.request.content.userInfo);
 
     if ALStrToBool(LJsonDoc.GetChildValuetext('alcinoe.present_notification', '0')) then begin
 
@@ -1039,13 +1084,9 @@ begin
     'Error: ' + LErrorMessage,
     LLogType);
   {$ENDIF}
-  FGetTokenTaskIsRunning := False;
-  var LDoDeleteToken := FDeleteTokenTaskIsRunning;
-  FDeleteTokenTaskIsRunning := False;
   if assigned(fOnGetToken) then
     fOnGetToken(LToken, LErrorMessage);
   if LIsSuccessful then doTokenRefresh(LToken);
-  if LDoDeleteToken then DeleteToken;
 end;
 
 {******************************************************************************************}
@@ -1065,13 +1106,9 @@ begin
     'Error: ' + LErrorMessage,
     LLogType);
   {$ENDIF}
-  FDeleteTokenTaskIsRunning := False;
-  var LDoGetToken := FGetTokenTaskIsRunning;
-  FGetTokenTaskIsRunning := False;
   if assigned(fOnDeleteToken) then
     fOnDeleteToken(LIsSuccessful, LErrorMessage);
   if LIsSuccessful then doTokenRefresh('');
-  if LDoGetToken then GetToken;
 end;
 
 {************************************************************************************************************}
@@ -1081,28 +1118,71 @@ begin
   FFirebaseMessaging := AFirebaseMessaging;
 end;
 
-{****************************************************************************************************************************}
-//This method will be called once a token is available, or has been refreshed. Typically it will be called once per app start,
-//but may be called more often, if token is invalidated or updated. In this method, you should perform operations such as:
-// * Uploading the FCM token to your application server, so targeted notifications can be sent.
-// * Subscribing to any topics.
-procedure TALFirebaseMessaging.TFIRMessagingDelegate.messaging(messaging: FIRMessaging; fcmToken: NSString);
+{*****************************************************************************************************************************}
+// This method will be called once a token is available, or has been refreshed. Typically it will be called once per app start,
+// but may be called more often, if token is invalidated or updated. In this method, you should perform operations such as:
+//  * Uploading the FCM token to your application server, so targeted notifications can be sent.
+//  * Subscribing to any topics.
+procedure TALFirebaseMessaging.TFIRMessagingDelegate.messaging(messaging: FIRMessaging; didReceiveRegistrationToken: NSString);
 begin
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.TFIRMessagingDelegate.messaging', 'Token: ' + NSStrToStr(fcmToken));
+  allog('TALFirebaseMessaging.TFIRMessagingDelegate.messaging', 'Token: ' + NSStrToStr(didReceiveRegistrationToken));
   {$ENDIF}
-  FFirebaseMessaging.doTokenRefresh(NSStrToStr(fcmToken));
+  FFirebaseMessaging.doTokenRefresh(NSStrToStr(didReceiveRegistrationToken));
 end;
 
 {***************************************************************************************************************}
 procedure TALFirebaseMessaging.applicationDidReceiveRemoteNotification(const Sender: TObject; const M: TMessage);
+
+  {~~~~~~~~~~~~~~~~}
+  {$IF defined(IOS)}
+  function JSONToNSDictionary(const AJSON: string): NSDictionary;
+  begin
+
+    var LData: NSData := StrToNSStr(AJSON).dataUsingEncoding(NSUTF8StringEncoding);
+    if LData = nil then raise Exception.Create('Error 6F1EEB1E-62E1-47F5-9685-CF63E2919DAD');
+    var LError: NSError := nil;
+    var LObject: Pointer := TNSJSONSerialization.OCClass.JSONObjectWithData(LData, 0, Addr(LError));
+    if (LObject <> nil) and
+       (LError = nil) and
+       (TNSObject.Wrap(LObject).isKindOfClass(objc_getClass('NSDictionary'))) then
+      Result := TNSDictionary.Wrap(LObject)
+    else
+      raise Exception.Create('Error 97C45B85-4618-4977-80B3-846625675001');
+
+    // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+    // No release required for result because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
+
+  end;
+  {$ENDIF}
+
 begin
   if (M is TPushRemoteNotificationMessage) then begin
+
     var LMessage := TPushRemoteNotificationMessage(M).Value.Notification;
     {$IFDEF DEBUG}
     allog('TALFirebaseMessaging.applicationDidReceiveRemoteNotification', 'Message: ' + LMessage);
     {$ENDIF}
+
+    {$IF defined(IOS)}
+    // https://firebase.google.com/docs/cloud-messaging/ios/receive-messages#handle-messages-swizzling-disabled
+    TFIRMessaging.OCClass.messaging.appDidReceiveMessage(JSONToNSDictionary(LMessage));
+    {$ENDIF}
+
     doMessageReceived(LMessage);
+
+  end;
+end;
+
+{***********************************************************************************************************************************}
+procedure TALFirebaseMessaging.applicationDidRegisterForRemoteNotificationsWithDeviceToken(const Sender: TObject; const M: TMessage);
+begin
+  if (M is TPushDeviceTokenMessage) then begin
+    {$IFDEF DEBUG}
+    allog('TALFirebaseMessaging.applicationDidRegisterForRemoteNotificationsWithDeviceToken', 'Token: ' + TPushDeviceTokenMessage(M).Value.Token);
+    {$ENDIF}
+    // https://firebase.google.com/docs/cloud-messaging/ios/receive-messages#handle-messages-swizzling-disabled
+    TFIRMessaging.OCClass.messaging.setAPNSToken(TNSData.Wrap(TPushDeviceTokenMessage(M).Value.RawToken));
   end;
 end;
 
@@ -1133,6 +1213,25 @@ begin
 
 end;
 
+{*******************************************************************************************************}
+procedure TALFirebaseMessaging.InstanceApplicationEventHandler(const Sender: TObject; const M: TMessage);
+begin
+  if (M is TApplicationEventMessage) and
+     (TApplicationEventMessage(M).Value.Event = TApplicationEvent.FinishedLaunching) then begin
+    TUNUserNotificationCenter.OCClass.currentNotificationCenter.setdelegate(fUserNotificationCenterDelegate.GetObjectID);
+  end;
+end;
+
+{**********************************************************************************************************}
+class procedure TALFirebaseMessaging.ClassApplicationEventHandler(const Sender: TObject; const M: TMessage);
+begin
+  if (M is TApplicationEventMessage) and
+     (TApplicationEventMessage(M).Value.Event = TApplicationEvent.FinishedLaunching) then begin
+    if TALFirebaseMessaging.CanRegisterForRemoteNotifications then SharedApplication.registerForRemoteNotifications;
+    TALFirebaseMessaging.CanRegisterForRemoteNotifications := True;
+  end;
+end;
+
 {$ENDIF}
 {$ENDREGION}
 
@@ -1153,7 +1252,9 @@ initialization
 
   {$REGION 'IOS'}
   {$IF defined(IOS)}
+  TALFirebaseMessaging.CanRegisterForRemoteNotifications := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TPushStartupNotificationMessage, TALFirebaseMessaging.StartupNotificationMessageHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, TALFirebaseMessaging.ClassApplicationEventHandler);
   {$ENDIF}
   {$ENDREGION}
 
@@ -1172,6 +1273,7 @@ finalization
   {$REGION 'IOS'}
   {$IF defined(IOS)}
   TMessageManager.DefaultManager.Unsubscribe(TPushStartupNotificationMessage, TALFirebaseMessaging.StartupNotificationMessageHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, TALFirebaseMessaging.ClassApplicationEventHandler);
   {$ENDIF}
   {$ENDREGION}
 

@@ -119,6 +119,8 @@ type
       end;
   private
     FDockEdge: TDockEdge;
+    FSafeAreaInsets: TRectF;
+    FIsVirtualKeyboardVisible: Boolean;
     FScrollEngine: TALScrollEngine;
     fMouseDownPos: TPointF;
     FHandleMouseEvents: Boolean;
@@ -166,6 +168,8 @@ type
     class procedure CloseCurrent(const AOnClosedCallback: TOnClosedRefProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
     function IsTransitioning: Boolean; virtual;
     function IsVirtualKeyboardAnimationRunning: Boolean; virtual;
+    property IsVirtualKeyboardVisible: Boolean read FIsVirtualKeyboardVisible;
+    property SafeAreaInsets: TRectF read FSafeAreaInsets;
     property CloseOnScrimClick: Boolean read GetCloseOnScrimClick write SetCloseOnScrimClick;
     procedure ActionButtonClick(Sender: TObject); virtual;
     property Container: TALRectangle read FContainer;
@@ -1036,6 +1040,7 @@ begin
   FDisableScrollRealign := False;
   //--
   FDockEdge := ADockEdge;
+  FIsVirtualKeyboardVisible := False;
   FScrollEngine := CreateScrollEngine;
   fMouseDownPos := TpointF.Zero;
   FHandleMouseEvents := False;
@@ -1051,6 +1056,8 @@ begin
     TDockEdge.Bottom: FContainer.Assign(TALSheetManager.Instance.DefaultBottomSheetContainer);
     else Raise Exception.Create('Error 1224CCA1-75C7-4E5F-8F4C-48F0DE5BAA05')
   end;
+  FSafeAreaInsets := ALGetSafeAreaInsets;
+  if FContainer.Margins.Empty then FContainer.Margins.Rect := FSafeAreaInsets;
   FContainer.Name := 'ALSheetContainer';
   //--
   FScrollBox := nil;
@@ -1260,7 +1267,7 @@ begin
     case FDockEdge of
       TDockEdge.Left: begin
         ScrollEngine.SetScrollLimits(
-          TALPointD.Create(Max(-Width, -Container.Width - Container.Margins.Left), 0), // const MinValue: TalPointD;
+          TALPointD.Create(Max(-Width + Container.Margins.Right, -Container.Width - Container.Margins.Left), 0), // const MinValue: TalPointD;
           TALPointD.Create(0, 0), // const MaxValue: TalPointD;
           True); // const EnforceLimits: Boolean = True
         if not SameValue(Scrollengine.ViewportPosition.X, ScrollEngine.MinScrollLimit.X, TEpsilon.Position) then
@@ -1274,7 +1281,7 @@ begin
       TDockEdge.Right: begin
         ScrollEngine.SetScrollLimits(
           TALPointD.Create(0, 0), // const MinValue: TalPointD;
-          TALPointD.Create(Min(Width, Container.Width + Container.Margins.Right), 0), // const MaxValue: TalPointD;
+          TALPointD.Create(Min(Width - Container.Margins.Left, Container.Width + Container.Margins.Right), 0), // const MaxValue: TalPointD;
           True); // const EnforceLimits: Boolean = True
         if not SameValue(Scrollengine.ViewportPosition.X, ScrollEngine.MaxScrollLimit.X, TEpsilon.Position) then
           ScrollEngine.SetViewportPosition(
@@ -1286,7 +1293,7 @@ begin
       end;
       TDockEdge.Top: begin
         ScrollEngine.SetScrollLimits(
-          TALPointD.Create(0, Max(-Height, -Container.Height - Container.Margins.Top)), // const MinValue: TalPointD;
+          TALPointD.Create(0, Max(-Height + Container.Margins.bottom, -Container.Height - Container.Margins.Top)), // const MinValue: TalPointD;
           TALPointD.Create(0, 0), // const MaxValue: TalPointD;
           True); // const EnforceLimits: Boolean = True
         if not SameValue(Scrollengine.ViewportPosition.Y, ScrollEngine.MinScrollLimit.Y, TEpsilon.Position) then
@@ -1300,7 +1307,7 @@ begin
       TDockEdge.Bottom: begin
         ScrollEngine.SetScrollLimits(
           TALPointD.Create(0, 0), // const MinValue: TalPointD;
-          TALPointD.Create(0, Min(Height, Container.Height + Container.Margins.Bottom)), // const MaxValue: TalPointD;
+          TALPointD.Create(0, Min(Height - Container.Margins.Top, Container.Height + Container.Margins.Bottom)), // const MaxValue: TalPointD;
           True); // const EnforceLimits: Boolean = True
         if not SameValue(Scrollengine.ViewportPosition.Y, ScrollEngine.MaxScrollLimit.Y, TEpsilon.Position) then
           ScrollEngine.SetViewportPosition(
@@ -1511,7 +1518,7 @@ begin
      (TAlphaColorRec(Container.Fill.Color).A = $FF) then begin
     case DockEdge of
       TALSheet.TDockEdge.Left: begin
-        if SameValue(Container.Margins.Left, 0, TEpsilon.Position) then begin
+        if CompareValue(Container.Margins.Left, FSafeAreaInsets.Left, TEpsilon.Position) <= 0 then begin
           var LRect := Container.BoundsRect;
           LRect.Offset(0, -LRect.Width);
           LRect.Left := -65535;
@@ -1519,6 +1526,7 @@ begin
           LLocalRect.Left := LLocalRect.Left - margins.Left;
           LRect.Intersect(LLocalRect);
           if CompareValue(LRect.Width, 0, TEpsilon.Position) >= 0 then begin
+            LRect.Right := LRect.right + 1;
             LRect := Canvas.AlignToPixel(LRect);
             Canvas.Fill.Kind := TBrushKind.Solid;
             Canvas.Fill.Color := Container.Fill.Color;
@@ -1527,7 +1535,7 @@ begin
         end;
       end;
       TALSheet.TDockEdge.Right: begin
-        if SameValue(Container.Margins.Right, 0, TEpsilon.Position) then begin
+        if CompareValue(Container.Margins.Right, FSafeAreaInsets.Right, TEpsilon.Position) <= 0 then begin
           var LRect := Container.BoundsRect;
           LRect.Offset(0, LRect.Width);
           LRect.Right := 65535;
@@ -1535,6 +1543,7 @@ begin
           LLocalRect.Right := LLocalRect.Right + margins.Right;
           LRect.Intersect(LLocalRect);
           if CompareValue(LRect.Width, 0, TEpsilon.Position) >= 0 then begin
+            LRect.Left := LRect.Left - 1;
             LRect := Canvas.AlignToPixel(LRect);
             Canvas.Fill.Kind := TBrushKind.Solid;
             Canvas.Fill.Color := Container.Fill.Color;
@@ -1543,7 +1552,7 @@ begin
         end;
       end;
       TALSheet.TDockEdge.Top: begin
-        if SameValue(Container.Margins.Top, 0, TEpsilon.Position) then begin
+        if CompareValue(Container.Margins.Top, FSafeAreaInsets.Top, TEpsilon.Position) <= 0 then begin
           var LRect := Container.BoundsRect;
           LRect.Offset(0, -LRect.Height);
           LRect.Top := -65535;
@@ -1551,6 +1560,7 @@ begin
           LLocalRect.Top := LLocalRect.Top - margins.Top;
           LRect.Intersect(LLocalRect);
           if CompareValue(LRect.Height, 0, TEpsilon.Position) >= 0 then begin
+            LRect.Bottom := LRect.Bottom + 1;
             LRect := Canvas.AlignToPixel(LRect);
             Canvas.Fill.Kind := TBrushKind.Solid;
             Canvas.Fill.Color := Container.Fill.Color;
@@ -1559,7 +1569,7 @@ begin
         end;
       end;
       TALSheet.TDockEdge.Bottom: begin
-        if SameValue(Container.Margins.Bottom, 0, TEpsilon.Position) then begin
+        if CompareValue(Container.Margins.Bottom, FSafeAreaInsets.Bottom, TEpsilon.Position) <= 0 then begin
           var LRect := Container.BoundsRect;
           LRect.Offset(0, LRect.Height);
           LRect.Bottom := 65535;
@@ -1567,6 +1577,7 @@ begin
           LLocalRect.Bottom := LLocalRect.Bottom + margins.Bottom;
           LRect.Intersect(LLocalRect);
           if CompareValue(LRect.Height, 0, TEpsilon.Position) >= 0 then begin
+            LRect.Top := LRect.Top - 1;
             LRect := Canvas.AlignToPixel(LRect);
             Canvas.Fill.Kind := TBrushKind.Solid;
             Canvas.Fill.Color := Container.Fill.Color;
@@ -1684,9 +1695,26 @@ begin
     FVirtualKeyboardAnimation.OnProcess := VirtualKeyboardAnimationProcess;
   end;
   FVirtualKeyboardAnimation.Enabled := False;
-  if TVKStateChangeMessage(Msg).KeyboardVisible then begin
+  FIsVirtualKeyboardVisible := TVKStateChangeMessage(Msg).KeyboardVisible;
+  if FIsVirtualKeyboardVisible then begin
+
+    {$IFDEF DEBUG}
+    ALLog(
+      ClassName + '.VirtualKeyboardChangeHandler',
+      'Visible: true | ' +
+      'KeyboardBounds:' + TVKStateChangeMessage(Msg).KeyboardBounds.ToString);
+    {$ENDIF}
+
     if FVirtualKeyboardAnimation.Tag = 1 then exit;
     FVirtualKeyboardAnimation.Tag := 1;
+
+    // Android: the virtual keyboard height excludes the bottom safe area (system insets).
+    // iOS: the virtual keyboard height includes the bottom safe area.
+    var LKeyboardHeight: Single := TVKStateChangeMessage(Msg).KeyboardBounds.Height;
+    {$IF defined(IOS)}
+    LKeyboardHeight := LKeyboardHeight - ALGetSafeAreaInsets.Bottom;
+    {$ENDIF}
+
     {$IF defined(ANDROID)}
     FVirtualKeyboardAnimation.Duration := {$IF defined(DEBUG)}0.300{$ELSE}0.300{$ENDIF};
     {$ELSE}
@@ -1694,18 +1722,20 @@ begin
     {$ENDIF}
     FVirtualKeyboardAnimation.InterpolationType := TALInterpolationType.Material3StandardDefaultEffects;
     FVirtualKeyboardAnimation.StartValue := margins.Bottom;
-    FVirtualKeyboardAnimation.StopValue := TVKStateChangeMessage(Msg).KeyboardBounds.Height;
+    FVirtualKeyboardAnimation.StopValue := LKeyboardHeight;
 
     if (FscrollBox <> nil) then begin
       var LContainerPositionY := Fcontainer.LocalToAbsolute(TPointF.Create(0,0)).y;
-      var LVirtualKeyboardOverlapHeight := TVKStateChangeMessage(Msg).KeyboardBounds.Height - LContainerPositionY;
-      if CompareValue(LVirtualKeyboardOverlapHeight, 0, TEpsilon.Position)> 0 then begin
+      var LVirtualKeyboardOverlapHeight := LKeyboardHeight
+                                           - LContainerPositionY    // < This is the total available height
+                                           - Container.Margins.Top; // < the container can slide up
+      if CompareValue(LVirtualKeyboardOverlapHeight, 0, TEpsilon.Position) > 0 then begin
         var LForm := Screen.ActiveForm;
         if LForm = nil then LForm := Application.MainForm;
         if LForm = nil then Raise Exception.Create('Error 4BCA940A-A899-48F3-B37B-B30049284723');
         if (LForm.Focused <> nil) and FscrollBox.IsAncestorOf(LForm.Focused) and (LForm.Focused.GetObject is TControl) then begin
 
-          var LMaxVisiblePosY := LForm.ClientHeight - TVKStateChangeMessage(Msg).KeyboardBounds.Height;
+          var LMaxVisiblePosY := LForm.ClientHeight - Container.Margins.Top - Container.Margins.bottom - LKeyboardHeight;
           var LFocusedControl := TControl(LForm.Focused.GetObject);
           var LFocusedControlBottomY := LFocusedControl.LocalToAbsolute(TPointF.Create(0,0)).y + LFocusedControl.Height + 16;
 
@@ -1725,6 +1755,12 @@ begin
 
   end
   else begin
+
+    {$IFDEF DEBUG}
+    ALLog(
+      ClassName + '.VirtualKeyboardChangeHandler',
+      'Visible: False');
+    {$ENDIF}
     if FVirtualKeyboardAnimation.Tag = 0 then exit;
     FVirtualKeyboardAnimation.Tag := 0;
     FVirtualKeyboardAnimation.Duration := {$IF defined(DEBUG)}0.200{$ELSE}0.200{$ENDIF};
@@ -1733,6 +1769,7 @@ begin
     FVirtualKeyboardAnimation.StopValue := 0;
     if FScrollBox <> nil then
       FScrollBox.FVirtualKeyboardOverlapHeight := 0;
+
   end;
   FVirtualKeyboardAnimation.Start;
 end;

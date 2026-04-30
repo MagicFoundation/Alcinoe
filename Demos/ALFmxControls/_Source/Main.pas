@@ -551,7 +551,7 @@ procedure TMainForm.FormCreate(Sender: TObject);
 begin
   ALLog('TMainForm.FormCreate', 'begin');
 
-  TALErrorReporting.Instance;
+  TALErrorReporter.Instance;
 
   FSafeAreaInsets := TRectF.Empty;
 

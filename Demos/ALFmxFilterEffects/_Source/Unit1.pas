@@ -134,7 +134,7 @@ end;
 {*******************************************}
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  TALErrorReporting.Instance;
+  TALErrorReporter.Instance;
   ALColorAdjustEffect1.Enabled := true;
   ALLayout1.Height := ALLayout1.Width / (720 / 404);
   ALSetSystemBarsColor(

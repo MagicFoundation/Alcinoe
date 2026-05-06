@@ -753,7 +753,8 @@ begin
                               '', // const AResourceName: String;
                               ANotification.FLargeIconStream, // const AResourceStream: TStream;
                               '', // const AMaskResourceName: String;
-                              0, // const AScale: Single;
+                              1, // const AScale: Single;
+                              TRectF.Empty, // const ASrcRect: TRectF;
                               LIconSize.Width, LIconSize.Height, // const W, H: single;
                               False, //const AApplyMetadataOrientation: Boolean;
                               TALImageWrapMode.Cover, // const AWrapMode: TALImageWrapMode;

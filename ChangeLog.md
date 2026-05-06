@@ -1,3 +1,15 @@
+## 05/06/2026
+
+- Added `ALIsAlreadyRunning(AMutexName: String): Boolean` to `Alcinoe.Common`:
+  - creates a named Windows mutex (`Global\{name}`) on first call and returns `False`
+  - returns `True` if the mutex already exists (another instance is running)
+  - handle is released in unit finalization
+- Added `ASrcRect: TRectF` parameter to all image-from-resource functions in `Alcinoe.FMX.Graphics`:
+  - applies to `ALCreateSkSurface/Image/JBitmap/CGContextRef/CGImageRef/TBitmap/BitmapFromResource`, `ALCreateDrawableFromResource`, and all `ALGetCached*` variants
+  - added `FFillSrcRect` field and `SetFillSrcRect` builder method to `TALDrawRectangleHelper`
+  - when non-empty, `ASrcRect` clips the source image (in real pixel coordinates) before the wrap mode is applied; use `TRectF.Empty` for the full image (existing behaviour unchanged)
+  - `ASrcRect` is included in the bitmap cache key so cropped and uncropped renders are cached independently
+
 ## 04/30/2026
 
 - Extended hexadecimal and Base64 helpers in `Alcinoe.StringUtils`:

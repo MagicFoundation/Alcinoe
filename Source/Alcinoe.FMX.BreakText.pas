@@ -2795,6 +2795,7 @@ begin
                                       nil, // const AResourceStream: TStream;
                                       '', // const AMaskResourceName: String;
                                       1, // const AScale: Single;
+                                      TRectF.Empty, // const ASrcRect: TRectF;
                                       LDstRect.Width, LDstRect.Height, // const W, H: single;
                                       False, // const AApplyMetadataOrientation: Boolean;
                                       TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
@@ -2816,6 +2817,7 @@ begin
                                       nil, // const AResourceStream: TStream;
                                       '', // const AMaskResourceName: String;
                                       1, // const AScale: Single;
+                                      TRectF.Empty, // const ASrcRect: TRectF;
                                       LDstRect.Width, LDstRect.Height, // const W, H: single;
                                       False, // const AApplyMetadataOrientation: Boolean;
                                       TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
@@ -4160,6 +4162,7 @@ begin
                              nil, // const AResourceStream: TStream;
                              '', // const AMaskResourceName: String;
                              1, // const AScale: Single;
+                             TRectF.Empty, // const ASrcRect: TRectF;
                              LDstRect.Width, LDstRect.Height, // const W, H: single;
                              False, // const AApplyMetadataOrientation: Boolean;
                              TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
@@ -4181,6 +4184,7 @@ begin
                              nil, // const AResourceStream: TStream;
                              '', // const AMaskResourceName: String;
                              1, // const AScale: Single;
+                             TRectF.Empty, // const ASrcRect: TRectF;
                              LDstRect.Width, LDstRect.Height, // const W, H: single;
                              False, // const AApplyMetadataOrientation: Boolean;
                              TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
@@ -4262,6 +4266,7 @@ begin
                             nil, // const AResourceStream: TStream;
                             '', // const AMaskResourceName: String;
                             1, // const AScale: Single;
+                            TRectF.Empty, // const ASrcRect: TRectF;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             False, // const AApplyMetadataOrientation: Boolean;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
@@ -4283,6 +4288,7 @@ begin
                             nil, // const AResourceStream: TStream;
                             '', // const AMaskResourceName: String;
                             1, // const AScale: Single;
+                            TRectF.Empty, // const ASrcRect: TRectF;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             False, // const AApplyMetadataOrientation: Boolean;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;

@@ -18,7 +18,7 @@ REM     * In your account settings, navigate to the Security section.
 REM     * Locate the option to generate an app-specific password, then click "Create an app-specific password."
 REM     * Follow the on-screen instructions and provide a label ^(e.g., "altool"^) for your reference.
 REM  2. Store the Username/Password Pair in Windows Credential Manager:
-REM     * Launch {Alcinoe}\Tools\WindowsCredentialScripts\GetWindowsCredential.ps1
+REM     * Launch {Alcinoe}\Tools\WindowsCredentialScripts\SetWindowsCredential.ps1
 REM     * TargetName: alcinoe.altool
 REM     * Username: {Username} 
 REM     * Password: {Password} 
@@ -751,8 +751,8 @@ REM IF ERRORLEVEL 1 EXIT /B 1
 Call :BUILD_PROJECT "%~1" "%~2" "%~3" "Android64"
 IF ERRORLEVEL 1 EXIT /B 1
 
-Call :BUILD_PROJECT "%~1" "%~2" "%~3" "iOSDevice64"
-IF ERRORLEVEL 1 EXIT /B 1
+REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "iOSDevice64"
+REM IF ERRORLEVEL 1 EXIT /B 1
 
 REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "iOSSimARM64"
 REM IF ERRORLEVEL 1 EXIT /B 1
@@ -760,8 +760,8 @@ REM IF ERRORLEVEL 1 EXIT /B 1
 REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "OSX64"
 REM IF ERRORLEVEL 1 EXIT /B 1
 
-Call :BUILD_PROJECT "%~1" "%~2" "%~3" "OSXARM64"
-IF ERRORLEVEL 1 EXIT /B 1
+REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "OSXARM64"
+REM IF ERRORLEVEL 1 EXIT /B 1
 
 EXIT /B 0
 

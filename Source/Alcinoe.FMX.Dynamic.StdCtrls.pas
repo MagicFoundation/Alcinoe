@@ -3696,6 +3696,7 @@ begin
                       nil, // const AResourceStream: TStream;
                       '', // const AMaskResourceName: String;
                       1, // const AScale: Single;
+                      TRectF.Empty, // const ASrcRect: TRectF;
                       Width * (fframeCount div fRowCount) * ALGetScreenScale,
                       Height * fRowCount * ALGetScreenScale, // const W, H: single;
                       False, // const AApplyMetadataOrientation: Boolean;

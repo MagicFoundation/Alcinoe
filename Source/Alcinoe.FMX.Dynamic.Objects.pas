@@ -2317,6 +2317,7 @@ begin
                         AResourceStream, // const AResourceStream: TStream;
                         AMaskResourceName, // const AMaskResourceName: String;
                         AScale, // const AScale: Single;
+                        TRectF.Empty, // const ASrcRect: TRectF;
                         ABufDrawableRect.Width, ABufDrawableRect.Height, // const W, H: single;
                         AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;

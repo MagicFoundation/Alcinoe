@@ -4423,6 +4423,7 @@ begin
                         AResourceStream, // const AResourceStream: TStream;
                         '', // AMaskResourceName, // const AMaskResourceName: String;
                         AScale, // const AScale: Single;
+                        TRectF.Empty, // const ASrcRect: TRectF;
                         ARect.Width, ARect.Height, // const W, H: single;
                         False, // const AApplyMetadataOrientation: Boolean;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;

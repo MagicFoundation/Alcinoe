@@ -293,6 +293,7 @@ function ALCreateSkSurfaceFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -306,6 +307,7 @@ function ALCreateSkImageFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -336,6 +338,7 @@ function ALCreateJBitmapFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -366,6 +369,7 @@ function ALCreateCGContextRefFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -379,6 +383,7 @@ function ALCreateCGImageRefFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -409,6 +414,7 @@ function ALCreateTBitmapFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -438,6 +444,7 @@ function ALCreateBitmapFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -473,6 +480,7 @@ function ALCreateDrawableFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -510,6 +518,7 @@ Type
     FFillImageNoRadius: Boolean;
     FFillWrapMode: TALImageWrapMode;
     FFillCropCenter: TpointF;
+    FFillSrcRect: TRectF;
     FFillBlurRadius: single;
     FStateLayerOpacity: Single;
     FStateLayerColor: TAlphaColor;
@@ -558,6 +567,7 @@ Type
     function SetFillImageNoRadius(const AValue: Boolean): PALDrawRectangleHelper;
     function SetFillWrapMode(const AValue: TALImageWrapMode): PALDrawRectangleHelper;
     function SetFillCropCenter(const AValue: TpointF): PALDrawRectangleHelper;
+    function SetFillSrcRect(const AValue: TRectF): PALDrawRectangleHelper;
     function SetFillBlurRadius(const AValue: single): PALDrawRectangleHelper;
     function SetStateLayer(const AStateLayer: TALStateLayer; const AContentColor: TAlphaColor): PALDrawRectangleHelper;
     function SetStateLayerOpacity(const AValue: Single): PALDrawRectangleHelper;
@@ -686,6 +696,7 @@ function ALGetCachedBitmap(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -778,6 +789,7 @@ function ALGetCachedBitmapKey(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -813,6 +825,10 @@ begin
     SizeOf(Pointer) + SizeOf(Int64) + // AResourceStream: Address + Size
     SizeOf(Integer) + LLen2 + // AMaskResourceName: Length + Text
     SizeOf(Single) + // AScale
+    SizeOf(Single) + // ASrcRect.Left
+    SizeOf(Single) + // ASrcRect.Top
+    SizeOf(Single) + // ASrcRect.Right
+    SizeOf(Single) + // ASrcRect.Bottom
     SizeOf(Single) + // W
     SizeOf(Single) + // H
     SizeOf(Boolean) + // AApplyMetadataOrientation
@@ -851,6 +867,18 @@ begin
 
   // Write all binary values
   PSingle(@AKey[LOffset])^ := AScale;
+  Inc(LOffset, SizeOf(Single));
+
+  PSingle(@AKey[LOffset])^ := ASrcRect.Left;
+  Inc(LOffset, SizeOf(Single));
+
+  PSingle(@AKey[LOffset])^ := ASrcRect.Top;
+  Inc(LOffset, SizeOf(Single));
+
+  PSingle(@AKey[LOffset])^ := ASrcRect.Right;
+  Inc(LOffset, SizeOf(Single));
+
+  PSingle(@AKey[LOffset])^ := ASrcRect.Bottom;
   Inc(LOffset, SizeOf(Single));
 
   PSingle(@AKey[LOffset])^ := W;
@@ -934,6 +962,18 @@ begin
   var LScale: Single := PSingle(@AKey[LOffset])^;
   Inc(LOffset, SizeOf(Single));
 
+  var LSrcRectLeft: Single := PSingle(@AKey[LOffset])^;
+  Inc(LOffset, SizeOf(Single));
+
+  var LSrcRectTop: Single := PSingle(@AKey[LOffset])^;
+  Inc(LOffset, SizeOf(Single));
+
+  var LSrcRectRight: Single := PSingle(@AKey[LOffset])^;
+  Inc(LOffset, SizeOf(Single));
+
+  var LSrcRectBottom: Single := PSingle(@AKey[LOffset])^;
+  Inc(LOffset, SizeOf(Single));
+
   var LW: Single := PSingle(@AKey[LOffset])^;
   Inc(LOffset, SizeOf(Single));
 
@@ -979,6 +1019,11 @@ begin
     Format('ResourceStreamPtr=%p; ResourceStreamSize=%d; ', [LStreamPtr, LStreamSize]) +
     'MaskResourceName="' + LMaskResourceName + '"; ' +
     'Scale=' + ALFloatToStrW(LScale) + '; ' +
+    'SrcRect=(' +
+      ALFloatToStrW(LSrcRectLeft) + ',' +
+      ALFloatToStrW(LSrcRectTop) + ',' +
+      ALFloatToStrW(LSrcRectRight) + ',' +
+      ALFloatToStrW(LSrcRectBottom) + '); ' +
     'W=' + ALFloatToStrW(LW) + '; ' +
     'H=' + ALFloatToStrW(LH) + '; ' +
     'ApplyMetadataOrientation=' + ALBoolToStrW(LApplyMetadataOrientation, 'True', 'False') + '; ' +
@@ -1001,6 +1046,7 @@ function ALGetCachedSkImage(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -1018,6 +1064,7 @@ begin
            AResourceStream, // const AResourceStream: TStream;
            AMaskResourceName, // const AMaskResourceName: String;
            AScale, // const AScale: Single;
+           ASrcRect, // const ASrcRect: TRectF;
            W, H, // const W, H: single;
            AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
            AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -1107,6 +1154,7 @@ function ALGetCachedJBitmap(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -1124,6 +1172,7 @@ begin
            AResourceStream, // const AResourceStream: TStream;
            AMaskResourceName, // const AMaskResourceName: String;
            AScale, // const AScale: Single;
+           ASrcRect, // const ASrcRect: TRectF;
            W, H, // const W, H: single;
            AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
            AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -1215,6 +1264,7 @@ function ALGetCachedCGImageRef(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -1232,6 +1282,7 @@ begin
            AResourceStream, // const AResourceStream: TStream;
            AMaskResourceName, // const AMaskResourceName: String;
            AScale, // const AScale: Single;
+           ASrcRect, // const ASrcRect: TRectF;
            W, H, // const W, H: single;
            AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
            AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -1320,6 +1371,7 @@ function ALGetCachedTBitmap(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -1337,6 +1389,7 @@ begin
            AResourceStream, // const AResourceStream: TStream;
            AMaskResourceName, // const AMaskResourceName: String;
            AScale, // const AScale: Single;
+           ASrcRect, // const ASrcRect: TRectF;
            W, H, // const W, H: single;
            AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
            AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -1422,6 +1475,7 @@ function ALGetCachedBitmap(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -1439,6 +1493,7 @@ begin
            AResourceStream, // const AResourceStream: TStream;
            AMaskResourceName, // const AMaskResourceName: String;
            AScale, // const AScale: Single;
+           ASrcRect, // const ASrcRect: TRectF;
            W, H, // const W, H: single;
            AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
            AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -2933,6 +2988,7 @@ function ALCreateSkSurfaceFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -3015,6 +3071,7 @@ begin
                         nil, // const AResourceStream: TStream;
                         '', // const AMaskResourceName: String;
                         AScale, // const AScale: Single;
+                        TRectF.Empty, // const ASrcRect: TRectF;
                         W, H, // const W, H: single;
                         False, // const AApplyMetadataOrientation: Boolean;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3032,6 +3089,7 @@ begin
                           nil, // const AResourceStream: TStream;
                           '', // const AMaskResourceName: String;
                           AScale, // const AScale: Single;
+                          TRectF.Empty, // const ASrcRect: TRectF;
                           W, H, // const W, H: single;
                           False, // const AApplyMetadataOrientation: Boolean;
                           AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3053,7 +3111,9 @@ begin
         // ASrcRect is always calculated using the cover wrap mode.
         LDstRect := TrectF.Create(0, 0, sk4d_image_get_width(LMaskImage), sk4d_image_get_Height(LMaskImage));
         LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
-        LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, sk4d_image_get_width(LImage), sk4d_image_get_Height(LImage)), ACropCenter);
+        LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(LImage), sk4d_image_get_Height(LImage));
+        if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
+        LSrcRect := ALRectFitInto(LDstRect, LSrcRect, ACropCenter);
       end
       else begin
         case AWrapMode of
@@ -3069,17 +3129,20 @@ begin
           //end;
           TALImageWrapMode.Fit: Begin
             LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(LImage), sk4d_image_get_Height(LImage));
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
             LDstRect := LSrcRect.FitInto(TRectF.Create(0, 0, W * AScale, H * AScale));
             LDstRect.SetLocation(0,0);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
           end;
           TALImageWrapMode.Stretch: Begin
             LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(LImage), sk4d_image_get_Height(LImage));
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
             LDstRect := TRectF.Create(0, 0, W * AScale, H * AScale);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
           end;
           TALImageWrapMode.Place: Begin
             LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(LImage), sk4d_image_get_Height(LImage));
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
             LDstRect := LSrcRect.PlaceInto(TRectF.Create(0, 0, W * AScale, H * AScale));
             LDstRect.SetLocation(0,0);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
@@ -3087,7 +3150,9 @@ begin
           TALImageWrapMode.Cover: Begin
             LDstRect := TRectF.Create(0, 0, W * AScale, H * AScale);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
-            LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, sk4d_image_get_width(LImage), sk4d_image_get_Height(LImage)), ACropCenter);
+            LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(LImage), sk4d_image_get_Height(LImage));
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
+            LSrcRect := ALRectFitInto(LDstRect, LSrcRect, ACropCenter);
           end;
           Else
             Raise Exception.Create('Error FE241032-F199-4700-9F65-A32E408A71F0');
@@ -3147,6 +3212,7 @@ function ALCreateSkImageFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -3161,6 +3227,7 @@ begin
                     AResourceStream, // const AResourceStream: TStream;
                     AMaskResourceName, // const AMaskResourceName: String;
                     AScale, // const AScale: Single;
+                    ASrcRect, // const ASrcRect: TRectF;
                     W, H, // const W, H: single;
                     AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                     AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3441,6 +3508,7 @@ function ALCreateJBitmapFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -3587,6 +3655,7 @@ begin
                          nil, // const AResourceStream: TStream;
                          '', // const AMaskResourceName: String;
                          AScale, // const AScale: Single;
+                         TRectF.Empty, // const ASrcRect: TRectF;
                          W, H, // const W, H: single;
                          False, // const AApplyMetadataOrientation: Boolean;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3604,6 +3673,7 @@ begin
                            nil, // const AResourceStream: TStream;
                            '', // const AMaskResourceName: String;
                            AScale, // const AScale: Single;
+                           TRectF.Empty, // const ASrcRect: TRectF;
                            W, H, // const W, H: single;
                            False, // const AApplyMetadataOrientation: Boolean;
                            AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3625,7 +3695,9 @@ begin
         // ASrcRect is always calculated using the cover wrap mode.
         LDstRect := TrectF.Create(0, 0, LMaskBitmap.getWidth, LMaskBitmap.getHeight);
         LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
-        LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, LBitmap.getWidth, LBitmap.getHeight), ACropCenter);
+        LSrcRect := TrectF.Create(0, 0, LBitmap.getWidth, LBitmap.getHeight);
+        if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
+        LSrcRect := ALRectFitInto(LDstRect, LSrcRect, ACropCenter);
       end
       else begin
         case AWrapMode of
@@ -3641,17 +3713,20 @@ begin
           //end;
           TALImageWrapMode.Fit: Begin
             LSrcRect := TrectF.Create(0, 0, LBitmap.getWidth, LBitmap.getHeight);
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
             LDstRect := LSrcRect.FitInto(TRectF.Create(0, 0, W * AScale, H * AScale));
             LDstRect.SetLocation(0,0);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
           end;
           TALImageWrapMode.Stretch: Begin
             LSrcRect := TrectF.Create(0, 0, LBitmap.getWidth, LBitmap.getHeight);
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
             LDstRect := TRectF.Create(0, 0, W * AScale, H * AScale);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
           end;
           TALImageWrapMode.Place: Begin
             LSrcRect := TrectF.Create(0, 0, LBitmap.getWidth, LBitmap.getHeight);
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
             LDstRect := LSrcRect.PlaceInto(TRectF.Create(0, 0, W * AScale, H * AScale));
             LDstRect.SetLocation(0,0);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
@@ -3659,7 +3734,9 @@ begin
           TALImageWrapMode.Cover: Begin
             LDstRect := TRectF.Create(0, 0, W * AScale, H * AScale);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
-            LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, LBitmap.getWidth, LBitmap.getHeight), ACropCenter);
+            LSrcRect := TrectF.Create(0, 0, LBitmap.getWidth, LBitmap.getHeight);
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
+            LSrcRect := ALRectFitInto(LDstRect, LSrcRect, ACropCenter);
           end;
           Else
             Raise Exception.Create('Error FE241032-F199-4700-9F65-A32E408A71F0');
@@ -4008,6 +4085,7 @@ function ALCreateCGContextRefFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -4221,6 +4299,7 @@ begin
                         nil, // const AResourceStream: TStream;
                         '', // const AMaskResourceName: String;
                         AScale, // const AScale: Single;
+                        TRectF.Empty, // const ASrcRect: TRectF;
                         W, H, // const W, H: single;
                         False, // const AApplyMetadataOrientation: Boolean;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -4238,6 +4317,7 @@ begin
                           nil, // const AResourceStream: TStream;
                           '', // const AMaskResourceName: String;
                           AScale, // const AScale: Single;
+                          TRectF.Empty, // const ASrcRect: TRectF;
                           W, H, // const W, H: single;
                           False, // const AApplyMetadataOrientation: Boolean;
                           AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -4259,7 +4339,9 @@ begin
         // ASrcRect is always calculated using the cover wrap mode.
         LDstRect := TrectF.Create(0, 0, CGImageGetWidth(LMaskImage), CGImageGetHeight(LMaskImage));
         LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
-        LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)), ACropCenter);
+        LSrcRect := TrectF.Create(0, 0, CGImageGetWidth(LImage), CGImageGetHeight(LImage));
+        if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
+        LSrcRect := ALRectFitInto(LDstRect, LSrcRect, ACropCenter);
       end
       else begin
         case AWrapMode of
@@ -4275,17 +4357,20 @@ begin
           //end;
           TALImageWrapMode.Fit: Begin
             LSrcRect := TrectF.Create(0, 0, CGImageGetWidth(LImage), CGImageGetHeight(LImage));
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
             LDstRect := LSrcRect.FitInto(TRectF.Create(0, 0, W * AScale, H * AScale));
             LDstRect.SetLocation(0,0);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
           end;
           TALImageWrapMode.Stretch: Begin
             LSrcRect := TrectF.Create(0, 0, CGImageGetWidth(LImage), CGImageGetHeight(LImage));
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
             LDstRect := TRectF.Create(0, 0, W * AScale, H * AScale);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
           end;
           TALImageWrapMode.Place: Begin
             LSrcRect := TrectF.Create(0, 0, CGImageGetWidth(LImage), CGImageGetHeight(LImage));
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
             LDstRect := LSrcRect.PlaceInto(TRectF.Create(0, 0, W * AScale, H * AScale));
             LDstRect.SetLocation(0,0);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
@@ -4293,7 +4378,9 @@ begin
           TALImageWrapMode.Cover: Begin
             LDstRect := TRectF.Create(0, 0, W * AScale, H * AScale);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
-            LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)), ACropCenter);
+            LSrcRect := TrectF.Create(0, 0, CGImageGetWidth(LImage), CGImageGetHeight(LImage));
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
+            LSrcRect := ALRectFitInto(LDstRect, LSrcRect, ACropCenter);
           end;
           Else
             Raise Exception.Create('Error FE241032-F199-4700-9F65-A32E408A71F0');
@@ -4353,6 +4440,7 @@ function ALCreateCGImageRefFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -4367,6 +4455,7 @@ begin
                          AResourceStream, // const AResourceStream: TStream;
                          AMaskResourceName, // const AMaskResourceName: String;
                          AScale, // const AScale: Single;
+                         ASrcRect, // const ASrcRect: TRectF;
                          W, H, // const W, H: single;
                          AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -4548,6 +4637,7 @@ function ALCreateTBitmapFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -4617,6 +4707,7 @@ begin
                          nil, // const AResourceStream: TStream;
                          '', // const AMaskResourceName: String;
                          AScale, // const AScale: Single;
+                         TRectF.Empty, // const ASrcRect: TRectF;
                          W, H, // const W, H: single;
                          False, // const AApplyMetadataOrientation: Boolean;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -4634,6 +4725,7 @@ begin
                            nil, // const AResourceStream: TStream;
                            '', // const AMaskResourceName: String;
                            AScale, // const AScale: Single;
+                           TRectF.Empty, // const ASrcRect: TRectF;
                            W, H, // const W, H: single;
                            False, // const AApplyMetadataOrientation: Boolean;
                            AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -4655,7 +4747,9 @@ begin
         // ASrcRect is always calculated using the cover wrap mode.
         LDstRect := TrectF.Create(0, 0, LMaskBitmap.Width, LMaskBitmap.Height);
         LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
-        LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, LBitmap.Width, Lbitmap.Height), ACropCenter);
+        LSrcRect := TrectF.Create(0, 0, LBitmap.Width, LBitmap.Height);
+        if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
+        LSrcRect := ALRectFitInto(LDstRect, LSrcRect, ACropCenter);
       end
       else begin
         case AWrapMode of
@@ -4671,17 +4765,20 @@ begin
           //end;
           TALImageWrapMode.Fit: Begin
             LSrcRect := TrectF.Create(0, 0, LBitmap.Width, LBitmap.Height);
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
             LDstRect := LSrcRect.FitInto(TRectF.Create(0, 0, W * AScale, H * AScale));
             LDstRect.SetLocation(0,0);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
           end;
           TALImageWrapMode.Stretch: Begin
             LSrcRect := TrectF.Create(0, 0, LBitmap.Width, LBitmap.Height);
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
             LDstRect := TRectF.Create(0, 0, W * AScale, H * AScale);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
           end;
           TALImageWrapMode.Place: Begin
             LSrcRect := TrectF.Create(0, 0, LBitmap.Width, LBitmap.Height);
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
             LDstRect := LSrcRect.PlaceInto(TRectF.Create(0, 0, W * AScale, H * AScale));
             LDstRect.SetLocation(0,0);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
@@ -4689,7 +4786,9 @@ begin
           TALImageWrapMode.Cover: Begin
             LDstRect := TRectF.Create(0, 0, W * AScale, H * AScale);
             LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
-            LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, LBitmap.Width, LBitmap.Height), ACropCenter);
+            LSrcRect := TrectF.Create(0, 0, LBitmap.Width, LBitmap.Height);
+            if not ASrcRect.IsEmpty then LSrcRect := TRectF.Intersect(ASrcRect, LSrcRect);
+            LSrcRect := ALRectFitInto(LDstRect, LSrcRect, ACropCenter);
           end;
           Else
             Raise Exception.Create('Error FE241032-F199-4700-9F65-A32E408A71F0');
@@ -4826,6 +4925,7 @@ function ALCreateBitmapFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -4841,6 +4941,7 @@ begin
               AResourceStream, // const AResourceStream: TStream;
               AMaskResourceName, // const AMaskResourceName: String;
               AScale, // const AScale: Single;
+              ASrcRect, // const ASrcRect: TRectF;
               W, H, // const W, H: single;
               AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -4855,6 +4956,7 @@ begin
               AResourceStream, // const AResourceStream: TStream;
               AMaskResourceName, // const AMaskResourceName: String;
               AScale, // const AScale: Single;
+              ASrcRect, // const ASrcRect: TRectF;
               W, H, // const W, H: single;
               AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -4869,6 +4971,7 @@ begin
               AResourceStream, // const AResourceStream: TStream;
               AMaskResourceName, // const AMaskResourceName: String;
               AScale, // const AScale: Single;
+              ASrcRect, // const ASrcRect: TRectF;
               W, H, // const W, H: single;
               AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -4883,6 +4986,7 @@ begin
               AResourceStream, // const AResourceStream: TStream;
               AMaskResourceName, // const AMaskResourceName: String;
               AScale, // const AScale: Single;
+              ASrcRect, // const ASrcRect: TRectF;
               W, H, // const W, H: single;
               AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -4890,7 +4994,7 @@ begin
               ATintColor, // const ATintColor: TalphaColor;
               ABlurRadius, // const ABlurRadius: single;
               AXRadius, // const AXRadius: Single;
-              AYRadius); // const AYRadius: Single);;
+              AYRadius); // const AYRadius: Single);
   {$ENDIF}
 end;
 
@@ -5135,6 +5239,7 @@ function ALCreateDrawableFromResource(
            const AResourceStream: TStream;
            const AMaskResourceName: String;
            const AScale: Single;
+           const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
            const W, H: single;
            const AApplyMetadataOrientation: Boolean;
            const AWrapMode: TALImageWrapMode;
@@ -5151,6 +5256,7 @@ begin
                 AResourceStream, // const AResourceStream: TStream;
                 AMaskResourceName, // const AMaskResourceName: String;
                 AScale, // const AScale: Single;
+                ASrcRect, // const ASrcRect: TRectF;
                 W, H, // const W, H: single;
                 AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                 AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -5165,6 +5271,7 @@ begin
                       AResourceStream, // const AResourceStream: TStream;
                       AMaskResourceName, // const AMaskResourceName: String;
                       AScale, // const AScale: Single;
+                      ASrcRect, // const ASrcRect: TRectF;
                       W, H, // const W, H: single;
                       AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                       AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -5189,6 +5296,7 @@ begin
                    AResourceStream, // const AResourceStream: TStream;
                    AMaskResourceName, // const AMaskResourceName: String;
                    AScale, // const AScale: Single;
+                   ASrcRect, // const ASrcRect: TRectF;
                    W, H, // const W, H: single;
                    AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                    AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -5209,6 +5317,7 @@ begin
                          AResourceStream, // const AResourceStream: TStream;
                          AMaskResourceName, // const AMaskResourceName: String;
                          AScale, // const AScale: Single;
+                         ASrcRect, // const ASrcRect: TRectF;
                          W, H, // const W, H: single;
                          AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -5232,6 +5341,7 @@ begin
               AResourceStream, // const AResourceStream: TStream;
               AMaskResourceName, // const AMaskResourceName: String;
               AScale, // const AScale: Single;
+              ASrcRect, // const ASrcRect: TRectF;
               W, H, // const W, H: single;
               AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -5239,7 +5349,7 @@ begin
               ATintColor, // const ATintColor: TalphaColor;
               ABlurRadius, // const ABlurRadius: single;
               AXRadius, // const AXRadius: Single;
-              AYRadius); // const AYRadius: Single);;
+              AYRadius); // const AYRadius: Single);
   {$ENDIF}
 end;
 
@@ -5275,6 +5385,7 @@ begin
   FFillImageNoRadius := False;
   FFillWrapMode := TALImageWrapMode.Fit;
   FFillCropCenter := TpointF.Create(0.5,0.5);
+  FFillSrcRect := TRectF.Empty;
   FFillBlurRadius := 0;
   FStateLayerOpacity := 0;
   FStateLayerColor := TAlphaColors.Null;
@@ -5458,6 +5569,13 @@ end;
 function TALDrawRectangleHelper.SetFillCropCenter(const AValue: TpointF): PALDrawRectangleHelper;
 begin
   FFillCropCenter := AValue;
+  Result := @Self;
+end;
+
+{******************************************************************************************}
+function TALDrawRectangleHelper.SetFillSrcRect(const AValue: TRectF): PALDrawRectangleHelper;
+begin
+  FFillSrcRect := AValue;
   Result := @Self;
 end;
 
@@ -7283,6 +7401,7 @@ begin
                           LFillResourceStream, // const AResourceStream: TStream;
                           FFillMaskResourceName, // const AMaskResourceName: String;
                           1, // const AScale: Single;
+                          FFillSrcRect, // const ASrcRect: TRectF;
                           LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                           FFillApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                           FFillWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -7304,6 +7423,7 @@ begin
                           LFillResourceStream, // const AResourceStream: TStream;
                           FFillMaskResourceName, // const AMaskResourceName: String;
                           1, // const AScale: Single;
+                          FFillSrcRect, // const ASrcRect: TRectF;
                           LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                           FFillApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                           FFillWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -7587,6 +7707,7 @@ begin
                        LFillResourceStream, // const AResourceStream: TStream;
                        FFillMaskResourceName, // const AMaskResourceName: String;
                        1, // const AScale: Single;
+                       FFillSrcRect, // const ASrcRect: TRectF;
                        LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                        FFillApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                        FFillWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -7608,6 +7729,7 @@ begin
                        LFillResourceStream, // const AResourceStream: TStream;
                        FFillMaskResourceName, // const AMaskResourceName: String;
                        1, // const AScale: Single;
+                       FFillSrcRect, // const ASrcRect: TRectF;
                        LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                        FFillApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                        FFillWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -7937,6 +8059,7 @@ begin
                       LFillResourceStream, // const AResourceStream: TStream;
                       FFillMaskResourceName, // const AMaskResourceName: String;
                       1, // const AScale: Single;
+                      FFillSrcRect, // const ASrcRect: TRectF;
                       LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                       FFillApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                       FFillWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -7958,6 +8081,7 @@ begin
                       LFillResourceStream, // const AResourceStream: TStream;
                       FFillMaskResourceName, // const AMaskResourceName: String;
                       1, // const AScale: Single;
+                      FFillSrcRect, // const ASrcRect: TRectF;
                       LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                       FFillApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                       FFillWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -8089,6 +8213,7 @@ begin
                      LFillResourceStream, // const AResourceStream: TStream;
                      FFillMaskResourceName, // const AMaskResourceName: String;
                      1, // const AScale: Single;
+                     FFillSrcRect, // const ASrcRect: TRectF;
                      LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                      FFillApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                      FFillWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -8110,6 +8235,7 @@ begin
                      LFillResourceStream, // const AResourceStream: TStream;
                      FFillMaskResourceName, // const AMaskResourceName: String;
                      1, // const AScale: Single;
+                     FFillSrcRect, // const ASrcRect: TRectF;
                      LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                      FFillApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                      FFillWrapMode, // const AWrapMode: TALImageWrapMode;

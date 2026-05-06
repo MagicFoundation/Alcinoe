@@ -97,6 +97,9 @@ contains
   Alcinoe.Url in 'Alcinoe.Url.pas',
   Alcinoe.Winapi.Windows in 'Alcinoe.Winapi.Windows.pas',
   Alcinoe.WinApi.WinError in 'Alcinoe.WinApi.WinError.pas',
+  Alcinoe.WinApi.NCrypt in 'Alcinoe.WinApi.NCrypt.pas',
+  Alcinoe.WinApi.BCrypt in 'Alcinoe.WinApi.BCrypt.pas',
+  Alcinoe.WinApi.WinCrypt in 'Alcinoe.WinApi.WinCrypt.pas',
   Alcinoe.XMLDoc in 'Alcinoe.XMLDoc.pas';
 
 end.

@@ -5572,7 +5572,7 @@ begin
   Result := @Self;
 end;
 
-{******************************************************************************************}
+{*******************************************************************************************}
 function TALDrawRectangleHelper.SetFillSrcRect(const AValue: TRectF): PALDrawRectangleHelper;
 begin
   FFillSrcRect := AValue;

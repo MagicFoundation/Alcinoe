@@ -4040,7 +4040,7 @@ begin
 end;
 
 {$IF defined(MSWINDOWS)}
-{**}
+{*}
 var
   ALRunningMutex: THandle = 0;
 

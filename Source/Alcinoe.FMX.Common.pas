@@ -1372,6 +1372,7 @@ var
   ALScreenScale: Single;
 procedure ALInitScreenScale;
 function ALGetScreenScale: Single; Inline;
+procedure ALEnableScreenScaleCorrection(const AReferenceDensity, AReferenceXdpi, AReferenceYdpi: Single; const AThresholdPercent: Single = 7.5);
 function ALGetSafeAreaInsets: TRectF;
 
 var
@@ -1409,6 +1410,8 @@ uses
   Androidapi.Helpers,
   Androidapi.JNI.App,
   Androidapi.JNI.Provider,
+  Androidapi.JNI.Util,
+  Fmx.Platform.Screen.Android,
   Alcinoe.Androidapi.GraphicsContentViewText,
   {$ENDIF}
   {$IF defined(ALMacOS)}
@@ -7063,23 +7066,161 @@ end;
 {********************************}
 function ALGetScreenScale: Single;
 begin
+
+  //
   // The Alcinoe Framework assumes that the screen scale is fixed and uniform,
   // meaning the scale is the same for both width and height, and consistent
-  // across all forms.
+  // across all forms. you can change screenscale via ALSetScreenScale
   //
-  // On windows you can change screenscale via
-  //   FMX.Platform.Win.TWinWindowHandle.SetForcedScaleForForm
-  // --
-  // On Android you can change screenscale via
-  //   FMX.Platform.Screen.Android.SetScreenScaleOverrideHook
-  // --
-  // On iOS you can change screenscale via
-  //   setContentScaleFactor
+
   result := ALScreenScale;
   if Result = 0 then begin
     ALInitScreenScale;
     result := ALScreenScale;
   end;
+
+end;
+
+var
+  _ALScreenScaleReferenceDensity: Single = 0;
+  _ALScreenScaleReferenceXdpi: Single = 0;
+  _ALScreenScaleReferenceYdpi: Single = 0;
+  _ALScreenScaleCorrectionThreshold: Single = 0;
+
+{********************}
+{$IF defined(ANDROID)}
+procedure ALScreenScaleOverrideHook(const UserContext: Pointer; const DensityScale, DensityDPI: Single; var ScreenScale: Single);
+begin
+
+  {$IF defined(DEBUG)}
+  // Enable this to trigger the warning, e.g.:
+  //   "menu_hamburger" is 144×112; expected ~4× (86×86). Requested 86×86 @ scale 4
+  // Useful to audit the effective sizes of all resource images at runtime.
+  //ScreenScale := 4;
+  //Exit;
+  {$ENDIF}
+
+  var LDisplayMetrics := TAndroidHelper.DisplayMetrics;
+  if LDisplayMetrics = nil then exit;
+  {$IF defined(DEBUG)}
+  ALLog('Screen density (DisplayMetrics)', ALFloatToStrW(LDisplayMetrics.density));
+  ALLog('Screen densityDpi (DisplayMetrics)', ALFloatToStrW(LDisplayMetrics.densityDpi));
+  ALLog('Screen xdpi (DisplayMetrics)', ALFloatToStrW(LDisplayMetrics.xdpi));
+  ALLog('Screen ydpi (DisplayMetrics)', ALFloatToStrW(LDisplayMetrics.ydpi));
+  {$ENDIF}
+
+  //
+  // Use the Pixel 7 as the visual reference device.
+  // On the Pixel 7, the app was designed with:
+  //   density = 2.625
+  //   densityDpi  = 420
+  //   xdpi = 415.635986328125
+  //   ydpi  = 417.533996582031
+  //
+
+  // Average xdpi and ydpi for a representative physical DPI
+  var LDeviceXYDpi    := (LDisplayMetrics.xdpi + LDisplayMetrics.ydpi) / 2;
+  var LReferenceXYDpi := (_ALScreenScaleReferenceXdpi + _ALScreenScaleReferenceYdpi) / 2;
+
+  // Guard against bogus values
+  if (LDeviceXYDpi <= 1) or (LDisplayMetrics.density < 1) then
+    Exit;
+
+  // Physical size (in inches) that 1 logical unit (dp) occupies on each device.
+  // On Pixel 7: density=2.625 px per dp, and those px are at xdpi=~416 real dpi
+  //   -> 1 dp = 2.625 / 416 inches ≈ 0.00631"
+  // On Samsung: density=3 px per dp, at xdpi=~403 real dpi
+  //   -> 1 dp = 3 / 403 inches ≈ 0.00745"  (bigger!)
+  var LReferenceDpInches := _ALScreenScaleReferenceDensity / LReferenceXYDpi;
+  var LDeviceDpInches    := LDisplayMetrics.density        / LDeviceXYDpi;
+
+  // Sanity check: some manufacturers report wildly incorrect xdpi/ydpi values.
+  // Cross-check LDeviceDpInches against what densityDpi implies (1/160" per dp baseline).
+  // If densityDpi is consistent, then density / densityDpi should equal 1/160 = 0.00625.
+  // We use the same logic on LDeviceDpInches: it should be close to 1/160" too,
+  // typically within ~30% on real devices. If it's way off, xdpi/ydpi are unreliable
+  // and we recompute using densityDpi instead.
+  if LDisplayMetrics.densityDpi > 0 then begin
+    var LExpectedDpInches := LDisplayMetrics.density / LDisplayMetrics.densityDpi;
+    var LRatio := LDeviceDpInches / LExpectedDpInches;
+    if (LRatio < 0.6) or (LRatio > 1.4) then begin
+      {$IF defined(DEBUG)}
+      ALLog(
+        'Unreliable screen DPI: xdpi/ydpi '+
+        '(' + ALFloatToStrW(LDisplayMetrics.xdpi) + '/' + ALFloatToStrW(LDisplayMetrics.ydpi) + ') '+
+        'disagree with densityDpi '+
+        '(' + ALFloatToStrW(LDisplayMetrics.densityDpi) + ') '+
+        'by ratio ' + ALFloatToStrW(LRatio) + ' - skipping physical-size correction',
+        TALLogType.WARN);
+      {$ENDIF}
+      Exit;
+    end;
+  end;
+
+  // Correction = how much to shrink/grow ScreenScale to match the reference
+  var LCorrection := LReferenceDpInches / LDeviceDpInches;
+  if (LCorrection < 1 - _ALScreenScaleCorrectionThreshold) or (LCorrection > 1 + _ALScreenScaleCorrectionThreshold) then begin
+    ScreenScale := DensityScale * LCorrection;
+    // Snap to the nearest 1/8 step (0.125, 0.25, 0.375, ...).
+    // 8 = 2³, so any integer divided by 8 is an exact IEEE 754 binary fraction.
+    // Example: 2.53 × 8 = 20.24 → 20 → 20/8 = 2.5 (stored bit-perfect as a Single).
+    //
+    // Without snapping, a computed scale like 2.53 is stored as the nearest
+    // representable Single ≈ 2.52999997. When CalcContentBounds accumulates the dp
+    // heights of all children (each dp = pixel_count / ScreenScale), this tiny error
+    // in the divisor (~3e-8) multiplies across every pixel count. Summed over the
+    // hundreds of children in a long scrollable list it reaches ~1e-4 dp — well
+    // above the TEpsilon.Position (≈1e-5) convergence threshold used by
+    // TALCustomScrollBox.DoRealign. Because the bounds never stabilise within that
+    // threshold, DoRealign recurses indefinitely and the UI thread hangs.
+    ScreenScale := Round(ScreenScale * 8) / 8;
+    {$IF defined(DEBUG)}
+    ALLog('Screen scale correction factor', ALFloatToStrW(LCorrection));
+    ALLog('Adjusted screen scale', ALFloatToStrW(ScreenScale));
+    {$ENDIF}
+  end
+  else begin
+    {$IF defined(DEBUG)}
+    ALLog(
+      'Screen correction factor '+
+      '(' + ALFloatToStrW(LCorrection) + ') '+
+      'is within ±' + ALFloatToStrW(_ALScreenScaleCorrectionThreshold * 100) + '% threshold - skipping correction');
+    {$ENDIF}
+  end;
+
+end;
+{$ENDIF}
+
+{**********************************************************************************************************************************************}
+procedure ALEnableScreenScaleCorrection(const AReferenceDensity, AReferenceXdpi, AReferenceYdpi: Single; const AThresholdPercent: Single = 7.5);
+begin
+
+  {$REGION 'ANDROID'}
+  {$IF defined(ANDROID)}
+  _ALScreenScaleReferenceDensity := AReferenceDensity;
+  _ALScreenScaleReferenceXdpi := AReferenceXdpi;
+  _ALScreenScaleReferenceYdpi := AReferenceYdpi;
+  _ALScreenScaleCorrectionThreshold := AThresholdPercent / 100;
+  SetScreenScaleOverrideHook(nil, ALScreenScaleOverrideHook);
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'IOS'}
+  {$IF defined(IOS)}
+  // On iOS you can change screenscale via
+  //   setContentScaleFactor
+  // but this currently does not behave as expected.
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'MSWINDOWS'}
+  {$IF defined(MSWINDOWS)}
+  // On windows you can change screenscale via
+  //   FMX.Platform.Win.TWinWindowHandle.SetForcedScaleForForm
+  // but this currently does not behave as expected.
+  {$ENDIF}
+  {$ENDREGION}
+
 end;
 
 {***********************************}

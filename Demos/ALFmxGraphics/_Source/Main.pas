@@ -949,5 +949,9 @@ initialization
   ReportMemoryleaksOnSHutdown := True;
   {$ENDIF}
   SetMultiByteConversionCodePage(CP_UTF8);
+  {$IF defined(ANDROID)}
+  // Pixel 7 reference values (the device the app was designed on)
+  ALEnableScreenScaleCorrection(2.625{AReferenceDensity}, 415.635986328125{AReferenceXdpi}, 417.533996582031{AReferenceYdpi});
+  {$ENDIF}
 
 end.

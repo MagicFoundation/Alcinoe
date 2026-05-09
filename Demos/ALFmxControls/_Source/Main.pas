@@ -500,6 +500,8 @@ uses
   Androidapi.Helpers,
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNI.App,
+  Androidapi.JNI.Util,
+  FMX.Platform.Screen.Android,
   {$ENDIF}
   fmx.DialogService,
   Alcinoe.FMX.Dialogs,
@@ -507,6 +509,7 @@ uses
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.Stringutils,
   Alcinoe.FMX.LoadingOverlay,
+  Alcinoe.Localization,
   ScrollBoxDemo;
 
 {$R *.fmx}
@@ -1994,5 +1997,9 @@ initialization
   ReportMemoryleaksOnSHutdown := True;
   {$ENDIF}
   SetMultiByteConversionCodePage(CP_UTF8);
+  {$IF defined(ANDROID)}
+  // Pixel 7 reference values (the device the app was designed on)
+  ALEnableScreenScaleCorrection(2.625{AReferenceDensity}, 415.635986328125{AReferenceXdpi}, 417.533996582031{AReferenceYdpi});
+  {$ENDIF}
 
 end.

@@ -1,3 +1,10 @@
+## 05/09/2026
+
+- Added ALEnableScreenScaleCorrection to Alcinoe.FMX.Common, which should be 
+  called once during app startup (for example in the initialization section) 
+  using the reference device's density, xdpi, and ydpi values to normalize 
+  screen scaling across Android devices.
+
 ## 05/06/2026
 
 - Added `ALIsAlreadyRunning(AMutexName: String): Boolean` to `Alcinoe.Common`:

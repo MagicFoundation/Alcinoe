@@ -4946,16 +4946,17 @@ begin
   end;
 end;
 
-{**************************************************************************************************************************}
+{*************************************************************************************************************************}
 function TALDynamicBaseText.GetElementAtPos(const APos: TPointF; const AExpandTouchTarget: Boolean = True): TALTextElement;
 begin
   for var I := Low(fElements) to High(fElements) do begin
     var LRect := fElements[I].Rect;
     if AExpandTouchTarget then
-      LRect.Inflate(TouchTargetExpansion.Left,
-                    TouchTargetExpansion.Top,
-                    TouchTargetExpansion.Right,
-                    TouchTargetExpansion.Bottom);
+      LRect.Inflate(
+        TouchTargetExpansion.Left,
+        TouchTargetExpansion.Top,
+        TouchTargetExpansion.Right,
+        TouchTargetExpansion.Bottom);
     if LRect.Contains(APos) then begin
       Result := fElements[I];
       Exit;

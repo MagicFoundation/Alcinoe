@@ -916,10 +916,10 @@ if "%~4"=="iOSDevice64" (
 if "%Alcinoe_Mac_Connection_Profile_Name%"=="" Set ALDeploy=N
 if "%ALDeploy%"=="Y" (
   echo [36mMSBuild %~3 /p:config=Release /p:Platform=%~4 /t:Build;Deploy[0m
-  echo Clean PAServer scratch-dir
-  ssh %Alcinoe_Mac_Username%@%Alcinoe_Mac_Host% "rm -rf /Users/%Alcinoe_Mac_Username%/PAServer/scratch-dir"
-  IF ERRORLEVEL 1 EXIT /B 1
   if "%~4"=="iOSDevice64" ( 
+    echo Clean PAServer scratch-dir
+    ssh %Alcinoe_Mac_Username%@%Alcinoe_Mac_Host% "rm -rf /Users/%Alcinoe_Mac_Username%/PAServer/scratch-dir"
+    IF ERRORLEVEL 1 EXIT /B 1
     MSBuild "%~1\%~2\%~3" /p:DCC_UseMSBuildExternally=true /p:Config=Release /p:Platform=%~4 /p:Profile=%Alcinoe_Mac_Connection_Profile_Name% /t:Build;Deploy /verbosity:minimal
   )
   if "%~4" neq "iOSDevice64" ( 

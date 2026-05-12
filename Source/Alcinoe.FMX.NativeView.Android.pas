@@ -139,12 +139,16 @@ end;
 {**************************************}
 destructor TALAndroidNativeView.Destroy;
 begin
+  // setOnFocusChangeListener(nil) must come first: both setVisibility(INVISIBLE) and RootChanged(nil)
+  // can cause Android to fire onFocusChange, which calls Control.ResetFocus, which accesses
+  // Control.NativeView — but ALFreeAndNil already zeroed FNativeView, so GetNativeView would
+  // lazily recreate a new TALAndroidNativeView mid-destruction.
+  View.setOnFocusChangeListener(nil);
+  ALFreeAndNil(FFocusChangedListener);
   View.setVisibility(TJView.JavaClass.INVISIBLE);
   TMessageManager.DefaultManager.Unsubscribe(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
   TMessageManager.DefaultManager.Unsubscribe(TAfterCreateFormHandle, AfterCreateHandleListener);
   RootChanged(nil);
-  View.setOnFocusChangeListener(nil);
-  ALFreeAndNil(FFocusChangedListener);
   inherited;
 end;
 

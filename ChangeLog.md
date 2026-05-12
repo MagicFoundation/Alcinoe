@@ -1,3 +1,13 @@
+## 05/12/2026
+
+- Expanded `TALText` and `TALDynamicBaseText` element hit testing to honor 
+  `TouchTargetExpansion` for element mouse/touch events.
+- Improved native-control focus handling:
+  - reset focus before recreating a native view
+  - detached the Android focus-change listener before hiding/removing the 
+    native view during destruction, avoiding native-view recreation during 
+    teardown
+
 ## 05/09/2026
 
 - Added ALEnableScreenScaleCorrection to Alcinoe.FMX.Common, which should be 

@@ -553,6 +553,7 @@ end;
 {********************************************}
 procedure TALNativeControl.RecreateNativeView;
 begin
+  ResetFocus;
   if fNativeView = nil then exit;
   ALFreeAndNil(fNativeView);
   FNativeView := CreateNativeView;

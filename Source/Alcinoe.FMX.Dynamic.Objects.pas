@@ -988,7 +988,7 @@ type
     procedure SetAlign(const Value: TALAlignLayout); override;
     procedure SetAutoSize(const Value: TALAutoSizeMode); override;
     function GetEffectiveMaxSize: TSizeF; Virtual;
-    function GetElementAtPos(const APos: TPointF): TALTextElement;
+    function GetElementAtPos(const APos: TPointF; const AExpandTouchTarget: Boolean = True): TALTextElement;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
@@ -4946,14 +4946,21 @@ begin
   end;
 end;
 
-{*******************************************************************************}
-function TALDynamicBaseText.GetElementAtPos(const APos: TPointF): TALTextElement;
+{**************************************************************************************************************************}
+function TALDynamicBaseText.GetElementAtPos(const APos: TPointF; const AExpandTouchTarget: Boolean = True): TALTextElement;
 begin
-  for var I := Low(fElements) to High(fElements) do
-    if fElements[i].Rect.Contains(APos) then begin
-      Result := fElements[i];
+  for var I := Low(fElements) to High(fElements) do begin
+    var LRect := fElements[I].Rect;
+    if AExpandTouchTarget then
+      LRect.Inflate(TouchTargetExpansion.Left,
+                    TouchTargetExpansion.Top,
+                    TouchTargetExpansion.Right,
+                    TouchTargetExpansion.Bottom);
+    if LRect.Contains(APos) then begin
+      Result := fElements[I];
       Exit;
     end;
+  end;
   Result.Id := '';
   Result.Rect := TrectF.Empty;
 end;

@@ -106,6 +106,9 @@ begin
   if ALSameTextA(ACtype, '_ImageInfo') then Result := 'ImageInfo'
   else if ALSameTextA(ACtype, 'float') then Result := 'Single'
   else if ALSameTextA(ACtype, 'char') then Result := 'AnsiChar'
+  else if ALSameTextA(ACtype, 'char*') then Result := 'PAnsiChar'
+  else if ALSameTextA(ACtype, 'wchar_t') then Result := 'WideChar'
+  else if ALSameTextA(ACtype, 'wchar_t*') then Result := 'PWideChar'
   else if ALSameTextA(ACtype, 'unsigned') then Result := 'Cardinal'
   else if ALSameTextA(ACtype, 'unsigned char') then Result := 'Byte'
   else if ALSameTextA(ACtype, 'int') then Result := 'Integer'
@@ -607,6 +610,7 @@ begin
   LCSrc := ALStringReplaceA(LCSrc, 'ResizeMemoryHandler *resize_memory_handler','ResizeMemoryHandler resize_memory_handler');
   LCSrc := ALStringReplaceA(LCSrc, 'DestroyMemoryHandler *destroy_memory_handler','DestroyMemoryHandler destroy_memory_handler');
   LCSrc := ALStringReplaceA(LCSrc, 'WandExport','MagickExport');
+  LCSrc := ALStringReplaceA(LCSrc, '#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION','#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)');
 
   While ALPosA(' * ',LCSrc) > 0 do
     LCSrc := ALStringReplaceA(LCSrc, ' * ',' *');
@@ -633,6 +637,7 @@ begin
   LCSrc := RemoveSection(LCSrc, '!defined(MAGICKCORE_MODULES_SUPPORT)');
   LCSrc := RemoveSection(LCSrc, '!defined(MAGICKCORE_OPENCL_SUPPORT)');
   LCSrc := RemoveSection(LCSrc, '!defined(MAGICKCORE_LQR_DELEGATE)');
+  LCSrc := RemoveSection(LCSrc, 'defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)');
 
   P1 := ALPosIgnoreCaseA('MagickExport ', LCSrc);
   While P1 > 0 do begin
@@ -1025,12 +1030,14 @@ begin
             CCMaxMetrics = 16; // #define CCMaxMetrics  16
 
           type
+            mode_t = Cardinal;
             time_t = Int64;
             TUnregisterModule = procedure; cdecl;
             TRegisterModule = function: NativeUInt; cdecl;
 
             %s
 
+            PStat = Pointer;
             PImage = ^Image;
             PPImage = ^PImage;
             PImageInfo = ^ImageInfo;

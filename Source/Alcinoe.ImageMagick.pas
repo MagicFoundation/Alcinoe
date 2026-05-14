@@ -87,6 +87,7 @@ const
   CCMaxMetrics = 16; // #define CCMaxMetrics  16
 
 type
+  mode_t = Cardinal;
   time_t = Int64;
   TUnregisterModule = procedure; cdecl;
   TRegisterModule = function: NativeUInt; cdecl;
@@ -1446,6 +1447,7 @@ Type
     AllEvents = $7fffffff);
   PLogEventType = ^LogEventType;
 
+  PStat = Pointer;
   PImage = ^Image;
   PPImage = ^PImage;
   PImageInfo = ^ImageInfo;
@@ -3311,15 +3313,15 @@ Type
 
     {$REGION 'MagickCore - nt-base.c - https://imagemagick.org/api/nt-base.html'}
     NTAccessWide: function(const path: PAnsiChar; mode: Integer): Integer; cdecl;
-    NTCreateWidePath: function(const utf8: PAnsiChar): wchar_t*; cdecl;
+    NTCreateWidePath: function(const utf8: PAnsiChar): PWideChar; cdecl;
     NTIsSymlinkWide: function(const path: PAnsiChar): MagickBooleanType; cdecl;
     NTLongPathsEnabled: function(): MagickBooleanType; cdecl;
-    NTOpenFileWide: function(const path: char*; const mode: char*): PFILE; cdecl;
+    NTOpenFileWide: function(const path: PAnsiChar; const mode: PAnsiChar): PFILE; cdecl;
     NTOpenPipeWide: function(const command: PAnsiChar; const &type: PAnsiChar): PFILE; cdecl;
-    NTOpenWide: function(const path: char*; flags: Integer; mode: mode_t): Integer; cdecl;
+    NTOpenWide: function(const path: PAnsiChar; flags: Integer; mode: mode_t): Integer; cdecl;
     NTRealPathWide: function(const path: PAnsiChar): PAnsiChar; cdecl;
     NTRemoveWide: function(const path: PAnsiChar): Integer; cdecl;
-    NTRenameWide: function(const source: char*; const destination: char*): Integer; cdecl;
+    NTRenameWide: function(const source: PAnsiChar; const destination: PAnsiChar): Integer; cdecl;
     NTSetFileTimestamp: function(const path: PAnsiChar; attributes: PStat): Integer; cdecl;
     NTStatWide: function(const path: PAnsiChar; attributes: PStat): Integer; cdecl;
     {$ENDREGION}
@@ -3543,7 +3545,6 @@ Type
     ListMagickResourceInfo: function(&file: PFILE; exception: PExceptionInfo): MagickBooleanType; cdecl;
     RelinquishMagickResource: procedure(const &type: ResourceType; const size: MagickSizeType); cdecl;
     RelinquishUniqueFileResource: function(const path: PAnsiChar): MagickBooleanType; cdecl;
-    ResetMagickResourceCounters: procedure(); cdecl;
     SetMagickResourceLimit: function(const &type: ResourceType; const limit: MagickSizeType): MagickBooleanType; cdecl;
     {$ENDREGION}
 
@@ -5292,15 +5293,15 @@ procedure UnityAddKernelInfo(kernel: PKernelInfo; const scale: double); inline;
 
 {$REGION ' MagickCore - nt-base.c - https://imagemagick.org/api/nt-base.html'}
 function NTAccessWide(const path: PAnsiChar; mode: Integer): Integer; inline;
-function NTCreateWidePath(const utf8: PAnsiChar): wchar_t*; inline;
+function NTCreateWidePath(const utf8: PAnsiChar): PWideChar; inline;
 function NTIsSymlinkWide(const path: PAnsiChar): MagickBooleanType; inline;
 function NTLongPathsEnabled(): MagickBooleanType; inline;
-function NTOpenFileWide(const path: char*; const mode: char*): PFILE; inline;
+function NTOpenFileWide(const path: PAnsiChar; const mode: PAnsiChar): PFILE; inline;
 function NTOpenPipeWide(const command: PAnsiChar; const &type: PAnsiChar): PFILE; inline;
-function NTOpenWide(const path: char*; flags: Integer; mode: mode_t): Integer; inline;
+function NTOpenWide(const path: PAnsiChar; flags: Integer; mode: mode_t): Integer; inline;
 function NTRealPathWide(const path: PAnsiChar): PAnsiChar; inline;
 function NTRemoveWide(const path: PAnsiChar): Integer; inline;
-function NTRenameWide(const source: char*; const destination: char*): Integer; inline;
+function NTRenameWide(const source: PAnsiChar; const destination: PAnsiChar): Integer; inline;
 function NTSetFileTimestamp(const path: PAnsiChar; attributes: PStat): Integer; inline;
 function NTStatWide(const path: PAnsiChar; attributes: PStat): Integer; inline;
 {$ENDREGION}
@@ -5524,7 +5525,6 @@ function GetMagickResourceLimit(const &type: ResourceType): MagickSizeType; inli
 function ListMagickResourceInfo(&file: PFILE; exception: PExceptionInfo): MagickBooleanType; inline;
 procedure RelinquishMagickResource(const &type: ResourceType; const size: MagickSizeType); inline;
 function RelinquishUniqueFileResource(const path: PAnsiChar): MagickBooleanType; inline;
-procedure ResetMagickResourceCounters(); inline;
 function SetMagickResourceLimit(const &type: ResourceType; const limit: MagickSizeType): MagickBooleanType; inline;
 {$ENDREGION}
 
@@ -7560,7 +7560,6 @@ begin
   ListMagickResourceInfo := GetProcAddress(FMagickCorelib,'ListMagickResourceInfo');
   RelinquishMagickResource := GetProcAddress(FMagickCorelib,'RelinquishMagickResource');
   RelinquishUniqueFileResource := GetProcAddress(FMagickCorelib,'RelinquishUniqueFileResource');
-  ResetMagickResourceCounters := GetProcAddress(FMagickCorelib,'ResetMagickResourceCounters');
   SetMagickResourceLimit := GetProcAddress(FMagickCorelib,'SetMagickResourceLimit');
   {$ENDREGION}
 
@@ -12319,8 +12318,8 @@ begin
   Result := ALImageMagickLibrary.NTAccessWide(path, mode);
 end;
 
-{*********************************************************}
-function NTCreateWidePath(const utf8: PAnsiChar): wchar_t*;
+{**********************************************************}
+function NTCreateWidePath(const utf8: PAnsiChar): PWideChar;
 begin
   Result := ALImageMagickLibrary.NTCreateWidePath(utf8);
 end;
@@ -12337,8 +12336,8 @@ begin
   Result := ALImageMagickLibrary.NTLongPathsEnabled();
 end;
 
-{*******************************************************************}
-function NTOpenFileWide(const path: char*; const mode: char*): PFILE;
+{***************************************************************************}
+function NTOpenFileWide(const path: PAnsiChar; const mode: PAnsiChar): PFILE;
 begin
   Result := ALImageMagickLibrary.NTOpenFileWide(path, mode);
 end;
@@ -12349,8 +12348,8 @@ begin
   Result := ALImageMagickLibrary.NTOpenPipeWide(command, &type);
 end;
 
-{****************************************************************************}
-function NTOpenWide(const path: char*; flags: Integer; mode: mode_t): Integer;
+{********************************************************************************}
+function NTOpenWide(const path: PAnsiChar; flags: Integer; mode: mode_t): Integer;
 begin
   Result := ALImageMagickLibrary.NTOpenWide(path, flags, mode);
 end;
@@ -12367,8 +12366,8 @@ begin
   Result := ALImageMagickLibrary.NTRemoveWide(path);
 end;
 
-{****************************************************************************}
-function NTRenameWide(const source: char*; const destination: char*): Integer;
+{************************************************************************************}
+function NTRenameWide(const source: PAnsiChar; const destination: PAnsiChar): Integer;
 begin
   Result := ALImageMagickLibrary.NTRenameWide(source, destination);
 end;
@@ -13457,12 +13456,6 @@ end;
 function RelinquishUniqueFileResource(const path: PAnsiChar): MagickBooleanType;
 begin
   Result := ALImageMagickLibrary.RelinquishUniqueFileResource(path);
-end;
-
-{**************************************}
-procedure ResetMagickResourceCounters();
-begin
-  ALImageMagickLibrary.ResetMagickResourceCounters();
 end;
 
 {*********************************************************************************************************}

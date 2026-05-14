@@ -730,6 +730,8 @@ begin
             LDelphiParam := 'const ';
             LCParamLst.Delete(0);
           end;
+          if AlsameTextA(AlTrim(LCParamLst[0]), 'struct') then
+            LCParamLst.Delete(0);
           if (LCParamLst.Count = 1) and (LCParamLst[0] = '...') then begin
             // http://rvelthuis.de/articles/articles-convert.html#varargs
             if I <> LCParamsLst.Count - 1 then
@@ -945,7 +947,7 @@ begin
           // https://www.imagemagick.org/script/magick-wand.php
           // https://www.imagemagick.org/MagickWand/
           //
-          // This wrapper was automagically generated from ImageMagick version 7.1.2-8
+          // This wrapper was automagically generated from ImageMagick version 7.1.2-22
           // using Alcinoe\Tools\ImageMagickWrapperGenerator\.
           // DLLs: /Libraries/dll/ImageMagick
           //

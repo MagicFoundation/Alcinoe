@@ -230,6 +230,7 @@ function AlGetImageSignature(const AStream: TStream; const ASignatureLength: int
 function AlGetImageSignature(const AFilename: string; const ASignatureLength: integer = 12): Tbytes; overload;
 function AlDetectImageExtension(const AStream: TStream): String; overload;
 function AlDetectImageExtension(const AFilename: string): String; overload;
+function AlDetectImageExtension(const AStream: TStream; const AUri: String): String; overload;
 function ALModulateColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
 function ALBlendColor(const ABaseColor, AOverlayColor: TAlphaColor): TAlphaColor; overload;
 function ALBlendColor(const ABaseColor, AOverlayColor: TAlphaColor; const AOverlayOpacity: Single): TAlphaColor; overload;
@@ -772,6 +773,7 @@ uses
   {$ENDIF}
   FMX.Effects,
   System.UIConsts,
+  Alcinoe.Mime.Types,
   Alcinoe.Url,
   Alcinoe.StringUtils,
   Alcinoe.FMX.Types3D;
@@ -2395,10 +2397,37 @@ function AlDetectImageExtension(const AFilename: string): String;
 begin
   var LFileStream := TFileStream.Create(AFilename, fmOpenRead);
   try
-    result := AlDetectImageExtension(LFileStream);
+    result := AlDetectImageExtension(LFileStream, AFilename);
   finally
     ALFreeAndNil(LFileStream);
   end;
+end;
+
+{**********************************************************************************}
+function AlDetectImageExtension(const AStream: TStream; const AUri: String): String;
+begin
+
+  //
+  // On Android, URIs look like:
+  //   content://media/picker/0/com.android.providers.media.photopicker/media/1000059599
+  //
+  // On iOS, URIs usually look like:
+  //   /private/var/mobile/Containers/Data/Application/E797B4C8-4358-4915-87BC-B33C14A1DB64/tmp/3445f74e-674f-f111-92d7-55fe4fc437cf.jpeg
+  //
+
+  Result := AlDetectImageExtension(AStream);
+  if (Result = '') and (AUri <> '') then begin
+    Result := ALExtractFileExt(AUri);
+    if (Result <> '') and (ALPosIgnoreCaseW('image/', ALGetDefaultMimeTypeFromExt(Result, false{ARaiseIfNotFound})) <> 1) then Result := '';
+    {$IF defined(ANDROID)}
+    if Result = '' then begin
+      var LMimeType := JStringToString(TAndroidHelper.Context.getContentResolver.getType(StrToJURI(AUri)));
+      if (LMimeType <> '') and (ALPosIgnoreCaseW('image/', LMimeType) = 1) then Result := ALGetDefaultFileExtFromMimeType(LMimeType);
+    end;
+    {$ENDIF}
+  end;
+  if (Result <> '') and (Result[low(Result)] = '.') then delete(Result, 1, 1);
+
 end;
 
 {****************************************************************************************}

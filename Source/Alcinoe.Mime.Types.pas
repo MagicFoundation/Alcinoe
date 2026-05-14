@@ -83,6 +83,10 @@ begin
 
   // Build with IANAMediaTypesExtractor
   // Source: https://github.com/apache/httpd/blob/trunk/docs/conf/mime.types
+  //-
+  // Additional mappings manually added when missing from the Apache mime.types list.
+  AlMimeTypeByExtA.Add('.dng','image/x-adobe-dng');
+  //-
   AlMimeTypeByExtA.Add('.123','application/vnd.lotus-1-2-3');
   AlMimeTypeByExtA.Add('.3dml','text/vnd.in3d.3dml');
   AlMimeTypeByExtA.Add('.3ds','image/x-3ds');
@@ -1086,6 +1090,10 @@ begin
 
   // Build with IANAMediaTypesExtractor
   // Source: https://github.com/apache/httpd/blob/trunk/docs/conf/mime.types
+  //-
+  // Additional mappings manually added when missing from the Apache mime.types list.
+  AlExtbyMimeTypeA.Add('image/x-adobe-dng', '.dng');
+  //-
   AlExtbyMimeTypeA.Add('application/andrew-inset','.ez');
   AlExtbyMimeTypeA.Add('application/applixware','.aw');
   AlExtbyMimeTypeA.Add('application/atom+xml','.atom');

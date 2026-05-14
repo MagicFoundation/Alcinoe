@@ -1,3 +1,9 @@
+## 05/14/2026
+
+- Updated ImageMagick to version 7.1.2-22
+- Added `AlDetectImageExtension(const AStream: TStream; const AUri: String): String`
+- Added `image/x-adobe-dng` MIME type support
+
 ## 05/12/2026
 
 - Expanded `TALText` and `TALDynamicBaseText` element hit testing to honor 

@@ -19,8 +19,8 @@ installation of the C++ headers** (the
 ## 2) Copy the DLL distributions
 
 Copy the content of:
-- c:\Program Files (x86)\ImageMagick-7.1.2-Q16-HDRI\ → `Alcinoe/References/ImageMagick/win32`
-- c:\Program Files\ImageMagick-7.1.2-Q16-HDRI\ → `Alcinoe/References/ImageMagick/win64`
+- c:\Program Files (x86)\ImageMagick-7.1.2-Q16-HDRI\ → `Alcinoe/Libraries/dll/ImageMagick/win32`
+- c:\Program Files\ImageMagick-7.1.2-Q16-HDRI\ → `Alcinoe/Libraries/dll/ImageMagick/win64`
 
 ---
 
@@ -45,8 +45,8 @@ magick.exe
 
 ## 5) Regenerate the Delphi wrapper
 
-Clone:  
-https://github.com/ImageMagick/ImageMagick.git
+Copy the source code from:  
+https://github.com/ImageMagick/ImageMagick/releases
 
 Then run:  
 Alcinoe/Tools/ImageMagickWrapperGenerator/ImageMagickWrapperGenerator.exe

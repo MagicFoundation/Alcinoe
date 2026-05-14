@@ -5,7 +5,7 @@
   You may not use this file except in compliance with the License.
   obtain a copy of the License at
   
-    https://imagemagick.org/script/license.php
+    https://imagemagick.org/license/
   
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,19 +30,19 @@ extern "C" {
 #define MagickLibVersion  0x712
 #define MagickLibVersionText  "7.1.2"
 #define MagickLibVersionNumber  10,2,0
-#define MagickLibAddendum  "-8"
+#define MagickLibAddendum  "-22"
 #define MagickLibInterface  10
 #define MagickLibMinInterface  10
 #define MagickPlatform  "x64"
 #define MagickppLibVersionText  "7.1.2"
 #define MagickppLibVersionNumber  5:0:0
-#define MagickppLibAddendum  "-8"
+#define MagickppLibAddendum  "-22"
 #define MagickppLibInterface  5
 #define MagickppLibMinInterface  5
-#define MagickGitRevision  "a3b13d1:20251026"
-#define MagickReleaseDate  "2025-10-26"
+#define MagickGitRevision  "ccf56fb:20260512"
+#define MagickReleaseDate  "2026-05-12"
 #define MagickAuthoritativeLicense  \
-  "https://imagemagick.org/script/license.php"
+  "https://imagemagick.org/license/"
 #define MagickAuthoritativeURL  "https://imagemagick.org"
 #define MagickHomeURL  "file://unavailable/index.html"
 #if (MAGICKCORE_QUANTUM_DEPTH == 8)

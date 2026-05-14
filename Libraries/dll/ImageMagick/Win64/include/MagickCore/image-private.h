@@ -5,7 +5,7 @@
   You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
 
-    https://imagemagick.org/script/license.php
+    https://imagemagick.org/license/
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -46,14 +46,10 @@ extern "C" {
 #define MagickPHI    1.61803398874989484820458683436563811772030917980576
 #define MagickPI2    1.57079632679489661923132169163975144209858469968755
 #define MagickPI     3.1415926535897932384626433832795028841971693993751058209749445923078164062
-#define MAGICK_PTRDIFF_MAX  (PTRDIFF_MAX)
-#define MAGICK_PTRDIFF_MIN  (-PTRDIFF_MAX-1)
 #define MagickSQ1_2  0.70710678118654752440084436210484903928483593768847
 #define MagickSQ2    1.41421356237309504880168872420969807856967187537695
 #define MagickSQ2PI  2.50662827463100024161235523934010416269302368164062
-#define MAGICK_SIZE_MAX  (SIZE_MAX)
-#define MAGICK_SSIZE_MAX  (SSIZE_MAX)
-#define MAGICK_SSIZE_MIN  (-SSIZE_MAX-1)
+#define MAGICK_UCHAR_MAX  (UCHAR_MAX)
 #define MAGICK_UINT_MAX  (UINT_MAX)
 #define MAGICK_ULONG_MAX  (ULONG_MAX)
 #define MAGICK_USHORT_MAX  (USHRT_MAX)
@@ -68,6 +64,30 @@ extern "C" {
 #define TransparentColorRGBA  (Quantum) 0,(Quantum) 0,(Quantum) 0,TransparentAlpha
 #define UndefinedCompressionQuality  0UL
 #define UndefinedTicksPerSecond  100L
+
+static inline int CastDoubleToInt(const double x)
+{
+  double
+    value;
+
+  if (IsNaN(x) != 0)
+    {
+      errno=ERANGE;
+      return(0);
+    }
+  value=(x < 0.0) ? ceil(x) : floor(x);
+  if (value < 0.0)
+    {
+      errno=ERANGE;
+      return(0);
+    }
+  if (value >= ((double) MAGICK_INT_MAX))
+    {
+      errno=ERANGE;
+      return(MAGICK_INT_MAX);
+    }
+  return((int) value);
+}
 
 static inline ptrdiff_t CastDoubleToPtrdiffT(const double x)
 {
@@ -85,7 +105,7 @@ static inline ptrdiff_t CastDoubleToPtrdiffT(const double x)
       errno=ERANGE;
       return(MAGICK_PTRDIFF_MIN);
     }
-  if (value > ((double) MAGICK_PTRDIFF_MAX))
+  if (value >= ((double) MAGICK_PTRDIFF_MAX))
     {
       errno=ERANGE;
       return(MAGICK_PTRDIFF_MAX);
@@ -109,7 +129,7 @@ static inline QuantumAny CastDoubleToQuantumAny(const double x)
       errno=ERANGE;
       return(0);
     }
-  if (value > ((double) ((QuantumAny) ~0)))
+  if (value >= ((double) ((QuantumAny) ~0)))
     {
       errno=ERANGE;
       return((QuantumAny) ~0);
@@ -133,7 +153,7 @@ static inline size_t CastDoubleToSizeT(const double x)
       errno=ERANGE;
       return(0);
     }
-  if (value > ((double) MAGICK_SIZE_MAX))
+  if (value >= ((double) MAGICK_SIZE_MAX))
     {
       errno=ERANGE;
       return(MAGICK_SIZE_MAX);
@@ -157,12 +177,36 @@ static inline ssize_t CastDoubleToSsizeT(const double x)
       errno=ERANGE;
       return(MAGICK_SSIZE_MIN);
     }
-  if (value > ((double) MAGICK_SSIZE_MAX))
+  if (value >= ((double) MAGICK_SSIZE_MAX))
     {
       errno=ERANGE;
       return(MAGICK_SSIZE_MAX);
     }
   return((ssize_t) value);
+}
+
+static inline unsigned char CastDoubleToUChar(const double x)
+{
+  double
+    value;
+
+  if (IsNaN(x) != 0)
+    {
+      errno=ERANGE;
+      return(0);
+    }
+  value=(x < 0.0) ? ceil(x) : floor(x);
+  if (value < 0.0)
+    {
+      errno=ERANGE;
+      return(0);
+    }
+  if (value >= ((double) MAGICK_UCHAR_MAX))
+    {
+      errno=ERANGE;
+      return(MAGICK_UCHAR_MAX);
+    }
+  return((unsigned char) value);
 }
 
 static inline unsigned int CastDoubleToUInt(const double x)
@@ -181,7 +225,7 @@ static inline unsigned int CastDoubleToUInt(const double x)
       errno=ERANGE;
       return(0);
     }
-  if (value > ((double) MAGICK_UINT_MAX))
+  if (value >= ((double) MAGICK_UINT_MAX))
     {
       errno=ERANGE;
       return(MAGICK_UINT_MAX);
@@ -205,7 +249,7 @@ static inline unsigned short CastDoubleToUShort(const double x)
       errno=ERANGE;
       return(0);
     }
-  if (value > ((double) MAGICK_USHORT_MAX))
+  if (value >= ((double) MAGICK_USHORT_MAX))
     {
       errno=ERANGE;
       return(MAGICK_USHORT_MAX);

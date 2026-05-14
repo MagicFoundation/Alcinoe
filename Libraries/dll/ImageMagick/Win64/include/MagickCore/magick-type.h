@@ -5,7 +5,7 @@
   You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
 
-    https://imagemagick.org/script/license.php
+    https://imagemagick.org/license/
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -129,17 +129,20 @@ typedef long long MagickOffsetType;
 typedef unsigned long long MagickSizeType;
 #define MagickOffsetFormat  "lld"
 #define MagickSizeFormat  "llu"
+#define MagickOffsetMax  LLONG_MAX
 #else
 typedef ssize_t MagickOffsetType;
 typedef size_t MagickSizeType;
 #define MagickOffsetFormat  "ld"
 #define MagickSizeFormat  "lu"
+#define MagickOffsetMax  SSIZE_MAX
 #endif
 #else
 typedef __int64 MagickOffsetType;
 typedef unsigned __int64 MagickSizeType;
 #define MagickOffsetFormat  "I64i"
 #define MagickSizeFormat  "I64u"
+#define MagickOffsetMax  _I64_MAX
 #endif
 
 #if defined(MAGICKCORE_HAVE_UINTPTR_T) || defined(uintptr_t)

@@ -140,7 +140,7 @@
   <!-- Indirect reads are not permitted. -->
   <!-- <policy domain="path" rights="none" pattern="@*"/> -->
   <!-- These image types are security risks on read, but write is fine -->
-  <!-- <policy domain="module" rights="write" pattern="{MSL,MVG,PS,SVG,URL,XPS}"/> -->
+  <!-- <policy domain="module" rights="write" pattern="{MSL,MVG,PS,SVG,TXT,URL,XPS}"/> -->
   <!-- This policy sets the number of times to replace content of certain
        memory buffers and temporary files before they are freed or deleted. -->
   <!-- <policy domain="system" name="shred" value="1"/> -->
@@ -150,4 +150,6 @@
   <!-- Set the maximum amount of memory in bytes that are permitted for
        allocation requests. -->
   <!-- <policy domain="system" name="max-memory-request" value="256MiB"/> -->
+  <!-- If the basename of path is a symbolic link, the open fails -->
+  <!-- <policy domain="system" name="symlink" rights="none" pattern="follow"/> -->
 </policymap>

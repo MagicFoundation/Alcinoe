@@ -6,8 +6,8 @@ Download the Windows DLL builds from:
 https://imagemagick.org/script/download.php
 
 Current version used by Alcinoe:
-- ImageMagick-7.1.2-8-Q16-HDRI-x64-dll.exe
-- ImageMagick-7.1.2-8-Q16-HDRI-x86-dll.exe
+- ImageMagick-7.1.2-22-Q16-HDRI-x64-dll.exe
+- ImageMagick-7.1.2-22-Q16-HDRI-x86-dll.exe
 
 Install both (ideally inside a clean VM).  
 During installation, make sure to **enable 
@@ -18,9 +18,9 @@ installation of the C++ headers** (the
 
 ## 2) Copy the DLL distributions
 
-Copy the extracted content of:
-- ImageMagick-7.1.2-8-Q16-HDRI-x86-dll.exe → `Alcinoe/References/ImageMagick/win32`
-- ImageMagick-7.1.1-8-Q16-HDRI-x64-dll.exe → `Alcinoe/References/ImageMagick/win64`
+Copy the content of:
+- c:\Program Files (x86)\ImageMagick-7.1.2-Q16-HDRI\ → `Alcinoe/References/ImageMagick/win32`
+- c:\Program Files\ImageMagick-7.1.2-Q16-HDRI\ → `Alcinoe/References/ImageMagick/win64`
 
 ---
 

@@ -5,7 +5,7 @@
   You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
 
-    https://imagemagick.org/script/license.php
+    https://imagemagick.org/license/
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -233,11 +233,14 @@ extern int vsnprintf(char *,size_t,const char *,va_list);
 # include "MagickCore/magick-type.h"
 #endif
 
-#if defined(S_IRUSR) && defined(S_IWUSR)
-# define S_MODE (S_IRUSR | S_IWUSR)
-#elif defined (MAGICKCORE_WINDOWS_SUPPORT)
+#if defined (MAGICKCORE_WINDOWS_SUPPORT) || defined(__MINGW32__)
+# define P_MODE (_S_IREAD | _S_IWRITE)
 # define S_MODE (_S_IREAD | _S_IWRITE)
+#elif defined(MAGICKCORE_POSIX_SUPPORT)
+# define P_MODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)
+# define S_MODE (S_IRUSR | S_IWUSR)
 #else
+# define P_MODE  0666
 # define S_MODE  0600
 #endif
 

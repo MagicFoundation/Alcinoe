@@ -5,7 +5,7 @@
   You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
 
-    https://imagemagick.org/script/license.php
+    https://imagemagick.org/license/
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -62,7 +62,7 @@ static inline int GetMagickNumberThreads(const Image *source,
   /*
     Determine number of threads based on workload.
   */
-  number_threads=(chunk <= workload_factor) ? 1UL : 
+  number_threads=(chunk <= workload_factor) ? 1UL :
     (chunk >= (workload_factor << 6)) ? max_threads :
     1UL+(chunk-workload_factor)*(max_threads-1L)/(((workload_factor << 6))-1L);
   /*
@@ -83,6 +83,30 @@ static inline MagickThreadType GetMagickThreadId(void)
 #else
   return(getpid());
 #endif
+}
+
+static inline void GetMagickThreadFilename(const char *filename,
+  char *thread_filename)
+{
+  MagickThreadType
+    id;
+
+  char
+    thread_id[2*sizeof(id)+1];
+
+  ssize_t
+    i;
+
+  unsigned char
+    bytes[sizeof(id)];
+
+  id=GetMagickThreadId();
+  (void) memcpy(bytes,&id,sizeof(id));
+  for (i=0; i < (ssize_t) sizeof(bytes); i++)
+    (void) FormatLocaleString(thread_id+2*i,MagickPathExtent,"%02x",bytes[i]);
+  thread_id[sizeof(thread_id)-1]='\0';
+  (void) FormatLocaleString(thread_filename,MagickPathExtent,"%s|%s",thread_id,
+    filename);
 }
 
 static inline size_t GetMagickThreadSignature(void)
@@ -157,11 +181,15 @@ static inline void SetOpenMPMaximumThreads(const int magick_unused(threads))
 }
 
 #if defined(MAGICKCORE_OPENMP_SUPPORT)
-static inline void SetOpenMPNested(const int value)
+static inline void SetOpenMPMaxActiveLevels(const int value)
 {
+#if defined(MAGICKCORE_WINDOWS_SUPPORT)
   omp_set_nested(value);
 #else
-static inline void SetOpenMPNested(const int magick_unused(value))
+  omp_set_max_active_levels(value ? 2 : 1);
+#endif
+#else
+static inline void SetOpenMPMaxActiveLevels(const int magick_unused(value))
 {
   magick_unreferenced(value);
 #endif

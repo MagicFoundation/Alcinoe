@@ -5,7 +5,7 @@
   You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
 
-    https://imagemagick.org/script/license.php
+    https://imagemagick.org/license/
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -72,7 +72,9 @@ extern "C" {
 
 #if defined(_MSC_VER)
 # if !defined(MAGICKCORE_MSC_VER)
-#   if (_MSC_VER >= 1930)
+#   if (_MSC_VER >= 1950)
+#     define MAGICKCORE_MSC_VER 2026
+#   elif (_MSC_VER >= 1930)
 #     define MAGICKCORE_MSC_VER 2022
 #   elif (_MSC_VER >= 1920)
 #     define MAGICKCORE_MSC_VER 2019

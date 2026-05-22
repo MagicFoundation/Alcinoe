@@ -159,8 +159,8 @@ type
     class function HasInstance: Boolean; inline;
   public
     type
-      // -------------------------
-      // TGeoLocationUpdateMessage
+      // ----------------------------
+      // TNotificationReceivedMessage
       TNotificationReceivedMessage = class(TMessage)
       private
         FPayload: TALStringListW;
@@ -212,6 +212,15 @@ type
         constructor Create(const AGranted: Boolean);
         property Granted: Boolean read FGranted;
       end;
+      // ---------------------------------
+      // TGetDeliveredNotificationsMessage
+      TGetDeliveredNotificationsMessage = class(TMessage)
+      private
+        FNotifications: TArray<TALNotification>;
+      public
+        constructor Create(const ANotifications: TArray<TALNotification>);
+        property Notifications: TArray<TALNotification> read FNotifications;
+      end;
       // -------------
       // TPushProvider
       TPushProvider = (FCM, APNS, HMS);
@@ -224,12 +233,16 @@ type
     {$IF defined(ANDROID)}
     function GenerateUniqueID: integer;
     {$ENDIF}
+    {$IF defined(IOS)}
+    class procedure GetDeliveredNotificationsCompletionHandler(notifications: NSArray);
+    {$ENDIF}
   protected
     procedure HandleGetToken(const AToken: String; const AErrorMessage: String); virtual;
     procedure HandleDeleteToken(const AIsSuccessful: Boolean; const AErrorMessage: String); virtual;
     procedure HandleTokenRefresh(const AToken: String); virtual;
     procedure HandleMessageReceived(const APayload: TALStringListW); virtual;
     procedure HandlePermissionResult(const AGranted: Boolean); virtual;
+    procedure HandleGetDeliveredNotifications(const ANotifications: TArray<TALNotification>); virtual;
   public
     class var TmpPath: String;
   public
@@ -242,6 +255,7 @@ type
     procedure ShowNotification(const ANotification: TALNotification); virtual;
     procedure GetToken; virtual;
     procedure DeleteToken; virtual;
+    procedure GetDeliveredNotifications;
     procedure removeAllDeliveredNotifications; virtual;
     property PushProvider: TPushProvider read FPushProvider;
     /// <summary>
@@ -283,6 +297,7 @@ uses
   {$IF defined(IOS)}
   Macapi.Helpers,
   Macapi.ObjectiveC,
+  Macapi.ObjCRuntime,
   iOSapi.UserNotifications,
   FMX.Helpers.iOS,
   {$ENDIF}
@@ -526,6 +541,13 @@ constructor TALNotificationService.TNotificationPermissionResultMessage.Create(c
 begin
   Inherited Create;
   FGranted := AGranted;
+end;
+
+{*************************************************************************************************************************}
+constructor TALNotificationService.TGetDeliveredNotificationsMessage.Create(const ANotifications: TArray<TALNotification>);
+begin
+  Inherited Create;
+  FNotifications := ANotifications;
 end;
 
 {************************************************************************************************}
@@ -934,6 +956,134 @@ begin
   FFirebaseMessaging.DeleteToken;
 end;
 
+{****************}
+{$IF defined(IOS)}
+class procedure TALNotificationService.GetDeliveredNotificationsCompletionHandler(notifications: NSArray);
+begin
+
+  {$IFDEF DEBUG}
+  allog('TALNotificationService.GetDeliveredNotificationsCompletionHandler');
+  {$ENDIF}
+
+  var LNotifications: TArray<TALNotification>;
+  if notifications <> nil then SetLength(LNotifications, notifications.count)
+  else SetLength(LNotifications, 0);
+
+  for var I := 0 to Length(LNotifications) - 1 do begin
+
+    var LUNNotification := TUNNotification.Wrap(notifications.objectAtIndex(I));
+    LNotifications[I] := TALNotification.Create(NSStrToStr(LUNNotification.request.identifier));
+    LNotifications[I].SetTitle(NSStrToStr(LUNNotification.request.content.title));
+    LNotifications[I].SetText(NSStrToStr(LUNNotification.request.content.body));
+    var LPayload := TALStringListW.Create;
+    try
+
+      var LUserInfo := LUNNotification.request.content.userInfo;
+      if LUserInfo <> nil then begin
+        var LEnumerator := LUserInfo.keyEnumerator;
+        var LKeyObj := LEnumerator.nextObject;
+        while LKeyObj <> nil do begin
+          var LValueObj := LUserInfo.objectForKey(LKeyObj);
+          if LValueObj <> nil then begin
+            var LDescPtr := objc_msgSend(LValueObj, sel_getUid('description'));
+            if LDescPtr <> nil then
+              LPayload.Values[NSStrToStr(TNSString.Wrap(LKeyObj))] := NSStrToStr(TNSString.Wrap(LDescPtr));
+          end;
+          LKeyObj := LEnumerator.nextObject;
+        end;
+      end;
+
+      LNotifications[I].SetPayload(LPayload);
+
+    finally
+      ALFreeAndNil(LPayload);
+    end;
+
+  end;
+
+  TThread.Queue(nil,
+    procedure
+    begin
+      if TALNotificationService.HasInstance then
+        TALNotificationService.Instance.HandleGetDeliveredNotifications(LNotifications);
+    end);
+
+end;
+{$ENDIF}
+
+{*********************************************************}
+procedure TALNotificationService.GetDeliveredNotifications;
+begin
+
+  {$REGION 'ANDROID'}
+  {$IF defined(ANDROID)}
+
+  var LNotifications: TArray<TALNotification> := [];
+
+  if TOSVersion.Check(6, 0) {API level >= 23 (Android M)} then begin
+    var LNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
+    var LNotificationManager := TJALNotificationManager.Wrap(TAndroidHelper.JObjectToID(LNotificationServiceNative));
+    var LActiveNotifications := LNotificationManager.getActiveNotifications;
+    SetLength(LNotifications, LActiveNotifications.Length);
+    for var I := 0 to LActiveNotifications.Length - 1 do begin
+      var LStatusBarNotification := LActiveNotifications.Items[I];
+      var LNativeNotification := LStatusBarNotification.getNotification;
+      LNotifications[I] := TALNotification.Create(JStringToString(LStatusBarNotification.getTag));
+      var LExtras := LNativeNotification.extras;
+      if LExtras <> nil then begin
+        LNotifications[I].SetTitle(JStringToString(LExtras.getString(TJNotification.JavaClass.EXTRA_TITLE)));
+        LNotifications[I].SetText(JStringToString(LExtras.getString(TJNotification.JavaClass.EXTRA_TEXT)));
+        var LPayload := TALStringListW.Create;
+        try
+          var LIterator := LExtras.keySet.iterator;
+          while LIterator.hasNext do begin
+            var LKey := LIterator.next;
+            if LKey <> nil then begin
+              var LKeyStr := LKey.toString;
+              var LValue := LExtras.get(LKeyStr);
+              if LValue <> nil then LPayload.AddNameValue(JStringToString(LKeyStr), JStringToString(LValue.toString));
+            end;
+          end;
+          LNotifications[I].SetPayload(LPayload);
+        finally
+          ALFreeAndNil(LPayload);
+        end;
+      end;
+    end;
+  end;
+
+  var LSelf := Self;
+  TThread.ForceQueue(nil,
+    procedure
+    begin
+      if TALNotificationService.HasInstance and (TALNotificationService.Instance = LSelf) then
+        TALNotificationService.Instance.HandleGetDeliveredNotifications(LNotifications);
+    end);
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'IOS'}
+  {$IF defined(IOS)}
+
+  if not TOSVersion.Check(10) then begin
+    var LSelf := Self;
+    TThread.ForceQueue(nil,
+      procedure
+      begin
+        if TALNotificationService.HasInstance and (TALNotificationService.Instance = LSelf) then
+          TALNotificationService.Instance.HandleGetDeliveredNotifications([]);
+      end);
+      exit;
+  end;
+
+  TUNUserNotificationCenter.OCClass.currentNotificationCenter.getDeliveredNotificationsWithCompletionHandler(GetDeliveredNotificationsCompletionHandler);
+
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
 {***************************************************************}
 procedure TALNotificationService.removeAllDeliveredNotifications;
 begin
@@ -998,6 +1148,13 @@ procedure TALNotificationService.HandlePermissionResult(const AGranted: Boolean)
 begin
   TMessageManager.DefaultManager.SendMessage(nil, TNotificationPermissionResultMessage.create(AGranted));
 end;
+
+{**************************************************************************************************************}
+procedure TALNotificationService.HandleGetDeliveredNotifications(const ANotifications: TArray<TALNotification>);
+begin
+  TMessageManager.DefaultManager.SendMessage(nil, TGetDeliveredNotificationsMessage.create(ANotifications));
+end;
+
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}

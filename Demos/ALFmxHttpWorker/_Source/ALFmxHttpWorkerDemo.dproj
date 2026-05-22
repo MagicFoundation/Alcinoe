@@ -457,7 +457,7 @@
     <JavaReference Include="Android\Merged\libs\io.magicfoundation.alcinoe-alcinoe-broadcastreceiver-1.0.2.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
-    <JavaReference Include="Android\Merged\libs\io.magicfoundation.alcinoe-alcinoe-http-1.0.0.jar">
+    <JavaReference Include="Android\Merged\libs\io.magicfoundation.alcinoe-alcinoe-http-1.1.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.checkerframework-checker-qual-3.37.0.jar">

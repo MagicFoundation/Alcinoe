@@ -2545,11 +2545,13 @@ begin
         false{EnforceLimits});
     end;
 
-    if InRange(ActivePageIndex, 0, PageCount - 1) then
-      SetActivePageIndex(ActivePageIndex)
-    else begin
-      FActivePageIndex := -1;
-      if pageCount > 0 then SetActivePageIndex(0)
+    if (not FScrollEngine.TimerActive) or ((FScrollEngine.IsVelocityLow) and (not FScrollEngine.Down)) then begin
+      if InRange(ActivePageIndex, 0, PageCount - 1) then
+        SetActivePageIndex(ActivePageIndex)
+      else begin
+        FActivePageIndex := -1;
+        if pageCount > 0 then SetActivePageIndex(0)
+      end;
     end;
 
   finally

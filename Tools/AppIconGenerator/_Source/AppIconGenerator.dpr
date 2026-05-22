@@ -124,6 +124,7 @@ begin
 
           // Save the composited image to the specified file location
           TDirectory.CreateDirectory(ExtractFilePath(aDstImgFilename));
+          ALCheckMagickWandResult(MagickSetOption(LWand, 'png:exclude-chunks', 'date,time'), LWand);
           ALCheckMagickWandResult(MagickWriteImage(LWand, pansiChar(AnsiString(aDstImgFilename))), LWand);
 
         end
@@ -145,6 +146,7 @@ begin
 
       // Save the composited image to the specified file location
       TDirectory.CreateDirectory(ExtractFilePath(aDstImgFilename));
+      ALCheckMagickWandResult(MagickSetOption(LContainerWand, 'png:exclude-chunks', 'date,time'), LContainerWand);
       ALCheckMagickWandResult(MagickWriteImages(LContainerWand, pansiChar(AnsiString(aDstImgFilename)), MagickTrue{adjoin}), LContainerWand);
 
     end
@@ -258,6 +260,7 @@ begin
 
           // Save the composited image to the specified file location
           TDirectory.CreateDirectory(ExtractFilePath(aDstImgFilename));
+          ALCheckMagickWandResult(MagickSetOption(LSquircleWand, 'png:exclude-chunks', 'date,time'), LSquircleWand);
           ALCheckMagickWandResult(MagickWriteImage(LSquircleWand, pansiChar(AnsiString(aDstImgFilename))), LSquircleWand);
 
         end
@@ -280,6 +283,7 @@ begin
 
       // Save the composited image to the specified file location
       TDirectory.CreateDirectory(ExtractFilePath(aDstImgFilename));
+      ALCheckMagickWandResult(MagickSetOption(LContainerWand, 'png:exclude-chunks', 'date,time'), LContainerWand);
       ALCheckMagickWandResult(MagickWriteImages(LContainerWand, pansiChar(AnsiString(aDstImgFilename)), MagickTrue{adjoin}), LContainerWand);
 
     end
@@ -333,6 +337,7 @@ begin
 
     // Save the newly created image to the specified file path
     TDirectory.CreateDirectory(ExtractFilePath(aDstImgFilename));
+    ALCheckMagickWandResult(MagickSetOption(LWand, 'png:exclude-chunks', 'date,time'), LWand);
     ALCheckMagickWandResult(MagickWriteImage(LWand, pansiChar(AnsiString(aDstImgFilename))), LWand);
 
   finally
@@ -356,7 +361,7 @@ begin
     Result[I] := GetReducedSizeByPadding(ASizes[i], APaddingPercent);
 end;
 
-{***************************}
+{*******************************************************}
 procedure GenerateLauncherIcon(const aOutputDir: String);
 begin
 
@@ -616,7 +621,7 @@ begin
 
 end;
 
-{****************************}
+{***********************************************************}
 procedure GenerateNotificationIcon(const aOutputDir: String);
 begin
 

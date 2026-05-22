@@ -1,3 +1,13 @@
+## 05/22/2026
+
+- Updated `TALHttpWorker`:
+  - added optional delayed enqueue support via `ADelayMs`
+- Updated `TALNotificationService`:
+  - added `GetDeliveredNotifications`
+  - added `TGetDeliveredNotificationsMessage`
+- Updated Android media picking to exclude RAW/DNG files when image selection 
+  is requested, while keeping common raster formats and video selection support.
+
 ## 05/14/2026
 
 - Updated ImageMagick to version 7.1.2-22

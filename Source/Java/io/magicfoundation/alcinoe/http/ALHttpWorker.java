@@ -30,6 +30,7 @@ import java.util.Map;
 import java.net.URL;
 import java.net.URI;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Generic background HTTP worker for uploading or downloading data.
@@ -293,7 +294,8 @@ public class ALHttpWorker extends Worker {
                                  String requestBodyFilePath,
                                  boolean deleteRequestBodyFile,
                                  String requestBodyString,
-                                 String headers) {
+                                 String headers,
+                                 long delayMs) {
 
     Data.Builder dataBuilder = new Data.Builder()
                                      .putString(KEY_REQUEST_URL, url != null ? url : "")
@@ -303,7 +305,7 @@ public class ALHttpWorker extends Worker {
                                      .putString(KEY_REQUEST_BODY_STRING, requestBodyString != null ? requestBodyString : "")
                                      .putString(KEY_REQUEST_HEADERS, headers != null ? headers : "")
                                      .putLong(KEY_ENQUEUE_TIME, System.currentTimeMillis());
- 
+
     Constraints constraints = new Constraints.Builder()
                                     .setRequiredNetworkType(NetworkType.CONNECTED)
                                     .build();
@@ -312,7 +314,9 @@ public class ALHttpWorker extends Worker {
                                                .setInputData(dataBuilder.build())
                                                .setConstraints(constraints);
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 
+    if (delayMs > 0)
+      builder.setInitialDelay(delayMs, TimeUnit.MILLISECONDS);
+    else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
       builder.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST);
 
     OneTimeWorkRequest request = builder.build();
@@ -334,6 +338,7 @@ public class ALHttpWorker extends Worker {
    *                               work has completed (success or failure)
    * @param headers                Optional HTTP headers as a single string (may be null/empty).
    *                               Format: "Name1: value1\r\nName2: value2\r\n..."
+   * @param delayMs                Delay in milliseconds before the request is sent (0 = immediate)
    *
    * @return The request ID associated with this HTTP request.
    */
@@ -343,7 +348,8 @@ public class ALHttpWorker extends Worker {
                                 @NonNull String method,
                                 @NonNull String requestBodyFilePath,
                                 boolean deleteRequestBodyFile,
-                                String headers) {
+                                String headers,
+                                long delayMs) {
     return enqueue(
              context, // @NonNull Context context,
              url, // @NonNull String url,
@@ -351,9 +357,10 @@ public class ALHttpWorker extends Worker {
              requestBodyFilePath, // String requestBodyFilePath,
              deleteRequestBodyFile, // boolean deleteRequestBodyFile,
              null, // String requestBodyString,
-             headers); // String headers)
+             headers, // String headers,
+             delayMs); // long delayMs
   }
-  
+
   /**
    * Enqueue a background HTTP request using WorkManager.
    *
@@ -363,6 +370,7 @@ public class ALHttpWorker extends Worker {
    * @param requestBodyString    Payload to upload (will be sent as UTF-8)
    * @param headers              Optional HTTP headers as a single string (may be null/empty).
    *                             Format: "Name1: value1\r\nName2: value2\r\n..."
+   * @param delayMs              Delay in milliseconds before the request is sent (0 = immediate)
    *
    * @return The request ID associated with this HTTP request.
    */
@@ -371,7 +379,8 @@ public class ALHttpWorker extends Worker {
                                 @NonNull String url,
                                 @NonNull String method,
                                 @NonNull String requestBodyString,
-                                String headers) {
+                                String headers,
+                                long delayMs) {
     return enqueue(
              context, // @NonNull Context context,
              url, // @NonNull String url,
@@ -379,7 +388,8 @@ public class ALHttpWorker extends Worker {
              null, // String requestBodyFilePath,
              false, // boolean deleteRequestBodyFile,
              requestBodyString, // String requestBodyString,
-             headers); // String headers)
+             headers, // String headers,
+             delayMs); // long delayMs
   }
   
   private boolean isCanceled() {

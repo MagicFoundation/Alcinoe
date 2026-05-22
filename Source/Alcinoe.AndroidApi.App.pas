@@ -10,6 +10,7 @@ uses
   Androidapi.JNI.App,
   Androidapi.JNI.Net,
   Androidapi.JNI.JavaTypes,
+  Alcinoe.AndroidApi.Service,
   Alcinoe.AndroidApi.Window;
 
 type
@@ -18,6 +19,7 @@ type
   JUiModeManager = interface;
   JALNotification = interface;
   JALNotificationChannel = interface;
+  JALNotificationManager = interface;
   JALActivity = interface;
 
   {*******************************************}
@@ -71,6 +73,20 @@ type
 
   {*************************************}
   {$IFNDEF ALCompilerVersionSupported131}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5425 has been resolved. If resolved, remove the class definition below.'}
+  {$ENDIF}
+  JALNotificationManagerClass = interface(JNotificationManagerClass)
+    ['{B8532F89-609E-49C0-89BD-B2541147C014}']
+  end;
+  [JavaSignature('android/app/NotificationManager')]
+  JALNotificationManager = interface(JNotificationManager)
+    ['{E689CE00-8DFC-454E-AF32-CD65EC10AB54}']
+    function getActiveNotifications: TJavaObjectArray<JStatusBarNotification>; cdecl;
+  end;
+  TJALNotificationManager = class(TJavaGenericImport<JALNotificationManagerClass, JALNotificationManager>) end;
+
+  {*************************************}
+  {$IFNDEF ALCompilerVersionSupported131}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5362 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALActivityClass = interface(JActivityClass)
@@ -94,6 +110,7 @@ begin
   TRegTypes.RegisterType('Alcinoe.AndroidApi.App.JUiModeManager', TypeInfo(Alcinoe.AndroidApi.App.JUiModeManager));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.App.JALNotification', TypeInfo(Alcinoe.AndroidApi.App.JALNotification));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.App.JALNotificationChannel', TypeInfo(Alcinoe.AndroidApi.App.JALNotificationChannel));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.App.JALNotificationManager', TypeInfo(Alcinoe.AndroidApi.App.JALNotificationManager));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.App.JALActivity', TypeInfo(Alcinoe.AndroidApi.App.JALActivity));
 end;
 

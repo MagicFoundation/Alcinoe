@@ -677,24 +677,90 @@ begin
 
     {$REGION 'ANDROID'}
     {$IF defined(ANDROID)}
+
+    //
+    // Android 13+ Photo Picker
+    // Modern, privacy-friendly picker
+    // No storage permission needed
+    // Best for selecting photos/videos from MediaStore/cloud providers
+    // Limited control over MIME filtering
+    // Returns temporary read access to selected media
+    //
+
     if TOSVersion.Check(13, 0) {API level >= 33 (Android TIRAMISU)} then begin
       var LIntent := TJIntent.JavaClass.init(TJMediaStore.JavaClass.ACTION_PICK_IMAGES);
-      if (AMediaTypes = [TMediaType.Image]) then LIntent.setType(StringToJString('image/*'))
+      if (AMediaTypes = [TMediaType.Image]) then begin
+        LIntent.setType(StringToJString('image/*'));
+        // Some devices (e.g. Pixel phones) can store photos as RAW+JPEG pairs.
+        // In this case the Android picker may return the RAW/DNG asset instead of
+        // the JPEG companion image. Most Android image APIs then operate on the
+        // embedded preview inside the DNG rather than on the actual RAW image.
+        // For example, ALGetImageDimensions may return the preview dimensions
+        // instead of the full RAW image dimensions.
+        // To avoid these issues, explicitly restrict the picker to commonly
+        // supported raster image formats and exclude RAW/DNG formats.
+        var LArray := TJavaObjectArray<JString>.Create(8);
+        Try
+          LArray.Items[0] := StringToJString('image/jpeg');
+          LArray.Items[1] := StringToJString('image/png');
+          LArray.Items[2] := StringToJString('image/gif');
+          LArray.Items[3] := StringToJString('image/bmp');
+          LArray.Items[4] := StringToJString('image/heic');
+          LArray.Items[5] := StringToJString('image/heif');
+          LArray.Items[6] := StringToJString('image/webp');
+          LArray.Items[7] := StringToJString('image/avif');
+          LIntent.putExtra(TJIntent.JavaClass.EXTRA_MIME_TYPES, LArray);
+        finally
+          ALFreeAndNil(LArray);
+        end;
+      end
       else if (AMediaTypes = [TMediaType.Video]) then LIntent.setType(StringToJString('video/*'));
       LIntent.putExtra(TJMediaStore.JavaClass.EXTRA_PICK_IMAGES_MAX, Max(1, AMaxCount));
       TAndroidHelper.Activity.startActivityForResult(LIntent, REQUEST_CODE_PICK_MEDIA);
       exit;
     end;
 
+    //
+    // Old generic document/content picker
+    // Works on older Android versions
+    // Can select from many providers: gallery, files, cloud apps, etc.
+    // Better MIME-type filtering with EXTRA_MIME_TYPES
+    // Usually needs CATEGORY_OPENABLE
+    // Returns a content:// URI from any provider
+    //
+
     var LIntent := TJIntent.JavaClass.init(TJIntent.JavaClass.ACTION_GET_CONTENT);
-    if (AMediaTypes = [TMediaType.Image]) then LIntent.setType(StringToJString('image/*'))
+    if (AMediaTypes = [TMediaType.Image]) then begin
+      LIntent.setType(StringToJString('image/*'));
+      var LArray := TJavaObjectArray<JString>.Create(8);
+      Try
+        LArray.Items[0] := StringToJString('image/jpeg');
+        LArray.Items[1] := StringToJString('image/png');
+        LArray.Items[2] := StringToJString('image/gif');
+        LArray.Items[3] := StringToJString('image/bmp');
+        LArray.Items[4] := StringToJString('image/heic');
+        LArray.Items[5] := StringToJString('image/heif');
+        LArray.Items[6] := StringToJString('image/webp');
+        LArray.Items[7] := StringToJString('image/avif');
+        LIntent.putExtra(TJIntent.JavaClass.EXTRA_MIME_TYPES, LArray);
+      finally
+        ALFreeAndNil(LArray);
+      end;
+    end
     else if (AMediaTypes = [TMediaType.Video]) then LIntent.setType(StringToJString('video/*'))
     else begin
       LIntent.setType(StringToJString('*/*'));
-      var LArray := TJavaObjectArray<JString>.Create(2);
+      var LArray := TJavaObjectArray<JString>.Create(9);
       Try
-        LArray.Items[0] := StringToJString('image/*');
-        LArray.Items[1] := StringToJString('video/*');
+        LArray.Items[0] := StringToJString('image/jpeg');
+        LArray.Items[1] := StringToJString('image/png');
+        LArray.Items[2] := StringToJString('image/gif');
+        LArray.Items[3] := StringToJString('image/bmp');
+        LArray.Items[4] := StringToJString('image/heic');
+        LArray.Items[5] := StringToJString('image/heif');
+        LArray.Items[6] := StringToJString('image/webp');
+        LArray.Items[7] := StringToJString('image/avif');
+        LArray.Items[8] := StringToJString('video/*');
         LIntent.putExtra(TJIntent.JavaClass.EXTRA_MIME_TYPES, LArray);
       finally
         ALFreeAndNil(LArray);
@@ -703,6 +769,7 @@ begin
     if AMaxCount > 1 then LIntent.putExtra(TJIntent.JavaClass.EXTRA_ALLOW_MULTIPLE, true);
     LIntent.addCategory(TJIntent.JavaClass.CATEGORY_OPENABLE);
     TAndroidHelper.Activity.startActivityForResult(LIntent, REQUEST_CODE_PICK_MEDIA);
+
     {$ENDIF}
     {$ENDREGION}
 

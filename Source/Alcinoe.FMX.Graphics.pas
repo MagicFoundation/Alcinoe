@@ -742,6 +742,7 @@ uses
   Androidapi.JNI.Media,
   Androidapi.Bitmap,
   Androidapi.Gles2,
+  Androidapi.JNI.Net,
   FMX.Context.GLES,
   Alcinoe.AndroidApi.RenderScript,
   Alcinoe.Androidapi.GraphicsContentViewText,

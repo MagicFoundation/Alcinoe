@@ -59,6 +59,7 @@ uses
   Alcinoe.AndroidApi.Os,
   Alcinoe.AndroidApi.RenderScript,
   Alcinoe.AndroidApi.Security,
+  Alcinoe.AndroidApi.Service,
   Alcinoe.AndroidApi.WebKit,
   Alcinoe.AndroidApi.Widget,
   Alcinoe.Androidapi.Window,

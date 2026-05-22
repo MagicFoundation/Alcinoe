@@ -137,23 +137,27 @@ Type
                const AUrl: String;
                const AMethod: String;
                const ABodyString: String;
-               const AHeaders: TNetHeaders): String; overload; virtual;
+               const AHeaders: TNetHeaders;
+               const ADelayMs: Cardinal = 0): String; overload; virtual;
     function Enqueue(
                const AUrl: String;
                const AMethod: String;
                const ABodyFilePath: String;
                const ADeleteBodyFile: Boolean;
-               const AHeaders: TNetHeaders): String; overload; virtual;
+               const AHeaders: TNetHeaders;
+               const ADelayMs: Cardinal = 0): String; overload; virtual;
     function Enqueue(
                const AUrl: String;
                const AMethod: String;
                const ABodyBytes: TBytes;
-               const AHeaders: TNetHeaders): String; overload; virtual;
+               const AHeaders: TNetHeaders;
+               const ADelayMs: Cardinal = 0): String; overload; virtual;
     function Enqueue(
                const AUrl: String;
                const AMethod: String;
                const ABodyStream: Tstream;
-               const AHeaders: TNetHeaders): String; overload; virtual;
+               const AHeaders: TNetHeaders;
+               const ADelayMs: Cardinal = 0): String; overload; virtual;
     procedure Cancel(const ARequestID: String); virtual;
   End;
 
@@ -1311,7 +1315,8 @@ function TALHttpWorker.enqueue(
            const AUrl: String;
            const AMethod: String;
            const ABodyString: String;
-           const AHeaders: TNetHeaders): String;
+           const AHeaders: TNetHeaders;
+           const ADelayMs: Cardinal = 0): String;
 begin
 
   {$REGION 'ANDROID'}
@@ -1330,7 +1335,8 @@ begin
                  StringToJString(AUrl), // url: JString;
                  StringToJString(AMethod), // method: JString;
                  StringToJString(ABodyString), // bodyString: JString;
-                 StringToJString(LHeaders)); // headers: JString)
+                 StringToJString(LHeaders), // headers: JString;
+                 ADelayMs); // delayMs: Int64
   Result := JStringToString(LUUID.toString);
   {$ENDIF}
   {$ENDREGION}
@@ -1341,7 +1347,8 @@ begin
               AUrl, // const AUrl: String;
               AMethod, // const AMethod: String;
               TEncoding.UTF8.GetBytes(ABodyString), // const ABodyBytes: TBytes;
-              AHeaders); // const AHeaders: TNetHeaders)
+              AHeaders, // const AHeaders: TNetHeaders;
+              ADelayMs); // const ADelayMs: Cardinal
   {$ENDIF}
   {$ENDREGION}
 
@@ -1349,9 +1356,11 @@ begin
   {$IF defined(MSWindows) or defined(ALMacOS)}
   Result := ALNewGUIDStringW(True{WithoutBracket});
   var LRequestID := Result;
+  var LDelay := ADelayMs;
   TThread.CreateAnonymousThread(
     procedure
     begin
+      if LDelay > 0 then Sleep(LDelay);
 
       var LHttpClient := ALAcquireKeepAliveNetHttpClient(AUrl);
       try
@@ -1426,7 +1435,8 @@ function TALHttpWorker.enqueue(
            const AMethod: String;
            const ABodyFilePath: String;
            const ADeleteBodyFile: Boolean;
-           const AHeaders: TNetHeaders): String;
+           const AHeaders: TNetHeaders;
+           const ADelayMs: Cardinal = 0): String;
 begin
 
   If (ABodyFilePath = '') or (not Tfile.Exists(ABodyFilePath)) then
@@ -1448,8 +1458,9 @@ begin
                  StringToJString(AUrl), // url: JString;
                  StringToJString(AMethod), // method: JString;
                  StringToJString(ABodyFilePath), // bodyFilePath: JString;
-                 ADeleteBodyFile, // deleteBodyFile: Boolean
-                 StringToJString(LHeaders)); // headers: JString)
+                 ADeleteBodyFile, // deleteBodyFile: Boolean;
+                 StringToJString(LHeaders), // headers: JString;
+                 ADelayMs); // delayMs: Int64
   Result := JStringToString(LUUID.toString);
   {$ENDIF}
   {$ENDREGION}
@@ -1486,6 +1497,10 @@ begin
   Finally
     ALFreeAndNil(LLst);
   end;
+  if ADelayMs > 0 then begin
+    var LBeginDate := TNSDate.Wrap(TNSDate.OCClass.dateWithTimeIntervalSinceNow(ADelayMs / 1000));
+    LTask.setEarliestBeginDate(LBeginDate);
+  end;
   LTask.resume;
   {$ENDIF}
   {$ENDREGION}
@@ -1494,9 +1509,11 @@ begin
   {$IF defined(MSWindows) or defined(ALMacOS)}
   Result := ALNewGUIDStringW(True{WithoutBracket});
   var LRequestID := Result;
+  var LDelay := ADelayMs;
   TThread.CreateAnonymousThread(
     procedure
     begin
+      if LDelay > 0 then Sleep(LDelay);
 
       var LHttpClient := ALAcquireKeepAliveNetHttpClient(AUrl);
       try
@@ -1575,7 +1592,8 @@ function TALHttpWorker.enqueue(
            const AUrl: String;
            const AMethod: String;
            const ABodyBytes: TBytes;
-           const AHeaders: TNetHeaders): String;
+           const AHeaders: TNetHeaders;
+           const ADelayMs: Cardinal = 0): String;
 begin
 
   {$REGION 'ANDROID'}
@@ -1585,7 +1603,8 @@ begin
                 AUrl, // const AUrl: String;
                 AMethod, // const AMethod: String;
                 '', // const ABodyString: String;
-                AHeaders); // const AHeaders: TNetHeaders)
+                AHeaders, // const AHeaders: TNetHeaders;
+                ADelayMs); // const ADelayMs: Cardinal
   end
   else begin
     var LFilename := GetTempFilename;
@@ -1596,7 +1615,8 @@ begin
                   AMethod, // const AMethod: String;
                   LFilename, // const ABodyFilePath: String;
                   true, // const ADeleteBodyFile: Boolean;
-                  AHeaders); // const AHeaders: TNetHeaders): String;
+                  AHeaders, // const AHeaders: TNetHeaders;
+                  ADelayMs); // const ADelayMs: Cardinal
     except
       On E: Exception do begin
         If TFile.Exists(LFilename) then TFile.Delete(LFilename);
@@ -1618,7 +1638,8 @@ begin
                   AMethod, // const AMethod: String;
                   LFilename, // const ABodyFilePath: String;
                   true, // const ADeleteBodyFile: Boolean;
-                  AHeaders); // const AHeaders: TNetHeaders): String;
+                  AHeaders, // const AHeaders: TNetHeaders;
+                  ADelayMs); // const ADelayMs: Cardinal
     except
       On E: Exception do begin
         If TFile.Exists(LFilename) then TFile.Delete(LFilename);
@@ -1660,6 +1681,10 @@ begin
     Finally
       ALFreeAndNil(LLst);
     end;
+    if ADelayMs > 0 then begin
+      var LBeginDate := TNSDate.Wrap(TNSDate.OCClass.dateWithTimeIntervalSinceNow(ADelayMs / 1000));
+      LTask.setEarliestBeginDate(LBeginDate);
+    end;
     LTask.resume;
   end;
   {$ENDIF}
@@ -1669,9 +1694,11 @@ begin
   {$IF defined(MSWindows) or defined(ALMacOS)}
   Result := ALNewGUIDStringW(True{WithoutBracket});
   var LRequestID := Result;
+  var LDelay := ADelayMs;
   TThread.CreateAnonymousThread(
     procedure
     begin
+      if LDelay > 0 then Sleep(LDelay);
 
       var LHttpClient := ALAcquireKeepAliveNetHttpClient(AUrl);
       try
@@ -1745,7 +1772,8 @@ function TALHttpWorker.enqueue(
            const AUrl: String;
            const AMethod: String;
            const ABodyStream: Tstream;
-           const AHeaders: TNetHeaders): String;
+           const AHeaders: TNetHeaders;
+           const ADelayMs: Cardinal = 0): String;
 begin
 
   {$REGION 'ANDROID'}
@@ -1755,7 +1783,8 @@ begin
                 AUrl, // const AUrl: String;
                 AMethod, // const AMethod: String;
                 '', // const ABodyString: String;
-                AHeaders); // const AHeaders: TNetHeaders)
+                AHeaders, // const AHeaders: TNetHeaders;
+                ADelayMs); // const ADelayMs: Cardinal
   end
   else begin
     var LFilename := GetTempFilename;
@@ -1772,7 +1801,8 @@ begin
                   AMethod, // const AMethod: String;
                   LFilename, // const ABodyFilePath: String;
                   true, // const ADeleteBodyFile: Boolean;
-                  AHeaders); // const AHeaders: TNetHeaders): String;
+                  AHeaders, // const AHeaders: TNetHeaders;
+                  ADelayMs); // const ADelayMs: Cardinal
     except
       On E: Exception do begin
         If TFile.Exists(LFilename) then TFile.Delete(LFilename);
@@ -1794,7 +1824,8 @@ begin
                 AUrl, // const AUrl: String;
                 AMethod, // const AMethod: String;
                 LBytes, // const ABodyBytes: TBytes;
-                AHeaders); // const AHeaders: TNetHeaders)
+                AHeaders, // const AHeaders: TNetHeaders;
+                ADelayMs); // const ADelayMs: Cardinal
   end
   else begin
     var LFilename := GetTempFilename;
@@ -1811,7 +1842,8 @@ begin
                   AMethod, // const AMethod: String;
                   LFilename, // const ABodyFilePath: String;
                   true, // const ADeleteBodyFile: Boolean;
-                  AHeaders); // const AHeaders: TNetHeaders): String;
+                  AHeaders, // const AHeaders: TNetHeaders;
+                  ADelayMs); // const ADelayMs: Cardinal
     except
       On E: Exception do begin
         If TFile.Exists(LFilename) then TFile.Delete(LFilename);
@@ -1832,7 +1864,8 @@ begin
               AUrl, // const AUrl: String;
               AMethod, // const AMethod: String;
               LBytes, // const ABodyBytes: TBytes;
-              AHeaders); // const AHeaders: TNetHeaders)
+              AHeaders, // const AHeaders: TNetHeaders;
+              ADelayMs); // const ADelayMs: Cardinal
   {$ENDIF}
   {$ENDREGION}
 

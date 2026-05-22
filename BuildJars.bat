@@ -178,10 +178,10 @@ REM Use Tools\AndroidLibScanner\AndroidLibScanner.bat to determine the required 
 Call :UPDATE_ClASSPATH "https://repo1.maven.org/maven2" "org.jetbrains.kotlin" "kotlin-stdlib" "2.1.20"
 Call :UPDATE_ClASSPATH "https://repo1.maven.org/maven2" "com.google.guava" "listenablefuture" "1.0"
 SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\http\*.java
-Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-http" "1.0.0"
+Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-http" "1.1.0"
 
-SET HttpLibDir=%ALBaseDir%\Libraries\jar\io\magicfoundation\alcinoe\alcinoe-http\1.0.0\
-SET HttpLibFilename=alcinoe-http-1.0.0
+SET HttpLibDir=%ALBaseDir%\Libraries\jar\io\magicfoundation\alcinoe\alcinoe-http\1.1.0\
+SET HttpLibFilename=alcinoe-http-1.1.0
 SET AndroidManifestFilename=%HttpLibDir%\AndroidManifest.xml
 IF EXIST "%AndroidManifestFilename%" del "%AndroidManifestFilename%" /s > nul
 IF EXIST "%AndroidManifestFilename%" goto ERROR

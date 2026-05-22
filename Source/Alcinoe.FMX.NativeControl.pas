@@ -596,6 +596,7 @@ begin
   end;
   if FNativeView = nil then exit(false);
   if not FNativeView.visible then exit(false);
+  if not ParentedVisible then exit(false);
   inc(FFreezeNativeViewCount);
   ALFreeAndNilDrawable(FNativeViewScreenshot);
   FNativeViewScreenshot := FNativeView.CaptureScreenshot;

@@ -50,8 +50,8 @@ type
     {class} property EXTRA_HTTP_RESPONSE_STATUS_CODE: JString read _GetEXTRA_HTTP_RESPONSE_STATUS_CODE;
     {class} property EXTRA_HTTP_RESPONSE_HEADERS: JString read _GetEXTRA_HTTP_RESPONSE_HEADERS;
     {class} property EXTRA_HTTP_RESPONSE_BODY_FILE_PATH: JString read _GetEXTRA_HTTP_RESPONSE_BODY_FILE_PATH;
-    {class} function enqueue(context: JContext; url: JString; method: JString; bodyFilePath: JString; deleteBodyFile: Boolean; headers: JString): JUUID; overload; cdecl;
-    {class} function enqueue(context: JContext; url: JString; method: JString; bodyString: JString; headers: JString): JUUID; overload; cdecl;
+    {class} function enqueue(context: JContext; url: JString; method: JString; bodyFilePath: JString; deleteBodyFile: Boolean; headers: JString; delayMs: Int64): JUUID; overload; cdecl;
+    {class} function enqueue(context: JContext; url: JString; method: JString; bodyString: JString; headers: JString; delayMs: Int64): JUUID; overload; cdecl;
     {class} procedure cancel(context: JContext; requestId: JUUID); overload; cdecl;
   end;
   [JavaSignature('io/magicfoundation/alcinoe/http/ALHttpWorker')]

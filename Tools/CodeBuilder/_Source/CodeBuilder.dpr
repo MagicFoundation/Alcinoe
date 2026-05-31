@@ -1244,6 +1244,8 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '     (FMouseDownAtRest) and'+#13#10+
               '     (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) <= TALScrollEngine.DefaultTouchSlop) and'+#13#10+
               '     (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) <= TALScrollEngine.DefaultTouchSlop) and'+#13#10+
+              '     (abs(FMouseLocalPosAtMouseDown.x - X) <= TALScrollEngine.DefaultTouchSlop) and'+#13#10+
+              '     (abs(FMouseLocalPosAtMouseDown.y - Y) <= TALScrollEngine.DefaultTouchSlop) and'+#13#10+
               '     (not (csDesigning in ComponentState)) and'+#13#10+
               '     (not FIsFocused) then'+#13#10+
               '    SetFocus;',

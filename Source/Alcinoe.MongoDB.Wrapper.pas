@@ -136,14 +136,14 @@ const BSON_MAJOR_VERSION = (2);
 // *
 // * BSON minor version component (e.g. 2 if %BSON_VERSION is 1.2.3)
 // *
-const BSON_MINOR_VERSION = (2);
+const BSON_MINOR_VERSION = (3);
 
 // * *
 // * BSON_MICRO_VERSION:
 // *
 // * BSON micro version component (e.g. 3 if %BSON_VERSION is 1.2.3)
 // *
-const BSON_MICRO_VERSION = (1);
+const BSON_MICRO_VERSION = (0);
 
 // * *
 // * BSON_PRERELEASE_VERSION:
@@ -157,7 +157,7 @@ const BSON_MICRO_VERSION = (1);
 // *
 // * BSON version.
 // *
-// #define BSON_VERSION (2.2.1)
+// #define BSON_VERSION (2.3.0)
 
 // * *
 // * BSON_VERSION_S:
@@ -165,7 +165,7 @@ const BSON_MICRO_VERSION = (1);
 // * BSON version, encoded as a string, useful for printing and
 // * concatenation.
 // *
-const BSON_VERSION_S = '2.2.1';
+const BSON_VERSION_S = '2.3.0';
 
 // * *
 // * BSON_VERSION_HEX:
@@ -3488,6 +3488,7 @@ function bson_array_builder_append_document_end(
 // * @key_length: The length of @key in bytes not including NUL or -1
 // * if @key_length is NUL terminated.
 // * @child: A location to an uninitialized bson_t.
+// * @deprecated Use bson_append_array_builder_begin or bson_append_array_unsafe_begin instead.
 // *
 // * Appends a new field named @key to @bson. The field is, however,
 // * incomplete. @child will be initialized so that you may add fields to the
@@ -3501,6 +3502,7 @@ function bson_array_builder_append_document_end(
 // *
 // * Returns: true if successful; false if append would overflow max size.
 // *
+// BSON_GNUC_DEPRECATED_FOR(bson_append_array_builder_begin or bson_append_array_unsafe_begin)
 function bson_append_array_begin(
            bson: Pbson_t;
            key: PAnsiChar;
@@ -3508,6 +3510,14 @@ function bson_append_array_begin(
            child: Pbson_t): ByteBool; inline;
 
 // #define BSON_APPEND_ARRAY_BEGIN(b, key, child) bson_append_array_begin(b, key, (int)strlen(key), child)
+
+function bson_append_array_unsafe_begin(
+           bson: Pbson_t;
+           key: PAnsiChar;
+           key_length: Integer;
+           child: Pbson_t): ByteBool; inline;
+
+// #define BSON_APPEND_ARRAY_UNSAFE_BEGIN(b, key, child) bson_append_array_unsafe_begin(b, key, (int)strlen(key), child)
 
 // * *
 // * bson_append_array_end:
@@ -3804,6 +3814,8 @@ function bson_array_builder_append_utf8(
            value: PAnsiChar;
            length: Integer): ByteBool; inline;
 
+// #define BSON_APPEND_ARRAY_BUILDER_APPEND_UTF8(b, value) bson_array_builder_append_utf8(b, value, (int)strlen(value))
+
 // * *
 // * bson_append_symbol:
 // * @bson: A bson_t.
@@ -3831,6 +3843,8 @@ function bson_array_builder_append_symbol(
            bab: Pbson_array_builder_t;
            value: PAnsiChar;
            length: Integer): ByteBool; inline;
+
+// #define BSON_APPEND_ARRAY_BUILDER_APPEND_SYMBOL(b, value) bson_array_builder_append_symbol(b, value, (int)strlen(value))
 
 // * *
 // * bson_append_time_t:
@@ -4047,7 +4061,7 @@ const MONGOC_USER_SET_CFLAGS = '/DWIN32 /D_WINDOWS';
 const MONGOC_USER_SET_LDFLAGS = '/machine:x64';
 
 // * MONGOC_CC is used to determine what C compiler was used to compile mongoc
-const MONGOC_CC = 'C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/cl.exe';
+const MONGOC_CC = 'C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe';
 
 // *
 // * MONGOC_ENABLE_SSL_SECURE_CHANNEL is set from configure to determine if we are
@@ -4428,14 +4442,14 @@ const MONGOC_MAJOR_VERSION = (2);
 // *
 // * MONGOC minor version component (e.g. 2 if %MONGOC_VERSION is 1.2.3)
 // *
-const MONGOC_MINOR_VERSION = (2);
+const MONGOC_MINOR_VERSION = (3);
 
 // * *
 // * MONGOC_MICRO_VERSION:
 // *
 // * MONGOC micro version component (e.g. 3 if %MONGOC_VERSION is 1.2.3)
 // *
-const MONGOC_MICRO_VERSION = (1);
+const MONGOC_MICRO_VERSION = (0);
 
 // * *
 // * MONGOC_PRERELEASE_VERSION:
@@ -4449,7 +4463,7 @@ const MONGOC_MICRO_VERSION = (1);
 // *
 // * MONGOC version.
 // *
-// #define MONGOC_VERSION (2.2.1)
+// #define MONGOC_VERSION (2.3.0)
 
 // * *
 // * MONGOC_VERSION_S:
@@ -4457,7 +4471,7 @@ const MONGOC_MICRO_VERSION = (1);
 // * MONGOC version, encoded as a string, useful for printing and
 // * concatenation.
 // *
-const MONGOC_VERSION_S = '2.2.1';
+const MONGOC_VERSION_S = '2.3.0';
 
 // * *
 // * MONGOC_VERSION_HEX:
@@ -6728,6 +6742,8 @@ const MONGOC_URI_READPREFERENCETAGS = 'readpreferencetags';
 const MONGOC_URI_REPLICASET = 'replicaset';
 const MONGOC_URI_RETRYREADS = 'retryreads';
 const MONGOC_URI_RETRYWRITES = 'retrywrites';
+const MONGOC_URI_MAXADAPTIVERETRIES = 'maxadaptiveretries';
+const MONGOC_URI_ENABLEOVERLOADRETARGETING = 'enableoverloadretargeting';
 const MONGOC_URI_SAFE = 'safe';
 const MONGOC_URI_SERVERMONITORINGMODE = 'servermonitoringmode';
 const MONGOC_URI_SERVERSELECTIONTIMEOUTMS = 'serverselectiontimeoutms';
@@ -7890,6 +7906,12 @@ function mongoc_client_set_oidc_callback(
            client: Pmongoc_client_t;
            callback: Pmongoc_oidc_callback_t): ByteBool; inline;
 
+function mongoc_client_append_metadata(
+           client: Pmongoc_client_t;
+           name: PAnsiChar;
+           version: PAnsiChar;
+           platform: PAnsiChar): ByteBool; inline;
+
 ////////////////////////
 // mongoc-client-pool //
 ////////////////////////
@@ -7958,6 +7980,12 @@ function mongoc_client_pool_set_structured_log_opts(
 function mongoc_client_pool_set_oidc_callback(
            pool: Pmongoc_client_pool_t;
            callback: Pmongoc_oidc_callback_t): ByteBool; inline;
+
+function mongoc_client_pool_append_metadata(
+           pool: Pmongoc_client_pool_t;
+           name: PAnsiChar;
+           version: PAnsiChar;
+           platform: PAnsiChar): ByteBool; inline;
 
 ///////////////////////////
 // mongoc-client-session //
@@ -8737,6 +8765,7 @@ type
     bson_append_document_end: function(bson: Pbson_t; child: Pbson_t): ByteBool; cdecl;
     bson_array_builder_append_document_end: function(bab: Pbson_array_builder_t; child: Pbson_t): ByteBool; cdecl;
     bson_append_array_begin: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; child: Pbson_t): ByteBool; cdecl;
+    bson_append_array_unsafe_begin: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; child: Pbson_t): ByteBool; cdecl;
     bson_append_array_end: function(bson: Pbson_t; child: Pbson_t): ByteBool; cdecl;
     bson_append_int32: function(bson: Pbson_t; key: PAnsiChar; key_length: Integer; value: int32_t): ByteBool; cdecl;
     bson_array_builder_append_int32: function(bab: Pbson_array_builder_t; value: int32_t): ByteBool; cdecl;
@@ -9370,6 +9399,7 @@ type
     mongoc_client_set_server_api: function(client: Pmongoc_client_t; api: Pmongoc_server_api_t; error: Pbson_error_t): ByteBool; cdecl;
     mongoc_client_get_handshake_description: function(client: Pmongoc_client_t; server_id: uint32_t; opts: Pbson_t; error: Pbson_error_t): Pmongoc_server_description_t; cdecl;
     mongoc_client_set_oidc_callback: function(client: Pmongoc_client_t; callback: Pmongoc_oidc_callback_t): ByteBool; cdecl;
+    mongoc_client_append_metadata: function(client: Pmongoc_client_t; name: PAnsiChar; version: PAnsiChar; platform: PAnsiChar): ByteBool; cdecl;
     mongoc_client_pool_new: function(uri: Pmongoc_uri_t): Pmongoc_client_pool_t; cdecl;
     mongoc_client_pool_new_with_error: function(uri: Pmongoc_uri_t; error: Pbson_error_t): Pmongoc_client_pool_t; cdecl;
     mongoc_client_pool_destroy: procedure(pool: Pmongoc_client_pool_t); cdecl;
@@ -9385,6 +9415,7 @@ type
     mongoc_client_pool_set_server_api: function(pool: Pmongoc_client_pool_t; api: Pmongoc_server_api_t; error: Pbson_error_t): ByteBool; cdecl;
     mongoc_client_pool_set_structured_log_opts: function(pool: Pmongoc_client_pool_t; opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl;
     mongoc_client_pool_set_oidc_callback: function(pool: Pmongoc_client_pool_t; callback: Pmongoc_oidc_callback_t): ByteBool; cdecl;
+    mongoc_client_pool_append_metadata: function(pool: Pmongoc_client_pool_t; name: PAnsiChar; version: PAnsiChar; platform: PAnsiChar): ByteBool; cdecl;
     mongoc_transaction_opts_new: function(): Pmongoc_transaction_opt_t; cdecl;
     mongoc_transaction_opts_clone: function(opts: Pmongoc_transaction_opt_t): Pmongoc_transaction_opt_t; cdecl;
     mongoc_transaction_opts_destroy: procedure(opts: Pmongoc_transaction_opt_t); cdecl;
@@ -9786,6 +9817,7 @@ begin
   bson_append_document_end := GetProcAddress(Fbson2Lib,'bson_append_document_end');
   bson_array_builder_append_document_end := GetProcAddress(Fbson2Lib,'bson_array_builder_append_document_end');
   bson_append_array_begin := GetProcAddress(Fbson2Lib,'bson_append_array_begin');
+  bson_append_array_unsafe_begin := GetProcAddress(Fbson2Lib,'bson_append_array_unsafe_begin');
   bson_append_array_end := GetProcAddress(Fbson2Lib,'bson_append_array_end');
   bson_append_int32 := GetProcAddress(Fbson2Lib,'bson_append_int32');
   bson_array_builder_append_int32 := GetProcAddress(Fbson2Lib,'bson_array_builder_append_int32');
@@ -10419,6 +10451,7 @@ begin
   mongoc_client_set_server_api := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_server_api');
   mongoc_client_get_handshake_description := GetProcAddress(Fmongoc2Lib,'mongoc_client_get_handshake_description');
   mongoc_client_set_oidc_callback := GetProcAddress(Fmongoc2Lib,'mongoc_client_set_oidc_callback');
+  mongoc_client_append_metadata := GetProcAddress(Fmongoc2Lib,'mongoc_client_append_metadata');
   mongoc_client_pool_new := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_new');
   mongoc_client_pool_new_with_error := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_new_with_error');
   mongoc_client_pool_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_destroy');
@@ -10434,6 +10467,7 @@ begin
   mongoc_client_pool_set_server_api := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_set_server_api');
   mongoc_client_pool_set_structured_log_opts := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_set_structured_log_opts');
   mongoc_client_pool_set_oidc_callback := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_set_oidc_callback');
+  mongoc_client_pool_append_metadata := GetProcAddress(Fmongoc2Lib,'mongoc_client_pool_append_metadata');
   mongoc_transaction_opts_new := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_new');
   mongoc_transaction_opts_clone := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_clone');
   mongoc_transaction_opts_destroy := GetProcAddress(Fmongoc2Lib,'mongoc_transaction_opts_destroy');
@@ -11962,6 +11996,12 @@ end;
 function bson_append_array_begin(bson: Pbson_t; key: PAnsiChar; key_length: Integer; child: Pbson_t): ByteBool;
 begin
   Result := ALMongoDBLibrary.bson_append_array_begin(bson, key, key_length, child);
+end;
+
+{********************************************************************************************************************}
+function bson_append_array_unsafe_begin(bson: Pbson_t; key: PAnsiChar; key_length: Integer; child: Pbson_t): ByteBool;
+begin
+  Result := ALMongoDBLibrary.bson_append_array_unsafe_begin(bson, key, key_length, child);
 end;
 
 {**********************************************************************}
@@ -15762,6 +15802,12 @@ begin
   Result := ALMongoDBLibrary.mongoc_client_set_oidc_callback(client, callback);
 end;
 
+{***********************************************************************************************************************************}
+function mongoc_client_append_metadata(client: Pmongoc_client_t; name: PAnsiChar; version: PAnsiChar; platform: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_append_metadata(client, name, version, platform);
+end;
+
 {*************************************************************************}
 function mongoc_client_pool_new(uri: Pmongoc_uri_t): Pmongoc_client_pool_t;
 begin
@@ -15850,6 +15896,12 @@ end;
 function mongoc_client_pool_set_oidc_callback(pool: Pmongoc_client_pool_t; callback: Pmongoc_oidc_callback_t): ByteBool;
 begin
   Result := ALMongoDBLibrary.mongoc_client_pool_set_oidc_callback(pool, callback);
+end;
+
+{*******************************************************************************************************************************************}
+function mongoc_client_pool_append_metadata(pool: Pmongoc_client_pool_t; name: PAnsiChar; version: PAnsiChar; platform: PAnsiChar): ByteBool;
+begin
+  Result := ALMongoDBLibrary.mongoc_client_pool_append_metadata(pool, name, version, platform);
 end;
 
 {****************************************************************}

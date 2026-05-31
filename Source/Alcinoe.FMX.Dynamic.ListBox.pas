@@ -480,7 +480,7 @@ type
         FHandleMouseEvents: Boolean; // 1 byte
         FIsSettingViewportPosition: Boolean; // 1 byte
         FRefreshTransitionKind: TRefreshTransitionKind; // 1 byte
-        FInitialItemHandled: Boolean; // 1 byte
+        FInitialItemHandled: Byte; // 1 byte
         FInitialInt64ItemID: Int64; // 8 Bytes
         FInitialTextItemID: String; // 8 Bytes
         fLastViewportPosition: TALPointD; // 16 bytes
@@ -786,7 +786,6 @@ type
     property InitialInt64ItemID: Int64 read FInitialInt64ItemID write FInitialInt64ItemID;
     property InitialTextItemID: String read FInitialTextItemID write FInitialTextItemID;
     property MainView: TView read FMainView write SetMainView;
-    property OnCreateMainView: TCreateMainViewEvent read FOnCreateMainView write FOnCreateMainView;
   published
     //property Action;
     property Align;
@@ -834,6 +833,7 @@ type
     property Visible;
     property Width;
     //--
+    property OnCreateMainView: TCreateMainViewEvent read FOnCreateMainView write FOnCreateMainView;
     property OnCreateLoadingContent: TView.TCreateLoadingContentEvent read FOnCreateLoadingContent write FOnCreateLoadingContent;
     property OnCreateErrorContent: TView.TCreateErrorContentEvent read FOnCreateErrorContent write FOnCreateErrorContent; // [MultiThread]
     property OnCreateNoItemsContent: TView.TCreateNoItemsContentEvent read FOnCreateNoItemsContent write FOnCreateNoItemsContent;
@@ -2016,8 +2016,22 @@ begin
     Owner.UpdateScrollEngineLimits;
 
     var LMustSetViewportPosition: Boolean;
-    if not Owner.FInitialItemHandled then begin
-      Owner.FInitialItemHandled := True;
+    if Owner.FInitialItemHandled = 0 then begin
+      Owner.FInitialItemHandled := 1;
+      // The initial-item scroll is also attempted later, before OnShowMainContent,
+      // because this event may be called while the items are still dirty, meaning
+      // their final content has not been downloaded/measured yet.
+      //
+      // Example: if the screen height is 800 px and each dirty item initially has
+      // a height of 50 px, then 3 items will all fit on screen. If the requested
+      // initial item is the third one, ScrollToItem may do nothing because there is
+      // not enough content height to scroll. In that case, the first item remains
+      // stuck at the top of the list box.
+      //
+      // Normally, OnShowMainContent is called after the loading content has been
+      // displayed and after all images have been downloaded. At that point, each
+      // item has its final height, so ScrollToItem can position the initial item
+      // correctly.
       if Owner.FInitialInt64ItemID <> 0 then LMustSetViewportPosition := not Owner.ScrollToItem(Owner.FInitialInt64ItemID, false{AHideTopBar}, false{AHideBottomBar}, 0{ADuration})
       else if Owner.FInitialTextItemID <> '' then LMustSetViewportPosition := not Owner.ScrollToItem(Owner.FInitialTextItemID, false{AHideTopBar}, false{AHideBottomBar}, 0{ADuration})
       else LMustSetViewportPosition := True;
@@ -2485,7 +2499,7 @@ begin
   FHandleMouseEvents := False;
   FIsSettingViewportPosition := False;
   FRefreshTransitionKind := TRefreshTransitionKind.CrossFade;
-  FInitialItemHandled := False;
+  FInitialItemHandled := 0;
   FInitialInt64ItemID := 0;
   FInitialTextItemID := '';
   fLastViewportPosition := TALPointD.Create(0,0);
@@ -3515,7 +3529,8 @@ begin
             // Scrolling down (from left to right) — show the top bar
             else begin
               // Not in the overscroll-at-right zone
-              if (aValue.X < FScrollEngine.MaxScrollLimit.X - 1{*}) then begin
+              if (aValue.X < FScrollEngine.MaxScrollLimit.X - 1{*}) or
+                 (SameValue(FScrollEngine.MaxScrollLimit.X, 0, TEpsilon.Position)) then begin
                 var LLeft: Double := min(0, FTopBar.Left + (LOldViewportPosition.X - aValue.X));
                 if LLeft < -FTopBar.Width + TEpsilon.Position then begin
                   FTopBar.Visible := False;
@@ -3568,7 +3583,8 @@ begin
             // Scrolling down (from top to bottom) — show the top bar
             else begin
               // Not in the overscroll-at-bottom zone
-              if (aValue.Y < FScrollEngine.MaxScrollLimit.Y - 1{*}) then begin
+              if (aValue.Y < FScrollEngine.MaxScrollLimit.Y - 1{*}) or
+                 (SameValue(FScrollEngine.MaxScrollLimit.Y, 0, TEpsilon.Position)) then begin
                 var LTop: Double := min(0, FTopBar.top + (LOldViewportPosition.Y - aValue.Y));
                 if LTop < -FTopBar.Height + TEpsilon.Position then begin
                   FTopBar.Visible := False;
@@ -3633,7 +3649,8 @@ begin
             // Scrolling down (from left to right) — show the bottom bar
             else begin
               // Not in the overscroll-at-right zone
-              if (aValue.X < FScrollEngine.MaxScrollLimit.X - 1{*}) then begin
+              if (aValue.X < FScrollEngine.MaxScrollLimit.X - 1{*}) or
+                 (SameValue(FScrollEngine.MaxScrollLimit.X, 0, TEpsilon.Position)) then begin
                 var LLeft: Double := max(Width - FBottomBar.Width, FBottomBar.Left - (LOldViewportPosition.X - aValue.X));
                 if LLeft > Width - TEpsilon.Position then begin
                   FBottomBar.Visible := False;
@@ -3686,7 +3703,8 @@ begin
             // Scrolling down (from top to bottom) — show the bottom bar
             else begin
               // Not in the overscroll-at-bottom zone
-              if (aValue.Y < FScrollEngine.MaxScrollLimit.Y - 1{*}) then begin
+              if (aValue.Y < FScrollEngine.MaxScrollLimit.Y - 1{*}) or
+                 (SameValue(FScrollEngine.MaxScrollLimit.Y, 0, TEpsilon.Position)) then begin
                 var LTop: Double := max(Height - FBottomBar.Height, FBottomBar.top - (LOldViewportPosition.Y - aValue.Y));
                 if LTop > Height - TEpsilon.Position then begin
                   FBottomBar.Visible := False;
@@ -4108,6 +4126,10 @@ begin
       end;
     end;
     DoScrollToItemIndex;
+  end;
+  if not scrollengine.TimerActive then begin
+    FTopBarLockedByScrollToItem := False;
+    FBottomBarLockedByScrollToItem := False;
   end;
 end;
 
@@ -4870,6 +4892,11 @@ begin
       if FLoadMoreIndicator <> nil then FLoadMoreIndicator.Visible := (FPaginationToken <> '') and (FDownloadItemsErrorCode = '');
       if FLoadMoreRetryButton <> nil then FLoadMoreRetryButton.Visible := (FPaginationToken <> '') and (FDownloadItemsErrorCode <> '');
       SetViewportPosition(ViewportPosition);
+      if FInitialItemHandled = 1 then begin
+        FInitialItemHandled := 2;
+        if FInitialInt64ItemID <> 0 then ScrollToItem(FInitialInt64ItemID, false{AHideTopBar}, false{AHideBottomBar}, 0{ADuration})
+        else ScrollToItem(FInitialTextItemID, false{AHideTopBar}, false{AHideBottomBar}, 0{ADuration});
+      end;
       if assigned(FOnShowMainContent) then FOnShowMainContent(FMainContent);
     end;
     //--

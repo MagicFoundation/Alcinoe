@@ -91,6 +91,7 @@ type
     FForm: TCommonCustomForm; // 8 bytes
     FALParentControl: TALControl; // 8 bytes
     FControlAbsolutePosAtMouseDown: TpointF; // 8 bytes
+    FMouseLocalPosAtMouseDown: TpointF; // 8 bytes
     FFocusOnMouseDown: Boolean; // 1 byte
     FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtRest: Boolean; // 1 byte
@@ -324,6 +325,7 @@ begin
   FForm := nil;
   FALParentControl := nil;
   FControlAbsolutePosAtMouseDown := TpointF.zero;
+  FMouseLocalPosAtMouseDown := TpointF.zero;
   FFocusOnMouseDown := False;
   FFocusOnMouseUp := False;
   FMouseDownAtRest := True;
@@ -1593,6 +1595,7 @@ begin
   var LPrevPressed := Pressed;
   //--
   FControlAbsolutePosAtMouseDown := LocalToAbsolute(TPointF.Zero);
+  FMouseLocalPosAtMouseDown := TPointF.Create(X, Y);
   FMouseDownAtRest := not IsInMotion;
   //--
   FDoubleClick := ssDouble in Shift;
@@ -1642,6 +1645,8 @@ begin
      (FMouseDownAtRest) and
      (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) <= TALScrollEngine.DefaultTouchSlop) and
      (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) <= TALScrollEngine.DefaultTouchSlop) and
+     (abs(FMouseLocalPosAtMouseDown.x - X) <= TALScrollEngine.DefaultTouchSlop) and
+     (abs(FMouseLocalPosAtMouseDown.y - Y) <= TALScrollEngine.DefaultTouchSlop) and
      (not (csDesigning in ComponentState)) and
      (not FIsFocused) then
     SetFocus;
@@ -1655,7 +1660,9 @@ begin
   var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);
   if (not FMouseDownAtRest) or
      (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) > TALScrollEngine.DefaultTouchSlop) or
-     (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) > TALScrollEngine.DefaultTouchSlop) then begin
+     (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) > TALScrollEngine.DefaultTouchSlop) or
+     (abs(FMouseLocalPosAtMouseDown.x - X) > TALScrollEngine.DefaultTouchSlop) or
+     (abs(FMouseLocalPosAtMouseDown.y - Y) > TALScrollEngine.DefaultTouchSlop) then begin
     {$IF defined(debug)}
     if (not FMouseDownAtRest) then
       ALLog(Classname+'.MouseClick', 'Skipped | Mouse Down was not made at Low Velocity')
@@ -1663,6 +1670,10 @@ begin
       ALLog(Classname+'.MouseClick', 'Skipped | Control moved by '+ALFormatFloatW('0.##', abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x)) + ' horizontally')
     else if (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) > TALScrollEngine.DefaultTouchSlop) then
       ALLog(Classname+'.MouseClick', 'Skipped | Control moved by '+ALFormatFloatW('0.##', abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y)) + ' vertically')
+    else if (abs(FMouseLocalPosAtMouseDown.x - X) > TALScrollEngine.DefaultTouchSlop) then
+      ALLog(Classname+'.MouseClick', 'Skipped | Finger moved by '+ALFormatFloatW('0.##', abs(FMouseLocalPosAtMouseDown.x - X)) + ' horizontally')
+    else if (abs(FMouseLocalPosAtMouseDown.y - Y) > TALScrollEngine.DefaultTouchSlop) then
+      ALLog(Classname+'.MouseClick', 'Skipped | Finger moved by '+ALFormatFloatW('0.##', abs(FMouseLocalPosAtMouseDown.y - Y)) + ' vertically')
     else
       raise Exception.Create('Error 79BF6F83-8725-476D-A283-507BE9CC671C');
     {$ENDIF}

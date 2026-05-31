@@ -120,7 +120,6 @@ Type
     procedure PaddingChangedHandler(Sender: TObject); // [TControl] procedure PaddingChangedHandler(Sender: TObject); overload;
     procedure MarginsChangedHandler(Sender: TObject); // [TControl] procedure MarginsChanged(Sender: TObject);
     function GetControlByIndex(Const AIndex: Integer): TALDynamicControl;
-    function GetControlByName(Const AName: String): TALDynamicControl;
     function GetForm: TCommonCustomForm;
   protected
     FOwner: TALDynamicControl; // 8 bytes | [TControl] FOwner: TComponent; FParentControl: TControl;
@@ -307,6 +306,8 @@ Type
                const APos: TALPointD; // APos is local to the control
                const ACheckHitTest: Boolean = true): TALDynamicControl; overload; virtual; // [TControl] function ObjectAtPoint(AScreenPoint: TPointF): IControl; virtual;
     procedure EnumControls(const Proc: TFunc<TALDynamicControl, TEnumControlsResult>);
+    function GetControlByName(Const AName: String): TALDynamicControl; overload;
+    function GetControlByName(Const APath: array of String): TALDynamicControl; overload;
     property Controls[const Index: Integer]: TALDynamicControl read GetControlByIndex; default; // [TControl] property Controls: TControlList read GetControls;
     property Controls[const Name: String]: TALDynamicControl read GetControlByName; default; // [TControl] property Controls: TControlList read GetControls;
     property ControlsCount: Integer read FControlsCount; // [TControl] property ControlsCount: Integer read GetControlsCount;
@@ -339,6 +340,7 @@ type
     //**FForm: TCommonCustomForm; // 8 bytes
     //**FOwner: TALDynamicControl; // 8 bytes
     FControlAbsolutePosAtMouseDown: TALPointD; // 8 bytes
+    FMouseLocalPosAtMouseDown: TpointF; // 8 bytes
     //**FFocusOnMouseDown: Boolean; // 1 byte
     //**FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtRest: Boolean; // 1 byte
@@ -987,6 +989,16 @@ begin
       exit(FControls[I]);
 end;
 
+{*******************************************************************************************}
+function TALDynamicControl.GetControlByName(Const APath: array of String): TALDynamicControl;
+begin
+  Result := Self;
+  for var I := low(APath) to high(APath) do begin
+    Result := Result.GetControlByName(APath[I]);
+    if result = nil then exit;
+  end;
+end;
+
 {*****************************************}
 function TALDynamicControl.GetControlAtPos(
            const APos: TALPointD; // APos is local to the control
@@ -1001,19 +1013,39 @@ begin
   //  AControlPos := TALPointD.Zero;
   //  exit(nil);
   //end;
-  if ControlsCount > 0 then
+  result := nil;
+  if ControlsCount > 0 then begin
+    var LBestDistSq: Double := 0;
     for var I := GetLastVisibleObjectIndex downto GetFirstVisibleObjectIndex do
     begin
       var LControl := Controls[I];
       if not IsVisibleChild(LControl) then
         Continue;
-      result := LControl.GetControlAtPos(
-                  APos - LControl.BoundsRect.TopLeft,
-                  AControlPos,
-                  ACheckHitTest);
-      if result <> nil then
-        exit;
+      var LCandidatePos: TALPointD;
+      var LCandidate := LControl.GetControlAtPos(
+                          APos - LControl.BoundsRect.TopLeft,
+                          LCandidatePos,
+                          ACheckHitTest);
+      if LCandidate <> nil then begin
+        // Distance from APos to LCandidate's center.
+        // LCandidateControlPos is APos expressed in LCandidate's local space,
+        // so (LCandidateControlPos - LCandidate.LocalRect.CenterPoint) is the
+        // vector from the candidate's center to APos. Its squared length is
+        // invariant under translation, so it equals |APos - centerInSelfSpace|^2.
+        var LCenter := LCandidate.LocalRect.CenterPoint;
+        var LDx := LCandidatePos.X - LCenter.X;
+        var LDy := LCandidatePos.Y - LCenter.Y;
+        var LDistSq := (LDx * LDx) + (LDy * LDy);
+        if (result = nil) or (LDistSq < LBestDistSq) then begin
+          result := LCandidate;
+          AControlPos := LCandidatePos;
+          LBestDistSq := LDistSq;
+        end;
+      end;
     end;
+    if result <> nil then
+      exit;
+  end;
 
   if ExpandedLocalRect.Contains(aPos) and ((not ACheckHitTest) or (HitTest)) then begin
     result := Self;
@@ -2634,6 +2666,7 @@ begin
   //**FForm := nil;
   //**FOwner := nil;
   FControlAbsolutePosAtMouseDown := TALPointD.zero;
+  FMouseLocalPosAtMouseDown := TpointF.zero;
   //**FFocusOnMouseDown := False;
   //**FFocusOnMouseUp := False;
   FMouseDownAtRest := True;
@@ -3904,6 +3937,7 @@ begin
   var LPrevPressed := Pressed;
   //--
   FControlAbsolutePosAtMouseDown := LocalToAbsolute(TPointF.Zero);
+  FMouseLocalPosAtMouseDown := TPointF.Create(X, Y);
   FMouseDownAtRest := not IsInMotion;
   //--
   FDoubleClick := ssDouble in Shift;
@@ -3966,7 +4000,9 @@ begin
   var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);
   if (not FMouseDownAtRest) or
      (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) > TALScrollEngine.DefaultTouchSlop) or
-     (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) > TALScrollEngine.DefaultTouchSlop) then begin
+     (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) > TALScrollEngine.DefaultTouchSlop) or
+     (abs(FMouseLocalPosAtMouseDown.x - X) > TALScrollEngine.DefaultTouchSlop) or
+     (abs(FMouseLocalPosAtMouseDown.y - Y) > TALScrollEngine.DefaultTouchSlop) then begin
     {$IF defined(debug)}
     if (not FMouseDownAtRest) then
       ALLog(Classname+'.MouseClick', 'Skipped | Mouse Down was not made at Low Velocity')
@@ -3974,6 +4010,10 @@ begin
       ALLog(Classname+'.MouseClick', 'Skipped | Control moved by '+ALFormatFloatW('0.##', abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x)) + ' horizontally')
     else if (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) > TALScrollEngine.DefaultTouchSlop) then
       ALLog(Classname+'.MouseClick', 'Skipped | Control moved by '+ALFormatFloatW('0.##', abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y)) + ' vertically')
+    else if (abs(FMouseLocalPosAtMouseDown.x - X) > TALScrollEngine.DefaultTouchSlop) then
+      ALLog(Classname+'.MouseClick', 'Skipped | Finger moved by '+ALFormatFloatW('0.##', abs(FMouseLocalPosAtMouseDown.x - X)) + ' horizontally')
+    else if (abs(FMouseLocalPosAtMouseDown.y - Y) > TALScrollEngine.DefaultTouchSlop) then
+      ALLog(Classname+'.MouseClick', 'Skipped | Finger moved by '+ALFormatFloatW('0.##', abs(FMouseLocalPosAtMouseDown.y - Y)) + ' vertically')
     else
       raise Exception.Create('Error 79BF6F83-8725-476D-A283-507BE9CC671C');
     {$ENDIF}

@@ -4,10 +4,11 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IF defined(MSWindows)}
 uses
-  Winapi.Winsock2;
-{$ENDIF}
+  {$IF defined(MSWindows)}
+  Winapi.Winsock2,
+  {$ENDIF}
+  System.SysUtils;
 
 type
   TALIPv6Binary = array[0..15] of Byte;
@@ -22,6 +23,8 @@ function ALNumericToIPv4StrA(const AIPv4: Cardinal): AnsiString; overload;
 function ALNumericToIPv4StrW(const AIPv4: Cardinal): String; overload;
 function ALIPv4EndOfRange(const AStartIPv4: Cardinal; const AMaskLength: integer): Cardinal;
 
+function ALTryBytesToIPV6Binary(const ABytes: TBytes; out AIPV6Bin: TALIPv6Binary): Boolean;
+function ALBytesToIPV6Binary(const ABytes: TBytes): TALIPv6Binary;
 function ALIsZeroIPv6(const AIPV6: TALIPv6Binary): Boolean;
 function ALTryIPV6StrToBinary(const AIPV6Str: AnsiString; out AIPV6Bin: TALIPv6Binary): Boolean;
 function ALIPV6StrTobinary(const AIPV6: AnsiString): TALIPv6Binary;
@@ -66,7 +69,6 @@ uses
   Winapi.Windows,
   Winapi.ShellAPI,
   {$ENDIF}
-  System.SysUtils,
   Alcinoe.StringList,
   Alcinoe.StringUtils,
   Alcinoe.Common;
@@ -219,6 +221,22 @@ begin
 
   LNetStart := AStartIPv4 and not LHostMask; // ensure we’re aligned to the subnet
   Result := LNetStart or LHostMask;          // last address in that subnet (incl. broadcast)
+end;
+
+{******************************************************************************************}
+function ALTryBytesToIPV6Binary(const ABytes: TBytes; out AIPV6Bin: TALIPv6Binary): Boolean;
+begin
+  if Length(ABytes) <> SizeOf(TALIPv6Binary) then
+    Exit(False);
+  ALMove(ABytes[0], AIPV6Bin[0], SizeOf(TALIPv6Binary));
+  Result := True;
+end;
+
+{****************************************************************}
+function ALBytesToIPV6Binary(const ABytes: TBytes): TALIPv6Binary;
+begin
+  if not ALTryBytesToIPV6Binary(ABytes, Result) then
+    Raise EALException.CreateFmt('Bad IPv6 byte array length: expected %d bytes, got %d', [SizeOf(TALIPv6Binary), Length(ABytes)]);
 end;
 
 {*********************************************************}

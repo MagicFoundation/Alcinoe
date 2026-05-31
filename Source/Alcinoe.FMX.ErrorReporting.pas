@@ -83,7 +83,7 @@ end;
 procedure TALErrorReporter.HandleExceptionReportMessage(const Sender: TObject; const M: TMessage);
 begin
   var LExceptionReport := TgoExceptionReportMessage(M).Report;
-  ALLog('Unhandled Exception', ALAdjustLineBreaks(LExceptionReport.Report), TALLogType.ERROR);
+  ALLog('Unhandled Exception - ' + ALAdjustLineBreaks(LExceptionReport.ExceptionMessage), ALAdjustLineBreaks(LExceptionReport.Report), TALLogType.ERROR);
 end;
 
 {************************************************************************************************************}

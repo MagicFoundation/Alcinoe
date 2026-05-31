@@ -1,3 +1,23 @@
+## 05/31/2026
+
+- Improved click-vs-scroll discrimination in `TALControl` and `TALDynamicControl`:
+  - tracks finger local position at mouse-down (`FMouseLocalPosAtMouseDown`)
+  - suppresses the click event if the finger moved more than `DefaultTouchSlop` between 
+    press and release, independent of any scroll movement in the control
+- Updated `TALDynamicControl`:
+  - `GetControlByName` moved from private to public; added path-array overload 
+    `GetControlByName(const APath: array of String): TALDynamicControl`
+  - `GetControlAtPos` reworked: instead of returning the first hit, selects the 
+    candidate whose center is nearest to the query point (distance-squared 
+    comparison across all candidates)
+- Updated `TALDynamicListBox`:
+  - `OnCreateMainView` moved to the `published` section
+- Updated `TALErrorReporter`: unhandled-exception log entry now includes the exception 
+  message in the title (`'Unhandled Exception - ' + ExceptionMessage`)
+- Added IPv6 byte helpers to `Alcinoe.Net`:
+  - `ALTryBytesToIPV6Binary(ABytes: TBytes; out AIPV6Bin: TALIPv6Binary): Boolean`
+  - `ALBytesToIPV6Binary(ABytes: TBytes): TALIPv6Binary`
+
 ## 05/22/2026
 
 - Updated `TALHttpWorker`:

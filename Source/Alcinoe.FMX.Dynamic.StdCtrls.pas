@@ -526,6 +526,7 @@ type
     //**property CanFocus default True;
     property Cursor default crHandPoint;
     property Checked: Boolean read GetChecked write SetChecked default False;
+    procedure SetCheckedNoChange(const Value: Boolean);
     property CheckMark: TCheckMarkBrush read FCheckMark write SetCheckMark;
     property DoubleBuffered default true;
     property StateStyles: TStateStyles read FStateStyles write SetStateStyles;
@@ -5029,6 +5030,18 @@ begin
     if FChecked then DisabledOpacity := StateStyles.Checked.Disabled.opacity
     else DisabledOpacity := StateStyles.Unchecked.Disabled.opacity;
     DoChanged;
+  end;
+end;
+
+{************************************************************************}
+procedure TALDynamicBaseCheckBox.SetCheckedNoChange(const Value: Boolean);
+begin
+  var LPrevOnChange := fOnChange;
+  fOnChange := nil;
+  try
+    SetChecked(Value);
+  finally
+    fOnChange := LPrevOnChange;
   end;
 end;
 

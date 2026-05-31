@@ -1068,6 +1068,28 @@ function TALMongoDBClient.FindAndModify(
            const ANew: ByteBool): TALJsonNodeA;
 begin
 
+  //
+  // Returns
+  // {
+  //   "lastErrorObject":{
+  //     "n":NumberInt(1),
+  //     "updatedExisting":true
+  //   },
+  //   "value":{
+  //     ...
+  //   },
+  //   "ok":1,
+  //   "$clusterTime":{
+  //     "clusterTime":Timestamp(1,1776111267),
+  //     "signature":{
+  //       "hash":BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+  //       "keyId":NumberLong(0)
+  //     }
+  //   },
+  //   "operationTime":Timestamp(1,1776111267)
+  // }
+  //
+
   var LOwnsClient: Boolean := False;
   var LClient := FClient;
 
@@ -1236,6 +1258,29 @@ function TALMongoDBClient.FindAndModify(
            const AUpsert: ByteBool;
            const ANew: ByteBool): TALJsonNodeA;
 begin
+
+  //
+  // Returns
+  // {
+  //   "lastErrorObject":{
+  //     "n":NumberInt(1),
+  //     "updatedExisting":true
+  //   },
+  //   "value":{
+  //     ...
+  //   },
+  //   "ok":1,
+  //   "$clusterTime":{
+  //     "clusterTime":Timestamp(1,1776111267),
+  //     "signature":{
+  //       "hash":BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+  //       "keyId":NumberLong(0)
+  //     }
+  //   },
+  //   "operationTime":Timestamp(1,1776111267)
+  // }
+  //
+
   Result := FindAndModify(
               ADatabaseName, // const ADatabaseName: AnsiString;
               ACollectionName, // const ACollectionName: AnsiString;
@@ -1247,6 +1292,7 @@ begin
               ARemove, // const ARemove: ByteBool;
               AUpsert, // const AUpsert: ByteBool;
               ANew); // const ANew: ByteBool): TALJsonNodeA;
+
 end;
 
 {**************************************}
@@ -1261,6 +1307,29 @@ function TALMongoDBClient.FindAndModify(
            const AUpsert: ByteBool;
            const ANew: ByteBool): TALJsonNodeA;
 begin
+
+  //
+  // Returns
+  // {
+  //   "lastErrorObject":{
+  //     "n":NumberInt(1),
+  //     "updatedExisting":true
+  //   },
+  //   "value":{
+  //     ...
+  //   },
+  //   "ok":1,
+  //   "$clusterTime":{
+  //     "clusterTime":Timestamp(1,1776111267),
+  //     "signature":{
+  //       "hash":BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+  //       "keyId":NumberLong(0)
+  //     }
+  //   },
+  //   "operationTime":Timestamp(1,1776111267)
+  // }
+  //
+
   Result := FindAndModify(
               ADatabaseName, // const ADatabaseName: AnsiString;
               ACollectionName, // const ACollectionName: AnsiString;
@@ -1272,6 +1341,7 @@ begin
               ARemove, // const ARemove: ByteBool;
               AUpsert, // const AUpsert: ByteBool;
               ANew); // const ANew: ByteBool): TALJsonNodeA;
+
 end;
 
 {**********************************}
@@ -1282,6 +1352,11 @@ function TALMongoDBClient.InsertOne(
            const ADocumentBSON: TBytes;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
+
+  //
+  // Returns
+  // {"insertedCount":NumberInt(1), "insertedId":NumberLong(-6810411464464853625)}
+  //
 
   var LOwnsClient: Boolean := False;
   var LClient := FClient;
@@ -1384,12 +1459,19 @@ function TALMongoDBClient.InsertOne(
            const ADocument: AnsiString;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
+
+  //
+  // Returns
+  // {"insertedCount":NumberInt(1), "insertedId":NumberLong(-6810411464464853625)}
+  //
+
   Result := InsertOne(
               ADatabaseName, // const ADatabaseName: AnsiString;
               ACollectionName, // const ACollectionName: AnsiString;
               ADocument, // const ADocumentJSON: AnsiString;
               nil, // const ADocumentBSON: TBytes;
               AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+
 end;
 
 {**********************************}
@@ -1399,12 +1481,19 @@ function TALMongoDBClient.InsertOne(
            const ADocument: TBytes;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
+
+  //
+  // Returns
+  // {"insertedCount":NumberInt(1), "insertedId":NumberLong(-6810411464464853625)}
+  //
+
   Result := InsertOne(
               ADatabaseName, // const ADatabaseName: AnsiString;
               ACollectionName, // const ACollectionName: AnsiString;
               '', // const ADocumentJSON: AnsiString;
               ADocument, // const ADocumentBSON: TBytes;
               AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+
 end;
 
 {***********************************}
@@ -1575,6 +1664,12 @@ function TALMongoDBClient.UpdateOne(
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
 
+  //
+  // Returns:
+  // {"modifiedCount":NumberInt(1),"matchedCount":NumberInt(1),"upsertedCount":NumberInt(0)}
+  // {"modifiedCount":NumberInt(0),"matchedCount":NumberInt(0),"upsertedCount":NumberInt(1),"upsertedId":NumberLong(-5777534431705297019)}
+  //
+
   var LOwnsClient: Boolean := False;
   var LClient := FClient;
 
@@ -1688,6 +1783,13 @@ function TALMongoDBClient.UpdateOne(
            const AUpdate: AnsiString;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
+
+  //
+  // Returns:
+  // {"modifiedCount":NumberInt(1),"matchedCount":NumberInt(1),"upsertedCount":NumberInt(0)}
+  // {"modifiedCount":NumberInt(0),"matchedCount":NumberInt(0),"upsertedCount":NumberInt(1),"upsertedId":NumberLong(-5777534431705297019)}
+  //
+
   Result := UpdateOne(
               ADatabaseName, // const ADatabaseName: AnsiString;
               ACollectionName, // const ACollectionName: AnsiString;
@@ -1695,6 +1797,7 @@ begin
               AUpdate, // const AUpdateJSON: AnsiString;
               nil, // const AUpdateBSON: TBytes;
               AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+
 end;
 
 {**********************************}
@@ -1705,6 +1808,13 @@ function TALMongoDBClient.UpdateOne(
            const AUpdate: TBytes;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
+
+  //
+  // Returns:
+  // {"modifiedCount":NumberInt(1),"matchedCount":NumberInt(1),"upsertedCount":NumberInt(0)}
+  // {"modifiedCount":NumberInt(0),"matchedCount":NumberInt(0),"upsertedCount":NumberInt(1),"upsertedId":NumberLong(-5777534431705297019)}
+  //
+
   Result := UpdateOne(
               ADatabaseName, // const ADatabaseName: AnsiString;
               ACollectionName, // const ACollectionName: AnsiString;
@@ -1712,6 +1822,7 @@ begin
               '', // const AUpdateJSON: AnsiString;
               AUpdate, // const AUpdateBSON: TBytes;
               AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+
 end;
 
 {***********************************}
@@ -1873,6 +1984,11 @@ function TALMongoDBClient.ReplaceOne(
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
 
+  //
+  // Returns
+  // {"modifiedCount":NumberInt(1),"matchedCount":NumberInt(1),"upsertedCount":NumberInt(0)}
+  //
+
   var LOwnsClient: Boolean := False;
   var LClient := FClient;
 
@@ -1986,6 +2102,12 @@ function TALMongoDBClient.ReplaceOne(
            const AReplacement: AnsiString;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
+
+  //
+  // Returns
+  // {"modifiedCount":NumberInt(1),"matchedCount":NumberInt(1),"upsertedCount":NumberInt(0)}
+  //
+
   Result := ReplaceOne(
               ADatabaseName, // const ADatabaseName: AnsiString;
               ACollectionName, // const ACollectionName: AnsiString;
@@ -1993,6 +2115,7 @@ begin
               AReplacement, // const AReplacementJSON: AnsiString;
               nil, // const AReplacementBSON: TBytes;
               AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+
 end;
 
 {***********************************}
@@ -2003,6 +2126,12 @@ function TALMongoDBClient.ReplaceOne(
            const AReplacement: TBytes;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
+
+  //
+  // Returns
+  // {"modifiedCount":NumberInt(1),"matchedCount":NumberInt(1),"upsertedCount":NumberInt(0)}
+  //
+
   Result := ReplaceOne(
               ADatabaseName, // const ADatabaseName: AnsiString;
               ACollectionName, // const ACollectionName: AnsiString;
@@ -2010,6 +2139,7 @@ begin
               '', // const AReplacementJSON: AnsiString;
               AReplacement, // const AReplacementBSON: TBytes;
               AOpts); // const AOpts: AnsiString = ''): TALJsonNodeA;
+
 end;
 
 {**********************************}
@@ -2019,6 +2149,11 @@ function TALMongoDBClient.DeleteOne(
            const ASelector: AnsiString;
            const AOpts: AnsiString = ''): TALJsonNodeA;
 begin
+
+  //
+  // Returns
+  // {"deletedCount":NumberInt(1)}
+  //
 
   var LOwnsClient: Boolean := False;
   var LClient := FClient;

@@ -4895,7 +4895,7 @@ begin
       if FInitialItemHandled = 1 then begin
         FInitialItemHandled := 2;
         if FInitialInt64ItemID <> 0 then ScrollToItem(FInitialInt64ItemID, false{AHideTopBar}, false{AHideBottomBar}, 0{ADuration})
-        else ScrollToItem(FInitialTextItemID, false{AHideTopBar}, false{AHideBottomBar}, 0{ADuration});
+        else if FInitialTextItemID <> '' then ScrollToItem(FInitialTextItemID, false{AHideTopBar}, false{AHideBottomBar}, 0{ADuration});
       end;
       if assigned(FOnShowMainContent) then FOnShowMainContent(FMainContent);
     end;

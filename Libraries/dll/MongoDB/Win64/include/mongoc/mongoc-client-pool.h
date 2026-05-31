@@ -87,6 +87,12 @@ mongoc_client_pool_set_structured_log_opts(mongoc_client_pool_t *pool, const mon
 MONGOC_EXPORT(bool)
 mongoc_client_pool_set_oidc_callback(mongoc_client_pool_t *pool, const mongoc_oidc_callback_t *callback);
 
+MONGOC_EXPORT(bool)
+mongoc_client_pool_append_metadata(mongoc_client_pool_t *pool,
+                                   const char *name,
+                                   const char *version,
+                                   const char *platform);
+
 BSON_END_DECLS
 
 

@@ -112,7 +112,7 @@ typedef struct _bson_json_opts_t bson_json_opts_t;
  * on http://bsonspec.org. If you would like the bson_oid_t in string form
  * see bson_oid_to_string() or bson_oid_to_string_r().
  */
-typedef struct {
+typedef struct bson_oid_t {
    uint8_t bytes[12];
 } bson_oid_t;
 
@@ -327,7 +327,7 @@ typedef struct _bson_value_t {
  * This structure is safe to discard on the stack. No cleanup is necessary
  * after using it.
  */
-typedef struct {
+typedef struct bson_iter_t {
    const uint8_t *raw; /* The raw buffer being iterated. */
    uint32_t len;       /* The length of raw. */
    uint32_t off;       /* The offset within the buffer. */

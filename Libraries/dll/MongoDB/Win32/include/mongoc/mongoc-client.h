@@ -280,6 +280,9 @@ mongoc_client_get_handshake_description(mongoc_client_t *client, uint32_t server
 MONGOC_EXPORT(bool)
 mongoc_client_set_oidc_callback(mongoc_client_t *client, const mongoc_oidc_callback_t *callback);
 
+MONGOC_EXPORT(bool)
+mongoc_client_append_metadata(mongoc_client_t *client, const char *name, const char *version, const char *platform);
+
 BSON_END_DECLS
 
 

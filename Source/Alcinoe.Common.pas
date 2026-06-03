@@ -3186,6 +3186,37 @@ begin
   inherited CreateFmt(Msg, Args);
 end;
 
+{$IF defined(IOS)}
+const
+  libSystem = '/usr/lib/libSystem.dylib';
+  libdyld = '/usr/lib/system/libdyld.dylib';
+
+  OS_LOG_TYPE_DEFAULT = $00;
+  OS_LOG_TYPE_INFO    = $01;
+  OS_LOG_TYPE_DEBUG   = $02;
+  OS_LOG_TYPE_ERROR   = $10;
+  OS_LOG_TYPE_FAULT   = $11;
+
+type
+  os_log_t = Pointer;
+  os_log_type_t = Byte; // uint8_t
+
+// os_release(void *object);
+procedure os_release(&object: Pointer); cdecl; external libSystem;
+// os_log_t os_log_create(const char *subsystem, const char *category);
+function os_log_create(subsystem: MarshaledAString; category: MarshaledAString): os_log_t; cdecl; external libSystem;
+// bool os_log_type_enabled(os_log_t oslog, os_log_type_t type);
+function os_log_type_enabled(oslog: os_log_t; &type: os_log_type_t): Boolean; cdecl; external libSystem;
+// void _os_log_impl(void *dso, os_log_t log, os_log_type_t type, const char *format, uint8_t *buf, uint32_t size);
+procedure _os_log_impl(dso: Pointer; log: os_log_t; &type: os_log_type_t; format: MarshaledAString; buf: PByte; size: Cardinal); cdecl; external libSystem;
+// const struct mach_header* _dyld_get_image_header(uint32_t image_index)
+function _dyld_get_image_header(image_index: Cardinal): Pointer; cdecl; external libdyld;
+
+var
+  _ImageHeader: Pointer;
+  _LogHandle: Pointer;
+{$ENDIF}
+
 type
 
   {******************}
@@ -3329,6 +3360,7 @@ begin
     TalLogType.ASSERT: TJutil_Log.JavaClass.wtf(StringToJString(Tag), StringToJString(LMsg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
   end;
   {$ELSEIF defined(IOS)}
+  If (_LogHandle = nil) or (_ImageHeader = nil) then exit;
   if LMsg <> '' then LMsg := Tag + ' | ' + LMsg
   else LMsg := Tag;
   var LThreadID: String;
@@ -3339,14 +3371,23 @@ begin
   var P: integer := 1;
   while P <= length(LMsg) do begin
     var LMsgPart := ALCopyStr(LMsg, P, 950); // to stay safe
+    LMsgPart := ALStringReplaceW(LMsgPart, '%', '%%', [rfReplaceAll]);
     inc(P, 950);
+    var M: TMarshaller;
+    var LBuf: UInt16 := 0;
     case &Type of
-      TalLogType.VERBOSE: NSLog(StringToID('[V]'+LThreadID+' ' + LMsgPart));
-      TalLogType.DEBUG:   NSLog(StringToID('[D][V]'+LThreadID+' ' + LMsgPart));
-      TalLogType.INFO:    NSLog(StringToID('[I][D][V]'+LThreadID+' ' + LMsgPart));
-      TalLogType.WARN:    NSLog(StringToID('[W][I][D][V]'+LThreadID+' ' + LMsgPart));
-      TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V]'+LThreadID+' ' + LMsgPart));
-      TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V]'+LThreadID+' ' + LMsgPart));
+      // TalLogType.VERBOSE: NSLog(StringToID('[V]'+LThreadID+' ' + LMsgPart));
+      // TalLogType.DEBUG:   NSLog(StringToID('[D][V]'+LThreadID+' ' + LMsgPart));
+      // TalLogType.INFO:    NSLog(StringToID('[I][D][V]'+LThreadID+' ' + LMsgPart));
+      // TalLogType.WARN:    NSLog(StringToID('[W][I][D][V]'+LThreadID+' ' + LMsgPart));
+      // TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V]'+LThreadID+' ' + LMsgPart));
+      // TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V]'+LThreadID+' ' + LMsgPart));
+      TalLogType.VERBOSE: _os_log_impl(_ImageHeader{dso}, _LogHandle{log}, OS_LOG_TYPE_DEFAULT{&type}, M.AsAnsi('[V]'+LThreadID+' '+LMsgPart).ToPointer{format}, @LBuf{buf}, SizeOf(LBuf){size});
+      TalLogType.DEBUG:   _os_log_impl(_ImageHeader{dso}, _LogHandle{log}, OS_LOG_TYPE_DEFAULT{&type}, M.AsAnsi('[D][V]'+LThreadID+' '+LMsgPart).ToPointer{format}, @LBuf{buf}, SizeOf(LBuf){size});
+      TalLogType.INFO:    _os_log_impl(_ImageHeader{dso}, _LogHandle{log}, OS_LOG_TYPE_DEFAULT{&type}, M.AsAnsi('[I][D][V]'+LThreadID+' '+LMsgPart).ToPointer{format}, @LBuf{buf}, SizeOf(LBuf){size});
+      TalLogType.WARN:    _os_log_impl(_ImageHeader{dso}, _LogHandle{log}, OS_LOG_TYPE_DEFAULT{&type}, M.AsAnsi('[W][I][D][V]'+LThreadID+' '+LMsgPart).ToPointer{format}, @LBuf{buf}, SizeOf(LBuf){size});
+      TalLogType.ERROR:   _os_log_impl(_ImageHeader{dso}, _LogHandle{log}, OS_LOG_TYPE_DEFAULT{&type}, M.AsAnsi('[E][W][I][D][V]'+LThreadID+' '+LMsgPart).ToPointer{format}, @LBuf{buf}, SizeOf(LBuf){size});
+      TalLogType.ASSERT:  _os_log_impl(_ImageHeader{dso}, _LogHandle{log}, OS_LOG_TYPE_DEFAULT{&type}, M.AsAnsi('[A][E][W][I][D][V]'+LThreadID+' '+LMsgPart).ToPointer{format}, @LBuf{buf}, SizeOf(LBuf){size});
     end;
   end;
   {$ELSEIF defined(MSWINDOWS)}
@@ -4325,6 +4366,11 @@ initialization
   {$IF defined(MSWindows)}
   ALPerformanceFrequency := -1;
   {$ENDIF}
+  {$IF defined(IOS)}
+  var M: TMarshaller;
+  _LogHandle := os_log_create(M.AsAnsi(NSStrToStr(TNSBundle.OCClass.mainBundle.bundleIdentifier)).ToPointer, 'General');
+  _ImageHeader := _dyld_get_image_header(0);
+  {$ENDIF}
   _ALLogHistory := TList<_TALLogItem>.Create;
 
 finalization
@@ -4336,6 +4382,9 @@ finalization
   {$IF defined(MSWINDOWS)}
   if ALRunningMutex <> 0 then
     CloseHandle(ALRunningMutex);
+  {$ENDIF}
+  {$IF defined(IOS)}
+  os_release(_LogHandle);
   {$ENDIF}
 
 end.

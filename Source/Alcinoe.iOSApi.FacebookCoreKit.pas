@@ -102,8 +102,7 @@ procedure libclangrtiosLoader; cdecl; external '/usr/lib/clang/lib/darwin/libcla
 {$ELSE}
 procedure libclangrtiosLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a';
 {$ENDIF}
-procedure libvDSPLoader; cdecl; external '/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libvDSP.dylib';
-procedure libvMiscLoader; cdecl; external '/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libvMisc.dylib';
+procedure AccelerateFrameworkLoader; cdecl; external '/System/Library/Frameworks/Accelerate.framework/Accelerate' name 'vDSP_dotpr';
 
 {$IF Defined(IOSSIMULATOR)}
 procedure libswiftCompatibility50Loader; cdecl; external '/usr/lib/swift/iphonesimulator/libswiftCompatibility50.a';

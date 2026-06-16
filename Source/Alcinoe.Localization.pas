@@ -206,6 +206,7 @@ type
     /// </summary>
     function ToLanguageTag: String;
   end;
+  PALLocaleW = ^TALLocaleW;
 
   /// <summary>
   ///   A Locale object represents a specific geographical, political, or
@@ -332,6 +333,7 @@ type
     /// </summary>
     function ToLanguageTag: AnsiString;
   end;
+  PALLocaleA = ^TALLocaleA;
 
   {*****************************}
   TALPluralRules = Class(TObject)

@@ -141,6 +141,7 @@ uses
   Alcinoe.FMX.WebBrowser,
   Alcinoe.FileUtils,
   Alcinoe.GuardianThread,
+  Alcinoe.Handlebars,
   Alcinoe.HTML,
   Alcinoe.HTTP,
   Alcinoe.HTTP.Client,
@@ -172,7 +173,8 @@ uses
   ALDUnitXTestXmlDoc in 'ALDUnitXTestXmlDoc.pas',
   ALDUnitXTestNet in 'ALDUnitXTestNet.pas',
   ALDUnitXTestUrl in 'ALDUnitXTestUrl.pas',
-  ALDUnitXTestMimeMultipart in 'ALDUnitXTestMimeMultipart.pas';
+  ALDUnitXTestMimeMultipart in 'ALDUnitXTestMimeMultipart.pas',
+  ALDUnitXTestHandlebars in 'ALDUnitXTestHandlebars.pas';
 
 {$IFDEF MSWINDOWS}
   {$IFNDEF TESTINSIGHT}

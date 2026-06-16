@@ -246,7 +246,6 @@ begin
 end;
 
 {*********************}
-{$ZEROBASEDSTRINGS OFF}
 Function ALTryIPV6StrToBinary(const AIPV6Str: AnsiString; out AIPV6Bin: TALIPv6Binary): Boolean;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -377,9 +376,6 @@ begin
   end;
 
 end;
-{$IF defined(ALZEROBASEDSTRINGSON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {*****************************************************************}
 Function ALIPV6StrTobinary(const AIPV6: AnsiString): TALIPv6Binary;

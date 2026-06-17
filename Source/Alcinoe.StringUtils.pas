@@ -714,8 +714,8 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALTagReplaceFuncA = function(
                          const ATagName: AnsiString;
-                         ATagParams: TALTagParamsA;
-                         AContext: pointer): AnsiString of object;
+                         const ATagParams: TALTagParamsA;
+                         const AContext: pointer): AnsiString of object;
 
 /// <summary>
 ///   Precompiles all tags found in <paramref name="ASourceString"/>.
@@ -12301,15 +12301,15 @@ type
   public
     class function ReplaceTagWithContext(
                      const ATagName: AnsiString;
-                     ATagParams: TALTagParamsA;
-                     AContext: pointer): AnsiString;
+                     const ATagParams: TALTagParamsA;
+                     const AContext: pointer): AnsiString;
   end;
 
 {*********************************************************}
 class function TALStaticTagReplacerA.ReplaceTagWithContext(
                  const ATagName: AnsiString;
-                 ATagParams: TALTagParamsA;
-                 AContext: pointer): AnsiString;
+                 const ATagParams: TALTagParamsA;
+                 const AContext: pointer): AnsiString;
 begin
   result := AnsiString(AContext);
 end;

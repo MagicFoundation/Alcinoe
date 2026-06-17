@@ -8,7 +8,7 @@ unit ALDUnitXTestHandlebars;
 //   procedure   RegisterStringHelper(const AName: AnsiString; const AHandler: THelperHandler);
 //   function    RenderSource(const ATemplateSource: AnsiString; const AContext: TALJSONNodeA): AnsiString;
 //   function    RenderFile(const ATemplateFilename: AnsiString; const AContext: TALJSONNodeA): AnsiString;
-//   function    RenderParamValue(const AParams: TALTagParamsA; const AIndex: Integer; const AContext: TALJSONNodeA): AnsiString;
+//   function    ResolveParamValue(const AParams: TALTagParamsA; const AIndex: Integer; const AContext: TALJSONNodeA): AnsiString;
 //
 // ...and against the standard Handlebars specification (https://Handlebarsjs.com).
 // They describe the EXPECTED behavior of the engine; because the engine is still
@@ -23,7 +23,7 @@ unit ALDUnitXTestHandlebars;
 //     that folder.
 //   * Custom helpers with fully deterministic behavior are registered in Setup
 //     ('concat', 'upper', 'lower', 'wrap'). Their result is defined purely in
-//     terms of the public RenderParamValue, so the expected output does not
+//     terms of the public ResolveParamValue, so the expected output does not
 //     depend on any engine internal.
 //   * Plain '{{var}}' resolves a value from the JSON context.
 //   * Block tests assume the standard Handlebars built-in block helpers
@@ -59,13 +59,11 @@ type
     // Renders the given template FILE (relative to Templates\) against AJson.
     function RenderF(const AFilename: AnsiString; const AJson: AnsiString): AnsiString;
     // Loads the given template FILE from disk and renders it through RenderSource
-    // (so RenderSource is exercised without embedding any raw template source here).
-    function RenderSrc(const AFilename: AnsiString; const AJson: AnsiString): AnsiString;
     // Deterministic helpers registered for the tests.
-    function HelperConcat(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>): AnsiString;
-    function HelperUpper(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>): AnsiString;
-    function HelperLower(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>): AnsiString;
-    function HelperWrap(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>): AnsiString;
+    function HelperConcat(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
+    function HelperUpper(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
+    function HelperLower(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
+    function HelperWrap(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
   public
     [Setup]
     procedure Setup;
@@ -136,13 +134,6 @@ type
     [Test] procedure Test_Partial_WithHelper;
     (*$ENDREGION*)
 
-    {$REGION 'RenderSource (same templates, loaded from disk then rendered as source)'}
-    [Test] procedure Test_RenderSource_Mustache;
-    [Test] procedure Test_RenderSource_Subexpr;
-    [Test] procedure Test_RenderSource_Block;
-    [Test] procedure Test_RenderSource_Partial;
-    {$ENDREGION}
-
     {$REGION 'Kitchen sink'}
     [Test] procedure Test_KitchenSink;
     {$ENDREGION}
@@ -173,10 +164,10 @@ procedure TALDUnitXTestHandlebars.Setup;
 begin
   FTemplatesPath := LocateTemplatesPath;
   FHandlebars := TALHandlebars.Create(FTemplatesPath);
-  FHandlebars.RegisterStringHelper('concat', HelperConcat);
-  FHandlebars.RegisterStringHelper('upper', HelperUpper);
-  FHandlebars.RegisterStringHelper('lower', HelperLower);
-  FHandlebars.RegisterStringHelper('wrap', HelperWrap);
+  FHandlebars.RegisterHelper('concat', HelperConcat);
+  FHandlebars.RegisterHelper('upper', HelperUpper);
+  FHandlebars.RegisterHelper('lower', HelperLower);
+  FHandlebars.RegisterHelper('wrap', HelperWrap);
 end;
 
 {*******************************************}
@@ -210,47 +201,93 @@ begin
 end;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-function TALDUnitXTestHandlebars.RenderSrc(const AFilename: AnsiString; const AJson: AnsiString): AnsiString;
-begin
-  var LSource: AnsiString := AnsiString(TFile.ReadAllText(FTemplatesPath + String(AFilename)));
-  var LCtx := Ctx(AJson);
-  try
-    Result := FHandlebars.RenderSource(LSource, LCtx);
-  finally
-    ALFreeAndNil(LCtx);
-  end;
-end;
-
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 // {{concat a b c ...}} -> concatenation of every (rendered) positional argument.
-function TALDUnitXTestHandlebars.HelperConcat(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>): AnsiString;
+function TALDUnitXTestHandlebars.HelperConcat(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
-  Result := '';
-  for var I := 0 to AParams.Count - 1 do
-    Result := Result + FHandlebars.RenderParamValue(AParams, I, AContext, ADepths);
+  var LText: AnsiString := '';
+  for var I := 0 to AParams.Count - 1 do begin
+    var LOwned: Boolean;
+    var LJsonNode := FHandlebars.ResolveParamValue(AParams, I, AContext, ADepths, LOwned);
+    try
+      if LJsonNode <> nil then
+        LText := LText + LJsonNode.Text;
+    finally
+      if LOwned then
+        ALFreeAndNil(LJsonNode);
+    end;
+  end;
+  Result := TALJSONTextNodeA.Create('');
+  Result.Text := LText;
 end;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 // {{upper x}} -> uppercase of the (rendered) first argument.
-function TALDUnitXTestHandlebars.HelperUpper(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>): AnsiString;
+function TALDUnitXTestHandlebars.HelperUpper(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
-  Result := ALUnicodeUpperCase(FHandlebars.RenderParamValue(AParams, 0, AContext, ADepths));
+  var LText: AnsiString;
+  var LOwned: Boolean;
+  var LJsonNode := FHandlebars.ResolveParamValue(AParams, 0, AContext, ADepths, LOwned);
+  try
+    if LJsonNode <> nil then LText := LJsonNode.Text
+    else LText := '';
+  finally
+    if LOwned then
+      ALFreeAndNil(LJsonNode);
+  end;
+  Result := TALJSONTextNodeA.Create('');
+  Result.Text := ALUnicodeUpperCase(LText);
 end;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 // {{lower x}} -> lowercase of the (rendered) first argument.
-function TALDUnitXTestHandlebars.HelperLower(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>): AnsiString;
+function TALDUnitXTestHandlebars.HelperLower(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
-  Result := ALUnicodeLowerCase(FHandlebars.RenderParamValue(AParams, 0, AContext, ADepths));
+  var LText: AnsiString;
+  var LOwned: Boolean;
+  var LJsonNode := FHandlebars.ResolveParamValue(AParams, 0, AContext, ADepths, LOwned);
+  try
+    if LJsonNode <> nil then LText := LJsonNode.Text
+    else LText := '';
+  finally
+    if LOwned then
+      ALFreeAndNil(LJsonNode);
+  end;
+  Result := TALJSONTextNodeA.Create('');
+  Result.Text := ALUnicodeLowerCase(LText);
 end;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 // {{wrap value prefix suffix}} -> prefix + value + suffix.
-function TALDUnitXTestHandlebars.HelperWrap(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>): AnsiString;
+function TALDUnitXTestHandlebars.HelperWrap(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
-  Result := FHandlebars.RenderParamValue(AParams, 1, AContext, ADepths)
-          + FHandlebars.RenderParamValue(AParams, 0, AContext, ADepths)
-          + FHandlebars.RenderParamValue(AParams, 2, AContext, ADepths);
+  var LText: AnsiString := '';
+  var LOwned: Boolean;
+  var LJsonNode := FHandlebars.ResolveParamValue(AParams, 1, AContext, ADepths, LOwned);
+  try
+    if LJsonNode <> nil then LText := LText + LJsonNode.Text;
+  finally
+    if LOwned then
+      ALFreeAndNil(LJsonNode);
+  end;
+
+  LJsonNode := FHandlebars.ResolveParamValue(AParams, 0, AContext, ADepths, LOwned);
+  try
+    if LJsonNode <> nil then LText := LText + LJsonNode.Text;
+  finally
+    if LOwned then
+      ALFreeAndNil(LJsonNode);
+  end;
+
+  LJsonNode := FHandlebars.ResolveParamValue(AParams, 2, AContext, ADepths, LOwned);
+  try
+    if LJsonNode <> nil then LText := LText + LJsonNode.Text;
+  finally
+    if LOwned then
+      ALFreeAndNil(LJsonNode);
+  end;
+
+  Result := TALJSONTextNodeA.Create('');
+  Result.Text := LText;
 end;
 
 (*$REGION 'Plain mustache {{ }}'*)
@@ -558,32 +595,6 @@ begin
 end;
 
 (*$ENDREGION*)
-
-{$REGION 'RenderSource (same templates, loaded from disk then rendered as source)'}
-
-procedure TALDUnitXTestHandlebars.Test_RenderSource_Mustache;
-begin
-  CheckEq('World', RenderSrc('m_var.hbs', '{"name":"World"}'));
-end;
-
-procedure TALDUnitXTestHandlebars.Test_RenderSource_Subexpr;
-begin
-  CheckEq('ABC', RenderSrc('s_nested.hbs', '{}'));
-end;
-
-procedure TALDUnitXTestHandlebars.Test_RenderSource_Block;
-begin
-  CheckEq('ON', RenderSrc('block_if.hbs', '{"active":true}'));
-end;
-
-procedure TALDUnitXTestHandlebars.Test_RenderSource_Partial;
-begin
-(*
-  CheckEq('<[World]>', RenderSrc('partial_host.hbs', '{"name":"World"}', Inner('p_var.hbs')));
-*)
-end;
-
-{$ENDREGION}
 
 {$REGION 'Kitchen sink'}
 

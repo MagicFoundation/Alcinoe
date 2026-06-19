@@ -98,6 +98,7 @@ Type
     //[deleted from Tstrings] procedure SetEncoding(const Value: TEncoding);
     //[deleted from Tstrings] procedure DefineProperties(Filer: TFiler); override;
     function GetName(Index: Integer): AnsiString; virtual;
+    procedure SetName(Index: Integer; const Value: AnsiString); virtual; // [added from Tstrings]
     function GetStrictName(Index: Integer): AnsiString; virtual; // [added from Tstrings]
     function GetValue(const Name: AnsiString): AnsiString; virtual;
     procedure SetValue(const Name, Value: AnsiString); virtual;
@@ -136,6 +137,8 @@ Type
     function ItemHasNameValue(Index: Integer): Boolean; virtual; // [added from Tstrings]
     function Add(const S: AnsiString): Integer; virtual;
     function AddObject(const S: AnsiString; AObject: TObject): Integer; virtual;
+    function AddName(const Name: AnsiString): Integer; virtual; // [added from Tstrings]
+    function AddNameObject(const Name: AnsiString; AObject: TObject): Integer; virtual; // [added from Tstrings]
     function AddNameValue(const Name, Value: AnsiString): Integer; virtual; // [added from Tstrings]
     function AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer; virtual; // [added from Tstrings]
     procedure Append(const S: AnsiString);
@@ -159,6 +162,8 @@ Type
     function IndexOfObject(AObject: TObject): Integer; virtual;
     procedure Insert(Index: Integer; const S: AnsiString); virtual; abstract;
     procedure InsertObject(Index: Integer; const S: AnsiString; AObject: TObject); virtual;
+    procedure InsertName(Index: Integer; const Name: AnsiString); virtual; // [added from Tstrings]
+    procedure InsertNameObject(Index: Integer; const Name: AnsiString; AObject: TObject); virtual; // [added from Tstrings]
     procedure InsertNameValue(Index: Integer; const Name, Value: AnsiString); virtual; // [added from Tstrings]
     procedure InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject); virtual; // [added from Tstrings]
     procedure LoadFromFile(const FileName: AnsiString); overload; virtual;
@@ -179,7 +184,7 @@ Type
     property Delimiter: AnsiChar read fDelimiter write fDelimiter;
     property DelimitedText: AnsiString read GetDelimitedText write SetDelimitedText;
     property LineBreak: AnsiString read fLineBreak write fLineBreak;
-    property Names[Index: Integer]: AnsiString read GetName;
+    property Names[Index: Integer]: AnsiString read GetName write SetName;
     property StrictNames[Index: Integer]: AnsiString read GetStrictName; // [added from Tstrings]
     property Objects[Index: Integer]: TObject read GetObject write PutObject;
     property QuoteChar: AnsiChar read fQuoteChar write fQuoteChar;
@@ -313,6 +318,7 @@ Type
     Function ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean; //[added from TStringList]
   protected
     function GetName(Index: Integer): AnsiString; override;
+    procedure SetName(Index: Integer; const Value: AnsiString); override; // [added from Tstrings]
     function GetStrictName(Index: Integer): AnsiString; override; // [added from Tstrings]
     function GetValue(const Name: AnsiString): AnsiString; override;
     procedure SetValue(const Name, Value: AnsiString); override;
@@ -345,6 +351,8 @@ Type
     function ItemHasNameValue(Index: Integer): Boolean; override;
     function Add(const S: AnsiString): Integer; override;
     function AddObject(const S: AnsiString; AObject: TObject): Integer; override;
+    function AddName(const Name: AnsiString): Integer; override; // [added from Tstrings]
+    function AddNameObject(const Name: AnsiString; AObject: TObject): Integer; override; // [added from Tstrings]
     function AddNameValue(const Name, Value: AnsiString): Integer; override; // [added from Tstrings]
     function AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer; override; // [added from Tstrings]
     procedure Assign(Source: TPersistent); override;
@@ -359,6 +367,8 @@ Type
     function IndexOfName(const Name: AnsiString): Integer; override; // [added from TStringList]
     procedure Insert(Index: Integer; const S: AnsiString); override;
     procedure InsertObject(Index: Integer; const S: AnsiString; AObject: TObject); override;
+    procedure InsertName(Index: Integer; const Name: AnsiString); override; // [added from Tstrings]
+    procedure InsertNameObject(Index: Integer; const Name: AnsiString; AObject: TObject); override; // [added from Tstrings]
     procedure InsertNameValue(Index: Integer; const Name, Value: AnsiString); override; // [added from Tstrings]
     procedure InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject); override; // [added from Tstrings]
     procedure Move(CurIndex, NewIndex: Integer); override;
@@ -508,6 +518,7 @@ Type
   protected
     //[deleted from Tstrings] procedure DefineProperties(Filer: TFiler); override;
     function GetName(Index: Integer): String; virtual;
+    procedure SetName(Index: Integer; const Value: String); virtual; // [added from Tstrings]
     function GetStrictName(Index: Integer): String; virtual; // [added from Tstrings]
     function GetValue(const Name: String): String; virtual;
     procedure SetValue(const Name, Value: String); virtual;
@@ -540,6 +551,8 @@ Type
     function ItemHasNameValue(Index: Integer): Boolean; virtual; // [added from Tstrings]
     function Add(const S: String): Integer; virtual;
     function AddObject(const S: String; AObject: TObject): Integer; virtual;
+    function AddName(const Name: String): Integer; virtual; // [added from Tstrings]
+    function AddNameObject(const Name: String; AObject: TObject): Integer; virtual; // [added from Tstrings]
     function AddNameValue(const Name, Value: String): Integer; virtual; // [added from Tstrings]
     function AddNameValueObject(const Name, Value: String; AObject: TObject): Integer; virtual; // [added from Tstrings]
     procedure Append(const S: String);
@@ -563,6 +576,8 @@ Type
     function IndexOfObject(AObject: TObject): Integer; virtual;
     procedure Insert(Index: Integer; const S: String); virtual; abstract;
     procedure InsertObject(Index: Integer; const S: String; AObject: TObject); virtual;
+    procedure InsertName(Index: Integer; const Name: String); virtual; // [added from Tstrings]
+    procedure InsertNameObject(Index: Integer; const Name: String; AObject: TObject); virtual; // [added from Tstrings]
     procedure InsertNameValue(Index: Integer; const Name, Value: String); virtual; // [added from Tstrings]
     procedure InsertNameValueObject(Index: Integer; const Name, Value: String; AObject: TObject); virtual; // [added from Tstrings]
     procedure LoadFromFile(const FileName: String); overload; virtual;
@@ -587,7 +602,7 @@ Type
     property DelimitedText: String read GetDelimitedText write SetDelimitedText;
     property Encoding: TEncoding read FEncoding;
     property LineBreak: String read fLineBreak write fLineBreak;
-    property Names[Index: Integer]: String read GetName;
+    property Names[Index: Integer]: String read GetName write SetName;
     property StrictNames[Index: Integer]: String read GetStrictName; // [added from Tstrings]
     property Objects[Index: Integer]: TObject read GetObject write PutObject;
     property QuoteChar: Char read fQuoteChar write fQuoteChar;
@@ -722,6 +737,7 @@ Type
     Function ExtractNameValue(const S: String; var Name, Value: String): Boolean; //[added from TStringList]
   protected
     function GetName(Index: Integer): String; override;
+    procedure SetName(Index: Integer; const Value: String); override; // [added from Tstrings]
     function GetStrictName(Index: Integer): String; override; // [added from Tstrings]
     function GetValue(const Name: String): String; override;
     procedure SetValue(const Name, Value: String); override;
@@ -754,6 +770,8 @@ Type
     function ItemHasNameValue(Index: Integer): Boolean; override;
     function Add(const S: String): Integer; override;
     function AddObject(const S: String; AObject: TObject): Integer; override;
+    function AddName(const Name: String): Integer; override; // [added from Tstrings]
+    function AddNameObject(const Name: String; AObject: TObject): Integer; override; // [added from Tstrings]
     function AddNameValue(const Name, Value: String): Integer; override; // [added from Tstrings]
     function AddNameValueObject(const Name, Value: String; AObject: TObject): Integer; override; // [added from Tstrings]
     procedure Assign(Source: TPersistent); override;
@@ -768,6 +786,8 @@ Type
     function IndexOfName(const Name: String): Integer; override; // [added from TStringList]
     procedure Insert(Index: Integer; const S: String); override;
     procedure InsertObject(Index: Integer; const S: String; AObject: TObject); override;
+    procedure InsertName(Index: Integer; const Name: String); override; // [added from Tstrings]
+    procedure InsertNameObject(Index: Integer; const Name: String; AObject: TObject); override; // [added from Tstrings]
     procedure InsertNameValue(Index: Integer; const Name, Value: String); override; // [added from Tstrings]
     procedure InsertNameValueObject(Index: Integer; const Name, Value: String; AObject: TObject); override; // [added from Tstrings]
     procedure Move(CurIndex, NewIndex: Integer); override;
@@ -845,6 +865,18 @@ function TALStringsA.AddObject(const S: AnsiString; AObject: TObject): Integer;
 begin
   Result := Add(S);
   PutObject(Result, AObject);
+end;
+
+{**************************************************************}
+function TALStringsA.AddName(const Name: AnsiString): Integer;
+begin
+  Result := AddNameObject(Name, nil);
+end;
+
+{****************************************************************************}
+function TALStringsA.AddNameObject(const Name: AnsiString; AObject: TObject): Integer;
+begin
+  Result := AddObject(Name, AObject);
 end;
 
 {************************************************************************}
@@ -1183,6 +1215,18 @@ begin
   Result := ExtractName(Get(Index));
 end;
 
+{*****************************************************************}
+procedure TALStringsA.SetName(Index: Integer; const Value: AnsiString);
+var
+  S: AnsiString;
+  P: Integer;
+begin
+  S := Get(Index);
+  P := ALPosA(NameValueSeparator, S);
+  if P <> 0 then Put(Index, Value + NameValueSeparator + ALCopyStr(S, P + 1, MaxInt))
+  else Put(Index, Value);
+end;
+
 {*************************************************************}
 function TALStringsA.GetStrictName(Index: Integer): AnsiString;
 var P: Integer;
@@ -1359,6 +1403,18 @@ procedure TALStringsA.InsertObject(Index: Integer; const S: AnsiString; AObject:
 begin
   Insert(Index, S);
   PutObject(Index, AObject);
+end;
+
+{*****************************************************************}
+procedure TALStringsA.InsertName(Index: Integer; const Name: AnsiString);
+begin
+  InsertNameObject(Index, Name, nil);
+end;
+
+{***************************************************************************************}
+procedure TALStringsA.InsertNameObject(Index: Integer; const Name: AnsiString; AObject: TObject);
+begin
+  InsertObject(Index, Name, AObject);
 end;
 
 {***********************************************************************************}
@@ -2531,6 +2587,28 @@ begin
   end;
 end;
 
+{**************************************************************}
+function TALNVStringListA.AddName(const Name: AnsiString): Integer;
+begin
+  Result := AddNameObject(Name, nil);
+end;
+
+{****************************************************************************}
+function TALNVStringListA.AddNameObject(const Name: AnsiString; AObject: TObject): Integer;
+begin
+  if not Sorted then begin
+    Result := FCount;
+  end
+  else begin
+    if FindName(Name, False{WithNvS}, Result) then
+      case Duplicates of
+        dupIgnore: Exit;
+        dupError: Error(@SDuplicateString, 0);
+      end;
+  end;
+  InsertItem(Result, Name, False{WithNvS}, AObject);
+end;
+
 {*****************************************************************************}
 function TALNVStringListA.AddNameValue(const Name, Value: AnsiString): Integer;
 begin
@@ -3024,6 +3102,21 @@ begin
   InsertItem(Index, S, AObject);
 end;
 
+{*****************************************************************}
+procedure TALNVStringListA.InsertName(Index: Integer; const Name: AnsiString);
+begin
+  InsertNameObject(Index, Name, nil);
+end;
+
+{***************************************************************************************}
+procedure TALNVStringListA.InsertNameObject(Index: Integer; const Name: AnsiString; AObject: TObject);
+begin
+  if Sorted then Error(@SSortedListError, 0);
+  if (Index < 0) or (Index > FCount) then
+    IndexError(Index, FCount - 1);
+  InsertItem(Index, Name, False{WithNvS}, AObject);
+end;
+
 {****************************************************************************************}
 procedure TALNVStringListA.InsertNameValue(Index: Integer; const Name, Value: AnsiString);
 begin
@@ -3414,6 +3507,39 @@ begin
   if Cardinal(Index) >= Cardinal(FCount) then
     IndexError(Index, FCount - 1);
   Result := Flist[Index].fName;
+end;
+
+{**********************************************************************}
+procedure TALNVStringListA.SetName(Index: Integer; const Value: AnsiString);
+begin
+  if Cardinal(Index) >= Cardinal(FCount) then
+    IndexError(Index, FCount - 1);
+  if not FSorted then begin
+    Changing;
+    Flist[Index].fName := Value;
+    Changed;
+  end
+  else begin
+    var LValue: AnsiString := Flist[Index].fValue;
+    var LNvs: Boolean := Flist[Index].fNVS;
+    var LObject: TObject := Flist[Index].fObject;
+    var LOwnsObject: Boolean := FOwnsObject;
+    FOwnsObject := False;
+    try
+      Delete(Index);
+    finally
+      FOwnsObject := LOwnsObject;
+    end;
+    var LIdx: Integer;
+    if LNvs then begin
+      FindNameValue(Value, LValue, LIdx);
+      InsertItem(LIdx, Value, LValue, LObject);
+    end
+    else begin
+      FindName(Value, False{WithNvS}, LIdx);
+      InsertItem(LIdx, Value, False{WithNvS}, LObject);
+    end;
+  end;
 end;
 
 {******************************************************************}
@@ -4384,6 +4510,18 @@ begin
   PutObject(Result, AObject);
 end;
 
+{**************************************************************}
+function TALStringsW.AddName(const Name: String): Integer;
+begin
+  Result := AddNameObject(Name, nil);
+end;
+
+{****************************************************************************}
+function TALStringsW.AddNameObject(const Name: String; AObject: TObject): Integer;
+begin
+  Result := AddObject(Name, AObject);
+end;
+
 {********************************************************************}
 function TALStringsW.AddNameValue(const Name, Value: String): Integer;
 begin
@@ -4732,6 +4870,18 @@ begin
   Result := ExtractName(Get(Index));
 end;
 
+{*****************************************************************}
+procedure TALStringsW.SetName(Index: Integer; const Value: String);
+var
+  S: String;
+  P: Integer;
+begin
+  S := Get(Index);
+  P := ALPosW(NameValueSeparator, S);
+  if P <> 0 then Put(Index, Value + NameValueSeparator + ALCopyStr(S, P + 1, MaxInt))
+  else Put(Index, Value);
+end;
+
 {*********************************************************}
 function TALStringsW.GetStrictName(Index: Integer): String;
 var P: Integer;
@@ -4908,6 +5058,18 @@ procedure TALStringsW.InsertObject(Index: Integer; const S: String; AObject: TOb
 begin
   Insert(Index, S);
   PutObject(Index, AObject);
+end;
+
+{*****************************************************************}
+procedure TALStringsW.InsertName(Index: Integer; const Name: String);
+begin
+  InsertNameObject(Index, Name, nil);
+end;
+
+{***************************************************************************************}
+procedure TALStringsW.InsertNameObject(Index: Integer; const Name: String; AObject: TObject);
+begin
+  InsertObject(Index, Name, AObject);
 end;
 
 {*******************************************************************************}
@@ -6142,6 +6304,28 @@ begin
   end;
 end;
 
+{**************************************************************}
+function TALNVStringListW.AddName(const Name: String): Integer;
+begin
+  Result := AddNameObject(Name, nil);
+end;
+
+{****************************************************************************}
+function TALNVStringListW.AddNameObject(const Name: String; AObject: TObject): Integer;
+begin
+  if not Sorted then begin
+    Result := FCount;
+  end
+  else begin
+    if FindName(Name, False{WithNvS}, Result) then
+      case Duplicates of
+        dupIgnore: Exit;
+        dupError: Error(@SDuplicateString, 0);
+      end;
+  end;
+  InsertItem(Result, Name, False{WithNvS}, AObject);
+end;
+
 {*************************************************************************}
 function TALNVStringListW.AddNameValue(const Name, Value: String): Integer;
 begin
@@ -6628,6 +6812,21 @@ begin
   InsertItem(Index, S, AObject);
 end;
 
+{*****************************************************************}
+procedure TALNVStringListW.InsertName(Index: Integer; const Name: String);
+begin
+  InsertNameObject(Index, Name, nil);
+end;
+
+{***************************************************************************************}
+procedure TALNVStringListW.InsertNameObject(Index: Integer; const Name: String; AObject: TObject);
+begin
+  if Sorted then Error(@SSortedListError, 0);
+  if (Index < 0) or (Index > FCount) then
+    IndexError(Index, FCount - 1);
+  InsertItem(Index, Name, False{WithNvS}, AObject);
+end;
+
 {************************************************************************************}
 procedure TALNVStringListW.InsertNameValue(Index: Integer; const Name, Value: String);
 begin
@@ -7018,6 +7217,39 @@ begin
   if Cardinal(Index) >= Cardinal(FCount) then
     IndexError(Index, FCount - 1);
   Result := Flist[Index].fName;
+end;
+
+{**********************************************************************}
+procedure TALNVStringListW.SetName(Index: Integer; const Value: String);
+begin
+  if Cardinal(Index) >= Cardinal(FCount) then
+    IndexError(Index, FCount - 1);
+  if not FSorted then begin
+    Changing;
+    Flist[Index].fName := Value;
+    Changed;
+  end
+  else begin
+    var LValue: String := Flist[Index].fValue;
+    var LNvs: Boolean := Flist[Index].fNVS;
+    var LObject: TObject := Flist[Index].fObject;
+    var LOwnsObject: Boolean := FOwnsObject;
+    FOwnsObject := False;
+    try
+      Delete(Index);
+    finally
+      FOwnsObject := LOwnsObject;
+    end;
+    var LIdx: Integer;
+    if LNvs then begin
+      FindNameValue(Value, LValue, LIdx);
+      InsertItem(LIdx, Value, LValue, LObject);
+    end
+    else begin
+      FindName(Value, False{WithNvS}, LIdx);
+      InsertItem(LIdx, Value, False{WithNvS}, LObject);
+    end;
+  end;
 end;
 
 {**************************************************************}

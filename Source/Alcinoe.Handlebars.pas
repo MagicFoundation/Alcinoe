@@ -5,14 +5,10 @@ interface
 {$I Alcinoe.inc}
 
 uses
-  System.SysUtils,
-  System.Classes,
   System.Generics.Collections,
   System.Contnrs,
   System.Types,
-  Alcinoe.Common,
   Alcinoe.StringUtils,
-  Alcinoe.StringList,
   Alcinoe.JSONDoc;
 
 type
@@ -131,11 +127,12 @@ type
 implementation
 
 uses
+  System.SysUtils,
   System.DateUtils,
   System.AnsiStrings,
   System.Math,
   System.IOUtils,
-  System.StrUtils,
+  Alcinoe.Common,
   Alcinoe.Localization,
   Alcinoe.XMLDoc;
 
@@ -149,63 +146,92 @@ begin
   FHelpers := TDictionary<AnsiString{name}, THelperHandler>.Create;
   FTagsContainer := TObjectList.Create(true{AOwnsObjects});
 
-  var LTmpTagsContainer := TObjectList.Create(False{AOwnsObjects});
-  try
-
-    var LTemplatesPath := ALIncludeTrailingPathDelimiterW(ATemplatesPath);
-    Var LTemplateFilePaths := TDirectory.GetFiles(LTemplatesPath, '*', TSearchOption.soAllDirectories);
-    for var LTemplateFilePath in LTemplateFilePaths do begin
-      var LTemplateFileName := AlStringReplaceW(LTemplateFilePath, LTemplatesPath, '');
-      var LTemplateSrc := ALPrecompileTagsA(
-                            ALGetStringFromFile(LTemplateFilePath), // const ASourceString: AnsiString;
-                            '{{{', // const ATagStartMarker,
-                            '}}}', // ATagEndMarker: AnsiString;
-                            LTmpTagsContainer, // const ATagsContainer: TObjectList;
-                            [rfreplaceall], // const AFlags: TReplaceFlags=[rfreplaceall];
-                            false, // const AQuoteDoublingEscape: Boolean = False;
-                            '\', // const AEscapeChar: AnsiChar = #0; // ex: '\' like in {{uppercase "abc\"def}}
-                            '=', // const ANameValueSeparator: AnsiChar = '='; // ex: '=' like in {{link title url="/home" target="_blank"}}
-                            '#', // const ABlockStartMarker: AnsiChar = #0; // ex: '#' like in {{#if ...}}
-                            '/', // const ABlockEndMarker: AnsiChar = #0; // ex: '/' like in {{/if}}
-                            'else', // const ABlockElseTag: AnsiString = ''; // ex: 'else' like in {{else}}
-                            '(', // const ASubExpressionTagStartMarker: AnsiString = ''; // ex: '(' like in {{uppercase (concat a b)}}
-                            ')', // const ASubExpressionTagEndMarker: AnsiString = ''; // ex: ')' like in {{uppercase (concat a b)}}
-                            False, // const AHandleTagsInQuote: Boolean = True; // False = quoted params are kept literal
-                            MainBlockParamName, // const AMainBlockParamName: AnsiString = '__main'; // name of the supplemental block param holding the main section
-                            InverseBlockParamName, // const AInverseBlockParamName: AnsiString = '__inverse'; // name of the supplemental block param holding the inverse section
-                            ALDefaultPrecompiledTagStartMarker, // const APrecompiledTagStartMarker: AnsiChar = ALDefaultPrecompiledTagStartMarker; // opens the precompiled-tag marker (ex: STX)
-                            ALDefaultPrecompiledTagEndMarker); // const APrecompiledTagEndMarker: AnsiChar = ALDefaultPrecompiledTagEndMarker): AnsiString; // closes the precompiled-tag marker (ex: ETX)
-      for var I := 0 to LTmpTagsContainer.Count - 1 do begin
-        var LPrecompiledTag := TALPrecompiledTagA(LTmpTagsContainer[I]);
-        LPrecompiledTag.TagParams.AddNameValue(UnescapedParamName, '1');
-      end;
-      LTemplateSrc := ALPrecompileTagsA(
-                        LTemplateSrc, // const ASourceString: AnsiString;
-                        '{{', // const ATagStartMarker,
-                        '}}', // ATagEndMarker: AnsiString;
-                        LTmpTagsContainer, // const ATagsContainer: TObjectList;
-                        [rfreplaceall], // const AFlags: TReplaceFlags=[rfreplaceall];
-                        false, // const AQuoteDoublingEscape: Boolean = False;
-                        '\', // const AEscapeChar: AnsiChar = #0; // ex: '\' like in {{uppercase "abc\"def}}
-                        '=', // const ANameValueSeparator: AnsiChar = '='; // ex: '=' like in {{link title url="/home" target="_blank"}}
-                        '#', // const ABlockStartMarker: AnsiChar = #0; // ex: '#' like in {{#if ...}}
-                        '/', // const ABlockEndMarker: AnsiChar = #0; // ex: '/' like in {{/if}}
-                        'else', // const ABlockElseTag: AnsiString = ''; // ex: 'else' like in {{else}}
-                        '(', // const ASubExpressionTagStartMarker: AnsiString = ''; // ex: '(' like in {{uppercase (concat a b)}}
-                        ')', // const ASubExpressionTagEndMarker: AnsiString = ''; // ex: ')' like in {{uppercase (concat a b)}}
-                        False, // const AHandleTagsInQuote: Boolean = True; // False = quoted params are kept literal
-                        MainBlockParamName, // const AMainBlockParamName: AnsiString = '__main'; // name of the supplemental block param holding the main section
-                        InverseBlockParamName, // const AInverseBlockParamName: AnsiString = '__inverse'; // name of the supplemental block param holding the inverse section
-                        ALDefaultPrecompiledTagStartMarker, // const APrecompiledTagStartMarker: AnsiChar = ALDefaultPrecompiledTagStartMarker; // opens the precompiled-tag marker (ex: STX)
-                        ALDefaultPrecompiledTagEndMarker); // const APrecompiledTagEndMarker: AnsiChar = ALDefaultPrecompiledTagEndMarker): AnsiString; // closes the precompiled-tag marker (ex: ETX)
-      FTemplates.Add(AnsiString(LTemplateFileName){name}, LTemplateSrc{content});
-      for var I := 0 to LTmpTagsContainer.Count - 1 do
-        FTagsContainer.Add(LTmpTagsContainer[I]);
-      LTmpTagsContainer.Clear;
+  var LTemplatesPath := ALIncludeTrailingPathDelimiterW(ATemplatesPath);
+  Var LTemplateFilePaths := TDirectory.GetFiles(LTemplatesPath, '*', TSearchOption.soAllDirectories);
+  for var LTemplateFilePath in LTemplateFilePaths do begin
+    var LTemplateFileName := AlStringReplaceW(LTemplateFilePath, LTemplatesPath, '');
+    var LTemplateSrc := ALGetStringFromFile(LTemplateFilePath);
+    // Remove whitespace before {{~ and replace {{~ with {{
+    var P := ALPosA('{{~', LTemplateSrc);
+    while P > 0 do begin
+      var LStart := P;
+      while (LStart > 1) and (LTemplateSrc[LStart - 1] <= ' ') do
+        Dec(LStart);
+      Delete(LTemplateSrc, LStart, P - LStart);
+      Delete(LTemplateSrc, LStart + 2, 1);
+      P := ALPosA('{{~', LTemplateSrc, LStart + 2);
     end;
-
-  finally
-    ALFreeAndNil(LTmpTagsContainer);
+    // Replace ~}} with }} and remove whitespace after it
+    P := ALPosA('~}}', LTemplateSrc);
+    while P > 0 do begin
+      Delete(LTemplateSrc, P, 1);
+      var LEnd := P + 2;
+      while (LEnd <= Length(LTemplateSrc)) and (LTemplateSrc[LEnd] <= ' ') do
+        Delete(LTemplateSrc, LEnd, 1);
+      P := ALPosA('~}}', LTemplateSrc, P + 2);
+    end;
+    // Remove whitespace immediately after {{
+    P := ALPosA('{{', LTemplateSrc);
+    while P > 0 do begin
+      var LStart := P + 2;
+      var LEnd := LStart;
+      while (LEnd <= Length(LTemplateSrc)) and
+            (LTemplateSrc[LEnd] <= ' ') do
+        Inc(LEnd);
+      if LEnd > LStart then
+        Delete(LTemplateSrc, LStart, LEnd - LStart);
+      P := ALPosA('{{', LTemplateSrc, P + 2);
+    end;
+    // Remove whitespace immediately before }}
+    P := ALPosA('}}', LTemplateSrc);
+    while P > 0 do begin
+      var LStart := P - 1;
+      while (LStart >= 1) and
+            (LTemplateSrc[LStart] <= ' ') do
+        Dec(LStart);
+      Inc(LStart);
+      if LStart < P then begin
+        Delete(LTemplateSrc, LStart, P - LStart);
+        P := LStart;
+      end;
+      P := ALPosA('}}', LTemplateSrc, P + 2);
+    end;
+    // Remove {{!-- .... --}} comments
+    LTemplateSrc := ALReplaceTagsA(
+                      LTemplateSrc, // const ASourceString: AnsiString;
+                      '{{!--', // const ATagStartMarker,
+                      '--}}', // ATagEndMarker: AnsiString;
+                      ''); // const AReplaceWith: AnsiString;
+    // Remove {{! .... }} comments
+    LTemplateSrc := ALReplaceTagsA(
+                      LTemplateSrc, // const ASourceString: AnsiString;
+                      '{{!', // const ATagStartMarker,
+                      '}}', // ATagEndMarker: AnsiString;
+                      ''); // const AReplaceWith: AnsiString;
+    // Handle unescaped {{{ .... }}} blocks
+    LTemplateSrc := ALStringReplaceA(LTemplateSrc, '{{{', '{{', [RfReplaceAll]);
+    LTemplateSrc := ALStringReplaceA(LTemplateSrc, '}}}', ' ' + UnescapedParamName + '=true}}', [RfReplaceAll]);
+    // Handle normal {{ .... }} blocks
+    LTemplateSrc := ALPrecompileTagsA(
+                      LTemplateSrc, // const ASourceString: AnsiString;
+                      '{{', // const ATagStartMarker,
+                      '}}', // ATagEndMarker: AnsiString;
+                      FTagsContainer, // const ATagsContainer: TObjectList;
+                      false, // const AIgnoreCase: Boolean = false;
+                      false, // const AQuoteDoublingEscape: Boolean = False;
+                      '\', // const AEscapeChar: AnsiChar = #0; // ex: '\' like in {{uppercase "abc\"def}}
+                      '=', // const ANameValueSeparator: AnsiChar = '='; // ex: '=' like in {{link title url="/home" target="_blank"}}
+                      '#', // const ABlockStartMarker: AnsiChar = #0; // ex: '#' like in {{#if ...}}
+                      '/', // const ABlockEndMarker: AnsiChar = #0; // ex: '/' like in {{/if}}
+                      'else', // const ABlockElseTag: AnsiString = ''; // ex: 'else' like in {{else}}
+                      '(', // const ASubExpressionTagStartMarker: AnsiString = ''; // ex: '(' like in {{uppercase (concat a b)}}
+                      ')', // const ASubExpressionTagEndMarker: AnsiString = ''; // ex: ')' like in {{uppercase (concat a b)}}
+                      False, // const AHandleTagsInQuote: Boolean = True; // False = quoted params are kept literal
+                      MainBlockParamName, // const AMainBlockParamName: AnsiString = '__main'; // name of the supplemental block param holding the main section
+                      InverseBlockParamName, // const AInverseBlockParamName: AnsiString = '__inverse'; // name of the supplemental block param holding the inverse section
+                      ALDefaultPrecompiledTagStartMarker, // const APrecompiledTagStartMarker: AnsiChar = ALDefaultPrecompiledTagStartMarker; // opens the precompiled-tag marker (ex: STX)
+                      ALDefaultPrecompiledTagEndMarker); // const APrecompiledTagEndMarker: AnsiChar = ALDefaultPrecompiledTagEndMarker): AnsiString; // closes the precompiled-tag marker (ex: ETX)
+    FTemplates.Add(AnsiString(LTemplateFileName){name}, LTemplateSrc{content});
   end;
 
   RegisterHelper('>', partial);
@@ -341,8 +367,11 @@ begin
                 LMergedContext.ChildNodes.Add(LHashNode);
                 LHashNode := nil;
               end
-              else
-                LMergedContext.ChildNodes.Add(LHashNode.Clone);
+              else begin
+                var LJsonNode := LHashNode.Clone;
+                LJsonNode.NodeName := LParamName;
+                LMergedContext.ChildNodes.Add(LJsonNode);
+              end;
             end;
           finally
             if LHashOwned then
@@ -1315,7 +1344,7 @@ procedure TALHandlebars.RegisterHelper(
             const AName: AnsiString;
             const AHandler: THelperHandler);
 begin
-  FHelpers.Add(AName, AHandler);
+  FHelpers.AddOrSetValue(AName, AHandler);
 end;
 
 {**********************************}
@@ -1329,7 +1358,6 @@ begin
               ALDefaultPrecompiledTagEndMarker, // ATagEndMarker: AnsiChar;
               TagReplaceHandler, // const AReplaceFunc: TALTagReplaceFuncA;
               @AContext, // const AContext: Pointer;
-              true, // const AReplaceall: Boolean = true;
               False); // const AReplaceTagsInResult: Boolean = False): AnsiString; overload;
 end;
 

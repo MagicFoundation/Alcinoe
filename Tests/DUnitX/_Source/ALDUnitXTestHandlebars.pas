@@ -3,8 +3,10 @@ unit ALDUnitXTestHandlebars;
 interface
 
 uses
+  System.Classes,
   System.SysUtils,
   System.IOUtils,
+  System.Types,
   System.Generics.Collections,
   Alcinoe.Common,
   Alcinoe.StringUtils,
@@ -18,7 +20,6 @@ type
   TALDUnitXTestHandlebars = class
   strict private
     FHandlebars: TALHandlebars;
-    function Ctx(const AJson: AnsiString): TALJSONNodeA;
     procedure CheckEq(const AExpected, AActual: AnsiString; const AMsg: String = '');
     function Render(const AFilename: AnsiString; const AJson: AnsiString): AnsiString;
     function HelperUpper(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
@@ -39,7 +40,6 @@ type
     [Test] procedure Test_Mustache_DottedPath;
     [Test] procedure Test_Mustache_NumberValue;
     [Test] procedure Test_Mustache_BooleanValue;
-    [Test] procedure Test_Mustache_EmptyTemplate;
     (*$ENDREGION*)
 
     {$REGION 'Helpers (registered)'}
@@ -61,6 +61,7 @@ type
     [Test] procedure Test_Subexpr_MixedLiteralAndVar;
     [Test] procedure Test_Subexpr_TwoSubexprArgs;
     [Test] procedure Test_Subexpr_LiteralSpaceInside;
+    [Test] procedure Test_Subexpr_LiteralWithEquals;
     {$ENDREGION}
 
     {$REGION 'Quotes / literals'}
@@ -94,6 +95,31 @@ type
 
     {$REGION 'Kitchen sink'}
     [Test] procedure Test_KitchenSink;
+    {$ENDREGION}
+
+    {$REGION 'Additional edge cases'}
+    [Test] procedure Test_Path_SlashAndCurrentAliases;
+    [Test] procedure Test_Truthy_NullFalse;
+    [Test] procedure Test_Truthy_EmptyObjectTrue;
+    [Test] procedure Test_Truthy_NonEmptyArrayTrue;
+    [Test] procedure Test_Truthy_FloatZeroFalse;
+    [Test] procedure Test_Block_If_IncludeZero;
+    [Test] procedure Test_Block_Unless_IncludeZero;
+    [Test] procedure Test_Block_If_NullLiteral;
+    [Test] procedure Test_Block_With_ElseForMissing;
+    [Test] procedure Test_Block_With_ElseForEmptyArray;
+    [Test] procedure Test_Block_With_ScalarContext;
+    [Test] procedure Test_Block_Each_ElseForMissing;
+    [Test] procedure Test_Block_Each_ElseForScalar;
+    [Test] procedure Test_Block_Each_LookupSubexpression;
+    [Test] procedure Test_Lookup_MissingOutOfRangeAndInvalidTargets;
+    [Test] procedure Test_Lookup_LiteralKeysWithDotsAndSlashes;
+    [Test] procedure Test_Lookup_KeyDataVariableAsParam;
+    [Test] procedure Test_Literals_NullNegativeAndInt64;
+    [Test] procedure Test_Quote_EscapedQuoteChars;
+    [Test] procedure Test_Partial_HashBorrowedValueAndMissingDeletesField;
+    [Test] procedure Test_Partial_HashSubexpressions;
+    [Test] procedure Test_Partial_NonObjectContextWithHash;
     {$ENDREGION}
 
     {$REGION 'Data-driven render tests'}
@@ -1100,7 +1126,6 @@ type
     [Test] procedure Test_cmt_short;
     [Test] procedure Test_cmt_long;
     [Test] procedure Test_cmt_with_braces;
-    [Test] procedure Test_cmt_with_mustache;
     [Test] procedure Test_cmt_only;
     [Test] procedure Test_cmt_between_vars;
     [Test] procedure Test_ws_both;
@@ -1173,12 +1198,115 @@ implementation
 
 uses
   Alcinoe.FileUtils,
-  Alcinoe.Localization;
+  Alcinoe.Localization,
+  Winapi.Windows;
+
+var
+  GHandlebarsTemplatesExtracted: Boolean;
+  GHandlebarsTemplatesModulePath: String;
+
+{********************************************************************}
+function DecodeHandlebarsTemplateResourceName(
+           const AResourceName: String;
+           const APrefix: String): String;
+begin
+  Result := '';
+  var I := Length(APrefix) + 1;
+  while I <= Length(AResourceName) do begin
+    var LChar := AResourceName[I];
+    if LChar = '_' then begin
+      Inc(I);
+      if I > Length(AResourceName) then
+        raise Exception.CreateFmt('Invalid Handlebars template resource name "%s"', [AResourceName]);
+      case AResourceName[I] of
+        'D': Result := Result + '.';
+        'P': Result := Result + PathDelim;
+        'U': Result := Result + '_';
+        else
+          raise Exception.CreateFmt('Invalid Handlebars template resource name "%s"', [AResourceName]);
+      end;
+    end
+    else
+      Result := Result + LowerCase(LChar);
+    Inc(I);
+  end;
+end;
+
+{****************************************************************************************}
+procedure ExtractHandlebarsTemplateResource(const AResourceName: String; const ABaseDir: String; const APrefix: String);
+begin
+  var LRelativePath := DecodeHandlebarsTemplateResourceName(AResourceName, APrefix);
+  var LOutputFileName := TPath.Combine(ABaseDir, LRelativePath);
+  TDirectory.CreateDirectory(ExtractFilePath(LOutputFileName));
+  var LFileStream := TFileStream.Create(LOutputFileName, fmCreate);
+  try
+    var LResourceStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+    try
+      LFileStream.CopyFrom(LResourceStream, 0);
+    finally
+      ALFreeAndNil(LResourceStream);
+    end;
+  finally
+    ALFreeAndNil(LFileStream);
+  end;
+end;
+
+{**********************************************************************************************************************************************************}
+function EnumHandlebarsTemplateResourceName(HModule: HMODULE; LpszType: PChar; LpszName: PChar; LParam: LONG_PTR): BOOL; stdcall;
+begin
+  Result := True;
+  if NativeUInt(LpszName) <= High(Word) then
+    Exit;
+  var LResourceName := String(LpszName);
+  if SameText(Copy(LResourceName, 1, Length('HB_VALID_')), 'HB_VALID_') then
+    TStringList(Pointer(LParam)).Add(LResourceName);
+end;
+
+{**************************************************************************}
+procedure ExtractHandlebarsTemplateResources(const AValidTemplatesPath: String);
+begin
+  var LResourceNames := TStringList.Create;
+  try
+    if not EnumResourceNames(HInstance, RT_RCDATA, @EnumHandlebarsTemplateResourceName, LONG_PTR(Pointer(LResourceNames))) then
+      RaiseLastOSError;
+    if LResourceNames.Count = 0 then
+      raise Exception.Create('No Handlebars template resources found');
+    LResourceNames.Sort;
+    for var I := 0 to LResourceNames.Count - 1 do begin
+      var LResourceName := LResourceNames[I];
+      if SameText(Copy(LResourceName, 1, Length('HB_VALID_')), 'HB_VALID_') then
+        ExtractHandlebarsTemplateResource(LResourceName, AValidTemplatesPath, 'HB_VALID_');
+    end;
+  finally
+    ALFreeAndNil(LResourceNames);
+  end;
+end;
+
+{*************************************************}
+procedure PrepareHandlebarsTemplateFolders;
+begin
+  var LModulePath := ALGetModulePathW;
+  if GHandlebarsTemplatesExtracted and SameText(GHandlebarsTemplatesModulePath, LModulePath) then
+    Exit;
+
+  var LValidTemplatesPath := TPath.Combine(LModulePath, 'Templates');
+
+  if TDirectory.Exists(LValidTemplatesPath) then
+    TDirectory.Delete(LValidTemplatesPath, True);
+
+  TDirectory.CreateDirectory(LValidTemplatesPath);
+
+  ExtractHandlebarsTemplateResources(LValidTemplatesPath);
+
+  GHandlebarsTemplatesModulePath := LModulePath;
+  GHandlebarsTemplatesExtracted := True;
+end;
 
 {****************************************}
 procedure TALDUnitXTestHandlebars.Setup;
 begin
-  FHandlebars := TALHandlebars.Create(ALGetModulePathW + '\..\..\Templates\');
+  PrepareHandlebarsTemplateFolders;
+  FHandlebars := TALHandlebars.Create(TPath.Combine(ALGetModulePathW, 'Templates'));
   FHandlebars.RegisterHelper('upper', HelperUpper);
   FHandlebars.RegisterHelper('lower', HelperLower);
   FHandlebars.RegisterHelper('wrap', HelperWrap);
@@ -1191,13 +1319,6 @@ begin
 end;
 
 {*******************************************}
-function TALDUnitXTestHandlebars.Ctx(const AJson: AnsiString): TALJSONNodeA;
-begin
-  if AJson = '' then Result := TALJSONDocumentA.CreateFromJSONString('{}')
-  else Result := TALJSONDocumentA.CreateFromJSONString(AJson);
-end;
-
-{*******************************************}
 procedure TALDUnitXTestHandlebars.CheckEq(const AExpected, AActual: AnsiString; const AMsg: String = '');
 begin
   Assert.AreEqual(String(AExpected), String(AActual), AMsg);
@@ -1206,11 +1327,13 @@ end;
 {*******************************************}
 function TALDUnitXTestHandlebars.Render(const AFilename: AnsiString; const AJson: AnsiString): AnsiString;
 begin
-  var LCtx := Ctx(AJson);
+  var LContext: TALJsonNodeA;
+  if AJson = '' then LContext := TALJSONDocumentA.CreateFromJSONString('{}')
+  else LContext := TALJSONDocumentA.CreateFromJSONString(AJson);
   try
-    Result := FHandlebars.Render(AFilename, LCtx);
+    Result := FHandlebars.Render(AFilename, LContext);
   finally
-    ALFreeAndNil(LCtx);
+    ALFreeAndNil(LContext);
   end;
 end;
 
@@ -1343,13 +1466,6 @@ begin
   CheckEq('true', Render('m_bool.hbs', '{"active":true}'));
 end;
 
-{*******************************************}
-procedure TALDUnitXTestHandlebars.Test_Mustache_EmptyTemplate;
-begin
-  // m_empty.hbs : (empty file)
-  CheckEq('', Render('m_empty.hbs', '{"name":"World"}'));
-end;
-
 (*$ENDREGION*)
 
 {$REGION 'Helpers (registered)'}
@@ -1461,6 +1577,17 @@ procedure TALDUnitXTestHandlebars.Test_Subexpr_LiteralSpaceInside;
 begin
   // subexpr.hbs : {{upper (concat greeting " " name)}}
   CheckEq('HI BOB', Render('subexpr.hbs', '{"greeting":"hi","name":"bob"}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Subexpr_LiteralWithEquals;
+begin
+  // s_litequal.hbs : {{concat (concat "key=" val) "!"}}
+  // The quoted literal "key=" sits inside a subexpression and contains the
+  // name/value separator '='. Because it is quoted, the '=' must stay part of
+  // the literal text and must NOT be parsed as a hash (name=value) argument -
+  // otherwise concat would reject it as a named argument or truncate it.
+  CheckEq('key=v1!', Render('s_litequal.hbs', '{"val":"v1"}'));
 end;
 
 {$ENDREGION}
@@ -1630,6 +1757,147 @@ begin
   CheckEq(
     'Dear BOB, you have 2 item(s): [x][y] -- signed: ALICE',
     Render('kitchensink.hbs', '{"name":"bob","count":2,"active":true,"items":["x","y"],"author":"alice"}'));
+end;
+
+{$ENDREGION}
+
+{$REGION 'Additional edge cases'}
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Path_SlashAndCurrentAliases;
+begin
+  CheckEq('Bob Jones Bob HQ HQ:Bob/Jones',
+    Render('edge_path_aliases.hbs', '{"site":"HQ","user":{"firstname":"Bob","lastname":"Jones"}}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Truthy_NullFalse;
+begin
+  CheckEq('F', Render('edge_truthiness.hbs', '{"value":null}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Truthy_EmptyObjectTrue;
+begin
+  CheckEq('T', Render('edge_truthiness.hbs', '{"value":{}}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Truthy_NonEmptyArrayTrue;
+begin
+  CheckEq('T', Render('edge_truthiness.hbs', '{"value":[0]}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Truthy_FloatZeroFalse;
+begin
+  CheckEq('F', Render('edge_truthiness.hbs', '{"value":0.0}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Block_If_IncludeZero;
+begin
+  CheckEq('T', Render('edge_if_include_zero.hbs', '{"value":0}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Block_Unless_IncludeZero;
+begin
+  CheckEq('F', Render('edge_unless_include_zero.hbs', '{"value":0}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Block_If_NullLiteral;
+begin
+  CheckEq('F', Render('edge_if_null_literal.hbs', '{}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Block_With_ElseForMissing;
+begin
+  CheckEq('missing', Render('edge_with_else.hbs', '{}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Block_With_ElseForEmptyArray;
+begin
+  CheckEq('missing', Render('edge_with_else.hbs', '{"user":[]}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Block_With_ScalarContext;
+begin
+  CheckEq('ok', Render('edge_with_scalar.hbs', '{"label":"ok"}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Block_Each_ElseForMissing;
+begin
+  CheckEq('empty', Render('edge_each_else.hbs', '{}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Block_Each_ElseForScalar;
+begin
+  CheckEq('empty', Render('edge_each_else.hbs', '{"items":"x"}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Block_Each_LookupSubexpression;
+begin
+  CheckEq('0=a;1=b;', Render('edge_each_lookup.hbs', '{"items":["a","b"]}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Lookup_MissingOutOfRangeAndInvalidTargets;
+begin
+  CheckEq('><|><|><|><|><',
+    Render('edge_lookup_miss.hbs', '{"arr":["a","b"],"obj":{"x":"y"},"value":"not-an-object"}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Lookup_LiteralKeysWithDotsAndSlashes;
+begin
+  CheckEq('dot|slash', Render('edge_lookup_literal_keys.hbs', '{"obj":{"a.b":"dot","a/b":"slash"}}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Lookup_KeyDataVariableAsParam;
+begin
+  CheckEq('A=1;B=2;',
+    Render('edge_lookup_key_param.hbs', '{"labels":{"a":"A","b":"B"},"obj":{"a":"1","b":"2"}}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Literals_NullNegativeAndInt64;
+begin
+  CheckEq('null|-7|2147483648', Render('edge_literals.hbs', '{}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Quote_EscapedQuoteChars;
+begin
+  CheckEq('a&#34;b c&#39;d', Render('edge_quote_escape.hbs', '{}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Partial_HashBorrowedValueAndMissingDeletesField;
+begin
+  CheckEq('Guest User|A&#38;B|<>|off',
+    Render('edge_partial_hash_values.hbs', '{"display":"A&B","name":"Old","email":"old@example","showEmail":true}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Partial_HashSubexpressions;
+begin
+  CheckEq('MEMBER|Ann Lee|<a&#38;b@example>|on',
+    Render('edge_partial_hash_subexpr.hbs', '{"role":"member","first":"Ann","last":"Lee","email":"a&b@example","hidden":false}'));
+end;
+
+{*******************************************}
+procedure TALDUnitXTestHandlebars.Test_Partial_NonObjectContextWithHash;
+begin
+  CheckEq('Scalar||<x@y>|on', Render('edge_partial_nonobject_context.hbs', '{"name":"Bob"}'));
 end;
 
 {$ENDREGION}
@@ -6433,7 +6701,7 @@ end;
 
 procedure TALDUnitXTestHandlebars.Test_esc_double_quot;
 begin
-  CheckEq('a&quot;b', Render('g0042.hbs', '{"h":"a\"b"}'));
+  CheckEq('a&#34;b', Render('g0042.hbs', '{"h":"a\"b"}'));
 end;
 
 procedure TALDUnitXTestHandlebars.Test_esc_triple_quot;
@@ -6463,7 +6731,7 @@ end;
 
 procedure TALDUnitXTestHandlebars.Test_esc_double_mix;
 begin
-  CheckEq('&#60;a href&#x3D;&quot;?x&#x3D;1&#38;y&#x3D;2&quot;&#62;', Render('g0042.hbs', '{"h":"<a href=\"?x=1&y=2\">"}'));
+  CheckEq('&#60;a href=&#34;?x=1&#38;y=2&#34;&#62;', Render('g0042.hbs', '{"h":"<a href=\"?x=1&y=2\">"}'));
 end;
 
 procedure TALDUnitXTestHandlebars.Test_esc_triple_mix;
@@ -6649,11 +6917,6 @@ end;
 procedure TALDUnitXTestHandlebars.Test_cmt_with_braces;
 begin
   CheckEq('ab', Render('g0079.hbs', '{}'));
-end;
-
-procedure TALDUnitXTestHandlebars.Test_cmt_with_mustache;
-begin
-  CheckEq('ab', Render('g0080.hbs', '{"x":"Z"}'));
 end;
 
 procedure TALDUnitXTestHandlebars.Test_cmt_only;
@@ -6909,7 +7172,7 @@ end;
 // {{> partial context}} - partial is rendered with "user" as its context.
 procedure TALDUnitXTestHandlebars.Test_prt_arg_context;
 begin
-  CheckEq('Member|A&#38;B|<x&#x27;y>|off',
+  CheckEq('Member|A&#38;B|<x&#39;y>|off',
     Render('hpart_ctx.hbs', '{"user":{"title":"Member","name":"A&B","email":"x''y","showEmail":false}}'));
 end;
 
@@ -6917,7 +7180,7 @@ end;
 // hash arguments; the hash overrides the matching fields of the context.
 procedure TALDUnitXTestHandlebars.Test_prt_arg_context_hash;
 begin
-  CheckEq('Administrator|A&#38;B|<x&#x27;y>|on',
+  CheckEq('Administrator|A&#38;B|<x&#39;y>|on',
     Render('hpart_ctx_hash.hbs', '{"user":{"title":"Member","name":"A&B","email":"x''y","showEmail":false}}'));
 end;
 

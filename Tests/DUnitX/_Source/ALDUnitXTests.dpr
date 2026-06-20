@@ -9,21 +9,22 @@ program ALDUnitXTests;
   {$STRONGLINKTYPES ON}
 {$ENDIF}
 
+{$R 'Resources.res' 'Resources\Resources.rc'}
+
 uses
   {$IF defined(SKIA)}
   FMX.Skia,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF MSWINDOWS}
   {$IFDEF TESTINSIGHT}
   TestInsight.DUnitX,
   {$ELSE}
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
-  {$ENDIF}
+  {$ENDIF }
   DUnitX.TestFramework,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF MSWINDOWS}
-  //Alcinoe.TbbMM,
   Alcinoe.Execute,
   Alcinoe.FMX.NativeView.Win,
   Alcinoe.FMX.Trayicon,
@@ -42,54 +43,16 @@ uses
   Alcinoe.WinApi.SSPI,
   Alcinoe.WinApi.Windows,
   Alcinoe.WinApi.WinError,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF ANDROID}
   Alcinoe.AndroidApi.AndroidX,
-  Alcinoe.AndroidApi.AndroidX.Media3,
-  Alcinoe.AndroidApi.App,
-  Alcinoe.AndroidApi.AppCompat,
-  Alcinoe.AndroidApi.BillingClient,
-  Alcinoe.AndroidApi.Crypto,
-  Alcinoe.AndroidApi.Facebook,
-  Alcinoe.AndroidApi.Firebase.Analytics,
-  Alcinoe.AndroidApi.Firebase.Messaging,
-  Alcinoe.AndroidApi.Google,
-  Alcinoe.AndroidApi.InstallReferrer,
-  Alcinoe.AndroidApi.JavaTypes,
-  Alcinoe.AndroidApi.Os,
-  Alcinoe.AndroidApi.RenderScript,
-  Alcinoe.AndroidApi.Security,
-  Alcinoe.AndroidApi.Service,
-  Alcinoe.AndroidApi.WebKit,
-  Alcinoe.AndroidApi.Widget,
-  Alcinoe.Androidapi.Window,
-  Alcinoe.Androidapi.GraphicsContentViewText,
-  Alcinoe.FMX.NativeView.Android,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF iOS}
   Alcinoe.FMX.NativeView.iOS,
-  Alcinoe.iOSApi.AdSupport,
-  Alcinoe.iOSApi.AudioToolbox,
-  Alcinoe.iOSApi.AuthenticationServices,
-  Alcinoe.iOSApi.BackgroundTasks,
-  Alcinoe.iOSApi.FacebookCoreKit,
-  Alcinoe.iOSApi.FacebookLoginKit,
-  Alcinoe.iOSApi.FacebookShareKit,
-  Alcinoe.iOSApi.FirebaseCore,
-  Alcinoe.iOSApi.FirebaseMessaging,
-  Alcinoe.iOSApi.MessageUI,
-  Alcinoe.iOSApi.Photos,
-  Alcinoe.iOSapi.PhotosUI,
-  Alcinoe.iOSapi.CoreFoundation,
-  Alcinoe.iOSapi.CoreVideo,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF ALMacOS}
   Alcinoe.FMX.NativeView.Mac,
-  Alcinoe.Macapi.AppKit,
-  Alcinoe.Macapi.QuartzCore,
-  {$ENDIF}
-  //Alcinoe.CodeProfiler,
-  //Alcinoe.FMX.DesignEditors,
+  {$ENDIF }
   Alcinoe.BroadcastReceiver,
   Alcinoe.Cipher,
   Alcinoe.Common,
@@ -167,7 +130,7 @@ uses
   {$IFDEF MSWINDOWS}
   ALDUnitXTestStringUtils in 'ALDUnitXTestStringUtils.pas',
   ALDUnitXTestHtml in 'ALDUnitXTestHtml.pas',
-  {$ENDIF}
+  {$ENDIF }
   System.SysUtils,
   ALDUnitXTestHttp in 'ALDUnitXTestHttp.pas',
   ALDUnitXTestXmlDoc in 'ALDUnitXTestXmlDoc.pas',

@@ -25,10 +25,10 @@ type
       // --------------
       // THelperHandler
       THelperHandler = function(
-        const AParams: TALTagParamsA;
-        const AContext: TALJsonNodeA;
-        const ADepths: TList<TALJsonNodeA>;
-        var AOwned: Boolean): TALJsonNodeA of object;
+                         const AParams: TALTagParamsA;
+                         const AContext: TALJsonNodeA;
+                         const ADepths: TList<TALJsonNodeA>;
+                         var AOwned: Boolean): TALJsonNodeA of object;
   private
     type
       // -------------------------
@@ -404,7 +404,7 @@ begin
 
 end;
 
-{*************************************************************************************************}
+{************************************************************************************************************************************************************}
 function TALHandlebars.&if(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -438,7 +438,7 @@ begin
 
 end;
 
-{***************************************************************************************************}
+{***************************************************************************************************************************************************************}
 function TALHandlebars.unless(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -472,7 +472,7 @@ begin
 
 end;
 
-{**************************************************************************************************}
+{*************************************************************************************************************************************************************}
 function TALHandlebars.each(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -552,7 +552,7 @@ begin
   Raise Exception.Create('Unable to resolve "@index": the current context was not found in its parent context');
 end;
 
-{**************************************************************************************************************************************************************}
+{************************************************************************************************************************************************************}
 function TALHandlebars.key(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
   AOwned := True;
@@ -572,7 +572,7 @@ begin
   exit;
 end;
 
-{**************************************************************************************************************************************************************}
+{*************************************************************************************************************************************************************}
 function TALHandlebars.last(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
   If (ADepths.Count < 1) or (AContext = nil) then raise Exception.Create('The "@last" variable can only be used inside an "each" block');
@@ -594,11 +594,11 @@ begin
   var LParamIndex: Integer;
   var LOwned: Boolean;
   var LJSonNode := ResolveParamValue(
-                      AParams, // const AParams: TALTagParamsA;
-                      0, // const AIndex: Integer;
-                      AContext, // const AContext: TALJsonNodeA;
-                      ADepths, // const ADepths: TList<TALJsonNodeA>;
-                      LOwned); // out AOwned: Boolean): TALJsonNodeA;
+                     AParams, // const AParams: TALTagParamsA;
+                     0, // const AIndex: Integer;
+                     AContext, // const AContext: TALJsonNodeA;
+                     ADepths, // const ADepths: TList<TALJsonNodeA>;
+                     LOwned); // out AOwned: Boolean): TALJsonNodeA;
   try
     if (LJSonNode <> nil) and (IsTruthy(LJSonNode)) then begin
       LParamIndex := AParams.IndexOfName(MainBlockParamName);
@@ -629,7 +629,7 @@ begin
 
 end;
 
-{**************************************************************************************************************************************************************}
+{***************************************************************************************************************************************************************}
 function TALHandlebars.lookup(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -722,7 +722,7 @@ begin
 
 end;
 
-{*************************************************************************************************************************************************************}
+{***************************************************************************************************************************************************************}
 function TALHandlebars.concat(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -758,7 +758,7 @@ begin
 
 end;
 
-{*****************************************************************************}
+{***********************************************************************************************************************************************************}
 function TALHandlebars.eq(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -825,7 +825,7 @@ begin
 
 end;
 
-{*****************************************************************************}
+{***********************************************************************************************************************************************************}
 function TALHandlebars.ne(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
   result := eq(AParams, AContext, ADepths, AOwned);
@@ -833,7 +833,7 @@ begin
   result.Bool := not result.Bool;
 end;
 
-{*****************************************************************************}
+{***********************************************************************************************************************************************************}
 function TALHandlebars.gt(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -885,7 +885,7 @@ begin
 
 end;
 
-{*****************************************************************************}
+{***********************************************************************************************************************************************************}
 function TALHandlebars.lt(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -937,7 +937,7 @@ begin
 
 end;
 
-{*****************************************************************************}
+{************************************************************************************************************************************************************}
 function TALHandlebars.gte(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -989,7 +989,7 @@ begin
 
 end;
 
-{*****************************************************************************}
+{************************************************************************************************************************************************************}
 function TALHandlebars.lte(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -1041,7 +1041,7 @@ begin
 
 end;
 
-{*****************************************************************************}
+{*************************************************************************************************************************************************************}
 function TALHandlebars.&and(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -1078,7 +1078,7 @@ begin
 
 end;
 
-{*****************************************************************************}
+{************************************************************************************************************************************************************}
 function TALHandlebars.&or(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -1115,7 +1115,7 @@ begin
 
 end;
 
-{*****************************************************************************}
+{*************************************************************************************************************************************************************}
 function TALHandlebars.&not(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -1347,7 +1347,7 @@ begin
   FHelpers.AddOrSetValue(AName, AHandler);
 end;
 
-{**********************************}
+{*************************************}
 function TALHandlebars.ResolveTemplate(
            const ATemplateSource: AnsiString;
            const AContext: TTagReplaceHandlerContext): AnsiString;
@@ -1361,7 +1361,7 @@ begin
               False); // const AReplaceTagsInResult: Boolean = False): AnsiString; overload;
 end;
 
-{**********************************}
+{*************************************}
 function TALHandlebars.ResolveTemplate(
            const ATemplateSource: AnsiString;
            const AContext: TALJsonNodeA): AnsiString;

@@ -265,7 +265,7 @@ Begin
   else Result := AlGenerateInternetMessageID;
 end;
 
-{*********************}
+{***************************}
 {$WARN SYMBOL_DEPRECATED OFF}
 function AlIsValidEmail(const Value: AnsiString): boolean;
 
@@ -341,7 +341,7 @@ begin
 end;
 {$WARN SYMBOL_DEPRECATED ON}
 
-{*********************}
+{***************************}
 {$WARN SYMBOL_DEPRECATED OFF}
 function AlIsValidEmail(const Value: String): boolean;
 

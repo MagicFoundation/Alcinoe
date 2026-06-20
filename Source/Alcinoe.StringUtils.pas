@@ -1480,7 +1480,7 @@ begin
   Result := FData[Index+1];
 end;
 
-{*********************}
+{********************************************************************}
 procedure TALStringBuilderA.SetChars(Index: Integer; Value: AnsiChar);
 begin
   if Index < 0 then
@@ -1557,7 +1557,7 @@ begin
   Result := Capacity;
 end;
 
-{*********************}
+{***************************************************************************}
 function TALStringBuilderA.Append(const AValue: AnsiChar): TALStringBuilderA;
 begin
   FLength := Length + 1;
@@ -1597,7 +1597,7 @@ begin
   Result := Self;
 end;
 
-{*********************}
+{********************************************************************************************************************************}
 function TALStringBuilderA.Append(const AValue: AnsiString; const AStartIndex: Integer; const ACount: Integer): TALStringBuilderA;
 begin
   if (AStartIndex < low(AValue)) or (AStartIndex > high(AValue)) then
@@ -1710,7 +1710,7 @@ begin
   System.SetLength(FData, AValue);
 end;
 
-{*********************}
+{********************************************************}
 function TALStringBuilderW.GetChars(Index: Integer): Char;
 begin
   if Index < 0 then
@@ -1720,7 +1720,7 @@ begin
   Result := FData[Index+1];
 end;
 
-{*********************}
+{****************************************************************}
 procedure TALStringBuilderW.SetChars(Index: Integer; Value: Char);
 begin
   if Index < 0 then
@@ -1797,7 +1797,7 @@ begin
   Result := Capacity;
 end;
 
-{*********************}
+{***********************************************************************}
 function TALStringBuilderW.Append(const AValue: Char): TALStringBuilderW;
 begin
   FLength := Length + 1;
@@ -1837,7 +1837,7 @@ begin
   Result := Self;
 end;
 
-{*********************}
+{****************************************************************************************************************************}
 function TALStringBuilderW.Append(const AValue: string; const AStartIndex: Integer; const ACount: Integer): TALStringBuilderW;
 begin
   if (AStartIndex < low(AValue)) or (AStartIndex > high(AValue)) then
@@ -6494,7 +6494,7 @@ begin
   result := _GetBase64Encoding.EncodeBytesToString(Bytes, Size);
 end;
 
-{*********************}
+{******************************************************************}
 function  ALBase64EncodeStringMIME(const S: AnsiString): AnsiString;
 var Ln: integer;
     CountOfCRLF: integer;
@@ -8691,7 +8691,7 @@ begin
   Result := 0;
 end;
 
-{************************************************************************************************************}
+{*************************************************************************************************************}
 function  ALPosOfAnyA(const AnyOf: array of AnsiChar; const S: AnsiString; const Offset: Integer = 1): Integer;
 begin
   if Offset > 0 then begin
@@ -8704,14 +8704,14 @@ begin
   Result := 0;
 end;
 
-{****************************************************************************************************}
+{*****************************************************************************************************}
 function  ALPosOfAnyW(const AnyOf: array of Char; const S: String; const Offset: Integer = 1): Integer;
 begin
   if Offset > 0 then Result := S.IndexOfAny(AnyOf, Offset - 1) + 1
   else Result := 0;
 end;
 
-{**********************************************************************************************}
+{*************************************************************************************************************************************************************}
 function  ALSplitA(const S: AnsiString; const Separator: array of AnsiChar; const Options: TStringSplitOptions = TStringSplitOptions.None): TArray<AnsiString>;
 const
   DeltaGrow = 32;
@@ -8763,7 +8763,7 @@ begin
     SetLength(Result, Total);
 end;
 
-{**********************************************************************************}
+{*************************************************************************************************************************************************}
 function  ALSplitW(const S: String; const Separator: array of Char; const Options: TStringSplitOptions = TStringSplitOptions.None): TArray<String>;
 begin
   Result := S.Split(Separator, Options);
@@ -10981,7 +10981,7 @@ begin
 end;
 {$WARN WIDECHAR_REDUCED ON}
 
-{*********************}
+{*******************************************************************************************}
 procedure ALPercentDecodeInPlace(var AStr: AnsiString; const APlusAsSpaces: Boolean = False);
 
 var
@@ -11083,7 +11083,7 @@ begin
 
 end;
 
-{*********************}
+{***************************************************************************************}
 procedure ALPercentDecodeInPlace(var AStr: String; const APlusAsSpaces: Boolean = False);
 begin
 
@@ -12189,7 +12189,7 @@ var
   LResultCurrentPos: integer;
   LResultCurrentLength: integer;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function _ExtractTagName(const ATagContent: AnsiString): AnsiString;
   Begin
     var X: Integer := 1;
@@ -12199,7 +12199,7 @@ var
     else Result := AlcopyStr(ATagContent,1,x-1);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function _ExtractParamsStr(const ATagName, ATagContent: ansiString): AnsiString;
   Begin
     Result := ALTrim(AlcopyStr(ATagContent,length(ATagName) + 1, MaxInt));
@@ -12351,7 +12351,7 @@ end;
 
 type
 
-  {****************************}
+  {***************************}
   TALStaticTagReplacerA = class
   public
     class function ReplaceTagWithContext(

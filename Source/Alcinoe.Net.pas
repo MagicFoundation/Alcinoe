@@ -245,7 +245,7 @@ begin
   result := CompareMem(@AIpV6, @ALZeroIpV6, SizeOf(TALIPv6Binary));
 end;
 
-{*********************}
+{**********************************************************************************************}
 Function ALTryIPV6StrToBinary(const AIPV6Str: AnsiString; out AIPV6Bin: TALIPv6Binary): Boolean;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}

@@ -7092,7 +7092,7 @@ begin
   Result := FNodeSubType;
 end;
 
-{*******************************************************}
+{***********************************************************}
 function TALJSONTextNodeA.GetStorageKind: TALJSONStorageKind;
 begin
   Result := FStorageKind;
@@ -8046,7 +8046,7 @@ begin
   end;
 end;
 
-{*********************}
+{****************************************************************************************************************}
 function ALJSONTryStrToRegExW(const S: String; out RegEx: String; out RegExOptions: TALPerlRegExOptions): Boolean;
 begin
 
@@ -8101,7 +8101,7 @@ begin
 
 end;
 
-{*********************}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 function ALJSONTryStrToBinaryW(const S: String; out Data: TBytes; out Subtype: Byte): Boolean;
 begin
@@ -8176,7 +8176,7 @@ begin
 end;
 {$WARN WIDECHAR_REDUCED ON}
 
-{*********************}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 function ALJSONTryStrToDateTimeW(const S: String; out Value: TDateTime): Boolean;
 begin
@@ -8249,7 +8249,7 @@ begin
 end;
 {$WARN WIDECHAR_REDUCED ON}
 
-{*********************}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 // ObjectId is a 12-Byte BSON type, constructed using:
 // a 4-Byte value representing the seconds since the Unix epoch,
@@ -8295,7 +8295,7 @@ begin
 end;
 {$WARN WIDECHAR_REDUCED ON}
 
-{*********************}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 function ALJSONTryStrToTimestampW(const S: String; out Value: TALBSONTimestamp): Boolean;
 begin
@@ -8330,7 +8330,7 @@ begin
 end;
 {$WARN WIDECHAR_REDUCED ON}
 
-{*********************}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 function ALJSONTryStrToInt32W(const S: String; out Value: Int32): Boolean;
 begin
@@ -8392,7 +8392,7 @@ begin
 end;
 {$WARN WIDECHAR_REDUCED ON}
 
-{*********************}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 function ALJSONTryStrToInt64W(const S: String; out Value: Int64): Boolean;
 begin
@@ -8490,7 +8490,7 @@ begin
   end;
 end;
 
-{*********************}
+{********************************************************************************************}
 class function TALJSONDocumentW.DetectNodeTypeFromJSON(const Buffer: String): TALJSONNodeType;
 begin
 
@@ -9927,7 +9927,7 @@ begin
       Result.ChildNodes.Add(ChildNodes[I].Clone);
 end;
 
-{*********************}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 procedure TALJSONNodeW.ParseJSON(
             const Buffer: String;
@@ -12054,7 +12054,7 @@ begin
 
 end;
 
-{*********************}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 procedure TALJSONNodeW.SaveToJSON(
             const Stream: TStream;

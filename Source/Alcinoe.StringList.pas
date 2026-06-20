@@ -867,13 +867,13 @@ begin
   PutObject(Result, AObject);
 end;
 
-{**************************************************************}
+{************************************************************}
 function TALStringsA.AddName(const Name: AnsiString): Integer;
 begin
   Result := AddNameObject(Name, nil);
 end;
 
-{****************************************************************************}
+{************************************************************************************}
 function TALStringsA.AddNameObject(const Name: AnsiString; AObject: TObject): Integer;
 begin
   Result := AddObject(Name, AObject);
@@ -1215,7 +1215,7 @@ begin
   Result := ExtractName(Get(Index));
 end;
 
-{*****************************************************************}
+{*********************************************************************}
 procedure TALStringsA.SetName(Index: Integer; const Value: AnsiString);
 var
   S: AnsiString;
@@ -1405,13 +1405,13 @@ begin
   PutObject(Index, AObject);
 end;
 
-{*****************************************************************}
+{***********************************************************************}
 procedure TALStringsA.InsertName(Index: Integer; const Name: AnsiString);
 begin
   InsertNameObject(Index, Name, nil);
 end;
 
-{***************************************************************************************}
+{***********************************************************************************************}
 procedure TALStringsA.InsertNameObject(Index: Integer; const Name: AnsiString; AObject: TObject);
 begin
   InsertObject(Index, Name, AObject);
@@ -2587,13 +2587,13 @@ begin
   end;
 end;
 
-{**************************************************************}
+{*****************************************************************}
 function TALNVStringListA.AddName(const Name: AnsiString): Integer;
 begin
   Result := AddNameObject(Name, nil);
 end;
 
-{****************************************************************************}
+{*****************************************************************************************}
 function TALNVStringListA.AddNameObject(const Name: AnsiString; AObject: TObject): Integer;
 begin
   if not Sorted then begin
@@ -3102,13 +3102,13 @@ begin
   InsertItem(Index, S, AObject);
 end;
 
-{*****************************************************************}
+{****************************************************************************}
 procedure TALNVStringListA.InsertName(Index: Integer; const Name: AnsiString);
 begin
   InsertNameObject(Index, Name, nil);
 end;
 
-{***************************************************************************************}
+{****************************************************************************************************}
 procedure TALNVStringListA.InsertNameObject(Index: Integer; const Name: AnsiString; AObject: TObject);
 begin
   if Sorted then Error(@SSortedListError, 0);
@@ -3509,7 +3509,7 @@ begin
   Result := Flist[Index].fName;
 end;
 
-{**********************************************************************}
+{**************************************************************************}
 procedure TALNVStringListA.SetName(Index: Integer; const Value: AnsiString);
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
@@ -4510,13 +4510,13 @@ begin
   PutObject(Result, AObject);
 end;
 
-{**************************************************************}
+{********************************************************}
 function TALStringsW.AddName(const Name: String): Integer;
 begin
   Result := AddNameObject(Name, nil);
 end;
 
-{****************************************************************************}
+{********************************************************************************}
 function TALStringsW.AddNameObject(const Name: String; AObject: TObject): Integer;
 begin
   Result := AddObject(Name, AObject);
@@ -5060,13 +5060,13 @@ begin
   PutObject(Index, AObject);
 end;
 
-{*****************************************************************}
+{*******************************************************************}
 procedure TALStringsW.InsertName(Index: Integer; const Name: String);
 begin
   InsertNameObject(Index, Name, nil);
 end;
 
-{***************************************************************************************}
+{*******************************************************************************************}
 procedure TALStringsW.InsertNameObject(Index: Integer; const Name: String; AObject: TObject);
 begin
   InsertObject(Index, Name, AObject);
@@ -6304,13 +6304,13 @@ begin
   end;
 end;
 
-{**************************************************************}
+{*************************************************************}
 function TALNVStringListW.AddName(const Name: String): Integer;
 begin
   Result := AddNameObject(Name, nil);
 end;
 
-{****************************************************************************}
+{*************************************************************************************}
 function TALNVStringListW.AddNameObject(const Name: String; AObject: TObject): Integer;
 begin
   if not Sorted then begin
@@ -6812,13 +6812,13 @@ begin
   InsertItem(Index, S, AObject);
 end;
 
-{*****************************************************************}
+{************************************************************************}
 procedure TALNVStringListW.InsertName(Index: Integer; const Name: String);
 begin
   InsertNameObject(Index, Name, nil);
 end;
 
-{***************************************************************************************}
+{************************************************************************************************}
 procedure TALNVStringListW.InsertNameObject(Index: Integer; const Name: String; AObject: TObject);
 begin
   if Sorted then Error(@SSortedListError, 0);

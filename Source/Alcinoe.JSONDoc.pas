@@ -9488,7 +9488,7 @@ end;
 {*******************************************************}
 function TALJSONNodeW.GetStorageKind: TALJSONStorageKind;
 begin
-  AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
+  AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
 end;
 
 {*********************************************************}

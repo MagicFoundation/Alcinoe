@@ -1,3 +1,50 @@
+## 06/20/2026
+
+- Added `Alcinoe.Handlebars` unit with `TALHandlebars`, a native Delphi 
+  Handlebars-compatible template engine:
+  - renders text from a template combined with a `TALJsonNodeA` context
+  - context-aware value resolution (`this`, `.`, `..`, `../`, `@root`, nested 
+    property paths using `.` or `/` separators)
+  - block helpers `{{#if}}`, `{{#unless}}`, `{{#each}}`, `{{#with}}` with 
+    `{{else}}` (inverse) branches
+  - built-in data variables `@index`, `@key`, `@first`, `@last`
+  - built-in helpers `lookup`, `concat`, `eq`, `ne`, `gt`, `lt`, `gte`, `lte`, 
+    `and`, `or`, `not`, and partials via `{{> partial}}`
+  - subexpressions, e.g. `{{#if (eq status "active")}}`
+  - automatic HTML escaping for `{{value}}`, raw output for `{{{value}}}`, 
+    whitespace control with `{{~`/`~}}`, and `{{! }}` / `{{!-- --}}` comments
+  - custom helpers via `RegisterHelper`
+- Reworked the tag-replacement engine in `Alcinoe.StringUtils`:
+  - replaced the `ALFastTagReplaceA` / `ALFastTagReplacePrecompileA` / 
+    `ALExtractTagParamsA` / `ALSplitTextAndTagA` family with 
+    `ALPrecompileTagsA`, `ALReplacePrecompiledTagsA`, and `ALReplaceTagsA`
+  - the new precompiler supports block tags, an else/inverse section, 
+    subexpressions, escape characters, and a configurable name/value separator
+  - precompiled tags now store the object address as raw pointer bytes instead 
+    of a hex string
+  - replaced `TALBasePrecompiledTagA`/`TALPrecompiledTagA` internals with 
+    `TALPrecompiledTagA` (now exposing `TagName` and a `TALTagParamsA` 
+    `TagParams`); added `TALTagParamsA` with a `WasQuoted[]` property and 
+    `TALTagReplaceFuncA`
+- Added `ALPosOfAnyA/W` and `ALSplitA/W` to `Alcinoe.StringUtils`
+- Added `AStoreWasQuotedInObjects` parameter to both overloads of 
+  `ALExtractHeaderFields` (stores, in the string-list objects, whether each 
+  token was originally quoted)
+- Moved `ALGetAppVersion`, `ALSemanticVersionToInt64`, 
+  `ALInt64ToSemanticVersionA/W` from `Alcinoe.FMX.Common` to `Alcinoe.Common`, 
+  and split `ALGetAppVersion` into `ALGetAppVersionA`/`ALGetAppVersionW`
+- Extended `TALStringsA/W` and `TALNVStringListA/W` in `Alcinoe.StringList` 
+  (ported from `TStrings`):
+  - added `AddName`, `AddNameObject`, `InsertName`, `InsertNameObject`, and 
+    `SetName`
+  - the `Names[]` property is now writable
+- Added a `StorageKind` property (`GetStorageKind`) to the JSON nodes in 
+  `Alcinoe.JSONDoc`, exposing the internal `TALJSONStorageKind` of text nodes
+- Added `PALLocaleA`/`PALLocaleW` pointer types to `Alcinoe.Localization`
+- `Alcinoe.inc` now enables `{$ZEROBASEDSTRINGS OFF}` globally and removes the 
+  per-unit `ALZeroBasedStringsON` toggling
+- Added `ALDUnitXTestHandlebars` to the DUnitX test suite
+
 ## 05/31/2026
 
 - Improved click-vs-scroll discrimination in `TALControl` and `TALDynamicControl`:

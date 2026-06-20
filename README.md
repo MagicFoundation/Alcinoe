@@ -965,6 +965,8 @@ Learn more at [Demos\ALHttpServer](https://github.com/MagicFoundation/Alcinoe/tr
 Handlebars Template Engine (TALHandlebars)
 ==========================================
 
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/handlebars.webp?raw=true" width="720" style="width:720px;"/>
+
 TALHandlebars is a fast, lightweight Handlebars-compatible template engine
 written entirely in Delphi. It lets you generate HTML, JSON, emails, configuration
 files, or any other text-based content by combining reusable templates with
@@ -972,8 +974,6 @@ dynamic JSON data. Designed to integrate naturally with Alcinoe's JSON classes,
 TALHandlebars provides context-aware value resolution, block helpers, partials,
 subexpressions, automatic HTML escaping, and extensible custom helpers without
 requiring an external scripting engine or runtime.
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/handlebars.webp?raw=true" width="540" style="width:540px;"/>
 
 Advantages of using TALHandlebars:
 

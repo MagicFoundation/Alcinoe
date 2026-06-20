@@ -482,6 +482,10 @@ function  ALPosA(const SubStr, Str: AnsiString; const Offset: Integer = 1): Inte
 function  ALPosW(const SubStr, Str: String; const Offset: Integer = 1): Integer; inline;
 function  ALPosIgnoreCaseA(const SubStr, S: Ansistring; const Offset: Integer = 1): Integer;
 function  ALPosIgnoreCaseW(const SubStr, S: String; const Offset: Integer = 1): Integer;
+function  ALPosOfAnyA(const AnyOf: array of AnsiChar; const S: AnsiString; const Offset: Integer = 1): Integer; overload;
+function  ALPosOfAnyW(const AnyOf: array of Char; const S: String; const Offset: Integer = 1): Integer; overload;
+function  ALSplitA(const S: AnsiString; const Separator: array of AnsiChar; const Options: TStringSplitOptions = TStringSplitOptions.None): TArray<AnsiString>;
+function  ALSplitW(const S: String; const Separator: array of Char; const Options: TStringSplitOptions = TStringSplitOptions.None): TArray<String>;
 function  ALCompareStrA(const S1, S2: AnsiString): Integer; inline;
 function  ALCompareStrW(const S1, S2: string): Integer; inline;
 function  ALSameStrA(const S1, S2: AnsiString): Boolean; inline;
@@ -607,8 +611,8 @@ function  AlLowerCase(const S: AnsiString): AnsiString; overload; inline;
 function  AlLowerCase(const S: string): string; overload; inline;
 function  AlUpCase(const Ch: AnsiChar): AnsiChar; overload; inline;
 function  AlUpCase(Ch: Char): Char; overload; inline;
-function  AlLoCase(const Ch: AnsiChar): AnsiChar; overload;
-function  AlLoCase(Ch: Char): Char; overload;
+function  AlLoCase(const Ch: AnsiChar): AnsiChar; overload; inline;
+function  AlLoCase(Ch: Char): Char; overload; inline;
 function  ALUnicodeUpperCase(const s: AnsiString): AnsiString; overload; inline;
 function  ALUnicodeUpperCase(const s: String): String; overload; inline;
 function  ALUnicodeLowerCase(const s: AnsiString): AnsiString; overload; inline;
@@ -637,9 +641,9 @@ function  AlUTF8DetectBOM(const P: PAnsiChar; const Size: Integer): Boolean;
 function  AlUTF8removeBOM(const S: AnsiString): AnsiString;
 function  ALUTF8CharSize(Lead: AnsiChar; out IsValid: Boolean): Integer; overload;
 function  ALUTF8CharSize(Lead: AnsiChar): Integer; overload;
-function  ALUTF8CharCount(const S: AnsiString): Integer;
-Function  ALUTF8ByteTrunc(const s:AnsiString; const Count: Integer): AnsiString;
-Function  ALUTF8CharTrunc(const s:AnsiString; const Count: Integer): AnsiString;
+function  ALUTF8CharCount(const s: AnsiString): Integer;
+Function  ALUTF8ByteTrunc(const s: AnsiString; const Count: Integer): AnsiString;
+Function  ALUTF8CharTrunc(const s: AnsiString; const Count: Integer): AnsiString;
 Function  ALUTF8CharToUtf16(
             const S: AnsiString;
             const AIndex: integer;
@@ -669,7 +673,8 @@ procedure ALExtractHeaderFields(
             const AStripQuotes: Boolean = False;
             const AQuoteDoublingEscape: Boolean = False;
             const AEscapeChar: AnsiChar = #0;
-            const ANameValueSeparator: AnsiChar = '='); overload;
+            const ANameValueSeparator: AnsiChar = '=';
+            const AStoreWasQuotedInObjects: Boolean = False); overload;
 procedure ALExtractHeaderFields(
             const ASeparators: TSysCharSet;
             const AWhiteSpace: TSysCharSet;
@@ -679,91 +684,107 @@ procedure ALExtractHeaderFields(
             const AStripQuotes: Boolean = False;
             const AQuoteDoublingEscape: Boolean = False;
             const AEscapeChar: Char = #0;
-            const ANameValueSeparator: Char = '='); overload;
+            const ANameValueSeparator: Char = '=';
+            const AStoreWasQuotedInObjects: Boolean = False); overload;
+
+const
+
+  ALDefaultPrecompiledTagStartMarker = AnsiChar(#2); // STX   Start of Text
+  ALDefaultPrecompiledTagEndMarker = AnsiChar(#3); // ETX   End of Text
 
 type
 
-  TALTagParamsClassA = class of TALStringsA;
-
-  TALBasePrecompiledTagA = Class(Tobject)
-  private
-    fTagString: ansiString;
+  {-------------------------------------}
+  TALTagParamsA = class(TALNVStringListA)
   protected
-    function GetTagParams: TALStringsA; virtual; abstract;
+    function GetWasQuoted(Index: Integer): Boolean; virtual;
   public
-    property TagString: ansiString read fTagString write fTagString;
-    property TagParams: TALStringsA read GetTagParams;
-  End;
+    property WasQuoted[Index: Integer]: Boolean read GetWasQuoted;
+  end;
 
-  TALPrecompiledTagA = Class(TALBasePrecompiledTagA)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALPrecompiledTagA = Class(Tobject)
   private
-    fTagParams: TALStringsA;
+    fTagName: ansiString;
+    fTagParams: TALTagParamsA;
   protected
-    function GetTagParams: TALStringsA; override;
+    function GetTagParams: TALTagParamsA; virtual;
   public
     constructor Create;
     destructor Destroy; override;
+    property TagName: ansiString read fTagName write fTagName;
+    property TagParams: TALTagParamsA read GetTagParams;
   End;
 
-  TALHandleTagfunctA = function(
-                         const TagString: AnsiString;
-                         TagParams: TALStringsA;
-                         Context: pointer;
-                         Var Handled: Boolean): AnsiString;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALTagReplaceFuncA = function(
+                         const ATagName: AnsiString;
+                         const ATagParams: TALTagParamsA;
+                         const AContext: pointer): AnsiString of object;
 
-  TALHandleTagExtendedfunctA = function(
-                                 const TagString: AnsiString;
-                                 TagParams: TALStringsA;
-                                 Context: pointer;
-                                 Var Handled: Boolean;
-                                 Const SourceString: AnsiString;
-                                 Var TagPosition, TagLength: integer): AnsiString;
-
-  TALHandleTagPrecompileFunctA = function(
-                                   const TagString: AnsiString;
-                                   TagParams: TALStringsA;
-                                   Context: pointer;
-                                   Const SourceString: AnsiString;
-                                   Var TagPosition, TagLength: integer): TALBasePrecompiledTagA;
-
-function ALFastTagReplacePrecompileA(
-           Const SourceString, TagStart, TagEnd: AnsiString;
-           PrecompileProc: TALHandleTagPrecompileFunctA;
-           Context: Pointer;
-           TagsContainer: TObjectList;
-           Const flags: TReplaceFlags=[]): AnsiString; // rfreplaceall is ignored here, only rfIgnoreCase is matter
-function ALFastTagReplaceA(
-           Const SourceString, TagStart, TagEnd: AnsiString;
-           ReplaceProc: TALHandleTagFunctA;
-           ReplaceExtendedProc: TALHandleTagExtendedfunctA;
-           Flags: TReplaceFlags;
-           Context: Pointer;
-           TagParamsClass: TALTagParamsClassA;
-           const TagReplaceProcResult: Boolean = False): AnsiString; overload;
-function  ALFastTagReplaceA(
-            const SourceString, TagStart, TagEnd: AnsiString;
-            ReplaceProc: TALHandleTagFunctA;
-            Context: Pointer;
-            Const flags: TReplaceFlags=[rfreplaceall];
-            const TagReplaceProcResult: Boolean = False): AnsiString; overload;
-function  ALFastTagReplaceA(
-            const SourceString, TagStart, TagEnd: AnsiString;
-            ReplaceExtendedProc: TALHandleTagExtendedfunctA;
-            Context: Pointer;
-            Const flags: TReplaceFlags=[rfreplaceall];
-            const TagReplaceProcResult: Boolean = False): AnsiString; overload;
-function  ALFastTagReplaceA(
-            const SourceString, TagStart, TagEnd: AnsiString;
-            const ReplaceWith: AnsiString;
-            const Flags: TReplaceFlags=[rfreplaceall]): AnsiString; overload;
-function  ALExtractTagParamsA(
-            Const SourceString, TagStart, TagEnd: AnsiString;
-            TagParams: TALStringsA;
-            IgnoreCase: Boolean): Boolean;
-Procedure ALSplitTextAndTagA(
-            Const SourceString, TagStart, TagEnd: AnsiString;
-            SplitTextAndTagLst: TALStringsA;
-            IgnoreCase: Boolean);
+/// <summary>
+///   Precompiles all tags found in ASourceString using ATagStartMarker and
+///   ATagEndMarker. Each tag is parsed into a TALPrecompiledTagA object,
+///   stored in ATagsContainer, and replaced in the returned string by an
+///   internal marker containing the object's address. ATagsContainer and all
+///   stored TALPrecompiledTagA objects must remain alive while the returned
+///   string is being used.
+///
+///   Example:
+///
+///     LResult := ALPrecompileTagsA(
+///                  'Hello {{name firstname="John"}}',
+///                  '{{',
+///                  '}}',
+///                  TagsContainer);
+///
+///   The name tag and its firstname parameter are stored in TagsContainer,
+///   and the original tag is replaced in LResult by an internal precompiled
+///   marker. You can then call ALReplacePrecompiledTagsA on LResult with a
+///   custom AReplaceFunc to efficiently resolve and replace its tags.
+/// </summary>
+function ALPrecompileTagsA(
+           const ASourceString: AnsiString;
+           const ATagStartMarker, ATagEndMarker: AnsiString;
+           const ATagsContainer: TObjectList;
+           const AIgnoreCase: Boolean = false;
+           const AQuoteDoublingEscape: Boolean = False;
+           const AEscapeChar: AnsiChar = #0; // ex: '\' like in {{uppercase "abc\"def}}
+           const ANameValueSeparator: AnsiChar = '='; // ex: '=' like in {{link title url="/home" target="_blank"}}
+           const ABlockStartMarker: AnsiChar = #0; // ex: '#' like in {{#if ...}}
+           const ABlockEndMarker: AnsiChar = #0; // ex: '/' like in {{/if}}
+           const ABlockElseTag: AnsiString = ''; // ex: 'else' like in {{else}}
+           const ASubExpressionTagStartMarker: AnsiString = ''; // ex: '(' like in {{uppercase (concat a b)}}
+           const ASubExpressionTagEndMarker: AnsiString = ''; // ex: ')' like in {{uppercase (concat a b)}}
+           const AHandleTagsInQuote: Boolean = True; // False = quoted params are kept literal
+           const AMainBlockParamName: AnsiString = '__main'; // name of the supplemental block param holding the main section
+           const AInverseBlockParamName: AnsiString = '__inverse'; // name of the supplemental block param holding the inverse section
+           const APrecompiledTagStartMarker: AnsiChar = ALDefaultPrecompiledTagStartMarker; // opens the precompiled-tag marker (ex: STX)
+           const APrecompiledTagEndMarker: AnsiChar = ALDefaultPrecompiledTagEndMarker): AnsiString; // closes the precompiled-tag marker (ex: ETX)
+function ALReplacePrecompiledTagsA(
+           const ASourceString: AnsiString;
+           const ATagStartMarker, ATagEndMarker: AnsiChar;
+           const AReplaceFunc: TALTagReplaceFuncA;
+           const AContext: Pointer;
+           const AReplaceTagsInResult: Boolean = False): AnsiString; overload;
+function ALReplaceTagsA(
+           const ASourceString: AnsiString;
+           const ATagStartMarker, ATagEndMarker: AnsiString;
+           const AReplaceFunc: TALTagReplaceFuncA;
+           const AContext: Pointer;
+           const AIgnoreCase: Boolean = False;
+           const AReplaceTagsInResult: Boolean = False;
+           const AQuoteDoublingEscape: Boolean = False;
+           const AEscapeChar: AnsiChar = #0;
+           const ANameValueSeparator: AnsiChar = '='): AnsiString; overload;
+function ALReplaceTagsA(
+           const ASourceString: AnsiString;
+           const ATagStartMarker, ATagEndMarker: AnsiString;
+           const AReplaceWith: AnsiString;
+           const AIgnoreCase: Boolean = False;
+           const AQuoteDoublingEscape: Boolean = False;
+           const AEscapeChar: AnsiChar = #0;
+           const ANameValueSeparator: AnsiChar = '='): AnsiString; overload;
 
 implementation
 
@@ -1449,8 +1470,7 @@ begin
   System.SetLength(FData, AValue);
 end;
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{************************************************************}
 function TALStringBuilderA.GetChars(Index: Integer): AnsiChar;
 begin
   if Index < 0 then
@@ -1459,12 +1479,8 @@ begin
     RangeIndexError(Index, Length - 1, Self);
   Result := FData[Index+1];
 end;
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{********************************************************************}
 procedure TALStringBuilderA.SetChars(Index: Integer; Value: AnsiChar);
 begin
   if Index < 0 then
@@ -1473,9 +1489,6 @@ begin
     RangeIndexError(Index, Length - 1, Self);
   FData[Index+1] := Value;
 end;
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {********************************************}
 function TALStringBuilderA.GetLength: Integer;
@@ -1544,8 +1557,7 @@ begin
   Result := Capacity;
 end;
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{***************************************************************************}
 function TALStringBuilderA.Append(const AValue: AnsiChar): TALStringBuilderA;
 begin
   FLength := Length + 1;
@@ -1554,9 +1566,6 @@ begin
   FData[Length] := AValue;
   Result := Self;
 end;
-{$IF defined(ALZEROBASEDSTRINGSON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {*****************************************************************************}
 function TALStringBuilderA.Append(const AValue: AnsiString): TALStringBuilderA;
@@ -1588,8 +1597,7 @@ begin
   Result := Self;
 end;
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{********************************************************************************************************************************}
 function TALStringBuilderA.Append(const AValue: AnsiString; const AStartIndex: Integer; const ACount: Integer): TALStringBuilderA;
 begin
   if (AStartIndex < low(AValue)) or (AStartIndex > high(AValue)) then
@@ -1602,9 +1610,6 @@ begin
   end;
   Result := Self;
 end;
-{$IF defined(ALZEROBASEDSTRINGSON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {*******************************************************}
 function TALStringBuilderA.AppendLine: TALStringBuilderA;
@@ -1705,8 +1710,7 @@ begin
   System.SetLength(FData, AValue);
 end;
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{********************************************************}
 function TALStringBuilderW.GetChars(Index: Integer): Char;
 begin
   if Index < 0 then
@@ -1715,12 +1719,8 @@ begin
     RangeIndexError(Index, Length - 1, Self);
   Result := FData[Index+1];
 end;
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{****************************************************************}
 procedure TALStringBuilderW.SetChars(Index: Integer; Value: Char);
 begin
   if Index < 0 then
@@ -1729,9 +1729,6 @@ begin
     RangeIndexError(Index, Length - 1, Self);
   FData[Index+1] := Value;
 end;
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {********************************************}
 function TALStringBuilderW.GetLength: Integer;
@@ -1800,8 +1797,7 @@ begin
   Result := Capacity;
 end;
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{***********************************************************************}
 function TALStringBuilderW.Append(const AValue: Char): TALStringBuilderW;
 begin
   FLength := Length + 1;
@@ -1810,9 +1806,6 @@ begin
   FData[Length] := AValue;
   Result := Self;
 end;
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {*************************************************************************}
 function TALStringBuilderW.Append(const AValue: string): TALStringBuilderW;
@@ -1844,8 +1837,7 @@ begin
   Result := Self;
 end;
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{****************************************************************************************************************************}
 function TALStringBuilderW.Append(const AValue: string; const AStartIndex: Integer; const ACount: Integer): TALStringBuilderW;
 begin
   if (AStartIndex < low(AValue)) or (AStartIndex > high(AValue)) then
@@ -1858,9 +1850,6 @@ begin
   end;
   Result := Self;
 end;
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {*******************************************************}
 function TALStringBuilderW.AppendLine: TALStringBuilderW;
@@ -6505,8 +6494,7 @@ begin
   result := _GetBase64Encoding.EncodeBytesToString(Bytes, Size);
 end;
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{******************************************************************}
 function  ALBase64EncodeStringMIME(const S: AnsiString): AnsiString;
 var Ln: integer;
     CountOfCRLF: integer;
@@ -6539,9 +6527,6 @@ begin
   end;
 
 end;
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {*****************************************************************}
 function  ALURLBase64EncodeString(const S: AnsiString): AnsiString;
@@ -8706,6 +8691,84 @@ begin
   Result := 0;
 end;
 
+{*************************************************************************************************************}
+function  ALPosOfAnyA(const AnyOf: array of AnsiChar; const S: AnsiString; const Offset: Integer = 1): Integer;
+begin
+  if Offset > 0 then begin
+    var C: AnsiChar;
+    for Var I := Offset to high(S) do
+      for C in AnyOf do
+        if S[I] = C then
+          Exit(I);
+  end;
+  Result := 0;
+end;
+
+{*****************************************************************************************************}
+function  ALPosOfAnyW(const AnyOf: array of Char; const S: String; const Offset: Integer = 1): Integer;
+begin
+  if Offset > 0 then Result := S.IndexOfAny(AnyOf, Offset - 1) + 1
+  else Result := 0;
+end;
+
+{*************************************************************************************************************************************************************}
+function  ALSplitA(const S: AnsiString; const Separator: array of AnsiChar; const Options: TStringSplitOptions = TStringSplitOptions.None): TArray<AnsiString>;
+const
+  DeltaGrow = 32;
+var
+  NextSeparator, LastIndex, L: Integer;
+  Total: Integer;
+  CurrentLength: Integer;
+  SingleSeparator: Boolean;
+begin
+  if S = '' then
+    Exit(nil);
+
+  Total := 0;
+  LastIndex := low(S);
+  CurrentLength := 0;
+
+  if High(Separator) = 0 then begin
+    SingleSeparator := True;
+    NextSeparator := ALPosA(Separator[0], S, LastIndex);
+  end
+  else begin
+    SingleSeparator := False;
+    NextSeparator := ALPosOfAnyA(Separator, S, LastIndex);
+  end;
+
+  while (NextSeparator > 0) do begin
+    L := NextSeparator - LastIndex;
+    if (L > 0) or (Options <> TStringSplitOptions.ExcludeEmpty) then begin
+      Inc(Total);
+      if CurrentLength < Total then begin
+        CurrentLength := Total + DeltaGrow;
+        SetLength(Result, CurrentLength);
+      end;
+      Result[Total - 1] := ALCopyStr(S, LastIndex, L);
+    end;
+
+    LastIndex := NextSeparator + 1;
+    if not SingleSeparator then NextSeparator := ALPosOfAnyA(Separator, S, LastIndex)
+    else NextSeparator := ALPosA(Separator[0], S, LastIndex);
+  end;
+
+  L := Length(S) - LastIndex + 1;
+  if (L > 0) or not (Options in [TStringSplitOptions.ExcludeEmpty, TStringSplitOptions.ExcludeLastEmpty]) then begin
+    Inc(Total);
+    SetLength(Result, Total);
+    Result[Total - 1] := ALCopyStr(S, LastIndex, L);
+  end
+  else
+    SetLength(Result, Total);
+end;
+
+{*************************************************************************************************************************************************}
+function  ALSplitW(const S: String; const Separator: array of Char; const Options: TStringSplitOptions = TStringSplitOptions.None): TArray<String>;
+begin
+  Result := S.Split(Separator, Options);
+end;
+
 {*********************************************************}
 function  ALCompareStrA(const S1, S2: AnsiString): Integer;
 begin
@@ -10661,7 +10724,7 @@ end;
 
 {*****************************************}
 // return how many char (not byte) are in S
-function ALUTF8CharCount(const S: AnsiString): Integer;
+function ALUTF8CharCount(const s: AnsiString): Integer;
 var P, L: Integer;
 begin
   Result := 0;
@@ -10675,7 +10738,7 @@ end;
 
 {**************************************}
 // Trunc a AnsiString to max count bytes
-Function ALUTF8ByteTrunc(const s:AnsiString; const Count: Integer): AnsiString;
+Function ALUTF8ByteTrunc(const s: AnsiString; const Count: Integer): AnsiString;
 var L, P, C: Integer;
 begin
   L := Length(S);
@@ -10696,7 +10759,7 @@ end;
 
 {*****************************************}
 // Trunc a AnsiString to count unicode char
-Function ALUTF8CharTrunc(const s:AnsiString; const Count: Integer): AnsiString;
+Function ALUTF8CharTrunc(const s: AnsiString; const Count: Integer): AnsiString;
 var L, P, C: Integer;
 begin
   L := Length(S);
@@ -10918,8 +10981,7 @@ begin
 end;
 {$WARN WIDECHAR_REDUCED ON}
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{*******************************************************************************************}
 procedure ALPercentDecodeInPlace(var AStr: AnsiString; const APlusAsSpaces: Boolean = False);
 
 var
@@ -11020,12 +11082,8 @@ begin
     SetLength(AStr, PResTail - PResHead);
 
 end;
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{***************************************************************************************}
 procedure ALPercentDecodeInPlace(var AStr: String; const APlusAsSpaces: Boolean = False);
 begin
 
@@ -11048,9 +11106,6 @@ begin
   AStr := String(LAnsiString);
 
 end;
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {*****************************************************************}
 // Unlike Delphi’s HttpApp.HttpDecode, this function never raises
@@ -11147,93 +11202,96 @@ procedure ALExtractHeaderFields(
             const AStripQuotes: Boolean = False;
             const AQuoteDoublingEscape: Boolean = False;
             const AEscapeChar: AnsiChar = #0;
-            const ANameValueSeparator: AnsiChar = '=');
+            const ANameValueSeparator: AnsiChar = '=';
+            const AStoreWasQuotedInObjects: Boolean = False);
 
 var
   LHead: PAnsiChar;
   LTail: PAnsiChar;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _ExtractToken(var AToken: AnsiString; Const AIsNameToken: Boolean);
-    begin
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _ExtractToken(var AToken: AnsiString; Const AIsNameToken: Boolean; out AWasQuoted: Boolean);
+  begin
 
-      // Init LQuoteChar
-      var LQuoteChar: AnsiChar := #0;
+    // Init out param and LQuoteChar
+    AWasQuoted := False;
+    var LQuoteChar: AnsiChar := #0;
 
-      // Remove left white spaces
-      while LTail^ in AWhiteSpace do Inc(LTail);
-      LHead := LTail;
+    // Remove left white spaces
+    while LTail^ in AWhiteSpace do Inc(LTail);
+    LHead := LTail;
 
-      // We are on a quote char
-      if LTail^ in AQuoteChars then begin
-        LQuoteChar := LTail^;
-        inc(LTail);
-        While true do begin
-          if (LTail^ = LQuoteChar) or (LTail^ = #0) then begin
-            if AQuoteDoublingEscape and (LTail^ = LQuoteChar) and ((LTail+1)^ = LQuoteChar) then begin
-              inc(LTail, 2);
-              continue;
-            end;
-            if LTail^ = LQuoteChar then inc(LTail)
-            else LQuoteChar := #0;
-            break;
-          end
-          //--
-          else if (LTail^ = AEscapeChar) then begin
-            inc(LTail);
-            if LTail^ <> #0 then inc(LTail);
+    // We are on a quote char
+    if LTail^ in AQuoteChars then begin
+      LQuoteChar := LTail^;
+      inc(LTail);
+      While true do begin
+        if (LTail^ = LQuoteChar) or (LTail^ = #0) then begin
+          if AQuoteDoublingEscape and (LTail^ = LQuoteChar) and ((LTail+1)^ = LQuoteChar) then begin
+            inc(LTail, 2);
             continue;
-          end
-          //--
-          else
-            Inc(LTail);
-        end;
-      end;
-
-      // Loop still the end of token
-      while true do begin
-
-        // We are at the end of token
-        if (AIsNameToken and (LTail^ = ANameValueSeparator)) or (LTail^ in ASeparators) or (LTail^ = #0) then begin
-          var LTailNoWhiteSpaces := LTail;
-          While (LTailNoWhiteSpaces > LHead) and
-                ((LTailNoWhiteSpaces-1)^ in AWhiteSpace) do dec(LTailNoWhiteSpaces);
-          if (not AStripQuotes) or (LQuoteChar = #0) then SetString(AToken, LHead, LTailNoWhiteSpaces-LHead)
-          else begin
-            var LLength := LTailNoWhiteSpaces - LHead - 2; // Exclude quotes
-            if LLength <= 0 then SetLength(AToken, 0)
-            else begin
-              Setlength(AToken, LLength);
-              var LTokenPtr := PAnsiChar(AToken);
-              var LContentPtr := LHead + 1;
-              while LContentPtr < LTailNoWhiteSpaces - 1 do begin
-                if (AQuoteDoublingEscape and (LContentPtr < LTailNoWhiteSpaces - 2) and (LContentPtr^ = LQuoteChar) and ((LContentPtr+1)^ = LQuoteChar)) or
-                   ((AEscapeChar <> #0) and (LContentPtr < LTailNoWhiteSpaces - 2) and (LContentPtr^ = AEscapeChar)) then
-                  inc(LContentPtr);
-                LTokenPtr^ := LContentPtr^;
-                inc(LTokenPtr);
-                inc(LContentPtr);
-              end;
-              SetLength(AToken, LTokenPtr-PAnsiChar(AToken));
-            end;
           end;
-          // Remove right White spaces
-          while LTail^ in AWhiteSpace do Inc(LTail);
-          // Remove right Separators
-          while LTail^ in ASeparators do Inc(LTail);
-          LHead := LTail;
+          if LTail^ = LQuoteChar then inc(LTail)
+          else LQuoteChar := #0;
           break;
         end
-
-        // We are inside token
-        else begin
-          If (LQuoteChar <> #0) and (not (LTail^ in AWhiteSpace)) then
-            LQuoteChar := #0;
+        //--
+        else if (LTail^ = AEscapeChar) then begin
           inc(LTail);
-        end;
-
+          if LTail^ <> #0 then inc(LTail);
+          continue;
+        end
+        //--
+        else
+          Inc(LTail);
       end;
     end;
+
+    // Loop still the end of token
+    while true do begin
+
+      // We are at the end of token
+      if (AIsNameToken and (LTail^ = ANameValueSeparator)) or (LTail^ in ASeparators) or (LTail^ = #0) then begin
+        AWasQuoted := LQuoteChar <> #0;
+        var LTailNoWhiteSpaces := LTail;
+        While (LTailNoWhiteSpaces > LHead) and
+              ((LTailNoWhiteSpaces-1)^ in AWhiteSpace) do dec(LTailNoWhiteSpaces);
+        if (not AStripQuotes) or (LQuoteChar = #0) then SetString(AToken, LHead, LTailNoWhiteSpaces-LHead)
+        else begin
+          var LLength := LTailNoWhiteSpaces - LHead - 2; // Exclude quotes
+          if LLength <= 0 then SetLength(AToken, 0)
+          else begin
+            Setlength(AToken, LLength);
+            var LTokenPtr := PAnsiChar(AToken);
+            var LContentPtr := LHead + 1;
+            while LContentPtr < LTailNoWhiteSpaces - 1 do begin
+              if (AQuoteDoublingEscape and (LContentPtr < LTailNoWhiteSpaces - 2) and (LContentPtr^ = LQuoteChar) and ((LContentPtr+1)^ = LQuoteChar)) or
+                 ((AEscapeChar <> #0) and (LContentPtr < LTailNoWhiteSpaces - 2) and (LContentPtr^ = AEscapeChar)) then
+                inc(LContentPtr);
+              LTokenPtr^ := LContentPtr^;
+              inc(LTokenPtr);
+              inc(LContentPtr);
+            end;
+            SetLength(AToken, LTokenPtr-PAnsiChar(AToken));
+          end;
+        end;
+        // Remove right White spaces
+        while LTail^ in AWhiteSpace do Inc(LTail);
+        // Remove right Separators
+        while LTail^ in ASeparators do Inc(LTail);
+        LHead := LTail;
+        break;
+      end
+
+      // We are inside token
+      else begin
+        If (LQuoteChar <> #0) and (not (LTail^ in AWhiteSpace)) then
+          LQuoteChar := #0;
+        inc(LTail);
+      end;
+
+    end;
+  end;
 
 
 Begin
@@ -11252,17 +11310,26 @@ Begin
   LTail := LHead;
   var LName: AnsiString;
   var LValue: AnsiString;
+  var LNameWasQuoted: Boolean;
+  var LValueWasQuoted: Boolean;
 
   while LTail^ <> #0 do begin
-    _ExtractToken(LName, true{AIsNameToken});
+    _ExtractToken(LName, true{AIsNameToken}, LNameWasQuoted);
     if (ANameValueSeparator <> #0) and (LTail^ = ANameValueSeparator) then begin
       inc(LTail);
       LHead := LTail;
-      _ExtractToken(LValue, False{AIsNameToken});
-      AStrings.AddNameValue(LName, LValue);
+      _ExtractToken(LValue, False{AIsNameToken}, LValueWasQuoted);
+      if AStoreWasQuotedInObjects then
+        AStrings.AddNameValueObject(LName, LValue, TObject(NativeInt(Ord(LValueWasQuoted))))
+      else
+        AStrings.AddNameValue(LName, LValue);
     end
-    else if LName <> '' then
-      AStrings.Add(LName);
+    else if LName <> '' then begin
+      if AStoreWasQuotedInObjects then
+        AStrings.AddNameObject(LName, TObject(NativeInt(Ord(LNameWasQuoted))))
+      else
+        AStrings.AddName(LName);
+    end;
   end;
 end;
 
@@ -11288,92 +11355,95 @@ procedure ALExtractHeaderFields(
             const AStripQuotes: Boolean = False;
             const AQuoteDoublingEscape: Boolean = False;
             const AEscapeChar: Char = #0;
-            const ANameValueSeparator: Char = '='); overload;
+            const ANameValueSeparator: Char = '=';
+            const AStoreWasQuotedInObjects: Boolean = False); overload;
  var
   LHead: PChar;
   LTail: PChar;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _ExtractToken(var AToken: String; Const AIsNameToken: Boolean);
-    begin
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _ExtractToken(var AToken: String; Const AIsNameToken: Boolean; out AWasQuoted: Boolean);
+  begin
 
-      // Init LQuoteChar
-      var LQuoteChar: Char := #0;
+    // Init out param and LQuoteChar
+    AWasQuoted := False;
+    var LQuoteChar: Char := #0;
 
-      // Remove left white spaces
-      while LTail^ in AWhiteSpace do Inc(LTail);
-      LHead := LTail;
+    // Remove left white spaces
+    while LTail^ in AWhiteSpace do Inc(LTail);
+    LHead := LTail;
 
-      // We are on a quote char
-      if LTail^ in AQuoteChars then begin
-        LQuoteChar := LTail^;
-        inc(LTail);
-        While true do begin
-          if (LTail^ = LQuoteChar) or (LTail^ = #0) then begin
-            if AQuoteDoublingEscape and (LTail^ = LQuoteChar) and ((LTail+1)^ = LQuoteChar) then begin
-              inc(LTail, 2);
-              continue;
-            end;
-            if LTail^ = LQuoteChar then inc(LTail)
-            else LQuoteChar := #0;
-            break;
-          end
-          //--
-          else if (LTail^ = AEscapeChar) then begin
-            inc(LTail);
-            if LTail^ <> #0 then inc(LTail);
+    // We are on a quote char
+    if LTail^ in AQuoteChars then begin
+      LQuoteChar := LTail^;
+      inc(LTail);
+      While true do begin
+        if (LTail^ = LQuoteChar) or (LTail^ = #0) then begin
+          if AQuoteDoublingEscape and (LTail^ = LQuoteChar) and ((LTail+1)^ = LQuoteChar) then begin
+            inc(LTail, 2);
             continue;
-          end
-          //--
-          else
-            Inc(LTail);
-        end;
-      end;
-
-      // Loop still the end of token
-      while true do begin
-
-        // We are at the end of token
-        if (AIsNameToken and (LTail^ = ANameValueSeparator)) or (LTail^ in ASeparators) or (LTail^ = #0) then begin
-          var LTailNoWhiteSpaces := LTail;
-          While (LTailNoWhiteSpaces > LHead) and
-                ((LTailNoWhiteSpaces-1)^ in AWhiteSpace) do dec(LTailNoWhiteSpaces);
-          if (not AStripQuotes) or (LQuoteChar = #0) then SetString(AToken, LHead, LTailNoWhiteSpaces-LHead)
-          else begin
-            var LLength := LTailNoWhiteSpaces - LHead - 2; // Exclude quotes
-            if LLength <= 0 then SetLength(AToken, 0)
-            else begin
-              Setlength(AToken, LLength);
-              var LTokenPtr := PChar(AToken);
-              var LContentPtr := LHead + 1;
-              while LContentPtr < LTailNoWhiteSpaces - 1 do begin
-                if (AQuoteDoublingEscape and (LContentPtr < LTailNoWhiteSpaces - 2) and (LContentPtr^ = LQuoteChar) and ((LContentPtr+1)^ = LQuoteChar)) or
-                   ((AEscapeChar <> #0) and (LContentPtr < LTailNoWhiteSpaces - 2) and (LContentPtr^ = AEscapeChar)) then
-                  inc(LContentPtr);
-                LTokenPtr^ := LContentPtr^;
-                inc(LTokenPtr);
-                inc(LContentPtr);
-              end;
-              SetLength(AToken, LTokenPtr-PChar(AToken));
-            end;
           end;
-          // Remove right White spaces
-          while LTail^ in AWhiteSpace do Inc(LTail);
-          // Remove right Separators
-          while LTail^ in ASeparators do Inc(LTail);
-          LHead := LTail;
+          if LTail^ = LQuoteChar then inc(LTail)
+          else LQuoteChar := #0;
           break;
         end
-
-        // We are inside token
-        else begin
-          If (LQuoteChar <> #0) and (not (LTail^ in AWhiteSpace)) then
-            LQuoteChar := #0;
+        //--
+        else if (LTail^ = AEscapeChar) then begin
           inc(LTail);
-        end;
-
+          if LTail^ <> #0 then inc(LTail);
+          continue;
+        end
+        //--
+        else
+          Inc(LTail);
       end;
     end;
+
+    // Loop still the end of token
+    while true do begin
+
+      // We are at the end of token
+      if (AIsNameToken and (LTail^ = ANameValueSeparator)) or (LTail^ in ASeparators) or (LTail^ = #0) then begin
+        AWasQuoted := LQuoteChar <> #0;
+        var LTailNoWhiteSpaces := LTail;
+        While (LTailNoWhiteSpaces > LHead) and
+              ((LTailNoWhiteSpaces-1)^ in AWhiteSpace) do dec(LTailNoWhiteSpaces);
+        if (not AStripQuotes) or (LQuoteChar = #0) then SetString(AToken, LHead, LTailNoWhiteSpaces-LHead)
+        else begin
+          var LLength := LTailNoWhiteSpaces - LHead - 2; // Exclude quotes
+          if LLength <= 0 then SetLength(AToken, 0)
+          else begin
+            Setlength(AToken, LLength);
+            var LTokenPtr := PChar(AToken);
+            var LContentPtr := LHead + 1;
+            while LContentPtr < LTailNoWhiteSpaces - 1 do begin
+              if (AQuoteDoublingEscape and (LContentPtr < LTailNoWhiteSpaces - 2) and (LContentPtr^ = LQuoteChar) and ((LContentPtr+1)^ = LQuoteChar)) or
+                 ((AEscapeChar <> #0) and (LContentPtr < LTailNoWhiteSpaces - 2) and (LContentPtr^ = AEscapeChar)) then
+                inc(LContentPtr);
+              LTokenPtr^ := LContentPtr^;
+              inc(LTokenPtr);
+              inc(LContentPtr);
+            end;
+            SetLength(AToken, LTokenPtr-PChar(AToken));
+          end;
+        end;
+        // Remove right White spaces
+        while LTail^ in AWhiteSpace do Inc(LTail);
+        // Remove right Separators
+        while LTail^ in ASeparators do Inc(LTail);
+        LHead := LTail;
+        break;
+      end
+
+      // We are inside token
+      else begin
+        If (LQuoteChar <> #0) and (not (LTail^ in AWhiteSpace)) then
+          LQuoteChar := #0;
+        inc(LTail);
+      end;
+
+    end;
+  end;
 
 
 Begin
@@ -11392,27 +11462,41 @@ Begin
   LTail := LHead;
   var LName: String;
   var LValue: String;
+  var LNameWasQuoted: Boolean;
+  var LValueWasQuoted: Boolean;
 
   while LTail^ <> #0 do begin
-    _ExtractToken(LName, true{AIsNameToken});
+    _ExtractToken(LName, true{AIsNameToken}, LNameWasQuoted);
     if (ANameValueSeparator <> #0) and (LTail^ = ANameValueSeparator) then begin
       inc(LTail);
       LHead := LTail;
-      _ExtractToken(LValue, False{AIsNameToken});
-      AStrings.AddNameValue(LName, LValue);
+      _ExtractToken(LValue, False{AIsNameToken}, LValueWasQuoted);
+      if AStoreWasQuotedInObjects then
+        AStrings.AddNameValueObject(LName, LValue, TObject(NativeInt(Ord(LValueWasQuoted))))
+      else
+        AStrings.AddNameValue(LName, LValue);
     end
-    else if LName <> '' then
-      AStrings.Add(LName);
+    else if LName <> '' then begin
+      if AStoreWasQuotedInObjects then
+        AStrings.AddNameObject(LName, TObject(NativeInt(Ord(LNameWasQuoted))))
+      else
+        AStrings.AddName(LName);
+    end;
   end;
 end;
 {$WARN WIDECHAR_REDUCED ON}
 
+{***********************************************************}
+function TALTagParamsA.GetWasQuoted(Index: Integer): Boolean;
+begin
+  Result := NativeInt(Objects[Index]) <> 0;
+end;
+
 {************************************}
 constructor TALPrecompiledTagA.Create;
 begin
-  fTagString := '';
-  fTagParams := TALStringListA.Create;
-  TALStringListA(fTagParams).Duplicates := dupIgnore;
+  fTagName := '';
+  fTagParams := TALTagParamsA.Create;
 end;
 
 {************************************}
@@ -11422,716 +11506,892 @@ begin
   inherited;
 end;
 
-{****************************************************}
-function TALPrecompiledTagA.GetTagParams: TALStringsA;
+{******************************************************}
+function TALPrecompiledTagA.GetTagParams: TALTagParamsA;
 begin
   result := fTagParams;
 end;
 
-{***********************************}
-function ALFastTagReplacePrecompileA(
-           Const SourceString, TagStart, TagEnd: AnsiString;
-           PrecompileProc: TALHandleTagPrecompileFunctA;
-           Context: Pointer;
-           TagsContainer: TObjectList; // just a container where all the PrecompiledTag will be store. must free all the PrecompiledTag at the end of the application
-           Const flags: TReplaceFlags=[]): AnsiString; // rfreplaceall is ignored here, only rfIgnoreCase is matter
+{*************************}
+function ALPrecompileTagsA(
+           const ASourceString: AnsiString;
+           const ATagStartMarker, ATagEndMarker: AnsiString;
+           const ATagsContainer: TObjectList;
+           const AIgnoreCase: Boolean = false;
+           const AQuoteDoublingEscape: Boolean = False;
+           const AEscapeChar: AnsiChar = #0;
+           const ANameValueSeparator: AnsiChar = '=';
+           const ABlockStartMarker: AnsiChar = #0;
+           const ABlockEndMarker: AnsiChar = #0;
+           const ABlockElseTag: AnsiString = '';
+           const ASubExpressionTagStartMarker: AnsiString = '';
+           const ASubExpressionTagEndMarker: AnsiString = '';
+           const AHandleTagsInQuote: Boolean = True;
+           const AMainBlockParamName: AnsiString = '__main';
+           const AInverseBlockParamName: AnsiString = '__inverse';
+           const APrecompiledTagStartMarker: AnsiChar = #2;
+           const APrecompiledTagEndMarker: AnsiChar = #3): AnsiString;
 
-var ReplaceString: AnsiString;
-    TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
-    TokenStr, ParamStr: AnsiString;
-    ParamList: TALNVStringListA;
-    TagStartLength: integer;
-    TagEndLength: integer;
-    SourceStringLength: Integer;
-    InDoubleQuote: Boolean;
-    InsingleQuote: Boolean;
-    SourceCurrentPos: integer;
-    ResultCurrentPos: integer;
-    ResultCurrentLength: integer;
-    PrecompiledTag: TALBasePrecompiledTagA;
-    IgnoreCase: Boolean;
-    PosFunct: Function(const SubStr, S: AnsiString; const Offset: Integer = 1): Integer;
-    T1,T2: Integer;
-    I: integer;
+Const
+  cResultBuffSize: integer = 16384;
 
-Const ResultBuffSize: integer = 16384;
+var
+  LSubExpressionEnabled: Boolean;
+  LSubExpressionTagStartMarkerLen: Integer;
+  LSubExpressionTagEndMarkerLen: Integer;
+  LPosFunc: Function(const SubStr, S: AnsiString; const Offset: Integer = 1): Integer;
+  LSourceStringLength: Integer;
+  LTagStartMarkerLength: integer;
+  LTagEndMarkerLength: integer;
+  LTagEndMarkerFirstChar: AnsiChar;
+  LTagEndMarkerFirstCharLower: AnsiChar;
+  LTagEndMarkerFirstCharUpper: AnsiChar;
+  LResultCurrentPos: integer;
+  LResultCurrentLength: integer;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Function _ExtractTokenStr: AnsiString;
-    var x: Integer;
-    Begin
-      X := 1;
-      while (x <= length(ReplaceString)) and
-            (not (ReplaceString[x] in [' ', #9, #13, #10])) do inc(x);
-      if x > length(ReplaceString) then Result := ReplaceString
-      else Result := AlcopyStr(ReplaceString,1,x-1);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Function _ExtractTagName(const ATagContent: AnsiString): AnsiString;
+  Begin
+    var X: Integer := 1;
+    while (x <= length(ATagContent)) and
+          (not (ATagContent[x] in [' ', #9, #13, #10])) do inc(x);
+    if x > length(ATagContent) then Result := ATagContent
+    else Result := AlcopyStr(ATagContent,1,x-1);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Function _ExtractParamsStr(const ATagName, ATagContent: ansiString): AnsiString;
+  Begin
+    Result := ALTrim(AlcopyStr(ATagContent,length(ATagName) + 1, MaxInt));
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Function _SameTagName(const ATagName1, ATagName2: AnsiString): Boolean;
+  Begin
+    if AIgnoreCase then Result := ALSameTextA(ATagName1, ATagName2)
+    else Result := ATagName1 = ATagName2;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _MoveStr2Result(const ASourceString: AnsiString; AStart, ALength: Integer);
+  begin
+    var LSourceStringLn: Integer := Length(ASourceString);
+    If (AStart < 1) then AStart := 1;
+
+    if (LSourceStringLn=0) or
+       (ALength < 1) or
+       (AStart > LSourceStringLn) then Exit;
+
+    ALength := Min(ALength, LSourceStringLn - (AStart - 1));
+
+    If ALength + LResultCurrentPos - 1 > LResultCurrentLength then begin
+      LResultCurrentLength := LResultCurrentLength + ALength + cResultBuffSize;
+      SetLength(Result, LResultCurrentLength);
     end;
+    AlMove(pbyte(ASourceString)[AStart-1], pbyte(Result)[LResultCurrentPos-1], ALength);
+    LResultCurrentPos := LResultCurrentPos + ALength;
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Function _ExtractParamsStr(const TokenStr: ansiString): AnsiString;
-    Begin
-      Result := ALTrim(AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt));
-    end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // Stores the object address as its raw bytes (sizeof(pointer) bytes). AnsiString
+  // is byte-based so it can hold the raw address verbatim (including #0 bytes);
+  function _ObjAddressToStr(Const Obj: Tobject): AnsiString;
+  begin
+    SetLength(Result, SizeOf(Pointer));
+    PPointer(Result)^ := Pointer(Obj);
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _MoveStr2Result(const aSourceString: AnsiString; aStart, aLength: Integer);
-    var LSourceStringLn: Integer;
-    begin
-      LSourceStringLn := Length(aSourceString);
-      If (aStart < 1) then aStart := 1;
-
-      if (LSourceStringLn=0) or
-         (aLength < 1) or
-         (aStart > LSourceStringLn) then Exit;
-
-      aLength := Min(aLength, LSourceStringLn - (aStart - 1));
-
-      If aLength + ResultCurrentPos - 1 > ResultCurrentLength then begin
-        ResultCurrentLength := ResultCurrentLength + aLength + ResultBuffSize;
-        SetLength(Result, ResultCurrentLength);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // Locates the next complete ATagStartMarker..ATagEndMarker pair at or after AFromPos.
+  // AOpenPos: position of ATagStartMarker; AContentPos/AContentLen: boundaries of the
+  // text located between ATagStartMarker and ATagEndMarker; AAfterPos: first char following
+  // ATagEndMarker.
+  function _FindNextTag(
+             const AFromPos: Integer;
+             out AOpenPos, AContentPos, AContentLen, AAfterPos: Integer): Boolean;
+  begin
+    Result := False;
+    AOpenPos := LPosFunc(ATagStartMarker,ASourceString,AFromPos);
+    if AOpenPos <= 0 then exit;
+    var T2: Integer := AOpenPos + LTagStartMarkerLength;
+    var LInDoubleQuote := False;
+    var LInSingleQuote := False;
+    While (T2 <= LSourceStringLength) and
+          (LInDoubleQuote or
+           LInSingleQuote or
+           (AIgnoreCase and (ASourceString[T2] <> LTagEndMarkerFirstCharLower) and (ASourceString[T2] <> LTagEndMarkerFirstCharUpper)) or
+           ((not AIgnoreCase) and (ASourceString[T2] <> LTagEndMarkerFirstChar)) or
+           ((LTagEndMarkerLength > 1) and (LPosFunc(ATagEndMarker,AlCopyStr(ASourceString,T2,LTagEndMarkerLength),1) <> 1))) do begin
+      if (AEscapeChar <> #0) and (LInDoubleQuote or LInSingleQuote) and (ASourceString[T2] = AEscapeChar) then begin
+        inc(T2);
+        if T2 <= LSourceStringLength then inc(T2);
+      end
+      else begin
+        If ASourceString[T2] = '"' then LInDoubleQuote := (not LInDoubleQuote) and (not LInSingleQuote)
+        else If ASourceString[T2] = '''' then LInSingleQuote := (not LInSingleQuote) and (not LInDoubleQuote);
+        inc(T2);
       end;
-      AlMove(pbyte(aSourceString)[aStart-1], pbyte(Result)[ResultCurrentPos-1], aLength);
-      ResultCurrentPos := ResultCurrentPos + aLength;
     end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    function  _ObjAddressToStr(Const Obj: Tobject): AnsiString;
-    begin
-      result := ALIntToHexA(NativeInt(Obj), sizeof(pointer) * 2);
-    end;
-
-begin
-  if (SourceString = '') or (TagStart = '') or (TagEnd = '') then begin
-    Result := SourceString;
-    Exit;
+    if (T2 > LSourceStringLength) then exit;
+    AContentPos := AOpenPos + LTagStartMarkerLength;
+    AContentLen := T2 - AContentPos;
+    AAfterPos := T2 + LTagEndMarkerLength;
+    Result := True;
   end;
 
-  IgnoreCase := rfIgnoreCase in flags;
-  If IgnoreCase then PosFunct := ALPosIgnoreCaseA
-  Else PosFunct := ALPosA;
-
-  SourceCurrentPos := 1;
-  T1 := PosFunct(TagStart,SourceString,SourceCurrentPos);
-  if T1 <= 0 then begin
-    result := SourceString;
-    exit;
-  end;
-
-  SourceStringLength := length(SourceString);
-  ResultCurrentLength := SourceStringLength;
-  SetLength(Result,ResultCurrentLength);
-  ResultCurrentPos := 1;
-  TagStartLength := Length(TagStart);
-  TagEndLength := Length(TagEnd);
-  TagEndFirstChar := TagEnd[1];
-  TagEndFirstCharLower := ALLoCase(TagEnd[1]);
-  TagEndFirstCharUpper := ALUpCase(TagEnd[1]);
-
-  T2 := T1 + TagStartLength;
-  If (T1 > 0) and (T2 <= SourceStringLength) then begin
-    InDoubleQuote := False;
-    InsingleQuote := False;
-    While (T2 <= SourceStringLength) and
-          (InDoubleQuote or
-           InSingleQuote or
-           (IgnoreCase and (SourceString[T2] <> TagEndFirstCharLower) and (SourceString[T2] <> TagEndFirstCharUpper)) or
-           ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
-           ((TagEndLength > 1) and (PosFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1))) do begin
-      If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-      else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
-      inc(T2);
-    end;
-    if (T2 > SourceStringLength) then T2 := 0;
-  end;
-
-
-  While (T1 > 0) and (T2 > T1) do begin
-    ReplaceString := AlCopyStr(SourceString,T1 + TagStartLength,T2 - T1 - TagStartLength);
-    T2 := T2 + TagEndLength;
-
-    If assigned(PrecompileProc) then begin
-      TokenStr := _ExtractTokenStr;
-      ParamStr := _ExtractParamsStr(TokenStr);
-      ParamList := TALNVStringListA.Create;
-      try
-        ParamList.Duplicates := dupIgnore;
-        ALExtractHeaderFields(
-          [' ', #9, #13, #10], // const ASeparators: TSysCharSet;
-          [' ', #9, #13, #10], // const AWhiteSpace: TSysCharSet;
-          ['"', ''''], // const AQuoteChars: TSysCharSet;
-          PAnsiChar(ParamStr), // const AContent: PAnsiChar;
-          ParamList, // const AStrings: TALStringsA;
-          True, // const AStripQuotes: Boolean = False;
-          True); // const AQuoteDoublingEscape: Boolean = False;
-
-        T2 := T2 - T1;
-        PrecompiledTag := PrecompileProc(TokenStr, ParamList, Context, SourceString, T1, T2);
-        T2 := T2 + T1;
-        if assigned(PrecompiledTag) then begin
-          TagsContainer.Add(PrecompiledTag);
-          ReplaceString := TagStart + #2{start of text} + _ObjAddressToStr(PrecompiledTag) + #3{end of text} + TagEnd;
-        end
-        else ReplaceString := '';
-      finally
-        ALFreeAndNil(ParamList);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // Scans the source from AFromPos (first char following the block opening tag)
+  // for the matching block-end tag, skipping nested blocks and splitting the
+  // block body on the ABlockElseTag tag found at nesting level 0. The main
+  // section starts at AFromPos and is AMainLen chars long; the inverse section
+  // starts at AInversePos (0 when there is no else) and is AInverseLen chars
+  // long; AAfterBlockPos is the first char following the block-end tag.
+  procedure _FindBlockBounds(
+              const ABlockTagName: AnsiString;
+              const AFromPos: Integer;
+              out AMainLen: Integer;
+              out AInversePos: Integer;
+              out AInverseLen: Integer;
+              out AAfterBlockPos: Integer);
+  begin
+    AMainLen := 0;
+    AInversePos := 0;
+    AInverseLen := 0;
+    AAfterBlockPos := 0;
+    var LBlockEndTagName: AnsiString := ABlockEndMarker + AlCopyStr(ABlockTagName, 2, MaxInt);
+    var LDepth: Integer := 0;
+    var LScanPos: Integer := AFromPos;
+    repeat
+      var LOpenPos: Integer;
+      var LContentPos: Integer;
+      var LContentLen: Integer;
+      var LAfterPos: Integer;
+      if not _FindNextTag(LScanPos, LOpenPos, LContentPos, LContentLen, LAfterPos) then
+        Raise EALException.CreateFmt('Block tag "%s" is not closed', [ABlockTagName]);
+      var LTagName := _ExtractTagName(AlCopyStr(ASourceString,LContentPos,LContentLen));
+      if (LTagName <> '') and (LTagName[low(LTagName)] = ABlockStartMarker) then inc(LDepth)
+      else if (LTagName <> '') and (LTagName[low(LTagName)] = ABlockEndMarker) then begin
+        if LDepth > 0 then dec(LDepth)
+        else begin
+          if not _SameTagName(LTagName, LBlockEndTagName) then
+            Raise EALException.CreateFmt('Block tag "%s" is closed by mismatched tag "%s"', [ABlockTagName, LTagName]);
+          if AInversePos > 0 then AInverseLen := LOpenPos - AInversePos
+          else AMainLen := LOpenPos - AFromPos;
+          AAfterBlockPos := LAfterPos;
+          Exit;
+        end;
+      end
+      else if (LDepth = 0) and (ABlockElseTag <> '') and _SameTagName(LTagName, ABlockElseTag) then begin
+        if AInversePos > 0 then
+          Raise EALException.CreateFmt('Block tag "%s" contains more than one "%s" tag', [ABlockTagName, ABlockElseTag]);
+        AMainLen := LOpenPos - AFromPos;
+        AInversePos := LAfterPos;
       end;
-    end
-    else begin
-      PrecompiledTag := TALPrecompiledTagA.Create;
+      LScanPos := LAfterPos;
+    until False;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // True when AStr[APos..] starts with ADelim (case-sensitive - subexpression
+  // delimiters are punctuation).
+  function _SubExprMatchAt(const ADelim, AStr: AnsiString; const APos: Integer): Boolean;
+  begin
+    Result := False;
+    var LDLen: Integer := Length(ADelim);
+    if (LDLen = 0) or (APos < 1) or (APos + LDLen - 1 > Length(AStr)) then Exit;
+    for var I := 1 to LDLen do
+      if AStr[APos + I - 1] <> ADelim[I] then Exit;
+    Result := True;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // AStartPos must sit on a ASubExpressionTagStartMarker delimiter. Returns the position
+  // of the first char following the matching ASubExpressionTagEndMarker, counting depth
+  // so nested subexpressions are skipped and respecting quotes/escape. Returns 0
+  // when the subexpression is not closed.
+  function _FindSubExprEnd(const AStr: AnsiString; const AStartPos: Integer): Integer;
+  begin
+    Result := 0;
+    var LDepth: Integer := 0;
+    var P: Integer := AStartPos;
+    var LLen: Integer := Length(AStr);
+    var LInDoubleQuote: Boolean := False;
+    var LInSingleQuote: Boolean := False;
+    while P <= LLen do begin
+      var C: AnsiChar := AStr[P];
+      if (AEscapeChar <> #0) and (LInDoubleQuote or LInSingleQuote) and (C = AEscapeChar) then begin
+        inc(P, 2);
+        continue;
+      end;
+      if LInDoubleQuote then begin if C = '"' then LInDoubleQuote := False; inc(P); continue; end;
+      if LInSingleQuote then begin if C = '''' then LInSingleQuote := False; inc(P); continue; end;
+      if C = '"' then begin LInDoubleQuote := True; inc(P); continue; end;
+      if C = '''' then begin LInSingleQuote := True; inc(P); continue; end;
+      if _SubExprMatchAt(ASubExpressionTagStartMarker, AStr, P) then begin inc(LDepth); inc(P, LSubExpressionTagStartMarkerLen); continue; end;
+      if _SubExprMatchAt(ASubExpressionTagEndMarker, AStr, P) then begin
+        dec(LDepth);
+        inc(P, LSubExpressionTagEndMarkerLen);
+        if LDepth <= 0 then Exit(P);
+        continue;
+      end;
+      inc(P);
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // True when AStr (assumed already trimmed) is a single balanced subexpression
+  // spanning the whole string, ex: '(concat a b)'.
+  function _IsPureSubExpr(const AStr: AnsiString): Boolean;
+  begin
+    Result := LSubExpressionEnabled and
+              (Length(AStr) >= LSubExpressionTagStartMarkerLen + LSubExpressionTagEndMarkerLen) and
+              _SubExprMatchAt(ASubExpressionTagStartMarker, AStr, 1) and
+              (_FindSubExprEnd(AStr, 1) = Length(AStr) + 1);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // Restores in AStr the subexpression substrings that _SplitParams temporarily
+  // replaced by '#1 <index> #1' placeholders (so they would survive the
+  // whitespace-based field split as a single token).
+  function _ExpandSubExprPlaceholders(const AStr: AnsiString; const ASubExprs: TALStringListA): AnsiString;
+  begin
+    var LLen: Integer := Length(AStr);
+    Result := '';
+    var P: Integer := 1;
+    while P <= LLen do begin
+      if AStr[P] = #1 then begin
+        var LIdx: Integer := 0;
+        inc(P);
+        while (P <= LLen) and (AStr[P] <> #1) do begin
+          LIdx := LIdx * 10 + (Ord(AStr[P]) - Ord('0'));
+          inc(P);
+        end;
+        inc(P); // skip closing #1
+        Result := Result + ASubExprs[LIdx];
+      end
+      else begin
+        Result := Result + AStr[P];
+        inc(P);
+      end;
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // Splits ATagContent params into ATagParams exactly like the historical call to
+  // ALExtractHeaderFields. When subexpressions are enabled, each top-level
+  // subexpression (depth-counted, quote-aware) is first swapped for a
+  // whitespace-free placeholder so it is not torn apart by the field split, then
+  // restored verbatim in the resulting tokens.
+  procedure _SplitParams(const AParamStr: AnsiString; const ATagParams: TALTagParamsA);
+  begin
+    if not LSubExpressionEnabled then begin
+      ALExtractHeaderFields(
+        [' ', #9, #13, #10], // const ASeparators: TSysCharSet;
+        [' ', #9, #13, #10], // const AWhiteSpace: TSysCharSet;
+        ['"', ''''], // const AQuoteChars: TSysCharSet;
+        PAnsiChar(AParamStr), // const AContent: PAnsiChar;
+        ATagParams, // const AStrings: TALStringsA;
+        True, // const AStripQuotes: Boolean = False;
+        AQuoteDoublingEscape, // const AQuoteDoublingEscape: Boolean = False;
+        AEscapeChar, // const AEscapeChar: AnsiChar = #0;
+        ANameValueSeparator, // const ANameValueSeparator: AnsiChar = '=';
+        True); // const AStoreWasQuotedInObjects: Boolean = False);
+      Exit;
+    end;
+
+    var LSubExprs := TALStringListA.Create;
+    try
+      var LBuf: AnsiString := '';
+      var P: Integer := 1;
+      var LLen: Integer := Length(AParamStr);
+      var LInDoubleQuote: Boolean := False;
+      var LInSingleQuote: Boolean := False;
+      while P <= LLen do begin
+        var C: AnsiChar := AParamStr[P];
+        if (AEscapeChar <> #0) and (LInDoubleQuote or LInSingleQuote) and (C = AEscapeChar) then begin
+          LBuf := LBuf + C;
+          inc(P);
+          if P <= LLen then begin LBuf := LBuf + AParamStr[P]; inc(P); end;
+          continue;
+        end;
+        if LInDoubleQuote then begin if C = '"' then LInDoubleQuote := False; LBuf := LBuf + C; inc(P); continue; end;
+        if LInSingleQuote then begin if C = '''' then LInSingleQuote := False; LBuf := LBuf + C; inc(P); continue; end;
+        if C = '"' then begin LInDoubleQuote := True; LBuf := LBuf + C; inc(P); continue; end;
+        if C = '''' then begin LInSingleQuote := True; LBuf := LBuf + C; inc(P); continue; end;
+        if _SubExprMatchAt(ASubExpressionTagStartMarker, AParamStr, P) then begin
+          var LEnd: Integer := _FindSubExprEnd(AParamStr, P);
+          if LEnd > 0 then begin
+            LBuf := LBuf + #1 + ALIntToStrA(LSubExprs.Count) + #1;
+            LSubExprs.Add(AlCopyStr(AParamStr, P, LEnd - P));
+            P := LEnd;
+            continue;
+          end;
+        end;
+        LBuf := LBuf + C;
+        inc(P);
+      end;
+
+      ALExtractHeaderFields(
+        [' ', #9, #13, #10], // const ASeparators: TSysCharSet;
+        [' ', #9, #13, #10], // const AWhiteSpace: TSysCharSet;
+        ['"', ''''], // const AQuoteChars: TSysCharSet;
+        PAnsiChar(LBuf), // const AContent: PAnsiChar;
+        ATagParams, // const AStrings: TALStringsA;
+        True, // const AStripQuotes: Boolean = False;
+        AQuoteDoublingEscape, // const AQuoteDoublingEscape: Boolean = False;
+        AEscapeChar, // const AEscapeChar: AnsiChar = #0;
+        ANameValueSeparator, // const ANameValueSeparator: AnsiChar = '=';
+        True); // const AStoreWasQuotedInObjects: Boolean = False);
+
+      if LSubExprs.Count > 0 then
+        for var I := 0 to ATagParams.Count - 1 do
+          if ATagParams.ItemHasNameValue(I) then begin
+            ATagParams.PersistentValueFromIndex[I] := _ExpandSubExprPlaceholders(ATagParams.ValueFromIndex[I], LSubExprs);
+            ATagParams.Names[I] := _ExpandSubExprPlaceholders(ATagParams.Names[I], LSubExprs);
+          end
+          else
+            ATagParams.Names[I] := _ExpandSubExprPlaceholders(ATagParams.Names[I], LSubExprs);
+    finally
+      AlFreeAndNil(LSubExprs);
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // Recursively precompiles one parameter value. A parameter that is itself a
+  // subexpression - either standalone ('(concat a b)') or as the value of a
+  // 'name=(concat a b)' pair - is precompiled as a subexpression; anything else
+  // is precompiled as ordinary template text (handling nested main-delimiter
+  // tags).
+  function _PrecompileParam(const AParam: AnsiString): AnsiString;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    // Precompiles a single subexpression (ex: '(concat a b)'). Its inner content
+    // is parsed like a normal tag (name + params, recursively precompiled) and
+    // the result is emitted as a precompiled marker using the MAIN tag delimiters
+    // so that ALReplaceTagsA resolves it like any other tag.
+    function _BuildSubExpr(const ASubExpr: AnsiString): AnsiString;
+    begin
+      var LInner: AnsiString := ALTrim(AlCopyStr(ASubExpr, LSubExpressionTagStartMarkerLen + 1, Length(ASubExpr) - LSubExpressionTagStartMarkerLen - LSubExpressionTagEndMarkerLen));
+      var LTagName: AnsiString := _ExtractTagName(LInner);
+      var LParamStr: AnsiString := _ExtractParamsStr(LTagName, LInner);
+      var LPrecompiledTag := TALPrecompiledTagA.Create;
       try
-        PrecompiledTag.TagString := _ExtractTokenStr;
-        ParamStr := _ExtractParamsStr(PrecompiledTag.TagString);
-        ALExtractHeaderFields(
-          [' ', #9, #13, #10], // const ASeparators: TSysCharSet;
-          [' ', #9, #13, #10], // const AWhiteSpace: TSysCharSet;
-          ['"', ''''], // const AQuoteChars: TSysCharSet;
-          PAnsiChar(ParamStr), // const AContent: PAnsiChar;
-          PrecompiledTag.TagParams, // const AStrings: TALStringsA;
-          True, // const AStripQuotes: Boolean = False;
-          True); // const AQuoteDoublingEscape: Boolean = False;
-        TagsContainer.Add(PrecompiledTag);
-        ReplaceString := TagStart + #2{start of text} + _ObjAddressToStr(PrecompiledTag) + #3{end of text} + TagEnd;
+        LPrecompiledTag.TagParams.NameValueSeparator := ANameValueSeparator;
+        LPrecompiledTag.TagName := LTagName;
+        _SplitParams(LParamStr, LPrecompiledTag.TagParams);
+        ATagsContainer.Add(LPrecompiledTag);
       except
-        AlFreeAndNil(PrecompiledTag);
+        AlFreeAndNil(LPrecompiledTag);
         raise;
       end;
-      for I := 0 to PrecompiledTag.TagParams.Count - 1 do
-        PrecompiledTag.TagParams[i] := ALFastTagReplacePrecompileA(
-                                         PrecompiledTag.TagParams[i], //Const SourceString,
-                                         TagStart,
-                                         TagEnd,
-                                         PrecompileProc,
-                                         Context,
-                                         TagsContainer,
-                                         flags);
-      PrecompiledTag.TagString := ALFastTagReplacePrecompileA(
-                                    PrecompiledTag.TagString, //Const SourceString,
-                                    TagStart,
-                                    TagEnd,
-                                    PrecompileProc,
-                                    Context,
-                                    TagsContainer,
-                                    flags);
+      for var I := 0 to LPrecompiledTag.TagParams.Count - 1 do
+        // a quoted value is kept literal when AHandleTagsInQuote is False
+        if (not LPrecompiledTag.TagParams.WasQuoted[I]) or AHandleTagsInQuote then begin
+          if LPrecompiledTag.TagParams.ItemHasNameValue(I) then begin
+            LPrecompiledTag.TagParams.PersistentValueFromIndex[I] := _PrecompileParam(LPrecompiledTag.TagParams.ValueFromIndex[I]);
+            LPrecompiledTag.TagParams.Names[I] := _PrecompileParam(LPrecompiledTag.TagParams.Names[I]);
+          end
+          else
+            LPrecompiledTag.TagParams.Names[I] := _PrecompileParam(LPrecompiledTag.TagParams.Names[I]);
+        end;
+      LPrecompiledTag.TagName := _PrecompileParam(LPrecompiledTag.TagName);
+      Result := APrecompiledTagStartMarker + _ObjAddressToStr(LPrecompiledTag) + APrecompiledTagEndMarker;
     end;
 
-    _MoveStr2Result(SourceString,SourceCurrentPos,T1 - SourceCurrentPos);
-    _MoveStr2Result(ReplaceString,1,length(ReplaceString));
-    SourceCurrentPos := T2;
-
-    T1 := PosFunct(TagStart,SourceString,SourceCurrentPos);
-    T2 := T1 + TagStartLength;
-    If (T1 > 0) and (T2 <= SourceStringLength) then begin
-      InDoubleQuote := False;
-      InsingleQuote := False;
-      While (T2 <= SourceStringLength) and
-            (InDoubleQuote or
-             InSingleQuote or
-             (IgnoreCase and (SourceString[T2] <> TagEndFirstCharLower) and (SourceString[T2] <> TagEndFirstCharUpper)) or
-             ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
-             ((TagEndLength > 1) and (PosFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1))) do begin
-        If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-        else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
-        inc(T2);
-      end;
-      if (T2 > SourceStringLength) then T2 := 0;
-    end;
+  begin
+    if LSubExpressionEnabled and _IsPureSubExpr(AParam) then
+      Exit(_BuildSubExpr(AParam));
+    Result := ALPrecompileTagsA(
+                AParam, // const ASourceString: AnsiString;
+                ATagStartMarker, // const ATagStartMarker,
+                ATagEndMarker, // ATagEndMarker: AnsiString;
+                ATagsContainer, // const ATagsContainer: TObjectList;
+                AIgnoreCase, // const AIgnoreCase: Boolean = false;
+                AQuoteDoublingEscape, // const AQuoteDoublingEscape: Boolean = False;
+                AEscapeChar, // const AEscapeChar: AnsiChar = #0;
+                ANameValueSeparator, // const ANameValueSeparator: AnsiChar = '=';
+                ABlockStartMarker, // const ABlockStartMarker: AnsiChar = #0;
+                ABlockEndMarker, // const ABlockEndMarker: AnsiChar = #0;
+                ABlockElseTag, // const ABlockElseTag: AnsiString = '';
+                ASubExpressionTagStartMarker, // const ASubExpressionTagStartMarker: AnsiString = '';
+                ASubExpressionTagEndMarker, // const ASubExpressionTagEndMarker: AnsiString = '';
+                AHandleTagsInQuote, // const AHandleTagsInQuote: Boolean = True;
+                AMainBlockParamName, // const AMainBlockParamName: AnsiString = '__main';
+                AInverseBlockParamName, // const AInverseBlockParamName: AnsiString = '__inverse';
+                APrecompiledTagStartMarker, // const APrecompiledTagStartMarker: AnsiChar = #2;
+                APrecompiledTagEndMarker); // const APrecompiledTagEndMarker: AnsiChar = #3): AnsiString;
   end;
 
-  _MoveStr2Result(SourceString,SourceCurrentPos,maxint);
-  SetLength(Result,ResultCurrentPos-1);
-end;
-
-{*************************}
-function ALFastTagReplaceA(
-           Const SourceString, TagStart, TagEnd: AnsiString;
-           ReplaceProc: TALHandleTagFunctA;
-           ReplaceExtendedProc: TALHandleTagExtendedfunctA;
-           Flags: TReplaceFlags;
-           Context: Pointer;
-           TagParamsClass: TALTagParamsClassA;
-           const TagReplaceProcResult: Boolean = False): AnsiString; overload;
-
-var ReplaceString: AnsiString;
-    TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
-    TokenStr, ParamStr: AnsiString;
-    ParamList: TALStringsA;
-    TagStartLength: integer;
-    TagEndLength: integer;
-    SourceStringLength: Integer;
-    InDoubleQuote: Boolean;
-    InsingleQuote: Boolean;
-    TagHandled: Boolean;
-    SourceCurrentPos: integer;
-    ResultCurrentPos: integer;
-    ResultCurrentLength: integer;
-    PrecompiledTag: TALBasePrecompiledTagA;
-    InPrecompiledTag: Boolean;
-    IgnoreCase: Boolean;
-    pSize: integer;
-    PosFunct: Function(const SubStr, S: AnsiString; const Offset: Integer = 1): Integer;
-    T1,T2: Integer;
-
-Const ResultBuffSize: integer = 16384;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Function _ExtractTokenStr: AnsiString;
-    var x: Integer;
-    Begin
-      X := 1;
-      while (x <= length(ReplaceString)) and
-            (not (ReplaceString[x] in [' ', #9, #13, #10])) do inc(x);
-      if x > length(ReplaceString) then Result := ReplaceString
-      else Result := AlcopyStr(ReplaceString,1,x-1);
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Function _ExtractParamsStr: AnsiString;
-    Begin
-      Result := ALTrim(AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt));
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _MoveStr2Result(const aSourceString: AnsiString; aStart, aLength: Integer);
-    var LSourceStringLn: Integer;
-    begin
-      LSourceStringLn := Length(aSourceString);
-      If (aStart < 1) then aStart := 1;
-
-      if (LSourceStringLn=0) or
-         (aLength < 1) or
-         (aStart > LSourceStringLn) then Exit;
-
-      aLength := Min(aLength, LSourceStringLn - (aStart - 1));
-
-      If aLength + ResultCurrentPos - 1 > ResultCurrentLength then begin
-        ResultCurrentLength := ResultCurrentLength + aLength + ResultBuffSize;
-        SetLength(Result, ResultCurrentLength);
-      end;
-      AlMove(pbyte(aSourceString)[aStart-1], pbyte(Result)[ResultCurrentPos-1], aLength);
-      ResultCurrentPos := ResultCurrentPos + aLength;
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    function _HexToInt(const aSourceString: ansistring; Start, Length: Integer): integer;
-    begin
-      Result := 0;
-      for Start := start to start + length - 1 do
-        case aSourceString[Start] of
-          '0'..'9': Result := Result * 16 + Ord(aSourceString[Start]) - Ord('0');
-          'A'..'F': Result := Result * 16 + Ord(aSourceString[Start]) - Ord('A') + 10;
-        end;
-    end;
-
 begin
-  if (SourceString = '') or (TagStart = '') or (TagEnd = '') then begin
-    Result := SourceString;
+  if (ASourceString = '') or (ATagStartMarker = '') or (ATagEndMarker = '') then begin
+    Result := ASourceString;
     Exit;
   end;
 
-  IgnoreCase := rfIgnoreCase in flags;
-  If IgnoreCase then PosFunct := ALPosIgnoreCaseA
-  Else PosFunct := ALPosA;
+  if ALPosA(APrecompiledTagStartMarker, ASourceString) > 0 then
+    raise EALException.CreateFmt('The source string contains the reserved precompiled-tag start marker (#%d)', [Ord(APrecompiledTagStartMarker)]);
 
-  SourceCurrentPos := 1;
-  T1 := PosFunct(TagStart,SourceString,SourceCurrentPos);
-  if T1 <= 0 then begin
-    result := SourceString;
+  if ALPosA(APrecompiledTagEndMarker, ASourceString) > 0 then
+    raise EALException.CreateFmt('The source string contains the reserved precompiled-tag end marker (#%d)', [Ord(APrecompiledTagEndMarker)]);
+
+  if ALPosA(#1, ASourceString) > 0 then
+    raise EALException.CreateFmt('The source string contains the reserved subexpression placeholder marker (#%d)', [Ord(#1)]);
+
+  if (APrecompiledTagStartMarker = #1) or
+     (APrecompiledTagEndMarker = #1) then
+    raise EALException.CreateFmt('The precompiled-tag markers cannot use the reserved subexpression placeholder marker (#%d)', [Ord(#1)]);
+
+  If AIgnoreCase then LPosFunc := ALPosIgnoreCaseA
+  Else LPosFunc := ALPosA;
+
+  LSourceStringLength := length(ASourceString);
+  LTagStartMarkerLength := Length(ATagStartMarker);
+  LTagEndMarkerLength := Length(ATagEndMarker);
+  LTagEndMarkerFirstChar := ATagEndMarker[low(ATagEndMarker)];
+  LTagEndMarkerFirstCharLower := ALLoCase(LTagEndMarkerFirstChar);
+  LTagEndMarkerFirstCharUpper := ALUpCase(LTagEndMarkerFirstChar);
+  LSubExpressionTagStartMarkerLen := Length(ASubExpressionTagStartMarker);
+  LSubExpressionTagEndMarkerLen := Length(ASubExpressionTagEndMarker);
+  LSubExpressionEnabled := (LSubExpressionTagStartMarkerLen > 0) and (LSubExpressionTagEndMarkerLen > 0);
+  var LBlocksEnabled: Boolean := (ABlockStartMarker <> #0) and (ABlockEndMarker <> #0);
+
+  var LOpenPos: Integer;
+  var LContentPos: Integer;
+  var LContentLen: Integer;
+  var LAfterPos: Integer;
+  if not _FindNextTag(1, LOpenPos, LContentPos, LContentLen, LAfterPos) then begin
+    result := ASourceString;
     exit;
   end;
 
-  SourceStringLength := length(SourceString);
-  ResultCurrentLength := SourceStringLength;
-  SetLength(Result,ResultCurrentLength);
-  ResultCurrentPos := 1;
-  TagStartLength := Length(TagStart);
-  TagEndLength := Length(TagEnd);
-  TagEndFirstChar := TagEnd[1];
-  TagEndFirstCharLower := ALLoCase(TagEnd[1]);
-  TagEndFirstCharUpper := ALUpCase(TagEnd[1]);
-  pSize := sizeOf(pointer) * 2;
-  InPrecompiledTag := False; // to remove warning
+  LResultCurrentLength := LSourceStringLength;
+  SetLength(Result,LResultCurrentLength);
+  LResultCurrentPos := 1;
+  var LSourceCurrentPos: integer := 1;
 
-  T2 := T1 + TagStartLength;
-  If (T1 > 0) and (T2 <= SourceStringLength) then begin
+  While True do begin
+    var LReplaceString := AlCopyStr(ASourceString,LContentPos,LContentLen);
+    var LTagName := _ExtractTagName(LReplaceString);
+    var LNextSourcePos: Integer := LAfterPos;
+    var LMainStr: AnsiString := '';
+    var LInverseStr: AnsiString := '';
+    var LIsBlock := False;
 
-    //we are in precompiled tag
-    if (SourceString[T2] = #2) and
-       ((T2 + pSize + 1 + TagEndLength) <= SourceStringLength) and
-       (SourceString[T2 + pSize + 1] = #3) and
-       ((IgnoreCase and ((SourceString[T2 + pSize + 2] = TagEndFirstCharLower) or (SourceString[T2 + pSize + 2] = TagEndFirstCharUpper))) or
-        ((not IgnoreCase) and (SourceString[T2 + pSize + 2] = TagEndFirstChar))) and
-       ((TagEndLength <= 1) or (PosFunct(TagEnd,AlCopyStr(SourceString,T2 + pSize + 2,TagEndLength),1) = 1)) then begin
-      InPrecompiledTag := True;
-      T2 := T2 + pSize + 1 + TagEndLength;
-    end
-
-    //else not precompiled tag
-    else begin
-      InDoubleQuote := False;
-      InsingleQuote := False;
-      While (T2 <= SourceStringLength) and
-            (InDoubleQuote or
-             InSingleQuote or
-             (IgnoreCase and (SourceString[T2] <> TagEndFirstCharLower) and (SourceString[T2] <> TagEndFirstCharUpper)) or
-             ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
-             ((TagEndLength > 1) and (PosFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1))) do begin
-        If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-        else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
-        inc(T2);
-      end;
-      if (T2 > SourceStringLength) then T2 := 0;
+    if LBlocksEnabled and (LTagName <> '') then begin
+      if LTagName[low(LTagName)] = ABlockStartMarker then begin
+        LIsBlock := True;
+        var LMainLen: Integer;
+        var LInversePos: Integer;
+        var LInverseLen: Integer;
+        var LAfterBlockPos: Integer;
+        _FindBlockBounds(LTagName, LAfterPos, LMainLen, LInversePos, LInverseLen, LAfterBlockPos);
+        LMainStr := AlCopyStr(ASourceString, LAfterPos, LMainLen);
+        if LInversePos > 0 then LInverseStr := AlCopyStr(ASourceString, LInversePos, LInverseLen);
+        LNextSourcePos := LAfterBlockPos;
+      end
+      else if LTagName[low(LTagName)] = ABlockEndMarker then
+        Raise EALException.CreateFmt('Unexpected block-end tag "%s"', [LTagName])
+      else if (ABlockElseTag <> '') and _SameTagName(LTagName, ABlockElseTag) then
+        Raise EALException.CreateFmt('Unexpected "%s" tag outside of a block', [ABlockElseTag]);
     end;
 
-  end;
-
-
-  While (T1 > 0) and (T2 > T1) do begin
-
-    //we are in precompiled tag
-    if InPrecompiledTag then begin
-      PrecompiledTag := Pointer(_HexToInt(SourceString, T1 + TagStartLength+1, pSize));
-      T2 := T2 + TagEndLength;
-      if assigned(ReplaceExtendedProc) then begin
-        T2 := T2 - T1;
-        ReplaceString := ReplaceExtendedProc(PrecompiledTag.TagString, PrecompiledTag.TagParams, Context, TagHandled, SourceString, T1, T2);
-        T2 := T2 + T1;
-      end
-      else ReplaceString := ReplaceProc(PrecompiledTag.TagString, PrecompiledTag.TagParams, Context, TagHandled);
-    end
-
-    //else not precompiled tag
-    else begin
-      ReplaceString := AlCopyStr(SourceString,T1 + TagStartLength,T2 - T1 - TagStartLength);
-      T2 := T2 + TagEndLength;
-
-      TagHandled := True;
-      TokenStr := _ExtractTokenStr;
-      ParamStr := _ExtractParamsStr;
-      ParamList := TagParamsClass.Create;
-      try
-        ALExtractHeaderFields(
-          [' ', #9, #13, #10], // const ASeparators: TSysCharSet;
-          [' ', #9, #13, #10], // const AWhiteSpace: TSysCharSet;
-          ['"', ''''], // const AQuoteChars: TSysCharSet;
-          PAnsiChar(ParamStr), // const AContent: PAnsiChar;
-          ParamList, // const AStrings: TALStringsA;
-          True, // const AStripQuotes: Boolean = False;
-          True); // const AQuoteDoublingEscape: Boolean = False;
-        if assigned(ReplaceExtendedProc) then begin
-          T2 := T2 - T1;
-          ReplaceString := ReplaceExtendedProc(TokenStr, ParamList, Context, TagHandled, SourceString, T1, T2);
-          T2 := T2 + T1;
+    var LPrecompiledTag := TALPrecompiledTagA.Create;
+    try
+      LPrecompiledTag.TagParams.NameValueSeparator := ANameValueSeparator;
+      // For a block, drop the block-start char from the tag name so the stored
+      // TagName is the bare block name (ex: '#if' is stored as 'if'). LTagName
+      // itself keeps the '#' as it is still needed below by _ExtractParamsStr.
+      if LIsBlock then LPrecompiledTag.TagName := AlCopyStr(LTagName, 2, MaxInt)
+      else LPrecompiledTag.TagName := LTagName;
+      var LParamStr := _ExtractParamsStr(LTagName, LReplaceString);
+      _SplitParams(LParamStr, LPrecompiledTag.TagParams);
+      ATagsContainer.Add(LPrecompiledTag);
+    except
+      AlFreeAndNil(LPrecompiledTag);
+      raise;
+    end;
+    LReplaceString := APrecompiledTagStartMarker + _ObjAddressToStr(LPrecompiledTag) + APrecompiledTagEndMarker;
+    for var I := 0 to LPrecompiledTag.TagParams.Count - 1 do
+      // a quoted param value is kept literal when AHandleTagsInQuote is False
+      if (not LPrecompiledTag.TagParams.WasQuoted[I]) or AHandleTagsInQuote then begin
+        if LPrecompiledTag.TagParams.ItemHasNameValue(I) then begin
+          LPrecompiledTag.TagParams.PersistentValueFromIndex[i] := _PrecompileParam(LPrecompiledTag.TagParams.ValueFromIndex[i]);
+          LPrecompiledTag.TagParams.Names[i] := _PrecompileParam(LPrecompiledTag.TagParams.Names[i]);
         end
-        else ReplaceString := ReplaceProc(TokenStr, ParamList, Context, TagHandled);
-      finally
-        AlFreeAndNil(ParamList);
+        else
+          LPrecompiledTag.TagParams.Names[i] := _PrecompileParam(LPrecompiledTag.TagParams.Names[i]);
       end;
+    LPrecompiledTag.TagName := _PrecompileParam(LPrecompiledTag.TagName);
+    // The 'main'/'inverse' block sections are free template text (not tag
+    // parameters), so they are precompiled as such - subexpressions are only
+    // looked for inside the parameters of the tags they contain.
+    if LIsBlock then begin
+      LPrecompiledTag.TagParams.AddNameValue(
+        AMainBlockParamName,
+        ALPrecompileTagsA(
+          LMainStr, // const ASourceString: AnsiString;
+          ATagStartMarker, // const ATagStartMarker,
+          ATagEndMarker, // ATagEndMarker: AnsiString;
+          ATagsContainer, // const ATagsContainer: TObjectList;
+          AIgnoreCase, // const AIgnoreCase: Boolean = false;
+          AQuoteDoublingEscape, // const AQuoteDoublingEscape: Boolean = False;
+          AEscapeChar, // const AEscapeChar: AnsiChar = #0;
+          ANameValueSeparator, // const ANameValueSeparator: AnsiChar = '=';
+          ABlockStartMarker, // const ABlockStartMarker: AnsiChar = #0;
+          ABlockEndMarker, // const ABlockEndMarker: AnsiChar = #0;
+          ABlockElseTag, // const ABlockElseTag: AnsiString = '';
+          ASubExpressionTagStartMarker, // const ASubExpressionTagStartMarker: AnsiString = '';
+          ASubExpressionTagEndMarker, // const ASubExpressionTagEndMarker: AnsiString = '';
+          AHandleTagsInQuote, // const AHandleTagsInQuote: Boolean = True;
+          AMainBlockParamName, // const AMainBlockParamName: AnsiString = '__main';
+          AInverseBlockParamName, // const AInverseBlockParamName: AnsiString = '__inverse';
+          APrecompiledTagStartMarker, // const APrecompiledTagStartMarker: AnsiChar = #2;
+          APrecompiledTagEndMarker)); // const APrecompiledTagEndMarker: AnsiChar = #3): AnsiString;
+      LPrecompiledTag.TagParams.AddNameValue(
+        AInverseBlockParamName,
+        ALPrecompileTagsA(
+          LInverseStr, // // const ASourceString: AnsiString;
+          ATagStartMarker, // const ATagStartMarker,
+          ATagEndMarker, // ATagEndMarker: AnsiString;
+          ATagsContainer, // const ATagsContainer: TObjectList;
+          AIgnoreCase, // const AIgnoreCase: Boolean = false;
+          AQuoteDoublingEscape, // const AQuoteDoublingEscape: Boolean = False;
+          AEscapeChar, // const AEscapeChar: AnsiChar = #0;
+          ANameValueSeparator, // const ANameValueSeparator: AnsiChar = '=';
+          ABlockStartMarker, // const ABlockStartMarker: AnsiChar = #0;
+          ABlockEndMarker, // const ABlockEndMarker: AnsiChar = #0;
+          ABlockElseTag, // const ABlockElseTag: AnsiString = '';
+          ASubExpressionTagStartMarker, // const ASubExpressionTagStartMarker: AnsiString = '';
+          ASubExpressionTagEndMarker, // const ASubExpressionTagEndMarker: AnsiString = '';
+          AHandleTagsInQuote, // const AHandleTagsInQuote: Boolean = True;
+          AMainBlockParamName, // const AMainBlockParamName: AnsiString = '__main';
+          AInverseBlockParamName, // const AInverseBlockParamName: AnsiString = '__inverse';
+          APrecompiledTagStartMarker, // const APrecompiledTagStartMarker: AnsiChar = #2;
+          APrecompiledTagEndMarker)); // const APrecompiledTagEndMarker: AnsiChar = #3): AnsiString;
     end;
 
-    if (TagHandled) and
-       (TagReplaceProcResult) and
-       (rfreplaceAll in flags) then ReplaceString := ALFastTagReplaceA(
-                                                       ReplaceString,
-                                                       TagStart,
-                                                       TagEnd,
-                                                       ReplaceProc,
-                                                       ReplaceExtendedProc,
-                                                       Flags,
-                                                       Context,
-                                                       TagParamsClass,
-                                                       TagReplaceProcResult);
+    _MoveStr2Result(ASourceString,LSourceCurrentPos,LOpenPos - LSourceCurrentPos);
+    _MoveStr2Result(LReplaceString,1,length(LReplaceString));
+    LSourceCurrentPos := LNextSourcePos;
 
-    If tagHandled then begin
-      _MoveStr2Result(SourceString,SourceCurrentPos,T1 - SourceCurrentPos);
-      _MoveStr2Result(ReplaceString,1,length(ReplaceString))
-    end
-    else _MoveStr2Result(SourceString,SourceCurrentPos,T2 - SourceCurrentPos);
-    SourceCurrentPos := T2;
-
-    If TagHandled and (not (rfreplaceAll in flags)) then Break;
-
-    InPrecompiledTag := False;
-    T1 := PosFunct(TagStart,SourceString,SourceCurrentPos);
-    T2 := T1 + TagStartLength;
-    If (T1 > 0) and (T2 <= SourceStringLength) then begin
-
-      //we are in precompiled tag
-      if (SourceString[T2] = #2) and
-         ((T2 + pSize + 1 + TagEndLength) <= SourceStringLength) and
-         (SourceString[T2 + pSize + 1] = #3) and
-         ((IgnoreCase and ((SourceString[T2 + pSize + 2] = TagEndFirstCharLower) or (SourceString[T2 + pSize + 2] = TagEndFirstCharUpper))) or
-          ((not IgnoreCase) and (SourceString[T2 + pSize + 2] = TagEndFirstChar))) and
-         ((TagEndLength <= 1) or (PosFunct(TagEnd,AlCopyStr(SourceString,T2 + pSize + 2,TagEndLength),1) = 1)) then begin
-        InPrecompiledTag := True;
-        T2 := T2 + pSize + 1 + TagEndLength;
-      end
-
-      //else not precompiled tag
-      else begin
-        InDoubleQuote := False;
-        InsingleQuote := False;
-        While (T2 <= SourceStringLength) and
-              (InDoubleQuote or
-               InSingleQuote or
-               (IgnoreCase and (SourceString[T2] <> TagEndFirstCharLower) and (SourceString[T2] <> TagEndFirstCharUpper)) or
-               ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
-               ((TagEndLength > 1) and (PosFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1))) do begin
-          If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-          else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
-          inc(T2);
-        end;
-        if (T2 > SourceStringLength) then T2 := 0;
-      end;
-
-    end;
+    if not _FindNextTag(LSourceCurrentPos, LOpenPos, LContentPos, LContentLen, LAfterPos) then break;
   end;
 
-  _MoveStr2Result(SourceString,SourceCurrentPos,maxint);
-  SetLength(Result,ResultCurrentPos-1);
+  _MoveStr2Result(ASourceString,LSourceCurrentPos,maxint);
+  SetLength(Result,LResultCurrentPos-1);
 end;
 
-{*************************}
-function ALFastTagReplaceA(
-           const SourceString, TagStart, TagEnd: AnsiString;
-           ReplaceProc: TALHandleTagFunctA;
-           Context: Pointer;
-           Const flags: TReplaceFlags=[rfreplaceall];
-           const TagReplaceProcResult: Boolean = False): AnsiString;
-Begin
-  result := ALFastTagReplaceA(
-              SourceString,
-              TagStart,
-              TagEnd,
-              ReplaceProc,
-              nil,
-              flags,
-              Context,
-              TALStringListA,
-              TagReplaceProcResult);
-end;
+{*********************************}
+function ALReplacePrecompiledTagsA(
+           const ASourceString: AnsiString;
+           const ATagStartMarker, ATagEndMarker: AnsiChar;
+           const AReplaceFunc: TALTagReplaceFuncA;
+           const AContext: Pointer;
+           const AReplaceTagsInResult: Boolean = False): AnsiString;
 
-{*************************}
-function ALFastTagReplaceA(
-           const SourceString, TagStart, TagEnd: AnsiString;
-           ReplaceExtendedProc: TALHandleTagExtendedfunctA;
-           Context: Pointer;
-           Const flags: TReplaceFlags=[rfreplaceall];
-           const TagReplaceProcResult: Boolean = False): AnsiString;
-Begin
-  result := ALFastTagReplaceA(
-              SourceString,
-              TagStart,
-              TagEnd,
-              nil,
-              ReplaceExtendedProc,
-              flags,
-              Context,
-              TALStringListA,
-              TagReplaceProcResult);
-end;
+Const
+  cResultBuffSize: integer = 16384;
 
-{********************************}
-function ALFastTagReplaceWithFunc(
-           const TagString: AnsiString;
-           TagParams: TALStringsA;
-           Context: pointer;
-           Var Handled: Boolean): AnsiString;
-begin
-  Handled := true;
-  result := AnsiString(Context);
-end;
+var
+  LResultCurrentPos: integer;
+  LResultCurrentLength: integer;
 
-{*************************}
-function ALFastTagReplaceA(
-           const SourceString, TagStart, TagEnd: AnsiString;
-           const ReplaceWith: AnsiString;
-           const Flags: TReplaceFlags=[rfreplaceall]): AnsiString;
-Begin
-  Result := ALFastTagReplaceA(
-              SourceString,
-              TagStart,
-              TagEnd,
-              ALFastTagReplaceWithFunc,
-              nil,
-              flags,
-              PAnsiChar(ReplaceWith),
-              TALStringListA,
-              false);
-end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _MoveStr2Result(const ASourceString: AnsiString; AStart, ALength: Integer);
+  begin
+    var LSourceStringLn: Integer := Length(ASourceString);
+    If (AStart < 1) then AStart := 1;
 
-{**************************************************}
-//the problem with this function is that if you have
-//<#mytagwww params="xxx"> and
-//<#mytag params="xxx">
-//then the ALExtractTagParamsA(str, '<#mytag', '>' ... ) will not work like we expect
-//because it's will extract the params of the <#mytagwww
-function ALExtractTagParamsA(
-           Const SourceString, TagStart, TagEnd: AnsiString;
-           TagParams: TALStringsA;
-           IgnoreCase: Boolean): Boolean;
+    if (LSourceStringLn=0) or
+       (ALength < 1) or
+       (AStart > LSourceStringLn) then Exit;
 
-var ReplaceString: AnsiString;
-    TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
-    TokenStr, ParamStr: AnsiString;
-    TagStartLength: integer;
-    TagEndLength: integer;
-    SourceStringLength: Integer;
-    InDoubleQuote: Boolean;
-    InsingleQuote: Boolean;
-    PosFunct: Function(const SubStr, S: AnsiString; const Offset: Integer = 1): Integer;
-    T1,T2: Integer;
+    ALength := Min(ALength, LSourceStringLn - (AStart - 1));
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Function _ExtractTokenStr: AnsiString;
-    var x: Integer;
-    Begin
-      X := 1;
-      while (x <= length(ReplaceString)) and
-            (not (ReplaceString[x] in [' ', #9, #13, #10])) do inc(x);
-      if x > length(ReplaceString) then Result := ReplaceString
-      else Result := AlcopyStr(ReplaceString,1,x-1);
+    If ALength + LResultCurrentPos - 1 > LResultCurrentLength then begin
+      LResultCurrentLength := LResultCurrentLength + ALength + cResultBuffSize;
+      SetLength(Result, LResultCurrentLength);
     end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Function _ExtractParamsStr: AnsiString;
-    Begin
-      Result := ALTrim( AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt) );
-    end;
-
-begin
-  Result := False;
-  if (SourceString = '') or (TagStart = '') or (TagEnd = '') then Exit;
-
-  If IgnoreCase then PosFunct := ALPosIgnoreCaseA
-  Else PosFunct := ALPosA;
-
-  SourceStringLength := length(SourceString);
-  TagStartLength := Length(TagStart);
-  TagEndLength := Length(TagEnd);
-  TagEndFirstChar := TagEnd[1];
-  TagEndFirstCharLower := ALLowerCase(TagEnd[1])[1];
-  TagEndFirstCharUpper := ALUpperCase(TagEnd[1])[1];
-
-  T1 := PosFunct(TagStart,SourceString,1);
-  T2 := T1 + TagStartLength;
-  If (T1 > 0) and (T2 <= SourceStringLength) then begin
-    InDoubleQuote := False;
-    InsingleQuote := False;
-    While (T2 <= SourceStringLength) and
-          (InDoubleQuote or
-           InSingleQuote or
-           (IgnoreCase and (not (SourceString[T2] in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-           ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
-           (PosFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
-      If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-      else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
-      inc(T2);
-    end;
-    if (T2 > SourceStringLength) then T2 := 0;
+    AlMove(pbyte(ASourceString)[AStart-1], pbyte(Result)[LResultCurrentPos-1], ALength);
+    LResultCurrentPos := LResultCurrentPos + ALength;
   end;
 
-  If (T1 > 0) and (T2 > T1) Then begin
-    ReplaceString := AlCopyStr(SourceString,T1 + TagStartLength,T2 - T1 - TagStartLength);
-    TokenStr := _ExtractTokenStr;
-    ParamStr := _ExtractParamsStr;
-    ALExtractHeaderFields(
-      [' ', #9, #13, #10], // const ASeparators: TSysCharSet;
-      [' ', #9, #13, #10], // const AWhiteSpace: TSysCharSet;
-      ['"', ''''], // const AQuoteChars: TSysCharSet;
-      PAnsiChar(ParamStr), // const AContent: PAnsiChar;
-      TagParams, // const AStrings: TALStringsA;
-      True, // const AStripQuotes: Boolean = False;
-      True); // const AQuoteDoublingEscape: Boolean = False;
-    Result := True
-  end;
-end;
-
-{********************}
-// split the text like
-// blablabla<#tag param="xxx">whouwhouwhou
-// in a list of
-// blablabla
-// <#tag param="xxx">
-// whouwhouwhou
-Procedure ALSplitTextAndTagA(
-            Const SourceString, TagStart, TagEnd: AnsiString;
-            SplitTextAndTagLst: TALStringsA;
-            IgnoreCase: Boolean);
-
-var TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
-    TagStartLength: integer;
-    TagEndLength: integer;
-    SourceStringLength: Integer;
-    SourceCurrentPos: integer;
-    InDoubleQuote: Boolean;
-    InsingleQuote: Boolean;
-    PosFunct: Function(const SubStr, S: AnsiString; const Offset: Integer = 1): Integer;
-    T1,T2: Integer;
-
 begin
-
-  if (SourceString = '') or (TagStart = '') or (TagEnd = '') then begin
-    if SourceString <> '' then SplitTextAndTagLst.Add(SourceString);
+  if (ASourceString = '') then begin
+    Result := ASourceString;
     Exit;
   end;
 
-  If IgnoreCase then PosFunct := ALPosIgnoreCaseA
-  Else PosFunct := ALPosA;
+  // A precompiled tag is the single byte ATagStartMarker, followed by the raw bytes of
+  // a TALPrecompiledTagA address (SizeOf(Pointer) bytes - see _ObjAddressToStr),
+  // closed by the single byte ATagEndMarker. There is nothing else to look for: the
+  // string only contains literal text and these markers.
+  var LPointerSize: Integer := SizeOf(Pointer);
+  var LMarkerLength: Integer := LPointerSize + 2; // ATagStartMarker + address bytes + ATagEndMarker
+  var LSourceStringLength: Integer := Length(ASourceString);
 
-  SourceStringLength := length(SourceString);
-  TagStartLength := Length(TagStart);
-  TagEndLength := Length(TagEnd);
-  TagEndFirstChar := TagEnd[1];
-  TagEndFirstCharLower := ALLowerCase(TagEnd[1])[1];
-  TagEndFirstCharUpper := ALUpperCase(TagEnd[1])[1];
-  SourceCurrentPos := 1;
+  LResultCurrentLength := LSourceStringLength;
+  SetLength(Result, LResultCurrentLength);
+  LResultCurrentPos := 1;
+  var LSourceCurrentPos: Integer := 1;
 
-  T1 := PosFunct(TagStart,SourceString,SourceCurrentPos);
-  T2 := T1 + TagStartLength;
-  If (T1 > 0) and (T2 <= SourceStringLength) then begin
-    InDoubleQuote := False;
-    InsingleQuote := False;
-    While (T2 <= SourceStringLength) and
-          (InDoubleQuote or
-           InSingleQuote or
-           (IgnoreCase and (not (SourceString[T2] in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-           ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
-           (PosFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
-      If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-      else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
-      inc(T2);
+  var T1: Integer := ALPosA(ATagStartMarker, ASourceString, LSourceCurrentPos);
+  while T1 > 0 do begin
+
+    // A well-formed marker has ATagEndMarker right after the address bytes; if not, this
+    // ATagStartMarker byte is just literal content, so skip it and keep searching.
+    if (T1 + LPointerSize + 1 > LSourceStringLength) or
+       (ASourceString[T1 + LPointerSize + 1] <> ATagEndMarker) then begin
+      T1 := ALPosA(ATagStartMarker, ASourceString, T1 + 1);
+      Continue;
     end;
-    if (T2 > SourceStringLength) then T2 := 0;
+
+    // The address bytes start right after ATagStartMarker (at T1 + 1).
+    var LPrecompiledTag: TALPrecompiledTagA := PPointer(@ASourceString[T1 + 1])^;
+    var LReplaceString: AnsiString := AReplaceFunc(LPrecompiledTag.TagName, LPrecompiledTag.TagParams, AContext);
+    if AReplaceTagsInResult then
+      LReplaceString := ALReplacePrecompiledTagsA(
+                          LReplaceString, // const ASourceString: AnsiString;
+                          ATagStartMarker, // const ATagStartMarker,
+                          ATagEndMarker, // ATagEndMarker: AnsiChar;
+                          AReplaceFunc, // const AReplaceFunc: TALTagReplaceFuncA;
+                          AContext, // const AContext: Pointer;
+                          AReplaceTagsInResult); // const AReplaceTagsInResult: Boolean = False)
+
+    _MoveStr2Result(ASourceString, LSourceCurrentPos, T1 - LSourceCurrentPos);
+    _MoveStr2Result(LReplaceString, 1, Length(LReplaceString));
+    LSourceCurrentPos := T1 + LMarkerLength;
+
+    T1 := ALPosA(ATagStartMarker, ASourceString, LSourceCurrentPos);
+
   end;
 
-  While (T1 > 0) and (T2 > T1) do begin
-    SplitTextAndTagLst.AddObject(AlcopyStr(SourceString,SourceCurrentPos,T1 - SourceCurrentPos), pointer(0));
-    SplitTextAndTagLst.AddObject(AlCopyStr(SourceString,T1,T2 - T1 + TagEndLength), pointer(1));
+  _MoveStr2Result(ASourceString, LSourceCurrentPos, MaxInt);
+  SetLength(Result, LResultCurrentPos - 1);
+end;
 
-    SourceCurrentPos := T2 + TagEndLength;
+{**********************}
+function ALReplaceTagsA(
+           const ASourceString: AnsiString;
+           const ATagStartMarker, ATagEndMarker: AnsiString;
+           const AReplaceFunc: TALTagReplaceFuncA;
+           const AContext: Pointer;
+           const AIgnoreCase: Boolean = False;
+           const AReplaceTagsInResult: Boolean = False;
+           const AQuoteDoublingEscape: Boolean = False;
+           const AEscapeChar: AnsiChar = #0;
+           const ANameValueSeparator: AnsiChar = '='): AnsiString;
 
-    T1 := PosFunct(TagStart,SourceString,SourceCurrentPos);
-    T2 := T1 + TagStartLength;
-    If (T1 > 0) and (T2 <= SourceStringLength) then begin
-      InDoubleQuote := False;
-      InsingleQuote := False;
-      While (T2 <= SourceStringLength) and
-            (InDoubleQuote or
-             InSingleQuote or
-             (IgnoreCase and (not (SourceString[T2] in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-             ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
-             (PosFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
-        If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-        else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
+Const
+  cResultBuffSize: integer = 16384;
+
+var
+  LResultCurrentPos: integer;
+  LResultCurrentLength: integer;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Function _ExtractTagName(const ATagContent: AnsiString): AnsiString;
+  Begin
+    var X: Integer := 1;
+    while (x <= length(ATagContent)) and
+          (not (ATagContent[x] in [' ', #9, #13, #10])) do inc(x);
+    if x > length(ATagContent) then Result := ATagContent
+    else Result := AlcopyStr(ATagContent,1,x-1);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Function _ExtractParamsStr(const ATagName, ATagContent: ansiString): AnsiString;
+  Begin
+    Result := ALTrim(AlcopyStr(ATagContent,length(ATagName) + 1, MaxInt));
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _MoveStr2Result(const ASourceString: AnsiString; AStart, ALength: Integer);
+  begin
+    var LSourceStringLn: Integer := Length(ASourceString);
+    If (AStart < 1) then AStart := 1;
+
+    if (LSourceStringLn=0) or
+       (ALength < 1) or
+       (AStart > LSourceStringLn) then Exit;
+
+    ALength := Min(ALength, LSourceStringLn - (AStart - 1));
+
+    If ALength + LResultCurrentPos - 1 > LResultCurrentLength then begin
+      LResultCurrentLength := LResultCurrentLength + ALength + cResultBuffSize;
+      SetLength(Result, LResultCurrentLength);
+    end;
+    AlMove(pbyte(ASourceString)[AStart-1], pbyte(Result)[LResultCurrentPos-1], ALength);
+    LResultCurrentPos := LResultCurrentPos + ALength;
+  end;
+
+begin
+  if (ASourceString = '') or (ATagStartMarker = '') or (ATagEndMarker = '') then begin
+    Result := ASourceString;
+    Exit;
+  end;
+
+  var LPosFunc: Function(const SubStr, S: AnsiString; const Offset: Integer = 1): Integer;
+  If AIgnoreCase then LPosFunc := ALPosIgnoreCaseA
+  Else LPosFunc := ALPosA;
+
+  var LSourceCurrentPos: Integer := 1;
+  var T1: Integer := LPosFunc(ATagStartMarker,ASourceString,LSourceCurrentPos);
+  if T1 <= 0 then begin
+    result := ASourceString;
+    exit;
+  end;
+
+  var LSourceStringLength: Integer := length(ASourceString);
+  LResultCurrentLength := LSourceStringLength;
+  SetLength(Result,LResultCurrentLength);
+  LResultCurrentPos := 1;
+  var LTagStartMarkerLength: Integer := Length(ATagStartMarker);
+  var LTagEndMarkerLength: Integer := Length(ATagEndMarker);
+  var LTagEndMarkerFirstChar: AnsiChar := ATagEndMarker[low(ATagEndMarker)];
+  var LTagEndMarkerFirstCharLower: AnsiChar := ALLoCase(ATagEndMarker[low(ATagEndMarker)]);
+  var LTagEndMarkerFirstCharUpper: AnsiChar := ALUpCase(ATagEndMarker[low(ATagEndMarker)]);
+
+  var T2: Integer := T1 + LTagStartMarkerLength;
+  If (T1 > 0) and (T2 <= LSourceStringLength) then begin
+    var LInDoubleQuote := False;
+    var LInSingleQuote := False;
+    While (T2 <= LSourceStringLength) and
+          (LInDoubleQuote or
+           LInSingleQuote or
+           (AIgnoreCase and (ASourceString[T2] <> LTagEndMarkerFirstCharLower) and (ASourceString[T2] <> LTagEndMarkerFirstCharUpper)) or
+           ((not AIgnoreCase) and (ASourceString[T2] <> LTagEndMarkerFirstChar)) or
+           ((LTagEndMarkerLength > 1) and (LPosFunc(ATagEndMarker,AlCopyStr(ASourceString,T2,LTagEndMarkerLength),1) <> 1))) do begin
+      if (AEscapeChar <> #0) and (LInDoubleQuote or LInSingleQuote) and (ASourceString[T2] = AEscapeChar) then begin
+        inc(T2);
+        if T2 <= LSourceStringLength then inc(T2);
+      end
+      else begin
+        If ASourceString[T2] = '"' then LInDoubleQuote := (not LInDoubleQuote) and (not LInSingleQuote)
+        else If ASourceString[T2] = '''' then LInSingleQuote := (not LInSingleQuote) and (not LInDoubleQuote);
         inc(T2);
       end;
-      if (T2 > SourceStringLength) then T2 := 0;
     end;
+    if (T2 > LSourceStringLength) then T2 := 0;
+  end
+  else T2 := 0;
+
+  While (T1 > 0) and (T2 > T1) do begin
+
+    var LReplaceString: AnsiString := AlCopyStr(ASourceString,T1 + LTagStartMarkerLength,T2 - T1 - LTagStartMarkerLength);
+    T2 := T2 + LTagEndMarkerLength;
+
+    var LTagName: AnsiString := _ExtractTagName(LReplaceString);
+    var LParamStr := _ExtractParamsStr(LTagName, LReplaceString);
+    var LParamList := TALTagParamsA.Create;
+    try
+      LParamList.NameValueSeparator := ANameValueSeparator;
+      ALExtractHeaderFields(
+        [' ', #9, #13, #10], // const ASeparators: TSysCharSet;
+        [' ', #9, #13, #10], // const AWhiteSpace: TSysCharSet;
+        ['"', ''''], // const AQuoteChars: TSysCharSet;
+        PAnsiChar(LParamStr), // const AContent: PAnsiChar;
+        LParamList, // const AStrings: TALStringsA;
+        True, // const AStripQuotes: Boolean = False;
+        AQuoteDoublingEscape, // const AQuoteDoublingEscape: Boolean = False;
+        AEscapeChar, // const AEscapeChar: AnsiChar = #0;
+        ANameValueSeparator, // const ANameValueSeparator: AnsiChar = '=';
+        True); // const AStoreWasQuotedInObjects: Boolean = False);
+      LReplaceString := AReplaceFunc(LTagName, LParamList, AContext);
+    finally
+      AlFreeAndNil(LParamList);
+    end;
+
+    if AReplaceTagsInResult then
+      LReplaceString := ALReplaceTagsA(
+                          LReplaceString, // const ASourceString: AnsiString;
+                          ATagStartMarker, // const ATagStartMarker,
+                          ATagEndMarker, // const ATagStartMarker, ATagEndMarker: AnsiString;
+                          AReplaceFunc, // const AReplaceFunc: TALTagReplaceFuncA;
+                          AContext, // const AContext: Pointer;
+                          AIgnoreCase, // const AIgnoreCase: Boolean = False;
+                          AReplaceTagsInResult, // const AReplaceTagsInResult: Boolean = False;
+                          AQuoteDoublingEscape, // const AQuoteDoublingEscape: Boolean = False;
+                          AEscapeChar, // const AEscapeChar: AnsiChar = #0;
+                          ANameValueSeparator); // const ANameValueSeparator: AnsiChar = '='): AnsiString;
+
+    _MoveStr2Result(ASourceString,LSourceCurrentPos,T1 - LSourceCurrentPos);
+    _MoveStr2Result(LReplaceString,1,length(LReplaceString));
+    LSourceCurrentPos := T2;
+
+    T1 := LPosFunc(ATagStartMarker,ASourceString,LSourceCurrentPos);
+    T2 := T1 + LTagStartMarkerLength;
+    If (T1 > 0) and (T2 <= LSourceStringLength) then begin
+      var LInDoubleQuote := False;
+      var LInSingleQuote := False;
+      While (T2 <= LSourceStringLength) and
+            (LInDoubleQuote or
+             LInSingleQuote or
+             (AIgnoreCase and (ASourceString[T2] <> LTagEndMarkerFirstCharLower) and (ASourceString[T2] <> LTagEndMarkerFirstCharUpper)) or
+             ((not AIgnoreCase) and (ASourceString[T2] <> LTagEndMarkerFirstChar)) or
+             ((LTagEndMarkerLength > 1) and (LPosFunc(ATagEndMarker,AlCopyStr(ASourceString,T2,LTagEndMarkerLength),1) <> 1))) do begin
+        if (AEscapeChar <> #0) and (LInDoubleQuote or LInSingleQuote) and (ASourceString[T2] = AEscapeChar) then begin
+          inc(T2);
+          if T2 <= LSourceStringLength then inc(T2);
+        end
+        else begin
+          If ASourceString[T2] = '"' then LInDoubleQuote := (not LInDoubleQuote) and (not LInSingleQuote)
+          else If ASourceString[T2] = '''' then LInSingleQuote := (not LInSingleQuote) and (not LInDoubleQuote);
+          inc(T2);
+        end;
+      end;
+      if (T2 > LSourceStringLength) then T2 := 0;
+    end
+    else T2 := 0;
   end;
 
-  SplitTextAndTagLst.AddObject(AlcopyStr(SourceString,SourceCurrentPos,maxint), pointer(0));
-
+  _MoveStr2Result(ASourceString,LSourceCurrentPos,maxint);
+  SetLength(Result,LResultCurrentPos-1);
 end;
+
+type
+
+  {***************************}
+  TALStaticTagReplacerA = class
+  public
+    class function ReplaceTagWithContext(
+                     const ATagName: AnsiString;
+                     const ATagParams: TALTagParamsA;
+                     const AContext: pointer): AnsiString;
+  end;
+
+{*********************************************************}
+class function TALStaticTagReplacerA.ReplaceTagWithContext(
+                 const ATagName: AnsiString;
+                 const ATagParams: TALTagParamsA;
+                 const AContext: pointer): AnsiString;
+begin
+  result := AnsiString(AContext);
+end;
+
+{**********************}
+function ALReplaceTagsA(
+           const ASourceString: AnsiString;
+           const ATagStartMarker, ATagEndMarker: AnsiString;
+           const AReplaceWith: AnsiString;
+           const AIgnoreCase: Boolean = False;
+           const AQuoteDoublingEscape: Boolean = False;
+           const AEscapeChar: AnsiChar = #0;
+           const ANameValueSeparator: AnsiChar = '='): AnsiString;
+Begin
+  Result := ALReplaceTagsA(
+              ASourceString, // const ASourceString,
+              ATagStartMarker, // ATagStartMarker,
+              ATagEndMarker, // ATagEndMarker: AnsiString;
+              TALStaticTagReplacerA.ReplaceTagWithContext, // const AReplaceFunc: TALTagReplaceFuncA;
+              PAnsiChar(AReplaceWith), // const AContext: Pointer;
+              AIgnoreCase, // const AIgnoreCase: Boolean = False;
+              False, // const AReplaceTagsInResult: Boolean = False;
+              AQuoteDoublingEscape, // const AQuoteDoublingEscape: Boolean = False;
+              AEscapeChar, // const AEscapeChar: AnsiChar = #0;
+              ANameValueSeparator); // const ANameValueSeparator: AnsiChar = '=')
+end;
+
 
 initialization
   {$IF defined(DEBUG)}

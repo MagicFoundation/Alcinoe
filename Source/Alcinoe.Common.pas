@@ -922,6 +922,12 @@ function ALElapsedTimeSecondsAsInt64: int64;
 function ALIsValidLatlng(const ALatitude, ALongitude: Double): Boolean;
 function ALGetDistanceBetween2Points(const ALatitude1, ALongitude1, ALatitude2, ALongitude2: Double): Double{meters};
 
+function  ALGetAppVersionA: AnsiString;
+function  ALGetAppVersionW: String;
+function  ALSemanticVersionToInt64(const AVersion: string): Int64;
+function  ALInt64ToSemanticVersionA(const AVersion: Int64): AnsiString; overload;
+function  ALInt64ToSemanticVersionW(const AVersion: Int64): string; overload;
+
 {$IFDEF MSWINDOWS}
 {$IFNDEF ALCompilerVersionSupported131}
   {$MESSAGE WARN 'Check if EnumDynamicTimeZoneInformation/SystemTimeToTzSpecificLocalTimeEx/TzSpecificLocalTimeToSystemTimeEx are still not declared in Winapi.Windows and adjust the IFDEF'}
@@ -1027,13 +1033,16 @@ uses
   {$ENDIF}
   {$IF defined(ANDROID)}
   Posix.Sched,
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNI.App,
   Androidapi.JNI.JavaTypes,
-  Androidapi.Helpers,
   Androidapi.JNI.Util,
+  Androidapi.Helpers,
   Posix.Time,
   {$ENDIF}
   {$IF defined(IOS)}
   Posix.Sched,
+  iOSapi.Helpers,
   Macapi.Helpers,
   Macapi.Mach,
   {$ENDIF}
@@ -1043,6 +1052,7 @@ uses
   system.DateUtils,
   System.UIConsts,
   System.Diagnostics,
+  Alcinoe.FileUtils,
   Alcinoe.Localization,
   Alcinoe.StringUtils;
 
@@ -3806,6 +3816,88 @@ begin
   var dLon: Double := (ALongitude2 - ALongitude1) * (PI / 180); // Difference in longitude (radians)
   var a: Double := Sqr(Sin(dLat / 2)) + Cos(ALatitude1 * (PI / 180)) * Cos(ALatitude2 * (PI / 180)) * Sqr(Sin(dLon / 2));
   Result := 2 * 6371{Earth's mean radius in km} * ArcTan2(Sqrt(a), Sqrt(1 - a)) * 1000; // Distance in meters
+end;
+
+{*************************************}
+function  ALGetAppVersionA: AnsiString;
+begin
+  {$IF defined(ANDROID)}
+  Result := AnsiString(ALGetAppVersionW)
+  {$ELSEIF defined(IOS)}
+  Result := AnsiString(ALGetAppVersionW)
+  {$ELSEIF defined(MSWINDOWS)}
+  Result := AlGetFileVersionA(ALGetModulePathW+ALGetModuleNameW);
+  {$ELSE}
+  Result := 'x.x.x';
+  {$ENDIF}
+end;
+
+{*********************************}
+function  ALGetAppVersionW: String;
+begin
+  {$IF defined(ANDROID)}
+  var LPackageManager := TandroidHelper.Activity.getPackageManager;
+  if LPackageManager <> nil then begin
+    var LPackageInfo := LPackageManager.getPackageInfo(TandroidHelper.Context.getPackageName(), TJPackageManager.JavaClass.GET_ACTIVITIES);
+    if LPackageInfo <> nil then Result := JStringToString(LPackageInfo.versionName) // 1.0.8
+    else Result := 'x.x.x';
+  end
+  else Result := 'x.x.x';
+  {$ELSEIF defined(IOS)}
+  var LVersionObject := TiOSHelper.MainBundle.infoDictionary.objectForKey(StringToID('CFBundleVersion'));
+  if LVersionObject <> nil then Result := NSStrToStr(TNSString.Wrap(LVersionObject)) // 1.0.8
+  else Result := 'x.x.x';
+  {$ELSEIF defined(MSWINDOWS)}
+  Result := AlGetFileVersionW(ALGetModulePathW+ALGetModuleNameW);
+  {$ELSE}
+  Result := 'x.x.x';
+  {$ENDIF}
+end;
+
+{***************************************************************}
+function ALSemanticVersionToInt64(const AVersion: string): Int64;
+begin
+  var LParts := AVersion.Split(['.']);
+  if Length(LParts) <> 3 then
+    raise Exception.CreateFmt('Invalid version format: "%s". Expected x.x.x', [AVersion]);
+  var LMajor: Int64 := ALStrToInt64(LParts[0]);
+  var LMinor: Int64 := ALStrToInt64(LParts[1]);
+  var LPatch: Int64 := ALStrToInt64(LParts[2]);
+  if (LMajor < 0) or (LMajor > 999999) or
+     (LMinor < 0) or (LMinor > 999999) or
+     (LPatch < 0) or (LPatch > 999999) then
+    raise Exception.CreateFmt('Invalid version value: "%s". Each part must be between 0 and 999999.', [AVersion]);
+  Result := (LMajor * 1000000000000) +
+            (LMinor * 1000000) +
+            LPatch;
+end;
+
+{********************************************************************}
+function ALInt64ToSemanticVersionA(const AVersion: Int64): AnsiString;
+begin
+  const CPartBase: Int64 = 1000000;
+  if (AVersion < 0) or (AVersion > 999999999999999999) then
+    raise Exception.CreateFmt('Invalid packed version: %d.', [AVersion]);
+  var LMajor: Int64 := AVersion div (CPartBase * CPartBase);
+  var LMinor: Int64 := (AVersion div CPartBase) mod CPartBase;
+  var LPatch: Int64 := AVersion mod CPartBase;
+  Result := ALIntToStrA(LMajor) + '.' +
+            ALIntToStrA(LMinor) + '.' +
+            ALIntToStrA(LPatch);
+end;
+
+{****************************************************************}
+function ALInt64ToSemanticVersionW(const AVersion: Int64): string;
+begin
+  const CPartBase: Int64 = 1000000;
+  if (AVersion < 0) or (AVersion > 999999999999999999) then
+    raise Exception.CreateFmt('Invalid packed version: %d.', [AVersion]);
+  var LMajor: Int64 := AVersion div (CPartBase * CPartBase);
+  var LMinor: Int64 := (AVersion div CPartBase) mod CPartBase;
+  var LPatch: Int64 := AVersion mod CPartBase;
+  Result := ALIntToStrW(LMajor) + '.' +
+            ALIntToStrW(LMinor) + '.' +
+            ALIntToStrW(LPatch);
 end;
 
 {****************}

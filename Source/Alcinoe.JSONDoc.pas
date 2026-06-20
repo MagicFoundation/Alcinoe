@@ -178,6 +178,7 @@ type
     function GetHasChildNodes: Boolean;
     function GetNodeType: TALJSONNodeType; virtual; abstract;
     function GetNodeSubType: TALJSONNodeSubType; virtual; abstract;
+    function GetStorageKind: TALJSONStorageKind; virtual;
     procedure SetNodeName(const NodeName: AnsiString);
     function GetInterchangeValue(const AInterchangeFormat: TALJSONInterchangeFormat = icfMongoShellJson): AnsiString; virtual;
     function GetJSON: AnsiString;
@@ -418,6 +419,7 @@ type
     property NodeName: AnsiString read FNodeName write SetNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
     property NodeSubType: TALJSONNodeSubType read GetNodeSubType;
+    property StorageKind: TALJSONStorageKind read GetStorageKind;
     property Text: AnsiString read GetText write SetText;
     property Int32: Int32 read GetInt32 write SetInt32;
     property Int64: Int64 read GetInt64 write SetInt64;
@@ -478,6 +480,7 @@ type
   protected
     function GetNodeType: TALJSONNodeType; override;
     function GetNodeSubType: TALJSONNodeSubType; override;
+    function GetStorageKind: TALJSONStorageKind; override;
     function GetInterchangeValue(const AInterchangeFormat: TALJSONInterchangeFormat = icfMongoShellJson): AnsiString; override;
   public
     constructor Create(const NodeName: AnsiString = ''); override;
@@ -761,6 +764,7 @@ type
     function GetHasChildNodes: Boolean;
     function GetNodeType: TALJSONNodeType; virtual; abstract;
     function GetNodeSubType: TALJSONNodeSubType; virtual; abstract;
+    function GetStorageKind: TALJSONStorageKind; virtual;
     procedure SetNodeName(const NodeName: String);
     function GetInterchangeValue(const AInterchangeFormat: TALJSONInterchangeFormat = icfMongoShellJson): String; virtual;
     function GetJSON: String;
@@ -983,6 +987,7 @@ type
     property NodeName: String read FNodeName write SetNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
     property NodeSubType: TALJSONNodeSubType read GetNodeSubType;
+    property StorageKind: TALJSONStorageKind read GetStorageKind;
     property Text: String read GetText write SetText;
     property Int32: Int32 read GetInt32 write SetInt32;
     property Int64: Int64 read GetInt64 write SetInt64;
@@ -1043,6 +1048,7 @@ type
   protected
     function GetNodeType: TALJSONNodeType; override;
     function GetNodeSubType: TALJSONNodeSubType; override;
+    function GetStorageKind: TALJSONStorageKind; override;
     function GetInterchangeValue(const AInterchangeFormat: TALJSONInterchangeFormat = icfMongoShellJson): String; override;
   public
     constructor Create(const NodeName: String = ''); override;
@@ -2913,6 +2919,12 @@ function TALJSONNodeA.GetHasChildNodes: Boolean;
 begin
   var LNodeList := InternalGetChildNodes;
   Result := assigned(LNodeList) and (LNodeList.Count > 0);
+end;
+
+{*******************************************************}
+function TALJSONNodeA.GetStorageKind: TALJSONStorageKind;
+begin
+  AlJSONDocErrorA(ALJSONOperationError, GetNodeType);
 end;
 
 {*************************************************************}
@@ -7080,6 +7092,12 @@ begin
   Result := FNodeSubType;
 end;
 
+{***********************************************************}
+function TALJSONTextNodeA.GetStorageKind: TALJSONStorageKind;
+begin
+  Result := FStorageKind;
+end;
+
 {****************************************}
 procedure TALJSONTextNodeA.ClearNodeValue;
 begin
@@ -8028,8 +8046,7 @@ begin
   end;
 end;
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{****************************************************************************************************************}
 function ALJSONTryStrToRegExW(const S: String; out RegEx: String; out RegExOptions: TALPerlRegExOptions): Boolean;
 begin
 
@@ -8083,12 +8100,8 @@ begin
   end;
 
 end;
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 function ALJSONTryStrToBinaryW(const S: String; out Data: TBytes; out Subtype: Byte): Boolean;
 begin
@@ -8162,12 +8175,8 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 function ALJSONTryStrToDateTimeW(const S: String; out Value: TDateTime): Boolean;
 begin
@@ -8239,12 +8248,8 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 // ObjectId is a 12-Byte BSON type, constructed using:
 // a 4-Byte value representing the seconds since the Unix epoch,
@@ -8289,12 +8294,8 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 function ALJSONTryStrToTimestampW(const S: String; out Value: TALBSONTimestamp): Boolean;
 begin
@@ -8328,12 +8329,8 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 function ALJSONTryStrToInt32W(const S: String; out Value: Int32): Boolean;
 begin
@@ -8394,12 +8391,8 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 function ALJSONTryStrToInt64W(const S: String; out Value: Int64): Boolean;
 begin
@@ -8460,9 +8453,6 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {***************************************************************}
 procedure ALJSONDocErrorW(const Msg: String); noreturn; overload;
@@ -8500,8 +8490,7 @@ begin
   end;
 end;
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{********************************************************************************************}
 class function TALJSONDocumentW.DetectNodeTypeFromJSON(const Buffer: String): TALJSONNodeType;
 begin
 
@@ -8525,9 +8514,6 @@ begin
   end;
 
 end;
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {***************************************************}
 class function TALJSONDocumentW.Create: TALJSONNodeW;
@@ -9499,6 +9485,12 @@ begin
   Result := assigned(LNodeList) and (LNodeList.Count > 0);
 end;
 
+{*******************************************************}
+function TALJSONNodeW.GetStorageKind: TALJSONStorageKind;
+begin
+  AlJSONDocErrorW(ALJSONOperationError, GetNodeType);
+end;
+
 {*********************************************************}
 procedure TALJSONNodeW.SetNodeName(const NodeName: String);
 begin
@@ -9935,8 +9927,7 @@ begin
       Result.ChildNodes.Add(ChildNodes[I].Clone);
 end;
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 procedure TALJSONNodeW.ParseJSON(
             const Buffer: String;
@@ -11089,9 +11080,6 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {*************************************************************}
 {Last version of the spec: http://bsonspec.org/#/specification}
@@ -12066,8 +12054,7 @@ begin
 
 end;
 
-{*********************}
-{$ZEROBASEDSTRINGS OFF}
+{**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 procedure TALJSONNodeW.SaveToJSON(
             const Stream: TStream;
@@ -12324,9 +12311,6 @@ begin
   end;
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$IF defined(ALZeroBasedStringsON)}
-  {$ZEROBASEDSTRINGS ON}
-{$ENDIF}
 
 {***********************************}
 {Saves the JSON document to a stream.
@@ -13554,6 +13538,12 @@ end;
 function TALJSONTextNodeW.GetNodeSubType: TALJSONNodeSubType;
 begin
   Result := FNodeSubType;
+end;
+
+{***********************************************************}
+function TALJSONTextNodeW.GetStorageKind: TALJSONStorageKind;
+begin
+  Result := FStorageKind;
 end;
 
 {****************************************}

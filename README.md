@@ -962,6 +962,88 @@ Learn more at [Demos\ALHttpServer](https://github.com/MagicFoundation/Alcinoe/tr
 <br/>
 
 
+Handlebars Template Engine (TALHandlebars)
+==========================================
+
+TALHandlebars is a fast, lightweight Handlebars-compatible template engine
+written entirely in Delphi. It lets you generate HTML, JSON, emails, configuration
+files, or any other text-based content by combining reusable templates with
+dynamic JSON data. Designed to integrate naturally with Alcinoe's JSON classes,
+TALHandlebars provides context-aware value resolution, block helpers, partials,
+subexpressions, automatic HTML escaping, and extensible custom helpers without
+requiring an external scripting engine or runtime.
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/handlebars.webp?raw=true" width="540" style="width:540px;"/>
+
+Advantages of using TALHandlebars:
+
+- Native Delphi implementation → no JavaScript engine, external runtime, or
+  third-party template processor is required.
+- JSON integration → templates can directly access values, objects, and arrays
+  stored in `TALJsonNodeA` structures.
+- Context-aware resolution → supports nested properties, `this`, parent contexts,
+  depth traversal, and special values such as `@index`.
+- Block helpers → supports constructs such as `{{#if}}`, `{{#unless}}`,
+  `{{#each}}`, and `{{#with}}`, including `{{else}}` branches.
+- Custom helpers → easily register helpers that return strings, numbers,
+  booleans, arrays, objects, or any other JSON node type.
+- Subexpressions → helpers can be nested and composed using expressions such as
+  `{{#if (eq status "active")}}`.
+- Partials → reusable template fragments can be included with `{{> partial}}`
+  and supplied with custom contexts and named parameters.
+- Automatic HTML escaping → regular expressions such as `{{value}}` are safely
+  escaped, while triple-stache expressions such as `{{{value}}}` allow
+  intentional unescaped output.
+- Whitespace control → supports Handlebars whitespace trimming syntax using
+  `{{~` and `~}}`.
+- Template precompilation → templates are parsed and prepared in advance,
+  reducing the amount of work required during rendering.
+- Extensible architecture → new helpers, block behaviors, partial resolvers,
+  and application-specific template features can be added without modifying
+  the template parser.
+- Cross-platform → works anywhere Delphi and Alcinoe are supported, including
+  Windows, macOS, Linux, Android, and iOS.
+
+Example:
+
+```handlebars
+{{#if user}}
+  <h1>Hello {{user.firstname}}!</h1>
+
+  {{#each user.roles}}
+    <span class="role">{{this}}</span>
+  {{else}}
+    <span>No roles assigned</span>
+  {{/each}}
+{{else}}
+  <p>User not found</p>
+{{/if}}
+```
+
+Create the JSON context and render the template:
+
+```delphi
+var LJsonContext := TALJSONDocumentA.CreateFromJSONString(
+                      '{"user":{"firstname":"John","roles":["Administrator","Developer"]}}');
+try
+  var LResult := LHandlebars.Render(
+                   LTemplate,
+                   LJsonContext);
+finally
+  LJsonContext.Free;
+end;
+```
+
+Rendered result:
+
+```html
+<h1>Hello John!</h1>
+
+<span class="role">Administrator</span>
+<span class="role">Developer</span>
+```
+
+
 TLS Socket Client (SChannel)
 ============================
 

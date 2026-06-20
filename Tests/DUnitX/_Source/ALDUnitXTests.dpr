@@ -9,19 +9,21 @@ program ALDUnitXTests;
   {$STRONGLINKTYPES ON}
 {$ENDIF}
 
+{$R 'Resources.res' 'Resources\Resources.rc'}
+
 uses
   {$IF defined(SKIA)}
   FMX.Skia,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF MSWINDOWS}
   {$IFDEF TESTINSIGHT}
   TestInsight.DUnitX,
   {$ELSE}
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
-  {$ENDIF}
+  {$ENDIF }
   DUnitX.TestFramework,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF MSWINDOWS}
   //Alcinoe.TbbMM,
   Alcinoe.Execute,
@@ -42,7 +44,7 @@ uses
   Alcinoe.WinApi.SSPI,
   Alcinoe.WinApi.Windows,
   Alcinoe.WinApi.WinError,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF ANDROID}
   Alcinoe.AndroidApi.AndroidX,
   Alcinoe.AndroidApi.AndroidX.Media3,
@@ -65,7 +67,7 @@ uses
   Alcinoe.Androidapi.Window,
   Alcinoe.Androidapi.GraphicsContentViewText,
   Alcinoe.FMX.NativeView.Android,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF iOS}
   Alcinoe.FMX.NativeView.iOS,
   Alcinoe.iOSApi.AdSupport,
@@ -82,12 +84,12 @@ uses
   Alcinoe.iOSapi.PhotosUI,
   Alcinoe.iOSapi.CoreFoundation,
   Alcinoe.iOSapi.CoreVideo,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF ALMacOS}
   Alcinoe.FMX.NativeView.Mac,
   Alcinoe.Macapi.AppKit,
   Alcinoe.Macapi.QuartzCore,
-  {$ENDIF}
+  {$ENDIF }
   //Alcinoe.CodeProfiler,
   //Alcinoe.FMX.DesignEditors,
   Alcinoe.BroadcastReceiver,
@@ -141,6 +143,7 @@ uses
   Alcinoe.FMX.WebBrowser,
   Alcinoe.FileUtils,
   Alcinoe.GuardianThread,
+  Alcinoe.Handlebars,
   Alcinoe.HTML,
   Alcinoe.HTTP,
   Alcinoe.HTTP.Client,
@@ -166,13 +169,14 @@ uses
   {$IFDEF MSWINDOWS}
   ALDUnitXTestStringUtils in 'ALDUnitXTestStringUtils.pas',
   ALDUnitXTestHtml in 'ALDUnitXTestHtml.pas',
-  {$ENDIF}
+  {$ENDIF }
   System.SysUtils,
   ALDUnitXTestHttp in 'ALDUnitXTestHttp.pas',
   ALDUnitXTestXmlDoc in 'ALDUnitXTestXmlDoc.pas',
   ALDUnitXTestNet in 'ALDUnitXTestNet.pas',
   ALDUnitXTestUrl in 'ALDUnitXTestUrl.pas',
-  ALDUnitXTestMimeMultipart in 'ALDUnitXTestMimeMultipart.pas';
+  ALDUnitXTestMimeMultipart in 'ALDUnitXTestMimeMultipart.pas',
+  ALDUnitXTestHandlebars in 'ALDUnitXTestHandlebars.pas';
 
 {$IFDEF MSWINDOWS}
   {$IFNDEF TESTINSIGHT}

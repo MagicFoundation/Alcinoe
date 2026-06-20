@@ -11,10 +11,6 @@
   {$DEFINE ALCPUXASM} // The CPU is in an Intel 386 or supports the x86-64 instruction set on any platform AND the compiler support the inline Assembly Code (ASM)
 {$ENDIF}
 
-{$IF Low(string) = 0}
-  {$DEFINE ALZeroBasedStringsON}
-{$ENDIF}
-
 {$IFOPT R+}
   {$DEFINE ALRangeCheckingON}
 {$ENDIF}
@@ -69,5 +65,7 @@
 {$IF Defined(ALDPK)}
   {$DEFINE ALBackwardCompatible}
 {$ENDIF}
+
+{$ZEROBASEDSTRINGS OFF}
 
 {.$Define ALUIAutomationEnabled}

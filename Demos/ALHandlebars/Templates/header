@@ -1,0 +1,4 @@
+<header class="hero">
+  <h1>{{title}}</h1>
+  <p class="tagline">{{tagline}}</p>
+</header>

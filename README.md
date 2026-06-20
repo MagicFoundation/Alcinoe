@@ -1043,6 +1043,10 @@ Rendered result:
 <span class="role">Developer</span>
 ```
 
+Learn more at [Demos\ALHandlebars](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALHandlebars)
+<br/>
+<br/>
+
 
 TLS Socket Client (SChannel)
 ============================

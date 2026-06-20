@@ -418,6 +418,7 @@ Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxHttpWorker" "_Source" "ALFmxHttpWor
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxMediaPicker" "_Source" "ALFmxMediaPickerDemo.dproj" || PAUSE
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxNotificationService" "_Source" "ALFmxNotificationServiceDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALCipher" "_Source" "ALCipherDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALHandlebars" "_Source" "ALHandlebarsDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALHttpServer" "_Source" "ALHttpServerDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALMongoDBClient" "_Source" "ALMongoDBClientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALImageMagick" "_Source" "ALImageMagickDemo.dproj" || PAUSE

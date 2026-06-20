@@ -1,0 +1,4 @@
+<footer>
+  <hr/>
+  <small>Rendered server-side by <b>TALHandlebars</b> &middot; Alcinoe &middot; {{year}}</small>
+</footer>

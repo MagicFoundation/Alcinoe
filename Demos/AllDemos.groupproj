@@ -63,6 +63,9 @@
         <Projects Include="ALStressHTTPServer\_Source\ALStressHTTPServer.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="ALHandlebars\_Source\ALHandlebarsDemo.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="ALHttpServer\_Source\ALHttpServerDemo.dproj">
             <Dependencies/>
         </Projects>
@@ -263,6 +266,15 @@
     <Target Name="ALStressHTTPServer:Make">
         <MSBuild Projects="ALStressHTTPServer\_Source\ALStressHTTPServer.dproj" Targets="Make"/>
     </Target>
+    <Target Name="ALHandlebarsDemo">
+        <MSBuild Projects="ALHandlebars\_Source\ALHandlebarsDemo.dproj"/>
+    </Target>
+    <Target Name="ALHandlebarsDemo:Clean">
+        <MSBuild Projects="ALHandlebars\_Source\ALHandlebarsDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALHandlebarsDemo:Make">
+        <MSBuild Projects="ALHandlebars\_Source\ALHandlebarsDemo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="ALHttpServerDemo">
         <MSBuild Projects="ALHttpServer\_Source\ALHttpServerDemo.dproj"/>
     </Target>
@@ -300,13 +312,13 @@
         <MSBuild Projects="ALMongoDBClient\_Source\ALMongoDBClientDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="ALFmxControlsDemo;ALFmxDynamicListBoxDemo;ALFmxMediaPickerDemo;ALFmxHttpWorkerDemo;ALFmxAnimationDemo;ALFmxConfettiDemo;ALFmxGraphicsDemo;ALFmxGeoLocationSensorDemo;ALFmxFilterEffectsDemo;ALFmxFacebookLoginDemo;ALFmxNotificationServiceDemo;ALJsonDocDemo;ALSMTPClientDemo;ALSortedListBenchmark;ALStringBenchmark;ALWinHTTPClientDemo;ALXmlDocDemo;ALCipherDemo;ALRTTIDemo;ALStressHTTPServer;ALHttpServerDemo;ALImageMagickDemo;ALTSLClientDemo;ALMongoDBClientDemo"/>
+        <CallTarget Targets="ALFmxControlsDemo;ALFmxDynamicListBoxDemo;ALFmxMediaPickerDemo;ALFmxHttpWorkerDemo;ALFmxAnimationDemo;ALFmxConfettiDemo;ALFmxGraphicsDemo;ALFmxGeoLocationSensorDemo;ALFmxFilterEffectsDemo;ALFmxFacebookLoginDemo;ALFmxNotificationServiceDemo;ALJsonDocDemo;ALSMTPClientDemo;ALSortedListBenchmark;ALStringBenchmark;ALWinHTTPClientDemo;ALXmlDocDemo;ALCipherDemo;ALRTTIDemo;ALStressHTTPServer;ALHandlebarsDemo;ALHttpServerDemo;ALImageMagickDemo;ALTSLClientDemo;ALMongoDBClientDemo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="ALFmxControlsDemo:Clean;ALFmxDynamicListBoxDemo:Clean;ALFmxMediaPickerDemo:Clean;ALFmxHttpWorkerDemo:Clean;ALFmxAnimationDemo:Clean;ALFmxConfettiDemo:Clean;ALFmxGraphicsDemo:Clean;ALFmxGeoLocationSensorDemo:Clean;ALFmxFilterEffectsDemo:Clean;ALFmxFacebookLoginDemo:Clean;ALFmxNotificationServiceDemo:Clean;ALJsonDocDemo:Clean;ALSMTPClientDemo:Clean;ALSortedListBenchmark:Clean;ALStringBenchmark:Clean;ALWinHTTPClientDemo:Clean;ALXmlDocDemo:Clean;ALCipherDemo:Clean;ALRTTIDemo:Clean;ALStressHTTPServer:Clean;ALHttpServerDemo:Clean;ALImageMagickDemo:Clean;ALTSLClientDemo:Clean;ALMongoDBClientDemo:Clean"/>
+        <CallTarget Targets="ALFmxControlsDemo:Clean;ALFmxDynamicListBoxDemo:Clean;ALFmxMediaPickerDemo:Clean;ALFmxHttpWorkerDemo:Clean;ALFmxAnimationDemo:Clean;ALFmxConfettiDemo:Clean;ALFmxGraphicsDemo:Clean;ALFmxGeoLocationSensorDemo:Clean;ALFmxFilterEffectsDemo:Clean;ALFmxFacebookLoginDemo:Clean;ALFmxNotificationServiceDemo:Clean;ALJsonDocDemo:Clean;ALSMTPClientDemo:Clean;ALSortedListBenchmark:Clean;ALStringBenchmark:Clean;ALWinHTTPClientDemo:Clean;ALXmlDocDemo:Clean;ALCipherDemo:Clean;ALRTTIDemo:Clean;ALStressHTTPServer:Clean;ALHandlebarsDemo:Clean;ALHttpServerDemo:Clean;ALImageMagickDemo:Clean;ALTSLClientDemo:Clean;ALMongoDBClientDemo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="ALFmxControlsDemo:Make;ALFmxDynamicListBoxDemo:Make;ALFmxMediaPickerDemo:Make;ALFmxHttpWorkerDemo:Make;ALFmxAnimationDemo:Make;ALFmxConfettiDemo:Make;ALFmxGraphicsDemo:Make;ALFmxGeoLocationSensorDemo:Make;ALFmxFilterEffectsDemo:Make;ALFmxFacebookLoginDemo:Make;ALFmxNotificationServiceDemo:Make;ALJsonDocDemo:Make;ALSMTPClientDemo:Make;ALSortedListBenchmark:Make;ALStringBenchmark:Make;ALWinHTTPClientDemo:Make;ALXmlDocDemo:Make;ALCipherDemo:Make;ALRTTIDemo:Make;ALStressHTTPServer:Make;ALHttpServerDemo:Make;ALImageMagickDemo:Make;ALTSLClientDemo:Make;ALMongoDBClientDemo:Make"/>
+        <CallTarget Targets="ALFmxControlsDemo:Make;ALFmxDynamicListBoxDemo:Make;ALFmxMediaPickerDemo:Make;ALFmxHttpWorkerDemo:Make;ALFmxAnimationDemo:Make;ALFmxConfettiDemo:Make;ALFmxGraphicsDemo:Make;ALFmxGeoLocationSensorDemo:Make;ALFmxFilterEffectsDemo:Make;ALFmxFacebookLoginDemo:Make;ALFmxNotificationServiceDemo:Make;ALJsonDocDemo:Make;ALSMTPClientDemo:Make;ALSortedListBenchmark:Make;ALStringBenchmark:Make;ALWinHTTPClientDemo:Make;ALXmlDocDemo:Make;ALCipherDemo:Make;ALRTTIDemo:Make;ALStressHTTPServer:Make;ALHandlebarsDemo:Make;ALHttpServerDemo:Make;ALImageMagickDemo:Make;ALTSLClientDemo:Make;ALMongoDBClientDemo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

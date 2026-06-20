@@ -1197,15 +1197,20 @@ type
 implementation
 
 uses
+  {$IF defined(MSWindows)}
+  Winapi.Windows,
+  {$ENDIF}
   Alcinoe.FileUtils,
-  Alcinoe.Localization,
-  Winapi.Windows;
+  Alcinoe.Localization;
 
+{$IF defined(MSWindows)}
 var
   GHandlebarsTemplatesExtracted: Boolean;
   GHandlebarsTemplatesModulePath: String;
+{$ENDIF}
 
-{********************************************}
+{**********************}
+{$IF defined(MSWindows)}
 function DecodeHandlebarsTemplateResourceName(
            const AResourceName: String;
            const APrefix: String): String;
@@ -1231,8 +1236,10 @@ begin
     Inc(I);
   end;
 end;
+{$ENDIF}
 
-{**********************************************************************************************************************}
+{**********************}
+{$IF defined(MSWindows)}
 procedure ExtractHandlebarsTemplateResource(const AResourceName: String; const ABaseDir: String; const APrefix: String);
 begin
   var LRelativePath := DecodeHandlebarsTemplateResourceName(AResourceName, APrefix);
@@ -1250,8 +1257,10 @@ begin
     ALFreeAndNil(LFileStream);
   end;
 end;
+{$ENDIF}
 
-{*******************************************************************************************************************************}
+{**********************}
+{$IF defined(MSWindows)}
 function EnumHandlebarsTemplateResourceName(HModule: HMODULE; LpszType: PChar; LpszName: PChar; LParam: LONG_PTR): BOOL; stdcall;
 begin
   Result := True;
@@ -1261,9 +1270,11 @@ begin
   if SameText(Copy(LResourceName, 1, Length('HB_VALID_')), 'HB_VALID_') then
     TStringList(Pointer(LParam)).Add(LResourceName);
 end;
+{$ENDIF}
 
-{******************************************************************************}
-procedure ExtractHandlebarsTemplateResources(const AValidTemplatesPath: String);
+{**********************}
+{$IF defined(MSWindows)}
+procedure ExtractHandlebarsTemplateResources(const ATemplatesPath: String);
 begin
   var LResourceNames := TStringList.Create;
   try
@@ -1275,38 +1286,43 @@ begin
     for var I := 0 to LResourceNames.Count - 1 do begin
       var LResourceName := LResourceNames[I];
       if SameText(Copy(LResourceName, 1, Length('HB_VALID_')), 'HB_VALID_') then
-        ExtractHandlebarsTemplateResource(LResourceName, AValidTemplatesPath, 'HB_VALID_');
+        ExtractHandlebarsTemplateResource(LResourceName, ATemplatesPath, 'HB_VALID_');
     end;
   finally
     ALFreeAndNil(LResourceNames);
   end;
 end;
+{$ENDIF}
 
-{*****************************************}
+{**********************}
+{$IF defined(MSWindows)}
 procedure PrepareHandlebarsTemplateFolders;
 begin
   var LModulePath := ALGetModulePathW;
   if GHandlebarsTemplatesExtracted and SameText(GHandlebarsTemplatesModulePath, LModulePath) then
     Exit;
 
-  var LValidTemplatesPath := TPath.Combine(LModulePath, 'Templates');
+  var LTemplatesPath := TPath.Combine(LModulePath, 'Templates');
 
-  if TDirectory.Exists(LValidTemplatesPath) then
-    TDirectory.Delete(LValidTemplatesPath, True);
+  if TDirectory.Exists(LTemplatesPath) then
+    TDirectory.Delete(LTemplatesPath, True);
 
-  TDirectory.CreateDirectory(LValidTemplatesPath);
+  TDirectory.CreateDirectory(LTemplatesPath);
 
-  ExtractHandlebarsTemplateResources(LValidTemplatesPath);
+  ExtractHandlebarsTemplateResources(LTemplatesPath);
 
   GHandlebarsTemplatesModulePath := LModulePath;
   GHandlebarsTemplatesExtracted := True;
 end;
+{$ENDIF}
 
 {**************************************}
 procedure TALDUnitXTestHandlebars.Setup;
 begin
+  {$IF defined(MSWindows)}
   PrepareHandlebarsTemplateFolders;
   FHandlebars := TALHandlebars.Create(TPath.Combine(ALGetModulePathW, 'Templates'));
+  {$ENDIF}
   FHandlebars.RegisterHelper('upper', HelperUpper);
   FHandlebars.RegisterHelper('lower', HelperLower);
   FHandlebars.RegisterHelper('wrap', HelperWrap);

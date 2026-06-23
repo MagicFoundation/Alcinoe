@@ -1693,7 +1693,8 @@ begin
               LOverlappedContext^.HttpApiResponse^.EntityChunkCount := 1;
               LOverlappedContext^.HttpApiResponse^.pEntityChunks := LOverlappedContext^.HttpApiDataChunk;
             end
-            else if LOverlappedContext^.HttpSysResponse.FBodyStream <> nil then begin
+            else if (LOverlappedContext^.HttpSysResponse.FBodyStream <> nil) and
+                    (LOverlappedContext^.HttpSysResponse.FBodyStream.Size > 0) then begin
               ZeroMemory(LOverlappedContext^.HttpApiDataChunk, SizeOf(HTTP_DATA_CHUNK));
               LOverlappedContext^.HttpApiDataChunk^.DataChunkType := HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromMemory;
               if (LOverlappedContext^.HttpSysResponse.FBodyStream is TCustomMemoryStream) then begin

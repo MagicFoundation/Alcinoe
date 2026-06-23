@@ -605,7 +605,10 @@ begin
    ResizeIconSquareBackGround(LLauncherIconFilename, aOutputDir + 'uwp_logo_150x150.png', 'png'{aDstImgformat}, 150{aDstImgSize}, 150{aDstIconSize}, 'transparent'{aDstBackGroundColor});
    ResizeIconSquareBackGround(LLauncherIconFilename, aOutputDir + 'uwp_logo_44x44.png',   'png'{aDstImgformat},  44{aDstImgSize},  44{aDstIconSize}, 'transparent'{aDstBackGroundColor});
 
-   ResizeIconSquareBackGround(LLauncherIconFilename, aOutputDir + 'play_store_512.png', 'png'{aDstImgformat}, 512{aDstImgSize},  GetReducedSizeByPadding(512, LLauncherIconPaddingPercentInt){aDstIconSize}, LLauncherIconBackgroundColorStr{aDstBackGroundColor});
+   ResizeIconSquareBackGround(LLauncherIconFilename, aOutputDir + 'play_store_512.png',   'png'{aDstImgformat}, 512{aDstImgSize}, GetReducedSizeByPadding(512, LLauncherIconPaddingPercentInt){aDstIconSize}, LLauncherIconBackgroundColorStr{aDstBackGroundColor});
+   ResizeIconSquareBackGround(LLauncherIconFilename, aOutputDir + 'apple-touch-icon.png', 'png'{aDstImgformat}, 180{aDstImgSize}, 180{aDstIconSize}, 'transparent'{aDstBackGroundColor});
+
+   ResizeIconSquareBackGround(LLauncherIconFilename, aOutputDir + 'favicon.ico', 'ico'{aDstImgformat},  [16, 32, 48]{aDstImgSize}, [16, 32, 48]{aDstIconSizes}, 'transparent'{aDstBackGroundColor});
 
    ALSaveStringTofile(
      'How to Generate an .icns File'+#13#10+

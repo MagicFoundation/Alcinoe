@@ -484,6 +484,8 @@ function  ALPosIgnoreCaseA(const SubStr, S: Ansistring; const Offset: Integer = 
 function  ALPosIgnoreCaseW(const SubStr, S: String; const Offset: Integer = 1): Integer;
 function  ALPosOfAnyA(const AnyOf: array of AnsiChar; const S: AnsiString; const Offset: Integer = 1): Integer; overload;
 function  ALPosOfAnyW(const AnyOf: array of Char; const S: String; const Offset: Integer = 1): Integer; overload;
+function  ALCountCharA(const AChar: AnsiChar; const S: AnsiString): Integer;
+function  ALCountCharW(const AChar: Char; const S: String): Integer;
 function  ALSplitA(const S: AnsiString; const Separator: array of AnsiChar; const Options: TStringSplitOptions = TStringSplitOptions.None): TArray<AnsiString>;
 function  ALSplitW(const S: String; const Separator: array of Char; const Options: TStringSplitOptions = TStringSplitOptions.None): TArray<String>;
 function  ALCompareStrA(const S1, S2: AnsiString): Integer; inline;
@@ -8709,6 +8711,24 @@ function  ALPosOfAnyW(const AnyOf: array of Char; const S: String; const Offset:
 begin
   if Offset > 0 then Result := S.IndexOfAny(AnyOf, Offset - 1) + 1
   else Result := 0;
+end;
+
+{**************************************************************************}
+function  ALCountCharA(const AChar: AnsiChar; const S: AnsiString): Integer;
+begin
+  Result := 0;
+  for var I := Low(S) to High(S) do
+    if S[I] = AChar then
+      Inc(Result);
+end;
+
+{******************************************************************}
+function  ALCountCharW(const AChar: Char; const S: String): Integer;
+begin
+  Result := 0;
+  for var I := Low(S) to High(S) do
+    if S[I] = AChar then
+      Inc(Result);
 end;
 
 {*************************************************************************************************************************************************************}

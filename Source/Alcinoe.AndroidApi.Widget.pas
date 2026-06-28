@@ -43,11 +43,19 @@ type
   [JavaSignature('io/magicfoundation/alcinoe/datepicker/ALDatePickerDialog')]
   JALDatePickerDialog = interface(JObject)
     ['{DF4E7117-15AA-4063-9150-EEEC2356FCD7}']
+    procedure setListener(listener: JALDatePickerDialogListener); cdecl;
+    procedure setMinDate(
+                year: integer;
+                month: integer;
+                dayOfMonth: integer); cdecl;
+    procedure setMaxDate(
+                year: integer;
+                month: integer;
+                dayOfMonth: integer); cdecl;
     procedure show(
                 year: integer;
                 month: integer;
                 dayOfMonth: integer); cdecl;
-    procedure setListener(listener: JALDatePickerDialogListener); cdecl;
   end;
   TJALDatePickerDialog = class(TJavaGenericImport<JALDatePickerDialogClass, JALDatePickerDialog>) end;
 

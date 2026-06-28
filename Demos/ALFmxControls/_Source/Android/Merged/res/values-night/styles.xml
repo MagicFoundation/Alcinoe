@@ -3,8 +3,9 @@
     <style name="Theme.App.Material.Dialog.Alert" parent="@android:style/Theme.Material.Dialog.Alert">
     <item name="android:datePickerStyle">@style/Widget.App.Material.DatePicker</item>
     <item name="android:colorAccent">@color/material3_primary</item>
-    <item name="android:windowBackground">@color/material3_surface_container_high</item>
+    <item name="android:windowBackground">@drawable/material3_date_picker_background</item>
     <item name="android:textColorPrimary">@color/material3_on_surface_variant</item>
+    <item name="android:backgroundDimEnabled">false</item>
   </style>
     <style name="Widget.App.Material.DatePicker" parent="@android:style/Widget.Material.DatePicker">
     <item name="android:datePickerMode">spinner</item>

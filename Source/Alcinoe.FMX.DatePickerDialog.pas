@@ -15,10 +15,9 @@ uses
   iOSapi.uikit,
   iOSapi.Foundation,
   {$ENDIF}
-  System.UITypes;
-
-const
-  mrClear = 103;
+  System.UITypes,
+  Alcinoe.fmx.Controls,
+  Alcinoe.fmx.Dialogs;
 
 type
 
@@ -35,15 +34,65 @@ type
   end;
   {$ENDIF}
 
-  {*******************************************************************************************************************************************}
-  TALDatePickerDialogCloseEvent = procedure(Sender: Tobject; const AResult: TModalResult; const ayear, amonth, adayOfMonth: integer) of object;
-
   {****************}
   {$IF defined(IOS)}
   TALDatePickerDialog = Class(TOCLocal)
   {$ELSE}
   TALDatePickerDialog = Class(Tobject)
   {$ENDIF}
+  public
+    type
+      // --------
+      // TBuilder
+      TButtonKind = (
+        Done,
+        Cancel,
+        Clear);
+      // ----------------
+      // TOnActionRefProc
+      TOnActionRefProc = reference to procedure(Const ADialog: TALDatePickerDialog; const AButtonKind: TButtonKind; const ADate: TDate);
+      // ----------------
+      // TOnActionObjProc
+      TOnActionObjProc = procedure(Const ADialog: TALDatePickerDialog; const AButtonKind: TButtonKind; const ADate: TDate) of object;
+      // --------
+      // TBuilder
+      TBuilder = Class(TObject)
+      private
+        FTitle: String;
+        FMinDate: TDate;
+        FMaxDate: TDate;
+        FDate: TDate;
+        FDoneButtonCaption: string;
+        FCancelButtonCaption: string;
+        FClearButtonCaption: string;
+        FOnActionRefProc: TOnActionRefProc;
+        FOnActionObjProc: TOnActionObjProc;
+      public
+        constructor Create;
+        function SetTitle(const AValue: String): TBuilder;
+        function SetMinDate(const AValue: TDate): TBuilder;
+        function SetMaxDate(const AValue: TDate): TBuilder;
+        function SetDate(const AValue: TDate): TBuilder;
+        function AddButton(const ACaption: String; const AKind: TButtonKind): TBuilder;
+        function SetOnActionCallback(const AValue: TOnActionRefProc): TBuilder; overload;
+        function SetOnActionCallback(const AValue: TOnActionObjProc): TBuilder; overload;
+        /// <summary>
+        ///   The Builder instance will be released during this operation.
+        ///   If a dialog is already being shown and <c>AForceImmediateShow</c> is <c>false</c>,
+        ///   the new dialog will be queued and displayed after the current one is closed.
+        ///   If <c>AForceImmediateShow</c> is <c>true</c>, the current dialog will be closed
+        ///   immediately and replaced by the new one.
+        ///   Note: Showing a dialog on top of another is considered a poor UI practice.
+        /// </summary>
+        procedure Show(const AForceImmediateShow: Boolean = True);
+      end;
+  public
+    /// <summary>
+    ///   Creates a builder object. The builder will automatically be
+    ///   released when calling the Show method.
+    ///   If you do not call Show, you are responsible for releasing the builder manually.
+    /// </summary>
+    class function Builder: TBuilder;
   private
 
     {$REGION ' ANDROID'}
@@ -53,9 +102,9 @@ type
       {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
       TDatePickerDialogListener = class(TJavaLocal, JALDatePickerDialogListener)
       private
-        [Weak] fDatePickerDialog: TALDatePickerDialog;
+        [Weak] FDatePickerDialog: TALDatePickerDialog;
       public
-        constructor Create(const aDatePickerDialog: TALDatePickerDialog);
+        constructor Create(const ADatePickerDialog: TALDatePickerDialog);
         procedure onBtnClick(which: integer; year: integer; month: integer; dayOfMonth: integer); cdecl;
       end;
 
@@ -64,12 +113,16 @@ type
 
   private
 
-    fOnClose: TALDatePickerDialogCloseEvent;
+    FMustNotifyCustomDialogFinished: Boolean;
+    FMinDate: TDate;
+    FMaxDate: TDate;
+    FOnActionRefProc: TOnActionRefProc;
+    FOnActionObjProc: TOnActionObjProc;
 
     {$REGION ' ANDROID'}
     {$IF defined(android)}
-    fDatePickerDialogListener: TDatePickerDialogListener;
-    fDatePickerDialog: JALDatePickerDialog;
+    FDatePickerDialogListener: TDatePickerDialogListener;
+    FDatePickerDialog: JALDatePickerDialog;
     {$ENDIF}
     {$ENDREGION}
 
@@ -125,16 +178,15 @@ type
 
   public
     constructor create(
-                  const aBtnOKCaption: string;
-                  const aBtnCancelCaption: string = '';
-                  const aBtnClearCaption: string = '';
-                  const aTitle: String = '');
+                  const ATitle: String;
+                  const ADoneButtonCaption: string;
+                  const ACancelButtonCaption: string = '';
+                  const AClearButtonCaption: string = '');
     destructor Destroy; override;
-    procedure show(
-                const aYear: integer;
-                const aMonth: integer;
-                const aDayOfMonth: integer);
-    property OnClose: TALDatePickerDialogCloseEvent read fOnClose write fOnClose;
+    procedure Show(const ADate: TDate);
+    property MinDate: TDate read FMinDate write FMinDate;
+    property MaxDate: TDate read FMaxDate write FMaxDate;
+    property OnAction: TOnActionObjProc read FOnActionObjProc write FOnActionObjProc;
   End;
 
 implementation
@@ -142,6 +194,7 @@ implementation
 uses
   system.Classes,
   system.SysUtils,
+  System.DateUtils,
   {$IF defined(android)}
   Androidapi.JNI.JavaTypes,
   Androidapi.JNI.GraphicsContentViewText,
@@ -151,7 +204,6 @@ uses
   {$IF defined(ios)}
   System.Types,
   system.Math,
-  system.DateUtils,
   Macapi.Helpers,
   iOSapi.CoreGraphics,
   Macapi.ObjCRuntime,
@@ -167,38 +219,29 @@ uses
 {$IF defined(android)}
 
 {*************************************************************************************************************}
-constructor TALDatePickerDialog.TDatePickerDialogListener.Create(const aDatePickerDialog: TALDatePickerDialog);
+constructor TALDatePickerDialog.TDatePickerDialogListener.Create(const ADatePickerDialog: TALDatePickerDialog);
 begin
   inherited Create;
-  fDatePickerDialog := aDatePickerDialog;
+  FDatePickerDialog := ADatePickerDialog;
 end;
 
 {*************************************************************************************************************************************}
 procedure TALDatePickerDialog.TDatePickerDialogListener.onBtnClick(which: integer; year: integer; month: integer; dayOfMonth: integer);
-var LResult: TModalResult;
 begin
 
-  {$IFDEF DEBUG}
-  //i absolutly not understand why on berlin and android 6 i receive an error BUS ERROR 10 when i call allog ! this is big misterry
-  //allog(
-  //  'TALDatePickerDialog.TDatePickerDialogListener.onClick',
-  //  'which: ' + ALIntToStrW(which) + ' | ' +
-  //  'year: ' + ALIntToStrW(year) + ' | ' +
-  //  'month: ' + ALIntToStrW(month) + ' | ' +
-  //  'dayOfMonth: ' + ALIntToStrW(dayOfMonth));
-  {$ENDIF}
+  if FDatePickerDialog.FMustNotifyCustomDialogFinished then TALDialogManager.Instance.CustomDialogFinished;
 
-  if assigned(fDatePickerDialog.fOnClose) then begin
+  var LButtonKind: TButtonKind;
+  if which = TJDialogInterface.javaclass.BUTTON_POSITIVE then LButtonKind := TButtonKind.Done
+  else if which = TJDialogInterface.javaclass.BUTTON_NEGATIVE then LButtonKind := TButtonKind.Cancel
+  else if which = TJDialogInterface.javaclass.BUTTON_NEUTRAL then LButtonKind := TButtonKind.Clear
+  else LButtonKind := TButtonKind.Cancel;
 
-    if which = TJDialogInterface.javaclass.BUTTON_POSITIVE then LResult := mrOk
-    else if which = TJDialogInterface.javaclass.BUTTON_NEGATIVE then LResult := mrCancel
-    else if which = TJDialogInterface.javaclass.BUTTON_NEUTRAL then LResult := mrClear
-    else LResult := mrClose;
-
-    // Months are indexed starting at 0, so August is month 8, or index 7
-    fDatePickerDialog.fOnClose(fDatePickerDialog, LResult, year, month+1, dayOfMonth);
-
-  end;
+  // Months are indexed starting at 0
+  if assigned(FDatePickerDialog.FOnActionRefProc) then
+    FDatePickerDialog.FOnActionRefProc(FDatePickerDialog, LButtonKind, EncodeDate(year, month+1, dayOfMonth))
+  else if assigned(FDatePickerDialog.FOnActionObjProc) then
+    FDatePickerDialog.FOnActionObjProc(FDatePickerDialog, LButtonKind, EncodeDate(year, month+1, dayOfMonth));
 
 end;
 
@@ -217,28 +260,152 @@ const
 {$ENDIF}
 {$ENDREGION}
 
+{************************************}
+constructor TALDatePickerDialog.TBuilder.Create;
+begin
+  Inherited create;
+  FTitle := '';
+  FMinDate := ALNullDate;
+  FMaxDate := ALNullDate;
+  FDate := DateOf(ALUtcNow);
+  FDoneButtonCaption := '';
+  FCancelButtonCaption := '';
+  FClearButtonCaption := '';
+  FOnActionRefProc := nil;
+  FOnActionObjProc := nil;
+end;
+
+{**************************************************************************}
+function TALDatePickerDialog.TBuilder.SetTitle(const AValue: String): TBuilder;
+begin
+  FTitle := AValue;
+  Result := Self;
+end;
+
+{******************************************************************************}
+function TALDatePickerDialog.TBuilder.SetMinDate(const AValue: TDate): TBuilder;
+begin
+  FMinDate := AValue;
+  Result := Self;
+end;
+
+{******************************************************************************}
+function TALDatePickerDialog.TBuilder.SetMaxDate(const AValue: TDate): TBuilder;
+begin
+  FMaxDate := AValue;
+  Result := Self;
+end;
+
+{***************************************************************************}
+function TALDatePickerDialog.TBuilder.SetDate(const AValue: TDate): TBuilder;
+begin
+  FDate := AValue;
+  Result := Self;
+end;
+
+{**********************************************************************************************************}
+function TALDatePickerDialog.TBuilder.AddButton(const ACaption: String; const AKind: TButtonKind): TBuilder;
+begin
+  case AKind of
+    TButtonKind.Done: FDoneButtonCaption := ACaption;
+    TButtonKind.Cancel: FCancelButtonCaption := ACaption;
+    TButtonKind.Clear: FClearButtonCaption := ACaption;
+    else raise Exception.Create('Error 1935FDF7-4823-4850-8F62-A4DBACE3DD41');
+  end;
+  Result := Self;
+end;
+
+{**************************************************************************************************}
+function TALDatePickerDialog.TBuilder.SetOnActionCallback(const AValue: TOnActionRefProc): TBuilder;
+begin
+  FOnActionRefProc := AValue;
+  Result := Self;
+end;
+
+{**************************************************************************************************}
+function TALDatePickerDialog.TBuilder.SetOnActionCallback(const AValue: TOnActionObjProc): TBuilder;
+begin
+  FOnActionObjProc := AValue;
+  Result := Self;
+end;
+
+{***************************************************************************}
+procedure TALDatePickerDialog.TBuilder.Show(const AForceImmediateShow: Boolean = True);
+begin
+  if (not assigned(FOnActionRefProc)) and
+     (not assigned(FOnActionObjProc)) then raise Exception.Create('The date picker dialog requires an action callback before it can be shown');
+
+  {$IF defined(IOS) or defined(ANDROID)}
+
+  var LDatePickerDialog := TALDatePickerDialog.create(
+                             FTitle, // const ATitle: String;
+                             FDoneButtonCaption, // const ADoneButtonCaption: string;
+                             FCancelButtonCaption, // const ACancelButtonCaption: string = '';
+                             FClearButtonCaption); // const AClearButtonCaption: string = '');
+  LDatePickerDialog.FMustNotifyCustomDialogFinished := True;
+  LDatePickerDialog.FMinDate := FMinDate;
+  LDatePickerDialog.FMaxDate := FMaxDate;
+  LDatePickerDialog.FOnActionRefProc := FOnActionRefProc;
+  LDatePickerDialog.FOnActionObjProc := FOnActionObjProc;
+  var LDate := FDate;
+
+  TALDialog.Builder
+    .SetCustomDialogProc(
+      procedure
+      begin
+        LDatePickerDialog.show(LDate);
+      end)
+    .SetOnClosedCallback(
+      procedure(Const ADialog: TALDialog)
+      begin
+        // In iOS LDatePickerDialog is destroyed in it's "Hidden" procedure
+        {$IF not defined(IOS)}
+        TThread.ForceQueue(nil,
+          procedure
+          begin
+            ALFreeAndNil(LDatePickerDialog);
+          end);
+        {$ENDIF}
+      end)
+    .Show(AForceImmediateShow);
+
+  {$ENDIF}
+
+  Free;
+end;
+
+{*****************************************}
+class function TALDatePickerDialog.Builder: TBuilder;
+begin
+  Result := TBuilder.Create;
+end;
+
 {*************************************}
 constructor TALDatePickerDialog.create(
-              const aBtnOKCaption: string;
-              const aBtnCancelCaption: string = '';
-              const aBtnClearCaption: string = '';
-              const aTitle: String = '');
+              const ATitle: String;
+              const ADoneButtonCaption: string;
+              const ACancelButtonCaption: string = '';
+              const AClearButtonCaption: string = '');
 begin
 
   inherited create;
-  fOnClose := nil;
+  FMustNotifyCustomDialogFinished := False;
+  FMinDate := ALNullDate;
+  FMaxDate := ALNullDate;
+  FOnActionRefProc := nil;
+  FOnActionObjProc := nil;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  fDatePickerDialogListener := TDatePickerDialogListener.Create(Self);
-  fDatePickerDialog := TJALDatePickerDialog.JavaClass.init(
+  FDatePickerDialogListener := TDatePickerDialogListener.Create(Self);
+  FDatePickerDialog := TJALDatePickerDialog.JavaClass.init(
                          TAndroidHelper.Context,
-                         StrToJCharSequence(aBtnOKCaption),
-                         StrToJCharSequence(aBtnCancelCaption),
-                         StrToJCharSequence(aBtnClearCaption),
-                         StrToJCharSequence(aTitle));
-  fDatePickerDialog.setListener(fDatePickerDialogListener);
+                         StrToJCharSequence(ADoneButtonCaption),
+                         StrToJCharSequence(ACancelButtonCaption),
+                         StrToJCharSequence(AClearButtonCaption),
+                         StrToJCharSequence(ATitle));
+  FDatePickerDialog.setListener(FDatePickerDialogListener);
 
   {$ENDIF}
   {$ENDREGION}
@@ -260,8 +427,6 @@ begin
 
   { Creating Root view container for picker }
   FUIOverlayView := TUIView.Create;
-  var LUIColor := AlphaColorToUIColor($32000000);
-  FUIOverlayView.setBackgroundColor(LUIColor);
   FUIOverlayView.setAutoresizingMask(
     UIViewAutoresizingFlexibleWidth or
     UIViewAutoresizingFlexibleHeight or
@@ -312,9 +477,9 @@ begin
     LButtons.addObject(NSObjectToID(FUIToolbarButtonSepararator1));
 
     { Adding clear Button }
-    if aBtnClearCaption <> '' then begin
+    if AClearButtonCaption <> '' then begin
       FUIClearButton := TUIBarButtonItem.Create;
-      FUIClearButton.setTitle(StrToNSStr(aBtnClearCaption));
+      FUIClearButton.setTitle(StrToNSStr(AClearButtonCaption));
       FUIClearButton.setStyle(UIBarButtonItemStyleBordered);
       FUIClearButton.setTarget(Self.GetObjectID);
       FUIClearButton.setAction(sel_getUid('Clear'));
@@ -328,9 +493,9 @@ begin
     LButtons.addObject(NSObjectToID(FUIToolbarButtonSepararator2));
 
     { Adding Close Button }
-    if aBtnCancelCaption <> '' then begin
+    if ACancelButtonCaption <> '' then begin
       FUICancelButton := TUIBarButtonItem.Create;
-      FUICancelButton.setTitle(StrToNSStr(aBtnCancelCaption));
+      FUICancelButton.setTitle(StrToNSStr(ACancelButtonCaption));
       FUICancelButton.setStyle(UIBarButtonItemStyleBordered);
       FUICancelButton.setTarget(Self.GetObjectID);
       FUICancelButton.setAction(sel_getUid('Cancel'));
@@ -346,7 +511,7 @@ begin
 
     { Adding Done Button }
     FUIDoneButton := TUIBarButtonItem.Create;
-    FUIDoneButton.setTitle(StrToNSStr(aBtnOKCaption));
+    FUIDoneButton.setTitle(StrToNSStr(ADoneButtonCaption));
     FUIDoneButton.setStyle(UIBarButtonItemStyleDone);
     FUIDoneButton.setTarget(Self.GetObjectID);
     FUIDoneButton.setAction(sel_getUid('Done'));
@@ -355,7 +520,7 @@ begin
     { Adding Flexible Separator }
     FUIToolbarButtonSepararator4 := TUIBarButtonItem.Create;
     FUIToolbarButtonSepararator4.initWithBarButtonSystemItem(UIBarButtonSystemItemFixedSpace, nil, nil);
-    if aBtnClearCaption <> '' then FUIToolbarButtonSepararator4.setWidth(5)
+    if AClearButtonCaption <> '' then FUIToolbarButtonSepararator4.setWidth(5)
     else FUIToolbarButtonSepararator4.setWidth(15);
     LButtons.addObject(NSObjectToID(FUIToolbarButtonSepararator4));
 
@@ -377,14 +542,14 @@ begin
   LConstraint.setActive(True);
 
   { Creating the title }
-  if aTitle <> '' then begin
+  if ATitle <> '' then begin
 
     FUITitle := TUILabel.Wrap(TUILabel.Alloc.initWithFrame(RectToNSRect(TRect.Create(0, 0, floor(getWidth) - _TitlePaddingleft - _TitlePaddingRight, 10000))));
     FUITitle.setTextAlignment(NSTextAlignmentCenter);
     FUITitle.setLineBreakMode(NSLineBreakByWordWrapping);
     FUITitle.setFont(FUITitle.font.fontWithSize(TUIFont.OCClass.labelFontSize + 5));
     FUITitle.setNumberOfLines(0);
-    FUITitle.setText(StrToNsStr(aTitle));
+    FUITitle.setText(StrToNsStr(ATitle));
 
     FUITitleSeparatorLeft := TUIView.Create;
     FUIContainerView.addSubview(FUITitleSeparatorLeft);
@@ -443,9 +608,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  fDatePickerDialog.setListener(nil);
-  fDatePickerDialog := nil;
-  AlFreeAndNil(fDatePickerDialogListener);
+  FDatePickerDialog.setListener(nil);
+  FDatePickerDialog := nil;
+  AlFreeAndNil(FDatePickerDialogListener);
 
   {$ENDIF}
   {$ENDREGION}
@@ -487,28 +652,17 @@ begin
 
 end;
 
-{*********************************}
-procedure TALDatePickerDialog.show(
-            const aYear: integer;
-            const aMonth: integer;
-            const aDayOfMonth: integer);
-
-  {$REGION ' IOS'}
-  {$IF defined(ios)}
-  var LStartFrame: CGRect;
-      LEndFrame: NSRect;
-      LRootViewRect: NSRect;
-      LKeyWin: UIWindow;
-  {$ENDIF}
-  {$ENDREGION}
-
+{*****************************************************}
+procedure TALDatePickerDialog.Show(const ADate: TDate);
 begin
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  // Months are indexed starting at 0, so August is month 8, or index 7
-  fDatePickerDialog.show(aYear, aMonth - 1, aDayOfMonth);
+  // Months are indexed starting at 0
+  if Not SameDate(FMinDate, ALNullDate) then FDatePickerDialog.setMinDate(YearOf(FMinDate), MonthOf(FMinDate) - 1, DayOf(FMinDate));
+  if Not SameDate(FMaxDate, ALNullDate) then FDatePickerDialog.setMaxDate(YearOf(FMaxDate), MonthOf(FMaxDate) - 1, DayOf(FMaxDate));
+  FDatePickerDialog.show(YearOf(ADate), MonthOf(ADate) - 1, DayOf(ADate));
 
   {$ENDIF}
   {$ENDREGION}
@@ -516,10 +670,15 @@ begin
   {$REGION ' IOS'}
   {$IF defined(ios)}
 
+  if Not SameDate(FMinDate, ALNullDate) then FUIDatePicker.setMinimumDate(DateTimeToNSDate(DateOf(FMinDate)))
+  else FUIDatePicker.setMinimumDate(nil);
+  if Not SameDate(FMaxDate, ALNullDate) then FUIDatePicker.setMaximumDate(DateTimeToNSDate(DateOf(FMaxDate)))
+  else FUIDatePicker.setMaximumDate(nil);
+
   // Bug in using NSDate in UIDatePicker. When we set time 10:00:00,
   // UIDatePicker shows 9:59:59, but UIDatePicker.date.description shows 10:00:00
   // So we need to add 0.1 sec for it
-  FUIDatePicker.setDate(DateTimeToNSDate(EncodeDate(aYear, amonth, aDayOfMonth) + 0.1 / SecsPerDay));
+  FUIDatePicker.setDate(DateTimeToNSDate(ADate + (0.1 / SecsPerDay)));
   SharedApplication.keyWindow.rootViewController.view.addSubview(FUIOverlayView);
 
   // size everything
@@ -529,11 +688,11 @@ begin
   FUIContainerView.sizeToFit;
 
   { Setting animation }
-  LStartFrame := GetPopupFrame;
-  LEndFrame := LStartFrame;
-  LKeyWin := SharedApplication.keyWindow;
+  var LStartFrame: CGRect := GetPopupFrame;
+  var LEndFrame: NSRect := LStartFrame;
+  var LKeyWin: UIWindow := SharedApplication.keyWindow;
   if (LKeyWin <> nil) and (LKeyWin.rootViewController <> nil) and (LKeyWin.rootViewController.view <> nil) then begin
-    LRootViewRect := SharedApplication.keyWindow.rootViewController.view.frame;
+    var LRootViewRect: NSRect := SharedApplication.keyWindow.rootViewController.view.frame;
     LRootViewRect := SharedApplication.keyWindow.rootViewController.view.bounds;
     LStartFrame.origin.y := LRootViewRect.size.height;
   end;
@@ -634,13 +793,11 @@ end;
 
 {*************************************************}
 function TALDatePickerDialog.GetPopupFrame: NSRect;
-var LRootViewRect: NSRect;
-    LKeyWin: UIWindow;
 begin
   Result := CGRect.Create(0, 0, GetWidth, GetHeight);
-  LKeyWin := SharedApplication.keyWindow;
+  var LKeyWin: UIWindow := SharedApplication.keyWindow;
   if (LKeyWin <> nil) and (LKeyWin.rootViewController <> nil) and (LKeyWin.rootViewController.view <> nil) then begin
-    LRootViewRect := SharedApplication.keyWindow.rootViewController.view.frame;
+    var LRootViewRect: NSRect := SharedApplication.keyWindow.rootViewController.view.frame;
     LRootViewRect := SharedApplication.keyWindow.rootViewController.view.bounds;
     Result.origin.y := (LRootViewRect.size.height - GetHeight) / 2;
     Result.origin.x := (LRootViewRect.size.width - GetWidth) / 2;
@@ -652,63 +809,74 @@ function TALDatePickerDialog.GetDateTime: TDateTime;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _TrimSeconds(const ADateTime: TDateTime): TDateTime;
-  var Hour: Word;
-      Min: Word;
-      Sec: Word;
-      MSec: Word;
   begin
-    DecodeTime(ADateTime, Hour, Min, Sec, MSec);
-    Result := DateOf(ADateTime) +  EncodeTime(Hour, Min, 0, 0);
+    var LHour: Word;
+    var LMin: Word;
+    var LSec: Word;
+    var LMSec: Word;
+    DecodeTime(ADateTime, LHour, LMin, LSec, LMSec);
+    Result := DateOf(ADateTime) +  EncodeTime(LHour, LMin, 0, 0);
   end;
 
-var LDateTimeWithoutSec: TDateTime;
 begin
   // Native ios UIDatePicker doesn't allow users to set second.
   // We must to trim second from datetime
-  LDateTimeWithoutSec := _TrimSeconds(NSDateToDateTime(FUIDatePicker.date));
+  var LDateTimeWithoutSec: TDateTime := _TrimSeconds(NSDateToDateTime(FUIDatePicker.date));
   Result := _TrimSeconds(LDateTimeWithoutSec);
 end;
 
 {***********************************}
 procedure TALDatePickerDialog.Cancel;
-var LDt: TdateTime;
 begin
+  {$IFDEF DEBUG}
+  allog('TALDatePickerDialog.Cancel');
+  {$ENDIF}
   Hide;
-  LDt := GetDateTime;
-  if assigned(FonClose) then fOnClose(self, mrCancel, yearOf(LDt), monthOf(LDt), DayOfTheMonth(LDt));
+  if FMustNotifyCustomDialogFinished then TALDialogManager.Instance.CustomDialogFinished;
+  if assigned(FOnActionRefProc) then
+    FOnActionRefProc(Self, TButtonKind.Cancel, GetDateTime)
+  else if assigned(FOnActionObjProc) then
+    FOnActionObjProc(Self, TButtonKind.Cancel, GetDateTime);
 end;
 
 {**********************************}
 procedure TALDatePickerDialog.Clear;
-var LDt: TdateTime;
 begin
+  {$IFDEF DEBUG}
+  allog('TALDatePickerDialog.Clear');
+  {$ENDIF}
   Hide;
-  LDt := GetDateTime;
-  if assigned(FonClose) then fOnClose(self, mrClear, yearOf(LDt), monthOf(LDt), DayOfTheMonth(LDt));
+  if FMustNotifyCustomDialogFinished then TALDialogManager.Instance.CustomDialogFinished;
+  if assigned(FOnActionRefProc) then
+    FOnActionRefProc(Self, TButtonKind.Clear, GetDateTime)
+  else if assigned(FOnActionObjProc) then
+    FOnActionObjProc(Self, TButtonKind.Clear, GetDateTime);
 end;
 
 {*********************************}
 procedure TALDatePickerDialog.Done;
-var LDt: TdateTime;
 begin
+  {$IFDEF DEBUG}
+  allog('TALDatePickerDialog.Done');
+  {$ENDIF}
   Hide;
-  LDt := GetDateTime;
-  if assigned(FonClose) then fOnClose(self, mrOK, yearOf(LDt), monthOf(LDt), DayOfTheMonth(LDt));
+  if FMustNotifyCustomDialogFinished then TALDialogManager.Instance.CustomDialogFinished;
+  if assigned(FOnActionRefProc) then
+    FOnActionRefProc(Self, TButtonKind.Done, GetDateTime)
+  else if assigned(FOnActionObjProc) then
+    FOnActionObjProc(Self, TButtonKind.Done, GetDateTime);
 end;
 
 {*********************************}
 procedure TALDatePickerDialog.Hide;
-var LEndFrame: NSRect;
-    LRootViewRect: NSRect;
-    LKeyWin: UIWindow;
 begin
 
   if FUIOverlayView.superview = nil then Exit;
 
-  LEndFrame := GetPopupFrame;
-  LKeyWin := SharedApplication.keyWindow;
+  var LEndFrame: NSRect := GetPopupFrame;
+  var LKeyWin: UIWindow := SharedApplication.keyWindow;
   if (LKeyWin <> nil) and (LKeyWin.rootViewController <> nil) and (LKeyWin.rootViewController.view <> nil) then begin
-    LRootViewRect := SharedApplication.keyWindow.rootViewController.view.frame;
+    var LRootViewRect: NSRect := SharedApplication.keyWindow.rootViewController.view.frame;
     LRootViewRect := SharedApplication.keyWindow.rootViewController.view.bounds;
     LEndFrame.origin.y := LRootViewRect.size.height;
   end;
@@ -729,12 +897,23 @@ end;
 {***********************************}
 procedure TALDatePickerDialog.Hidden;
 begin
+  {$IFDEF DEBUG}
+  allog('TALDatePickerDialog.Hidden');
+  {$ENDIF}
   FUIOverlayView.removeFromSuperview;
+  TThread.ForceQueue(nil,
+    procedure
+    begin
+      Free;
+    end);
 end;
 
 {*****************************************************}
 procedure TALDatePickerDialog.DeviceOrientationChanged;
 begin
+  {$IFDEF DEBUG}
+  allog('TALDatePickerDialog.DeviceOrientationChanged');
+  {$ENDIF}
   FUIToolBar.sizeToFit;
   FUIDatePicker.sizeToFit;
   if FUITitle <> nil then FUITitle.sizeToFit;
@@ -745,6 +924,9 @@ end;
 {**************************************}
 procedure TALDatePickerDialog.HandleTap;
 begin
+  {$IFDEF DEBUG}
+  allog('TALDatePickerDialog.HandleTap');
+  {$ENDIF}
   Cancel;
 end;
 

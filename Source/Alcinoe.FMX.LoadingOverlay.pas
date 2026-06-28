@@ -162,6 +162,7 @@ uses
   Alcinoe.fmx.Styles,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Common,
+  Alcinoe.FMX.Sheets,
   Alcinoe.Common;
 
 {********************************************}
@@ -514,8 +515,23 @@ procedure TALLoadingOverlayManager.SyncSystemBarsColor;
 begin
   if (FCurrentLoadingOverlay = nil) or
      (TALCapturedSystemBarsColor.StatusBarColor = TAlphaColors.Null) then exit;
-  var LStatusBarColor := ALBlendColor(TALCapturedSystemBarsColor.StatusBarColor{ABaseColor}, FCurrentLoadingOverlay.Fill.Color{AOverlayColor});
-  var LNavigationBarColor := ALBlendColor(TALCapturedSystemBarsColor.NavigationBarColor{ABaseColor}, FCurrentLoadingOverlay.Fill.Color{AOverlayColor});
+
+  var LStatusBarColor: TAlphaColor;
+  var LNavigationBarColor: TAlphaColor;
+  if TALSheet.Current <> nil then begin
+    LStatusBarColor := ALBlendColor(TALCapturedSystemBarsColor.StatusBarColor{ABaseColor}, TALSheet.Current.Fill.Color{AOverlayColor});
+    LNavigationBarColor := ALBlendColor(TALCapturedSystemBarsColor.NavigationBarColor{ABaseColor}, TALSheet.Current.Fill.Color{AOverlayColor});
+    // Duplicated in TALSheetManager.SyncSystemBarsColor
+    If (TALSheet.Current is TALBottomSheet) then LNavigationBarColor := TALSheet.Current.Container.Fill.Color;
+  end
+  else begin
+    LStatusBarColor := TALCapturedSystemBarsColor.StatusBarColor;
+    LNavigationBarColor := TALCapturedSystemBarsColor.NavigationBarColor;
+  end;
+
+  LStatusBarColor := ALBlendColor(LStatusBarColor{ABaseColor}, FCurrentLoadingOverlay.Fill.Color{AOverlayColor});
+  LNavigationBarColor := ALBlendColor(LNavigationBarColor{ABaseColor}, FCurrentLoadingOverlay.Fill.Color{AOverlayColor});
+
   ALSetSystemBarsColor(
     LStatusBarColor,
     LNavigationBarColor,
@@ -588,8 +604,11 @@ begin
     LCurrentLoadingOverlay.FOnClosedRefProc(LCurrentLoadingOverlay);
   ProcessPendingLoadingOverlays;
   ALRestoreSystemBarsColor;
-  if not IsShowingLoadingOverlay then
-    UnfreezeNativeViews
+  if not IsShowingLoadingOverlay then begin
+    UnfreezeNativeViews;
+    if TALSheet.Current <> nil then
+      TALSheetManager.Instance.SyncSystemBarsColor;
+  end
   else if not LCurrentLoadingOverlay.IsStealthMode then
     FScrimAnimation.Stop;
   TThread.ForceQueue(nil,

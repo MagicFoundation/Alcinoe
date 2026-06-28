@@ -80,6 +80,7 @@ type
         function AddMemo(const APromptText: String; const ALabelText: String; const ASupportingText: String; const ATag: NativeInt): TBuilder;
         function AddButton(const ACaption: String; const ATag: NativeInt; Const AIsFooterButton: Boolean = True): TBuilder;
         function SetButtonFontColor(const ATag: NativeInt; const AFontColor: TalphaColor): TBuilder;
+        function SetScrimColor(const AValue: TAlphaColor): TBuilder;
         function SetCloseOnScrimClick(const AValue: boolean): TBuilder;
         function SetCustomContainer(const AValue: TALControl): TBuilder;
         function SetCustomDialogProc(const AValue: TCustomDialogRefProc): TBuilder; overload;
@@ -403,6 +404,13 @@ function TALDialog.TBuilder.SetButtonFontColor(const ATag: NativeInt; const AFon
 begin
   var Lbutton := FDialog.GetButton(ATag);
   if Lbutton <> nil then Lbutton.TextSettings.Font.Color := AFontColor;
+  Result := Self;
+end;
+
+{*******************************************************************************}
+function TALDialog.TBuilder.SetScrimColor(const AValue: TAlphaColor): TBuilder;
+begin
+  FDialog.Fill.Color := AValue;
   Result := Self;
 end;
 
@@ -1286,6 +1294,7 @@ end;
 {********************************************}
 procedure TALDialogManager.CloseCurrentDialog;
 begin
+
   if FCurrentDialog = nil then exit;
 
   if (not assigned(FCurrentDialog.CustomDialogRefProc)) and
@@ -1298,9 +1307,11 @@ begin
 
     If not TALDialogManager.Instance.HasPendingDialogs then begin
       FCurrentDialog.HitTest := False;
-      FCurrentDialog.FTouchBlocker.Parent := FCurrentDialog.Container;
+      if FCurrentDialog.FTouchBlocker <> nil then
+        FCurrentDialog.FTouchBlocker.Parent := FCurrentDialog.Container;
     end;
-    FCurrentDialog.FTouchBlocker.Visible := True;
+    if FCurrentDialog.FTouchBlocker <> nil then
+      FCurrentDialog.FTouchBlocker.Visible := True;
     FCurrentDialog.Container.Align := TALAlignlayout.None;
 
     FScrimAnimation.Enabled := False;
@@ -1323,8 +1334,29 @@ begin
     FContainerAnimation.Start;
 
   end
-  else
-    DoCloseCurrentDialog;
+  else begin
+
+    If (TAlphaColorRec(FCurrentDialog.Fill.Color).A = 0) or
+       (not (TALDialog.TAnimateOption.AnimateScrim in FCurrentDialog.CloseAnimateOptions)) or
+       (HasPendingDialogs) then begin
+      DoCloseCurrentDialog;
+      exit;
+    end;
+
+    FCurrentDialog.HitTest := False;
+    if FCurrentDialog.FTouchBlocker <> nil then
+      FCurrentDialog.FTouchBlocker.Visible := True;
+
+    FScrimAnimation.Enabled := False;
+    FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentDialog.Fill.Color).A / 255;
+    FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
+    FScrimAnimation.Duration := 0.200;
+    FScrimAnimation.StartValue := 1;
+    FScrimAnimation.StopValue := 0;
+    FScrimAnimation.Start;
+
+  end;
+
 end;
 
 {**********************************************}
@@ -1340,12 +1372,22 @@ begin
     LCurrentDialog.FOnClosedRefProc(LCurrentDialog);
   ProcessPendingDialogs;
   ALRestoreSystemBarsColor;
-  if not IsShowingDialog then
-    UnfreezeNativeViews
+  if not IsShowingDialog then begin
+    UnfreezeNativeViews;
+    if TALSheet.Current <> nil then
+      TALSheetManager.Instance.SyncSystemBarsColor;
+  end
   else begin
     FScrimAnimation.Stop;
-    if assigned(FCurrentDialog.CustomDialogRefProc) or
-       assigned(FCurrentDialog.CustomDialogObjProc) then begin
+    // A custom dialog may display its own native scrim. If the previous
+    // dialog also used a scrim, removing it immediately leaves the
+    // background briefly undimmed while the native dialog animates its
+    // own scrim, causing a visible flicker.
+    // To avoid this, keep the previous dialog's scrim color behind the
+    // native scrim until the new dialog is fully displayed.
+    if (assigned(FCurrentDialog.CustomDialogRefProc) or
+        assigned(FCurrentDialog.CustomDialogObjProc)) and
+       (TAlphaColorRec(FCurrentDialog.Fill.Color).A = 0) then begin
       FCurrentDialog.Fill.Color := LCurrentDialog.Fill.Color;
       SyncSystemBarsColor;
     end;
@@ -1540,12 +1582,12 @@ begin
 
   // CustomDialogRefProc
   if assigned(ADialog.CustomDialogRefProc) then begin
-    ADialog.Fill.Color := TALphaColors.Null;
+    // Nothing to do
   end
 
   // CustomDialogObjProc
   else if assigned(ADialog.CustomDialogObjProc) then begin
-    ADialog.Fill.Color := TALphaColors.Null;
+    // Nothing to do
   end
 
   // CustomContainer
@@ -1764,8 +1806,35 @@ begin
   FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentDialog.Fill.Color).A / 255;
   FContainerAnimation.Enabled := False;
 
-  if assigned(FCurrentDialog.CustomDialogRefProc) then FCurrentDialog.CustomDialogRefProc()
-  else if assigned(FCurrentDialog.CustomDialogObjProc) then FCurrentDialog.CustomDialogObjProc()
+  if assigned(FCurrentDialog.CustomDialogRefProc) or
+     assigned(FCurrentDialog.CustomDialogObjProc) then begin
+
+    // ShowAnimateOptions
+    if (TAlphaColorRec(FCurrentDialog.Fill.Color).A <> 0) then begin
+
+      if (TALDialog.TAnimateOption.AnimateScrim in FCurrentDialog.ShowAnimateOptions) then begin
+        FCurrentDialog.FTouchBlocker := TALLayout.Create(FCurrentDialog);
+        FCurrentDialog.FTouchBlocker.Parent := FCurrentDialog;
+        FCurrentDialog.FTouchBlocker.Align := TALAlignLayout.Contents;
+        FCurrentDialog.FTouchBlocker.HitTest := True;
+
+        FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
+        FScrimAnimation.Duration := 0.4;
+        FScrimAnimation.StartValue := 0;
+        FScrimAnimation.StopValue := 1;
+        FScrimAnimation.Start;
+      end
+      else begin
+        ScrimAnimationFinish(nil);
+        SyncSystemBarsColor;
+      end;
+
+    end;
+
+    if assigned(FCurrentDialog.CustomDialogRefProc) then FCurrentDialog.CustomDialogRefProc()
+    else if assigned(FCurrentDialog.CustomDialogObjProc) then FCurrentDialog.CustomDialogObjProc();
+
+  end
   else begin
 
     // ShowAnimateOptions
@@ -1817,6 +1886,12 @@ begin
   if FCurrentDialog = nil then exit;
   FCurrentDialog.Fill.Color := ALSetColorAlpha(FCurrentDialog.Fill.Color, FScrimAnimation.CurrentValue * FScrimAnimation.TagFloat);
   SyncSystemBarsColor;
+  if (assigned(FCurrentDialog.CustomDialogRefProc) or
+      assigned(FCurrentDialog.CustomDialogObjProc)) and
+     (FScrimAnimation.StopValue > 0.5) and
+     (FScrimAnimation.NormalizedTime > 0.90) and
+     (FCurrentDialog.FTouchBlocker <> nil) then
+    FCurrentDialog.FTouchBlocker.Visible := False;
 end;
 
 {********************************************************************}
@@ -1829,21 +1904,31 @@ begin
   else
     FCurrentDialog.Container.Position.y := (FContainerAnimation.TagFloat*0.8) + ((FContainerAnimation.TagFloat - (FContainerAnimation.TagFloat*0.8)) * FContainerAnimation.CurrentValue);
   if (FContainerAnimation.StopValue > 0.5) and
-     (FContainerAnimation.NormalizedTime > 0.90) then
+     (FContainerAnimation.NormalizedTime > 0.90) and
+     (FCurrentDialog.FTouchBlocker <> nil) then
     FCurrentDialog.FTouchBlocker.Visible := False;
 end;
 
 {***************************************************************}
 procedure TALDialogManager.ScrimAnimationFinish(Sender: TObject);
 begin
-  // Nothing to do
+  if FCurrentDialog = nil then exit;
+  if (assigned(FCurrentDialog.CustomDialogRefProc) or
+      assigned(FCurrentDialog.CustomDialogObjProc)) then begin
+    if (Sender <> nil) and
+       (FScrimAnimation.StopValue < 0.5) then DoCloseCurrentDialog
+    else begin
+      if FCurrentDialog.FTouchBlocker <> nil then
+        FCurrentDialog.FTouchBlocker.Visible := false;
+    end;
+  end;
 end;
 
 {*******************************************************************}
 procedure TALDialogManager.ContainerAnimationFinish(Sender: TObject);
 begin
   if FCurrentDialog = nil then exit;
-  if (TALDialog.TAnimateOption.AnimateContainer in FCurrentDialog.ShowAnimateOptions) and
+  if (Sender <> nil) and
      (FContainerAnimation.StopValue < 0.5) then DoCloseCurrentDialog
   else begin
     FCurrentDialog.Container.Align := TalAlignLayout.Center;

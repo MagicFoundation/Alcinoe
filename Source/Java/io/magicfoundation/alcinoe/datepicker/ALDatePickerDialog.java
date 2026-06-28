@@ -65,6 +65,20 @@ public class ALDatePickerDialog implements DialogInterface.OnClickListener {
     mDatePickerDialogListener = listener;
   }    
 
+  public void setMinDate(int year, int month, int dayOfMonth) {
+    java.util.Calendar calendar = java.util.Calendar.getInstance();
+    calendar.clear();
+    calendar.set(year, month, dayOfMonth);
+    mDatePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+  }
+
+  public void setMaxDate(int year, int month, int dayOfMonth) {
+    java.util.Calendar calendar = java.util.Calendar.getInstance();
+    calendar.clear();
+    calendar.set(year, month, dayOfMonth);
+    mDatePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
+  }
+
   public void show(int year, int month, int dayOfMonth) {
     mDatePickerDialog.getDatePicker().updateDate(year, month, dayOfMonth); 
     mDatePickerDialog.show();

@@ -1419,7 +1419,9 @@ uses
   {$IF defined(IOS)}
   Macapi.CoreFoundation,
   Macapi.Helpers,
+  Macapi.ObjCRuntime,
   iOSapi.Security,
+  FMX.Helpers.iOS,
   Alcinoe.iOSApi.AudioToolbox,
   {$ENDIF}
   {$IF defined(MSWINDOWS)}
@@ -6631,6 +6633,50 @@ begin
 
 end;
 
+{$IF defined(IOS)}
+
+{$IFNDEF ALCompilerVersionSupported131}
+  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5587 was correct and if yes delete the code below'}
+{$ENDIF}
+
+{*}
+var
+  ALOriginalPreferredStatusBarStyleImplementation: Pointer = nil;
+  ALStatusBarUseLightIcons: Boolean = False;
+
+  {***********************************************************************************************}
+function ALPreferredStatusBarStyleOverride(Self: NSObject; _cmd: Pointer): UIStatusBarStyle; cdecl;
+begin
+  if ALStatusBarUseLightIcons then Result := UIStatusBarStyleLightContent
+  else Result := UIStatusBarStyleDefault;
+end;
+
+{*******************************************************************}
+procedure ALSetStatusBarUseLightIcons(const AUseLightIcons: Boolean);
+begin
+
+  {$IF defined(DEBUG)}
+  if TThread.Current.ThreadID <> MainThreadID then
+    raise Exception.Create('ALSetStatusBarUseLightIcons must be called from the main thread');
+  {$ENDIF}
+
+  ALStatusBarUseLightIcons := AUseLightIcons;
+
+  // Swizzle the method
+  if ALOriginalPreferredStatusBarStyleImplementation = nil then begin
+    var LObjcClass: Pointer := objc_getClass('FMXViewController');
+    if LObjcClass = nil then Exit;
+    ALOriginalPreferredStatusBarStyleImplementation := class_getInstanceMethod(LObjcClass, sel_getUid('preferredStatusBarStyle'));
+    if ALOriginalPreferredStatusBarStyleImplementation <> nil then method_setImplementation(ALOriginalPreferredStatusBarStyleImplementation, @ALPreferredStatusBarStyleOverride);
+  end;
+
+  var LWindow := SharedApplication.keyWindow;
+  if LWindow <> nil then LWindow.rootViewController.setNeedsStatusBarAppearanceUpdate;
+
+end;
+
+{$ENDIF}
+
 {*****************************}
 procedure ALSetSystemBarsColor(
             const AStatusBarColor, ANavigationBarColor: TAlphaColor;
@@ -6682,6 +6728,9 @@ begin
     Var LForm := Screen.ActiveForm;
     if LForm = nil then LForm := Application.MainForm;
     if LForm <> nil then LForm.SystemStatusBar.BackgroundColor := AStatusBarColor;
+    {$IF defined(IOS)}
+    ALSetStatusBarUseLightIcons(AStatusBarUseLightIcons);
+    {$ENDIF}
   end;
   {$ENDIF}
 

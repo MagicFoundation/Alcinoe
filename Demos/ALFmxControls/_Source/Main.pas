@@ -468,7 +468,6 @@ type
     procedure FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
   private
     FSafeAreaInsets: TRectf;
-    FDatePickerDialog: TALDatePickerDialog;
     fLine: TLineStopWatch;
     fALLine: TALLineStopWatch;
     fText: TTextStopWatch;
@@ -568,7 +567,6 @@ begin
   end;
 
   FCurrentTextElements := TDictionary<TObject, TALTextElement>.Create;
-  fDatePickerDialog := nil;
 
   var LTitle: String := MainForm.Canvas.ClassName;
   {$IF defined(Android) and defined(SKIA)}
@@ -1239,17 +1237,17 @@ end;
 {**********************************************************************}
 procedure TMainForm.ButtonShowTALDatePickerDialogClick(Sender: TObject);
 begin
-  ALFreeAndNil(fDatePickerDialog);
-  fDatePickerDialog := TALDatePickerDialog.create(
-                         'OK', // const aBtnOKCaption: string;
-                         'Cancel', // const aBtnCancelCaption: string;
-                         '', // const aBtnClearCaption: string
-                         'TALDatePickerDialog (Spinner)');// const aTitle: String = ''
-  fDatePickerDialog.show(
-    YearOf(now), // const aYear: integer;
-    MonthOf(now), // const aMonth: integer;
-    DayOfTheMonth(now)); // const aDayOfMonth: integer);
-
+  TALDatePickerDialog.Builder
+    .SetTitle('TALDatePickerDialog (Spinner)')
+    .AddButton('OK', TALDatePickerDialog.TButtonKind.Done)
+    .AddButton('Cancel', TALDatePickerDialog.TButtonKind.Cancel)
+    .SetDate(Now)
+    .SetOnActionCallback(
+      procedure(Const ADialog: TALDatePickerDialog; const AButtonKind: TALDatePickerDialog.TButtonKind; const ADate: TDate)
+      begin
+        // Handle the result of the TALDatePickerDialog here
+      end)
+    .Show;
 end;
 
 {***************************************************************}

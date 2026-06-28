@@ -157,6 +157,7 @@ forced to apply patches to the original Delphi source files:
 * [Delphi language enhancement: allow multiple inline variant parts inside records (not only trailing)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4920)
 * [TCommonCustomForm.ClientRect loses precision because GetClientWidth/Height round float client size](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4999)
 * [iOS: TApplicationEvent.OpenURL is not fired on cold start when app is launched from URL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5196)
+* [iOS: Add support for explicitly setting the preferred status bar style](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5587)
 
 
 Install Alcinoe

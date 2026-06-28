@@ -260,7 +260,7 @@ const
 {$ENDIF}
 {$ENDREGION}
 
-{************************************}
+{**********************************************}
 constructor TALDatePickerDialog.TBuilder.Create;
 begin
   Inherited create;
@@ -275,7 +275,7 @@ begin
   FOnActionObjProc := nil;
 end;
 
-{**************************************************************************}
+{*****************************************************************************}
 function TALDatePickerDialog.TBuilder.SetTitle(const AValue: String): TBuilder;
 begin
   FTitle := AValue;
@@ -329,7 +329,7 @@ begin
   Result := Self;
 end;
 
-{***************************************************************************}
+{*************************************************************************************}
 procedure TALDatePickerDialog.TBuilder.Show(const AForceImmediateShow: Boolean = True);
 begin
   if (not assigned(FOnActionRefProc)) and
@@ -351,22 +351,22 @@ begin
 
   TALDialog.Builder
     .SetCustomDialogProc(
-      procedure
-      begin
-        LDatePickerDialog.show(LDate);
-      end)
+       procedure
+       begin
+         LDatePickerDialog.show(LDate);
+       end)
     .SetOnClosedCallback(
-      procedure(Const ADialog: TALDialog)
-      begin
-        // In iOS LDatePickerDialog is destroyed in it's "Hidden" procedure
-        {$IF not defined(IOS)}
-        TThread.ForceQueue(nil,
-          procedure
-          begin
-            ALFreeAndNil(LDatePickerDialog);
-          end);
-        {$ENDIF}
-      end)
+       procedure(Const ADialog: TALDialog)
+       begin
+         // In iOS LDatePickerDialog is destroyed in it's "Hidden" procedure
+         {$IF not defined(IOS)}
+         TThread.ForceQueue(nil,
+           procedure
+           begin
+             ALFreeAndNil(LDatePickerDialog);
+           end);
+         {$ENDIF}
+       end)
     .Show(AForceImmediateShow);
 
   {$ENDIF}
@@ -374,7 +374,7 @@ begin
   Free;
 end;
 
-{*****************************************}
+{***************************************************}
 class function TALDatePickerDialog.Builder: TBuilder;
 begin
   Result := TBuilder.Create;

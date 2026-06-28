@@ -407,7 +407,7 @@ begin
   Result := Self;
 end;
 
-{*******************************************************************************}
+{*****************************************************************************}
 function TALDialog.TBuilder.SetScrimColor(const AValue: TAlphaColor): TBuilder;
 begin
   FDialog.Fill.Color := AValue;

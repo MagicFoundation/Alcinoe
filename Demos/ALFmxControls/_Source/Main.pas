@@ -1243,10 +1243,10 @@ begin
     .AddButton('Cancel', TALDatePickerDialog.TButtonKind.Cancel)
     .SetDate(Now)
     .SetOnActionCallback(
-      procedure(Const ADialog: TALDatePickerDialog; const AButtonKind: TALDatePickerDialog.TButtonKind; const ADate: TDate)
-      begin
-        // Handle the result of the TALDatePickerDialog here
-      end)
+       procedure(Const ADialog: TALDatePickerDialog; const AButtonKind: TALDatePickerDialog.TButtonKind; const ADate: TDate)
+       begin
+         // Handle the result of the TALDatePickerDialog here
+       end)
     .Show;
 end;
 

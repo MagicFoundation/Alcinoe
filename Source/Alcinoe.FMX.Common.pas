@@ -6644,7 +6644,7 @@ var
   ALOriginalPreferredStatusBarStyleImplementation: Pointer = nil;
   ALStatusBarUseLightIcons: Boolean = False;
 
-  {***********************************************************************************************}
+{*************************************************************************************************}
 function ALPreferredStatusBarStyleOverride(Self: NSObject; _cmd: Pointer): UIStatusBarStyle; cdecl;
 begin
   if ALStatusBarUseLightIcons then Result := UIStatusBarStyleLightContent

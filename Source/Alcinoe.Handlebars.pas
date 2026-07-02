@@ -773,7 +773,7 @@ begin
 
 end;
 
-{***************************************************************************************************************************************************************}
+{**********************************************************************************************************************************************************************}
 function TALHandlebars.stringreplace(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -889,7 +889,7 @@ begin
 
 end;
 
-{***************************************************************************************************************************************************************}
+{***********************************************************************************************************************************************************************}
 function TALHandlebars.formatdatetime(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
 
@@ -1422,7 +1422,7 @@ begin
 
 end;
 
-{*****************************************************************************************}
+{*******************************************************************************************}
 function TALHandlebars.DoGetFormatSettings(const AContext: TALJsonNodeA): PALFormatSettingsA;
 begin
   If not assigned(FOnGetFormatSettings) then

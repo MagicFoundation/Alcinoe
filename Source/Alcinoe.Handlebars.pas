@@ -8,6 +8,7 @@ uses
   System.Generics.Collections,
   System.Contnrs,
   System.Types,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.JSONDoc;
 
@@ -22,6 +23,9 @@ type
       UnescapedParamName    = '__unescaped';
   public
     type
+      // -----------------------
+      // TGetFormatSettingsEvent
+      TGetFormatSettingsEvent = function(const AHandlebars: TALHandlebars; const AContext: TALJsonNodeA): PALFormatSettingsA of object;
       // --------------
       // THelperHandler
       THelperHandler = function(
@@ -41,12 +45,14 @@ type
     FTemplates: TDictionary<AnsiString{name}, AnsiString{content}>;
     FHelpers: TDictionary<AnsiString{name}, THelperHandler>;
     FTagsContainer: TObjectList;
+    FOnGetFormatSettings: TGetFormatSettingsEvent;
     function CompareJsonNode(const AJsonNode1, AJsonNode2: TALJsonNodeA): TValueRelationship;
     function TagReplaceHandler(
                const ATagName: AnsiString;
                const ATagParams: TALTagParamsA;
                const AContext: pointer): AnsiString;
   protected
+    function DoGetFormatSettings(const AContext: TALJsonNodeA): PALFormatSettingsA; virtual;
     /// <summary>
     ///   Resolves a tag as a registered helper or as a value from the current JSON context.
     ///   AOwned is set to True when the returned node was created by this method and must
@@ -82,6 +88,8 @@ type
     function &with(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
     function lookup(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
     function concat(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
+    function stringreplace(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
+    function formatdatetime(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
     function eq(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
     function ne(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
     function gt(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
@@ -91,11 +99,14 @@ type
     function &and(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
     function &or(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
     function &not(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
+    function uint32(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
+    function uint64(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
     {$ENDREGION}
 
   public
     constructor Create(const ATemplatesPath: String); virtual;
     destructor Destroy; override;
+    Property OnGetFormatSettings: TGetFormatSettingsEvent read FOnGetFormatSettings write FOnGetFormatSettings;
     procedure RegisterHelper(
                 const AName: AnsiString;
                 const AHandler: THelperHandler); virtual;
@@ -133,7 +144,6 @@ uses
   System.Math,
   System.IOUtils,
   Alcinoe.Common,
-  Alcinoe.Localization,
   Alcinoe.XMLDoc;
 
 {*************************************************************}
@@ -145,6 +155,7 @@ begin
   FTemplates := TDictionary<AnsiString{name}, AnsiString{content}>.Create;
   FHelpers := TDictionary<AnsiString{name}, THelperHandler>.Create;
   FTagsContainer := TObjectList.Create(true{AOwnsObjects});
+  FOnGetFormatSettings := nil;
 
   var LTemplatesPath := ALIncludeTrailingPathDelimiterW(ATemplatesPath);
   Var LTemplateFilePaths := TDirectory.GetFiles(LTemplatesPath, '*', TSearchOption.soAllDirectories);
@@ -245,6 +256,8 @@ begin
   RegisterHelper('with', &with);
   RegisterHelper('lookup', lookup);
   RegisterHelper('concat', concat);
+  RegisterHelper('stringreplace', stringreplace);
+  RegisterHelper('formatdatetime', formatdatetime);
   RegisterHelper('eq', eq);
   RegisterHelper('ne', ne);
   RegisterHelper('gt', gt);
@@ -254,6 +267,8 @@ begin
   RegisterHelper('and', &and);
   RegisterHelper('or', &or);
   RegisterHelper('not', &not);
+  RegisterHelper('uint32', uint32);
+  RegisterHelper('uint64', uint64);
 
 end;
 
@@ -758,6 +773,208 @@ begin
 
 end;
 
+{***************************************************************************************************************************************************************}
+function TALHandlebars.stringreplace(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
+begin
+
+  //
+  // {{stringreplace source old_pattern new_pattern replaceall ignorecase}}
+  //
+
+  if AParams.Count < 2 then
+    raise Exception.Create('The "stringreplace" helper requires at least 2 positional arguments');
+
+  var LSource: AnsiString;
+  var LOldPattern: AnsiString;
+  var LNewPattern: AnsiString;
+  var LReplaceall: Boolean;
+  var LIgnorecase: Boolean;
+
+  if AParams.ItemHasNameValue(0) then raise Exception.Create('The "stringreplace" helper only accepts positional arguments');
+  var LOwned: Boolean;
+  var LJsonNode := ResolveParamValue(
+                     AParams, // const AParams: TALTagParamsA;
+                     0, // const AIndex: Integer;
+                     AContext, // const AContext: TALJsonNodeA;
+                     ADepths, // const ADepths: TList<TALJsonNodeA>;
+                     LOwned); // out AOwned: Boolean): TALJsonNodeA;
+  try
+    if (LJsonNode <> nil) then
+      LSource := LJsonNode.Text
+    else
+      raise Exception.Create('The "stringreplace" helper requires the source argument to resolve to a value');
+  finally
+    if LOwned then
+      ALFreeAndNil(LJsonNode);
+  end;
+
+  if AParams.ItemHasNameValue(1) then raise Exception.Create('The "stringreplace" helper only accepts positional arguments');
+  LJsonNode := ResolveParamValue(
+                 AParams, // const AParams: TALTagParamsA;
+                 1, // const AIndex: Integer;
+                 AContext, // const AContext: TALJsonNodeA;
+                 ADepths, // const ADepths: TList<TALJsonNodeA>;
+                 LOwned); // out AOwned: Boolean): TALJsonNodeA;
+  try
+    if (LJsonNode <> nil) then
+      LOldPattern := LJsonNode.Text
+    else
+      raise Exception.Create('The "stringreplace" helper requires the old_pattern argument to resolve to a value');
+  finally
+    if LOwned then
+      ALFreeAndNil(LJsonNode);
+  end;
+
+  if AParams.Count > 2 then begin
+    if AParams.ItemHasNameValue(2) then raise Exception.Create('The "stringreplace" helper only accepts positional arguments');
+    LJsonNode := ResolveParamValue(
+                   AParams, // const AParams: TALTagParamsA;
+                   2, // const AIndex: Integer;
+                   AContext, // const AContext: TALJsonNodeA;
+                   ADepths, // const ADepths: TList<TALJsonNodeA>;
+                   LOwned); // out AOwned: Boolean): TALJsonNodeA;
+    try
+      if (LJsonNode <> nil) then
+        LNewPattern := LJsonNode.Text
+      else
+        LNewPattern := '';
+    finally
+      if LOwned then
+        ALFreeAndNil(LJsonNode);
+    end;
+  end
+  else LNewPattern := '';
+
+  if AParams.Count > 3 then begin
+    if AParams.ItemHasNameValue(3) then raise Exception.Create('The "stringreplace" helper only accepts positional arguments');
+    LJsonNode := ResolveParamValue(
+                   AParams, // const AParams: TALTagParamsA;
+                   3, // const AIndex: Integer;
+                   AContext, // const AContext: TALJsonNodeA;
+                   ADepths, // const ADepths: TList<TALJsonNodeA>;
+                   LOwned); // out AOwned: Boolean): TALJsonNodeA;
+    try
+      LReplaceall := IsTruthy(LJsonNode);
+    finally
+      if LOwned then
+        ALFreeAndNil(LJsonNode);
+    end;
+  end
+  else LReplaceall := False;
+
+  if AParams.Count > 4 then begin
+    if AParams.ItemHasNameValue(4) then raise Exception.Create('The "stringreplace" helper only accepts positional arguments');
+    LJsonNode := ResolveParamValue(
+                   AParams, // const AParams: TALTagParamsA;
+                   4, // const AIndex: Integer;
+                   AContext, // const AContext: TALJsonNodeA;
+                   ADepths, // const ADepths: TList<TALJsonNodeA>;
+                   LOwned); // out AOwned: Boolean): TALJsonNodeA;
+    try
+      LIgnorecase := IsTruthy(LJsonNode);
+    finally
+      if LOwned then
+        ALFreeAndNil(LJsonNode);
+    end;
+  end
+  else LIgnorecase := False;
+
+
+  AOwned := True;
+  Result := TALJSONTextNodeA.Create('');
+  var LFlags: TReplaceFlags := [];
+  if LReplaceall then LFlags := LFlags + [rfReplaceAll];
+  if LIgnorecase then LFlags := LFlags + [rfIgnorecase];
+  Result.Text := ALStringReplaceA(LSource, LOldPattern, LNewPattern, LFlags);
+
+end;
+
+{***************************************************************************************************************************************************************}
+function TALHandlebars.formatdatetime(const AParams: TALTagParamsA; const AContext: TALJsonNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
+begin
+
+  //
+  // {{formatdatetime value}}
+  // {{formatdatetime value "ddddd"}}
+  // {{formatdatetime value "dddddd"}}
+  // {{formatdatetime value "ddddd t"}}
+  // {{formatdatetime value "dddddd tt"}}
+  //
+  // The default format is "c".
+  // Displays the date using the format given by the ShortDateFormat global variable,
+  // followed by the time using the format given by the LongTimeFormat global variable.
+  // The time is not displayed if the date-time value indicates midnight precisely.
+  //
+  // ddddd  = Displays the date using the format given by the ShortDateFormat global variable.
+  // dddddd = Displays the date using the format given by the LongDateFormat global variable.
+  // t      = Displays the time using the format given by the ShortTimeFormat global variable.
+  // tt     = Displays the time using the format given by the LongTimeFormat global variable.
+  //
+
+  if (AParams.Count < 1) or
+     (AParams.Count > 2) then
+    raise Exception.Create('The "formatdatetime" helper requires one or two positional arguments');
+
+  if (AParams.ItemHasNameValue(0)) or
+     ((AParams.Count > 1) and AParams.ItemHasNameValue(1)) then
+    raise Exception.Create('The "formatdatetime" helper only accepts positional arguments');
+
+  // Resolve the date-time value.
+  var LDateTimeOwned: Boolean;
+  var LDateTimeJsonNode := ResolveParamValue(
+                             AParams, // const AParams: TALTagParamsA;
+                             0, // const AIndex: Integer;
+                             AContext, // const AContext: TALJsonNodeA;
+                             ADepths, // const ADepths: TList<TALJsonNodeA>;
+                             LDateTimeOwned); // out AOwned: Boolean): TALJsonNodeA;
+  try
+
+    // Missing and null values render as an empty string, consistently
+    // with normal unresolved Handlebars values.
+    if LDateTimeJsonNode = nil then begin
+      AOwned := True;
+      Result := TALJSONTextNodeA.Create('');
+      Result.Text := '';
+      Exit;
+    end;
+
+    // Use Delphi's locale-aware combined date/time format by default.
+    var LFormat: AnsiString := 'c';
+
+    // Resolve the optional format.
+    if AParams.Count > 1 then begin
+      var LFormatOwned: Boolean;
+      var LFormatJsonNode := ResolveParamValue(
+                               AParams, // const AParams: TALTagParamsA;
+                               1, // const AIndex: Integer;
+                               AContext, // const AContext: TALJsonNodeA;
+                               ADepths, // const ADepths: TList<TALJsonNodeA>;
+                               LFormatOwned); // out AOwned: Boolean): TALJsonNodeA;
+      try
+        if LFormatJsonNode = nil then raise Exception.Create('The second argument of the "formatdatetime" helper must resolve to a format string');
+        LFormat := LFormatJsonNode.Text;
+      finally
+        if LFormatOwned then
+          ALFreeAndNil(LFormatJsonNode);
+      end;
+    end;
+
+    var LText := ALFormatDateTimeA(
+                   LFormat, // const Format: AnsiString;
+                   LDateTimeJsonNode.DateTime, // DateTime: TDateTime;
+                   DoGetFormatSettings(AContext)^); // const AFormatSettings: TALFormatSettingsA;
+
+    AOwned := True;
+    Result := TALJSONTextNodeA.Create('');
+    Result.Text := LText;
+
+  finally
+    if LDateTimeOwned then
+      ALFreeAndNil(LDateTimeJsonNode);
+  end;
+
+end;
+
 {***********************************************************************************************************************************************************}
 function TALHandlebars.eq(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
 begin
@@ -1143,6 +1360,74 @@ begin
       ALFreeAndNil(LJsonNode);
   end;
 
+end;
+
+{***************************************************************************************************************************************************************}
+function TALHandlebars.uint32(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
+begin
+
+  if AParams.Count <> 1 then
+    raise Exception.Create('The "uint32" helper requires exactly one positional argument');
+
+  var LUint32: System.Uint32;
+  if AParams.ItemHasNameValue(0) then raise Exception.Create('The "uint32" helper only accepts positional arguments');
+  var LOwned: Boolean;
+  var LJsonNode := ResolveParamValue(
+                     AParams, // const AParams: TALTagParamsA;
+                     0, // const AIndex: Integer;
+                     AContext, // const AContext: TALJsonNodeA;
+                     ADepths, // const ADepths: TList<TALJsonNodeA>;
+                     LOwned); // out AOwned: Boolean): TALJsonNodeA;
+  try
+    if LJsonNode = nil then raise Exception.Create('The "uint32" helper requires its argument to resolve to a value');
+    LUint32 := System.UInt32(LJsonNode.Int32);
+  finally
+    if LOwned then
+      ALFreeAndNil(LJsonNode);
+  end;
+
+  AOwned := True;
+  Result := TALJSONTextNodeA.Create('');
+  Result.Text := ALUIntTostrA(LUint32);
+
+end;
+
+{***************************************************************************************************************************************************************}
+function TALHandlebars.uint64(const AParams: TALTagParamsA; const AContext: TALJSONNodeA; const ADepths: TList<TALJsonNodeA>; var AOwned: Boolean): TALJsonNodeA;
+begin
+
+  if AParams.Count <> 1 then
+    raise Exception.Create('The "uint64" helper requires exactly one positional argument');
+
+  var LUint64: System.uint64;
+  if AParams.ItemHasNameValue(0) then raise Exception.Create('The "uint64" helper only accepts positional arguments');
+  var LOwned: Boolean;
+  var LJsonNode := ResolveParamValue(
+                     AParams, // const AParams: TALTagParamsA;
+                     0, // const AIndex: Integer;
+                     AContext, // const AContext: TALJsonNodeA;
+                     ADepths, // const ADepths: TList<TALJsonNodeA>;
+                     LOwned); // out AOwned: Boolean): TALJsonNodeA;
+  try
+    if LJsonNode = nil then raise Exception.Create('The "uint64" helper requires its argument to resolve to a value');
+    LUint64 := System.uint64(LJsonNode.Int64);
+  finally
+    if LOwned then
+      ALFreeAndNil(LJsonNode);
+  end;
+
+  AOwned := True;
+  Result := TALJSONTextNodeA.Create('');
+  Result.Text := ALUIntTostrA(LUint64);
+
+end;
+
+{*****************************************************************************************}
+function TALHandlebars.DoGetFormatSettings(const AContext: TALJsonNodeA): PALFormatSettingsA;
+begin
+  If not assigned(FOnGetFormatSettings) then
+    Raise Exception.Create('Unable to retrieve the format settings: no OnGetFormatSettings event handler has been assigned');
+  Result := FOnGetFormatSettings(Self, AContext);
 end;
 
 {********************************}

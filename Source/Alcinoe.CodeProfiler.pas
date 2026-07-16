@@ -413,7 +413,18 @@ begin
       //--
       ALProcMetricsLock.BeginRead;
       try
-        if LProcMetricsHistory.FCount = LProcMetricsHistory.FCapacity then LProcMetricsHistory.Grow;
+        if (LProcMetricsHistory.FCount = LProcMetricsHistory.FCapacity) then begin
+          if (LProcMetricsHistory.FCount >= 100_000_000) {100_000_000 * 32 Bytes = 3.2 GB} then begin
+            ALProcMetricsLock.EndRead;
+            try
+              ALCodeProfilerPurgeHistories(ALCodeProfilerEnabled{ASaveHistories})
+            finally
+              ALProcMetricsLock.BeginRead;
+            end;
+          end;
+          if LProcMetricsHistory.FCount = LProcMetricsHistory.FCapacity then
+            LProcMetricsHistory.Grow;
+        end;
         inc(LProcMetricsHistory.FCount);
         With LProcMetricsHistory.FArray[LProcMetricsHistory.FCount - 1] do begin
           ExecutionID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ExecutionID;

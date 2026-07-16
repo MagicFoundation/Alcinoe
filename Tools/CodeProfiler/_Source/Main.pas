@@ -90,6 +90,8 @@ type
     MainStatusBar: TdxStatusBar;
     cxLabel13: TcxLabel;
     cxLabel14: TcxLabel;
+    ClearDataBtn: TcxButton;
+    ExportToCsvBtn: TcxButton;
     procedure InsertProfilerMarkersBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -112,6 +114,7 @@ type
     procedure IdHTTPServerException(AContext: TIdContext; AException: Exception);
     procedure IdHTTPServerListenException(AThread: TIdListenerThread; AException: Exception);
     procedure IdHTTPServerConnect(AContext: TIdContext);
+    procedure ExportToCsvBtnClick(Sender: TObject);
   private
     const ConfigFilename = 'Config.ini';
   private
@@ -155,8 +158,13 @@ uses
   System.IOUtils,
   System.Win.Registry,
   system.IniFiles,
+  System.Generics.Defaults,
   winapi.Windows,
+  DelphiAST,
+  DelphiAST.Classes,
+  DelphiAST.Consts,
   VCL.Dialogs,
+  VCL.CheckLst,
   Alcinoe.StringUtils,
   Alcinoe.FileUtils,
   Alcinoe.Common;
@@ -232,13 +240,11 @@ end;
 {*****************************************************************}
 procedure TMainForm.RemoveProfilerMarkersBtnClick(Sender: TObject);
 begin
-  if MessageDlg('⚠ WARNING: Make sure to back up your files before continuing! Do you want to continue?', mtWarning, [mbYes, mbCancel], 0) <> mrYes then Exit;
   var LSourceFilenames := TALStringListW.Create;
   try
     ExpandSourcesPath(SourcesPathMemo.Lines, LSourceFilenames);
     if LSourceFilenames.Count = 0 then
       Raise Exception.Create('Error: No files have been selected');
-    if MessageDlg('Are you REALLY sure you want to update all the files listed below?' + sLineBreak + sLineBreak + LSourceFilenames.Text, mtWarning, [mbYes, mbCancel], 0) <> mrYes then Exit;
     RemoveProfilerMarkersBtn.Cursor := crHourGlass;
     Try
       for var I := 0 to LSourceFilenames.Count - 1 do
@@ -363,211 +369,297 @@ end;
 procedure TMainForm.InsertMarkers(const AFileName: String; Const AProcIDMap: TALStringListA);
 
 type
-  TProcStackEntry = record
-    ProcID: cardinal;
-    ProcName: AnsiString;
-    ProcIndent: AnsiString;
-    MarkerAfterBeginAdded: Boolean;
+  TMarkerInsertion = record
+    Line: Integer;
+    Col: Integer;
+    Text: AnsiString;
+  end;
+
+  function IsIdentifierChar(const AChar: AnsiChar): Boolean;
+  begin
+    Result := AChar in ['a'..'z', 'A'..'Z', '0'..'9', '_'];
+  end;
+
+  {*****************************************************}
+  function IsKeywordAt(const ALine, AKeyword: AnsiString; const ACol: Integer): Boolean;
+  begin
+    Result := False;
+    if ACol < 1 then
+      Exit;
+    if ACol + Length(AKeyword) - 1 > Length(ALine) then
+      Exit;
+    if not ALSameTextA(ALCopyStr(ALine, ACol, Length(AKeyword)), AKeyword) then
+      Exit;
+    if ACol > 1 then
+      if IsIdentifierChar(ALine[ACol - 1]) then
+        Exit;
+    if ACol + Length(AKeyword) <= Length(ALine) then
+      if IsIdentifierChar(ALine[ACol + Length(AKeyword)]) then
+        Exit;
+    Result := True;
+  end;
+
+  {*************************************************************************}
+  function FindKeywordColumn(const ALine, AKeyword: AnsiString; const APreferredCol: Integer; const ASearchBackwards: Boolean): Integer;
+  begin
+    if IsKeywordAt(ALine, AKeyword, APreferredCol) then
+      Exit(APreferredCol);
+    if ASearchBackwards then begin
+      for var I := Length(ALine) - Length(AKeyword) + 1 downto 1 do
+        if IsKeywordAt(ALine, AKeyword, I) then
+          Exit(I);
+    end
+    else begin
+      for var I := 1 to Length(ALine) - Length(AKeyword) + 1 do
+        if IsKeywordAt(ALine, AKeyword, I) then
+          Exit(I);
+    end;
+    Result := 0;
+  end;
+
+  {***********************************************************************************}
+  function FindBeginInsertionColumn(const ASourceCode: TALStringListA; const ALine, ACol: Integer): Integer;
+  begin
+    if (ALine < 1) or (ALine > ASourceCode.Count) then
+      raise Exception.Create('Invalid AST begin line: ' + ALIntToStrW(ALine) + ' - Filename: ' + AFileName);
+    var LLine := ASourceCode[ALine - 1];
+    var LBeginCol := FindKeywordColumn(LLine, 'begin', ACol, False);
+    if LBeginCol <= 0 then
+      Exit(0);
+    Result := LBeginCol + Length('begin');
+  end;
+
+  {*********************************************************************************}
+  function FindEndInsertionColumn(const ASourceCode: TALStringListA; const ALine, ACol: Integer): Integer;
+  begin
+    if (ALine < 1) or (ALine > ASourceCode.Count) then
+      raise Exception.Create('Invalid AST end line: ' + ALIntToStrW(ALine) + ' - Filename: ' + AFileName);
+    var LLine := ASourceCode[ALine - 1];
+    Result := FindKeywordColumn(LLine, 'end', ACol - Length('end'), True);
+  end;
+
+  {***********************************************************************************************************}
+  procedure AddInsertion(const AInsertions: TList<TMarkerInsertion>; const ASourceCode: TALStringListA; const ALine, ACol: Integer; const AText: AnsiString);
+  begin
+    if (ALine < 1) or (ALine > ASourceCode.Count) then
+      raise Exception.Create('Invalid insertion line: ' + ALIntToStrW(ALine) + ' - Filename: ' + AFileName);
+    if (ACol < 1) or (ACol > Length(ASourceCode[ALine - 1]) + 1) then
+      raise Exception.Create('Invalid insertion column: ' + ALIntToStrW(ACol) + ' - Line: ' + ALIntToStrW(ALine) + ' - Filename: ' + AFileName);
+    var LInsertion: TMarkerInsertion;
+    LInsertion.Line := ALine;
+    LInsertion.Col := ACol;
+    LInsertion.Text := AText;
+    AInsertions.Add(LInsertion);
+  end;
+
+  {*************************************************************************************}
+  function FindFirstNode(const ANode: TSyntaxNode; const ANodeType: TSyntaxNodeType): TSyntaxNode;
+  begin
+    Result := nil;
+    if not Assigned(ANode) then
+      Exit;
+    if ANode.Typ = ANodeType then begin
+      Result := ANode;
+      Exit;
+    end;
+    for var LChild in ANode.ChildNodes do begin
+      Result := FindFirstNode(LChild, ANodeType);
+      if Assigned(Result) then
+        Exit;
+    end;
+  end;
+
+  {*************************************************************************************}
+  function HasAncestorOfType(const ANode: TSyntaxNode; const ANodeType: TSyntaxNodeType): Boolean;
+  begin
+    var LParent := ANode.ParentNode;
+    while Assigned(LParent) do begin
+      if LParent.Typ = ANodeType then
+        Exit(True);
+      LParent := LParent.ParentNode;
+    end;
+    Result := False;
+  end;
+
+  {*******************************************************************}
+  function FindRootStatements(const ANode: TSyntaxNode): TCompoundSyntaxNode;
+  begin
+    Result := nil;
+    if not Assigned(ANode) then
+      Exit;
+    if (ANode.Typ = ntStatements) and
+       (ANode is TCompoundSyntaxNode) and
+       (not HasAncestorOfType(ANode, ntMethod)) and
+       (not HasAncestorOfType(ANode, ntAnonymousMethod)) then begin
+      Result := TCompoundSyntaxNode(ANode);
+      Exit;
+    end;
+    for var LChild in ANode.ChildNodes do begin
+      Result := FindRootStatements(LChild);
+      if Assigned(Result) then
+        Exit;
+    end;
+  end;
+
+  {****************************************************************}
+  function GetMethodStatements(const ANode: TSyntaxNode): TCompoundSyntaxNode;
+  begin
+    Result := nil;
+    for var LChild in ANode.ChildNodes do
+      if (LChild.Typ = ntStatements) and
+         (LChild is TCompoundSyntaxNode) then begin
+        Result := TCompoundSyntaxNode(LChild);
+        Exit;
+      end;
+  end;
+
+  {**********************************************************************************************}
+  function GetMethodName(const ANode: TSyntaxNode; var AAnonymousMethodSequence: Integer): AnsiString;
+  begin
+    Result := ALTrim(AnsiString(ANode.GetAttribute(anName)));
+    for var LChild in ANode.ChildNodes do
+      if (LChild.Typ = ntName) and
+         (LChild is TValuedSyntaxNode) then begin
+        var LNamePart := ALTrim(AnsiString(TValuedSyntaxNode(LChild).Value));
+        if (LNamePart <> '') and
+           ((Result = '') or (ALPosIgnoreCaseA(LNamePart + '.', Result) <> 1)) then begin
+          if Result <> '' then
+            Result := LNamePart + '.' + Result
+          else
+            Result := LNamePart;
+        end;
+      end;
+    if Result = '' then begin
+      inc(AAnonymousMethodSequence);
+      Result := '$AnonymousMethod' + ALIntToStrA(AAnonymousMethodSequence);
+    end;
+  end;
+
+  {*********************************************************************************************************************************************************************}
+  procedure CollectMethodMarkers(const ANode: TSyntaxNode; const AParentProcName: AnsiString; const AUnitName: AnsiString; const ASourceCode: TALStringListA; const AInsertions: TList<TMarkerInsertion>; var AAnonymousMethodSequence: Integer);
+  begin
+    if not Assigned(ANode) then
+      Exit;
+
+    var LParentProcName := AParentProcName;
+    if ANode.Typ in [ntMethod, ntAnonymousMethod] then begin
+      var LProcName := GetMethodName(ANode, AAnonymousMethodSequence);
+      if LParentProcName <> '' then
+        LProcName := LParentProcName + '.' + LProcName;
+      LParentProcName := LProcName;
+
+      var LStatements := GetMethodStatements(ANode);
+      if Assigned(LStatements) then begin
+        var LBeginInsertionCol := FindBeginInsertionColumn(ASourceCode, LStatements.Line, LStatements.Col);
+        var LEndInsertionCol := FindEndInsertionColumn(ASourceCode, LStatements.EndLine, LStatements.EndCol);
+        if (LBeginInsertionCol > 0) and (LEndInsertionCol > 0) then begin
+          inc(FProcIDSequence);
+          AddInsertion(
+            AInsertions,
+            ASourceCode,
+            LStatements.Line,
+            LBeginInsertionCol,
+            '{ALCodeProfiler>>}ALCodeProfilerEnterProc('+ALIntToStrA(FProcIDSequence){$IF defined(debug)}+'{ '+LProcName+' }'{$ENDIF}+'); try{<<ALCodeProfiler}');
+          AddInsertion(
+            AInsertions,
+            ASourceCode,
+            LStatements.EndLine,
+            LEndInsertionCol,
+            '{ALCodeProfiler>>}finally ALCodeProfilerExitProc('+ALIntToStrA(FProcIDSequence){$IF defined(debug)}+'{ '+LProcName+' }'{$ENDIF}+'); end;{<<ALCodeProfiler}');
+          AProcIDMap.Add(ALIntToStrA(FProcIDSequence) + '=' + AUnitName + '.' + LProcName);
+        end;
+      end;
+    end;
+
+    for var LChild in ANode.ChildNodes do
+      CollectMethodMarkers(LChild, LParentProcName, AUnitName, ASourceCode, AInsertions, AAnonymousMethodSequence);
+  end;
+
+  {*****************************************************************************************************}
+  procedure ApplyInsertions(const ASourceCode: TALStringListA; const AInsertions: TList<TMarkerInsertion>);
+  begin
+    AInsertions.Sort(
+      TComparer<TMarkerInsertion>.Construct(
+        function(const Left, Right: TMarkerInsertion): Integer
+        begin
+          if Left.Line <> Right.Line then
+            Result := Right.Line - Left.Line
+          else
+            Result := Right.Col - Left.Col;
+        end));
+
+    for var LInsertion in AInsertions do begin
+      var LLine := ASourceCode[LInsertion.Line - 1];
+      Insert(LInsertion.Text, LLine, LInsertion.Col);
+      ASourceCode[LInsertion.Line - 1] := LLine;
+    end;
   end;
 
 begin
   RemoveMarkers(AFileName);
   var LIsDPR := ALSameTextW(ALExtractFileExt(AFileName), '.dpr');
-  var LHttpServerNameAdded := False;
   var LUnitName := ALExtractFileName(AnsiString(AFileName), true{RemoveFileExt});
-  var LUseAdded := False;
-  var LAnonymousMethodSequence := 0;
-  var LProcStack := TStack<TProcStackEntry>.Create;
+  var LSyntaxTree := TPasSyntaxTreeBuilder.Run(AFileName);
+  var LInsertions := TList<TMarkerInsertion>.Create;
   var LSourceCode := TALStringListA.create;
   try
     LSourceCode.LoadFromFile(AFileName);
-    var LCurrentProcIndent: AnsiString := '';
-    var LAddMarkerAfterNextProcBegin: Boolean := False;
-    var LAddMarkerBeforeNextProcEnd: Boolean := False;
-    var LImplementationFound: Boolean := false;
-    For var I := 0 to LSourceCode.Count - 1 do begin
 
-      var LLine := LSourceCode[i];
-      var LTrimedLine := ALTrim(LSourceCode[i]);
-
-      // Handle "uses"
-      if (not LUseAdded) and
-         (ALPosIgnoreCaseA(LCurrentProcIndent + 'uses', LLine) = 1) then begin
-        var LNewLine := LLine;
-        Insert('{ALCodeProfiler>>}{$DEFINE ALCodeProfiler}Alcinoe.CodeProfiler,{<<ALCodeProfiler}', LNewLine, length(LCurrentProcIndent + 'uses')+1);
-        LSourceCode[i] := LNewLine;
-        LUseAdded := True;
-        Continue;
-      end;
-
-      // Handle "begin" in DPR
-      if (LIsDPR) and
-         (not LHttpServerNameAdded) and
-         (ALPosIgnoreCaseA('begin', LLine) = 1) then begin
-        if (ALTrim(HttpServerNameEdit.Text) <> '') and
-           (ALTrim(HttpServerPortEdit.Text) <> '') then begin
-          var LNewLine := LLine;
-          Insert('{ALCodeProfiler>>}ALCodeProfilerServerName := ''http://'+ALTrim(AnsiString(HttpServerNameEdit.Text))+':'+ALTrim(AnsiString(HttpServerPortEdit.Text))+''';{<<ALCodeProfiler}', LNewLine, length('begin')+1);
-          LSourceCode[i] := LNewLine;
-        end;
-        LHttpServerNameAdded := True;
-        Continue;
-      end;
-
-      // Ignore Interface section
-      if ALSameTextA(LTrimedLine, 'implementation') then begin
-        LImplementationFound := True;
-        continue;
-      end;
-      if not LImplementationFound then continue;
-
-      // Ignore lines like:
-      //
-      // TALDynamicListBox = class(TALControl)
-      // public
-      //   procedure Prepare; virtual;
-      // end;
-      if (LAddMarkerAfterNextProcBegin) and
-         (LTrimedLine <> '') and
-         (LCurrentProcIndent <> '') and
-         (ALPosIgnoreCaseA(LCurrentProcIndent, LLine) <> 1) then begin
-        LProcStack.Pop;
-        LCurrentProcIndent := '';
-        LAddMarkerAfterNextProcBegin := False;
-        LAddMarkerBeforeNextProcEnd := False;
-      end;
-
-      // Add procedure like:
-      //
-      // Procedure ALDynamicListBoxMakeBufDrawables(const AControl: TALDynamicControl; const AEnsureDoubleBuffered: Boolean = True);
-      // begin
-      // end
-      //
-      // constructor TALDynamicControl.Create(const AOwner: TObject);
-      // begin
-      // end
-      //
-      // TThread.queue(nil,
-      //   procedure
-      //   begin
-      //     ...
-      //   end);
-      //
-      // TThread.CreateAnonymousThread(
-      //   procedure
-      //   begin
-      //   end).Start;
-      If (ALPosIgnoreCaseA('class function ', LTrimedLine) = 1) or
-         (ALPosIgnoreCaseA('class procedure ', LTrimedLine) = 1) or
-         (ALPosIgnoreCaseA('class operator ', LTrimedLine) = 1) or
-         (ALPosIgnoreCaseA('constructor ', LTrimedLine) = 1) or
-         (ALPosIgnoreCaseA('destructor ', LTrimedLine) = 1) or
-         (ALPosIgnoreCaseA('function', LTrimedLine) = 1) or
-         (ALPosIgnoreCaseA('procedure', LTrimedLine) = 1) then begin
-        var J := 1;
-        While (J <= High(LLine)) and (LLine[j] = ' ') do inc(J);
-        var LProcIndent := ALCopyStr(LLine, 1, J-1);
-        // Ignore lines like:
-        // function PMSessionValidatePrintSettings: OSStatus; cdecl; external libPrintCore name '_PMSessionValidatePrintSettings';
-        // function PMSessionSetDestination: OSStatus; cdecl; external libPrintCore name '_PMSessionSetDestination';
-        If (LAddMarkerAfterNextProcBegin) and (LProcIndent = LCurrentProcIndent) then
-          LProcStack.Clear;
-        LCurrentProcIndent := LProcIndent;
-        var LProcName: AnsiString;
-        If (ALPosIgnoreCaseA('class function ', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'class function', '', [rfIgnoreCase])
-        else If (ALPosIgnoreCaseA('class procedure ', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'class procedure', '', [rfIgnoreCase])
-        else If (ALPosIgnoreCaseA('class operator ', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'class operator', '', [rfIgnoreCase])
-        else If (ALPosIgnoreCaseA('constructor ', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'constructor ', '', [rfIgnoreCase])
-        else If (ALPosIgnoreCaseA('destructor ', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'destructor ', '', [rfIgnoreCase])
-        else If (ALPosIgnoreCaseA('function', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'function', '', [rfIgnoreCase])
-        else If (ALPosIgnoreCaseA('procedure', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'procedure', '', [rfIgnoreCase])
-        else Raise Exception.Create('Error C67E3412-6E90-4317-89A5-EED1E0A496B2');
-        LProcName := ALTrim(LProcName);
-        J := 1;
-        While true do begin
-          While (J <= High(LProcName)) and (LProcName[j] in ['a'..'z','A'..'Z','0'..'9','_','.']) do inc(J);
-          If (J <= High(LProcName)) and (LProcName[j] = '<') then
-            While (J <= High(LProcName)) and (LProcName[j] <> '>') do inc(J)
-          else
-            break;
-          inc(J);
-        end;
-        LProcName := ALCopyStr(LProcName, 1, J-1);
-        If LProcName = '' then begin
-          inc(LAnonymousMethodSequence);
-          LProcName := '$AnonymousMethod' + ALIntToStrA(LAnonymousMethodSequence);
-        end
-        else LAnonymousMethodSequence := 0;
-        if LProcStack.Count > 0 then
-          LProcName := LProcStack.Peek.ProcName + '.' + LProcName;
-        inc(FProcIDSequence);
-        var LProcStackEntry: TProcStackEntry;
-        LProcStackEntry.ProcID := FProcIDSequence;
-        LProcStackEntry.ProcName := LProcName;
-        LProcStackEntry.ProcIndent := LCurrentProcIndent;
-        LProcStackEntry.MarkerAfterBeginAdded := False;
-        LProcStack.Push(LProcStackEntry);
-        LAddMarkerAfterNextProcBegin := True;
-        LAddMarkerBeforeNextProcEnd := False;
-      end
-
-      // Handle "begin"
-      else if (LAddMarkerAfterNextProcBegin) and
-              (ALPosIgnoreCaseA(LCurrentProcIndent + 'begin', LLine) = 1) then begin
-        if LProcStack.Count = 0 then
-          raise Exception.Create(
-                  'The source code is not properly formatted. '+
-                  'CodeProfiler requires all procedures to be perfectly '+
-                  'indented to function correctly - ' +
-                  'Line: ' + ALIntToStrW(I+1) + ' - ' +
-                  'Filename: ' + AFileName + ' - ' +
-                  'Error: 75F32B58-8284-493D-BE75-2F9F3DE2DEF4');
-        var LNewLine := LLine;
-        Insert('{ALCodeProfiler>>}ALCodeProfilerEnterProc('+ALIntToStrA(LProcStack.Peek.ProcID){$IF defined(debug)}+'{ '+LProcStack.Peek.ProcName+' }'{$ENDIF}+'); try{<<ALCodeProfiler}', LNewLine, length(LCurrentProcIndent + 'begin')+1);
-        LSourceCode[i] := LNewLine;
-        var LProcStackEntry := LProcStack.Peek;
-        LProcStackEntry.MarkerAfterBeginAdded := True;
-        LProcStack.Pop;
-        LProcStack.Push(LProcStackEntry);
-        LAddMarkerAfterNextProcBegin := False;
-        LAddMarkerBeforeNextProcEnd := True;
-      end
-
-      // Handle "end"
-      else if (LAddMarkerBeforeNextProcEnd) and
-              (ALPosIgnoreCaseA(LCurrentProcIndent + 'end', LLine) = 1) then begin
-        if LProcStack.Count = 0 then
-          raise Exception.Create(
-                  'The source code is not properly formatted. '+
-                  'CodeProfiler requires all procedures to be perfectly '+
-                  'indented to function correctly - ' +
-                  'Line: ' + ALIntToStrW(I+1) + ' - ' +
-                  'Filename: ' + AFileName + ' - ' +
-                  'Error: 469093AA-2081-4271-97B9-4218B1E88C83');
-        var LNewLine := LLine;
-        Insert('{ALCodeProfiler>>}finally ALCodeProfilerExitProc('+ALIntToStrA(LProcStack.Peek.ProcID){$IF defined(debug)}+'{ '+LProcStack.Peek.ProcName+' }'{$ENDIF}+'); end;{<<ALCodeProfiler}', LNewLine, length(LCurrentProcIndent)+1);
-        LSourceCode[i] := LNewLine;
-        AProcIDMap.Add(ALIntToStrA(LProcStack.Peek.ProcId) + '=' + LUnitName + '.' + LProcStack.Peek.ProcName);
-        LProcStack.Pop;
-        if LProcStack.Count > 0 then begin
-          LCurrentProcIndent := LProcStack.Peek.ProcIndent;
-          LAddMarkerAfterNextProcBegin := not LProcStack.Peek.MarkerAfterBeginAdded;
-          LAddMarkerBeforeNextProcEnd := LProcStack.Peek.MarkerAfterBeginAdded;
-        end
-        else begin
-          LAddMarkerAfterNextProcBegin := False;
-          LAddMarkerBeforeNextProcEnd := False;
-        end;
-      end;
-
+    var LUsesNode := FindFirstNode(LSyntaxTree, ntUses);
+    if Assigned(LUsesNode) then
+      AddInsertion(
+        LInsertions,
+        LSourceCode,
+        LUsesNode.Line,
+        LUsesNode.Col + Length('uses'),
+        '{ALCodeProfiler>>}{$DEFINE ALCodeProfiler}Alcinoe.CodeProfiler,{<<ALCodeProfiler}')
+    else if not LIsDPR then begin
+      var LInterfaceNode := FindFirstNode(LSyntaxTree, ntInterface);
+      if not Assigned(LInterfaceNode) then
+        raise Exception.Create('Interface section not found - Filename: ' + AFileName);
+      var LInterfaceCol := FindKeywordColumn(LSourceCode[LInterfaceNode.Line - 1], 'interface', LInterfaceNode.Col, False);
+      if LInterfaceCol <= 0 then
+        raise Exception.Create('Interface keyword not found at line ' + ALIntToStrW(LInterfaceNode.Line) + ' - Filename: ' + AFileName);
+      AddInsertion(
+        LInsertions,
+        LSourceCode,
+        LInterfaceNode.Line,
+        LInterfaceCol + Length('interface'),
+        '{ALCodeProfiler>>}{$DEFINE ALCodeProfiler}uses Alcinoe.CodeProfiler;{<<ALCodeProfiler}');
     end;
 
+    if (LIsDPR) and
+       (ALTrim(HttpServerNameEdit.Text) <> '') and
+       (ALTrim(HttpServerPortEdit.Text) <> '') then begin
+      var LRootStatements := FindRootStatements(LSyntaxTree);
+      if Assigned(LRootStatements) then begin
+        var LBeginInsertionCol := FindBeginInsertionColumn(LSourceCode, LRootStatements.Line, LRootStatements.Col);
+        if LBeginInsertionCol > 0 then
+          AddInsertion(
+            LInsertions,
+            LSourceCode,
+            LRootStatements.Line,
+            LBeginInsertionCol,
+            '{ALCodeProfiler>>}ALCodeProfilerServerName := ''http://'+ALTrim(AnsiString(HttpServerNameEdit.Text))+':'+ALTrim(AnsiString(HttpServerPortEdit.Text))+''';{<<ALCodeProfiler}');
+      end;
+    end;
+
+    if not LIsDPR then begin
+      var LImplementationNode := FindFirstNode(LSyntaxTree, ntImplementation);
+      if Assigned(LImplementationNode) then begin
+        var LAnonymousMethodSequence := 0;
+        CollectMethodMarkers(LImplementationNode, '', LUnitName, LSourceCode, LInsertions, LAnonymousMethodSequence);
+      end;
+    end;
+
+    ApplyInsertions(LSourceCode, LInsertions);
     LSourceCode.ProtectedSave := true;
     LSourceCode.SaveToFile(AFileName);
 
   finally
     AlFreeAndNil(LSourceCode);
-    ALFreeAndNil(LProcStack);
+    ALFreeAndNil(LInsertions);
+    ALFreeAndNil(LSyntaxTree);
   end;
 end;
 
@@ -582,7 +674,6 @@ begin
   finally
     ALFreeAndNil(LIniFile);
   end;
-  if MessageDlg('⚠ WARNING: Make sure to back up your files before continuing! Do you want to continue?', mtWarning, [mbYes, mbCancel], 0) <> mrYes then Exit;
   var LSourceFilenames := TALStringListW.Create;
   var LFailedFilenames := TALStringListW.Create;
   var LProcIDMap := TALStringListA.Create;
@@ -590,7 +681,28 @@ begin
     ExpandSourcesPath(SourcesPathMemo.Lines, LSourceFilenames);
     if LSourceFilenames.Count = 0 then
       Raise Exception.Create('Error: No files have been selected');
-    if MessageDlg('Are you REALLY sure you want to update all the files listed below?' + sLineBreak + sLineBreak + LSourceFilenames.Text, mtWarning, [mbYes, mbCancel], 0) <> mrYes then Exit;
+
+    // Ask whether the previously collected data must be cleared. If it is
+    // kept, preload the existing proc ID map and continue the ID sequence
+    // after the highest existing ProcID so that the IDs already present in
+    // the sources and in the performance file stay valid
+    var LProcIDMapFilename := TPath.Combine(FDataDir, ALCodeProfilerProcIDMapFilename);
+    var LClearData := MessageDlg(
+                        'Do you want to start a fresh profiling session and clear the data collected so far?'+ sLineBreak + sLineBreak +
+                        'YES – Start fresh: the procedure IDs ('+ALCodeProfilerProcIDMapFilename+') and the collected performance data ('+ALCodeProfilerProcMetricsFilename+') will be discarded, and the ID numbering will restart from 1. '+
+                        'Choose this only if the selected files cover ALL the files currently containing profiler markers; any file left instrumented from a previous run would keep old IDs that clash with the new ones.'+ sLineBreak + sLineBreak +
+                        'NO – Keep the existing data: the procedures of the selected files will be assigned new IDs, following the existing ones, so previously instrumented files and already collected performance data stay valid.',
+                        mtConfirmation, [mbYes, mbNo, mbCancel], 0);
+    if (LClearData <> mrYes) and (LClearData <> mrNo) then Exit;
+    if LClearData = mrYes then FProcIDSequence := 0
+    else if TFile.Exists(LProcIDMapFilename) then begin
+      LProcIDMap.LoadFromFile(LProcIDMapFilename);
+      for var I := 0 to LProcIDMap.Count - 1 do begin
+        var LProcID := ALStrToInt(LProcIDMap.Names[I]);
+        if LProcID > FProcIDSequence then FProcIDSequence := LProcID;
+      end;
+    end;
+
     InsertProfilerMarkersBtn.Cursor := crHourGlass;
     Try
       for var I := 0 to LSourceFilenames.Count - 1 do
@@ -600,15 +712,23 @@ begin
           On E: Exception do
             LFailedFilenames.Add(LSourceFilenames[i]);
         end;
-      LProcIDMap.SaveToFile(TPath.Combine(FDataDir, ALCodeProfilerProcIDMapFilename));
+      LProcIDMap.SaveToFile(LProcIDMapFilename);
     finally
       InsertProfilerMarkersBtn.Cursor := crDefault;
     End;
-    var LProcMetricsFilename := TPath.Combine(FDataDir, ALCodeProfilerProcMetricsFilename);
-    If TFile.Exists(LProcMetricsFilename) then
-      TFile.Delete(LProcMetricsFilename);
+    if LClearData = mrYes then begin
+      var LProcMetricsFilename := TPath.Combine(FDataDir, ALCodeProfilerProcMetricsFilename);
+      If TFile.Exists(LProcMetricsFilename) then
+        TFile.Delete(LProcMetricsFilename);
+    end;
     if LFailedFilenames.Count > 0 then
-      MessageDlg('The operation completed successfully, except for the following file(s), which are badly formatted and could not be updated:' + sLineBreak + LFailedFilenames.Text, mtError, [mbOK], 0)
+      MessageDlg(
+        'The operation completed except for the following file(s), which are  '+
+        'badly formatted and could not be updated. Now, you must recompile your '+
+        'project and run it. After you close the application (or move it '+
+        'between background and foreground on Android/iOS), a performance '+
+        'file (ALCodeProfilerProcMetrics.dat) will be generated in the user''s '+
+        'document folder.' + sLineBreak + sLineBreak + LFailedFilenames.Text, mtError, [mbOK], 0)
     else
       MessageDlg(
         'The operation completed successfully. Now, you must recompile your '+
@@ -747,6 +867,225 @@ end;
 procedure TMainForm.InstrumentationTabSheetResize(Sender: TObject);
 begin
   InstructionPanel.Height := LastInstructionLabel.Top + LastInstructionLabel.Height + LastInstructionLabel.Margins.Bottom;
+end;
+
+{*******************************************************}
+procedure TMainForm.ExportToCsvBtnClick(Sender: TObject);
+
+Const
+  CColumnExecutionID = 0;
+  CColumnParentExecutionID = 1;
+  CColumnProcID = 2;
+  CColumnProcName = 3;
+  CColumnThreadID = 4;
+  CColumnStartTimeStamp = 5;
+  CColumnTimeTaken = 6;
+  CColumnNames: array[CColumnExecutionID..CColumnTimeTaken] of AnsiString = (
+    'ExecutionID',
+    'ParentExecutionID',
+    'ProcID',
+    'ProcName',
+    'ThreadID',
+    'StartTimeStamp',
+    'TimeTaken');
+
+var
+  LExportColumns: array[CColumnExecutionID..CColumnTimeTaken] of Boolean;
+  LCsvStream: TFileStream;
+  LCsvBuffer: AnsiString;
+  LCsvBufferPos: Integer;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _WriteToCsvBuffer(const AStr: AnsiString);
+  begin
+    if LCsvBufferPos + length(AStr) > length(LCsvBuffer) then begin
+      LCsvStream.WriteBuffer(PAnsiChar(LCsvBuffer)^, LCsvBufferPos);
+      LCsvBufferPos := 0;
+    end;
+    ALMove(PAnsiChar(AStr)^, LCsvBuffer[LCsvBufferPos + 1], length(AStr));
+    LCsvBufferPos := LCsvBufferPos + length(AStr);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _FlushCsvBuffer;
+  begin
+    if LCsvBufferPos > 0 then begin
+      LCsvStream.WriteBuffer(PAnsiChar(LCsvBuffer)^, LCsvBufferPos);
+      LCsvBufferPos := 0;
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _TicksToMillisecondsStr(const ATicks: Int64): AnsiString;
+  begin
+    // 1 tick equals 0.0001 millisecond (ALCodeProfilerMillisecondsPerTick),
+    // so use integer arithmetic to avoid any rounding/locale issue
+    Result := ALIntToStrA(ATicks div 10000) + '.' + ALFormatA('%.4d', [ATicks mod 10000]);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _AppendToCsvRow(var ARow: AnsiString; var AFirstColumn: Boolean; const AValue: AnsiString);
+  begin
+    if not AFirstColumn then ARow := ARow + ',';
+    AFirstColumn := False;
+    ARow := ARow + AValue;
+  end;
+
+begin
+  var LProcMetricsFilename := TPath.Combine(FDataDir, ALCodeProfilerProcMetricsFilename);
+  If not TFile.Exists(LProcMetricsFilename) then
+    raise Exception.CreateFmt(
+            'The required file "%s" is missing. Please make '+
+            'sure it is available in the data subfolder where '+
+            'Alcinoe Code Profiler is located before proceeding.',
+            [ALCodeProfilerProcMetricsFilename]);
+
+  // Ask which columns to export
+  var LColumnsForm := TForm.CreateNew(nil);
+  try
+    LColumnsForm.Caption := 'Export to CSV';
+    LColumnsForm.BorderStyle := bsDialog;
+    LColumnsForm.Position := poScreenCenter;
+    LColumnsForm.ClientWidth := 300;
+    LColumnsForm.ClientHeight := 233;
+    var LColumnsLabel := TLabel.Create(LColumnsForm);
+    LColumnsLabel.Parent := LColumnsForm;
+    LColumnsLabel.Caption := 'Select the columns to export:';
+    LColumnsLabel.SetBounds(8, 8, LColumnsForm.ClientWidth - 16, 15);
+    var LColumnsCheckListBox := TCheckListBox.Create(LColumnsForm);
+    LColumnsCheckListBox.Parent := LColumnsForm;
+    LColumnsCheckListBox.SetBounds(8, 29, LColumnsForm.ClientWidth - 16, 161);
+    for var I := CColumnExecutionID to CColumnTimeTaken do begin
+      LColumnsCheckListBox.Items.Add(String(CColumnNames[I]));
+      LColumnsCheckListBox.Checked[I] := True;
+    end;
+    var LOkBtn := TButton.Create(LColumnsForm);
+    LOkBtn.Parent := LColumnsForm;
+    LOkBtn.Caption := 'OK';
+    LOkBtn.ModalResult := mrOk;
+    LOkBtn.Default := True;
+    LOkBtn.SetBounds(LColumnsForm.ClientWidth - 170, 198, 75, 27);
+    var LCancelBtn := TButton.Create(LColumnsForm);
+    LCancelBtn.Parent := LColumnsForm;
+    LCancelBtn.Caption := 'Cancel';
+    LCancelBtn.ModalResult := mrCancel;
+    LCancelBtn.Cancel := True;
+    LCancelBtn.SetBounds(LColumnsForm.ClientWidth - 87, 198, 75, 27);
+    if LColumnsForm.ShowModal <> mrOk then exit;
+    for var I := CColumnExecutionID to CColumnTimeTaken do
+      LExportColumns[I] := LColumnsCheckListBox.Checked[I];
+  finally
+    ALFreeAndNil(LColumnsForm);
+  end;
+  var LExportAnyColumn := False;
+  for var I := CColumnExecutionID to CColumnTimeTaken do
+    LExportAnyColumn := LExportAnyColumn or LExportColumns[I];
+  if not LExportAnyColumn then
+    Raise Exception.Create('Error: No columns have been selected');
+
+  // The proc ID map is only needed to resolve the ProcName column
+  var LProcIDMapFilename := TPath.Combine(FDataDir, ALCodeProfilerProcIDMapFilename);
+  If (LExportColumns[CColumnProcName]) and (not TFile.Exists(LProcIDMapFilename)) then
+    raise Exception.CreateFmt('The required file "%s" does not exist. Please ensure it is available before proceeding', [ALCodeProfilerProcIDMapFilename]);
+
+  // Ask where to save the CSV file
+  var LCsvFilename: String;
+  var LSaveDialog := TSaveDialog.Create(nil);
+  try
+    LSaveDialog.Title := 'Export to CSV';
+    LSaveDialog.Filter := 'CSV files (*.csv)|*.csv|All files (*.*)|*.*';
+    LSaveDialog.DefaultExt := 'csv';
+    LSaveDialog.Options := LSaveDialog.Options + [ofOverwritePrompt];
+    LSaveDialog.FileName := ALStringReplaceW(ALCodeProfilerProcMetricsFilename, '.dat', '.csv', [rfIgnoreCase]);
+    if not LSaveDialog.Execute then exit;
+    LCsvFilename := LSaveDialog.FileName;
+  finally
+    ALFreeAndNil(LSaveDialog);
+  end;
+
+  ExportToCsvBtn.Cursor := crHourGlass;
+  var LExportedRecordCount: Int64 := 0;
+  Try
+
+    // Load ALCodeProfilerProcIDMap.txt in LProcNames
+    var LProcNames := TDictionary<Cardinal, AnsiString>.Create;
+    var LProcMetricsStream: TFileStream := nil;
+    LCsvStream := nil;
+    try
+      if LExportColumns[CColumnProcName] then begin
+        var LProcIDMap := TALHashedStringListA.Create;
+        try
+          LProcIDMap.LoadFromFile(LProcIDMapFilename);
+          for var I := 0 to LProcIDMap.Count - 1 do
+            LProcNames.AddOrSetValue(Cardinal(ALStrToInt(LProcIDMap.Names[I])), LProcIDMap.ValueFromIndex[I]);
+        finally
+          ALFreeAndNil(LProcIDMap);
+        end;
+      end;
+
+      // Convert ALCodeProfilerProcMetrics.dat to CSV chunk by chunk as the
+      // file can be very huge and can not be fully loaded in memory
+      LProcMetricsStream := TFileStream.Create(LProcMetricsFilename, fmOpenRead or fmShareDenyWrite);
+      if LProcMetricsStream.Size mod SizeOf(TALProcMetrics) <> 0 then
+        raise Exception.CreateFmt('The file "%s" is corrupted', [ALCodeProfilerProcMetricsFilename]);
+      var LTotalRecordCount: Int64 := LProcMetricsStream.Size div SizeOf(TALProcMetrics);
+      LCsvStream := TFileStream.Create(LCsvFilename, fmCreate);
+      var LProcMetrics: TArray<TALProcMetrics>;
+      Setlength(LProcMetrics, 65536); // 65536 * SizeOf(TALProcMetrics) = 2 MB
+      Setlength(LCsvBuffer, 4194304); // 4 MB
+      LCsvBufferPos := 0;
+      var LCsvHeader: AnsiString := '';
+      var LFirstColumn := True;
+      for var I := CColumnExecutionID to CColumnTimeTaken do
+        if LExportColumns[I] then
+          _AppendToCsvRow(LCsvHeader, LFirstColumn, CColumnNames[I]);
+      _WriteToCsvBuffer(LCsvHeader + #13#10);
+      While True do begin
+        var LBytesRead := LProcMetricsStream.Read(LProcMetrics[0], length(LProcMetrics) * SizeOf(TALProcMetrics));
+        if LBytesRead <= 0 then break;
+        if LBytesRead mod SizeOf(TALProcMetrics) <> 0 then
+          raise Exception.CreateFmt('The file "%s" is corrupted', [ALCodeProfilerProcMetricsFilename]);
+        for var I := 0 to (LBytesRead div SizeOf(TALProcMetrics)) - 1 do begin
+          var LCsvRow: AnsiString := '';
+          LFirstColumn := True;
+          if LExportColumns[CColumnExecutionID] then
+            _AppendToCsvRow(LCsvRow, LFirstColumn, ALIntToStrA(LProcMetrics[I].ExecutionID));
+          if LExportColumns[CColumnParentExecutionID] then
+            _AppendToCsvRow(LCsvRow, LFirstColumn, ALIntToStrA(LProcMetrics[I].ParentExecutionID));
+          if LExportColumns[CColumnProcID] then
+            _AppendToCsvRow(LCsvRow, LFirstColumn, ALIntToStrA(LProcMetrics[I].ProcID));
+          if LExportColumns[CColumnProcName] then begin
+            var LProcName: AnsiString;
+            if not LProcNames.TryGetValue(LProcMetrics[I].ProcID, LProcName) then LProcName := '';
+            _AppendToCsvRow(LCsvRow, LFirstColumn, LProcName);
+          end;
+          if LExportColumns[CColumnThreadID] then
+            _AppendToCsvRow(LCsvRow, LFirstColumn, ALIntToStrA(LProcMetrics[I].ThreadID));
+          if LExportColumns[CColumnStartTimeStamp] then
+            _AppendToCsvRow(LCsvRow, LFirstColumn, _TicksToMillisecondsStr(LProcMetrics[I].StartTimeStamp));
+          if LExportColumns[CColumnTimeTaken] then
+            _AppendToCsvRow(LCsvRow, LFirstColumn, _TicksToMillisecondsStr(LProcMetrics[I].ElapsedTicks));
+          _WriteToCsvBuffer(LCsvRow + #13#10);
+          inc(LExportedRecordCount);
+        end;
+        if LTotalRecordCount > 0 then begin
+          MainStatusBar.Panels[1].Text := 'Exporting to CSV: ' + ALIntToStrW(Round((LExportedRecordCount / LTotalRecordCount) * 100)) + '%';
+          MainStatusBar.Update;
+        end;
+      end;
+      _FlushCsvBuffer;
+    finally
+      ALFreeAndNil(LProcNames);
+      ALFreeAndNil(LProcMetricsStream);
+      ALFreeAndNil(LCsvStream);
+    end;
+
+  Finally
+    ExportToCsvBtn.Cursor := crDefault;
+    MainStatusBar.Panels[1].Text := '';
+  End;
+
+  MessageDlg(ALIntToStrW(LExportedRecordCount) + ' records have been exported successfully.', mtInformation, [mbOK], 0);
 end;
 
 {**********************************************}

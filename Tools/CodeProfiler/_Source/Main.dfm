@@ -23,7 +23,6 @@ object MainForm: TMainForm
     TabOrder = 0
     Properties.ActivePage = InstrumentationTabSheet
     Properties.CustomButtons.Buttons = <>
-    ExplicitHeight = 768
     ClientRectBottom = 863
     ClientRectLeft = 5
     ClientRectRight = 1075
@@ -32,7 +31,6 @@ object MainForm: TMainForm
       Caption = 'Source Code Instrumentation'
       ImageIndex = 0
       OnResize = InstrumentationTabSheetResize
-      ExplicitHeight = 726
       object InstructionPanel: TdxPanel
         Left = 0
         Top = 0
@@ -97,7 +95,6 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 2
           Transparent = True
-          ExplicitTop = 74
           Width = 1049
         end
         object cxLabel4: TcxLabel
@@ -117,7 +114,6 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 3
           Transparent = True
-          ExplicitTop = 107
           Width = 1049
         end
         object cxLabel5: TcxLabel
@@ -177,7 +173,6 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 6
           Transparent = True
-          ExplicitTop = 206
           Width = 1062
         end
         object LastInstructionLabel: TcxLabel
@@ -201,7 +196,6 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 7
           Transparent = True
-          ExplicitTop = 239
           Width = 1062
         end
         object cxLabel13: TcxLabel
@@ -260,8 +254,6 @@ object MainForm: TMainForm
         Margins.Bottom = 8
         Align = alClient
         TabOrder = 1
-        ExplicitTop = 393
-        ExplicitHeight = 325
         object SourcesPathMemo: TcxMemo
           AlignWithMargins = True
           Left = 8
@@ -271,7 +263,6 @@ object MainForm: TMainForm
           Margins.Bottom = 12
           Align = alClient
           TabOrder = 0
-          ExplicitHeight = 147
           Height = 208
           Width = 1052
         end
@@ -406,7 +397,6 @@ object MainForm: TMainForm
     object PerformanceAnalysisTabSheet: TcxTabSheet
       Caption = 'Performance Analysis'
       ImageIndex = 1
-      ExplicitHeight = 726
       object Panelfilter: TPanel
         Left = 0
         Top = 0
@@ -420,30 +410,30 @@ object MainForm: TMainForm
         TabOrder = 0
         OnResize = PanelfilterResize
         object Label1: TLabel
-          Left = 152
+          Left = 289
           Top = 11
           Width = 168
           Height = 23
           Caption = 'Start Timestamp (Min)'
         end
         object Label2: TLabel
-          Left = 520
+          Left = 657
           Top = 11
           Width = 171
           Height = 23
           Caption = 'Start Timestamp (Max)'
         end
         object ProcNameFilterEdit: TcxTextEdit
-          Left = 152
+          Left = 288
           Top = 45
           TabOrder = 0
           TextHint = 
             'Search for procedure names. Accepts multiple entries separated b' +
             'y '#39';'#39
-          Width = 913
+          Width = 724
         end
         object ApplyFilterBtn: TcxButton
-          Left = 8
+          Left = 143
           Top = 45
           Width = 124
           Height = 31
@@ -462,7 +452,7 @@ object MainForm: TMainForm
           OnClick = LoadDataBtnClick
         end
         object StartTimeStampMinEdit: TcxMaskEdit
-          Left = 326
+          Left = 463
           Top = 8
           Properties.MaskKind = emkRegExpr
           Properties.EditMask = '([0-5][0-9]):([0-5][0-9]):([0-9]{3})\.([0-9]{1,4})'
@@ -471,13 +461,32 @@ object MainForm: TMainForm
           Width = 177
         end
         object StartTimeStampMaxEdit: TcxMaskEdit
-          Left = 698
+          Left = 835
           Top = 8
           Properties.MaskKind = emkRegExpr
           Properties.EditMask = '([0-5][0-9]):([0-5][0-9]):([0-9]{3})\.([0-9]{1,4})'
           TabOrder = 4
           TextHint = 'mm:ss:zzz.zzzz'
           Width = 177
+        end
+        object ClearDataBtn: TcxButton
+          Left = 8
+          Top = 45
+          Width = 124
+          Height = 31
+          Margins.Right = 8
+          Caption = 'Clear Data'
+          TabOrder = 5
+        end
+        object ExportToCsvBtn: TcxButton
+          Left = 143
+          Top = 8
+          Width = 124
+          Height = 31
+          Margins.Right = 8
+          Caption = 'Export to CSV'
+          TabOrder = 6
+          OnClick = ExportToCsvBtnClick
         end
       end
       object TreeListProcMetrics: TcxTreeList
@@ -494,7 +503,6 @@ object MainForm: TMainForm
         Font.Height = -17
         Font.Name = 'Segoe UI Light'
         Font.Style = []
-        Navigator.Buttons.CustomButtons = <>
         OptionsBehavior.CopyCaptionsToClipboard = False
         OptionsData.Editing = False
         OptionsView.ColumnAutoWidth = True
@@ -512,8 +520,6 @@ object MainForm: TMainForm
           Position.ColIndex = 1
           Position.RowIndex = 0
           Position.BandIndex = 0
-          Summary.FooterSummaryItems = <>
-          Summary.GroupFooterSummaryItems = <>
         end
         object TreeListProcMetricsColumnThreadID: TcxTreeListColumn
           Caption.Text = 'Thread ID'
@@ -525,8 +531,6 @@ object MainForm: TMainForm
           Position.ColIndex = 2
           Position.RowIndex = 0
           Position.BandIndex = 0
-          Summary.FooterSummaryItems = <>
-          Summary.GroupFooterSummaryItems = <>
         end
         object TreeListProcMetricsColumnTimeTaken: TcxTreeListColumn
           Caption.Text = 'TimeTaken'
@@ -538,8 +542,6 @@ object MainForm: TMainForm
           Position.ColIndex = 4
           Position.RowIndex = 0
           Position.BandIndex = 0
-          Summary.FooterSummaryItems = <>
-          Summary.GroupFooterSummaryItems = <>
         end
         object TreeListProcMetricsColumnStartTimeStamp: TcxTreeListColumn
           Caption.Text = 'Start Timestamp (mm:ss:zzz)'
@@ -550,8 +552,6 @@ object MainForm: TMainForm
           Position.ColIndex = 3
           Position.RowIndex = 0
           Position.BandIndex = 0
-          Summary.FooterSummaryItems = <>
-          Summary.GroupFooterSummaryItems = <>
           OnGetDisplayText = TreeListProcMetricsColumnStartTimeStampGetDisplayText
         end
         object TreeListProcMetricsColumnExecutionID: TcxTreeListColumn
@@ -564,8 +564,6 @@ object MainForm: TMainForm
           Position.BandIndex = 0
           SortOrder = soDescending
           SortIndex = 0
-          Summary.FooterSummaryItems = <>
-          Summary.GroupFooterSummaryItems = <>
         end
       end
       object GridProcMetrics: TcxGrid
@@ -581,10 +579,7 @@ object MainForm: TMainForm
         Font.Style = []
         ParentFont = False
         TabOrder = 2
-        ExplicitHeight = 485
         object GridTableViewProcMetrics: TcxGridTableView
-          Navigator.Buttons.CustomButtons = <>
-          ScrollbarAnnotations.CustomAnnotations = <>
           OnCellDblClick = GridTableViewProcMetricsCellDblClick
           DataController.Summary.DefaultGroupSummaryItems = <
             item
@@ -603,7 +598,6 @@ object MainForm: TMainForm
               Kind = skCount
               Column = GridTableViewProcMetricsColumnProcName
             end>
-          DataController.Summary.SummaryGroups = <>
           DateTimeHandling.Grouping = dtgByDate
           OptionsBehavior.CellHints = True
           OptionsBehavior.CopyCaptionsToClipboard = False
@@ -678,7 +672,6 @@ object MainForm: TMainForm
       item
         PanelStyleClassName = 'TdxStatusBarTextPanelStyle'
       end>
-    ExplicitTop = 768
   end
   object dxSkinController: TdxSkinController
     NativeStyle = False

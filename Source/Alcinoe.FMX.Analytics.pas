@@ -102,9 +102,10 @@ implementation
 uses
   System.SysUtils,
   {$IF defined(android)}
+    Androidapi.JNI.App,
     Androidapi.JNI.JavaTypes,
-    Androidapi.Helpers,
     Androidapi.JNI.Os,
+    Androidapi.Helpers,
   {$ENDIF}
   {$IF defined(ios)}
     Macapi.Helpers,

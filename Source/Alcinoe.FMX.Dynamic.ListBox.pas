@@ -1413,6 +1413,10 @@ end;
 {******************************************}
 procedure TALDynamicListBox.TItem.Unprepare;
 begin
+  // Fast exit when there is nothing to cancel or free, so spurious calls
+  // on never-prepared items cost nothing.
+  if (FContentBuilderContext = nil) and (FControlsCount = 0) then
+    exit;
   {$IFDEF DEBUG}
   ALLog(ClassName+'.Unprepare', 'Index: ' + ALintToStrW(Index));
   {$ENDIF}
@@ -1931,12 +1935,46 @@ begin
     end;
   end;
   if Owner.FLastPreloadedItemIndex >= 0 then begin
-    if Owner.FFirstPreloadedItemIndex >= AIndex + ACount then dec(Owner.FFirstPreloadedItemIndex, ACount)
-    else if Owner.FFirstPreloadedItemIndex >= AIndex then Owner.FFirstPreloadedItemIndex := AIndex;
-    if Owner.FLastPreloadedItemIndex >= AIndex + ACount then dec(Owner.FLastPreloadedItemIndex, ACount)
-    else if Owner.FLastPreloadedItemIndex >= AIndex then Owner.FLastPreloadedItemIndex := AIndex - 1;
+    // The preloaded window must keep matching which surviving items are
+    // actually prepared. When the deleted block overlaps the window, the
+    // prepared range can split into a head (before the block) and a shifted
+    // tail (after the block): a window can only describe one contiguous
+    // range, so keep the head and unprepare the tail (or, when there is no
+    // head, keep the shifted tail).
+    var LFirst := Owner.FFirstPreloadedItemIndex;
+    var LLast := Owner.FLastPreloadedItemIndex;
+    if LLast < AIndex then begin
+      // window lies entirely before the deleted block: unchanged
+    end
+    else if LFirst >= AIndex + ACount then begin
+      // window lies entirely after the deleted block: shift down
+      dec(Owner.FFirstPreloadedItemIndex, ACount);
+      dec(Owner.FLastPreloadedItemIndex, ACount);
+    end
+    else begin
+      // window overlaps the deleted block
+      var LTailFirst := Max(LFirst, AIndex + ACount) - ACount; // new index of the first surviving tail item
+      var LTailLast := LLast - ACount;                         // new index of the last one (< LTailFirst if none)
+      if LFirst < AIndex then begin
+        // keep the prepared head [LFirst..AIndex-1]; detach the shifted tail
+        for var I := LTailFirst to Min(LTailLast, FControlsCount - 1) do
+          TItem(FControls[I]).Unprepare;
+        Owner.FLastPreloadedItemIndex := AIndex - 1;
+      end
+      else if LTailLast >= LTailFirst then begin
+        // no head: the shifted tail is the whole remaining prepared range
+        Owner.FFirstPreloadedItemIndex := LTailFirst;
+        Owner.FLastPreloadedItemIndex := LTailLast;
+      end
+      else begin
+        // whole window fell inside the deleted block
+        Owner.FFirstPreloadedItemIndex := 0;
+        Owner.FLastPreloadedItemIndex := -1;
+      end;
+    end;
     if Owner.FLastPreloadedItemIndex > FControlsCount - 1 then Owner.FLastPreloadedItemIndex := FControlsCount - 1;
-    if Owner.FFirstPreloadedItemIndex > Owner.FLastPreloadedItemIndex then begin
+    if (Owner.FLastPreloadedItemIndex >= 0) and
+       (Owner.FFirstPreloadedItemIndex > Owner.FLastPreloadedItemIndex) then begin
       Owner.FFirstPreloadedItemIndex := 0;
       Owner.FLastPreloadedItemIndex := -1;
     end;
@@ -1993,8 +2031,22 @@ begin
     if AIndex <= Owner.FLastVisibleItemIndex then inc(Owner.FLastVisibleItemIndex, LItemsLength);
   end;
   if Owner.FLastPreloadedItemIndex >= 0 then begin
-    if AIndex <= Owner.FFirstPreloadedItemIndex then inc(Owner.FFirstPreloadedItemIndex, LItemsLength);
-    if AIndex <= Owner.FLastPreloadedItemIndex then inc(Owner.FLastPreloadedItemIndex, LItemsLength);
+    if AIndex <= Owner.FFirstPreloadedItemIndex then begin
+      inc(Owner.FFirstPreloadedItemIndex, LItemsLength);
+      inc(Owner.FLastPreloadedItemIndex, LItemsLength);
+    end
+    else if AIndex <= Owner.FLastPreloadedItemIndex then begin
+      // Insertion inside the preloaded window. The inserted items are not
+      // prepared, so simply extending the window across them would falsely
+      // mark them as prepared: the next SetViewportPosition would then call
+      // Unprepare once per inserted item (a 24k insert = 24k calls) and the
+      // window would no longer match which items are actually prepared.
+      // Keep the window truthful: unprepare the (shifted) prepared items
+      // after the insertion point and clamp the window to the part before it.
+      for var I := AIndex + LItemsLength to Owner.FLastPreloadedItemIndex + LItemsLength do
+        TItem(FControls[I]).Unprepare;
+      Owner.FLastPreloadedItemIndex := AIndex - 1;
+    end;
   end;
   if AIndex <= Owner.FTriggerDownloadItemsAtIndex then inc(Owner.FTriggerDownloadItemsAtIndex, LItemsLength);
   //--

@@ -243,6 +243,7 @@ type
             constructor Create(const AOwner: TItem); override;
             property Owner: TView read GetOwner write SetOwner;
             procedure InsertItems(const AItems: TArray<TItem>; const AIndex: Integer); virtual;
+            procedure DeleteItems(const AIndex, ACount: Integer); virtual;
             function GetTopBarSize: Single;
             property OnRealign: TRealignEvent read FOnRealign write FOnRealign;
           end;
@@ -624,6 +625,7 @@ type
         procedure PrependItem(var AData: TALJsonNodeW); virtual;
         procedure AppendItem(var AData: TALJsonNodeW); virtual;
         procedure DeleteItemAtIndex(const AIndex: Integer); virtual;
+        procedure DeleteItems(const AIndex, ACount: Integer); virtual;
         procedure DeleteItem(const AId: String); overload;
         procedure DeleteItem(const AId: Int64); overload;
         function ScrollToItemIndex(const AIndex: Integer; const AHideTopBar: Boolean; const AHideBottomBar: Boolean; const ADuration: integer; const Adx: single = 0; const Ady: single = 0): Boolean; virtual;
@@ -778,6 +780,7 @@ type
     procedure PrependItem(var AData: TALJsonNodeW);
     procedure AppendItem(var AData: TALJsonNodeW);
     procedure DeleteItemAtIndex(const AIndex: Integer);
+    procedure DeleteItems(const AIndex, ACount: Integer);
     procedure DeleteItem(var AId: String); overload;
     procedure DeleteItem(var AId: Int64); overload;
     function ScrollToItemIndex(const AIndex: Integer; const AHideTopBar: Boolean; const AHideBottomBar: Boolean; const ADuration: integer; const Adx: single = 0; const Ady: single = 0): Boolean;
@@ -1881,6 +1884,68 @@ begin
     Raise Exception.Create('Error 46D12BC4-BB27-472B-AE2B-1A977646A7AB');
   {$ENDIF}
   Realign(LPrevControlIndex);
+end;
+
+{***********************************************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.DeleteItems(const AIndex, ACount: Integer);
+begin
+  // Bulk counterpart of InsertItems. Deleting items one by one via
+  // DeleteItemAtIndex is quadratic: every removal shifts the controls
+  // array, renumbers all trailing indexes and triggers a realign.
+  // For a 24k-item range that amounts to seconds of work; this method
+  // does one shift, one renumber and one realign.
+  if ACount <= 0 then
+    Exit;
+  if (AIndex < 0) or (AIndex + ACount > FControlsCount) then
+    Raise Exception.Create('DeleteItems failed: range out of bounds');
+  //--
+  // Detach the doomed items in O(1) each: clearing FOwner keeps the
+  // destructor (SetOwner(nil) -> RemoveControl -> DoRemoveControl) from
+  // shifting the array and realigning once per item. Use delayed
+  // destruction for the same reason as DeleteItemAtIndex.
+  for var I := AIndex to AIndex + ACount - 1 do begin
+    var LItem := FControls[I];
+    _TALDynamicControlProtectedAccess(LItem).FIndex := -1;
+    _TALDynamicControlProtectedAccess(LItem).FOwner := nil;
+    _TALDynamicControlProtectedAccess(LItem).SetHost(nil); // releases hovered/captured refs
+    ALFreeAndNil(LItem, true{delayed});
+  end;
+  //--
+  if AIndex + ACount < FControlsCount then
+    ALMove(FControls[AIndex + ACount], FControls[AIndex], (FControlsCount - AIndex - ACount) * SizeOf(Pointer));
+  FControlsCount := FControlsCount - ACount;
+  for var I := AIndex to FControlsCount - 1 do
+    _TALDynamicControlProtectedAccess(FControls[I]).FIndex := I;
+  //--
+  // Mirror of InsertItems' index bookkeeping (shift down; indexes that
+  // pointed inside the removed block collapse onto AIndex)
+  if Owner.FLastVisibleItemIndex >= 0 then begin
+    if Owner.FFirstVisibleItemIndex >= AIndex + ACount then dec(Owner.FFirstVisibleItemIndex, ACount)
+    else if Owner.FFirstVisibleItemIndex >= AIndex then Owner.FFirstVisibleItemIndex := AIndex;
+    if Owner.FLastVisibleItemIndex >= AIndex + ACount then dec(Owner.FLastVisibleItemIndex, ACount)
+    else if Owner.FLastVisibleItemIndex >= AIndex then Owner.FLastVisibleItemIndex := AIndex - 1;
+    if Owner.FLastVisibleItemIndex > FControlsCount - 1 then Owner.FLastVisibleItemIndex := FControlsCount - 1;
+    if Owner.FFirstVisibleItemIndex > Owner.FLastVisibleItemIndex then begin
+      Owner.FFirstVisibleItemIndex := 0;
+      Owner.FLastVisibleItemIndex := -1;
+    end;
+  end;
+  if Owner.FLastPreloadedItemIndex >= 0 then begin
+    if Owner.FFirstPreloadedItemIndex >= AIndex + ACount then dec(Owner.FFirstPreloadedItemIndex, ACount)
+    else if Owner.FFirstPreloadedItemIndex >= AIndex then Owner.FFirstPreloadedItemIndex := AIndex;
+    if Owner.FLastPreloadedItemIndex >= AIndex + ACount then dec(Owner.FLastPreloadedItemIndex, ACount)
+    else if Owner.FLastPreloadedItemIndex >= AIndex then Owner.FLastPreloadedItemIndex := AIndex - 1;
+    if Owner.FLastPreloadedItemIndex > FControlsCount - 1 then Owner.FLastPreloadedItemIndex := FControlsCount - 1;
+    if Owner.FFirstPreloadedItemIndex > Owner.FLastPreloadedItemIndex then begin
+      Owner.FFirstPreloadedItemIndex := 0;
+      Owner.FLastPreloadedItemIndex := -1;
+    end;
+  end;
+  if Owner.FTriggerDownloadItemsAtIndex >= AIndex + ACount then dec(Owner.FTriggerDownloadItemsAtIndex, ACount)
+  else if Owner.FTriggerDownloadItemsAtIndex >= AIndex then Owner.FTriggerDownloadItemsAtIndex := AIndex;
+  //--
+  Realign(AIndex);
+  Repaint;
 end;
 
 {************************************************************************************************************************}
@@ -4003,6 +4068,12 @@ begin
   ALFreeAndNil(LItem, true{delayed});
 end;
 
+{***********************************************************************************}
+procedure TALDynamicListBox.TView.DeleteItems(const AIndex, ACount: Integer);
+begin
+  TMainContent(FMainContent).DeleteItems(AIndex, ACount);
+end;
+
 {**************************************************************}
 procedure TALDynamicListBox.TView.DeleteItem(const AId: String);
 begin
@@ -5187,6 +5258,13 @@ procedure TALDynamicListBox.DeleteItemAtIndex(const AIndex: Integer);
 begin
   If MainView = nil then raise Exception.Create('MainView not yet initialized');
   MainView.DeleteItemAtIndex(AIndex);
+end;
+
+{**************************************************************************}
+procedure TALDynamicListBox.DeleteItems(const AIndex, ACount: Integer);
+begin
+  If MainView = nil then raise Exception.Create('MainView not yet initialized');
+  MainView.DeleteItems(AIndex, ACount);
 end;
 
 {******************************************************}

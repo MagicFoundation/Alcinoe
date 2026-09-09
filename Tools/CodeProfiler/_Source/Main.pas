@@ -2,6 +2,9 @@
 
 interface
 
+{$I Alcinoe.inc}
+{$SCOPEDENUMS OFF}
+
 uses
   Vcl.Forms, dxBarBuiltInMenu, cxGraphics, dxUIAClasses, cxControls,
   cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit, Vcl.Menus,
@@ -31,7 +34,7 @@ uses
   dxSkinXmas2008Blue, cxTL, cxTLdxBarBuiltInMenu, cxInplaceContainer, cxTreeView,
   cxTLData, cxSplitter, IdBaseComponent, IdComponent, IdCustomTCPServer,
   IdCustomHTTPServer, IdHTTPServer, IdContext, dxStatusBar, System.SysUtils,
-  System.SyncObjs;
+  System.SyncObjs, cxRadioGroup, cxCheckBox;
 
 type
 
@@ -55,6 +58,7 @@ type
     GridTableViewProcMetricsColumnProcName: TcxGridColumn;
     GridTableViewProcMetricsColumnThreadID: TcxGridColumn;
     GridTableViewProcMetricsColumnTimeTaken: TcxGridColumn;
+    GridTableViewProcMetricsColumnCallCount: TcxGridColumn;
     GridLevelProcMetrics: TcxGridLevel;
     LoadDataBtn: TcxButton;
     InstructionPanel: TdxPanel;
@@ -72,6 +76,7 @@ type
     cxSplitter1: TcxSplitter;
     cxStyleTreeListProcMetricsBackground: TcxStyle;
     TreeListProcMetricsColumnStartTimeStamp: TcxTreeListColumn;
+    TreeListProcMetricsColumnCallCount: TcxTreeListColumn;
     GridTableViewProcMetricsColumnStartTimestamp: TcxGridColumn;
     LastInstructionLabel: TcxLabel;
     StartTimeStampMinEdit: TcxMaskEdit;
@@ -92,10 +97,21 @@ type
     cxLabel14: TcxLabel;
     ClearDataBtn: TcxButton;
     ExportToCsvBtn: TcxButton;
+    dxPanel4: TdxPanel;
+    DoNotGroupRadioButton: TcxRadioButton;
+    GroupCallsByProcIDRadioButton: TcxRadioButton;
+    GroupCallsByCallStackRadioButton: TcxRadioButton;
+    cxLabel15: TcxLabel;
+    dxPanel5: TdxPanel;
+    BrowseCodeProfilerIncFilenameBtn: TcxButton;
+    CodeProfilerIncFilenameEdit: TcxTextEdit;
+    dxPanel6: TdxPanel;
+    CodeProfilerEnabledCheckBox: TcxCheckBox;
     procedure InsertProfilerMarkersBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure LoadDataBtnClick(Sender: TObject);
+    procedure ClearDataBtnClick(Sender: TObject);
     procedure GridTableViewProcMetricsCellDblClick(
                 Sender: TcxCustomGridTableView;
                 ACellViewInfo: TcxGridTableDataCellViewInfo;
@@ -110,11 +126,16 @@ type
     procedure TreeListProcMetricsColumnStartTimeStampGetDisplayText(Sender: TcxTreeListColumn; ANode: TcxTreeListNode; var Value: string);
     procedure PanelfilterResize(Sender: TObject);
     procedure HttpServerPortEditPropertiesChange(Sender: TObject);
+    procedure HttpServerNameEditPropertiesChange(Sender: TObject);
     procedure IdHTTPServerCommandGet(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     procedure IdHTTPServerException(AContext: TIdContext; AException: Exception);
     procedure IdHTTPServerListenException(AThread: TIdListenerThread; AException: Exception);
     procedure IdHTTPServerConnect(AContext: TIdContext);
     procedure ExportToCsvBtnClick(Sender: TObject);
+    procedure HistoryGroupModeRadioButtonClick(Sender: TObject);
+    procedure CodeProfilerIncFilenameEditPropertiesChange(Sender: TObject);
+    procedure BrowseCodeProfilerIncFilenameBtnClick(Sender: TObject);
+    procedure CodeProfilerEnabledCheckBoxPropertiesChange(Sender: TObject);
   private
     const ConfigFilename = 'Config.ini';
   private
@@ -125,24 +146,104 @@ type
         SortColumnIndex: Integer;
         SortOrder: TcxGridSortOrder;
       end;
+      // Mirrors the ALCodeProfilerHistoryGroupXXX modes selected via the
+      // radio buttons at runtime, so this tool never needs to be recompiled
+      // just because Alcinoe.CodeProfiler.inc's active mode changed.
+      TALCodeProfilerHistoryGroupMode = (hgmNone, hgmByProcID, hgmByCallStack);
+      // Raw, on-disk layouts. These intentionally mirror the field lists of
+      // Alcinoe.CodeProfiler.TALProcMetrics for each mode so the compiler
+      // computes the exact same size/offsets that the profiled app used
+      // when writing the .dat file.
+      TALProcMetricsNone = record
+        ExecutionID: Cardinal;
+        ParentExecutionID: Cardinal;
+        ProcID: Cardinal;
+        ThreadID: Cardinal;
+        StartTimeStamp: Int64;
+        ElapsedTicks: Int64;
+      end;
+      TALProcMetricsByProcID = record
+        ProcID: Cardinal;
+        ThreadID: Cardinal;
+        CallCount: Cardinal;
+        ElapsedTicks: Int64;
+      end;
+      TALProcMetricsByCallStack = record
+        HashCode: Integer;
+        ProcID: Cardinal;
+        MetricsID: Cardinal;
+        ParentMetricsID: Cardinal;
+        ThreadID: Cardinal;
+        CallCount: Cardinal;
+        ElapsedTicks: Int64;
+      end;
+      // In-memory, mode-agnostic representation decoded from whichever raw
+      // layout above matches FHistoryGroupMode. Fields not meaningful for
+      // the current mode are left at 0.
+      TALProcMetrics = record
+        ExecutionID: Cardinal;
+        ParentExecutionID: Cardinal;
+        ProcID: Cardinal;
+        MetricsID: Cardinal;
+        ParentMetricsID: Cardinal;
+        ThreadID: Cardinal;
+        StartTimeStamp: Int64;
+        ElapsedTicks: Int64;
+        CallCount: Cardinal;
+      end;
+      // CSV columns available across the three modes (CSV export).
+      TALProcMetricsColumnKind = (
+        colkExecutionID, colkParentExecutionID, colkProcID, colkMetricsID, colkParentMetricsID,
+        colkProcName, colkThreadID, colkStartTimeStamp, colkCallCount, colkTimeTaken);
   private
     FDataDir: String;
+    // Set while the UI is being populated from Config.ini or from
+    // Alcinoe.CodeProfiler.inc, so that the change events raised by that
+    // population do not write the settings back to Alcinoe.CodeProfiler.inc.
+    FLoadingSettings: Boolean;
     FProcIDSequence: Integer;
+    FHistoryGroupMode: TALCodeProfilerHistoryGroupMode;
     FProcMetrics: TArray<TALProcMetrics>;
     FProcIDMap: TALHashedStringListA;
     FTreeListProcMetricsTailNode: TcxTreeListNode;
+    FTreeListProcMetricsRootNode: TcxTreeListNode;
     FFilterProcIDs: THashSet<Cardinal>;
     FFilterExecutionIDs: THashSet<Cardinal>;
     FFilterParentExecutionIDs: THashSet<Cardinal>;
     FFilterStartTimeStampMin: Int64;
     FFilterStartTimeStampMax: Int64;
     FOverrideFilterParentExecutionID: Cardinal;
+    FOverrideFilterThreadID: Cardinal; // High(Cardinal) means "no thread filter"
     FGoBackStack: TDictionary<Int64{ExecutionID}, TGoBackStackItem>;
     FHttpServerCriticalSection: TCriticalSection;
     procedure ResetFilters;
+    procedure ResetTreeListProcMetrics;
     Procedure RemoveMarkers(const AFileName: String);
     Procedure InsertMarkers(const AFileName: String; Const AProcIDMap: TALStringListA);
     procedure Refresh;
+    function GetSelectedHistoryGroupModeEnum: TALCodeProfilerHistoryGroupMode;
+    function GetSelectedHistoryGroupMode: AnsiString;
+    procedure SelectHistoryGroupMode(const AHistoryGroupMode: String);
+    procedure UpdateHistoryGroupModeUI;
+    function GetSelectedProcMetricsFilename: String;
+    function GetProcMetricsRawRecordSize(const AHistoryGroupMode: TALCodeProfilerHistoryGroupMode): Integer;
+    procedure DecodeProcMetricsRaw(
+                const AHistoryGroupMode: TALCodeProfilerHistoryGroupMode;
+                const ARawBuffer: TBytes;
+                const AOffset: Integer;
+                out ARec: TALProcMetrics);
+    function GetProcMetricsColumnsForMode(const AHistoryGroupMode: TALCodeProfilerHistoryGroupMode): TArray<TALProcMetricsColumnKind>;
+    function GetProcMetricsColumnName(const AKind: TALProcMetricsColumnKind): AnsiString;
+    function GetProcMetricsColumnValue(
+               const AKind: TALProcMetricsColumnKind;
+               const ARec: TALProcMetrics;
+               const AProcNames: TDictionary<Cardinal, AnsiString>): AnsiString;
+    function GetSelectedServerName: AnsiString;
+    procedure SelectServerName(const AServerName: String);
+    function GetCodeProfilerIncFilename: String;
+    procedure SaveCodeProfilerIncFile;
+    procedure LoadCodeProfilerIncFile;
+    procedure SaveConfigFile;
   public
   end;
 
@@ -220,6 +321,389 @@ begin
   FFilterStartTimeStampMin := 0;
   FFilterStartTimeStampMax := 0;
   FOverrideFilterParentExecutionID := 0;
+  FOverrideFilterThreadID := High(Cardinal);
+end;
+
+{*******************************************************************}
+procedure TMainForm.ResetTreeListProcMetrics;
+begin
+  TreeListProcMetrics.Clear;
+  // Always keep a "..." root node visible so the user has an obvious,
+  // clickable way back to the root instead of having to guess that
+  // double-clicking empty space resets the drill-down.
+  FTreeListProcMetricsTailNode := TreeListProcMetrics.Add;
+  FTreeListProcMetricsTailNode.Texts[TreeListProcMetricsColumnProcName.ItemIndex] := '...';
+  FTreeListProcMetricsTailNode.Texts[TreeListProcMetricsColumnExecutionID.ItemIndex] := '0';
+  // Leave the ThreadID cell blank for the root node (there is no single
+  // thread to show); FTreeListProcMetricsRootNode is used instead of this
+  // column's value to detect the root node and clear the thread filter.
+  FTreeListProcMetricsRootNode := FTreeListProcMetricsTailNode;
+end;
+
+{*******************************************************************}
+function TMainForm.GetSelectedHistoryGroupModeEnum: TALCodeProfilerHistoryGroupMode;
+begin
+  if DoNotGroupRadioButton.Checked then Result := hgmNone
+  else if GroupCallsByProcIDRadioButton.Checked then Result := hgmByProcID
+  else Result := hgmByCallStack;
+end;
+
+{*******************************************************************}
+function TMainForm.GetSelectedHistoryGroupMode: AnsiString;
+begin
+  case GetSelectedHistoryGroupModeEnum of
+    hgmNone: Result := 'ALCodeProfilerHistoryGroupNone';
+    hgmByProcID: Result := 'ALCodeProfilerHistoryGroupByProcID';
+    else Result := 'ALCodeProfilerHistoryGroupByCallStack';
+  end;
+end;
+
+{*******************************************************************************}
+procedure TMainForm.SelectHistoryGroupMode(const AHistoryGroupMode: String);
+begin
+  if ALSameTextW(AHistoryGroupMode, 'ALCodeProfilerHistoryGroupNone') then DoNotGroupRadioButton.Checked := True
+  else if ALSameTextW(AHistoryGroupMode, 'ALCodeProfilerHistoryGroupByProcID') then GroupCallsByProcIDRadioButton.Checked := True
+  else GroupCallsByCallStackRadioButton.Checked := True;
+end;
+
+{*******************************************************************}
+procedure TMainForm.UpdateHistoryGroupModeUI;
+begin
+  case GetSelectedHistoryGroupModeEnum of
+    hgmNone: begin
+      TreeListProcMetricsColumnStartTimeStamp.Visible := True;
+      GridTableViewProcMetricsColumnStartTimestamp.Visible := True;
+      TreeListProcMetricsColumnCallCount.Visible := False;
+      GridTableViewProcMetricsColumnCallCount.Visible := False;
+      // The start-timestamp filter only makes sense for individual calls,
+      // which only exist in hgmNone; grouped modes have no StartTimeStamp.
+      StartTimeStampMinEdit.Enabled := True;
+      StartTimeStampMaxEdit.Enabled := True;
+    end;
+    else begin
+      TreeListProcMetricsColumnStartTimeStamp.Visible := False;
+      GridTableViewProcMetricsColumnStartTimestamp.Visible := False;
+      TreeListProcMetricsColumnCallCount.Visible := True;
+      GridTableViewProcMetricsColumnCallCount.Visible := True;
+      StartTimeStampMinEdit.Enabled := False;
+      StartTimeStampMaxEdit.Enabled := False;
+    end;
+  end;
+end;
+
+{*******************************************************************}
+function TMainForm.GetSelectedProcMetricsFilename: String;
+begin
+  case GetSelectedHistoryGroupModeEnum of
+    hgmNone: Result := 'ALCodeProfilerProcMetrics.None.dat';
+    hgmByProcID: Result := 'ALCodeProfilerProcMetrics.ByProcID.dat';
+    else Result := 'ALCodeProfilerProcMetrics.ByCallStack.dat';
+  end;
+end;
+
+{*******************************************************************}
+function TMainForm.GetProcMetricsRawRecordSize(const AHistoryGroupMode: TALCodeProfilerHistoryGroupMode): Integer;
+begin
+  case AHistoryGroupMode of
+    hgmNone: Result := SizeOf(TALProcMetricsNone);
+    hgmByProcID: Result := SizeOf(TALProcMetricsByProcID);
+    else Result := SizeOf(TALProcMetricsByCallStack);
+  end;
+end;
+
+{*******************************************************************}
+procedure TMainForm.DecodeProcMetricsRaw(
+            const AHistoryGroupMode: TALCodeProfilerHistoryGroupMode;
+            const ARawBuffer: TBytes;
+            const AOffset: Integer;
+            out ARec: TALProcMetrics);
+begin
+  FillChar(ARec, SizeOf(ARec), 0);
+  case AHistoryGroupMode of
+    hgmNone: begin
+      var LRaw: TALProcMetricsNone;
+      Move(ARawBuffer[AOffset], LRaw, SizeOf(LRaw));
+      ARec.ExecutionID := LRaw.ExecutionID;
+      ARec.ParentExecutionID := LRaw.ParentExecutionID;
+      ARec.ProcID := LRaw.ProcID;
+      ARec.ThreadID := LRaw.ThreadID;
+      ARec.StartTimeStamp := LRaw.StartTimeStamp;
+      ARec.ElapsedTicks := LRaw.ElapsedTicks;
+    end;
+    hgmByProcID: begin
+      var LRaw: TALProcMetricsByProcID;
+      Move(ARawBuffer[AOffset], LRaw, SizeOf(LRaw));
+      ARec.ProcID := LRaw.ProcID;
+      ARec.ThreadID := LRaw.ThreadID;
+      ARec.CallCount := LRaw.CallCount;
+      ARec.ElapsedTicks := LRaw.ElapsedTicks;
+    end;
+    hgmByCallStack: begin
+      var LRaw: TALProcMetricsByCallStack;
+      Move(ARawBuffer[AOffset], LRaw, SizeOf(LRaw));
+      ARec.ProcID := LRaw.ProcID;
+      ARec.MetricsID := LRaw.MetricsID;
+      ARec.ParentMetricsID := LRaw.ParentMetricsID;
+      ARec.ThreadID := LRaw.ThreadID;
+      ARec.CallCount := LRaw.CallCount;
+      ARec.ElapsedTicks := LRaw.ElapsedTicks;
+    end;
+  end;
+end;
+
+{*******************************************************************}
+function TMainForm.GetProcMetricsColumnsForMode(const AHistoryGroupMode: TALCodeProfilerHistoryGroupMode): TArray<TALProcMetricsColumnKind>;
+begin
+  case AHistoryGroupMode of
+    hgmNone: Result := [colkExecutionID, colkParentExecutionID, colkProcID, colkProcName, colkThreadID, colkStartTimeStamp, colkTimeTaken];
+    hgmByProcID: Result := [colkProcID, colkProcName, colkThreadID, colkCallCount, colkTimeTaken];
+    else Result := [colkProcID, colkMetricsID, colkParentMetricsID, colkProcName, colkThreadID, colkCallCount, colkTimeTaken];
+  end;
+end;
+
+{*******************************************************************}
+function TMainForm.GetProcMetricsColumnName(const AKind: TALProcMetricsColumnKind): AnsiString;
+begin
+  case AKind of
+    colkExecutionID: Result := 'ExecutionID';
+    colkParentExecutionID: Result := 'ParentExecutionID';
+    colkProcID: Result := 'ProcID';
+    colkMetricsID: Result := 'MetricsID';
+    colkParentMetricsID: Result := 'ParentMetricsID';
+    colkProcName: Result := 'ProcName';
+    colkThreadID: Result := 'ThreadID';
+    colkStartTimeStamp: Result := 'StartTimeStamp';
+    colkCallCount: Result := 'CallCount';
+    else Result := 'TimeTaken';
+  end;
+end;
+
+{*******************************************************************}
+function TMainForm.GetProcMetricsColumnValue(
+           const AKind: TALProcMetricsColumnKind;
+           const ARec: TALProcMetrics;
+           const AProcNames: TDictionary<Cardinal, AnsiString>): AnsiString;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _TicksToMillisecondsStr(const ATicks: Int64): AnsiString;
+  begin
+    // 1 tick equals 0.0001 millisecond (ALCodeProfilerMillisecondsPerTick),
+    // so use integer arithmetic to avoid any rounding/locale issue
+    Result := ALIntToStrA(ATicks div 10000) + '.' + ALFormatA('%.4d', [ATicks mod 10000]);
+  end;
+
+begin
+  case AKind of
+    colkExecutionID: Result := ALIntToStrA(ARec.ExecutionID);
+    colkParentExecutionID: Result := ALIntToStrA(ARec.ParentExecutionID);
+    colkProcID: Result := ALIntToStrA(ARec.ProcID);
+    colkMetricsID: Result := ALIntToStrA(ARec.MetricsID);
+    colkParentMetricsID: Result := ALIntToStrA(ARec.ParentMetricsID);
+    colkProcName: begin
+      var LProcName: AnsiString;
+      if not AProcNames.TryGetValue(ARec.ProcID, LProcName) then LProcName := '';
+      Result := LProcName;
+    end;
+    colkThreadID: Result := ALIntToStrA(ARec.ThreadID);
+    colkStartTimeStamp: Result := _TicksToMillisecondsStr(ARec.StartTimeStamp);
+    colkCallCount: Result := ALIntToStrA(ARec.CallCount);
+    else Result := _TicksToMillisecondsStr(ARec.ElapsedTicks);
+  end;
+end;
+
+{*******************************************************************}
+function TMainForm.GetSelectedServerName: AnsiString;
+begin
+  if (ALTrim(HttpServerNameEdit.Text) <> '') and (ALTrim(HttpServerPortEdit.Text) <> '') then
+    Result := AnsiString('http://'+ALTrim(HttpServerNameEdit.Text)+':'+ALTrim(HttpServerPortEdit.Text))
+  else
+    Result := '';
+end;
+
+{*******************************************************************}
+procedure TMainForm.SelectServerName(const AServerName: String);
+begin
+  var LServerName := AServerName;
+  if ALPosW('http://', LServerName) = 1 then Delete(LServerName, 1, Length('http://'));
+  var LColonPos := LastDelimiter(':', LServerName);
+  if LColonPos > 0 then begin
+    HttpServerNameEdit.Text := ALCopyStr(LServerName, 1, LColonPos - 1);
+    HttpServerPortEdit.Text := ALCopyStr(LServerName, LColonPos + 1, MaxInt);
+  end
+  else begin
+    HttpServerNameEdit.Text := LServerName;
+    HttpServerPortEdit.Text := '8080';
+  end;
+end;
+
+{*****************************************************************************}
+procedure TMainForm.HistoryGroupModeRadioButtonClick(Sender: TObject);
+begin
+  UpdateHistoryGroupModeUI;
+  SaveCodeProfilerIncFile;
+end;
+
+{**********************************************************}
+function TMainForm.GetCodeProfilerIncFilename: String;
+begin
+  Result := ALTrim(CodeProfilerIncFilenameEdit.Text);
+  if Result = '' then exit;
+  // A relative path is relative to the folder of this tool, so that the
+  // default value (..\..\Source\Alcinoe.CodeProfiler.inc) keeps working
+  // whatever the location of the Alcinoe repository.
+  if TPath.IsRelativePath(Result) then Result := ALGetModulePathW + Result;
+  Result := ExpandFileName(Result);
+end;
+
+{*******************************************}
+procedure TMainForm.SaveCodeProfilerIncFile;
+var
+  LHistoryGroupMode: AnsiString;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _DefineLine(const AHistoryGroupModeName: AnsiString): AnsiString;
+  begin
+    if ALSameTextA(AHistoryGroupModeName, LHistoryGroupMode) then Result := '{$DEFINE ' + AHistoryGroupModeName + '}'
+    else Result := '{.$DEFINE ' + AHistoryGroupModeName + '}';
+  end;
+
+begin
+  // Never write Alcinoe.CodeProfiler.inc while the UI is still being populated
+  // from Config.ini / Alcinoe.CodeProfiler.inc, else the values just loaded
+  // would be written back, possibly to a file that is not the selected one yet.
+  if FLoadingSettings then exit;
+  var LIncFilename := GetCodeProfilerIncFilename;
+  if LIncFilename = '' then exit;
+  LHistoryGroupMode := GetSelectedHistoryGroupMode;
+  var LContent: AnsiString :=
+    'var'#10 +
+    '  ALCodeProfilerEnabled: Boolean = '+ALIfThenA(CodeProfilerEnabledCheckBox.Checked, 'True', 'False')+';'#10 +
+    '  ALCodeProfilerServerName: String = '''+GetSelectedServerName+''';'#10 +
+    #10 +
+    '// Do not group calls. Each function/procedure call generates one row.'#10 +
+    '// The result will be displayed as a call tree, for example:'#10 +
+    '// procedure A - 1 call - 310 ms'#10 +
+    '//   procedure B - 1 call - 215 ms'#10 +
+    '//     procedure C - 1 call - 14 ms'#10 +
+    '//     procedure C - 1 call - 11 ms'#10 +
+    '//     procedure D - 1 call - 85 ms'#10 +
+    '//     procedure C - 1 call - 21 ms'#10 +
+    '//   procedure B - 1 call - 35 ms'#10 +
+    '//   procedure B - 1 call - 41 ms'#10 +
+    '//   procedure C - 1 call - 22 ms'#10 +
+    '//'#10 +
+    '// NOTE: This option can use a lot of memory. If you enable it, it is recommended'#10 +
+    '// to limit profiling to the specific code you want to measure by using'#10 +
+    '// ALCodeProfilerStart and ALCodeProfilerStop.'#10 +
+    _DefineLine('ALCodeProfilerHistoryGroupNone') + #10 +
+    #10 +
+    '// Group calls by procedure ID.'#10 +
+    '// The result will be displayed as a flat grid, for example:'#10 +
+    '// procedure A - 1 call - 310 ms'#10 +
+    '// procedure B - 3 calls - 291 ms'#10 +
+    '// procedure C - 4 calls - 68 ms'#10 +
+    '// procedure D - 1 call - 85 ms'#10 +
+    '//'#10 +
+    '// NOTE: This is the fastest option and has the lowest impact on each function call.'#10 +
+    _DefineLine('ALCodeProfilerHistoryGroupByProcID') + #10 +
+    #10 +
+    '// Group calls by call stack.'#10 +
+    '// The result will be displayed as a grouped call tree, for example:'#10 +
+    '// procedure A - 1 call - 310 ms'#10 +
+    '//   procedure B - 3 calls - 291 ms'#10 +
+    '//     procedure C - 3 calls - 46 ms'#10 +
+    '//     procedure D - 1 call - 85 ms'#10 +
+    '//   procedure C - 1 call - 22 ms'#10 +
+    _DefineLine('ALCodeProfilerHistoryGroupByCallStack') + #10;
+  ALSaveStringToFile(LContent, LIncFilename);
+end;
+
+{*******************************************}
+procedure TMainForm.LoadCodeProfilerIncFile;
+begin
+  var LIncFilename := GetCodeProfilerIncFilename;
+  var LContent: AnsiString := '';
+  if (LIncFilename <> '') and TFile.Exists(LIncFilename) then LContent := ALGetStringFromFile(LIncFilename);
+  // Populating the controls below raises their OnChange event, which would
+  // otherwise save these very same values back to Alcinoe.CodeProfiler.inc.
+  FLoadingSettings := True;
+  try
+    //--
+    if ALPosA('{$DEFINE ALCodeProfilerHistoryGroupNone}', LContent) > 0 then SelectHistoryGroupMode('ALCodeProfilerHistoryGroupNone')
+    else if ALPosA('{$DEFINE ALCodeProfilerHistoryGroupByProcID}', LContent) > 0 then SelectHistoryGroupMode('ALCodeProfilerHistoryGroupByProcID')
+    else SelectHistoryGroupMode('ALCodeProfilerHistoryGroupByCallStack');
+    //--
+    var LServerName: String := '';
+    var LMarker: AnsiString := 'ALCodeProfilerServerName: String = ''';
+    var LValueStart := ALPosA(LMarker, LContent);
+    if LValueStart > 0 then begin
+      inc(LValueStart, Length(LMarker));
+      var LValueEnd := ALPosA('''', LContent, LValueStart);
+      if LValueEnd > LValueStart then
+        LServerName := String(ALCopyStr(LContent, LValueStart, LValueEnd - LValueStart));
+    end;
+    SelectServerName(LServerName);
+    //--
+    var LEnabled := True;
+    LMarker := 'ALCodeProfilerEnabled: Boolean = ';
+    LValueStart := ALPosA(LMarker, LContent);
+    if LValueStart > 0 then begin
+      inc(LValueStart, Length(LMarker));
+      LEnabled := not ALSameTextA(ALCopyStr(LContent, LValueStart, Length('False')), 'False');
+    end;
+    CodeProfilerEnabledCheckBox.Checked := LEnabled;
+  finally
+    FLoadingSettings := False;
+  end;
+end;
+
+{*********************************}
+procedure TMainForm.SaveConfigFile;
+begin
+  var LIniFile := TIniFile.Create(TPath.Combine(FDataDir, ConfigFilename));
+  try
+    LIniFile.WriteString('General','SourcesPath',ALStringReplaceW(ALTrim(SourcesPathMemo.Text), #13#10, ';', [RfReplaceALL]));
+    LIniFile.WriteString('General','CodeProfilerIncFilename',ALTrim(CodeProfilerIncFilenameEdit.Text));
+  finally
+    ALFreeAndNil(LIniFile);
+  end;
+end;
+
+{*******************************************************************************}
+procedure TMainForm.CodeProfilerIncFilenameEditPropertiesChange(Sender: TObject);
+begin
+  if FLoadingSettings then exit;
+  SaveConfigFile;
+  // Reload the options only once the typed path points to an existing file,
+  // else every intermediate keystroke would reset them to their defaults.
+  if TFile.Exists(GetCodeProfilerIncFilename) then LoadCodeProfilerIncFile;
+end;
+
+{***************************************************************************}
+procedure TMainForm.BrowseCodeProfilerIncFilenameBtnClick(Sender: TObject);
+begin
+  var LOpenDialog := TOpenDialog.Create(nil);
+  try
+    LOpenDialog.Title := 'Select Alcinoe.CodeProfiler.inc';
+    LOpenDialog.Filter := 'Alcinoe.CodeProfiler.inc|Alcinoe.CodeProfiler.inc|Include files (*.inc)|*.inc|All files (*.*)|*.*';
+    LOpenDialog.DefaultExt := 'inc';
+    LOpenDialog.Options := LOpenDialog.Options + [ofFileMustExist, ofPathMustExist];
+    var LIncFilename := GetCodeProfilerIncFilename;
+    if LIncFilename <> '' then begin
+      LOpenDialog.InitialDir := ALExtractFilePath(LIncFilename);
+      LOpenDialog.FileName := LIncFilename;
+    end;
+    if LOpenDialog.Execute(Handle) then
+      CodeProfilerIncFilenameEdit.Text := LOpenDialog.FileName;
+  finally
+    ALFreeAndNil(LOpenDialog);
+  end;
+end;
+
+{*******************************************************************************}
+procedure TMainForm.CodeProfilerEnabledCheckBoxPropertiesChange(Sender: TObject);
+begin
+  SaveCodeProfilerIncFile;
 end;
 
 {*********************************************************}
@@ -252,7 +736,7 @@ begin
     finally
       RemoveProfilerMarkersBtn.Cursor := crDefault;
     End;
-    var LProcMetricsFilename := TPath.Combine(FDataDir, ALCodeProfilerProcMetricsFilename);
+    var LProcMetricsFilename := TPath.Combine(FDataDir, GetSelectedProcMetricsFilename);
     If TFile.Exists(LProcMetricsFilename) then
       TFile.Delete(LProcMetricsFilename);
     var LProcIDMapFilename := TPath.Combine(FDataDir, ALCodeProfilerProcIDMapFilename);
@@ -272,8 +756,16 @@ begin
     // We're only handling POST requests here.
     if ARequestInfo.CommandType = hcPOST then
     begin
-      // Define the file path where the POST content will be saved.
-      var LProcMetricsTmpFilename := TPath.Combine(FDataDir, ALCodeProfilerProcMetricsFilename + '~tmp');
+      // Define the file path where the POST content will be saved. The
+      // filename depends on the currently selected radio button, so it
+      // must be read on the main thread.
+      var LProcMetricsFilename: String;
+      TThread.Synchronize(nil,
+        procedure
+        begin
+          LProcMetricsFilename := TPath.Combine(FDataDir, GetSelectedProcMetricsFilename);
+        end);
+      var LProcMetricsTmpFilename := LProcMetricsFilename + '~tmp';
       If TFile.Exists(LProcMetricsTmpFilename) then
         TFile.Delete(LProcMetricsTmpFilename);
       if Assigned(ARequestInfo.PostStream) then
@@ -297,7 +789,6 @@ begin
           procedure
           begin
             Try
-              var LProcMetricsFilename := TPath.Combine(FDataDir, ALCodeProfilerProcMetricsFilename);
               If TFile.Exists(LProcMetricsFilename) then
                 TFile.Delete(LProcMetricsFilename);
               TFile.Move(LProcMetricsTmpFilename, LProcMetricsFilename);
@@ -469,38 +960,6 @@ type
     end;
   end;
 
-  {*************************************************************************************}
-  function HasAncestorOfType(const ANode: TSyntaxNode; const ANodeType: TSyntaxNodeType): Boolean;
-  begin
-    var LParent := ANode.ParentNode;
-    while Assigned(LParent) do begin
-      if LParent.Typ = ANodeType then
-        Exit(True);
-      LParent := LParent.ParentNode;
-    end;
-    Result := False;
-  end;
-
-  {*******************************************************************}
-  function FindRootStatements(const ANode: TSyntaxNode): TCompoundSyntaxNode;
-  begin
-    Result := nil;
-    if not Assigned(ANode) then
-      Exit;
-    if (ANode.Typ = ntStatements) and
-       (ANode is TCompoundSyntaxNode) and
-       (not HasAncestorOfType(ANode, ntMethod)) and
-       (not HasAncestorOfType(ANode, ntAnonymousMethod)) then begin
-      Result := TCompoundSyntaxNode(ANode);
-      Exit;
-    end;
-    for var LChild in ANode.ChildNodes do begin
-      Result := FindRootStatements(LChild);
-      if Assigned(Result) then
-        Exit;
-    end;
-  end;
-
   {****************************************************************}
   function GetMethodStatements(const ANode: TSyntaxNode): TCompoundSyntaxNode;
   begin
@@ -559,13 +1018,13 @@ type
             ASourceCode,
             LStatements.Line,
             LBeginInsertionCol,
-            '{ALCodeProfiler>>}ALCodeProfilerEnterProc('+ALIntToStrA(FProcIDSequence){$IF defined(debug)}+'{ '+LProcName+' }'{$ENDIF}+'); try{<<ALCodeProfiler}');
+            '{ALCodeProfiler>>}ALCodeProfilerEnterProc('+ALIntToStrA(FProcIDSequence)+'); try{<<ALCodeProfiler}');
           AddInsertion(
             AInsertions,
             ASourceCode,
             LStatements.EndLine,
             LEndInsertionCol,
-            '{ALCodeProfiler>>}finally ALCodeProfilerExitProc('+ALIntToStrA(FProcIDSequence){$IF defined(debug)}+'{ '+LProcName+' }'{$ENDIF}+'); end;{<<ALCodeProfiler}');
+            '{ALCodeProfiler>>}finally ALCodeProfilerExitProc('+ALIntToStrA(FProcIDSequence)+'); end;{<<ALCodeProfiler}');
           AProcIDMap.Add(ALIntToStrA(FProcIDSequence) + '=' + AUnitName + '.' + LProcName);
         end;
       end;
@@ -628,22 +1087,6 @@ begin
         '{ALCodeProfiler>>}{$DEFINE ALCodeProfiler}uses Alcinoe.CodeProfiler;{<<ALCodeProfiler}');
     end;
 
-    if (LIsDPR) and
-       (ALTrim(HttpServerNameEdit.Text) <> '') and
-       (ALTrim(HttpServerPortEdit.Text) <> '') then begin
-      var LRootStatements := FindRootStatements(LSyntaxTree);
-      if Assigned(LRootStatements) then begin
-        var LBeginInsertionCol := FindBeginInsertionColumn(LSourceCode, LRootStatements.Line, LRootStatements.Col);
-        if LBeginInsertionCol > 0 then
-          AddInsertion(
-            LInsertions,
-            LSourceCode,
-            LRootStatements.Line,
-            LBeginInsertionCol,
-            '{ALCodeProfiler>>}ALCodeProfilerServerName := ''http://'+ALTrim(AnsiString(HttpServerNameEdit.Text))+':'+ALTrim(AnsiString(HttpServerPortEdit.Text))+''';{<<ALCodeProfiler}');
-      end;
-    end;
-
     if not LIsDPR then begin
       var LImplementationNode := FindFirstNode(LSyntaxTree, ntImplementation);
       if Assigned(LImplementationNode) then begin
@@ -666,14 +1109,7 @@ end;
 {*****************************************************************}
 procedure TMainForm.InsertProfilerMarkersBtnClick(Sender: TObject);
 begin
-  var LIniFile := TIniFile.Create(TPath.Combine(FDataDir, ConfigFilename));
-  try
-    LIniFile.WriteString('General','ServerName',HttpServerNameEdit.Text);
-    LIniFile.WriteString('General','ServerPort',HttpServerPortEdit.Text);
-    LIniFile.WriteString('General','SourcesPath',ALStringReplaceW(ALTrim(SourcesPathMemo.Text), #13#10, ';', [RfReplaceALL]));
-  finally
-    ALFreeAndNil(LIniFile);
-  end;
+  SaveConfigFile;
   var LSourceFilenames := TALStringListW.Create;
   var LFailedFilenames := TALStringListW.Create;
   var LProcIDMap := TALStringListA.Create;
@@ -687,9 +1123,10 @@ begin
     // after the highest existing ProcID so that the IDs already present in
     // the sources and in the performance file stay valid
     var LProcIDMapFilename := TPath.Combine(FDataDir, ALCodeProfilerProcIDMapFilename);
+    var LProcMetricsFilenameOnly := GetSelectedProcMetricsFilename;
     var LClearData := MessageDlg(
                         'Do you want to start a fresh profiling session and clear the data collected so far?'+ sLineBreak + sLineBreak +
-                        'YES – Start fresh: the procedure IDs ('+ALCodeProfilerProcIDMapFilename+') and the collected performance data ('+ALCodeProfilerProcMetricsFilename+') will be discarded, and the ID numbering will restart from 1. '+
+                        'YES – Start fresh: the procedure IDs ('+ALCodeProfilerProcIDMapFilename+') and the collected performance data ('+LProcMetricsFilenameOnly+') will be discarded, and the ID numbering will restart from 1. '+
                         'Choose this only if the selected files cover ALL the files currently containing profiler markers; any file left instrumented from a previous run would keep old IDs that clash with the new ones.'+ sLineBreak + sLineBreak +
                         'NO – Keep the existing data: the procedures of the selected files will be assigned new IDs, following the existing ones, so previously instrumented files and already collected performance data stay valid.',
                         mtConfirmation, [mbYes, mbNo, mbCancel], 0);
@@ -717,7 +1154,7 @@ begin
       InsertProfilerMarkersBtn.Cursor := crDefault;
     End;
     if LClearData = mrYes then begin
-      var LProcMetricsFilename := TPath.Combine(FDataDir, ALCodeProfilerProcMetricsFilename);
+      var LProcMetricsFilename := TPath.Combine(FDataDir, LProcMetricsFilenameOnly);
       If TFile.Exists(LProcMetricsFilename) then
         TFile.Delete(LProcMetricsFilename);
     end;
@@ -752,38 +1189,83 @@ begin
   try
     GridTableViewProcMetrics.DataController.RecordCount := 0;
     for var I := low(FProcMetrics) to high(FProcMetrics) do begin
-      if FOverrideFilterParentExecutionID <> 0 then begin
-        if FProcMetrics[i].ParentExecutionID <> FOverrideFilterParentExecutionID then
-          continue;
-        //--
-        if (FFilterStartTimeStampMin > 0) and
-           (FProcMetrics[i].StartTimeStamp + FProcMetrics[i].ElapsedTicks < FFilterStartTimeStampMin) then
-          continue;
-        //--
-        if (FFilterStartTimeStampMax > 0) and
-           (FProcMetrics[i].StartTimeStamp > FFilterStartTimeStampMax) then
-          continue;
-      end
-      else begin
-        if (FFilterParentExecutionIDs.Count > 0) and
-           (not FFilterParentExecutionIDs.Contains(FProcMetrics[i].ParentExecutionID)) then
-          continue;
-        //--
-        if (FFilterExecutionIDs.Count > 0) and
-           (not FFilterExecutionIDs.Contains(FProcMetrics[i].ExecutionID)) then
-          continue;
-        //--
-        if (FFilterProcIDs.Count > 0) and
-           (not FFilterProcIDs.Contains(FProcMetrics[i].ProcID)) then
-          continue;
+      case FHistoryGroupMode of
+        hgmNone: begin
+          if FOverrideFilterParentExecutionID <> 0 then begin
+            if FProcMetrics[i].ParentExecutionID <> FOverrideFilterParentExecutionID then
+              continue;
+            //--
+            if (FOverrideFilterThreadID <> High(Cardinal)) and
+               (FProcMetrics[i].ThreadID <> FOverrideFilterThreadID) then
+              continue;
+            //--
+            if (FFilterStartTimeStampMin > 0) and
+               (FProcMetrics[i].StartTimeStamp + FProcMetrics[i].ElapsedTicks < FFilterStartTimeStampMin) then
+              continue;
+            //--
+            if (FFilterStartTimeStampMax > 0) and
+               (FProcMetrics[i].StartTimeStamp > FFilterStartTimeStampMax) then
+              continue;
+          end
+          else begin
+            if (FFilterParentExecutionIDs.Count > 0) and
+               (not FFilterParentExecutionIDs.Contains(FProcMetrics[i].ParentExecutionID)) then
+              continue;
+            //--
+            if (FFilterExecutionIDs.Count > 0) and
+               (not FFilterExecutionIDs.Contains(FProcMetrics[i].ExecutionID)) then
+              continue;
+            //--
+            if (FFilterProcIDs.Count > 0) and
+               (not FFilterProcIDs.Contains(FProcMetrics[i].ProcID)) then
+              continue;
+          end;
+        end;
+        hgmByCallStack: begin
+          if FOverrideFilterParentExecutionID <> 0 then begin
+            if FProcMetrics[i].ParentMetricsID <> FOverrideFilterParentExecutionID then
+              continue;
+            //--
+            if (FOverrideFilterThreadID <> High(Cardinal)) and
+               (FProcMetrics[i].ThreadID <> FOverrideFilterThreadID) then
+              continue;
+          end
+          else begin
+            if (FFilterParentExecutionIDs.Count > 0) and
+               (not FFilterParentExecutionIDs.Contains(FProcMetrics[i].ParentMetricsID)) then
+              continue;
+            //--
+            if (FFilterProcIDs.Count > 0) and
+               (not FFilterProcIDs.Contains(FProcMetrics[i].ProcID)) then
+              continue;
+          end;
+        end;
+        hgmByProcID: begin
+          if (FFilterProcIDs.Count > 0) and
+             (not FFilterProcIDs.Contains(FProcMetrics[i].ProcID)) then
+            continue;
+        end;
       end;
       var LRecordCount := GridTableViewProcMetrics.DataController.RecordCount;
       inc(LRecordCount);
       GridTableViewProcMetrics.DataController.RecordCount := LRecordCount;
-      GridTableViewProcMetrics.DataController.SetValue(LRecordCount-1, GridTableViewProcMetricsColumnExecutionID.Index, FProcMetrics[i].ExecutionID);
+      // No per-call ExecutionID exists in grouped modes, so a mode-specific
+      // surrogate is reused as the row identity: ProcID is unique enough in
+      // hgmByProcID (there is only ever one row per ProcID), but in
+      // hgmByCallStack the same ProcID can appear under different
+      // parents, so MetricsID (unique per row, and also the drill-down key
+      // matched against ParentMetricsID above) must be used instead.
+      case FHistoryGroupMode of
+        hgmNone: GridTableViewProcMetrics.DataController.SetValue(LRecordCount-1, GridTableViewProcMetricsColumnExecutionID.Index, FProcMetrics[i].ExecutionID);
+        hgmByProcID: GridTableViewProcMetrics.DataController.SetValue(LRecordCount-1, GridTableViewProcMetricsColumnExecutionID.Index, FProcMetrics[i].ProcID);
+        hgmByCallStack: GridTableViewProcMetrics.DataController.SetValue(LRecordCount-1, GridTableViewProcMetricsColumnExecutionID.Index, FProcMetrics[i].MetricsID);
+      end;
       GridTableViewProcMetrics.DataController.SetValue(LRecordCount-1, GridTableViewProcMetricsColumnThreadID.Index, FProcMetrics[i].ThreadID);
       GridTableViewProcMetrics.DataController.SetValue(LRecordCount-1, GridTableViewProcMetricsColumnProcName.Index, String(FProcIDMap.Values[ALIntToStrA(FProcMetrics[i].ProcID)]));
-      GridTableViewProcMetrics.DataController.SetValue(LRecordCount-1, GridTableViewProcMetricsColumnStartTimeStamp.Index, FProcMetrics[i].StartTimeStamp * ALCodeProfilerMillisecondsPerTick);
+      if FHistoryGroupMode = hgmNone then
+        GridTableViewProcMetrics.DataController.SetValue(LRecordCount-1, GridTableViewProcMetricsColumnStartTimestamp.Index, FProcMetrics[i].StartTimeStamp * ALCodeProfilerMillisecondsPerTick)
+      else
+        GridTableViewProcMetrics.DataController.SetValue(LRecordCount-1, GridTableViewProcMetricsColumnCallCount.Index, FProcMetrics[i].CallCount);
       GridTableViewProcMetrics.DataController.SetValue(LRecordCount-1, GridTableViewProcMetricsColumnTimeTaken.Index, FProcMetrics[i].ElapsedTicks * ALCodeProfilerMillisecondsPerTick);
     end;
   finally
@@ -795,37 +1277,63 @@ end;
 {****************************************************}
 procedure TMainForm.LoadDataBtnClick(Sender: TObject);
 begin
-  var LProcMetricsFilename := TPath.Combine(FDataDir, ALCodeProfilerProcMetricsFilename);
+  FHistoryGroupMode := GetSelectedHistoryGroupModeEnum;
+  var LProcMetricsFilenameOnly := GetSelectedProcMetricsFilename;
+  var LProcMetricsFilename := TPath.Combine(FDataDir, LProcMetricsFilenameOnly);
   If not TFile.Exists(LProcMetricsFilename) then
     raise Exception.CreateFmt(
             'The required file "%s" is missing. Please make '+
             'sure it is available in the data subfolder where '+
             'Alcinoe Code Profiler is located before proceeding.',
-            [ALCodeProfilerProcMetricsFilename]);
+            [LProcMetricsFilenameOnly]);
   LoadDataBtn.Cursor := crHourGlass;
   Try
 
     // Load ALCodeProfilerProcMetrics.dat in FProcMetrics
+    var LRawRecordSize := GetProcMetricsRawRecordSize(FHistoryGroupMode);
     Var LfileStream := TfileStream.Create(LProcMetricsFilename, fmOpenRead);
     try
-      setlength(FProcMetrics, LfileStream.Size div SizeOf(TALProcMetrics));
-      if length(FProcMetrics) > 0 then
-        LfileStream.ReadBuffer(FProcMetrics[0],  length(FProcMetrics) * SizeOf(TALProcMetrics));
+      if LfileStream.Size mod LRawRecordSize <> 0 then
+        raise Exception.CreateFmt('The file "%s" is corrupted', [LProcMetricsFilenameOnly]);
+      var LRawBytes: TBytes;
+      SetLength(LRawBytes, LfileStream.Size);
+      if Length(LRawBytes) > 0 then
+        LfileStream.ReadBuffer(LRawBytes[0], Length(LRawBytes));
+      setlength(FProcMetrics, Length(LRawBytes) div LRawRecordSize);
+      for var I := low(FProcMetrics) to high(FProcMetrics) do
+        DecodeProcMetricsRaw(FHistoryGroupMode, LRawBytes, I * LRawRecordSize, FProcMetrics[i]);
     finally
       ALFreeandNil(LfileStream);
     end;
 
     // Update orphan node
-    Var LDictionary := TDictionary<Cardinal, boolean>.Create;
-    try
-      For var I := low(FProcMetrics) to High(FProcMetrics) do
-        LDictionary.Add(FProcMetrics[i].ExecutionID, true);
-      var LBool: Boolean;
-      For var I := low(FProcMetrics) to High(FProcMetrics) do
-        if not LDictionary.TryGetValue(FProcMetrics[i].ParentExecutionID, LBool) then
-          FProcMetrics[i].ParentExecutionID := 0;
-    finally
-      AlFreeAndNil(LDictionary);
+    case FHistoryGroupMode of
+      hgmNone: begin
+        Var LDictionary := TDictionary<Cardinal, boolean>.Create;
+        try
+          For var I := low(FProcMetrics) to High(FProcMetrics) do
+            LDictionary.Add(FProcMetrics[i].ExecutionID, true);
+          var LBool: Boolean;
+          For var I := low(FProcMetrics) to High(FProcMetrics) do
+            if not LDictionary.TryGetValue(FProcMetrics[i].ParentExecutionID, LBool) then
+              FProcMetrics[i].ParentExecutionID := 0;
+        finally
+          AlFreeAndNil(LDictionary);
+        end;
+      end;
+      hgmByCallStack: begin
+        Var LDictionary := TDictionary<Cardinal, boolean>.Create;
+        try
+          For var I := low(FProcMetrics) to High(FProcMetrics) do
+            LDictionary.AddOrSetValue(FProcMetrics[i].MetricsID, true);
+          var LBool: Boolean;
+          For var I := low(FProcMetrics) to High(FProcMetrics) do
+            if not LDictionary.TryGetValue(FProcMetrics[i].ParentMetricsID, LBool) then
+              FProcMetrics[i].ParentMetricsID := 0;
+        finally
+          AlFreeAndNil(LDictionary);
+        end;
+      end;
     end;
 
     // Load ALCodeProfilerProcIDMap.txt in FProcIDMap
@@ -840,8 +1348,7 @@ begin
     FFilterParentExecutionIDs.Add(0);
 
     // Reset TreeListProcMetrics
-    FTreeListProcMetricsTailNode := nil;
-    TreeListProcMetrics.Clear;
+    ResetTreeListProcMetrics;
     FGoBackStack.Clear;
 
     // Reset the grid
@@ -855,6 +1362,66 @@ begin
   End;
 
   MessageDlg(ALIntToStrW(Length(FProcMetrics)) + ' records have been loaded successfully.', mtInformation, [mbOK], 0);
+end;
+
+{*****************************************************}
+procedure TMainForm.ClearDataBtnClick(Sender: TObject);
+begin
+  if MessageDlg(
+       'Do you want to delete all the performance data collected so far? ' +
+       'Every performance file of the CodeProfiler data folder will be deleted and the grid will be emptied. ' +
+       'The procedure IDs (' + ALCodeProfilerProcIDMapFilename + ') are kept, so the sources already instrumented stay valid ' +
+       'and the next run will simply collect fresh data.',
+       mtConfirmation, [mbYes, mbNo], 0) <> mrYes then exit;
+
+  var LDeletedCount := 0;
+  ClearDataBtn.Cursor := crHourGlass;
+  try
+
+    // Delete every performance file, whatever the history group mode they
+    // were collected with. This must not run while the HTTP server is
+    // receiving a new performance file in FDataDir.
+    FHttpServerCriticalSection.Acquire;
+    try
+      if TDirectory.Exists(FDataDir) then begin
+        var LFilenames := TDirectory.GetFiles(FDataDir, '*', TSearchOption.soTopDirectoryOnly);
+        for var I := low(LFilenames) to high(LFilenames) do begin
+          // '.dat~tmp' is the temporary file the HTTP server writes the
+          // incoming performance file to before renaming it to '.dat'.
+          var LExtension := TPath.GetExtension(LFilenames[I]);
+          if (not ALSameTextW(LExtension, '.dat')) and
+             (not ALSameTextW(LExtension, '.dat~tmp')) then continue;
+          TFile.Delete(LFilenames[I]);
+          inc(LDeletedCount);
+        end;
+      end;
+    finally
+      FHttpServerCriticalSection.Release;
+    end;
+
+    // Drop the data loaded in memory
+    setlength(FProcMetrics, 0);
+    FProcIDMap.Clear;
+
+    // Reset Filter
+    ResetFilters;
+    FFilterParentExecutionIDs.Add(0);
+
+    // Reset TreeListProcMetrics
+    ResetTreeListProcMetrics;
+    FGoBackStack.Clear;
+
+    // Empty the grid
+    Refresh;
+
+    // Clear the StatusBar
+    MainStatusBar.Panels[1].Text := '';
+
+  finally
+    ClearDataBtn.Cursor := crDefault;
+  end;
+
+  MessageDlg(ALIntToStrW(LDeletedCount) + ' performance file(s) have been deleted successfully.', mtInformation, [mbOK], 0);
 end;
 
 {*****************************************************}
@@ -872,25 +1439,7 @@ end;
 {*******************************************************}
 procedure TMainForm.ExportToCsvBtnClick(Sender: TObject);
 
-Const
-  CColumnExecutionID = 0;
-  CColumnParentExecutionID = 1;
-  CColumnProcID = 2;
-  CColumnProcName = 3;
-  CColumnThreadID = 4;
-  CColumnStartTimeStamp = 5;
-  CColumnTimeTaken = 6;
-  CColumnNames: array[CColumnExecutionID..CColumnTimeTaken] of AnsiString = (
-    'ExecutionID',
-    'ParentExecutionID',
-    'ProcID',
-    'ProcName',
-    'ThreadID',
-    'StartTimeStamp',
-    'TimeTaken');
-
 var
-  LExportColumns: array[CColumnExecutionID..CColumnTimeTaken] of Boolean;
   LCsvStream: TFileStream;
   LCsvBuffer: AnsiString;
   LCsvBufferPos: Integer;
@@ -915,14 +1464,6 @@ var
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _TicksToMillisecondsStr(const ATicks: Int64): AnsiString;
-  begin
-    // 1 tick equals 0.0001 millisecond (ALCodeProfilerMillisecondsPerTick),
-    // so use integer arithmetic to avoid any rounding/locale issue
-    Result := ALIntToStrA(ATicks div 10000) + '.' + ALFormatA('%.4d', [ATicks mod 10000]);
-  end;
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _AppendToCsvRow(var ARow: AnsiString; var AFirstColumn: Boolean; const AValue: AnsiString);
   begin
@@ -932,15 +1473,21 @@ var
   end;
 
 begin
-  var LProcMetricsFilename := TPath.Combine(FDataDir, ALCodeProfilerProcMetricsFilename);
+  var LHistoryGroupMode := GetSelectedHistoryGroupModeEnum;
+  var LRawRecordSize := GetProcMetricsRawRecordSize(LHistoryGroupMode);
+  var LColumns := GetProcMetricsColumnsForMode(LHistoryGroupMode);
+  var LProcMetricsFilenameOnly := GetSelectedProcMetricsFilename;
+  var LProcMetricsFilename := TPath.Combine(FDataDir, LProcMetricsFilenameOnly);
   If not TFile.Exists(LProcMetricsFilename) then
     raise Exception.CreateFmt(
             'The required file "%s" is missing. Please make '+
             'sure it is available in the data subfolder where '+
             'Alcinoe Code Profiler is located before proceeding.',
-            [ALCodeProfilerProcMetricsFilename]);
+            [LProcMetricsFilenameOnly]);
 
   // Ask which columns to export
+  var LExportColumns: TArray<Boolean>;
+  SetLength(LExportColumns, Length(LColumns));
   var LColumnsForm := TForm.CreateNew(nil);
   try
     LColumnsForm.Caption := 'Export to CSV';
@@ -955,8 +1502,8 @@ begin
     var LColumnsCheckListBox := TCheckListBox.Create(LColumnsForm);
     LColumnsCheckListBox.Parent := LColumnsForm;
     LColumnsCheckListBox.SetBounds(8, 29, LColumnsForm.ClientWidth - 16, 161);
-    for var I := CColumnExecutionID to CColumnTimeTaken do begin
-      LColumnsCheckListBox.Items.Add(String(CColumnNames[I]));
+    for var I := 0 to High(LColumns) do begin
+      LColumnsCheckListBox.Items.Add(String(GetProcMetricsColumnName(LColumns[I])));
       LColumnsCheckListBox.Checked[I] := True;
     end;
     var LOkBtn := TButton.Create(LColumnsForm);
@@ -972,20 +1519,23 @@ begin
     LCancelBtn.Cancel := True;
     LCancelBtn.SetBounds(LColumnsForm.ClientWidth - 87, 198, 75, 27);
     if LColumnsForm.ShowModal <> mrOk then exit;
-    for var I := CColumnExecutionID to CColumnTimeTaken do
+    for var I := 0 to High(LColumns) do
       LExportColumns[I] := LColumnsCheckListBox.Checked[I];
   finally
     ALFreeAndNil(LColumnsForm);
   end;
   var LExportAnyColumn := False;
-  for var I := CColumnExecutionID to CColumnTimeTaken do
+  for var I := 0 to High(LColumns) do
     LExportAnyColumn := LExportAnyColumn or LExportColumns[I];
   if not LExportAnyColumn then
     Raise Exception.Create('Error: No columns have been selected');
 
   // The proc ID map is only needed to resolve the ProcName column
+  var LNeedProcNames := False;
+  for var I := 0 to High(LColumns) do
+    if (LColumns[I] = colkProcName) and LExportColumns[I] then LNeedProcNames := True;
   var LProcIDMapFilename := TPath.Combine(FDataDir, ALCodeProfilerProcIDMapFilename);
-  If (LExportColumns[CColumnProcName]) and (not TFile.Exists(LProcIDMapFilename)) then
+  If LNeedProcNames and (not TFile.Exists(LProcIDMapFilename)) then
     raise Exception.CreateFmt('The required file "%s" does not exist. Please ensure it is available before proceeding', [ALCodeProfilerProcIDMapFilename]);
 
   // Ask where to save the CSV file
@@ -996,7 +1546,7 @@ begin
     LSaveDialog.Filter := 'CSV files (*.csv)|*.csv|All files (*.*)|*.*';
     LSaveDialog.DefaultExt := 'csv';
     LSaveDialog.Options := LSaveDialog.Options + [ofOverwritePrompt];
-    LSaveDialog.FileName := ALStringReplaceW(ALCodeProfilerProcMetricsFilename, '.dat', '.csv', [rfIgnoreCase]);
+    LSaveDialog.FileName := ALStringReplaceW(LProcMetricsFilenameOnly, '.dat', '.csv', [rfIgnoreCase]);
     if not LSaveDialog.Execute then exit;
     LCsvFilename := LSaveDialog.FileName;
   finally
@@ -1012,7 +1562,7 @@ begin
     var LProcMetricsStream: TFileStream := nil;
     LCsvStream := nil;
     try
-      if LExportColumns[CColumnProcName] then begin
+      if LNeedProcNames then begin
         var LProcIDMap := TALHashedStringListA.Create;
         try
           LProcIDMap.LoadFromFile(LProcIDMapFilename);
@@ -1026,45 +1576,33 @@ begin
       // Convert ALCodeProfilerProcMetrics.dat to CSV chunk by chunk as the
       // file can be very huge and can not be fully loaded in memory
       LProcMetricsStream := TFileStream.Create(LProcMetricsFilename, fmOpenRead or fmShareDenyWrite);
-      if LProcMetricsStream.Size mod SizeOf(TALProcMetrics) <> 0 then
-        raise Exception.CreateFmt('The file "%s" is corrupted', [ALCodeProfilerProcMetricsFilename]);
-      var LTotalRecordCount: Int64 := LProcMetricsStream.Size div SizeOf(TALProcMetrics);
+      if LProcMetricsStream.Size mod LRawRecordSize <> 0 then
+        raise Exception.CreateFmt('The file "%s" is corrupted', [LProcMetricsFilenameOnly]);
+      var LTotalRecordCount: Int64 := LProcMetricsStream.Size div LRawRecordSize;
       LCsvStream := TFileStream.Create(LCsvFilename, fmCreate);
-      var LProcMetrics: TArray<TALProcMetrics>;
-      Setlength(LProcMetrics, 65536); // 65536 * SizeOf(TALProcMetrics) = 2 MB
+      var LRawBuffer: TBytes;
+      SetLength(LRawBuffer, 65536 * LRawRecordSize); // ~2 MB chunk
       Setlength(LCsvBuffer, 4194304); // 4 MB
       LCsvBufferPos := 0;
       var LCsvHeader: AnsiString := '';
       var LFirstColumn := True;
-      for var I := CColumnExecutionID to CColumnTimeTaken do
+      for var I := 0 to High(LColumns) do
         if LExportColumns[I] then
-          _AppendToCsvRow(LCsvHeader, LFirstColumn, CColumnNames[I]);
+          _AppendToCsvRow(LCsvHeader, LFirstColumn, GetProcMetricsColumnName(LColumns[I]));
       _WriteToCsvBuffer(LCsvHeader + #13#10);
       While True do begin
-        var LBytesRead := LProcMetricsStream.Read(LProcMetrics[0], length(LProcMetrics) * SizeOf(TALProcMetrics));
+        var LBytesRead := LProcMetricsStream.Read(LRawBuffer[0], Length(LRawBuffer));
         if LBytesRead <= 0 then break;
-        if LBytesRead mod SizeOf(TALProcMetrics) <> 0 then
-          raise Exception.CreateFmt('The file "%s" is corrupted', [ALCodeProfilerProcMetricsFilename]);
-        for var I := 0 to (LBytesRead div SizeOf(TALProcMetrics)) - 1 do begin
+        if LBytesRead mod LRawRecordSize <> 0 then
+          raise Exception.CreateFmt('The file "%s" is corrupted', [LProcMetricsFilenameOnly]);
+        for var I := 0 to (LBytesRead div LRawRecordSize) - 1 do begin
+          var LRec: TALProcMetrics;
+          DecodeProcMetricsRaw(LHistoryGroupMode, LRawBuffer, I * LRawRecordSize, LRec);
           var LCsvRow: AnsiString := '';
           LFirstColumn := True;
-          if LExportColumns[CColumnExecutionID] then
-            _AppendToCsvRow(LCsvRow, LFirstColumn, ALIntToStrA(LProcMetrics[I].ExecutionID));
-          if LExportColumns[CColumnParentExecutionID] then
-            _AppendToCsvRow(LCsvRow, LFirstColumn, ALIntToStrA(LProcMetrics[I].ParentExecutionID));
-          if LExportColumns[CColumnProcID] then
-            _AppendToCsvRow(LCsvRow, LFirstColumn, ALIntToStrA(LProcMetrics[I].ProcID));
-          if LExportColumns[CColumnProcName] then begin
-            var LProcName: AnsiString;
-            if not LProcNames.TryGetValue(LProcMetrics[I].ProcID, LProcName) then LProcName := '';
-            _AppendToCsvRow(LCsvRow, LFirstColumn, LProcName);
-          end;
-          if LExportColumns[CColumnThreadID] then
-            _AppendToCsvRow(LCsvRow, LFirstColumn, ALIntToStrA(LProcMetrics[I].ThreadID));
-          if LExportColumns[CColumnStartTimeStamp] then
-            _AppendToCsvRow(LCsvRow, LFirstColumn, _TicksToMillisecondsStr(LProcMetrics[I].StartTimeStamp));
-          if LExportColumns[CColumnTimeTaken] then
-            _AppendToCsvRow(LCsvRow, LFirstColumn, _TicksToMillisecondsStr(LProcMetrics[I].ElapsedTicks));
+          for var J := 0 to High(LColumns) do
+            if LExportColumns[J] then
+              _AppendToCsvRow(LCsvRow, LFirstColumn, GetProcMetricsColumnValue(LColumns[J], LRec, LProcNames));
           _WriteToCsvBuffer(LCsvRow + #13#10);
           inc(LExportedRecordCount);
         end;
@@ -1092,10 +1630,11 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   FDataDir := ALGetModulePathW + 'data\';
+  FLoadingSettings := True;
   FProcIDSequence := 0;
   Setlength(FProcMetrics, 0);
   FProcIDMap := TALHashedStringListA.Create;
-  FTreeListProcMetricsTailNode := nil;
+  ResetTreeListProcMetrics;
   FFilterProcIDs := THashSet<Cardinal>.Create;
   FFilterExecutionIDs := THashSet<Cardinal>.Create;
   FFilterParentExecutionIDs := THashSet<Cardinal>.Create;
@@ -1103,6 +1642,7 @@ begin
   FFilterStartTimeStampMin := 0;
   FFilterStartTimeStampMax := 0;
   FOverrideFilterParentExecutionID := 0;
+  FOverrideFilterThreadID := High(Cardinal);
   FGoBackStack := TDictionary<Int64{ExecutionID}, TGoBackStackItem>.Create;
   FHttpServerCriticalSection := TCriticalSection.Create;
   //--
@@ -1123,12 +1663,17 @@ begin
   end;
   var LIniFile := TIniFile.Create(TPath.Combine(FDataDir, ConfigFilename));
   try
-    HttpServerNameEdit.Text := LIniFile.ReadString('General','ServerName', '');
-    HttpServerPortEdit.Text := LIniFile.ReadString('General','ServerPort', '8080');
     SourcesPathMemo.Text := ALStringReplaceW(LIniFile.ReadString('General','SourcesPath', '..\..\Source\;..\..\Embarcadero\Florence\fmx\;..\..\Demos\ALFmxDynamicListBox\_Source\'), ';', #13#10, [RfReplaceALL]);
+    CodeProfilerIncFilenameEdit.Text := LIniFile.ReadString('General','CodeProfilerIncFilename', '..\..\Source\Alcinoe.CodeProfiler.inc');
   finally
     ALFreeAndNil(LIniFile);
   end;
+  FLoadingSettings := False;
+  // Must be done after Config.ini has been read, as the location of
+  // Alcinoe.CodeProfiler.inc is one of its settings.
+  LoadCodeProfilerIncFile;
+  FHistoryGroupMode := GetSelectedHistoryGroupModeEnum;
+  UpdateHistoryGroupModeUI;
   InstrumentationTabSheetResize(nil);
   PanelfilterResize(nil);
 end;
@@ -1153,6 +1698,9 @@ procedure TMainForm.GridTableViewProcMetricsCellDblClick(
             AShift: TShiftState;
             var AHandled: Boolean);
 begin
+  // In hgmByProcID, calls are grouped by ProcID only, with no parent/child
+  // relationship recorded, so there is nothing to drill into.
+  if FHistoryGroupMode = hgmByProcID then Exit;
   if ACellViewInfo.GridRecord <> nil then begin
     var LGoBackStackItem: TGoBackStackItem;
     LGoBackStackItem.TopRowIndex := GridTableViewProcMetrics.Controller.TopRowIndex;
@@ -1171,12 +1719,15 @@ begin
     FGoBackStack.add(FOverrideFilterParentExecutionID, LGoBackStackItem);
     //--
     FOverrideFilterParentExecutionID := ACellViewInfo.GridRecord.Values[GridTableViewProcMetricsColumnExecutionID.Index];
-    if FTreeListProcMetricsTailNode = nil then FTreeListProcMetricsTailNode := TreeListProcMetrics.Add
-    else FTreeListProcMetricsTailNode := TreeListProcMetrics.AddChild(FTreeListProcMetricsTailNode);
+    FOverrideFilterThreadID := ACellViewInfo.GridRecord.Values[GridTableViewProcMetricsColumnThreadID.Index];
+    FTreeListProcMetricsTailNode := TreeListProcMetrics.AddChild(FTreeListProcMetricsTailNode);
     FTreeListProcMetricsTailNode.Texts[TreeListProcMetricsColumnExecutionID.ItemIndex] := ACellViewInfo.GridRecord.Values[GridTableViewProcMetricsColumnExecutionID.Index];
     FTreeListProcMetricsTailNode.Texts[TreeListProcMetricsColumnThreadID.ItemIndex] := ACellViewInfo.GridRecord.Values[GridTableViewProcMetricsColumnThreadID.Index];
     FTreeListProcMetricsTailNode.Texts[TreeListProcMetricsColumnProcName.ItemIndex] := ACellViewInfo.GridRecord.Values[GridTableViewProcMetricsColumnProcName.Index];
-    FTreeListProcMetricsTailNode.Texts[TreeListProcMetricsColumnStartTimeStamp.ItemIndex] := ACellViewInfo.GridRecord.Values[GridTableViewProcMetricsColumnStartTimeStamp.Index];
+    if FHistoryGroupMode = hgmNone then
+      FTreeListProcMetricsTailNode.Texts[TreeListProcMetricsColumnStartTimeStamp.ItemIndex] := ACellViewInfo.GridRecord.Values[GridTableViewProcMetricsColumnStartTimestamp.Index]
+    else
+      FTreeListProcMetricsTailNode.Texts[TreeListProcMetricsColumnCallCount.ItemIndex] := ACellViewInfo.GridRecord.Values[GridTableViewProcMetricsColumnCallCount.Index];
     FTreeListProcMetricsTailNode.Texts[TreeListProcMetricsColumnTimeTaken.ItemIndex] := ACellViewInfo.GridRecord.Values[GridTableViewProcMetricsColumnTimeTaken.Index];
     TreeListProcMetrics.FullExpand;
     TreeListProcMetrics.TopVisibleNode := FTreeListProcMetricsTailNode;
@@ -1203,14 +1754,26 @@ end;
 {**********************************************************************}
 procedure TMainForm.HttpServerPortEditPropertiesChange(Sender: TObject);
 begin
+  MainStatusBar.Panels[1].Text := '';
+  SaveCodeProfilerIncFile;
   IdHTTPServer.Active := False;
-  if ALTrim(HttpServerPortEdit.Text) <> '' then begin
+  if GetSelectedServerName <> '' then begin
     IdHTTPServer.DefaultPort := ALStrToInt(ALTrim(HttpServerPortEdit.Text));
-    IdHTTPServer.Active := True;
-    MainStatusBar.Panels[0].Text := 'Listening on port ' + HttpServerPortEdit.Text;
+    try
+      IdHTTPServer.Active := True;
+      MainStatusBar.Panels[0].Text := 'Listening on port ' + HttpServerPortEdit.Text;
+    except
+      MainStatusBar.Panels[0].Text := 'Not listening';
+      Raise;
+    end;
   end
   else MainStatusBar.Panels[0].Text := 'Not listening';
-  MainStatusBar.Panels[1].Text := '';
+end;
+
+{**********************************************************************}
+procedure TMainForm.HttpServerNameEditPropertiesChange(Sender: TObject);
+begin
+  SaveCodeProfilerIncFile;
 end;
 
 {**********************************************************************************************************************************************}
@@ -1236,14 +1799,17 @@ begin
   var LfocusedNode := TreeListProcMetrics.focusedNode;
   if Assigned(LClickedNode) and Assigned(LfocusedNode) then begin
     FOverrideFilterParentExecutionID := LfocusedNode.Values[TreeListProcMetricsColumnExecutionID.ItemIndex];
+    if LfocusedNode = FTreeListProcMetricsRootNode then
+      FOverrideFilterThreadID := High(Cardinal)
+    else
+      FOverrideFilterThreadID := LfocusedNode.Values[TreeListProcMetricsColumnThreadID.ItemIndex];
     FTreeListProcMetricsTailNode := LfocusedNode;
     FTreeListProcMetricsTailNode.DeleteChildren;
   end
   else begin
-    if FTreeListProcMetricsTailNode = nil then exit;
     FOverrideFilterParentExecutionID := 0;
-    FTreeListProcMetricsTailNode := nil;
-    TreeListProcMetrics.Clear;
+    FOverrideFilterThreadID := High(Cardinal);
+    ResetTreeListProcMetrics;
   end;
 
   var LGoBackStackItem: TGoBackStackItem;
@@ -1314,8 +1880,11 @@ begin
         FFilterProcIDs.Add(ALMaxUInt);
     end;
 
-    if (FFilterStartTimeStampMin > 0) or
-       (FFilterStartTimeStampMax > 0) then begin
+    // The start-timestamp filter only makes sense for individual calls,
+    // which only exist in hgmNone; grouped modes have no StartTimeStamp.
+    if (FHistoryGroupMode = hgmNone) and
+       ((FFilterStartTimeStampMin > 0) or
+        (FFilterStartTimeStampMax > 0)) then begin
       var LExecutionDict := TDictionary<Cardinal, Cardinal>.create;
       Try
         for var I := low(FProcMetrics) to high(FProcMetrics) do begin
@@ -1351,8 +1920,7 @@ begin
        (FFilterExecutionIDs.Count = 0) then
       FFilterParentExecutionIDs.Add(0);
 
-    FTreeListProcMetricsTailNode := nil;
-    TreeListProcMetrics.Clear;
+    ResetTreeListProcMetrics;
     FGoBackStack.Clear;
 
     Refresh;

@@ -3,17 +3,34 @@ unit Alcinoe.CodeProfiler;
 interface
 
 {$I Alcinoe.inc}
+{$I Alcinoe.CodeProfiler.inc}
 
 type
   TALProcMetrics = record
   public
+    {$IF defined(ALCodeProfilerHistoryGroupNone)}
     ExecutionID: Cardinal;
     ParentExecutionID: Cardinal;
     ProcID: Cardinal;
     ThreadID: Cardinal;
     StartTimeStamp: Int64;
     ElapsedTicks: Int64;
+    {$ELSEIF defined(ALCodeProfilerHistoryGroupByProcID)}
+    ProcID: Cardinal;
+    ThreadID: Cardinal;
+    CallCount: Cardinal;
+    ElapsedTicks: Int64;
+    {$ELSEIF defined(ALCodeProfilerHistoryGroupByCallStack)}
+    HashCode: Integer;
+    ProcID: Cardinal;
+    MetricsID: Cardinal;
+    ParentMetricsID: Cardinal;
+    ThreadID: Cardinal;
+    CallCount: Cardinal;
+    ElapsedTicks: Int64;
+    {$ENDIF}
   end;
+  PALProcMetrics = ^TALProcMetrics;
 
 procedure ALCodeProfilerEnterProc(const aProcID : Cardinal);
 procedure ALCodeProfilerExitProc(const aProcID : Cardinal);
@@ -22,19 +39,28 @@ procedure ALCodeProfilerStop(Const ASaveHistories: Boolean = True);
 function ALCodeProfilerIsrunning: Boolean;
 
 const
-  ALCodeProfilerProcMetricsFilename = 'ALCodeProfilerProcMetrics.dat';
   ALCodeProfilerProcIDMapFilename = 'ALCodeProfilerProcIDMap.txt';
+  {$IF defined(ALCodeProfilerHistoryGroupNone)}
+  ALCodeProfilerProcMetricsFilename: String = 'ALCodeProfilerProcMetrics.None.dat';
+  {$ELSEIF defined(ALCodeProfilerHistoryGroupByProcID)}
+  ALCodeProfilerProcMetricsFilename: String = 'ALCodeProfilerProcMetrics.ByProcID.dat';
+  {$ELSEIF defined(ALCodeProfilerHistoryGroupByCallStack)}
+  ALCodeProfilerProcMetricsFilename: String = 'ALCodeProfilerProcMetrics.ByCallStack.dat';
+  {$ENDIF}
   ALCodeProfilerRegistryPath = 'Software\MagicFoundation\Alcinoe\CodeProfiler';
   ALCodeProfilerDataStoragePathKey = 'DataStoragePath';
   ALCodeProfilerMillisecondsPerTick = 0.0001;
 
 var
   ALCodeProfilerAppStartTimeStamp: Int64;
-  ALCodeProfilerServerName: String;
+
 
 implementation
 
 uses
+  {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
+  System.Hash,
+  {$ENDIF}
   {$IF defined(MSWindows)}
   System.Win.Registry,
   Winapi.Windows,
@@ -59,19 +85,24 @@ uses
   System.Classes,
   System.Generics.Collections,
   System.Diagnostics,
-  System.IOUtils,
-  Alcinoe.FileUtils,
-  Alcinoe.Common;
+  System.IOUtils;
 
 {**}
 Type
   TALStopWatchProcMetrics = record
   private
+    {$IF defined(ALCodeProfilerHistoryGroupNone)}
     class var ExecutionIDSequence: cardinal;
+    {$ENDIF}
   public
+    {$IF defined(ALCodeProfilerHistoryGroupNone)}
     ExecutionID: Cardinal;
     ParentExecutionID: Cardinal;
+    {$ENDIF}
     ProcID: Cardinal;
+    {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
+    ParentMetricsID: Cardinal;
+    {$ENDIF}
     ThreadID: Cardinal;
     StopWatch: TStopWatch;
   end;
@@ -82,10 +113,8 @@ Type
     FArray: TALStopWatchProcMetricsArray;
     FCount: NativeInt;
     FCapacity: NativeInt;
-    procedure Grow; virtual;
+    procedure Grow;
     procedure SetCapacity(NewCapacity: NativeInt);
-  public
-    destructor Destroy; override;
   end;
 
   TALProcMetricsArray = array of TALProcMetrics;
@@ -95,23 +124,25 @@ Type
     FCount: NativeInt;
     FCapacity: NativeInt;
     FIsOrphaned: Boolean;
-    procedure Grow; virtual;
+    {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
+    FGrowThreshold: NativeInt;
+    procedure Rehash(NewCapPow2: NativeInt);
+    function GetBucketIndex(const AProcID, AParentMetricsID: Cardinal; const AHashCode: Integer): NativeInt;
+    function Hash(const AProcID, AParentMetricsID: Cardinal): Integer;
+    {$ENDIF}
+    procedure Grow;
     procedure SetCapacity(NewCapacity: NativeInt);
-  public
-    constructor Create; virtual;
-    destructor Destroy; override;
+    procedure Clear;
   end;
 
 {*******}
 threadvar
   ALProcMetricsStack: TALProcMetricsStack;
   ALProcMetricsHistory: TALProcMetricsHistory;
-  ALIsInCodeProfiler: Boolean;
 
 {*}
 var
   ALProcMetricsHistories: TList<TALProcMetricsHistory>;
-  ALCodeProfilerEnabled: Boolean;
   ALProcMetricsLock: TLightweightMREW;
   ALProcMetricsFilename: String;
   {$IF defined(IOS) or defined(ANDROID)}
@@ -121,6 +152,12 @@ var
 {**}
 Type
   TALCodeProfilerLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
+
+{**************************************************}
+{$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
+const
+  EMPTY_HASH = -1;
+{$ENDIF}
 
 {**************************}
 procedure ALCodeProfilerLog(
@@ -175,12 +212,6 @@ begin
   {$ENDIF}
 end;
 
-{*************************************}
-destructor TALProcMetricsStack.Destroy;
-begin
-  SetCapacity(0);
-end;
-
 {*********************************}
 procedure TALProcMetricsStack.Grow;
 begin
@@ -196,38 +227,194 @@ begin
   end;
 end;
 
-{***************************************}
-constructor TALProcMetricsHistory.Create;
-begin
-  inherited;
-  FIsOrphaned := False;
-end;
-
-{***************************************}
-destructor TALProcMetricsHistory.Destroy;
-begin
-  SetCapacity(0);
-end;
-
 {***********************************}
 procedure TALProcMetricsHistory.Grow;
 begin
+  {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
+
+  {$IFNDEF ALCompilerVersionSupported131}
+    {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.Grow was not updated and adjust the IFDEF'}
+  {$ENDIF}
+
+  var LNewCap: NativeInt := Length(FArray) * 2;
+  if LNewCap = 0 then
+    LNewCap := 4;
+  Rehash(LNewCap);
+
+  {$ELSE}
+
   SetCapacity(GrowCollection(FCapacity, FCount + 1));
+
+  {$ENDIF}
 end;
 
 {******************************************************************}
 procedure TALProcMetricsHistory.SetCapacity(NewCapacity: NativeInt);
 begin
+  {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
+
+  {$IFNDEF ALCompilerVersionSupported131}
+    {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.SetCapacity was not updated and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.InternalSetCapacity was not updated and adjust the IFDEF'}
+  {$ENDIF}
+
+  // Ensure at least one empty slot for GetBucketIndex to terminate.
+  Inc(NewCapacity);
+  if FCapacity <> NewCapacity then begin
+    if NewCapacity < FCount then
+      ErrorArgumentOutOfRange;
+
+    if NewCapacity = 0 then Rehash(0)
+    else begin
+      var LNewCap: NativeInt := 4;
+      while LNewCap shr 1 <= NewCapacity do // 50%
+        LNewCap := LNewCap shl 1;
+      Rehash(LNewCap);
+    end
+  end;
+
+  {$ELSE}
+
   if NewCapacity <> FCapacity then begin
     SetLength(FArray, NewCapacity);
     FCapacity := NewCapacity;
   end;
+
+  {$ENDIF}
 end;
+
+{************************************}
+procedure TALProcMetricsHistory.Clear;
+begin
+
+  {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
+
+  FCount := 0;
+  SetLength(FArray, 0);
+  FCapacity := 0;
+  FGrowThreshold := 0;
+
+  {$ELSE}
+
+  FCount := 0;
+
+  {$ENDIF}
+
+end;
+
+{**************************************************}
+{$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
+procedure TALProcMetricsHistory.Rehash(NewCapPow2: NativeInt);
+begin
+
+  {$IFNDEF ALCompilerVersionSupported131}
+    {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.Rehash was not updated and adjust the IFDEF'}
+  {$ENDIF}
+
+  if NewCapPow2 = Length(FArray) then
+    Exit
+  else if NewCapPow2 < 0 then
+    OutOfMemoryError;
+
+  var LOldArray: TALProcMetricsArray := FArray;
+  var LNewArray: TALProcMetricsArray;
+
+  SetLength(LNewArray, NewCapPow2);
+  var P: PALProcMetrics := PALProcMetrics(LNewArray);
+  for var i := 0 to Length(LNewArray) - 1 do begin
+    P^.HashCode := EMPTY_HASH;
+    Inc(P);
+  end;
+  FArray := LNewArray;
+  FGrowThreshold := NewCapPow2 shr 1; // 50%
+
+  P := PALProcMetrics(LOldArray);
+  for var i := 0 to Length(LOldArray) - 1 do begin
+    raise Exception.Create(
+      'Rehash is not implemented right now because MetricsID and ParentMetricsID ' +
+      'reference positions in the array, which would become invalid after rehashing. ' +
+      'The array is currently sized large enough to avoid calling Rehash.');
+    if P^.HashCode <> EMPTY_HASH then begin
+      var j := not GetBucketIndex(P^.ProcID, P^.ParentMetricsID, P^.HashCode);
+      FArray[j] := P^;
+    end;
+    Inc(P);
+  end;
+
+end;
+{$ENDIF}
+
+{********************************************************}
+{$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
+function TALProcMetricsHistory.GetBucketIndex(const AProcID, AParentMetricsID: Cardinal; const AHashCode: Integer): NativeInt;
+begin
+
+  {$IFNDEF ALCompilerVersionSupported131}
+    {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.GetBucketIndex was not updated and adjust the IFDEF'}
+  {$ENDIF}
+
+  var L: NativeInt := Length(FArray);
+  if L = 0 then
+    Exit(not High(NativeInt));
+
+  Result := AHashCode and (L - 1);
+  var P: PALProcMetrics := @FArray[Result];
+  while True do begin
+    var LHashCode := P^.HashCode;
+
+    // Not found: return complement of insertion point.
+    if LHashCode = EMPTY_HASH then
+      Exit(not Result);
+
+    // Found: return location.
+    if (LHashCode = AHashCode) and (P^.ProcID = AProcID) and (P^.ParentMetricsID = AParentMetricsID) then
+      Exit(Result);
+
+    Inc(Result);
+    Inc(P);
+    if Result >= L then begin
+      Result := 0;
+      P := @FArray[0];
+    end;
+  end;
+
+end;
+{$ENDIF}
+
+{********************************************************}
+{$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
+function TALProcMetricsHistory.Hash(const AProcID, AParentMetricsID: Cardinal): Integer;
+const
+  PositiveMask = Integer.MaxValue;
+begin
+
+  {$IFNDEF ALCompilerVersionSupported131}
+    {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.GetBucketIndex was not updated and adjust the IFDEF'}
+  {$ENDIF}
+
+  {$IFOPT Q+}
+    {$DEFINE Q_ON}
+    {$Q-}
+  {$ENDIF}
+  var LKey: UInt64 := (UInt64(AProcID) shl 32) or UInt64(AParentMetricsID);
+  // Double-Abs to avoid -MaxInt and MinInt problems.
+  // Not using compiler-Abs because we *must* get a positive integer;
+  // for compiler, Abs(Low(Integer)) is a null op.
+  Result := PositiveMask and ((PositiveMask and THashFNV1a32.GetHashValue(LKey, SizeOf(LKey))) + 1);
+  {$IFDEF Q_ON}
+    {$Q+}
+    {$UNDEF Q_ON}
+  {$ENDIF}
+
+end;
+{$ENDIF}
 
 {**********************************************************************************************}
 procedure ALCodeProfilerSaveHistory(const AProcMetricsHistory: TALProcMetricsHistory); overload;
 begin
+  {$IF defined(ALCodeProfilerHistoryGroupNone) or defined(ALCodeProfilerHistoryGroupByCallStack)}
   if AProcMetricsHistory.FCount = 0 then exit;
+  {$ENDIF}
   //--
   If ALProcMetricsFilename = '' then begin
     {$IF defined(MSWindows)}
@@ -248,7 +435,7 @@ begin
     end
     else
     {$ENDIF}
-      ALProcMetricsFilename := TPath.Combine(ALGetTempPathW, ALCodeProfilerProcMetricsFilename);
+      ALProcMetricsFilename := TPath.Combine(System.IOUtils.TPath.GetTempPath, ALCodeProfilerProcMetricsFilename);
     if TFile.Exists(ALProcMetricsFilename) then TFile.Delete(ALProcMetricsFilename);
   end;
   //--
@@ -257,12 +444,22 @@ begin
   else LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
   try
     LfileStream.Position := LfileStream.Size;
+    {$IF defined(ALCodeProfilerHistoryGroupNone)}
     LfileStream.WriteBuffer(AProcMetricsHistory.FArray[0], AProcMetricsHistory.FCount * SizeOf(TALProcMetrics));
+    {$ELSEIF defined(ALCodeProfilerHistoryGroupByProcID)}
+    for var I := Low(AProcMetricsHistory.FArray) to High(AProcMetricsHistory.FArray) do
+      if AProcMetricsHistory.FArray[I].CallCount <> 0 then
+        LfileStream.WriteBuffer(AProcMetricsHistory.FArray[I], SizeOf(TALProcMetrics));
+    {$ELSEIF defined(ALCodeProfilerHistoryGroupByCallStack)}
+    for var I := Low(AProcMetricsHistory.FArray) to High(AProcMetricsHistory.FArray) do
+      if AProcMetricsHistory.FArray[I].HashCode <> EMPTY_HASH then
+        LfileStream.WriteBuffer(AProcMetricsHistory.FArray[I], SizeOf(TALProcMetrics));
+    {$ENDIF}
   finally
     LFileStream.Free;
   end;
   //--
-  AProcMetricsHistory.FCount := 0;
+  AProcMetricsHistory.Clear;
 end;
 
 {********************************************************************}
@@ -273,7 +470,7 @@ begin
     for var I := ALProcMetricsHistories.Count - 1 downto 0 do begin
       if ASaveHistories then ALCodeProfilerSaveHistory(ALProcMetricsHistories[i]);
       if ALProcMetricsHistories[i].FIsOrphaned then ALProcMetricsHistories.ExtractAt(i).Free
-      else ALProcMetricsHistories[i].FCount := 0;
+      else ALProcMetricsHistories[i].Clear;
     end;
   finally
     ALProcMetricsLock.EndWrite;
@@ -325,9 +522,6 @@ end;
 {**********************************************************}
 procedure ALCodeProfilerEnterProc(const aProcID : Cardinal);
 begin
-  if ALIsInCodeProfiler then exit;
-  ALIsInCodeProfiler := True;
-  //--
   if ALCodeProfilerEnabled then begin
     var LProcMetricsStack := ALProcMetricsStack;
     if LProcMetricsStack = nil then begin
@@ -339,13 +533,64 @@ begin
     if LProcMetricsStack.FCount = LProcMetricsStack.FCapacity then LProcMetricsStack.Grow;
     inc(LProcMetricsStack.FCount);
     With LProcMetricsStack.FArray[LProcMetricsStack.FCount - 1] do begin
+      {$IF defined(ALCodeProfilerHistoryGroupNone)}
       ExecutionID := AtomicIncrement(TALStopWatchProcMetrics.ExecutionIDSequence);
+      {$ENDIF}
       if LProcMetricsStack.FCount > 1 then begin
+        {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
+        var LProcMetricsHistory := ALProcMetricsHistory;
+        if LProcMetricsHistory = nil then begin
+          ALProcMetricsHistory := TALProcMetricsHistory.Create;
+          ALProcMetricsHistory.SetCapacity(1000000); {1 000 000 * 32 Bytes = 32 MB or with gap = 2 097 152 * 32 Bytes = 67.11 MB}
+          LProcMetricsHistory := ALProcMetricsHistory;
+          ALProcMetricsLock.BeginWrite;
+          try
+            ALProcMetricsHistories.Add(LProcMetricsHistory);
+          finally
+            ALProcMetricsLock.EndWrite;
+          end;
+        end;
+        ALProcMetricsLock.BeginRead;
+        try
+          var LParentProcID: Cardinal := LProcMetricsStack.FArray[LProcMetricsStack.FCount - 2].ProcID;
+          var LParentParentMetricsID := LProcMetricsStack.FArray[LProcMetricsStack.FCount - 2].ParentMetricsID;
+          var LHashCode: Integer := LProcMetricsHistory.Hash(LParentProcID, LParentParentMetricsID);
+          var LParentMetricsID: NativeInt := LProcMetricsHistory.GetBucketIndex(LParentProcID, LParentParentMetricsID, LHashCode);
+          if LParentMetricsID < 0 then begin
+            if LProcMetricsHistory.FCount >= LProcMetricsHistory.FGrowThreshold then begin
+              LProcMetricsHistory.Grow;
+              LParentMetricsID := LProcMetricsHistory.GetBucketIndex(LParentProcID, LParentParentMetricsID, LHashCode);
+            end;
+            inc(LProcMetricsHistory.FCount);
+            LParentMetricsID := not LParentMetricsID;
+            With LProcMetricsHistory.FArray[LParentMetricsID] do begin
+              HashCode := LHashCode;
+              ProcID := LParentProcID;
+              MetricsID := LParentMetricsID;
+              ParentMetricsID := LParentParentMetricsID;
+              ThreadID := LProcMetricsStack.FArray[LProcMetricsStack.FCount - 2].ThreadID;
+              {$IFNDEF ALCompilerVersionSupported131}
+                {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
+              {$ENDIF}
+              CallCount := 0;
+              ElapsedTicks := 0;
+            end;
+          end;
+          ParentMetricsID := LParentMetricsID;
+        finally
+          ALProcMetricsLock.EndRead;
+        end;
+        {$ELSEIF defined(ALCodeProfilerHistoryGroupNone)}
         ParentExecutionID := LProcMetricsStack.FArray[LProcMetricsStack.FCount - 2].ExecutionID;
+        {$ENDIF}
         ThreadID := LProcMetricsStack.FArray[LProcMetricsStack.FCount - 2].ThreadID;
       end
       else begin
+        {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
+        ParentMetricsID := 0;
+        {$ELSEIF defined(ALCodeProfilerHistoryGroupNone)}
         ParentExecutionID := 0;
+        {$ENDIF}
         var LCurrentThreadID := TThread.CurrentThread.ThreadID;
         if LCurrentThreadID = MainThreadID then ThreadID := 0
         else begin
@@ -357,8 +602,6 @@ begin
       StopWatch := TStopWatch.StartNew;
     end;
   end;
-  //--
-  ALIsInCodeProfiler := False;
 end;
 
 {*********************************************************}
@@ -376,9 +619,6 @@ procedure ALCodeProfilerExitProc(const aProcID : Cardinal);
     end;
 
 begin
-  if ALIsInCodeProfiler then exit;
-  ALIsInCodeProfiler := True;
-  //--
   var LProcMetricsStack := ALProcMetricsStack;
   if LProcMetricsStack <> nil then begin
     if not ALCodeProfilerEnabled then begin
@@ -401,7 +641,7 @@ begin
       var LProcMetricsHistory := ALProcMetricsHistory;
       if LProcMetricsHistory = nil then begin
         ALProcMetricsHistory := TALProcMetricsHistory.Create;
-        ALProcMetricsHistory.SetCapacity(1000000); {1 000 000 * 32 Bytes = 32 MB}
+        ALProcMetricsHistory.SetCapacity(1000000); {1 000 000 * 32 Bytes = 32 MB or with gap = 2 097 152 * 32 Bytes = 67.11 MB}
         LProcMetricsHistory := ALProcMetricsHistory;
         ALProcMetricsLock.BeginWrite;
         try
@@ -413,6 +653,7 @@ begin
       //--
       ALProcMetricsLock.BeginRead;
       try
+        {$IF defined(ALCodeProfilerHistoryGroupNone)}
         if (LProcMetricsHistory.FCount = LProcMetricsHistory.FCapacity) then begin
           if (LProcMetricsHistory.FCount >= 100_000_000) {100_000_000 * 32 Bytes = 3.2 GB} then begin
             ALProcMetricsLock.EndRead;
@@ -447,6 +688,84 @@ begin
           Raise Exception.create('Error 55533349-EC72-404D-B113-CA32C518012F')
           {$ENDIF}
         end;
+        {$ELSEIF defined(ALCodeProfilerHistoryGroupByProcID)}
+        var LProcID: Cardinal := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ProcID;
+        {$IFNDEF ALCompilerVersionSupported131}
+          {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.TryAdd was not updated and adjust the IFDEF'}
+        {$ENDIF}
+        With LProcMetricsHistory.FArray[LProcID] do begin
+          ProcID := LProcID;
+          ThreadID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ThreadID;
+          Inc(CallCount);
+          {$IFNDEF ALCompilerVersionSupported131}
+            {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
+          {$ENDIF}
+          {$IF defined(MSWINDOWS)}
+          var LTickFrequency: Double;
+          if not TStopwatch.IsHighResolution then LTickFrequency := 1.0
+          else LTickFrequency := 10000000.0 / LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.Frequency;
+          ElapsedTicks := ElapsedTicks + Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * LTickFrequency);
+          {$ELSEIF defined(POSIX)}
+          ElapsedTicks := ElapsedTicks + LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks;
+          {$ELSE}
+          Raise Exception.create('Error 8CB28339-29A0-4276-80AA-F8CD5E447CE5')
+          {$ENDIF}
+        end;
+        {$ELSEIF defined(ALCodeProfilerHistoryGroupByCallStack)}
+        var LProcID: Cardinal := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ProcID;
+        var LParentMetricsID: Cardinal := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ParentMetricsID;
+        {$IFNDEF ALCompilerVersionSupported131}
+          {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.TryAdd was not updated and adjust the IFDEF'}
+        {$ENDIF}
+        var LHashCode: Integer := LProcMetricsHistory.Hash(LProcID, LParentMetricsID);
+        var LIndex: NativeInt := LProcMetricsHistory.GetBucketIndex(LProcID, LParentMetricsID, LHashCode);
+        if LIndex >= 0 then begin
+          With LProcMetricsHistory.FArray[LIndex] do begin
+            Inc(CallCount);
+            {$IFNDEF ALCompilerVersionSupported131}
+              {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
+            {$ENDIF}
+            {$IF defined(MSWINDOWS)}
+            var LTickFrequency: Double;
+            if not TStopwatch.IsHighResolution then LTickFrequency := 1.0
+            else LTickFrequency := 10000000.0 / LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.Frequency;
+            ElapsedTicks := ElapsedTicks + Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * LTickFrequency);
+            {$ELSEIF defined(POSIX)}
+            ElapsedTicks := ElapsedTicks + LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks;
+            {$ELSE}
+            Raise Exception.create('Error 8CB28339-29A0-4276-80AA-F8CD5E447CE5')
+            {$ENDIF}
+          end;
+        end
+        else begin
+          if LProcMetricsHistory.FCount >= LProcMetricsHistory.FGrowThreshold then begin
+            LProcMetricsHistory.Grow;
+            LIndex := LProcMetricsHistory.GetBucketIndex(LProcID, LParentMetricsID, LHashCode);
+          end;
+          inc(LProcMetricsHistory.FCount);
+          With LProcMetricsHistory.FArray[not LIndex] do begin
+            HashCode := LHashCode;
+            ProcID := LProcID;
+            MetricsID := not LIndex;
+            ParentMetricsID := LParentMetricsID;
+            ThreadID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ThreadID;
+            CallCount := 1;
+            {$IFNDEF ALCompilerVersionSupported131}
+              {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
+            {$ENDIF}
+            {$IF defined(MSWINDOWS)}
+            var LTickFrequency: Double;
+            if not TStopwatch.IsHighResolution then LTickFrequency := 1.0
+            else LTickFrequency := 10000000.0 / LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.Frequency;
+            ElapsedTicks := Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * LTickFrequency);
+            {$ELSEIF defined(POSIX)}
+            ElapsedTicks := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks;
+            {$ELSE}
+            Raise Exception.create('Error 8CB28339-29A0-4276-80AA-F8CD5E447CE5')
+            {$ENDIF}
+          end;
+        end;
+        {$ENDIF}
         dec(LProcMetricsStack.FCount);
       finally
         ALProcMetricsLock.EndRead;
@@ -467,8 +786,6 @@ begin
       end;
     end;
   end;
-  //--
-  ALIsInCodeProfiler := False;
 end;
 
 {****************************}
@@ -505,19 +822,19 @@ end;
 {$ENDIF}
 
 initialization
-  {$IF defined(DEBUG)}
-  ALLog('Alcinoe.CodeProfiler','initialization');
-  {$ENDIF}
-  ALIsInCodeProfiler := False;
   ALCodeProfilerAppStartTimeStamp := TStopWatch.GetTimeStamp;
+  {$IF defined(ALCodeProfilerHistoryGroupNone)}
   TALStopWatchProcMetrics.ExecutionIDSequence := 0;
+  {$ENDIF}
   //ALProcMetricsLock := ?? There is no TLightweightMREW.Create; initialization is done through the TLightweightMREW.Initialize class operator instead
-  ALCodeProfilerEnabled := True;
   ALProcMetricsFilename := '';
-  ALCodeProfilerServerName := '';
   //--
   ALProcMetricsHistory := TALProcMetricsHistory.Create;
+  {$IF defined(ALCodeProfilerHistoryGroupNone)}
   ALProcMetricsHistory.SetCapacity(25000000); {25 000 000 * 32 Bytes = 800MB}
+  {$ELSE}
+  ALProcMetricsHistory.SetCapacity(1000000); {1 000 000 = 2 097 152 (with gap) * 32 Bytes = 67.11 MB}
+  {$ENDIF}
   //--
   ALProcMetricsHistories := TList<TALProcMetricsHistory>.Create;
   ALProcMetricsHistories.Add(ALProcMetricsHistory);
@@ -528,9 +845,6 @@ initialization
   {$ENDIF}
 
 finalization
-  {$IF defined(DEBUG)}
-  ALLog('Alcinoe.CodeProfiler','finalization');
-  {$ENDIF}
   {$IF (not defined(IOS)) and (not defined(ANDROID))}
   // At this point, all background threads must have completed.
   ALCodeProfilerPurgeHistories(ALCodeProfilerEnabled{ASaveHistories});

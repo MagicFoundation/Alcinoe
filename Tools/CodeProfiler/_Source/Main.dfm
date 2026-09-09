@@ -21,7 +21,7 @@ object MainForm: TMainForm
     Height = 868
     Align = alClient
     TabOrder = 0
-    Properties.ActivePage = InstrumentationTabSheet
+    Properties.ActivePage = PerformanceAnalysisTabSheet
     Properties.CustomButtons.Buttons = <>
     ClientRectBottom = 863
     ClientRectLeft = 5
@@ -84,7 +84,9 @@ object MainForm: TMainForm
           Top = 107
           Margins.Left = 16
           Align = alTop
-          Caption = '2. Add Alcinoe profiler markers to your code.'
+          Caption = 
+            '2. Click the "Insert Markers" button below to add profiler marke' +
+            'rs to your code.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -124,8 +126,9 @@ object MainForm: TMainForm
           Align = alTop
           Caption = 
             '4. If you are using Android or iOS, send the app to the backgrou' +
-            'nd and then bring it back to the foreground to generate the perf' +
-            'ormance file.'
+            'nd and bring it back to the foreground to generate the performan' +
+            'ce file. On Windows and macOS, the performance file will be gene' +
+            'rated when you close the app.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -144,7 +147,9 @@ object MainForm: TMainForm
           Top = 285
           Margins.Left = 16
           Align = alTop
-          Caption = '6. Perform the performance analysis.'
+          Caption = 
+            '6. Go to the Performance Analysis tab, click the Load Data butto' +
+            'n, and run the analysis.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -204,7 +209,9 @@ object MainForm: TMainForm
           Top = 74
           Margins.Left = 16
           Align = alTop
-          Caption = '1. Specify the server IP and port for the listening process.'
+          Caption = 
+            '1. If you run the program on a remote device (such as Android or' +
+            ' iOS), specify the server IP and port for the listening process.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -225,10 +232,10 @@ object MainForm: TMainForm
           Align = alTop
           Caption = 
             '5. If you specified the server IP and port in step 1, the perfor' +
-            'mance file will be received automatically. After receiving it, s' +
-            'imply reload the data; otherwise, download the data from the use' +
-            'r'#39's document folder and place it in the CodeProfiler data folder' +
-            '.'
+            'mance file will be received automatically. Otherwise, if you are' +
+            ' running the program on a remote device, download the data from ' +
+            'the user'#39's documents folder and place it in the CodeProfiler dat' +
+            'a folder.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -257,21 +264,21 @@ object MainForm: TMainForm
         object SourcesPathMemo: TcxMemo
           AlignWithMargins = True
           Left = 8
-          Top = 164
+          Top = 254
           Margins.Left = 8
           Margins.Right = 8
-          Margins.Bottom = 12
+          Margins.Bottom = 0
           Align = alClient
           TabOrder = 0
-          Height = 208
+          Height = 78
           Width = 1052
         end
         object cxLabel9: TcxLabel
           AlignWithMargins = True
           Left = 8
-          Top = 134
+          Top = 224
           Margins.Left = 8
-          Margins.Top = 8
+          Margins.Top = 0
           Margins.Right = 8
           Margins.Bottom = 0
           Align = alTop
@@ -284,7 +291,7 @@ object MainForm: TMainForm
         end
         object dxPanel3: TdxPanel
           Left = 0
-          Top = 95
+          Top = 148
           Width = 1068
           Height = 31
           Align = alTop
@@ -329,6 +336,7 @@ object MainForm: TMainForm
             Margins.Right = 8
             Margins.Bottom = 0
             Align = alLeft
+            Properties.OnChange = HttpServerNameEditPropertiesChange
             TabOrder = 2
             Width = 358
           end
@@ -347,28 +355,104 @@ object MainForm: TMainForm
             Width = 71
           end
         end
-        object cxLabel10: TcxLabel
+        object cxLabel15: TcxLabel
           AlignWithMargins = True
           Left = 8
-          Top = 60
+          Top = 8
           Margins.Left = 8
           Margins.Top = 8
           Margins.Right = 8
           Margins.Bottom = 8
           Align = alTop
           Caption = 
-            'Specify the IP address and port to automatically receive the per' +
-            'formance file, then update the markers in your code.'
+            'Path to Alcinoe.CodeProfiler.inc, the include file where the opt' +
+            'ions below are stored'
+          Properties.WordWrap = True
+          TabOrder = 6
+          Width = 1052
+        end
+        object dxPanel5: TdxPanel
+          Left = 0
+          Top = 43
+          Width = 1068
+          Height = 31
+          Align = alTop
+          Frame.Borders = []
+          LookAndFeel.NativeStyle = False
+          LookAndFeel.SkinName = 'Foggy'
+          TabOrder = 7
+          object BrowseCodeProfilerIncFilenameBtn: TcxButton
+            AlignWithMargins = True
+            Left = 1020
+            Top = 0
+            Width = 40
+            Height = 31
+            Margins.Left = 8
+            Margins.Top = 0
+            Margins.Right = 8
+            Margins.Bottom = 0
+            Align = alRight
+            Caption = '...'
+            TabOrder = 0
+            OnClick = BrowseCodeProfilerIncFilenameBtnClick
+          end
+          object CodeProfilerIncFilenameEdit: TcxTextEdit
+            AlignWithMargins = True
+            Left = 8
+            Top = 0
+            Margins.Left = 8
+            Margins.Top = 0
+            Margins.Right = 8
+            Margins.Bottom = 0
+            Align = alClient
+            Properties.OnChange = CodeProfilerIncFilenameEditPropertiesChange
+            TabOrder = 1
+            Width = 996
+          end
+        end
+        object dxPanel6: TdxPanel
+          Left = 0
+          Top = 74
+          Width = 1068
+          Height = 31
+          Align = alTop
+          Frame.Borders = []
+          LookAndFeel.NativeStyle = False
+          LookAndFeel.SkinName = 'Foggy'
+          TabOrder = 8
+          object CodeProfilerEnabledCheckBox: TcxCheckBox
+            AlignWithMargins = True
+            Left = 8
+            Top = 3
+            Margins.Left = 8
+            Align = alLeft
+            Caption = 'Start profiling as soon as the application starts'
+            Properties.OnChange = CodeProfilerEnabledCheckBoxPropertiesChange
+            TabOrder = 0
+          end
+        end
+        object cxLabel10: TcxLabel
+          AlignWithMargins = True
+          Left = 8
+          Top = 113
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 8
+          Align = alTop
+          Caption = 
+            '(Optional) Specify the IP address and port of this computer to a' +
+            'utomatically receive the performance file'
           Properties.WordWrap = True
           TabOrder = 3
           Width = 1052
         end
         object dxPanel1: TdxPanel
           Left = 0
-          Top = 0
+          Top = 332
           Width = 1068
           Height = 52
-          Align = alTop
+          Align = alBottom
           Frame.Borders = []
           LookAndFeel.NativeStyle = False
           LookAndFeel.SkinName = 'Foggy'
@@ -390,6 +474,53 @@ object MainForm: TMainForm
             Caption = 'Remove Markers'
             TabOrder = 1
             OnClick = RemoveProfilerMarkersBtnClick
+          end
+        end
+        object dxPanel4: TdxPanel
+          AlignWithMargins = True
+          Left = 3
+          Top = 182
+          Width = 1062
+          Height = 39
+          Align = alTop
+          Frame.Borders = []
+          LookAndFeel.NativeStyle = False
+          LookAndFeel.SkinName = 'Foggy'
+          TabOrder = 5
+          object DoNotGroupRadioButton: TcxRadioButton
+            AlignWithMargins = True
+            Left = 8
+            Top = 3
+            Margins.Left = 8
+            Align = alLeft
+            Caption = 'Do not group (Huge memory usage!)'
+            TabOrder = 0
+            OnClick = HistoryGroupModeRadioButtonClick
+            AutoSize = True
+          end
+          object GroupCallsByProcIDRadioButton: TcxRadioButton
+            AlignWithMargins = True
+            Left = 347
+            Top = 3
+            Margins.Left = 32
+            Align = alLeft
+            Caption = 'Group by procedure ID'
+            TabOrder = 1
+            OnClick = HistoryGroupModeRadioButtonClick
+            AutoSize = True
+          end
+          object GroupCallsByCallStackRadioButton: TcxRadioButton
+            AlignWithMargins = True
+            Left = 579
+            Top = 3
+            Margins.Left = 32
+            Align = alLeft
+            Caption = 'Group by call stack (recommended)'
+            Checked = True
+            TabOrder = 2
+            TabStop = True
+            OnClick = HistoryGroupModeRadioButtonClick
+            AutoSize = True
           end
         end
       end
@@ -477,6 +608,7 @@ object MainForm: TMainForm
           Margins.Right = 8
           Caption = 'Clear Data'
           TabOrder = 5
+          OnClick = ClearDataBtnClick
         end
         object ExportToCsvBtn: TcxButton
           Left = 143
@@ -511,6 +643,19 @@ object MainForm: TMainForm
         Styles.Background = cxStyleTreeListProcMetricsBackground
         TabOrder = 1
         OnDblClick = TreeListProcMetricsDblClick
+        object TreeListProcMetricsColumnExecutionID: TcxTreeListColumn
+          Caption.Text = '_ExecutionID'
+          DataBinding.ValueType = 'Integer'
+          Options.Moving = False
+          Width = 120
+          Position.ColIndex = 0
+          Position.RowIndex = 0
+          Position.BandIndex = 0
+          SortOrder = soDescending
+          SortIndex = 0
+          Summary.FooterSummaryItems = <>
+          Summary.GroupFooterSummaryItems = <>
+        end
         object TreeListProcMetricsColumnProcName: TcxTreeListColumn
           Caption.Text = 'Name'
           Options.Filtering = False
@@ -520,6 +665,8 @@ object MainForm: TMainForm
           Position.ColIndex = 1
           Position.RowIndex = 0
           Position.BandIndex = 0
+          Summary.FooterSummaryItems = <>
+          Summary.GroupFooterSummaryItems = <>
         end
         object TreeListProcMetricsColumnThreadID: TcxTreeListColumn
           Caption.Text = 'Thread ID'
@@ -531,17 +678,8 @@ object MainForm: TMainForm
           Position.ColIndex = 2
           Position.RowIndex = 0
           Position.BandIndex = 0
-        end
-        object TreeListProcMetricsColumnTimeTaken: TcxTreeListColumn
-          Caption.Text = 'TimeTaken'
-          DataBinding.ValueType = 'Float'
-          Options.Filtering = False
-          Options.Moving = False
-          Options.Sorting = False
-          Width = 150
-          Position.ColIndex = 4
-          Position.RowIndex = 0
-          Position.BandIndex = 0
+          Summary.FooterSummaryItems = <>
+          Summary.GroupFooterSummaryItems = <>
         end
         object TreeListProcMetricsColumnStartTimeStamp: TcxTreeListColumn
           Caption.Text = 'Start Timestamp (mm:ss:zzz)'
@@ -552,18 +690,35 @@ object MainForm: TMainForm
           Position.ColIndex = 3
           Position.RowIndex = 0
           Position.BandIndex = 0
+          Summary.FooterSummaryItems = <>
+          Summary.GroupFooterSummaryItems = <>
           OnGetDisplayText = TreeListProcMetricsColumnStartTimeStampGetDisplayText
         end
-        object TreeListProcMetricsColumnExecutionID: TcxTreeListColumn
-          Caption.Text = '_ExecutionID'
-          DataBinding.ValueType = 'Integer'
+        object TreeListProcMetricsColumnCallCount: TcxTreeListColumn
+          Caption.Text = 'Call Count'
+          DataBinding.ValueType = 'LargeInt'
+          Options.Filtering = False
           Options.Moving = False
+          Options.Sorting = False
           Width = 120
-          Position.ColIndex = 0
+          Position.ColIndex = 4
           Position.RowIndex = 0
           Position.BandIndex = 0
-          SortOrder = soDescending
-          SortIndex = 0
+          Summary.FooterSummaryItems = <>
+          Summary.GroupFooterSummaryItems = <>
+        end
+        object TreeListProcMetricsColumnTimeTaken: TcxTreeListColumn
+          Caption.Text = 'TimeTaken'
+          DataBinding.ValueType = 'Float'
+          Options.Filtering = False
+          Options.Moving = False
+          Options.Sorting = False
+          Width = 150
+          Position.ColIndex = 5
+          Position.RowIndex = 0
+          Position.BandIndex = 0
+          Summary.FooterSummaryItems = <>
+          Summary.GroupFooterSummaryItems = <>
         end
       end
       object GridProcMetrics: TcxGrid
@@ -638,6 +793,11 @@ object MainForm: TMainForm
             SortOrder = soAscending
             Width = 250
           end
+          object GridTableViewProcMetricsColumnCallCount: TcxGridColumn
+            Caption = 'Call Count'
+            DataBinding.ValueType = 'LargeInt'
+            Width = 120
+          end
           object GridTableViewProcMetricsColumnTimeTaken: TcxGridColumn
             Caption = 'Time Taken'
             DataBinding.ValueType = 'Float'
@@ -676,12 +836,12 @@ object MainForm: TMainForm
   object dxSkinController: TdxSkinController
     NativeStyle = False
     SkinName = 'Foggy'
-    Left = 768
-    Top = 120
+    Left = 808
+    Top = 152
   end
   object cxStyleRepository: TcxStyleRepository
-    Left = 888
-    Top = 120
+    Left = 920
+    Top = 152
     PixelsPerInch = 96
     object cxStyleTreeListProcMetricsBackground: TcxStyle
       AssignedValues = [svColor]
@@ -694,7 +854,7 @@ object MainForm: TMainForm
     OnException = IdHTTPServerException
     OnListenException = IdHTTPServerListenException
     OnCommandGet = IdHTTPServerCommandGet
-    Left = 661
-    Top = 118
+    Left = 693
+    Top = 150
   end
 end

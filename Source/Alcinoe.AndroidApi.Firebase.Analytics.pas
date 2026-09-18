@@ -40,6 +40,7 @@ type
     ['{536A10DE-A85D-4260-98AC-0311F43DC370}']
     procedure logEvent(name: JString; params: JBundle); cdecl;
     procedure setUserId(id: JString); cdecl;
+    procedure setUserProperty(name: JString; value: JString); cdecl;
   end;
   TJFirebaseAnalytics = class(TJavaGenericImport<JFirebaseAnalyticsClass, JFirebaseAnalytics>) end;
 

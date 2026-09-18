@@ -625,9 +625,14 @@ type
         function RetryDownloadItems: boolean; virtual;
         procedure PrependItem(var AData: TALJsonNodeW); virtual;
         procedure AppendItem(var AData: TALJsonNodeW); virtual;
-        procedure DeleteItemAtIndex(const AIndex: Integer); virtual;
-        procedure DeleteItem(const AId: String); overload;
-        procedure DeleteItem(const AId: Int64); overload;
+        /// <summary>
+        ///   Use delayed by default because DeleteItemAtIndex may be invoked
+        ///   from within the item's own UI controls (for example, a button inside the item).
+        ///   Delaying ensures the item is not freed while its event handler is still running.
+        /// </summary>
+        procedure DeleteItemAtIndex(const AIndex: Integer; const ADelayed: boolean = true); virtual;
+        procedure DeleteItem(const AId: String; const ADelayed: boolean = true); overload;
+        procedure DeleteItem(const AId: Int64; const ADelayed: boolean = true); overload;
         function ScrollToItemIndex(const AIndex: Integer; const AHideTopBar: Boolean; const AHideBottomBar: Boolean; const ADuration: integer; const Adx: single = 0; const Ady: single = 0): Boolean; virtual;
         function ScrollToItem(const AId: String; const AHideTopBar: Boolean; const AHideBottomBar: Boolean; const ADuration: integer; const Adx: single = 0; const Ady: single = 0): Boolean; overload;
         function ScrollToItem(const AId: Int64; const AHideTopBar: Boolean; const AHideBottomBar: Boolean; const ADuration: integer; const Adx: single = 0; const Ady: single = 0): Boolean; overload;
@@ -4100,37 +4105,34 @@ begin
   end;
 end;
 
-{*************************************************************************}
-procedure TALDynamicListBox.TView.DeleteItemAtIndex(const AIndex: Integer);
+{*********************************************************************************************************}
+procedure TALDynamicListBox.TView.DeleteItemAtIndex(const AIndex: Integer; const ADelayed: boolean = true);
 begin
   var LItem := Items[AIndex];
-  // Use delayed destruction because DeleteItemAtIndex may be invoked
-  // from within the item's own UI controls (for example, a button inside the item).
-  // Delaying ensures the item is not freed while its event handler is still running.
-  ALFreeAndNil(LItem, true{delayed});
+  ALFreeAndNil(LItem, ADelayed);
 end;
 
-{**************************************************************}
-procedure TALDynamicListBox.TView.DeleteItem(const AId: String);
+{**********************************************************************************************}
+procedure TALDynamicListBox.TView.DeleteItem(const AId: String; const ADelayed: boolean = true);
 begin
   var LItemIdNodeName := ItemIdNodeName;
   If LItemIdNodeName = '' then raise Exception.Create('ItemIdNodeName must be defined');
   for var I := low(FItems^) to ItemsCount - 1 do
     if FItems^[i].Data.GetChildValueText(LItemIdNodeName, '') = AId then begin
-      DeleteItemAtIndex(i);
+      DeleteItemAtIndex(i, ADelayed);
       Exit;
     end;
   raise Exception.Create('Item not found');
 end;
 
-{*************************************************************}
-procedure TALDynamicListBox.TView.DeleteItem(const AId: Int64);
+{*********************************************************************************************}
+procedure TALDynamicListBox.TView.DeleteItem(const AId: Int64; const ADelayed: boolean = true);
 begin
   var LItemIdNodeName := ItemIdNodeName;
   If LItemIdNodeName = '' then raise Exception.Create('ItemIdNodeName must be defined');
   for var I := low(FItems^) to ItemsCount - 1 do
     if FItems^[i].Data.GetChildValueInt64(LItemIdNodeName, 0) = AId then begin
-      DeleteItemAtIndex(i);
+      DeleteItemAtIndex(i, ADelayed);
       Exit;
     end;
   raise Exception.Create('Item not found');

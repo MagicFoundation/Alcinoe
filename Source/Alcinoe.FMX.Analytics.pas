@@ -520,17 +520,62 @@ end;
 {************************************************************************************************}
 procedure TALAnalytics.SetUserProperty(const APropertyName: String; const APropertyValue: String);
 begin
+
   {$IFDEF DEBUG}
   ALLog(Classname+'.SetUserProperty', 'PropertyName: ' + APropertyName + ' | PropertyValue: ' + APropertyValue);
   {$ENDIF}
+
+
+  {$REGION 'android'}
+  {$IF defined(android)}
+
+    {$IF defined(ALAnalyticsFirebase)}
+    fFirebaseAnalytics.setUserProperty(StringToJString(APropertyName), StringToJString(APropertyValue));
+    {$ENDIF}
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'ios'}
+  {$IF defined(ios)}
+
+    {$IF defined(ALAnalyticsFirebase)}
+    TFIRAnalytics.OCClass.setUserPropertyString(StrToNSStr(APropertyValue), StrToNSStr(APropertyName));
+    {$ENDIF}
+
+  {$ENDIF}
+  {$ENDREGION}
+
 end;
 
 {********************************************************************}
 procedure TALAnalytics.ClearUserProperty(const APropertyName: String);
 begin
+
   {$IFDEF DEBUG}
   ALLog(Classname+'.ClearUserProperty', 'PropertyName: ' + APropertyName);
   {$ENDIF}
+
+  {$REGION 'android'}
+  {$IF defined(android)}
+
+    {$IF defined(ALAnalyticsFirebase)}
+    fFirebaseAnalytics.setUserProperty(StringToJString(APropertyName), nil);
+    {$ENDIF}
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'ios'}
+  {$IF defined(ios)}
+
+    {$IF defined(ALAnalyticsFirebase)}
+    TFIRAnalytics.OCClass.setUserPropertyString(nil, StrToNSStr(APropertyName));
+    {$ENDIF}
+
+  {$ENDIF}
+  {$ENDREGION}
+
 end;
 
 initialization

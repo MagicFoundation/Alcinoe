@@ -525,7 +525,6 @@ begin
   ALLog(Classname+'.SetUserProperty', 'PropertyName: ' + APropertyName + ' | PropertyValue: ' + APropertyValue);
   {$ENDIF}
 
-
   {$REGION 'android'}
   {$IF defined(android)}
 

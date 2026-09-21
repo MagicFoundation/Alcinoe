@@ -5,6 +5,10 @@ interface
 {$I Alcinoe.inc}
 {$I Alcinoe.CodeProfiler.inc}
 
+{$IF defined(ALCodeProfilerIgnoreThreadID) and (not defined(ALCodeProfilerHistoryGroupByProcID))}
+  {$MESSAGE ERROR 'ALCodeProfilerIgnoreThreadID is only available with ALCodeProfilerHistoryGroupByProcID'}
+{$ENDIF}
+
 type
   TALProcMetrics = record
   public
@@ -17,6 +21,8 @@ type
     ElapsedTicks: Int64;
     {$ELSEIF defined(ALCodeProfilerHistoryGroupByProcID)}
     ProcID: Cardinal;
+    // Always 0 when ALCodeProfilerIgnoreThreadID is defined. The field is kept
+    // in all cases so that the layout of the .dat file never changes.
     ThreadID: Cardinal;
     CallCount: Cardinal;
     ElapsedTicks: Int64;
@@ -35,7 +41,7 @@ type
 procedure ALCodeProfilerEnterProc(const aProcID : Cardinal);
 procedure ALCodeProfilerExitProc(const aProcID : Cardinal);
 procedure ALCodeProfilerStart;
-procedure ALCodeProfilerStop(Const ASaveHistories: Boolean = True);
+procedure ALCodeProfilerStop;
 function ALCodeProfilerIsrunning: Boolean;
 
 const
@@ -103,7 +109,9 @@ Type
     {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
     ParentMetricsID: Cardinal;
     {$ENDIF}
+    {$IF not defined(ALCodeProfilerIgnoreThreadID)}
     ThreadID: Cardinal;
+    {$ENDIF}
     StopWatch: TStopWatch;
   end;
 
@@ -123,7 +131,6 @@ Type
     FArray: TALProcMetricsArray;
     FCount: NativeInt;
     FCapacity: NativeInt;
-    FIsOrphaned: Boolean;
     {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
     FGrowThreshold: NativeInt;
     procedure Rehash(NewCapPow2: NativeInt);
@@ -138,7 +145,17 @@ Type
 {*******}
 threadvar
   ALProcMetricsStack: TALProcMetricsStack;
+
+{*******}
+{$IF defined(ALCodeProfilerIgnoreThreadID)}
+// All the threads share the same history, so that the metrics of a procedure
+// are merged together whatever the thread it was called from.
+var
   ALProcMetricsHistory: TALProcMetricsHistory;
+{$ELSE}
+threadvar
+  ALProcMetricsHistory: TALProcMetricsHistory;
+{$ENDIF}
 
 {*}
 var
@@ -469,7 +486,6 @@ begin
   try
     for var I := ALProcMetricsHistories.Count - 1 downto 0 do begin
       if ASaveHistories then ALCodeProfilerSaveHistory(ALProcMetricsHistories[i]);
-      if ALProcMetricsHistories[i].FIsOrphaned then ALProcMetricsHistories.ExtractAt(i).Free
       else ALProcMetricsHistories[i].Clear;
     end;
   finally
@@ -541,7 +557,7 @@ begin
         var LProcMetricsHistory := ALProcMetricsHistory;
         if LProcMetricsHistory = nil then begin
           ALProcMetricsHistory := TALProcMetricsHistory.Create;
-          ALProcMetricsHistory.SetCapacity(1000000); {1 000 000 * 32 Bytes = 32 MB or with gap = 2 097 152 * 32 Bytes = 67.11 MB}
+          ALProcMetricsHistory.SetCapacity(ALCodeProfilerHistoryCapacity); {with the default capacity: 1 000 000 * 32 Bytes = 32 MB or with gap = 2 097 152 * 32 Bytes = 67.11 MB}
           LProcMetricsHistory := ALProcMetricsHistory;
           ALProcMetricsLock.BeginWrite;
           try
@@ -583,7 +599,9 @@ begin
         {$ELSEIF defined(ALCodeProfilerHistoryGroupNone)}
         ParentExecutionID := LProcMetricsStack.FArray[LProcMetricsStack.FCount - 2].ExecutionID;
         {$ENDIF}
+        {$IF not defined(ALCodeProfilerIgnoreThreadID)}
         ThreadID := LProcMetricsStack.FArray[LProcMetricsStack.FCount - 2].ThreadID;
+        {$ENDIF}
       end
       else begin
         {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
@@ -591,12 +609,14 @@ begin
         {$ELSEIF defined(ALCodeProfilerHistoryGroupNone)}
         ParentExecutionID := 0;
         {$ENDIF}
+        {$IF not defined(ALCodeProfilerIgnoreThreadID)}
         var LCurrentThreadID := TThread.CurrentThread.ThreadID;
         if LCurrentThreadID = MainThreadID then ThreadID := 0
         else begin
           ThreadID := LCurrentThreadID mod 4294967295;
           if ThreadID = 0 then ThreadID := 1;
         end;
+        {$ENDIF}
       end;
       ProcID := AProcID;
       StopWatch := TStopWatch.StartNew;
@@ -624,24 +644,16 @@ begin
     if not ALCodeProfilerEnabled then begin
       ALProcMetricsStack.Free;
       ALProcMetricsStack := nil;
-      if ALProcMetricsHistory <> nil then begin
-        ALProcMetricsLock.BeginRead;
-        try
-          ALProcMetricsHistory.FIsOrphaned := true;
-          ALProcMetricsHistory := nil;
-        finally
-          ALProcMetricsLock.EndRead;
-        end;
-      end;
     end
     else if LProcMetricsStack.FCount <> 0 then begin
       var LProcMetricsStackLastIndex: integer := LProcMetricsStack.FCount - 1;
       LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.Stop;
       //--
       var LProcMetricsHistory := ALProcMetricsHistory;
+      {$IF not defined(ALCodeProfilerIgnoreThreadID)}
       if LProcMetricsHistory = nil then begin
         ALProcMetricsHistory := TALProcMetricsHistory.Create;
-        ALProcMetricsHistory.SetCapacity(1000000); {1 000 000 * 32 Bytes = 32 MB or with gap = 2 097 152 * 32 Bytes = 67.11 MB}
+        ALProcMetricsHistory.SetCapacity(ALCodeProfilerHistoryCapacity); {with the default capacity: 1 000 000 * 32 Bytes = 32 MB or with gap = 2 097 152 * 32 Bytes = 67.11 MB}
         LProcMetricsHistory := ALProcMetricsHistory;
         ALProcMetricsLock.BeginWrite;
         try
@@ -650,6 +662,7 @@ begin
           ALProcMetricsLock.EndWrite;
         end;
       end;
+      {$ENDIF}
       //--
       ALProcMetricsLock.BeginRead;
       try
@@ -693,6 +706,28 @@ begin
         {$IFNDEF ALCompilerVersionSupported131}
           {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.TryAdd was not updated and adjust the IFDEF'}
         {$ENDIF}
+        {$IF defined(ALCodeProfilerIgnoreThreadID)}
+        // All the threads update the very same record, so the metrics must be
+        // updated atomically.
+        With LProcMetricsHistory.FArray[LProcID] do begin
+          ProcID := LProcID;
+          ThreadID := 0;
+          AtomicIncrement(CallCount);
+          {$IFNDEF ALCompilerVersionSupported131}
+            {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
+          {$ENDIF}
+          {$IF defined(MSWINDOWS)}
+          var LTickFrequency: Double;
+          if not TStopwatch.IsHighResolution then LTickFrequency := 1.0
+          else LTickFrequency := 10000000.0 / LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.Frequency;
+          AtomicIncrement(ElapsedTicks, Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * LTickFrequency));
+          {$ELSEIF defined(POSIX)}
+          AtomicIncrement(ElapsedTicks, LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks);
+          {$ELSE}
+          Raise Exception.create('Error 5FE96C7E-ABFA-4AE2-84E5-39EFF2E83BBB')
+          {$ENDIF}
+        end;
+        {$ELSE}
         With LProcMetricsHistory.FArray[LProcID] do begin
           ProcID := LProcID;
           ThreadID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ThreadID;
@@ -711,6 +746,7 @@ begin
           Raise Exception.create('Error 8CB28339-29A0-4276-80AA-F8CD5E447CE5')
           {$ENDIF}
         end;
+        {$ENDIF}
         {$ELSEIF defined(ALCodeProfilerHistoryGroupByCallStack)}
         var LProcID: Cardinal := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ProcID;
         var LParentMetricsID: Cardinal := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ParentMetricsID;
@@ -774,15 +810,6 @@ begin
          (TThread.CurrentThread.ThreadID <> MainThreadID) then begin
         ALProcMetricsStack.Free;
         ALProcMetricsStack := nil;
-        If ALProcMetricsHistory <> nil then begin
-          ALProcMetricsLock.BeginRead;
-          try
-            ALProcMetricsHistory.FIsOrphaned := true;
-            ALProcMetricsHistory := nil;
-          finally
-            ALProcMetricsLock.EndRead;
-          end;
-        end;
       end;
     end;
   end;
@@ -794,11 +821,10 @@ begin
   ALCodeProfilerEnabled := True;
 end;
 
-{*****************************************************************}
-procedure ALCodeProfilerStop(Const ASaveHistories: Boolean = True);
+{***************************}
+procedure ALCodeProfilerStop;
 Begin
   ALCodeProfilerEnabled := False;
-  ALCodeProfilerPurgeHistories(ASaveHistories);
 End;
 
 {****************************************}
@@ -833,7 +859,7 @@ initialization
   {$IF defined(ALCodeProfilerHistoryGroupNone)}
   ALProcMetricsHistory.SetCapacity(25000000); {25 000 000 * 32 Bytes = 800MB}
   {$ELSE}
-  ALProcMetricsHistory.SetCapacity(1000000); {1 000 000 = 2 097 152 (with gap) * 32 Bytes = 67.11 MB}
+  ALProcMetricsHistory.SetCapacity(ALCodeProfilerHistoryCapacity); {with the default capacity: 1 000 000 = 2 097 152 (with gap) * 32 Bytes = 67.11 MB}
   {$ENDIF}
   //--
   ALProcMetricsHistories := TList<TALProcMetricsHistory>.Create;

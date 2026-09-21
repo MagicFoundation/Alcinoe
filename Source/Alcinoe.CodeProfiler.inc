@@ -29,6 +29,19 @@ var
 // NOTE: This is the fastest option and has the lowest impact on each function call.
 {.$DEFINE ALCodeProfilerHistoryGroupByProcID}
 
+{$IF defined(ALCodeProfilerHistoryGroupByProcID)}
+// Ignore the thread ID. The calls made from every thread are merged together
+// instead of producing one row per procedure and per thread, for example:
+// procedure A - 3 calls - 310 ms  = 1 call from the main thread + 2 calls from a background thread
+//
+// NOTE: This option is only available with ALCodeProfilerHistoryGroupByProcID.
+// All the threads then share the same metrics, which are updated atomically,
+// so it slightly increases the cost of each function call, but it also greatly
+// reduces the memory usage as only one history is allocated for the whole
+// process instead of one per thread.
+{.$DEFINE ALCodeProfilerIgnoreThreadID}
+{$ENDIF}
+
 // Group calls by call stack.
 // The result will be displayed as a grouped call tree, for example:
 // procedure A - 1 call - 310 ms
@@ -37,3 +50,18 @@ var
 //     procedure D - 1 call - 85 ms
 //   procedure C - 1 call - 22 ms
 {$DEFINE ALCodeProfilerHistoryGroupByCallStack}
+
+// Capacity of the history, in number of rows.
+//
+// NOTE: With ALCodeProfilerHistoryGroupByProcID the history is a flat array
+// indexed by the procedure ID, so it only needs to be big enough to hold the
+// highest procedure ID of ALCodeProfilerProcIDMap.txt. The value below is
+// updated by the Alcinoe Code Profiler GUI each time the markers are inserted
+// or removed, so there is no reason to edit it by hand.
+{$IF defined(ALCodeProfilerHistoryGroupByProcID)}
+const
+  ALCodeProfilerHistoryCapacity = 1000000;
+{$ELSE}
+const
+  ALCodeProfilerHistoryCapacity = 1000000; {1 000 000 * 32 Bytes = 32 MB or with gap = 2 097 152 * 32 Bytes = 67.11 MB}
+{$ENDIF}

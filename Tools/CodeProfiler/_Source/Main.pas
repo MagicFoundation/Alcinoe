@@ -67,8 +67,7 @@ type
     cxLabel3: TcxLabel;
     cxLabel4: TcxLabel;
     cxLabel5: TcxLabel;
-    cxLabel6: TcxLabel;
-    cxLabel8: TcxLabel;
+    LastInstructionLabel: TcxLabel;
     dxPanel2: TdxPanel;
     SourcesPathMemo: TcxMemo;
     cxLabel9: TcxLabel;
@@ -78,7 +77,6 @@ type
     TreeListProcMetricsColumnStartTimeStamp: TcxTreeListColumn;
     TreeListProcMetricsColumnCallCount: TcxTreeListColumn;
     GridTableViewProcMetricsColumnStartTimestamp: TcxGridColumn;
-    LastInstructionLabel: TcxLabel;
     StartTimeStampMinEdit: TcxMaskEdit;
     Label1: TLabel;
     StartTimeStampMaxEdit: TcxMaskEdit;
@@ -107,6 +105,10 @@ type
     CodeProfilerIncFilenameEdit: TcxTextEdit;
     dxPanel6: TdxPanel;
     CodeProfilerEnabledCheckBox: TcxCheckBox;
+    dxPanel7: TdxPanel;
+    IgnoreThreadIDCheckBox: TcxCheckBox;
+    cxLabel7: TcxLabel;
+    cxLabel16: TcxLabel;
     procedure InsertProfilerMarkersBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -136,8 +138,13 @@ type
     procedure CodeProfilerIncFilenameEditPropertiesChange(Sender: TObject);
     procedure BrowseCodeProfilerIncFilenameBtnClick(Sender: TObject);
     procedure CodeProfilerEnabledCheckBoxPropertiesChange(Sender: TObject);
+    procedure IgnoreThreadIDCheckBoxPropertiesChange(Sender: TObject);
   private
     const ConfigFilename = 'Config.ini';
+    // Default value of ALCodeProfilerHistoryCapacity, used for every history
+    // group mode but ALCodeProfilerHistoryGroupByProcID, where the capacity
+    // is deduced from ALCodeProfilerProcIDMap.txt instead.
+    const DefaultHistoryCapacity = 1000000;
   private
     Type
       TGoBackStackItem = record
@@ -241,6 +248,7 @@ type
     function GetSelectedServerName: AnsiString;
     procedure SelectServerName(const AServerName: String);
     function GetCodeProfilerIncFilename: String;
+    function GetHistoryCapacity: Integer;
     procedure SaveCodeProfilerIncFile;
     procedure LoadCodeProfilerIncFile;
     procedure SaveConfigFile;
@@ -389,6 +397,9 @@ begin
       StartTimeStampMaxEdit.Enabled := False;
     end;
   end;
+  // ALCodeProfilerIgnoreThreadID is only supported by
+  // ALCodeProfilerHistoryGroupByProcID.
+  IgnoreThreadIDCheckBox.Enabled := GetSelectedHistoryGroupModeEnum = hgmByProcID;
 end;
 
 {*******************************************************************}
@@ -543,6 +554,12 @@ begin
   SaveCodeProfilerIncFile;
 end;
 
+{*************************************************************************}
+procedure TMainForm.IgnoreThreadIDCheckBoxPropertiesChange(Sender: TObject);
+begin
+  SaveCodeProfilerIncFile;
+end;
+
 {**********************************************************}
 function TMainForm.GetCodeProfilerIncFilename: String;
 begin
@@ -553,6 +570,34 @@ begin
   // whatever the location of the Alcinoe repository.
   if TPath.IsRelativePath(Result) then Result := ALGetModulePathW + Result;
   Result := ExpandFileName(Result);
+end;
+
+{****************************************}
+function TMainForm.GetHistoryCapacity: Integer;
+begin
+  // With ALCodeProfilerHistoryGroupByProcID the history is a flat array
+  // indexed by the procedure ID, so it only needs to be big enough to hold the
+  // highest procedure ID of ALCodeProfilerProcIDMap.txt. When that file does
+  // not exist (no markers inserted yet, or markers just removed) fall back to
+  // the default capacity.
+  Result := DefaultHistoryCapacity;
+  var LProcIDMapFilename := TPath.Combine(FDataDir, ALCodeProfilerProcIDMapFilename);
+  if not TFile.Exists(LProcIDMapFilename) then exit;
+  var LProcIDMap := TALStringListA.Create;
+  try
+    LProcIDMap.LoadFromFile(LProcIDMapFilename);
+    if LProcIDMap.Count = 0 then exit;
+    var LMaxProcID := 0;
+    for var I := 0 to LProcIDMap.Count - 1 do begin
+      var LProcID := ALStrToInt(LProcIDMap.Names[I]);
+      if LProcID > LMaxProcID then LMaxProcID := LProcID;
+    end;
+    // The procedure IDs start at 1, so the array must have LMaxProcID + 1
+    // items for FArray[LMaxProcID] to be valid.
+    Result := LMaxProcID + 1;
+  finally
+    ALFreeAndNil(LProcIDMap);
+  end;
 end;
 
 {*******************************************}
@@ -607,6 +652,22 @@ begin
     '// NOTE: This is the fastest option and has the lowest impact on each function call.'#10 +
     _DefineLine('ALCodeProfilerHistoryGroupByProcID') + #10 +
     #10 +
+    '{$IF defined(ALCodeProfilerHistoryGroupByProcID)}'#10 +
+    '// Ignore the thread ID. The calls made from every thread are merged together'#10 +
+    '// instead of producing one row per procedure and per thread, for example:'#10 +
+    '// procedure A - 3 calls - 310 ms  = 1 call from the main thread + 2 calls from a background thread'#10 +
+    '//'#10 +
+    '// NOTE: This option is only available with ALCodeProfilerHistoryGroupByProcID.'#10 +
+    '// All the threads then share the same metrics, which are updated atomically,'#10 +
+    '// so it slightly increases the cost of each function call, but it also greatly'#10 +
+    '// reduces the memory usage as only one history is allocated for the whole'#10 +
+    '// process instead of one per thread.'#10 +
+    ALIfThenA(
+      IgnoreThreadIDCheckBox.Checked,
+      '{$DEFINE ALCodeProfilerIgnoreThreadID}',
+      '{.$DEFINE ALCodeProfilerIgnoreThreadID}') + #10 +
+    '{$ENDIF}'#10 +
+    #10 +
     '// Group calls by call stack.'#10 +
     '// The result will be displayed as a grouped call tree, for example:'#10 +
     '// procedure A - 1 call - 310 ms'#10 +
@@ -614,7 +675,22 @@ begin
     '//     procedure C - 3 calls - 46 ms'#10 +
     '//     procedure D - 1 call - 85 ms'#10 +
     '//   procedure C - 1 call - 22 ms'#10 +
-    _DefineLine('ALCodeProfilerHistoryGroupByCallStack') + #10;
+    _DefineLine('ALCodeProfilerHistoryGroupByCallStack') + #10 +
+    #10 +
+    '// Capacity of the history, in number of rows.'#10 +
+    '//'#10 +
+    '// NOTE: With ALCodeProfilerHistoryGroupByProcID the history is a flat array'#10 +
+    '// indexed by the procedure ID, so it only needs to be big enough to hold the'#10 +
+    '// highest procedure ID of ' + AnsiString(ALCodeProfilerProcIDMapFilename) + '. The value below is'#10 +
+    '// updated by the Alcinoe Code Profiler GUI each time the markers are inserted'#10 +
+    '// or removed, so there is no reason to edit it by hand.'#10 +
+    '{$IF defined(ALCodeProfilerHistoryGroupByProcID)}'#10 +
+    'const'#10 +
+    '  ALCodeProfilerHistoryCapacity = '+ALIntToStrA(GetHistoryCapacity)+';'#10 +
+    '{$ELSE}'#10 +
+    'const'#10 +
+    '  ALCodeProfilerHistoryCapacity = '+ALIntToStrA(DefaultHistoryCapacity)+'; {1 000 000 * 32 Bytes = 32 MB or with gap = 2 097 152 * 32 Bytes = 67.11 MB}'#10 +
+    '{$ENDIF}'#10;
   ALSaveStringToFile(LContent, LIncFilename);
 end;
 
@@ -632,6 +708,8 @@ begin
     if ALPosA('{$DEFINE ALCodeProfilerHistoryGroupNone}', LContent) > 0 then SelectHistoryGroupMode('ALCodeProfilerHistoryGroupNone')
     else if ALPosA('{$DEFINE ALCodeProfilerHistoryGroupByProcID}', LContent) > 0 then SelectHistoryGroupMode('ALCodeProfilerHistoryGroupByProcID')
     else SelectHistoryGroupMode('ALCodeProfilerHistoryGroupByCallStack');
+    //--
+    IgnoreThreadIDCheckBox.Checked := ALPosA('{$DEFINE ALCodeProfilerIgnoreThreadID}', LContent) > 0;
     //--
     var LServerName: String := '';
     var LMarker: AnsiString := 'ALCodeProfilerServerName: String = ''';
@@ -742,6 +820,9 @@ begin
     var LProcIDMapFilename := TPath.Combine(FDataDir, ALCodeProfilerProcIDMapFilename);
     If TFile.Exists(LProcIDMapFilename) then
       TFile.Delete(LProcIDMapFilename);
+    // ALCodeProfilerHistoryCapacity was deduced from the procedure IDs just
+    // deleted, so Alcinoe.CodeProfiler.inc must be reset as well.
+    SaveCodeProfilerIncFile;
     MessageDlg('The operation completed successfully', mtInformation, [mbOK], 0);
   Finally
     ALFreeAndNil(LSourceFilenames);
@@ -1150,6 +1231,9 @@ begin
             LFailedFilenames.Add(LSourceFilenames[i]);
         end;
       LProcIDMap.SaveToFile(LProcIDMapFilename);
+      // ALCodeProfilerHistoryCapacity depends on the procedure IDs just
+      // assigned, so Alcinoe.CodeProfiler.inc must be updated as well.
+      SaveCodeProfilerIncFile;
     finally
       InsertProfilerMarkersBtn.Cursor := crDefault;
     End;

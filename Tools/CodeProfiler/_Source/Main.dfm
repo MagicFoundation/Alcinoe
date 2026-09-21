@@ -2,8 +2,8 @@ object MainForm: TMainForm
   Left = 377
   Top = 296
   Caption = 'Alcinoe CodeProfiler'
-  ClientHeight = 900
-  ClientWidth = 1080
+  ClientHeight = 985
+  ClientWidth = 1264
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,15 +17,15 @@ object MainForm: TMainForm
   object MainPageControl: TcxPageControl
     Left = 0
     Top = 0
-    Width = 1080
-    Height = 868
+    Width = 1264
+    Height = 953
     Align = alClient
     TabOrder = 0
-    Properties.ActivePage = PerformanceAnalysisTabSheet
+    Properties.ActivePage = InstrumentationTabSheet
     Properties.CustomButtons.Buttons = <>
-    ClientRectBottom = 863
+    ClientRectBottom = 948
     ClientRectLeft = 5
-    ClientRectRight = 1075
+    ClientRectRight = 1259
     ClientRectTop = 37
     object InstrumentationTabSheet: TcxTabSheet
       Caption = 'Source Code Instrumentation'
@@ -34,8 +34,8 @@ object MainForm: TMainForm
       object InstructionPanel: TdxPanel
         Left = 0
         Top = 0
-        Width = 1070
-        Height = 424
+        Width = 1254
+        Height = 353
         Align = alTop
         Color = 16448250
         TabOrder = 0
@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 0
           Transparent = True
-          Width = 1062
+          Width = 1246
         end
         object cxLabel2: TcxLabel
           AlignWithMargins = True
@@ -76,7 +76,7 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 1
           Transparent = True
-          Width = 1062
+          Width = 1246
         end
         object cxLabel3: TcxLabel
           AlignWithMargins = True
@@ -97,7 +97,7 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 2
           Transparent = True
-          Width = 1049
+          Width = 1233
         end
         object cxLabel4: TcxLabel
           AlignWithMargins = True
@@ -116,7 +116,7 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 3
           Transparent = True
-          Width = 1049
+          Width = 1233
         end
         object cxLabel5: TcxLabel
           AlignWithMargins = True
@@ -139,13 +139,14 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 4
           Transparent = True
-          Width = 1049
+          Width = 1233
         end
-        object cxLabel6: TcxLabel
+        object LastInstructionLabel: TcxLabel
           AlignWithMargins = True
           Left = 16
-          Top = 285
+          Top = 308
           Margins.Left = 16
+          Margins.Bottom = 16
           Align = alTop
           Caption = 
             '6. Go to the Performance Analysis tab, click the Load Data butto' +
@@ -160,48 +161,8 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 5
           Transparent = True
-          Width = 1049
-        end
-        object cxLabel8: TcxLabel
-          AlignWithMargins = True
-          Left = 3
-          Top = 318
-          Align = alTop
-          Caption = 'Note:'
-          ParentFont = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clWindowText
-          Style.Font.Height = -17
-          Style.Font.Name = 'Segoe UI'
-          Style.Font.Style = [fsBold]
-          Style.IsFontAssigned = True
-          Properties.WordWrap = True
-          TabOrder = 6
-          Transparent = True
-          Width = 1062
-        end
-        object LastInstructionLabel: TcxLabel
-          AlignWithMargins = True
-          Left = 3
-          Top = 351
-          Margins.Bottom = 8
-          Align = alTop
-          Caption = 
-            'On Windows, the performance file is stored in the CodeProfiler d' +
-            'ata folder if the app is running locally; otherwise, it is saved' +
-            ' in the user'#39's document folder. On macOS, iOS, and Android, it i' +
-            's always stored in the user'#39's document folder.'
-          ParentFont = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clWindowText
-          Style.Font.Height = -17
-          Style.Font.Name = 'Segoe UI'
-          Style.Font.Style = []
-          Style.IsFontAssigned = True
-          Properties.WordWrap = True
-          TabOrder = 7
-          Transparent = True
-          Width = 1062
+          ExplicitTop = 285
+          Width = 1233
         end
         object cxLabel13: TcxLabel
           AlignWithMargins = True
@@ -220,9 +181,9 @@ object MainForm: TMainForm
           Style.Font.Style = []
           Style.IsFontAssigned = True
           Properties.WordWrap = True
-          TabOrder = 8
+          TabOrder = 6
           Transparent = True
-          Width = 1049
+          Width = 1233
         end
         object cxLabel14: TcxLabel
           AlignWithMargins = True
@@ -235,7 +196,9 @@ object MainForm: TMainForm
             'mance file will be received automatically. Otherwise, if you are' +
             ' running the program on a remote device, download the data from ' +
             'the user'#39's documents folder and place it in the CodeProfiler dat' +
-            'a folder.'
+            'a folder. Note: On Windows, the performance file is directly sto' +
+            'red in the CodeProfiler data folder if the app is running locall' +
+            'y; otherwise, it is saved in the user'#39's document folder.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -244,39 +207,43 @@ object MainForm: TMainForm
           Style.Font.Style = []
           Style.IsFontAssigned = True
           Properties.WordWrap = True
-          TabOrder = 9
+          TabOrder = 7
           Transparent = True
-          Width = 1049
+          Width = 1233
         end
       end
       object dxPanel2: TdxPanel
         AlignWithMargins = True
         Left = 0
-        Top = 432
-        Width = 1070
-        Height = 386
+        Top = 361
+        Width = 1254
+        Height = 542
         Margins.Left = 0
         Margins.Top = 8
         Margins.Right = 0
         Margins.Bottom = 8
         Align = alClient
         TabOrder = 1
+        ExplicitTop = 432
+        ExplicitHeight = 471
         object SourcesPathMemo: TcxMemo
           AlignWithMargins = True
           Left = 8
-          Top = 254
+          Top = 362
           Margins.Left = 8
           Margins.Right = 8
           Margins.Bottom = 0
           Align = alClient
           TabOrder = 0
-          Height = 78
-          Width = 1052
+          ExplicitTop = 299
+          ExplicitHeight = 118
+          Height = 126
+          Width = 1236
         end
         object cxLabel9: TcxLabel
           AlignWithMargins = True
           Left = 8
-          Top = 224
+          Top = 332
           Margins.Left = 8
           Margins.Top = 0
           Margins.Right = 8
@@ -287,12 +254,13 @@ object MainForm: TMainForm
             ' or filename per line. Prefix a name with '#39'!'#39' to ignore the file'
           Properties.WordWrap = True
           TabOrder = 1
-          Width = 1052
+          ExplicitTop = 269
+          Width = 1236
         end
         object dxPanel3: TdxPanel
           Left = 0
           Top = 148
-          Width = 1068
+          Width = 1252
           Height = 31
           Align = alTop
           Frame.Borders = []
@@ -369,12 +337,12 @@ object MainForm: TMainForm
             'ions below are stored'
           Properties.WordWrap = True
           TabOrder = 6
-          Width = 1052
+          Width = 1236
         end
         object dxPanel5: TdxPanel
           Left = 0
           Top = 43
-          Width = 1068
+          Width = 1252
           Height = 31
           Align = alTop
           Frame.Borders = []
@@ -383,7 +351,7 @@ object MainForm: TMainForm
           TabOrder = 7
           object BrowseCodeProfilerIncFilenameBtn: TcxButton
             AlignWithMargins = True
-            Left = 1020
+            Left = 1204
             Top = 0
             Width = 40
             Height = 31
@@ -407,19 +375,21 @@ object MainForm: TMainForm
             Align = alClient
             Properties.OnChange = CodeProfilerIncFilenameEditPropertiesChange
             TabOrder = 1
-            Width = 996
+            Width = 1180
           end
         end
         object dxPanel6: TdxPanel
           Left = 0
           Top = 74
-          Width = 1068
+          Width = 1252
           Height = 31
           Align = alTop
           Frame.Borders = []
           LookAndFeel.NativeStyle = False
           LookAndFeel.SkinName = 'Foggy'
           TabOrder = 8
+          ExplicitLeft = 16
+          ExplicitTop = 59
           object CodeProfilerEnabledCheckBox: TcxCheckBox
             AlignWithMargins = True
             Left = 8
@@ -429,6 +399,8 @@ object MainForm: TMainForm
             Caption = 'Start profiling as soon as the application starts'
             Properties.OnChange = CodeProfilerEnabledCheckBoxPropertiesChange
             TabOrder = 0
+            ExplicitLeft = -1
+            ExplicitTop = 19
           end
         end
         object cxLabel10: TcxLabel
@@ -442,21 +414,23 @@ object MainForm: TMainForm
           Align = alTop
           Caption = 
             '(Optional) Specify the IP address and port of this computer to a' +
-            'utomatically receive the performance file'
+            'utomatically receive the performance file. Not required for loca' +
+            'l execution.'
           Properties.WordWrap = True
           TabOrder = 3
-          Width = 1052
+          Width = 1236
         end
         object dxPanel1: TdxPanel
           Left = 0
-          Top = 332
-          Width = 1068
+          Top = 488
+          Width = 1252
           Height = 52
           Align = alBottom
           Frame.Borders = []
           LookAndFeel.NativeStyle = False
           LookAndFeel.SkinName = 'Foggy'
           TabOrder = 4
+          ExplicitTop = 417
           object InsertProfilerMarkersBtn: TcxButton
             Left = 8
             Top = 12
@@ -479,14 +453,16 @@ object MainForm: TMainForm
         object dxPanel4: TdxPanel
           AlignWithMargins = True
           Left = 3
-          Top = 182
-          Width = 1062
+          Top = 217
+          Width = 1246
           Height = 39
+          Margins.Bottom = 0
           Align = alTop
           Frame.Borders = []
           LookAndFeel.NativeStyle = False
           LookAndFeel.SkinName = 'Foggy'
           TabOrder = 5
+          ExplicitTop = 182
           object DoNotGroupRadioButton: TcxRadioButton
             AlignWithMargins = True
             Left = 8
@@ -523,6 +499,76 @@ object MainForm: TMainForm
             AutoSize = True
           end
         end
+        object dxPanel7: TdxPanel
+          AlignWithMargins = True
+          Left = 3
+          Top = 256
+          Width = 1246
+          Height = 39
+          Margins.Top = 0
+          Align = alTop
+          Frame.Borders = []
+          LookAndFeel.NativeStyle = False
+          LookAndFeel.SkinName = 'Foggy'
+          TabOrder = 9
+          ExplicitTop = 227
+          object IgnoreThreadIDCheckBox: TcxCheckBox
+            AlignWithMargins = True
+            Left = 8
+            Top = 3
+            Margins.Left = 8
+            Align = alLeft
+            Caption = 
+              'Ignore thread ID (This option is only available with Group by pr' +
+              'ocedure ID)'
+            Properties.OnChange = IgnoreThreadIDCheckBoxPropertiesChange
+            Style.TransparentBorder = False
+            TabOrder = 0
+          end
+        end
+        object cxLabel7: TcxLabel
+          AlignWithMargins = True
+          Left = 8
+          Top = 302
+          Margins.Left = 8
+          Margins.Top = 4
+          Margins.Right = 8
+          Align = alTop
+          Caption = 'Source Code Paths'
+          ParentFont = False
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clWindowText
+          Style.Font.Height = -17
+          Style.Font.Name = 'Segoe UI'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          Properties.WordWrap = True
+          TabOrder = 10
+          ExplicitTop = 349
+          Width = 1236
+        end
+        object cxLabel16: TcxLabel
+          AlignWithMargins = True
+          Left = 8
+          Top = 187
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 0
+          Align = alTop
+          Caption = 'Call Grouping (Help is available in Alcinoe.CodeProfiler.inc)'
+          ParentFont = False
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clWindowText
+          Style.Font.Height = -17
+          Style.Font.Name = 'Segoe UI'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          Properties.WordWrap = True
+          TabOrder = 11
+          ExplicitTop = 195
+          Width = 1236
+        end
       end
     end
     object PerformanceAnalysisTabSheet: TcxTabSheet
@@ -531,7 +577,7 @@ object MainForm: TMainForm
       object Panelfilter: TPanel
         Left = 0
         Top = 0
-        Width = 1070
+        Width = 1254
         Height = 89
         Margins.Left = 8
         Align = alTop
@@ -624,7 +670,7 @@ object MainForm: TMainForm
       object TreeListProcMetrics: TcxTreeList
         Left = 0
         Top = 89
-        Width = 1070
+        Width = 1254
         Height = 145
         Align = alTop
         Bands = <
@@ -724,8 +770,8 @@ object MainForm: TMainForm
       object GridProcMetrics: TcxGrid
         Left = 0
         Top = 241
-        Width = 1070
-        Height = 585
+        Width = 1254
+        Height = 670
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -813,7 +859,7 @@ object MainForm: TMainForm
       object cxSplitter1: TcxSplitter
         Left = 0
         Top = 234
-        Width = 1070
+        Width = 1254
         Height = 7
         AlignSplitter = salTop
       end
@@ -821,8 +867,8 @@ object MainForm: TMainForm
   end
   object MainStatusBar: TdxStatusBar
     Left = 0
-    Top = 868
-    Width = 1080
+    Top = 953
+    Width = 1264
     Height = 32
     Panels = <
       item

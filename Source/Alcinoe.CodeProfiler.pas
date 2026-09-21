@@ -479,15 +479,13 @@ begin
   AProcMetricsHistory.Clear;
 end;
 
-{********************************************************************}
-procedure ALCodeProfilerPurgeHistories(const ASaveHistories: boolean);
+{*************************************}
+procedure ALCodeProfilerPurgeHistories;
 begin
   ALProcMetricsLock.BeginWrite;
   try
-    for var I := ALProcMetricsHistories.Count - 1 downto 0 do begin
-      if ASaveHistories then ALCodeProfilerSaveHistory(ALProcMetricsHistories[i])
-      else ALProcMetricsHistories[i].Clear;
-    end;
+    for var I := ALProcMetricsHistories.Count - 1 downto 0 do
+      ALCodeProfilerSaveHistory(ALProcMetricsHistories[i]);
   finally
     ALProcMetricsLock.EndWrite;
   end;
@@ -671,7 +669,7 @@ begin
           if (LProcMetricsHistory.FCount >= 100_000_000) {100_000_000 * 32 Bytes = 3.2 GB} then begin
             ALProcMetricsLock.EndRead;
             try
-              ALCodeProfilerPurgeHistories(ALCodeProfilerEnabled{ASaveHistories})
+              ALCodeProfilerPurgeHistories;
             finally
               ALProcMetricsLock.BeginRead;
             end;
@@ -840,7 +838,7 @@ begin
   if (M is TApplicationEventMessage) and
      ((M as TApplicationEventMessage).value.Event = TApplicationEvent.BecameActive) then begin
     if ALCodeProfilerAppActivatedBefore then
-      ALCodeProfilerPurgeHistories(ALCodeProfilerEnabled{ASaveHistories})
+      ALCodeProfilerPurgeHistories;
     else
       ALCodeProfilerAppActivatedBefore := True;
   end;
@@ -873,7 +871,7 @@ initialization
 finalization
   {$IF (not defined(IOS)) and (not defined(ANDROID))}
   // At this point, all background threads must have completed.
-  ALCodeProfilerPurgeHistories(ALCodeProfilerEnabled{ASaveHistories});
+  ALCodeProfilerPurgeHistories;
   {$ENDIF}
   ALCodeProfilerEnabled := False;
   //--

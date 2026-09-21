@@ -485,7 +485,7 @@ begin
   ALProcMetricsLock.BeginWrite;
   try
     for var I := ALProcMetricsHistories.Count - 1 downto 0 do begin
-      if ASaveHistories then ALCodeProfilerSaveHistory(ALProcMetricsHistories[i]);
+      if ASaveHistories then ALCodeProfilerSaveHistory(ALProcMetricsHistories[i])
       else ALProcMetricsHistories[i].Clear;
     end;
   finally

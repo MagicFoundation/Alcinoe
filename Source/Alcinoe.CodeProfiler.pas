@@ -146,7 +146,7 @@ Type
 threadvar
   ALProcMetricsStack: TALProcMetricsStack;
 
-{*******}
+{*****************************************}
 {$IF defined(ALCodeProfilerIgnoreThreadID)}
 // All the threads share the same history, so that the metrics of a procedure
 // are merged together whatever the thread it was called from.
@@ -348,9 +348,9 @@ begin
   P := PALProcMetrics(LOldArray);
   for var i := 0 to Length(LOldArray) - 1 do begin
     raise Exception.Create(
-      'Rehash is not implemented right now because MetricsID and ParentMetricsID ' +
-      'reference positions in the array, which would become invalid after rehashing. ' +
-      'The array is currently sized large enough to avoid calling Rehash.');
+            'Rehash is not implemented right now because MetricsID and ParentMetricsID ' +
+            'reference positions in the array, which would become invalid after rehashing. ' +
+            'The array is currently sized large enough to avoid calling Rehash.');
     if P^.HashCode <> EMPTY_HASH then begin
       var j := not GetBucketIndex(P^.ProcID, P^.ParentMetricsID, P^.HashCode);
       FArray[j] := P^;
@@ -361,7 +361,7 @@ begin
 end;
 {$ENDIF}
 
-{********************************************************}
+{**************************************************}
 {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
 function TALProcMetricsHistory.GetBucketIndex(const AProcID, AParentMetricsID: Cardinal; const AHashCode: Integer): NativeInt;
 begin
@@ -398,7 +398,7 @@ begin
 end;
 {$ENDIF}
 
-{********************************************************}
+{**************************************************}
 {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
 function TALProcMetricsHistory.Hash(const AProcID, AParentMetricsID: Cardinal): Integer;
 const

@@ -161,7 +161,6 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 5
           Transparent = True
-          ExplicitTop = 285
           Width = 1233
         end
         object cxLabel13: TcxLabel
@@ -224,8 +223,6 @@ object MainForm: TMainForm
         Margins.Bottom = 8
         Align = alClient
         TabOrder = 1
-        ExplicitTop = 432
-        ExplicitHeight = 471
         object SourcesPathMemo: TcxMemo
           AlignWithMargins = True
           Left = 8
@@ -235,8 +232,6 @@ object MainForm: TMainForm
           Margins.Bottom = 0
           Align = alClient
           TabOrder = 0
-          ExplicitTop = 299
-          ExplicitHeight = 118
           Height = 126
           Width = 1236
         end
@@ -254,7 +249,6 @@ object MainForm: TMainForm
             ' or filename per line. Prefix a name with '#39'!'#39' to ignore the file'
           Properties.WordWrap = True
           TabOrder = 1
-          ExplicitTop = 269
           Width = 1236
         end
         object dxPanel3: TdxPanel
@@ -355,7 +349,6 @@ object MainForm: TMainForm
             Top = 0
             Width = 40
             Height = 31
-            Margins.Left = 8
             Margins.Top = 0
             Margins.Right = 8
             Margins.Bottom = 0
@@ -370,12 +363,13 @@ object MainForm: TMainForm
             Top = 0
             Margins.Left = 8
             Margins.Top = 0
-            Margins.Right = 8
+            Margins.Right = 0
             Margins.Bottom = 0
             Align = alClient
             Properties.OnChange = CodeProfilerIncFilenameEditPropertiesChange
             TabOrder = 1
-            Width = 1180
+            ExplicitWidth = 1180
+            Width = 1193
           end
         end
         object dxPanel6: TdxPanel
@@ -388,8 +382,6 @@ object MainForm: TMainForm
           LookAndFeel.NativeStyle = False
           LookAndFeel.SkinName = 'Foggy'
           TabOrder = 8
-          ExplicitLeft = 16
-          ExplicitTop = 59
           object CodeProfilerEnabledCheckBox: TcxCheckBox
             AlignWithMargins = True
             Left = 8
@@ -399,8 +391,6 @@ object MainForm: TMainForm
             Caption = 'Start profiling as soon as the application starts'
             Properties.OnChange = CodeProfilerEnabledCheckBoxPropertiesChange
             TabOrder = 0
-            ExplicitLeft = -1
-            ExplicitTop = 19
           end
         end
         object cxLabel10: TcxLabel
@@ -430,7 +420,6 @@ object MainForm: TMainForm
           LookAndFeel.NativeStyle = False
           LookAndFeel.SkinName = 'Foggy'
           TabOrder = 4
-          ExplicitTop = 417
           object InsertProfilerMarkersBtn: TcxButton
             Left = 8
             Top = 12
@@ -462,7 +451,6 @@ object MainForm: TMainForm
           LookAndFeel.NativeStyle = False
           LookAndFeel.SkinName = 'Foggy'
           TabOrder = 5
-          ExplicitTop = 182
           object DoNotGroupRadioButton: TcxRadioButton
             AlignWithMargins = True
             Left = 8
@@ -511,7 +499,6 @@ object MainForm: TMainForm
           LookAndFeel.NativeStyle = False
           LookAndFeel.SkinName = 'Foggy'
           TabOrder = 9
-          ExplicitTop = 227
           object IgnoreThreadIDCheckBox: TcxCheckBox
             AlignWithMargins = True
             Left = 8
@@ -544,7 +531,6 @@ object MainForm: TMainForm
           Style.IsFontAssigned = True
           Properties.WordWrap = True
           TabOrder = 10
-          ExplicitTop = 349
           Width = 1236
         end
         object cxLabel16: TcxLabel
@@ -566,7 +552,6 @@ object MainForm: TMainForm
           Style.IsFontAssigned = True
           Properties.WordWrap = True
           TabOrder = 11
-          ExplicitTop = 195
           Width = 1236
         end
       end

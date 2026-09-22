@@ -233,28 +233,54 @@ begin
   if M is TApplicationEventMessage then begin
     var LValue := (M as TApplicationEventMessage).value;
     if LValue.Event = TApplicationEvent.OpenURL then begin
-      var Lcontext := TiOSOpenApplicationContext(LValue.Context);
-      {$IFDEF DEBUG}
-      ALLog(
-        'ALFmxFacebookCoreApplicationEventHandler',
-        'Event: OpenURL | '+
-        'ALFacebookInitialised: '+ALBoolToStrW(_ALFacebookInitialised)+' | '+
-        'Url: ' + Lcontext.URL);
-      {$ENDIF}
-      if not _ALFacebookInitialised then exit;
-      {$IFNDEF ALCompilerVersionSupported131}
-        {$MESSAGE WARN 'Check if FMX.Platform.iOS.sceneOpenURLContexts still calls HandleOpenURLAppEvent with Options as UISceneOpenURLOptions, not as an ObjectID'}
-        {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5196 has been implemented'}
-        // If RSS-5196 has been implemented, test the code below with a cold start:
-        // in the browser, enter fb224667374702876://test while ALFmxFacebookLoginDemo is installed,
-        // then check the log and confirm that the application does not crash.
-      {$ENDIF}
-      var LOpenURLOptions := UISceneOpenURLOptions(Lcontext.Context);
-      TFBSDKApplicationDelegate.OCClass.sharedInstance.applicationOpenURLSourceApplicationAnnotation(
-        TiOSHelper.SharedApplication, // application: UIApplication
-        StrToNSUrl(Lcontext.Url),  // openURL: NSURL;
-        StrToNSStr(Lcontext.sourceApp), // sourceApplication: NSString;
-        LOpenURLOptions.annotation); // annotation: Pointer
+      if LValue.Context = nil then begin
+        ALLog(
+          'ALFmxFacebookCoreApplicationEventHandler',
+          'Event: OpenURL | Context is nil',
+          TALLogType.Error);
+        Exit;
+      end;
+      var LContext := TiOSOpenApplicationContext(LValue.Context);
+      if not _ALFacebookInitialised then begin
+        ALLog(
+          'ALFmxFacebookCoreApplicationEventHandler',
+          'Event: OpenURL | ALFacebookInitialised: False',
+          TALLogType.Error);
+        exit;
+      end;
+      if LContext.UserActivity <> nil then begin
+        // Universal link
+        {$IFDEF DEBUG}
+        ALLog(
+          'ALFmxFacebookCoreApplicationEventHandler',
+          'Event: OpenURL | '+
+          'Context: UserActivity | '+
+          'Url: ' + LContext.URL);
+        {$ENDIF}
+        TFBSDKApplicationDelegate.OCClass.sharedInstance.applicationContinueUserActivity(
+          TiOSHelper.SharedApplication, // application: UIApplication
+          LContext.UserActivity); // userActivity: NSUserActivity
+      end
+      else if LContext.Options <> nil then begin
+        // Custom URL scheme
+        {$IFDEF DEBUG}
+        ALLog(
+          'ALFmxFacebookCoreApplicationEventHandler',
+          'Event: OpenURL | '+
+          'Context: Options | '+
+          'Url: ' + LContext.URL);
+        {$ENDIF}
+        TFBSDKApplicationDelegate.OCClass.sharedInstance.applicationOpenURLSourceApplicationAnnotation(
+          TiOSHelper.SharedApplication, // application: UIApplication
+          StrToNSUrl(LContext.Url),  // openURL: NSURL;
+          StrToNSStr(LContext.sourceApp), // sourceApplication: NSString;
+          LContext.Options.annotation); // annotation: Pointer
+      end
+      else
+        ALLog(
+          'ALFmxFacebookCoreApplicationEventHandler',
+          'Event: OpenURL | Options and UserActivity are both nil',
+          TALLogType.Error);
     end
     else if LValue.Event = TApplicationEvent.FinishedLaunching then begin
       if not ALInitFacebookSDKAtStartup then exit;

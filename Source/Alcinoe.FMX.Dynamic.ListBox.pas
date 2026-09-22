@@ -224,6 +224,7 @@ type
               TRealignEvent = procedure(const AContent: TMainContent; const AStartIndex: integer) of object;
           private
             FOnRealign: TRealignEvent; // 8 bytes
+            FIsRemovingControl: Boolean; // 1 byte
             function GetOwner: TView;
           protected
             procedure SetOwner(const Value: TView); reintroduce; virtual;
@@ -243,6 +244,7 @@ type
             constructor Create(const AOwner: TItem); override;
             property Owner: TView read GetOwner write SetOwner;
             procedure InsertItems(const AItems: TArray<TItem>; const AIndex: Integer); virtual;
+            procedure DeleteItems(const AIndex, ACount: Integer); virtual;
             function GetTopBarSize: Single;
             property OnRealign: TRealignEvent read FOnRealign write FOnRealign;
           end;
@@ -623,9 +625,14 @@ type
         function RetryDownloadItems: boolean; virtual;
         procedure PrependItem(var AData: TALJsonNodeW); virtual;
         procedure AppendItem(var AData: TALJsonNodeW); virtual;
-        procedure DeleteItemAtIndex(const AIndex: Integer); virtual;
-        procedure DeleteItem(const AId: String); overload;
-        procedure DeleteItem(const AId: Int64); overload;
+        /// <summary>
+        ///   Use delayed by default because DeleteItemAtIndex may be invoked
+        ///   from within the item's own UI controls (for example, a button inside the item).
+        ///   Delaying ensures the item is not freed while its event handler is still running.
+        /// </summary>
+        procedure DeleteItemAtIndex(const AIndex: Integer; const ADelayed: boolean = true); virtual;
+        procedure DeleteItem(const AId: String; const ADelayed: boolean = true); overload;
+        procedure DeleteItem(const AId: Int64; const ADelayed: boolean = true); overload;
         function ScrollToItemIndex(const AIndex: Integer; const AHideTopBar: Boolean; const AHideBottomBar: Boolean; const ADuration: integer; const Adx: single = 0; const Ady: single = 0): Boolean; virtual;
         function ScrollToItem(const AId: String; const AHideTopBar: Boolean; const AHideBottomBar: Boolean; const ADuration: integer; const Adx: single = 0; const Ady: single = 0): Boolean; overload;
         function ScrollToItem(const AId: Int64; const AHideTopBar: Boolean; const AHideBottomBar: Boolean; const ADuration: integer; const Adx: single = 0; const Ady: single = 0): Boolean; overload;
@@ -775,6 +782,7 @@ type
                out AControlPos: TALPointD; // AControlPos is local to the founded control
                const ACheckHitTest: Boolean = true): TALDynamicControl; overload; override;
     procedure Prepare; virtual;
+    procedure Refresh; virtual;
     procedure PrependItem(var AData: TALJsonNodeW);
     procedure AppendItem(var AData: TALJsonNodeW);
     procedure DeleteItemAtIndex(const AIndex: Integer);
@@ -1846,6 +1854,7 @@ begin
   inherited create(AOwner);
   IsEphemeral := False;
   FOnRealign := nil;
+  FIsRemovingControl := False;
 end;
 
 {************************************************************}
@@ -1874,13 +1883,32 @@ end;
 {************************************************************************************************}
 procedure TALDynamicListBox.TView.TMainContent.DoRemoveControl(const AControl: TALDynamicControl);
 begin
-  var LPrevControlIndex := AControl.Index;
-  inherited;
-  {$IF defined(debug)}
-  if AControl.Align <> TALAlignLayout.None then
-    Raise Exception.Create('Error 46D12BC4-BB27-472B-AE2B-1A977646A7AB');
-  {$ENDIF}
-  Realign(LPrevControlIndex);
+  // Removing an item shrinks the content, which can momentarily push the
+  // viewport into the overscroll zone. Suppress the pull-to-refresh gesture
+  // and let DoRealign keep the viewport anchored on the first visible item
+  // while the removal is in progress.
+  var LPullToRefreshIndicator: TBasePullToRefreshIndicator := nil;
+  if Owner <> nil then LPullToRefreshIndicator := Owner.PullToRefreshIndicator;
+  var LOldCanTriggerRefresh: Boolean := False;
+  if LPullToRefreshIndicator <> nil then begin
+    LOldCanTriggerRefresh := LPullToRefreshIndicator.CanTriggerRefresh;
+    LPullToRefreshIndicator.CanTriggerRefresh := False;
+  end;
+  var LOldIsRemovingControl := FIsRemovingControl;
+  FIsRemovingControl := True;
+  Try
+    var LPrevControlIndex := AControl.Index;
+    inherited;
+    {$IF defined(debug)}
+    if AControl.Align <> TALAlignLayout.None then
+      Raise Exception.Create('Error 46D12BC4-BB27-472B-AE2B-1A977646A7AB');
+    {$ENDIF}
+    Realign(LPrevControlIndex);
+  Finally
+    FIsRemovingControl := LOldIsRemovingControl;
+    if LPullToRefreshIndicator <> nil then
+      LPullToRefreshIndicator.CanTriggerRefresh := LOldCanTriggerRefresh;
+  End;
 end;
 
 {************************************************************************************************************************}
@@ -1937,6 +1965,90 @@ begin
     AItems[i].ParentChanged;
   //--
   Realign(LIndex);
+end;
+
+{****************************************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.DeleteItems(const AIndex, ACount: Integer);
+begin
+  if ACount <= 0 then Exit;
+  if (AIndex < 0) or (AIndex + ACount > FControlsCount) then
+    Raise Exception.Create('DeleteItems failed: range out of bounds');
+  //--
+  for var I := AIndex to AIndex + ACount - 1 do begin
+    var LItem := FControls[I];
+    _TALDynamicControlProtectedAccess(LItem).FIndex := -1;
+    _TALDynamicControlProtectedAccess(LItem).FOwner := nil;
+      _TALDynamicControlProtectedAccess(LItem).SetHost(nil); // releases the hovered/captured references
+      // Use delayed destruction because DeleteItems may be invoked from within
+      // the item's own UI controls (for example, a button inside the item).
+      // Delaying ensures the item is not freed while its event handler is still running.
+      ALFreeAndNil(LItem, true{ADelayed});
+  end;
+  //--
+  if AIndex + ACount < FControlsCount then
+    ALMove(FControls[AIndex + ACount], FControls[AIndex], (FControlsCount - AIndex - ACount) * SizeOf(Pointer));
+  FControlsCount := FControlsCount - ACount;
+  for var I := AIndex to FControlsCount - 1 do
+    _TALDynamicControlProtectedAccess(FControls[I]).FIndex := I;
+  //--
+  if Owner.FLastVisibleItemIndex >= 0 then begin
+    if Owner.FFirstVisibleItemIndex >= AIndex + ACount then dec(Owner.FFirstVisibleItemIndex, ACount)
+    else if Owner.FFirstVisibleItemIndex >= AIndex then Owner.FFirstVisibleItemIndex := AIndex;
+    if Owner.FLastVisibleItemIndex >= AIndex + ACount then dec(Owner.FLastVisibleItemIndex, ACount)
+    else if Owner.FLastVisibleItemIndex >= AIndex then Owner.FLastVisibleItemIndex := AIndex - 1;
+    if Owner.FLastVisibleItemIndex > FControlsCount - 1 then Owner.FLastVisibleItemIndex := FControlsCount - 1;
+    if Owner.FFirstVisibleItemIndex > Owner.FLastVisibleItemIndex then begin
+      Owner.FFirstVisibleItemIndex := 0;
+      Owner.FLastVisibleItemIndex := -1;
+    end;
+  end;
+  if Owner.FLastPreloadedItemIndex >= 0 then begin
+    // The preloaded window must keep matching which surviving items are
+    // actually prepared. When the deleted block overlaps the window, the
+    // prepared range can split into a head (before the block) and a shifted
+    // tail (after the block): a window can only describe one contiguous
+    // range, so keep the head and unprepare the tail (or, when there is no
+    // head, keep the shifted tail).
+    if Owner.FLastPreloadedItemIndex < AIndex then begin
+      // window lies entirely before the deleted block: unchanged
+    end
+    else if Owner.FFirstPreloadedItemIndex >= AIndex + ACount then begin
+      // window lies entirely after the deleted block: shift down
+      dec(Owner.FFirstPreloadedItemIndex, ACount);
+      dec(Owner.FLastPreloadedItemIndex, ACount);
+    end
+    else begin
+      // window overlaps the deleted block
+      var LTailFirst := Max(Owner.FFirstPreloadedItemIndex, AIndex + ACount) - ACount; // new index of the first surviving tail item
+      var LTailLast := Owner.FLastPreloadedItemIndex - ACount;                         // new index of the last one (< LTailFirst if none)
+      if Owner.FFirstPreloadedItemIndex < AIndex then begin
+        // keep the prepared head [Owner.FFirstPreloadedItemIndex..AIndex-1]; detach the shifted tail
+        for var I := LTailFirst to Min(LTailLast, FControlsCount - 1) do
+          TItem(FControls[I]).Unprepare;
+        Owner.FLastPreloadedItemIndex := AIndex - 1;
+      end
+      else if LTailLast >= LTailFirst then begin
+        // no head: the shifted tail is the whole remaining prepared range
+        Owner.FFirstPreloadedItemIndex := LTailFirst;
+        Owner.FLastPreloadedItemIndex := LTailLast;
+      end
+      else begin
+        // whole window fell inside the deleted block
+        Owner.FFirstPreloadedItemIndex := 0;
+        Owner.FLastPreloadedItemIndex := -1;
+      end;
+    end;
+    if Owner.FLastPreloadedItemIndex > FControlsCount - 1 then Owner.FLastPreloadedItemIndex := FControlsCount - 1;
+    if (Owner.FLastPreloadedItemIndex >= 0) and
+       (Owner.FFirstPreloadedItemIndex > Owner.FLastPreloadedItemIndex) then begin
+      Owner.FFirstPreloadedItemIndex := 0;
+      Owner.FLastPreloadedItemIndex := -1;
+    end;
+  end;
+  if Owner.FTriggerDownloadItemsAtIndex >= AIndex + ACount then dec(Owner.FTriggerDownloadItemsAtIndex, ACount)
+  else if Owner.FTriggerDownloadItemsAtIndex >= AIndex then Owner.FTriggerDownloadItemsAtIndex := AIndex;
+  //--
+  Realign(AIndex);
 end;
 
 {******************************************************************}
@@ -2051,7 +2163,7 @@ begin
       end;
       try
         var LViewportPosition: TALPointD;
-        if (LFirstVisibleItemIndex >= 0) and (not Owner.ViewportPosition.IsZero) then LViewportPosition := Owner.FItems^[LFirstVisibleItemIndex].Position + LFirstItemOffset
+        if (LFirstVisibleItemIndex >= 0) and ((not Owner.ViewportPosition.IsZero) or FIsRemovingControl) then LViewportPosition := Owner.FItems^[LFirstVisibleItemIndex].Position + LFirstItemOffset
         else LViewportPosition := Owner.ViewportPosition;
         if ((Owner.ScrollEngine.TimerActive)) and (not LViewportPosition.EqualsTo(Owner.ViewportPosition,TEpsilon.Position)) then Owner.ScrollEngine.SetViewportPosition(LViewportPosition, False{EnforceLimits})
         else Owner.SetViewportPosition(LViewportPosition);
@@ -3753,7 +3865,7 @@ begin
             else begin
 
               // In the overscroll-at-left zone
-              if (FPullToRefreshIndicator.CanTriggerRefresh) and (aValue.Y < FScrollEngine.MinScrollLimit.Y - 1{*}) then begin
+              if (FPullToRefreshIndicator.CanTriggerRefresh) and (aValue.Y < FScrollEngine.MinScrollLimit.Y - 1{*}) and (FScrollEngine.Down) then begin
                 FPullToRefreshIndicator.Visible := True;
                 FPullToRefreshIndicator.SetPosition({LEdgeOffset}0 - (aValue.Y*1.5) - FPullToRefreshIndicator.Width, (Height - FPullToRefreshIndicator.Height) / 2);
                 FPullToRefreshIndicator.SetPullProgress((FPullToRefreshIndicator.Left - LEdgeOffset) / FPullToRefreshIndicator.PullThreshold);
@@ -3783,7 +3895,7 @@ begin
             else begin
 
               // In the overscroll-at-top zone
-              if (FPullToRefreshIndicator.CanTriggerRefresh) and (aValue.Y < FScrollEngine.MinScrollLimit.Y - 1{*}) then begin
+              if (FPullToRefreshIndicator.CanTriggerRefresh) and (aValue.Y < FScrollEngine.MinScrollLimit.Y - 1{*}) and (FScrollEngine.Down) then begin
                 FPullToRefreshIndicator.Visible := True;
                 FPullToRefreshIndicator.SetPosition((Width - FPullToRefreshIndicator.Width) / 2,  {LEdgeOffset}0 - (aValue.Y*1.5) - FPullToRefreshIndicator.Height);
                 FPullToRefreshIndicator.SetPullProgress((FPullToRefreshIndicator.Top - LEdgeOffset) / FPullToRefreshIndicator.PullThreshold);
@@ -3993,37 +4105,34 @@ begin
   end;
 end;
 
-{*************************************************************************}
-procedure TALDynamicListBox.TView.DeleteItemAtIndex(const AIndex: Integer);
+{*********************************************************************************************************}
+procedure TALDynamicListBox.TView.DeleteItemAtIndex(const AIndex: Integer; const ADelayed: boolean = true);
 begin
   var LItem := Items[AIndex];
-  // Use delayed destruction because DeleteItemAtIndex may be invoked
-  // from within the item's own UI controls (for example, a button inside the item).
-  // Delaying ensures the item is not freed while its event handler is still running.
-  ALFreeAndNil(LItem, true{delayed});
+  ALFreeAndNil(LItem, ADelayed);
 end;
 
-{**************************************************************}
-procedure TALDynamicListBox.TView.DeleteItem(const AId: String);
+{**********************************************************************************************}
+procedure TALDynamicListBox.TView.DeleteItem(const AId: String; const ADelayed: boolean = true);
 begin
   var LItemIdNodeName := ItemIdNodeName;
   If LItemIdNodeName = '' then raise Exception.Create('ItemIdNodeName must be defined');
   for var I := low(FItems^) to ItemsCount - 1 do
     if FItems^[i].Data.GetChildValueText(LItemIdNodeName, '') = AId then begin
-      DeleteItemAtIndex(i);
+      DeleteItemAtIndex(i, ADelayed);
       Exit;
     end;
   raise Exception.Create('Item not found');
 end;
 
-{*************************************************************}
-procedure TALDynamicListBox.TView.DeleteItem(const AId: Int64);
+{*********************************************************************************************}
+procedure TALDynamicListBox.TView.DeleteItem(const AId: Int64; const ADelayed: boolean = true);
 begin
   var LItemIdNodeName := ItemIdNodeName;
   If LItemIdNodeName = '' then raise Exception.Create('ItemIdNodeName must be defined');
   for var I := low(FItems^) to ItemsCount - 1 do
     if FItems^[i].Data.GetChildValueInt64(LItemIdNodeName, 0) = AId then begin
-      DeleteItemAtIndex(i);
+      DeleteItemAtIndex(i, ADelayed);
       Exit;
     end;
   raise Exception.Create('Item not found');
@@ -5158,6 +5267,13 @@ begin
     MainView.Prepare;
     FHasBeenPrepared := True;
   end;
+end;
+
+{**********************************}
+procedure TALDynamicListBox.Refresh;
+begin
+  If MainView <> nil then
+    MainView.Refresh;
 end;
 
 {****************************************}

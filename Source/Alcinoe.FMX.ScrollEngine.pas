@@ -2990,30 +2990,86 @@ end;
 procedure TALScrollEngine.SetViewportPosition(const Value: TALPointD; const EnforceLimits: Boolean; const SynchOverScroller: Boolean);
 begin
 
-  // If FOverScroller is still active and is in an over-scrolled state,
-  // we check if the final position lies within the ViewportPosition boundaries.
-  // If it doesn't, we terminate the FOverScroller to allow the subsequent block
-  // to initiate a new spring back action.
+  // When an OverScroller animation is active and is currently over-scrolled,
+  // changing the ViewportPosition requires special handling.
+  //
+  // In a normal scroll/fling, the OverScroller trajectory can safely be moved
+  // together with the viewport by applying the same delta to Curr/Start/Final.
+  //
+  // This is not always valid while over-scrolled, especially during a spring-back.
+  // During a spring-back, FinalX/FinalY represent the boundary to which the
+  // OverScroller is returning.
+  //
+  // Example:
+  //
+  //   ViewportPosition.Y = -330
+  //   CurrY              = -330
+  //   FinalY             = 0
+  //
+  // The OverScroller is currently animating from -330 back to the top boundary 0.
+  //
+  // If SetViewportPosition(0, 0) is called, the viewport delta is +330.
+  // Simply translating the OverScroller would produce:
+  //
+  //   CurrY  =    0
+  //   FinalY = +330
+  //
+  // which would incorrectly make the animation continue from 0 to +330 instead
+  // of stopping at the requested position.
+  //
+  // Therefore, when synchronization is requested and the viewport is explicitly
+  // moved while over-scrolled, terminate the current OverScroller animation.
+  // The block below will then rebuild the appropriate state from Value and,
+  // if Value itself lies outside the limits, start a new spring-back from that
+  // position.
+  //
+  // If the current overscroll animation is not being synchronized with a new
+  // viewport position, keep it whenever its destination is still valid, and
+  // terminate it only if its final position lies outside the current limits.
   if EnforceLimits and (not FOverScroller.isFinished) and FOverScroller.isOverScrolled then begin
-    var LMinX: integer := trunc(FMinScrollLimit.x*ALScreenScale);
-    var LMaxX: integer := trunc(FMaxScrollLimit.x*ALScreenScale);
-    var LMinY: integer := trunc(FMinScrollLimit.y*ALScreenScale);
-    var LMaxY: integer := trunc(FMaxScrollLimit.y*ALScreenScale);
-    var LFinalX: integer := FOverScroller.getFinalX;
-    var LFinalY: integer := FOverScroller.getFinalY;
-    if SynchOverScroller then begin
-      var LDelta := (Value - FViewportPosition) * ALScreenScale;
-      LFinalX := Trunc(LFinalX + LDelta.X);
-      LFinalY := Trunc(LFinalY + LDelta.Y);
+
+    // When synchronization is requested, an explicit viewport change takes
+    // precedence over the current overscroll animation. Stop it so that the
+    // requested Value becomes the new reference position and the limits can
+    // be evaluated again below.
+    if SynchOverScroller and (FViewportPosition <> Value) then
+      FOverScroller.forceFinished(True)
+
+    // The current overscroll animation is not being synchronized with a new
+    // viewport position. This can happen, for example, when the viewport has
+    // not changed but the scroll limits have changed.
+    //
+    // Verify that the destination of the currently running overscroll
+    // animation is still inside the current limits.
+    else begin
+      var LMinX: Integer := Trunc(FMinScrollLimit.X * ALScreenScale);
+      var LMaxX: Integer := Trunc(FMaxScrollLimit.X * ALScreenScale);
+      var LMinY: Integer := Trunc(FMinScrollLimit.Y * ALScreenScale);
+      var LMaxY: Integer := Trunc(FMaxScrollLimit.Y * ALScreenScale);
+      var LFinalX: Integer := FOverScroller.getFinalX;
+      var LFinalY: Integer := FOverScroller.getFinalY;
+
+      // If the old destination is no longer valid, stop the current animation.
+      // The next block will then evaluate Value against the new limits and,
+      // if necessary, create a new spring-back animation.
+      if (LFinalX < LMinX) or
+         (LFinalX > LMaxX) or
+         (LFinalY < LMinY) or
+         (LFinalY > LMaxY) then
+        FOverScroller.forceFinished(True);
     end;
-    if (LFinalX < LMinX) or
-       (LFinalX > LMaxX) or
-       (LFinalY < LMinY) or
-       (LFinalY > LMaxY) then FOverScroller.forceFinished(true);
+
   end;
 
-  // If the FOverScroller has completed, we verify the ViewportPosition boundaries.
-  // Should the new ViewportPosition exceed these boundaries, we initiate the springBack function.
+  // If there is no active OverScroller animation, Value becomes the new
+  // authoritative viewport position.
+  //
+  // Before assigning it, optionally enforce the scroll limits. springBack()
+  // initializes the OverScroller from Value and starts an animation only when
+  // Value lies outside the valid range.
+  //
+  // If Value is already inside the limits, springBack() simply initializes the
+  // OverScroller to Value and returns False, so no timer needs to be started.
   if FOverScroller.isFinished then begin
     if EnforceLimits then begin
       var LStartX: integer := trunc(Value.X*ALScreenScale);
@@ -3036,9 +3092,13 @@ begin
     end;
   end
 
-  // If FOverScroller hasn't finished, we skip checking the ViewportPosition
-  // limits. The upcoming calculation will call notifyVerticalEdgeReached or
-  // notifyHorizontalEdgeReached to adjust the viewport to its boundary limits.
+  // An OverScroller animation is still active.
+  //
+  // Do not enforce the limits directly here. During a normal fling,
+  // Calculate() is responsible for detecting when the current position crosses
+  // an edge and will call notifyVerticalEdgeReached() or
+  // notifyHorizontalEdgeReached() to transition into the appropriate
+  // overscroll/spring-back behavior.
   else begin
     if FViewportPosition <> Value then begin
       if SynchOverScroller then begin

@@ -424,6 +424,7 @@ type
     procedure PointerSymbol; virtual;
     procedure PointerType; virtual;
     procedure ProceduralDirective; virtual;
+    procedure ProceduralDirectiveList; virtual;
     procedure ProceduralDirectiveOf; virtual;
     procedure ProceduralType; virtual;
     procedure ProcedureDeclarationSection; virtual;
@@ -5588,6 +5589,7 @@ begin
           FormalParameterList;
       end;
   end;
+  ProceduralDirectiveList;
   Block;
 end;
 
@@ -5611,6 +5613,7 @@ begin
         ReturnType;
       end;
   end;
+  ProceduralDirectiveList;
 end;
 
 procedure TmwSimplePasPar.AddDefine(const ADefine: string);
@@ -5697,6 +5700,16 @@ begin
   begin
     DeclarationSection;
   end;
+end;
+
+procedure TmwSimplePasPar.ProceduralDirectiveList;
+begin
+  // A calling convention may follow a procedural signature without a leading
+  // semicolon, e.g. "reference to function(const P: T): HResult stdcall;" as
+  // used by Vcl.Edge.pas. Consume every such directive.
+  while GenID in [ptCdecl, ptPascal, ptRegister, ptSafeCall, ptStdCall,
+    ptVarargs, ptNoreturn] do
+    ProceduralDirective;
 end;
 
 procedure TmwSimplePasPar.ProceduralDirectiveOf;

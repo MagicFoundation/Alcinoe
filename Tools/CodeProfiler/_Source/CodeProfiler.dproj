@@ -72,11 +72,12 @@
         <DCC_S>false</DCC_S>
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
-        <DCC_UnitSearchPath>..\..\..\Source;c:\Dev\DelphiAST\Source\;c:\Dev\DelphiAST\Source\SimpleParser\;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\..\Source;..\..\..\References\DelphiAST\Source\;..\..\..\References\DelphiAST\Source\SimpleParser\;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_ExeOutput>..\</DCC_ExeOutput>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>13</VerInfo_MajorVer>
         <VerInfo_Release>26</VerInfo_Release>
+        <VerInfo_MinorVer>1</VerInfo_MinorVer>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
@@ -116,9 +117,7 @@
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <BT_BuildType>Debug</BT_BuildType>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=13.1.26.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=io.magicfoundation.alcinoe.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=13.1.26.0;Comments=</VerInfo_Keys>
-        <VerInfo_MajorVer>13</VerInfo_MajorVer>
-        <VerInfo_Release>26</VerInfo_Release>
+        <VerInfo_MinorVer>1</VerInfo_MinorVer>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

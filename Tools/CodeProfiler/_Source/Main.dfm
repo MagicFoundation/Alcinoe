@@ -2,8 +2,8 @@ object MainForm: TMainForm
   Left = 377
   Top = 296
   Caption = 'Alcinoe CodeProfiler'
-  ClientHeight = 900
-  ClientWidth = 1080
+  ClientHeight = 985
+  ClientWidth = 1264
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,27 +17,25 @@ object MainForm: TMainForm
   object MainPageControl: TcxPageControl
     Left = 0
     Top = 0
-    Width = 1080
-    Height = 868
+    Width = 1264
+    Height = 953
     Align = alClient
     TabOrder = 0
     Properties.ActivePage = InstrumentationTabSheet
     Properties.CustomButtons.Buttons = <>
-    ExplicitHeight = 768
-    ClientRectBottom = 863
+    ClientRectBottom = 948
     ClientRectLeft = 5
-    ClientRectRight = 1075
+    ClientRectRight = 1259
     ClientRectTop = 37
     object InstrumentationTabSheet: TcxTabSheet
       Caption = 'Source Code Instrumentation'
       ImageIndex = 0
       OnResize = InstrumentationTabSheetResize
-      ExplicitHeight = 726
       object InstructionPanel: TdxPanel
         Left = 0
         Top = 0
-        Width = 1070
-        Height = 424
+        Width = 1254
+        Height = 353
         Align = alTop
         Color = 16448250
         TabOrder = 0
@@ -60,7 +58,7 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 0
           Transparent = True
-          Width = 1062
+          Width = 1246
         end
         object cxLabel2: TcxLabel
           AlignWithMargins = True
@@ -78,7 +76,7 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 1
           Transparent = True
-          Width = 1062
+          Width = 1246
         end
         object cxLabel3: TcxLabel
           AlignWithMargins = True
@@ -86,7 +84,9 @@ object MainForm: TMainForm
           Top = 107
           Margins.Left = 16
           Align = alTop
-          Caption = '2. Add Alcinoe profiler markers to your code.'
+          Caption = 
+            '2. Click the "Insert Markers" button below to add profiler marke' +
+            'rs to your code.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -97,8 +97,7 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 2
           Transparent = True
-          ExplicitTop = 74
-          Width = 1049
+          Width = 1233
         end
         object cxLabel4: TcxLabel
           AlignWithMargins = True
@@ -117,8 +116,7 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 3
           Transparent = True
-          ExplicitTop = 107
-          Width = 1049
+          Width = 1233
         end
         object cxLabel5: TcxLabel
           AlignWithMargins = True
@@ -128,8 +126,9 @@ object MainForm: TMainForm
           Align = alTop
           Caption = 
             '4. If you are using Android or iOS, send the app to the backgrou' +
-            'nd and then bring it back to the foreground to generate the perf' +
-            'ormance file.'
+            'nd and bring it back to the foreground to generate the performan' +
+            'ce file. On Windows and macOS, the performance file will be gene' +
+            'rated when you close the app.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -140,15 +139,18 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 4
           Transparent = True
-          Width = 1049
+          Width = 1233
         end
-        object cxLabel6: TcxLabel
+        object LastInstructionLabel: TcxLabel
           AlignWithMargins = True
           Left = 16
-          Top = 285
+          Top = 308
           Margins.Left = 16
+          Margins.Bottom = 16
           Align = alTop
-          Caption = '6. Perform the performance analysis.'
+          Caption = 
+            '6. Go to the Performance Analysis tab, click the Load Data butto' +
+            'n, and run the analysis.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -159,38 +161,44 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 5
           Transparent = True
-          Width = 1049
+          ExplicitTop = 285
+          Width = 1233
         end
-        object cxLabel8: TcxLabel
+        object cxLabel13: TcxLabel
           AlignWithMargins = True
-          Left = 3
-          Top = 318
+          Left = 16
+          Top = 74
+          Margins.Left = 16
           Align = alTop
-          Caption = 'Note:'
+          Caption = 
+            '1. If you run the program on a remote device (such as Android or' +
+            ' iOS), specify the server IP and port for the listening process.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
           Style.Font.Height = -17
           Style.Font.Name = 'Segoe UI'
-          Style.Font.Style = [fsBold]
+          Style.Font.Style = []
           Style.IsFontAssigned = True
           Properties.WordWrap = True
           TabOrder = 6
           Transparent = True
-          ExplicitTop = 206
-          Width = 1062
+          Width = 1233
         end
-        object LastInstructionLabel: TcxLabel
+        object cxLabel14: TcxLabel
           AlignWithMargins = True
-          Left = 3
-          Top = 351
-          Margins.Bottom = 8
+          Left = 16
+          Top = 229
+          Margins.Left = 16
           Align = alTop
           Caption = 
-            'On Windows, the performance file is stored in the CodeProfiler d' +
-            'ata folder if the app is running locally; otherwise, it is saved' +
-            ' in the user'#39's document folder. On macOS, iOS, and Android, it i' +
-            's always stored in the user'#39's document folder.'
+            '5. If you specified the server IP and port in step 1, the perfor' +
+            'mance file will be received automatically. Otherwise, if you are' +
+            ' running the program on a remote device, download the data from ' +
+            'the user'#39's documents folder and place it in the CodeProfiler dat' +
+            'a folder. Note: On Windows, the performance file is directly sto' +
+            'red in the CodeProfiler data folder if the app is running locall' +
+            'y; otherwise, it is saved in the user'#39's document folder.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -201,86 +209,43 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 7
           Transparent = True
-          ExplicitTop = 239
-          Width = 1062
-        end
-        object cxLabel13: TcxLabel
-          AlignWithMargins = True
-          Left = 16
-          Top = 74
-          Margins.Left = 16
-          Align = alTop
-          Caption = '1. Specify the server IP and port for the listening process.'
-          ParentFont = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clWindowText
-          Style.Font.Height = -17
-          Style.Font.Name = 'Segoe UI'
-          Style.Font.Style = []
-          Style.IsFontAssigned = True
-          Properties.WordWrap = True
-          TabOrder = 8
-          Transparent = True
-          Width = 1049
-        end
-        object cxLabel14: TcxLabel
-          AlignWithMargins = True
-          Left = 16
-          Top = 229
-          Margins.Left = 16
-          Align = alTop
-          Caption = 
-            '5. If you specified the server IP and port in step 1, the perfor' +
-            'mance file will be received automatically. After receiving it, s' +
-            'imply reload the data; otherwise, download the data from the use' +
-            'r'#39's document folder and place it in the CodeProfiler data folder' +
-            '.'
-          ParentFont = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clWindowText
-          Style.Font.Height = -17
-          Style.Font.Name = 'Segoe UI'
-          Style.Font.Style = []
-          Style.IsFontAssigned = True
-          Properties.WordWrap = True
-          TabOrder = 9
-          Transparent = True
-          Width = 1049
+          Width = 1233
         end
       end
       object dxPanel2: TdxPanel
         AlignWithMargins = True
         Left = 0
-        Top = 432
-        Width = 1070
-        Height = 386
+        Top = 361
+        Width = 1254
+        Height = 542
         Margins.Left = 0
         Margins.Top = 8
         Margins.Right = 0
         Margins.Bottom = 8
         Align = alClient
         TabOrder = 1
-        ExplicitTop = 393
-        ExplicitHeight = 325
+        ExplicitTop = 432
+        ExplicitHeight = 471
         object SourcesPathMemo: TcxMemo
           AlignWithMargins = True
           Left = 8
-          Top = 164
+          Top = 362
           Margins.Left = 8
           Margins.Right = 8
-          Margins.Bottom = 12
+          Margins.Bottom = 0
           Align = alClient
           TabOrder = 0
-          ExplicitHeight = 147
-          Height = 208
-          Width = 1052
+          ExplicitTop = 299
+          ExplicitHeight = 118
+          Height = 126
+          Width = 1236
         end
         object cxLabel9: TcxLabel
           AlignWithMargins = True
           Left = 8
-          Top = 134
+          Top = 332
           Margins.Left = 8
-          Margins.Top = 8
+          Margins.Top = 0
           Margins.Right = 8
           Margins.Bottom = 0
           Align = alTop
@@ -289,12 +254,13 @@ object MainForm: TMainForm
             ' or filename per line. Prefix a name with '#39'!'#39' to ignore the file'
           Properties.WordWrap = True
           TabOrder = 1
-          Width = 1052
+          ExplicitTop = 269
+          Width = 1236
         end
         object dxPanel3: TdxPanel
           Left = 0
-          Top = 95
-          Width = 1068
+          Top = 148
+          Width = 1252
           Height = 31
           Align = alTop
           Frame.Borders = []
@@ -338,6 +304,7 @@ object MainForm: TMainForm
             Margins.Right = 8
             Margins.Bottom = 0
             Align = alLeft
+            Properties.OnChange = HttpServerNameEditPropertiesChange
             TabOrder = 2
             Width = 358
           end
@@ -356,32 +323,114 @@ object MainForm: TMainForm
             Width = 71
           end
         end
-        object cxLabel10: TcxLabel
+        object cxLabel15: TcxLabel
           AlignWithMargins = True
           Left = 8
-          Top = 60
+          Top = 8
           Margins.Left = 8
           Margins.Top = 8
           Margins.Right = 8
           Margins.Bottom = 8
           Align = alTop
           Caption = 
-            'Specify the IP address and port to automatically receive the per' +
-            'formance file, then update the markers in your code.'
+            'Path to Alcinoe.CodeProfiler.inc, the include file where the opt' +
+            'ions below are stored'
           Properties.WordWrap = True
-          TabOrder = 3
-          Width = 1052
+          TabOrder = 6
+          Width = 1236
         end
-        object dxPanel1: TdxPanel
+        object dxPanel5: TdxPanel
           Left = 0
-          Top = 0
-          Width = 1068
-          Height = 52
+          Top = 43
+          Width = 1252
+          Height = 31
           Align = alTop
           Frame.Borders = []
           LookAndFeel.NativeStyle = False
           LookAndFeel.SkinName = 'Foggy'
+          TabOrder = 7
+          object BrowseCodeProfilerIncFilenameBtn: TcxButton
+            AlignWithMargins = True
+            Left = 1204
+            Top = 0
+            Width = 40
+            Height = 31
+            Margins.Left = 8
+            Margins.Top = 0
+            Margins.Right = 8
+            Margins.Bottom = 0
+            Align = alRight
+            Caption = '...'
+            TabOrder = 0
+            OnClick = BrowseCodeProfilerIncFilenameBtnClick
+          end
+          object CodeProfilerIncFilenameEdit: TcxTextEdit
+            AlignWithMargins = True
+            Left = 8
+            Top = 0
+            Margins.Left = 8
+            Margins.Top = 0
+            Margins.Right = 8
+            Margins.Bottom = 0
+            Align = alClient
+            Properties.OnChange = CodeProfilerIncFilenameEditPropertiesChange
+            TabOrder = 1
+            Width = 1180
+          end
+        end
+        object dxPanel6: TdxPanel
+          Left = 0
+          Top = 74
+          Width = 1252
+          Height = 31
+          Align = alTop
+          Frame.Borders = []
+          LookAndFeel.NativeStyle = False
+          LookAndFeel.SkinName = 'Foggy'
+          TabOrder = 8
+          ExplicitLeft = 16
+          ExplicitTop = 59
+          object CodeProfilerEnabledCheckBox: TcxCheckBox
+            AlignWithMargins = True
+            Left = 8
+            Top = 3
+            Margins.Left = 8
+            Align = alLeft
+            Caption = 'Start profiling as soon as the application starts'
+            Properties.OnChange = CodeProfilerEnabledCheckBoxPropertiesChange
+            TabOrder = 0
+            ExplicitLeft = -1
+            ExplicitTop = 19
+          end
+        end
+        object cxLabel10: TcxLabel
+          AlignWithMargins = True
+          Left = 8
+          Top = 113
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 8
+          Align = alTop
+          Caption = 
+            '(Optional) Specify the IP address and port of this computer to a' +
+            'utomatically receive the performance file. Not required for loca' +
+            'l execution.'
+          Properties.WordWrap = True
+          TabOrder = 3
+          Width = 1236
+        end
+        object dxPanel1: TdxPanel
+          Left = 0
+          Top = 488
+          Width = 1252
+          Height = 52
+          Align = alBottom
+          Frame.Borders = []
+          LookAndFeel.NativeStyle = False
+          LookAndFeel.SkinName = 'Foggy'
           TabOrder = 4
+          ExplicitTop = 417
           object InsertProfilerMarkersBtn: TcxButton
             Left = 8
             Top = 12
@@ -401,16 +450,134 @@ object MainForm: TMainForm
             OnClick = RemoveProfilerMarkersBtnClick
           end
         end
+        object dxPanel4: TdxPanel
+          AlignWithMargins = True
+          Left = 3
+          Top = 217
+          Width = 1246
+          Height = 39
+          Margins.Bottom = 0
+          Align = alTop
+          Frame.Borders = []
+          LookAndFeel.NativeStyle = False
+          LookAndFeel.SkinName = 'Foggy'
+          TabOrder = 5
+          ExplicitTop = 182
+          object DoNotGroupRadioButton: TcxRadioButton
+            AlignWithMargins = True
+            Left = 8
+            Top = 3
+            Margins.Left = 8
+            Align = alLeft
+            Caption = 'Do not group (Huge memory usage!)'
+            TabOrder = 0
+            OnClick = HistoryGroupModeRadioButtonClick
+            AutoSize = True
+          end
+          object GroupCallsByProcIDRadioButton: TcxRadioButton
+            AlignWithMargins = True
+            Left = 347
+            Top = 3
+            Margins.Left = 32
+            Align = alLeft
+            Caption = 'Group by procedure ID'
+            TabOrder = 1
+            OnClick = HistoryGroupModeRadioButtonClick
+            AutoSize = True
+          end
+          object GroupCallsByCallStackRadioButton: TcxRadioButton
+            AlignWithMargins = True
+            Left = 579
+            Top = 3
+            Margins.Left = 32
+            Align = alLeft
+            Caption = 'Group by call stack (recommended)'
+            Checked = True
+            TabOrder = 2
+            TabStop = True
+            OnClick = HistoryGroupModeRadioButtonClick
+            AutoSize = True
+          end
+        end
+        object dxPanel7: TdxPanel
+          AlignWithMargins = True
+          Left = 3
+          Top = 256
+          Width = 1246
+          Height = 39
+          Margins.Top = 0
+          Align = alTop
+          Frame.Borders = []
+          LookAndFeel.NativeStyle = False
+          LookAndFeel.SkinName = 'Foggy'
+          TabOrder = 9
+          ExplicitTop = 227
+          object IgnoreThreadIDCheckBox: TcxCheckBox
+            AlignWithMargins = True
+            Left = 8
+            Top = 3
+            Margins.Left = 8
+            Align = alLeft
+            Caption = 
+              'Ignore thread ID (This option is only available with Group by pr' +
+              'ocedure ID)'
+            Properties.OnChange = IgnoreThreadIDCheckBoxPropertiesChange
+            Style.TransparentBorder = False
+            TabOrder = 0
+          end
+        end
+        object cxLabel7: TcxLabel
+          AlignWithMargins = True
+          Left = 8
+          Top = 302
+          Margins.Left = 8
+          Margins.Top = 4
+          Margins.Right = 8
+          Align = alTop
+          Caption = 'Source Code Paths'
+          ParentFont = False
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clWindowText
+          Style.Font.Height = -17
+          Style.Font.Name = 'Segoe UI'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          Properties.WordWrap = True
+          TabOrder = 10
+          ExplicitTop = 349
+          Width = 1236
+        end
+        object cxLabel16: TcxLabel
+          AlignWithMargins = True
+          Left = 8
+          Top = 187
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 0
+          Align = alTop
+          Caption = 'Call Grouping (Help is available in Alcinoe.CodeProfiler.inc)'
+          ParentFont = False
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clWindowText
+          Style.Font.Height = -17
+          Style.Font.Name = 'Segoe UI'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          Properties.WordWrap = True
+          TabOrder = 11
+          ExplicitTop = 195
+          Width = 1236
+        end
       end
     end
     object PerformanceAnalysisTabSheet: TcxTabSheet
       Caption = 'Performance Analysis'
       ImageIndex = 1
-      ExplicitHeight = 726
       object Panelfilter: TPanel
         Left = 0
         Top = 0
-        Width = 1070
+        Width = 1254
         Height = 89
         Margins.Left = 8
         Align = alTop
@@ -420,30 +587,30 @@ object MainForm: TMainForm
         TabOrder = 0
         OnResize = PanelfilterResize
         object Label1: TLabel
-          Left = 152
+          Left = 289
           Top = 11
           Width = 168
           Height = 23
           Caption = 'Start Timestamp (Min)'
         end
         object Label2: TLabel
-          Left = 520
+          Left = 657
           Top = 11
           Width = 171
           Height = 23
           Caption = 'Start Timestamp (Max)'
         end
         object ProcNameFilterEdit: TcxTextEdit
-          Left = 152
+          Left = 288
           Top = 45
           TabOrder = 0
           TextHint = 
             'Search for procedure names. Accepts multiple entries separated b' +
             'y '#39';'#39
-          Width = 913
+          Width = 724
         end
         object ApplyFilterBtn: TcxButton
-          Left = 8
+          Left = 143
           Top = 45
           Width = 124
           Height = 31
@@ -462,7 +629,7 @@ object MainForm: TMainForm
           OnClick = LoadDataBtnClick
         end
         object StartTimeStampMinEdit: TcxMaskEdit
-          Left = 326
+          Left = 463
           Top = 8
           Properties.MaskKind = emkRegExpr
           Properties.EditMask = '([0-5][0-9]):([0-5][0-9]):([0-9]{3})\.([0-9]{1,4})'
@@ -471,7 +638,7 @@ object MainForm: TMainForm
           Width = 177
         end
         object StartTimeStampMaxEdit: TcxMaskEdit
-          Left = 698
+          Left = 835
           Top = 8
           Properties.MaskKind = emkRegExpr
           Properties.EditMask = '([0-5][0-9]):([0-5][0-9]):([0-9]{3})\.([0-9]{1,4})'
@@ -479,11 +646,31 @@ object MainForm: TMainForm
           TextHint = 'mm:ss:zzz.zzzz'
           Width = 177
         end
+        object ClearDataBtn: TcxButton
+          Left = 8
+          Top = 45
+          Width = 124
+          Height = 31
+          Margins.Right = 8
+          Caption = 'Clear Data'
+          TabOrder = 5
+          OnClick = ClearDataBtnClick
+        end
+        object ExportToCsvBtn: TcxButton
+          Left = 143
+          Top = 8
+          Width = 124
+          Height = 31
+          Margins.Right = 8
+          Caption = 'Export to CSV'
+          TabOrder = 6
+          OnClick = ExportToCsvBtnClick
+        end
       end
       object TreeListProcMetrics: TcxTreeList
         Left = 0
         Top = 89
-        Width = 1070
+        Width = 1254
         Height = 145
         Align = alTop
         Bands = <
@@ -494,7 +681,6 @@ object MainForm: TMainForm
         Font.Height = -17
         Font.Name = 'Segoe UI Light'
         Font.Style = []
-        Navigator.Buttons.CustomButtons = <>
         OptionsBehavior.CopyCaptionsToClipboard = False
         OptionsData.Editing = False
         OptionsView.ColumnAutoWidth = True
@@ -503,6 +689,19 @@ object MainForm: TMainForm
         Styles.Background = cxStyleTreeListProcMetricsBackground
         TabOrder = 1
         OnDblClick = TreeListProcMetricsDblClick
+        object TreeListProcMetricsColumnExecutionID: TcxTreeListColumn
+          Caption.Text = '_ExecutionID'
+          DataBinding.ValueType = 'Integer'
+          Options.Moving = False
+          Width = 120
+          Position.ColIndex = 0
+          Position.RowIndex = 0
+          Position.BandIndex = 0
+          SortOrder = soDescending
+          SortIndex = 0
+          Summary.FooterSummaryItems = <>
+          Summary.GroupFooterSummaryItems = <>
+        end
         object TreeListProcMetricsColumnProcName: TcxTreeListColumn
           Caption.Text = 'Name'
           Options.Filtering = False
@@ -528,19 +727,6 @@ object MainForm: TMainForm
           Summary.FooterSummaryItems = <>
           Summary.GroupFooterSummaryItems = <>
         end
-        object TreeListProcMetricsColumnTimeTaken: TcxTreeListColumn
-          Caption.Text = 'TimeTaken'
-          DataBinding.ValueType = 'Float'
-          Options.Filtering = False
-          Options.Moving = False
-          Options.Sorting = False
-          Width = 150
-          Position.ColIndex = 4
-          Position.RowIndex = 0
-          Position.BandIndex = 0
-          Summary.FooterSummaryItems = <>
-          Summary.GroupFooterSummaryItems = <>
-        end
         object TreeListProcMetricsColumnStartTimeStamp: TcxTreeListColumn
           Caption.Text = 'Start Timestamp (mm:ss:zzz)'
           Options.Filtering = False
@@ -554,16 +740,29 @@ object MainForm: TMainForm
           Summary.GroupFooterSummaryItems = <>
           OnGetDisplayText = TreeListProcMetricsColumnStartTimeStampGetDisplayText
         end
-        object TreeListProcMetricsColumnExecutionID: TcxTreeListColumn
-          Caption.Text = '_ExecutionID'
-          DataBinding.ValueType = 'Integer'
+        object TreeListProcMetricsColumnCallCount: TcxTreeListColumn
+          Caption.Text = 'Call Count'
+          DataBinding.ValueType = 'LargeInt'
+          Options.Filtering = False
           Options.Moving = False
+          Options.Sorting = False
           Width = 120
-          Position.ColIndex = 0
+          Position.ColIndex = 4
           Position.RowIndex = 0
           Position.BandIndex = 0
-          SortOrder = soDescending
-          SortIndex = 0
+          Summary.FooterSummaryItems = <>
+          Summary.GroupFooterSummaryItems = <>
+        end
+        object TreeListProcMetricsColumnTimeTaken: TcxTreeListColumn
+          Caption.Text = 'TimeTaken'
+          DataBinding.ValueType = 'Float'
+          Options.Filtering = False
+          Options.Moving = False
+          Options.Sorting = False
+          Width = 150
+          Position.ColIndex = 5
+          Position.RowIndex = 0
+          Position.BandIndex = 0
           Summary.FooterSummaryItems = <>
           Summary.GroupFooterSummaryItems = <>
         end
@@ -571,8 +770,8 @@ object MainForm: TMainForm
       object GridProcMetrics: TcxGrid
         Left = 0
         Top = 241
-        Width = 1070
-        Height = 585
+        Width = 1254
+        Height = 670
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -581,10 +780,7 @@ object MainForm: TMainForm
         Font.Style = []
         ParentFont = False
         TabOrder = 2
-        ExplicitHeight = 485
         object GridTableViewProcMetrics: TcxGridTableView
-          Navigator.Buttons.CustomButtons = <>
-          ScrollbarAnnotations.CustomAnnotations = <>
           OnCellDblClick = GridTableViewProcMetricsCellDblClick
           DataController.Summary.DefaultGroupSummaryItems = <
             item
@@ -603,7 +799,6 @@ object MainForm: TMainForm
               Kind = skCount
               Column = GridTableViewProcMetricsColumnProcName
             end>
-          DataController.Summary.SummaryGroups = <>
           DateTimeHandling.Grouping = dtgByDate
           OptionsBehavior.CellHints = True
           OptionsBehavior.CopyCaptionsToClipboard = False
@@ -644,6 +839,11 @@ object MainForm: TMainForm
             SortOrder = soAscending
             Width = 250
           end
+          object GridTableViewProcMetricsColumnCallCount: TcxGridColumn
+            Caption = 'Call Count'
+            DataBinding.ValueType = 'LargeInt'
+            Width = 120
+          end
           object GridTableViewProcMetricsColumnTimeTaken: TcxGridColumn
             Caption = 'Time Taken'
             DataBinding.ValueType = 'Float'
@@ -659,7 +859,7 @@ object MainForm: TMainForm
       object cxSplitter1: TcxSplitter
         Left = 0
         Top = 234
-        Width = 1070
+        Width = 1254
         Height = 7
         AlignSplitter = salTop
       end
@@ -667,8 +867,8 @@ object MainForm: TMainForm
   end
   object MainStatusBar: TdxStatusBar
     Left = 0
-    Top = 868
-    Width = 1080
+    Top = 953
+    Width = 1264
     Height = 32
     Panels = <
       item
@@ -678,17 +878,16 @@ object MainForm: TMainForm
       item
         PanelStyleClassName = 'TdxStatusBarTextPanelStyle'
       end>
-    ExplicitTop = 768
   end
   object dxSkinController: TdxSkinController
     NativeStyle = False
     SkinName = 'Foggy'
-    Left = 768
-    Top = 120
+    Left = 808
+    Top = 152
   end
   object cxStyleRepository: TcxStyleRepository
-    Left = 888
-    Top = 120
+    Left = 920
+    Top = 152
     PixelsPerInch = 96
     object cxStyleTreeListProcMetricsBackground: TcxStyle
       AssignedValues = [svColor]
@@ -701,7 +900,7 @@ object MainForm: TMainForm
     OnException = IdHTTPServerException
     OnListenException = IdHTTPServerListenException
     OnCommandGet = IdHTTPServerCommandGet
-    Left = 661
-    Top = 118
+    Left = 693
+    Top = 150
   end
 end

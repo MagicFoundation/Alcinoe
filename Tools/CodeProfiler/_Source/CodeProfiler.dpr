@@ -8,7 +8,7 @@ uses
 {$R *.res}
 
 begin
-  ALCodeProfilerStop(False{ASaveHistory});
+  ALCodeProfilerStop;
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
   Application.Run;

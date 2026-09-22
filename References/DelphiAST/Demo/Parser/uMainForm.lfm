@@ -1,0 +1,61 @@
+object MainForm: TMainForm
+  Left = 309
+  Height = 389
+  Top = 89
+  Width = 666
+  Caption = 'DelphiAST Demo'
+  ClientHeight = 369
+  ClientWidth = 666
+  Color = clBtnFace
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Menu = MainMenu
+  LCLVersion = '1.6.0.4'
+  object OutputMemo: TMemo
+    Left = 0
+    Height = 346
+    Top = 0
+    Width = 666
+    Align = alClient
+    ScrollBars = ssBoth
+    TabOrder = 0
+  end
+  object StatusBar: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 346
+    Width = 666
+    Panels = <    
+      item
+        Text = 'TEST'
+        Width = 500
+      end>
+  end
+  object CheckBox1: TCheckBox
+    AlignWithMargins = True
+    Left = 3
+    Top = 350
+    Width = 660
+    Height = 17
+    Align = alBottom
+    Caption = 
+      'Use string interning for less memory consumption (has a minor im' +
+      'pact on speed)'
+    TabOrder = 2
+  end  
+  object MainMenu: TMainMenu
+    left = 224
+    top = 96
+    object OpenDelphiUnit1: TMenuItem
+      Caption = 'Open Delphi Unit...'
+      OnClick = OpenDelphiUnit1Click
+    end
+  end
+  object OpenDialog: TOpenDialog
+    Filter = 'Delphi Unit|*.pas|Delphi Package|*.dpk|Delphi Project|*.dpr'
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    left = 272
+    top = 96
+  end
+end

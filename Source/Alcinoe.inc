@@ -68,4 +68,6 @@
 
 {$ZEROBASEDSTRINGS OFF}
 
+{$TYPEDADDRESS OFF}
+
 {.$Define ALUIAutomationEnabled}

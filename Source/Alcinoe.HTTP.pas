@@ -16,6 +16,12 @@ type
   {-------------------------------------------------------}
   TALHttpVersion = (Unspecified, v0_9, v1_0, v1_1, v2, v3);
 
+  {-----------------------------------------------------------}
+  // Ignore: Ignore the Range header and send the full content.
+  // Partial: A valid byte range was parsed; send HTTP 206 Partial Content.
+  // Unsatisfiable: The requested range cannot be satisfied; send HTTP 416.
+  TALHttpRangeResult = (Ignore, Partial, Unsatisfiable);
+
   {-----------------------------}
   TALHttpCookieA = class(TObject)
   public
@@ -551,6 +557,8 @@ function ALGetHttpReasonPhraseA(Const AStatusCode: Integer): Ansistring;
 function ALGetHttpReasonPhraseW(Const AStatusCode: Integer): String;
 procedure ALDecompressHttpResponseBody(const AContentEncoding: AnsiString; var ABodyStream: TMemoryStream); overload;
 procedure ALDecompressHttpResponseBody(const AContentEncoding: String; var ABodyStream: TMemoryStream); overload;
+function ALParseHttpByteRange(const ARange: AnsiString; const ASize: Int64; out AStart, ALength: Int64): TALHttpRangeResult; overload;
+function ALParseHttpByteRange(const ARange: String; const ASize: Int64; out AStart, ALength: Int64): TALHttpRangeResult; overload;
 
 implementation
 
@@ -1878,6 +1886,142 @@ begin
   end;
   {$ENDIF}
   ABodyStream.Position := 0;
+end;
+
+{**************************************************************************************************************************}
+function ALParseHttpByteRange(const ARange: AnsiString; const ASize: Int64; out AStart, ALength: Int64): TALHttpRangeResult;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function ParseDecimal(const AText: AnsiString; out AValue: Int64): Boolean;
+  begin
+    AValue := 0;
+    Result := False;
+    if AText = '' then Exit;
+    for var C in AText do begin
+      if not (C in ['0'..'9']) then Exit;
+      var LDigit := Ord(C) - Ord('0');
+      // Saturate rather than overflow: huge ends/suffixes cover the whole file,
+      // while huge starting offsets cannot overlap an Int64-sized file.
+      if AValue > (High(Int64) - LDigit) div 10 then AValue := High(Int64)
+      else AValue := AValue * 10 + LDigit;
+    end;
+    Result := True;
+  end;
+
+begin
+  Result := TALHttpRangeResult.Ignore;
+  AStart := 0;
+  ALength := ASize;
+  if ASize < 0 then begin
+    ALength := 0;
+    Exit;
+  end;
+  if ARange = '' then exit;
+  // bytes=0-499
+  // bytes=500-
+  // bytes=-500
+  // bytes=0-499,1000-1499
+  // bytes=0-499, 1000-1499
+  // bytes= 0-499
+  var LRange := ALLowerCase(ALTrim(ARange));
+  if AlPosA('bytes=', LRange) <> 1 then Exit;
+  // Multipart responses are not implemented; HTTP permits ignoring Range.
+  // bytes=0-499,1000-1499
+  // bytes=0-499, 1000-1499
+  if ALPosA(',', LRange) > 0 then Exit;
+  var LDash := ALPosA('-', LRange, 7{length('bytes=') + 1});
+  if LDash <= 0 then Exit;
+  var LFirstStr := ALTrim(ALCopyStr(LRange, 7{length('bytes=') + 1}, LDash - 7{length('bytes=') + 1}));
+  var LLastStr := ALTrim(ALCopyStr(LRange, LDash + 1, MaxInt));
+  var LFirstInt, LLastInt: Int64;
+  if LFirstStr = '' then begin
+    if not ParseDecimal(LLastStr, LLastInt) then Exit;
+    if (LLastInt = 0) or (ASize = 0) then Exit(TALHttpRangeResult.Unsatisfiable);
+    if LLastInt > ASize then LLastInt := ASize;
+    AStart := ASize - LLastInt;
+    ALength := LLastInt;
+  end
+  else begin
+    if not ParseDecimal(LFirstStr, LFirstInt) then Exit;
+    if LLastStr <> '' then begin
+      if not ParseDecimal(LLastStr, LLastInt) then Exit;
+      if LLastInt < LFirstInt then Exit;
+    end
+    else LLastInt := High(Int64);
+    if LFirstInt >= ASize then Exit(TALHttpRangeResult.Unsatisfiable);
+    if LLastInt >= ASize then LLastInt := ASize - 1;
+    AStart := LFirstInt;
+    ALength := LLastInt - LFirstInt + 1;
+  end;
+  Result := TALHttpRangeResult.Partial;
+end;
+
+{**********************************************************************************************************************}
+function ALParseHttpByteRange(const ARange: String; const ASize: Int64; out AStart, ALength: Int64): TALHttpRangeResult;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function ParseDecimal(const AText: String; out AValue: Int64): Boolean;
+  begin
+    AValue := 0;
+    Result := False;
+    if AText = '' then Exit;
+    for var C in AText do begin
+      if not CharInSet(C, ['0'..'9']) then Exit;
+      var LDigit := Ord(C) - Ord('0');
+      // Saturate rather than overflow: huge ends/suffixes cover the whole file,
+      // while huge starting offsets cannot overlap an Int64-sized file.
+      if AValue > (High(Int64) - LDigit) div 10 then AValue := High(Int64)
+      else AValue := AValue * 10 + LDigit;
+    end;
+    Result := True;
+  end;
+
+begin
+  Result := TALHttpRangeResult.Ignore;
+  AStart := 0;
+  ALength := ASize;
+  if ASize < 0 then begin
+    ALength := 0;
+    Exit;
+  end;
+  if ARange = '' then exit;
+  // bytes=0-499
+  // bytes=500-
+  // bytes=-500
+  // bytes=0-499,1000-1499
+  // bytes=0-499, 1000-1499
+  // bytes= 0-499
+  var LRange := ALLowerCase(ALTrim(ARange));
+  if AlPosW('bytes=', LRange) <> 1 then Exit;
+  // Multipart responses are not implemented; HTTP permits ignoring Range.
+  // bytes=0-499,1000-1499
+  // bytes=0-499, 1000-1499
+  if AlPosW(',', LRange) > 0 then Exit;
+  var LDash := AlPosW('-', LRange, 7{length('bytes=') + 1});
+  if LDash <= 0 then Exit;
+  var LFirstStr := ALTrim(ALCopyStr(LRange, 7{length('bytes=') + 1}, LDash - 7{length('bytes=') + 1}));
+  var LLastStr := ALTrim(ALCopyStr(LRange, LDash + 1, MaxInt));
+  var LFirstInt, LLastInt: Int64;
+  if LFirstStr = '' then begin
+    if not ParseDecimal(LLastStr, LLastInt) then Exit;
+    if (LLastInt = 0) or (ASize = 0) then Exit(TALHttpRangeResult.Unsatisfiable);
+    if LLastInt > ASize then LLastInt := ASize;
+    AStart := ASize - LLastInt;
+    ALength := LLastInt;
+  end
+  else begin
+    if not ParseDecimal(LFirstStr, LFirstInt) then Exit;
+    if LLastStr <> '' then begin
+      if not ParseDecimal(LLastStr, LLastInt) then Exit;
+      if LLastInt < LFirstInt then Exit;
+    end
+    else LLastInt := High(Int64);
+    if LFirstInt >= ASize then Exit(TALHttpRangeResult.Unsatisfiable);
+    if LLastInt >= ASize then LLastInt := ASize - 1;
+    AStart := LFirstInt;
+    ALength := LLastInt - LFirstInt + 1;
+  end;
+  Result := TALHttpRangeResult.Partial;
 end;
 
 end.

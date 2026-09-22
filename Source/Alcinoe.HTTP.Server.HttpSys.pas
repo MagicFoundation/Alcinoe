@@ -1694,15 +1694,20 @@ begin
               LOverlappedContext^.HttpApiResponse^.pEntityChunks := LOverlappedContext^.HttpApiDataChunk;
             end
             else if (LOverlappedContext^.HttpSysResponse.FBodyStream <> nil) and
-                    (LOverlappedContext^.HttpSysResponse.FBodyStream.Size > 0) then begin
+                    (LOverlappedContext^.HttpSysResponse.FBodyStream.Size > 0) and
+                    (LOverlappedContext^.HttpSysResponse.BodyByteRangeLength > 0) and
+                    (LOverlappedContext^.HttpSysResponse.BodyByteRangeStartingOffset < LOverlappedContext^.HttpSysResponse.FBodyStream.Size) then begin
               ZeroMemory(LOverlappedContext^.HttpApiDataChunk, SizeOf(HTTP_DATA_CHUNK));
               LOverlappedContext^.HttpApiDataChunk^.DataChunkType := HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromMemory;
               if (LOverlappedContext^.HttpSysResponse.FBodyStream is TCustomMemoryStream) then begin
-                LOverlappedContext^.HttpApiDataChunk^.fromMemory.pBuffer := TCustomMemoryStream(LOverlappedContext^.HttpSysResponse.FBodyStream).Memory;
-                LOverlappedContext^.HttpApiDataChunk^.fromMemory.BufferLength := LOverlappedContext^.HttpSysResponse.FBodyStream.Size;
+                LOverlappedContext^.HttpApiDataChunk^.fromMemory.pBuffer := PByte(TCustomMemoryStream(LOverlappedContext^.HttpSysResponse.FBodyStream).Memory) + LOverlappedContext^.HttpSysResponse.BodyByteRangeStartingOffset;
+                var LBufferLength: Uint64 := Min(UInt64(LOverlappedContext^.HttpSysResponse.FBodyStream.Size) - LOverlappedContext^.HttpSysResponse.BodyByteRangeStartingOffset, LOverlappedContext^.HttpSysResponse.BodyByteRangeLength);
+                if LBufferLength > High(ULONG) then
+                  raise Exception.Create('Memory response body exceeds the maximum size supported by a single HTTP memory chunk.');
+                LOverlappedContext^.HttpApiDataChunk^.fromMemory.BufferLength := LBufferLength;
               end
               else
-                raise Exception.Create('Unsupported stream type. Only TALStringStreamA and TCustomMemoryStream are supported.');
+                raise Exception.Create('Unsupported stream type. Only streams derived from TCustomMemoryStream are supported.');
               LOverlappedContext^.HttpApiResponse^.EntityChunkCount := 1;
               LOverlappedContext^.HttpApiResponse^.pEntityChunks := LOverlappedContext^.HttpApiDataChunk;
             end;

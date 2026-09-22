@@ -457,8 +457,13 @@ begin
   end;
   //--
   var LfileStream: TFileStream;
+  {$IF defined(ALCodeProfilerHistoryGroupByProcID) or defined(ALCodeProfilerHistoryGroupByCallStack)}
+  if Tfile.Exists(ALProcMetricsFilename) then Tfile.Delete(ALProcMetricsFilename);
+  LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
+  {$ELSE}
   if Tfile.Exists(ALProcMetricsFilename) then LfileStream := TFileStream.Create(ALProcMetricsFilename, fmOpenWrite)
   else LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
+  {$ENDIF}
   try
     LfileStream.Position := LfileStream.Size;
     {$IF defined(ALCodeProfilerHistoryGroupNone)}
@@ -475,8 +480,6 @@ begin
   finally
     LFileStream.Free;
   end;
-  //--
-  AProcMetricsHistory.Clear;
 end;
 
 {*************************************}
@@ -484,52 +487,58 @@ procedure ALCodeProfilerPurgeHistories;
 begin
   ALProcMetricsLock.BeginWrite;
   try
-    for var I := ALProcMetricsHistories.Count - 1 downto 0 do
+
+    for var I := ALProcMetricsHistories.Count - 1 downto 0 do begin
       ALCodeProfilerSaveHistory(ALProcMetricsHistories[i]);
+      {$IF defined(ALCodeProfilerHistoryGroupNone)}
+      ALProcMetricsHistories[i].Clear;
+      {$ENDIF}
+    end;
+
+    if ALCodeProfilerServerName <> '' then begin
+      var LGuid: TGUID;
+      if CreateGUID(LGuid) <> S_OK then RaiseLastOSError;
+      var LGuidStr: String;
+      SetLength(LGuidStr, 32);
+      StrLFmt(
+        PChar(LGuidStr), 32,'%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x',
+        [LGuid.D1, LGuid.D2, LGuid.D3, LGuid.D4[0], LGuid.D4[1], LGuid.D4[2], LGuid.D4[3],
+        LGuid.D4[4], LGuid.D4[5], LGuid.D4[6], LGuid.D4[7]]);
+      var LTmpProcMetricsFilename := ALProcMetricsFilename + '~' + LGuidStr;
+      TFile.Move(ALProcMetricsFilename, LTmpProcMetricsFilename);
+      {$IF defined(IOS) or defined(ANDROID)}
+      TThread.CreateAnonymousThread(
+        procedure
+        begin
+        {$ENDIF}
+          var LHTTPClient := TNetHTTPClient.Create(nil);
+          try
+            Try
+              var LFileStream := TFileStream.Create(LTmpProcMetricsFilename, fmOpenRead or fmShareDenyWrite);
+              try
+                var LHeaders: TNetHeaders;
+                setlength(LHeaders, 1);
+                LHeaders[0].Name := 'Content-Type';
+                LHeaders[0].Value := 'application/octet-stream';
+                LHTTPClient.Post(ALCodeProfilerServerName, LFileStream, nil{AResponseContent}, LHeaders);
+              finally
+                LFileStream.Free;
+              end;
+            Except
+              On E: Exception do
+                ALCodeProfilerLog('ALCodeProfiler', E.Message, TALCodeProfilerLogType.ERROR);
+            End;
+          finally
+            TFile.Delete(LTmpProcMetricsFilename);
+            LHTTPClient.Free;
+          end;
+        {$IF defined(IOS) or defined(ANDROID)}
+        end).Start;
+      {$ENDIF}
+    end;
+
   finally
     ALProcMetricsLock.EndWrite;
-  end;
-  //--
-  if ALCodeProfilerServerName <> '' then begin
-    var LGuid: TGUID;
-    if CreateGUID(LGuid) <> S_OK then RaiseLastOSError;
-    var LGuidStr: String;
-    SetLength(LGuidStr, 32);
-    StrLFmt(
-      PChar(LGuidStr), 32,'%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x',
-      [LGuid.D1, LGuid.D2, LGuid.D3, LGuid.D4[0], LGuid.D4[1], LGuid.D4[2], LGuid.D4[3],
-      LGuid.D4[4], LGuid.D4[5], LGuid.D4[6], LGuid.D4[7]]);
-    var LTmpProcMetricsFilename := ALProcMetricsFilename + '~' + LGuidStr;
-    TFile.Move(ALProcMetricsFilename, LTmpProcMetricsFilename);
-    {$IF defined(IOS) or defined(ANDROID)}
-    TThread.CreateAnonymousThread(
-      procedure
-      begin
-      {$ENDIF}
-        var LHTTPClient := TNetHTTPClient.Create(nil);
-        try
-          Try
-            var LFileStream := TFileStream.Create(LTmpProcMetricsFilename, fmOpenRead or fmShareDenyWrite);
-            try
-              var LHeaders: TNetHeaders;
-              setlength(LHeaders, 1);
-              LHeaders[0].Name := 'Content-Type';
-              LHeaders[0].Value := 'application/octet-stream';
-              LHTTPClient.Post(ALCodeProfilerServerName, LFileStream, nil{AResponseContent}, LHeaders);
-            finally
-              LFileStream.Free;
-            end;
-          Except
-            On E: Exception do
-              ALCodeProfilerLog('ALCodeProfiler', E.Message, TALCodeProfilerLogType.ERROR);
-          End;
-        finally
-          TFile.Delete(LTmpProcMetricsFilename);
-          LHTTPClient.Free;
-        end;
-      {$IF defined(IOS) or defined(ANDROID)}
-      end).Start;
-    {$ENDIF}
   end;
 end;
 

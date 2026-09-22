@@ -1,0 +1,520 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{321657A2-2981-497B-80FB-95AE03110DDF}</ProjectGuid>
+        <ProjectVersion>17.2</ProjectVersion>
+        <FrameworkType>VCL</FrameworkType>
+        <MainSource>DelphiASTTest.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1</TargetedPlatforms>
+        <AppType>Application</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <VerInfo_Locale>1049</VerInfo_Locale>
+        <DCC_UnitSearchPath>..\Source;..\Source\SimpleParser;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <SanitizedProjectName>DelphiASTTest</SanitizedProjectName>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <DCC_E>false</DCC_E>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_UsePackage>dxPScxSchedulerLnkRS21;JvGlobus;JvMM;cxSchedulerRibbonStyleEventEditorRS21;JvManagedThreads;cxSchedulerRS21;FireDACPgDriver;dxSkinOffice2007BlueRS21;RemObjects_Server_Indy_D21;FixInsight_XE7;JvCrypt;cxTreeListdxBarPopupMenuRS21;dxSkinHighContrastRS21;dxSkinSevenRS21;cxPivotGridRS21;DBXInterBaseDriver;DataSnapServer;DataSnapCommon;DataAbstract_SQLiteDriver_D21;DPIAwareExpert;JvNet;dxGaugeControlRS21;JvDotNetCtrls;cxEditorsRS21;DbxCommonDriver;CromisIPC;vclimg;dxTileControlRS21;dxSkinSilverRS21;dbxcds;cxPivotGridOLAPRS21;DatasnapConnectorsFreePascal;dxPSdxGaugeControlLnkRS21;dxPsPrVwAdvRS21;dxSkinMoneyTwinsRS21;JvXPCtrls;OmniXMLCore;vcldb;cxTreeListRS21;DataAbstract_DBXDriver_Enterprise_D21;GMLibEdit_DXE7;dxdborRS21;cxSpreadSheetRS21;dxBarExtItemsRS21;frxDBX21;dxWizardControlRS21;dxSkinBlueprintRS21;RemObjects_Synapse_D21;DataAbstract_SpiderMonkeyScripting_D21;CustomIPTransport;dsnap;IndyIPServer;dxSkinOffice2010BlackRS21;IndyCore;SynEdit_RXE7;dxSkinsdxBarPainterRS21;cxPageControldxBarPopupMenuRS21;dxSkinValentineRS21;CloudService;dxSkinDevExpressStyleRS21;FmxTeeUI;FireDACIBDriver;dxSkinCaramelRS21;dxPScxPCProdRS21;frxADO21;ShareBikeCommon_XE7;dxSkinOffice2013DarkGrayRS21;JvDB;JvRuntimeDesign;dxDockingRS21;dxLayoutControlRS21;dsnapxml;JclDeveloperTools;FireDACDb2Driver;dxSkinscxSchedulerPainterRS21;dxPSLnksRS21;dxPSdxDBOCLnkRS21;dxSkinVS2010RS21;cxLibraryRS21;bindcompfmx;cxDataRS21;dxComnRS21;FireDACODBCDriver;RESTBackendComponents;dxSkinBlackRS21;dxSkinDarkSideRS21;RemObjects_WebBroker_D21;dbrtl;FireDACCommon;bindcomp;inetdb;JvPluginSystem;dxPScxTLLnkRS21;DBXOdbcDriver;JvCmp;vclFireDAC;JvTimeFramework;xmlrtl;ibxpress;cxExportRS21;FireDACCommonDriver;dxSkinOffice2007PinkRS21;dxFlowChartRS21;bindengine;vclactnband;soaprtl;FMXTee;bindcompvcl;cxPageControlRS21;dxCoreRS21;Jcl;vclie;dxSkinOffice2007BlackRS21;dxPSCoreRS21;dxPSdxDBTVLnkRS21;dxPScxCommonRS21;dxADOServerModeRS21;FireDACMSSQLDriver;DBXInformixDriver;dxSkinLilianRS21;dxSkinWhiteprintRS21;DataSnapServerMidas;dxPSTeeChartRS21;DataAbstract_DBXDriver_Pro_D21;dsnapcon;DBXFirebirdDriver;dxNavBarRS21;inet;dxRibbonRS21;dxSkinsdxNavBarPainterRS21;JvPascalInterpreter;FireDACMySQLDriver;soapmidas;vclx;dxSkinOffice2013WhiteRS21;cxBarEditItemRS21;dxSkinsCoreRS21;DBXSybaseASADriver;dxFireDACServerModeRS21;dxSkinSharpPlusRS21;RESTComponents;dxSkinSevenClassicRS21;dbexpress;EurekaLogCore;IndyIPClient;dxThemeRS21;fsIBX21;FireDACSqliteDriver;dxSkinBlueRS21;FireDACDSDriver;dxDBXServerModeRS21;DBXSqliteDriver;dxSkinsdxDLPainterRS21;dxRichEditControlRS21;DPFiOSPackagesXE7;fmx;dxSkinMetropolisDarkRS21;cxVerticalGridRS21;IndySystem;dxSkinMetropolisRS21;TeeDB;tethering;dxSpreadSheetRS21;JvDlgs;dxSkinGlassOceansRS21;frxe21;vclib;dxSkinSummer2008RS21;DataSnapClient;dxPScxPivotGridLnkRS21;frxIBX21;frx21;DataSnapProviderClient;dxPSPrVwRibbonRS21;DBXSybaseASEDriver;ORM_R;cxGridRS21;RemObjects_Indy_D21;GMLib_DXE7;MetropolisUILiveTile;vcldsnap;dxSpellCheckerRS21;dxSkinLondonLiquidSkyRS21;dxSkinMcSkinRS21;dxSkinOffice2010SilverRS21;dxSkinOffice2007GreenRS21;fsTee21;fmxFireDAC;DBXDb2Driver;dxSkinFoggyRS21;DBXOracleDriver;JvCore;vclribbon;dxtrmdRS21;fmxase;vcl;dxBarExtDBItemsRS21;dxGDIPlusRS21;DBXMSSQLDriver;IndyIPCommon;CodeSiteExpressPkg;dxPSDBTeeChartRS21;dxSkinOffice2007SilverRS21;DataSnapFireDAC;FireDACDBXDriver;dxSkinStardustRS21;dxPSdxSpreadSheetLnkRS21;soapserver;JvAppFrm;dxdbtrRS21;inetdbxpress;FireDACInfxDriver;dxSkinCoffeeRS21;dxPSdxFCLnkRS21;dxPScxGridLnkRS21;FMXContainer_Runtime_XE7;JvDocking;adortl;RemObjects_Server_Synapse_D21;JvWizards;FireDACASADriver;JvHMI;fsADO21;JvBands;dxTabbedMDIRS21;emsclientfiredac;rtl;dxPScxSSLnkRS21;DbxClientDriver;dxSkinDarkRoomRS21;dxorgcRS21;dxPScxExtCommonRS21;dxPSdxOCLnkRS21;frxTee21;Tee;dxPSdxLCLnkRS21;JclContainers;frxDB21;dxMapControlRS21;JvSystem;DataSnapNativeClient;svnui;JvControls;dxSkinSpringTimeRS21;IndyProtocols;DBXMySQLDriver;cxPivotGridChartRS21;dxSkinOffice2013LightGrayRS21;dxSkinPumpkinRS21;bindcompdbx;TeeUI;fsDB21;JvJans;JvPrintPreview;JvPageComps;JvStdCtrls;cxSchedulerTreeBrowserRS21;dxmdsRS21;JvCustom;fs21;dxSkinDevExpressDarkStyleRS21;dxSkinSharpRS21;FireDACADSDriver;vcltouch;dxSkinscxPCPainterRS21;dxServerModeRS21;emsclient;FrameViewerXE7;dxSkinsdxRibbonPainterRS21;VCLRESTComponents;FireDAC;VclSmp;dxBarDBNavRS21;dxSkinTheAsphaltWorldRS21;dxSkinXmas2008BlueRS21;DataSnapConnectors;dxSkinLiquidSkyRS21;cxSchedulerGridRS21;fmxobj;JclVcl;dxPScxVGridLnkRS21;svn;dxBarRS21;FireDACOracleDriver;fmxdae;dxSkinOffice2010BlueRS21;VirtualTreesR;FireDACMSAccDriver;DataSnapIndy10ServerTransport;dxSkiniMaginaryRS21;$(DCC_UsePackage)</DCC_UsePackage>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_UsePackage>dxPScxSchedulerLnkRS21;cxSchedulerRibbonStyleEventEditorRS21;cxSchedulerRS21;FireDACPgDriver;dxSkinOffice2007BlueRS21;RemObjects_Server_Indy_D21;cxTreeListdxBarPopupMenuRS21;dxSkinHighContrastRS21;dxSkinSevenRS21;cxPivotGridRS21;DBXInterBaseDriver;DataSnapServer;DataSnapCommon;DataAbstract_SQLiteDriver_D21;dxGaugeControlRS21;cxEditorsRS21;DbxCommonDriver;vclimg;dxTileControlRS21;dxSkinSilverRS21;dbxcds;cxPivotGridOLAPRS21;DatasnapConnectorsFreePascal;dxPSdxGaugeControlLnkRS21;dxPsPrVwAdvRS21;dxSkinMoneyTwinsRS21;vcldb;cxTreeListRS21;DataAbstract_DBXDriver_Enterprise_D21;dxdborRS21;cxSpreadSheetRS21;dxBarExtItemsRS21;dxWizardControlRS21;dxSkinBlueprintRS21;RemObjects_Synapse_D21;DataAbstract_SpiderMonkeyScripting_D21;CustomIPTransport;dsnap;IndyIPServer;dxSkinOffice2010BlackRS21;IndyCore;SynEdit_RXE7;dxSkinsdxBarPainterRS21;cxPageControldxBarPopupMenuRS21;dxSkinValentineRS21;CloudService;dxSkinDevExpressStyleRS21;FmxTeeUI;FireDACIBDriver;dxSkinCaramelRS21;dxPScxPCProdRS21;ShareBikeCommon_XE7;dxSkinOffice2013DarkGrayRS21;dxDockingRS21;dxLayoutControlRS21;dsnapxml;FireDACDb2Driver;dxSkinscxSchedulerPainterRS21;dxPSLnksRS21;dxPSdxDBOCLnkRS21;dxSkinVS2010RS21;cxLibraryRS21;bindcompfmx;cxDataRS21;dxComnRS21;FireDACODBCDriver;RESTBackendComponents;dxSkinBlackRS21;dxSkinDarkSideRS21;RemObjects_WebBroker_D21;dbrtl;FireDACCommon;bindcomp;inetdb;dxPScxTLLnkRS21;DBXOdbcDriver;vclFireDAC;xmlrtl;ibxpress;cxExportRS21;FireDACCommonDriver;dxSkinOffice2007PinkRS21;dxFlowChartRS21;bindengine;vclactnband;soaprtl;FMXTee;bindcompvcl;cxPageControlRS21;dxCoreRS21;vclie;dxSkinOffice2007BlackRS21;dxPSCoreRS21;dxPSdxDBTVLnkRS21;dxPScxCommonRS21;dxADOServerModeRS21;FireDACMSSQLDriver;DBXInformixDriver;dxSkinLilianRS21;dxSkinWhiteprintRS21;DataSnapServerMidas;dxPSTeeChartRS21;DataAbstract_DBXDriver_Pro_D21;dsnapcon;DBXFirebirdDriver;dxNavBarRS21;inet;dxRibbonRS21;dxSkinsdxNavBarPainterRS21;FireDACMySQLDriver;soapmidas;vclx;dxSkinOffice2013WhiteRS21;cxBarEditItemRS21;dxSkinsCoreRS21;DBXSybaseASADriver;dxFireDACServerModeRS21;dxSkinSharpPlusRS21;RESTComponents;dxSkinSevenClassicRS21;dbexpress;IndyIPClient;dxThemeRS21;FireDACSqliteDriver;dxSkinBlueRS21;FireDACDSDriver;dxDBXServerModeRS21;DBXSqliteDriver;dxSkinsdxDLPainterRS21;dxRichEditControlRS21;fmx;dxSkinMetropolisDarkRS21;cxVerticalGridRS21;IndySystem;dxSkinMetropolisRS21;TeeDB;tethering;dxSpreadSheetRS21;dxSkinGlassOceansRS21;vclib;dxSkinSummer2008RS21;DataSnapClient;dxPScxPivotGridLnkRS21;DataSnapProviderClient;dxPSPrVwRibbonRS21;DBXSybaseASEDriver;cxGridRS21;RemObjects_Indy_D21;GMLib_DXE7;MetropolisUILiveTile;vcldsnap;dxSpellCheckerRS21;dxSkinLondonLiquidSkyRS21;dxSkinMcSkinRS21;dxSkinOffice2010SilverRS21;dxSkinOffice2007GreenRS21;fmxFireDAC;DBXDb2Driver;dxSkinFoggyRS21;DBXOracleDriver;vclribbon;dxtrmdRS21;fmxase;vcl;dxBarExtDBItemsRS21;dxGDIPlusRS21;DBXMSSQLDriver;IndyIPCommon;dxPSDBTeeChartRS21;dxSkinOffice2007SilverRS21;DataSnapFireDAC;FireDACDBXDriver;dxSkinStardustRS21;dxPSdxSpreadSheetLnkRS21;soapserver;dxdbtrRS21;inetdbxpress;FireDACInfxDriver;dxSkinCoffeeRS21;dxPSdxFCLnkRS21;dxPScxGridLnkRS21;adortl;RemObjects_Server_Synapse_D21;FireDACASADriver;dxTabbedMDIRS21;emsclientfiredac;rtl;dxPScxSSLnkRS21;DbxClientDriver;dxSkinDarkRoomRS21;dxorgcRS21;dxPScxExtCommonRS21;dxPSdxOCLnkRS21;Tee;dxPSdxLCLnkRS21;dxMapControlRS21;DataSnapNativeClient;dxSkinSpringTimeRS21;IndyProtocols;DBXMySQLDriver;cxPivotGridChartRS21;dxSkinOffice2013LightGrayRS21;dxSkinPumpkinRS21;bindcompdbx;TeeUI;cxSchedulerTreeBrowserRS21;dxmdsRS21;dxSkinDevExpressDarkStyleRS21;dxSkinSharpRS21;FireDACADSDriver;vcltouch;dxSkinscxPCPainterRS21;dxServerModeRS21;emsclient;dxSkinsdxRibbonPainterRS21;VCLRESTComponents;FireDAC;VclSmp;dxBarDBNavRS21;dxSkinTheAsphaltWorldRS21;dxSkinXmas2008BlueRS21;DataSnapConnectors;dxSkinLiquidSkyRS21;cxSchedulerGridRS21;fmxobj;dxPScxVGridLnkRS21;dxBarRS21;FireDACOracleDriver;fmxdae;dxSkinOffice2010BlueRS21;VirtualTreesR;FireDACMSAccDriver;DataSnapIndy10ServerTransport;dxSkiniMaginaryRS21;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_RemoteDebug>false</DCC_RemoteDebug>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="uMainForm.pas">
+            <Form>Form2</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Application</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">DelphiASTTest.dpr</Source>
+                </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\15.0\Bpl\FixInsightIntegration.bpl">(untitled)</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k210.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp210.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
+            </Delphi.Personality>
+            <Deployment Version="1">
+                <DeployFile LocalName="Win32\Debug\DelphiASTTest.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>DelphiASTTest.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployClass Required="true" Name="DependencyPackage">
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.bpl</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2048">
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXInfoPList">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceDebug">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage470">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-normal</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeX86File">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\x86</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSResource">
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXEntitlements">
+                    <Platform Name="OSX32">
+                        <RemoteDir>../</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidGDBServer">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch640">
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage960">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xlarge</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon96">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch320">
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon144">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeMipsFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\mips</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashImageDef">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DebugSymbols">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyFramework">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage426">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-small</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSEntitlements">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>../</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>../</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AdditionalDebugSymbols">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidClassesDexFile">
+                    <Platform Name="Android">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSInfoPList">
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1024">
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_DefaultAppIcon">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXResource">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceResourceRules">
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch768">
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="ProjectOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeArmeabiFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage640">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-large</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="File">
+                    <Platform Name="Android">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch640x1136">
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-ldpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStyles">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1536">
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon48">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon72">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectAndroidManifest">
+                    <Platform Name="Android">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+            </Deployment>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+    <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
+</Project>

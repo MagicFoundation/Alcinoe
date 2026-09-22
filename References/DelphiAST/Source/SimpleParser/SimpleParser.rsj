@@ -1,0 +1,4 @@
+{"version":1,"strings":[
+{"hash":24029655,"name":"simpleparser.rsexpected","value":"'%s' expected found '%s'"},
+{"hash":99256917,"name":"simpleparser.rsendoffile","value":"end of file"}
+]}

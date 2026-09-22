@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Package Version="4">
+    <PathDelim Value="\"/>
+    <Name Value="FPC_StringBuilder"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <OtherUnitFiles Value="Src"/>
+        <UnitOutputDirectory Value="Compiled\$(TargetCPU)-$(TargetOS)\"/>
+      </SearchPaths>
+      <Other>
+        <CompilerMessages>
+          <MsgFileName Value=""/>
+        </CompilerMessages>
+        <CompilerPath Value="$(CompPath)"/>
+      </Other>
+    </CompilerOptions>
+    <Files Count="1">
+      <Item1>
+        <Filename Value="Src\StringBuilderUnit.pas"/>
+        <UnitName Value="StringBuilderUnit"/>
+      </Item1>
+    </Files>
+    <Type Value="RunAndDesignTime"/>
+    <RequiredPkgs Count="1">
+      <Item1>
+        <PackageName Value="FCL"/>
+      </Item1>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

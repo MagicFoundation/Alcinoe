@@ -1,3 +1,20 @@
+## 23/10/2026
+
+- Fully redesigned the Alcinoe Code Profiler with new history grouping modes 
+  and improved memory/performance control:
+  - `ALCodeProfilerHistoryGroupNone`: does not group calls. Each function/procedure 
+    call generates its own row and the result is displayed as a complete call 
+    tree. This provides the most detailed profiling information but can use 
+    significantly more memory. When enabled, it is recommended to restrict profiling 
+    to the code being measured using `ALCodeProfilerStart` and `ALCodeProfilerStop`.
+  - `ALCodeProfilerHistoryGroupByProcID`: groups all calls by procedure ID and displays 
+    the result as a flat grid containing the accumulated call count and execution 
+    time for each procedure. This is the fastest mode and has the lowest overhead 
+    on profiled calls.
+  - `ALCodeProfilerHistoryGroupByCallStack`: groups calls according to their call 
+    stack and displays the result as an aggregated call tree, preserving the 
+    caller/callee hierarchy while merging repeated calls made through the same path.
+
 ## 07/10/2026
 
 - Added `Alcinoe.FMX.Analytics` unit with `TALAnalytics`, a singleton wrapper 

@@ -224,8 +224,13 @@ type
               TRealignEvent = procedure(const AContent: TMainContent; const AStartIndex: integer) of object;
           private
             FOnRealign: TRealignEvent; // 8 bytes
+            FLastSizeChangedWidth: Double; // 8 bytes
+            FLastSizeChangedHeight: Double; // 8 bytes
+            FItemsWidthLazy: Boolean; // 1 byte | items outside the preloaded window may still have a stale width
             FIsRemovingControl: Boolean; // 1 byte
             function GetOwner: TView;
+            function ItemWidthFor(const AItem: TALDynamicControl): Double;
+            procedure WidthOnlyRealign;
           protected
             procedure SetOwner(const Value: TView); reintroduce; virtual;
             procedure DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer); override;
@@ -235,6 +240,7 @@ type
             procedure DoRealign; overload; override;
             procedure Realign(const AStartIndex: integer); overload;
             procedure AdjustSize; override;
+            procedure SizeChanged; override;
             procedure DoResized; override;
             procedure VisibleChanged; override;
             function GetFirstVisibleObjectIndex: Integer; override;
@@ -245,6 +251,7 @@ type
             property Owner: TView read GetOwner write SetOwner;
             procedure InsertItems(const AItems: TArray<TItem>; const AIndex: Integer); virtual;
             procedure DeleteItems(const AIndex, ACount: Integer); virtual;
+            procedure EnsureItemWidth(const AItem: TALDynamicControl); // lazy width fixup, see WidthOnlyRealign
             function GetTopBarSize: Single;
             property OnRealign: TRealignEvent read FOnRealign write FOnRealign;
           end;
@@ -1758,6 +1765,12 @@ begin
   // If the item is not visible, do nothing
   if not Visible then exit;
 
+  // The item may still have a stale width when the last resize took the
+  // width-only fast path (see TView.TMainContent.WidthOnlyRealign): fix it
+  // up now, before the content builder captures the item bounds.
+  if (Owner <> nil) and (Owner is TView.TMainContent) then
+    TView.TMainContent(Owner).EnsureItemWidth(Self);
+
   // fetch main content
   if APreload then TryPreloadContent(MainContentType)
   else TryCreateAndActivateContent(MainContentType);
@@ -1854,6 +1867,9 @@ begin
   inherited create(AOwner);
   IsEphemeral := False;
   FOnRealign := nil;
+  FLastSizeChangedWidth := 0;
+  FLastSizeChangedHeight := 0;
+  FItemsWidthLazy := False;
   FIsRemovingControl := False;
 end;
 
@@ -1956,8 +1972,23 @@ begin
     if AIndex <= Owner.FLastVisibleItemIndex then inc(Owner.FLastVisibleItemIndex, LItemsLength);
   end;
   if Owner.FLastPreloadedItemIndex >= 0 then begin
-    if AIndex <= Owner.FFirstPreloadedItemIndex then inc(Owner.FFirstPreloadedItemIndex, LItemsLength);
-    if AIndex <= Owner.FLastPreloadedItemIndex then inc(Owner.FLastPreloadedItemIndex, LItemsLength);
+    if AIndex <= Owner.FFirstPreloadedItemIndex then begin
+      inc(Owner.FFirstPreloadedItemIndex, LItemsLength);
+      inc(Owner.FLastPreloadedItemIndex, LItemsLength);
+    end
+    else if AIndex <= Owner.FLastPreloadedItemIndex then begin
+      // Insertion inside the preloaded window. The inserted items are not
+      // prepared, so simply extending the window across them would falsely
+      // mark them as prepared: the next SetViewportPosition would then call
+      // Unprepare once per inserted item (a 24k insert = 24k calls) and the
+      // window would no longer match which items are actually prepared.
+      // Keep the window truthful (mirror of the DeleteItems bookkeeping):
+      // unprepare the (shifted) prepared items after the insertion point
+      // and clamp the window to the part before it.
+      for var I := AIndex + LItemsLength to Owner.FLastPreloadedItemIndex + LItemsLength do
+        TItem(FControls[I]).Unprepare;
+      Owner.FLastPreloadedItemIndex := AIndex - 1;
+    end;
   end;
   if AIndex <= Owner.FTriggerDownloadItemsAtIndex then inc(Owner.FTriggerDownloadItemsAtIndex, LItemsLength);
   //--
@@ -2064,6 +2095,87 @@ begin
     Result := 0;
 end;
 
+{*******************************************************************************************************}
+function TALDynamicListBox.TView.TMainContent.ItemWidthFor(const AItem: TALDynamicControl): Double;
+begin
+  Result := Width - Padding.Left - AItem.Margins.Left - AItem.Margins.Right - Padding.Right;
+end;
+
+{**************************************************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.EnsureItemWidth(const AItem: TALDynamicControl);
+begin
+  // Lazy width fixup for the items that WidthOnlyRealign skipped; called
+  // when an item materializes (FetchContent). FDisableAlign keeps the
+  // item's SizeChanged from cascading into a full realign.
+  if not FItemsWidthLazy then
+    Exit;
+  var LWidth := ItemWidthFor(AItem);
+  if SameValue(AItem.Width, LWidth, TEpsilon.Position) then
+    Exit;
+  var LPrevDisableAlign := FDisableAlign;
+  FDisableAlign := True;
+  try
+    AItem.SetBounds(Padding.Left + AItem.Margins.Left, AItem.Top, LWidth, AItem.Height);
+  finally
+    FDisableAlign := LPrevDisableAlign;
+  end;
+end;
+
+{***************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.WidthOnlyRealign;
+begin
+  // Width-only resize of a vertical list: every item Top stays valid, so
+  // repositioning all items (a 24k-item list = ~100ms of SetBounds per
+  // WM_SIZE during a live window-resize, freezing the resize) is wasted
+  // work. Resize only the items in the visible/preloaded window; the
+  // remaining items get their width lazily via EnsureItemWidth the moment
+  // they materialize.
+  if (Owner = nil) or IsDestroying or FDisableAlign or (FControlsCount = 0) then
+    Exit;
+  FItemsWidthLazy := True;
+  FDisableAlign := True;
+  try
+    var LLo := Max(0, Min(Owner.FFirstVisibleItemIndex, Owner.FFirstPreloadedItemIndex));
+    var LHi := Min(FControlsCount - 1, Max(Owner.FLastVisibleItemIndex, Owner.FLastPreloadedItemIndex));
+    for var I := LLo to LHi do begin
+      var LControl := FControls[I];
+      LControl.SetBounds(
+        Padding.Left + LControl.Margins.Left, // X
+        LControl.Top, // Y
+        ItemWidthFor(LControl), // AWidth
+        LControl.Height); // AHeight
+    end;
+  finally
+    FDisableAlign := False;
+  end;
+  if not FIsAdjustingSize then
+    Owner.UpdateScrollEngineLimits;
+end;
+
+{*************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.SizeChanged;
+begin
+  // A live window-resize of a vertical list only changes the content WIDTH
+  // (the height is the sum of the item heights): item Tops stay valid, so
+  // the full realign is wasted work - take the width-only fast path.
+  // Structural changes (insert/delete/item height) arrive through
+  // Realign(AIndex) and height changes fall through to the normal path.
+  if (Owner <> nil) and (Owner.Orientation = TOrientation.Vertical) and
+     (not Assigned(FOnRealign)) and
+     SameValue(Height, FLastSizeChangedHeight, TEpsilon.Position) and
+     (not SameValue(Width, FLastSizeChangedWidth, TEpsilon.Position)) then begin
+    FLastSizeChangedWidth := Width;
+    WidthOnlyRealign;
+    Repaint;
+    DoResized;
+  end
+  else begin
+    FLastSizeChangedWidth := Width;
+    FLastSizeChangedHeight := Height;
+    inherited;
+  end;
+end;
+
 {***********************************************************************************}
 procedure TALDynamicListBox.TView.TMainContent.DoRealign(const AStartIndex: integer);
 begin
@@ -2116,6 +2228,10 @@ begin
         end;
       end;
     end;
+
+    // A full pass gives every item its definitive bounds again
+    if AStartIndex <= 0 then
+      FItemsWidthLazy := False;
 
     AdjustSize;
 

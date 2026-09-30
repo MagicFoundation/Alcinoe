@@ -41,6 +41,7 @@ type
   JGraphRequestAsyncTask = interface;
   JFacebookRequestError = interface;
   JFacebookSdk = interface;
+  JAppEventsLogger = interface;
   JGraphResponse = interface;
   JGraphRequest_Callback = interface;
   JGraphRequest = interface;
@@ -193,6 +194,23 @@ type
   end;
   TJFacebookSdk = class(TJavaGenericImport<JFacebookSdkClass, JFacebookSdk>) end;
 
+  {*********************************************}
+  JAppEventsLoggerClass = interface(JObjectClass)
+    ['{AA9EBC17-18F8-4C67-A21F-DF6F87DA9C68}']
+    {class} function newLogger(context: JContext): JAppEventsLogger; cdecl;
+    {class} procedure activateApp(application: JApplication); cdecl;
+    {class} function getUserID: JString; cdecl;
+    {class} procedure setUserID(userID: JString); cdecl;
+    {class} procedure clearUserID; cdecl;
+  end;
+  [JavaSignature('com/facebook/appevents/AppEventsLogger')]
+  JAppEventsLogger = interface(JObject)
+    ['{64964880-634D-4631-980D-44802288237E}']
+    procedure logEvent(eventName: JString); cdecl; overload;
+    procedure logEvent(eventName: JString; parameters: JBundle); cdecl; overload;
+  end;
+  TJAppEventsLogger = class(TJavaGenericImport<JAppEventsLoggerClass, JAppEventsLogger>) end;
+
   {*******************************************}
   JGraphResponseClass = interface(JObjectClass)
     ['{2CF25531-06CA-4423-A804-2DAD41F6DEF4}']
@@ -252,6 +270,7 @@ begin
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JGraphRequestAsyncTask', TypeInfo(Alcinoe.AndroidApi.Facebook.JGraphRequestAsyncTask));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JFacebookRequestError', TypeInfo(Alcinoe.AndroidApi.Facebook.JFacebookRequestError));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JFacebookSdk', TypeInfo(Alcinoe.AndroidApi.Facebook.JFacebookSdk));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JAppEventsLogger', TypeInfo(Alcinoe.AndroidApi.Facebook.JAppEventsLogger));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JGraphResponse', TypeInfo(Alcinoe.AndroidApi.Facebook.JGraphResponse));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JGraphRequest_Callback', TypeInfo(Alcinoe.AndroidApi.Facebook.JGraphRequest_Callback));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JGraphRequest', TypeInfo(Alcinoe.AndroidApi.Facebook.JGraphRequest));

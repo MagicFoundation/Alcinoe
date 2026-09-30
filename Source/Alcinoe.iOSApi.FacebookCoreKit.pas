@@ -28,10 +28,12 @@ type
 
   {***************************}
   FBSDKAccessToken = interface;
+  FBSDKAppEvents = interface;
 
-  {**********************************************************************************}
-  //https://developers.facebook.com/docs/reference/ios/current/class/FBSDKAccessToken/
-  //@interface FBSDKAccessToken : NSObject <NSCopying, NSObject, NSSecureCoding, FBSDKAccessTokenProviding, FBSDKTokenStringProviding>
+  {***************************}
+  FBSDKAppEventName = NSString;
+
+  {**********************************************}
   FBSDKAccessTokenClass = interface(NSObjectClass)
     ['{4D123544-3287-472A-95B2-AF69E30C2738}']
     {class} procedure setCurrentAccessToken(currentAccessToken: FBSDKAccessToken); cdecl;
@@ -46,12 +48,25 @@ type
   end;
   TFBSDKAccessToken = class(TOCGenericImport<FBSDKAccessTokenClass, FBSDKAccessToken>) end;
 
+  {********************************************}
+  FBSDKAppEventsClass = interface(NSObjectClass)
+    ['{D013B76B-3C58-4BDC-98B1-5B81460F7B9E}']
+    {class} function shared: FBSDKAppEvents; cdecl;
+  end;
+  FBSDKAppEvents = interface(NSObject)
+    ['{1B0059E6-0B0A-45A1-867F-FE88AB9E8EDA}']
+    function userID: NSString; cdecl;
+    procedure setUserID(userID: NSString); cdecl;
+    procedure logEvent(eventName: FBSDKAppEventName); cdecl; overload;
+    procedure logEvent(eventName: FBSDKAppEventName; parameters: NSDictionary); cdecl; overload;
+    procedure activateApp; cdecl;
+  end;
+  TFBSDKAppEvents = class(TOCGenericImport<FBSDKAppEventsClass, FBSDKAppEvents>) end;
+
   {***********************************}
   FBSDKApplicationDelegate = interface;
 
-  {******************************************************************************************}
-  //https://developers.facebook.com/docs/reference/ios/current/class/FBSDKApplicationDelegate/
-  //@interface FBSDKApplicationDelegate : NSObject
+  {******************************************************}
   FBSDKApplicationDelegateClass = interface(NSObjectClass)
     ['{B4050326-F748-4FC6-9018-734AEADEE9ED}']
     {class} function sharedInstance: FBSDKApplicationDelegate; cdecl;
@@ -59,6 +74,8 @@ type
   FBSDKApplicationDelegate = interface(NSObject)
     ['{FA8D976C-3BC9-4152-A053-CD08C919210D}']
     procedure initializeSDK; cdecl;
+    [MethodName('application:continueUserActivity:')]
+    function applicationContinueUserActivity(application: UIApplication; userActivity: NSUserActivity): Boolean; cdecl;
     [MethodName('application:openURL:options:')]
     function applicationOpenURLOptions(application: UIApplication; openURL: NSURL; options: NSDictionary): Boolean; cdecl;
     [MethodName('application:openURL:sourceApplication:annotation:')]
@@ -68,8 +85,7 @@ type
   end;
   TFBSDKApplicationDelegate = class(TOCGenericImport<FBSDKApplicationDelegateClass, FBSDKApplicationDelegate>) end;
 
-  {*************************************}
-  //@protocol FBSDKGraphRequestConnecting
+  {**************************************************}
   FBSDKGraphRequestConnecting = interface(IObjectiveC)
   ['{21964E12-BDE3-4910-8DC9-31E41B987519}']
   end;
@@ -80,9 +96,7 @@ type
   {*************************}
   FBSDKHTTPMethod = NSString;
 
-  {***********************************************************************************}
-  //https://developers.facebook.com/docs/reference/ios/current/class/FBSDKGraphRequest/
-  //@interface FBSDKGraphRequest : NSObject <FBSDKGraphRequest>
+  {***********************************************}
   FBSDKGraphRequestClass = interface(NSObjectClass)
     ['{1233C916-F3DA-45F0-8F05-F702A42C2BBE}']
   end;

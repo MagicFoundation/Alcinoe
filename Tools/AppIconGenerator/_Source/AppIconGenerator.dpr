@@ -134,6 +134,7 @@ begin
 
       finally
         DestroyMagickWand(LWand);
+        DestroyPixelWand(LPixelWand);
       end;
 
     end;

@@ -146,7 +146,7 @@ Type
 threadvar
   ALProcMetricsStack: TALProcMetricsStack;
 
-{*******}
+{*****************************************}
 {$IF defined(ALCodeProfilerIgnoreThreadID)}
 // All the threads share the same history, so that the metrics of a procedure
 // are merged together whatever the thread it was called from.
@@ -348,9 +348,9 @@ begin
   P := PALProcMetrics(LOldArray);
   for var i := 0 to Length(LOldArray) - 1 do begin
     raise Exception.Create(
-      'Rehash is not implemented right now because MetricsID and ParentMetricsID ' +
-      'reference positions in the array, which would become invalid after rehashing. ' +
-      'The array is currently sized large enough to avoid calling Rehash.');
+            'Rehash is not implemented right now because MetricsID and ParentMetricsID ' +
+            'reference positions in the array, which would become invalid after rehashing. ' +
+            'The array is currently sized large enough to avoid calling Rehash.');
     if P^.HashCode <> EMPTY_HASH then begin
       var j := not GetBucketIndex(P^.ProcID, P^.ParentMetricsID, P^.HashCode);
       FArray[j] := P^;
@@ -361,7 +361,7 @@ begin
 end;
 {$ENDIF}
 
-{********************************************************}
+{**************************************************}
 {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
 function TALProcMetricsHistory.GetBucketIndex(const AProcID, AParentMetricsID: Cardinal; const AHashCode: Integer): NativeInt;
 begin
@@ -398,7 +398,7 @@ begin
 end;
 {$ENDIF}
 
-{********************************************************}
+{**************************************************}
 {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
 function TALProcMetricsHistory.Hash(const AProcID, AParentMetricsID: Cardinal): Integer;
 const
@@ -426,73 +426,69 @@ begin
 end;
 {$ENDIF}
 
-{**********************************************************************************************}
-procedure ALCodeProfilerSaveHistory(const AProcMetricsHistory: TALProcMetricsHistory); overload;
-begin
-  {$IF defined(ALCodeProfilerHistoryGroupNone) or defined(ALCodeProfilerHistoryGroupByCallStack)}
-  if AProcMetricsHistory.FCount = 0 then exit;
-  {$ENDIF}
-  //--
-  If ALProcMetricsFilename = '' then begin
-    {$IF defined(MSWindows)}
-    var LRegistry := TRegistry.Create(KEY_READ);
-    try
-      LRegistry.RootKey := HKEY_CURRENT_USER;
-      if LRegistry.OpenKeyReadOnly(ALCodeProfilerRegistryPath) then begin
-        if LRegistry.ValueExists(ALCodeProfilerDataStoragePathKey) then
-          ALProcMetricsFilename := LRegistry.ReadString(ALCodeProfilerDataStoragePathKey);
-        LRegistry.CloseKey;
-      end;
-    finally
-      LRegistry.Free;
-    end;
-    If ALProcMetricsFilename <> '' then begin
-      ALProcMetricsFilename := TPath.Combine(ALProcMetricsFilename, ALCodeProfilerProcMetricsFilename);
-      ALCodeProfilerServerName := '';
-    end
-    else
-    {$ENDIF}
-      ALProcMetricsFilename := TPath.Combine(System.IOUtils.TPath.GetTempPath, ALCodeProfilerProcMetricsFilename);
-    if TFile.Exists(ALProcMetricsFilename) then TFile.Delete(ALProcMetricsFilename);
-  end;
-  //--
-  var LfileStream: TFileStream;
-  {$IF defined(ALCodeProfilerHistoryGroupByProcID) or defined(ALCodeProfilerHistoryGroupByCallStack)}
-  if Tfile.Exists(ALProcMetricsFilename) then Tfile.Delete(ALProcMetricsFilename);
-  LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
-  {$ELSE}
-  if Tfile.Exists(ALProcMetricsFilename) then LfileStream := TFileStream.Create(ALProcMetricsFilename, fmOpenWrite)
-  else LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
-  {$ENDIF}
-  try
-    LfileStream.Position := LfileStream.Size;
-    {$IF defined(ALCodeProfilerHistoryGroupNone)}
-    LfileStream.WriteBuffer(AProcMetricsHistory.FArray[0], AProcMetricsHistory.FCount * SizeOf(TALProcMetrics));
-    {$ELSEIF defined(ALCodeProfilerHistoryGroupByProcID)}
-    for var I := Low(AProcMetricsHistory.FArray) to High(AProcMetricsHistory.FArray) do
-      if AProcMetricsHistory.FArray[I].CallCount <> 0 then
-        LfileStream.WriteBuffer(AProcMetricsHistory.FArray[I], SizeOf(TALProcMetrics));
-    {$ELSEIF defined(ALCodeProfilerHistoryGroupByCallStack)}
-    for var I := Low(AProcMetricsHistory.FArray) to High(AProcMetricsHistory.FArray) do
-      if AProcMetricsHistory.FArray[I].HashCode <> EMPTY_HASH then
-        LfileStream.WriteBuffer(AProcMetricsHistory.FArray[I], SizeOf(TALProcMetrics));
-    {$ENDIF}
-  finally
-    LFileStream.Free;
-  end;
-end;
-
 {*************************************}
 procedure ALCodeProfilerPurgeHistories;
 begin
   ALProcMetricsLock.BeginWrite;
   try
 
-    for var I := ALProcMetricsHistories.Count - 1 downto 0 do begin
-      ALCodeProfilerSaveHistory(ALProcMetricsHistories[i]);
-      {$IF defined(ALCodeProfilerHistoryGroupNone)}
-      ALProcMetricsHistories[i].Clear;
+    If ALProcMetricsFilename = '' then begin
+      {$IF defined(MSWindows)}
+      var LRegistry := TRegistry.Create(KEY_READ);
+      try
+        LRegistry.RootKey := HKEY_CURRENT_USER;
+        if LRegistry.OpenKeyReadOnly(ALCodeProfilerRegistryPath) then begin
+          if LRegistry.ValueExists(ALCodeProfilerDataStoragePathKey) then
+            ALProcMetricsFilename := LRegistry.ReadString(ALCodeProfilerDataStoragePathKey);
+          LRegistry.CloseKey;
+        end;
+      finally
+        LRegistry.Free;
+      end;
+      If ALProcMetricsFilename <> '' then begin
+        ALProcMetricsFilename := TPath.Combine(ALProcMetricsFilename, ALCodeProfilerProcMetricsFilename);
+        ALCodeProfilerServerName := '';
+      end
+      else
       {$ENDIF}
+        ALProcMetricsFilename := TPath.Combine(System.IOUtils.TPath.GetTempPath, ALCodeProfilerProcMetricsFilename);
+      if TFile.Exists(ALProcMetricsFilename) then TFile.Delete(ALProcMetricsFilename);
+    end;
+
+    var LfileStream: TFileStream;
+    {$IF defined(ALCodeProfilerHistoryGroupByProcID) and defined(ALCodeProfilerIgnoreThreadID)}
+    if Tfile.Exists(ALProcMetricsFilename) then Tfile.Delete(ALProcMetricsFilename);
+    LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
+    {$ELSE}
+    if Tfile.Exists(ALProcMetricsFilename) then LfileStream := TFileStream.Create(ALProcMetricsFilename, fmOpenWrite)
+    else LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
+    {$ENDIF}
+    try
+      LfileStream.Position := LfileStream.Size;
+
+      for var I := ALProcMetricsHistories.Count - 1 downto 0 do begin
+        var LProcMetricsHistory := ALProcMetricsHistories[I];
+        {$IF defined(ALCodeProfilerHistoryGroupNone) or defined(ALCodeProfilerHistoryGroupByCallStack)}
+        if LProcMetricsHistory.FCount = 0 then exit;
+        {$ENDIF}
+        {$IF defined(ALCodeProfilerHistoryGroupNone)}
+        LfileStream.WriteBuffer(LProcMetricsHistory.FArray[0], LProcMetricsHistory.FCount * SizeOf(TALProcMetrics));
+        {$ELSEIF defined(ALCodeProfilerHistoryGroupByProcID)}
+        for var J := Low(LProcMetricsHistory.FArray) to High(LProcMetricsHistory.FArray) do
+          if LProcMetricsHistory.FArray[J].CallCount <> 0 then
+            LfileStream.WriteBuffer(LProcMetricsHistory.FArray[J], SizeOf(TALProcMetrics));
+        {$ELSEIF defined(ALCodeProfilerHistoryGroupByCallStack)}
+        for var J := Low(LProcMetricsHistory.FArray) to High(LProcMetricsHistory.FArray) do
+          if LProcMetricsHistory.FArray[J].HashCode <> EMPTY_HASH then
+            LfileStream.WriteBuffer(LProcMetricsHistory.FArray[J], SizeOf(TALProcMetrics));
+        {$ENDIF}
+        {$IF defined(ALCodeProfilerHistoryGroupNone)}
+        ALProcMetricsHistories[i].Clear;
+        {$ENDIF}
+      end;
+
+    finally
+      LFileStream.Free;
     end;
 
     if ALCodeProfilerServerName <> '' then begin
@@ -514,15 +510,15 @@ begin
           var LHTTPClient := TNetHTTPClient.Create(nil);
           try
             Try
-              var LFileStream := TFileStream.Create(LTmpProcMetricsFilename, fmOpenRead or fmShareDenyWrite);
+              var LTmpFileStream := TFileStream.Create(LTmpProcMetricsFilename, fmOpenRead or fmShareDenyWrite);
               try
                 var LHeaders: TNetHeaders;
                 setlength(LHeaders, 1);
                 LHeaders[0].Name := 'Content-Type';
                 LHeaders[0].Value := 'application/octet-stream';
-                LHTTPClient.Post(ALCodeProfilerServerName, LFileStream, nil{AResponseContent}, LHeaders);
+                LHTTPClient.Post(ALCodeProfilerServerName, LTmpFileStream, nil{AResponseContent}, LHeaders);
               finally
-                LFileStream.Free;
+                LTmpFileStream.Free;
               end;
             Except
               On E: Exception do

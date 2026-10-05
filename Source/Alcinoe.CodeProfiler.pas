@@ -456,7 +456,7 @@ begin
     end;
 
     var LfileStream: TFileStream;
-    {$IF defined(ALCodeProfilerHistoryGroupByProcID) and defined(ALCodeProfilerIgnoreThreadID)}
+    {$IF not defined(ALCodeProfilerHistoryGroupNone)}
     if Tfile.Exists(ALProcMetricsFilename) then Tfile.Delete(ALProcMetricsFilename);
     LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
     {$ELSE}
@@ -843,7 +843,7 @@ begin
   if (M is TApplicationEventMessage) and
      ((M as TApplicationEventMessage).value.Event = TApplicationEvent.BecameActive) then begin
     if ALCodeProfilerAppActivatedBefore then
-      ALCodeProfilerPurgeHistories;
+      ALCodeProfilerPurgeHistories
     else
       ALCodeProfilerAppActivatedBefore := True;
   end;

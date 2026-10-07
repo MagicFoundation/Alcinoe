@@ -146,6 +146,19 @@ Type
 threadvar
   ALProcMetricsStack: TALProcMetricsStack;
 
+{*********************************************}
+{$IF not defined(ALCodeProfilerIgnoreThreadID)}
+// The ThreadID stored in the metrics is not the OS thread ID but a sequential
+// index (0 for the main thread, then 1, 2, 3, ...) assigned to each thread the
+// first time it is profiled. The OS may reuse the ID of a terminated thread
+// (very often for pthread_t on POSIX), while every new thread gets a new
+// history, so the OS thread ID cannot be used to tell the histories apart.
+threadvar
+  ALThreadIndex: Cardinal; // 0 = not assigned yet, otherwise the index + 1
+var
+  ALThreadIndexSequence: Cardinal;
+{$ENDIF}
+
 {*****************************************}
 {$IF defined(ALCodeProfilerIgnoreThreadID)}
 // All the threads share the same history, so that the metrics of a procedure
@@ -161,10 +174,12 @@ threadvar
 var
   ALProcMetricsHistories: TList<TALProcMetricsHistory>;
   ALProcMetricsLock: TLightweightMREW;
+  ALProcMetricsLockActivated: Boolean;
   ALProcMetricsFilename: String;
   {$IF defined(IOS) or defined(ANDROID)}
-  ALCodeProfilerAppActivatedBefore: Boolean;
+  ALAppActive: Boolean;
   {$ENDIF}
+  ALTickFrequency: Double;
 
 {**}
 Type
@@ -429,112 +444,128 @@ end;
 {*************************************}
 procedure ALCodeProfilerPurgeHistories;
 begin
-  ALProcMetricsLock.BeginWrite;
+  ALProcMetricsLockActivated := True;
   try
-
-    If ALProcMetricsFilename = '' then begin
-      {$IF defined(MSWindows)}
-      var LRegistry := TRegistry.Create(KEY_READ);
-      try
-        LRegistry.RootKey := HKEY_CURRENT_USER;
-        if LRegistry.OpenKeyReadOnly(ALCodeProfilerRegistryPath) then begin
-          if LRegistry.ValueExists(ALCodeProfilerDataStoragePathKey) then
-            ALProcMetricsFilename := LRegistry.ReadString(ALCodeProfilerDataStoragePathKey);
-          LRegistry.CloseKey;
-        end;
-      finally
-        LRegistry.Free;
-      end;
-      If ALProcMetricsFilename <> '' then begin
-        ALProcMetricsFilename := TPath.Combine(ALProcMetricsFilename, ALCodeProfilerProcMetricsFilename);
-        ALCodeProfilerServerName := '';
-      end
-      else
-      {$ENDIF}
-        ALProcMetricsFilename := TPath.Combine(System.IOUtils.TPath.GetTempPath, ALCodeProfilerProcMetricsFilename);
-      if TFile.Exists(ALProcMetricsFilename) then TFile.Delete(ALProcMetricsFilename);
-    end;
-
-    var LfileStream: TFileStream;
-    {$IF not defined(ALCodeProfilerHistoryGroupNone)}
-    if Tfile.Exists(ALProcMetricsFilename) then Tfile.Delete(ALProcMetricsFilename);
-    LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
-    {$ELSE}
-    if Tfile.Exists(ALProcMetricsFilename) then LfileStream := TFileStream.Create(ALProcMetricsFilename, fmOpenWrite)
-    else LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
-    {$ENDIF}
+    // 1000 ms should be more than enough time for all
+    // ALCodeProfilerEnterProc / ALCodeProfilerExitProc calls to complete.
+    sleep(1000);
+    ALProcMetricsLock.BeginWrite;
     try
-      LfileStream.Position := LfileStream.Size;
 
-      for var I := ALProcMetricsHistories.Count - 1 downto 0 do begin
-        var LProcMetricsHistory := ALProcMetricsHistories[I];
-        {$IF defined(ALCodeProfilerHistoryGroupNone) or defined(ALCodeProfilerHistoryGroupByCallStack)}
-        if LProcMetricsHistory.FCount = 0 then exit;
+      If ALProcMetricsFilename = '' then begin
+        {$IF defined(MSWindows)}
+        var LRegistry := TRegistry.Create(KEY_READ);
+        try
+          LRegistry.RootKey := HKEY_CURRENT_USER;
+          if LRegistry.OpenKeyReadOnly(ALCodeProfilerRegistryPath) then begin
+            if LRegistry.ValueExists(ALCodeProfilerDataStoragePathKey) then
+              ALProcMetricsFilename := LRegistry.ReadString(ALCodeProfilerDataStoragePathKey);
+            LRegistry.CloseKey;
+          end;
+        finally
+          LRegistry.Free;
+        end;
+        If ALProcMetricsFilename <> '' then begin
+          ALProcMetricsFilename := TPath.Combine(ALProcMetricsFilename, ALCodeProfilerProcMetricsFilename);
+          ALCodeProfilerServerName := '';
+        end
+        else
         {$ENDIF}
-        {$IF defined(ALCodeProfilerHistoryGroupNone)}
-        LfileStream.WriteBuffer(LProcMetricsHistory.FArray[0], LProcMetricsHistory.FCount * SizeOf(TALProcMetrics));
-        {$ELSEIF defined(ALCodeProfilerHistoryGroupByProcID)}
-        for var J := Low(LProcMetricsHistory.FArray) to High(LProcMetricsHistory.FArray) do
-          if LProcMetricsHistory.FArray[J].CallCount <> 0 then
-            LfileStream.WriteBuffer(LProcMetricsHistory.FArray[J], SizeOf(TALProcMetrics));
-        {$ELSEIF defined(ALCodeProfilerHistoryGroupByCallStack)}
-        for var J := Low(LProcMetricsHistory.FArray) to High(LProcMetricsHistory.FArray) do
-          if LProcMetricsHistory.FArray[J].HashCode <> EMPTY_HASH then
-            LfileStream.WriteBuffer(LProcMetricsHistory.FArray[J], SizeOf(TALProcMetrics));
-        {$ENDIF}
-        {$IF defined(ALCodeProfilerHistoryGroupNone)}
-        ALProcMetricsHistories[i].Clear;
+          ALProcMetricsFilename := TPath.Combine(System.IOUtils.TPath.GetTempPath, ALCodeProfilerProcMetricsFilename);
+        if TFile.Exists(ALProcMetricsFilename) then TFile.Delete(ALProcMetricsFilename);
+      end;
+
+      var LfileStream: TFileStream;
+      {$IF not defined(ALCodeProfilerHistoryGroupNone)}
+      if Tfile.Exists(ALProcMetricsFilename) then Tfile.Delete(ALProcMetricsFilename);
+      LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
+      {$ELSE}
+      if Tfile.Exists(ALProcMetricsFilename) then LfileStream := TFileStream.Create(ALProcMetricsFilename, fmOpenWrite)
+      else LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
+      {$ENDIF}
+      var LHasData: Boolean := False;
+      try
+        LfileStream.Position := LfileStream.Size;
+
+        for var I := ALProcMetricsHistories.Count - 1 downto 0 do begin
+          var LProcMetricsHistory := ALProcMetricsHistories[I];
+          {$IF defined(ALCodeProfilerHistoryGroupNone) or defined(ALCodeProfilerHistoryGroupByCallStack)}
+          if LProcMetricsHistory.FCount = 0 then continue;
+          {$ENDIF}
+          {$IF defined(ALCodeProfilerHistoryGroupNone)}
+          LfileStream.WriteBuffer(LProcMetricsHistory.FArray[0], LProcMetricsHistory.FCount * SizeOf(TALProcMetrics));
+          LHasData := True;
+          {$ELSEIF defined(ALCodeProfilerHistoryGroupByProcID)}
+          for var J := Low(LProcMetricsHistory.FArray) to High(LProcMetricsHistory.FArray) do
+            if LProcMetricsHistory.FArray[J].CallCount <> 0 then begin
+              LfileStream.WriteBuffer(LProcMetricsHistory.FArray[J], SizeOf(TALProcMetrics));
+              LHasData := True;
+            end;
+          {$ELSEIF defined(ALCodeProfilerHistoryGroupByCallStack)}
+          for var J := Low(LProcMetricsHistory.FArray) to High(LProcMetricsHistory.FArray) do
+            if LProcMetricsHistory.FArray[J].HashCode <> EMPTY_HASH then begin
+              LfileStream.WriteBuffer(LProcMetricsHistory.FArray[J], SizeOf(TALProcMetrics));
+              LHasData := True;
+            end;
+          {$ENDIF}
+          {$IF defined(ALCodeProfilerHistoryGroupNone)}
+          ALProcMetricsHistories[i].Clear;
+          {$ENDIF}
+        end;
+
+      finally
+        LFileStream.Free;
+      end;
+
+      if not LHasData then exit;
+
+      if ALCodeProfilerServerName <> '' then begin
+        var LGuid: TGUID;
+        if CreateGUID(LGuid) <> S_OK then RaiseLastOSError;
+        var LGuidStr: String;
+        SetLength(LGuidStr, 32);
+        StrLFmt(
+          PChar(LGuidStr), 32,'%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x',
+          [LGuid.D1, LGuid.D2, LGuid.D3, LGuid.D4[0], LGuid.D4[1], LGuid.D4[2], LGuid.D4[3],
+          LGuid.D4[4], LGuid.D4[5], LGuid.D4[6], LGuid.D4[7]]);
+        var LTmpProcMetricsFilename := ALProcMetricsFilename + '~' + LGuidStr;
+        TFile.Move(ALProcMetricsFilename, LTmpProcMetricsFilename);
+        {$IF defined(IOS) or defined(ANDROID)}
+        TThread.CreateAnonymousThread(
+          procedure
+          begin
+          {$ENDIF}
+            var LHTTPClient := TNetHTTPClient.Create(nil);
+            try
+              Try
+                var LTmpFileStream := TFileStream.Create(LTmpProcMetricsFilename, fmOpenRead or fmShareDenyWrite);
+                try
+                  var LHeaders: TNetHeaders;
+                  setlength(LHeaders, 1);
+                  LHeaders[0].Name := 'Content-Type';
+                  LHeaders[0].Value := 'application/octet-stream';
+                  LHTTPClient.Post(ALCodeProfilerServerName, LTmpFileStream, nil{AResponseContent}, LHeaders);
+                finally
+                  LTmpFileStream.Free;
+                end;
+              Except
+                On E: Exception do
+                  ALCodeProfilerLog('ALCodeProfiler', E.Message, TALCodeProfilerLogType.ERROR);
+              End;
+            finally
+              TFile.Delete(LTmpProcMetricsFilename);
+              LHTTPClient.Free;
+            end;
+          {$IF defined(IOS) or defined(ANDROID)}
+          end).Start;
         {$ENDIF}
       end;
 
     finally
-      LFileStream.Free;
+      ALProcMetricsLock.EndWrite;
     end;
-
-    if ALCodeProfilerServerName <> '' then begin
-      var LGuid: TGUID;
-      if CreateGUID(LGuid) <> S_OK then RaiseLastOSError;
-      var LGuidStr: String;
-      SetLength(LGuidStr, 32);
-      StrLFmt(
-        PChar(LGuidStr), 32,'%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x',
-        [LGuid.D1, LGuid.D2, LGuid.D3, LGuid.D4[0], LGuid.D4[1], LGuid.D4[2], LGuid.D4[3],
-        LGuid.D4[4], LGuid.D4[5], LGuid.D4[6], LGuid.D4[7]]);
-      var LTmpProcMetricsFilename := ALProcMetricsFilename + '~' + LGuidStr;
-      TFile.Move(ALProcMetricsFilename, LTmpProcMetricsFilename);
-      {$IF defined(IOS) or defined(ANDROID)}
-      TThread.CreateAnonymousThread(
-        procedure
-        begin
-        {$ENDIF}
-          var LHTTPClient := TNetHTTPClient.Create(nil);
-          try
-            Try
-              var LTmpFileStream := TFileStream.Create(LTmpProcMetricsFilename, fmOpenRead or fmShareDenyWrite);
-              try
-                var LHeaders: TNetHeaders;
-                setlength(LHeaders, 1);
-                LHeaders[0].Name := 'Content-Type';
-                LHeaders[0].Value := 'application/octet-stream';
-                LHTTPClient.Post(ALCodeProfilerServerName, LTmpFileStream, nil{AResponseContent}, LHeaders);
-              finally
-                LTmpFileStream.Free;
-              end;
-            Except
-              On E: Exception do
-                ALCodeProfilerLog('ALCodeProfiler', E.Message, TALCodeProfilerLogType.ERROR);
-            End;
-          finally
-            TFile.Delete(LTmpProcMetricsFilename);
-            LHTTPClient.Free;
-          end;
-        {$IF defined(IOS) or defined(ANDROID)}
-        end).Start;
-      {$ENDIF}
-    end;
-
   finally
-    ALProcMetricsLock.EndWrite;
+    ALProcMetricsLockActivated := False;
   end;
 end;
 
@@ -569,7 +600,11 @@ begin
             ALProcMetricsLock.EndWrite;
           end;
         end;
-        ALProcMetricsLock.BeginRead;
+        var LReadLockAcquired: Boolean := False;
+        if ALProcMetricsLockActivated then begin
+          LReadLockAcquired := True;
+          ALProcMetricsLock.BeginRead;
+        end;
         try
           var LParentProcID: Cardinal := LProcMetricsStack.FArray[LProcMetricsStack.FCount - 2].ProcID;
           var LParentParentMetricsID := LProcMetricsStack.FArray[LProcMetricsStack.FCount - 2].ParentMetricsID;
@@ -585,7 +620,7 @@ begin
             With LProcMetricsHistory.FArray[LParentMetricsID] do begin
               HashCode := LHashCode;
               ProcID := LParentProcID;
-              MetricsID := LParentMetricsID;
+              MetricsID := LParentMetricsID + 1;
               ParentMetricsID := LParentParentMetricsID;
               ThreadID := LProcMetricsStack.FArray[LProcMetricsStack.FCount - 2].ThreadID;
               {$IFNDEF ALCompilerVersionSupported131}
@@ -595,9 +630,10 @@ begin
               ElapsedTicks := 0;
             end;
           end;
-          ParentMetricsID := LParentMetricsID;
+          ParentMetricsID := LParentMetricsID + 1;
         finally
-          ALProcMetricsLock.EndRead;
+          if LReadLockAcquired then
+            ALProcMetricsLock.EndRead;
         end;
         {$ELSEIF defined(ALCodeProfilerHistoryGroupNone)}
         ParentExecutionID := LProcMetricsStack.FArray[LProcMetricsStack.FCount - 2].ExecutionID;
@@ -613,12 +649,12 @@ begin
         ParentExecutionID := 0;
         {$ENDIF}
         {$IF not defined(ALCodeProfilerIgnoreThreadID)}
-        var LCurrentThreadID := TThread.CurrentThread.ThreadID;
-        if LCurrentThreadID = MainThreadID then ThreadID := 0
-        else begin
-          ThreadID := LCurrentThreadID mod 4294967295;
-          if ThreadID = 0 then ThreadID := 1;
+        var LThreadIndex := ALThreadIndex;
+        if LThreadIndex = 0 then begin
+          LThreadIndex := AtomicIncrement(ALThreadIndexSequence);
+          ALThreadIndex := LThreadIndex;
         end;
+        ThreadID := LThreadIndex - 1;
         {$ENDIF}
       end;
       ProcID := AProcID;
@@ -667,21 +703,14 @@ begin
       end;
       {$ENDIF}
       //--
-      ALProcMetricsLock.BeginRead;
+      var LReadLockAcquired: Boolean := False;
+      if ALProcMetricsLockActivated then begin
+        LReadLockAcquired := true;
+        ALProcMetricsLock.BeginRead;
+      end;
       try
         {$IF defined(ALCodeProfilerHistoryGroupNone)}
-        if (LProcMetricsHistory.FCount = LProcMetricsHistory.FCapacity) then begin
-          if (LProcMetricsHistory.FCount >= 100_000_000) {100_000_000 * 32 Bytes = 3.2 GB} then begin
-            ALProcMetricsLock.EndRead;
-            try
-              ALCodeProfilerPurgeHistories;
-            finally
-              ALProcMetricsLock.BeginRead;
-            end;
-          end;
-          if LProcMetricsHistory.FCount = LProcMetricsHistory.FCapacity then
-            LProcMetricsHistory.Grow;
-        end;
+        if (LProcMetricsHistory.FCount = LProcMetricsHistory.FCapacity) then LProcMetricsHistory.Grow;
         inc(LProcMetricsHistory.FCount);
         With LProcMetricsHistory.FArray[LProcMetricsHistory.FCount - 1] do begin
           ExecutionID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ExecutionID;
@@ -692,11 +721,8 @@ begin
             {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
           {$ENDIF}
           {$IF defined(MSWINDOWS)}
-          var LTickFrequency: Double;
-          if not TStopwatch.IsHighResolution then LTickFrequency := 1.0
-          else LTickFrequency := 10000000.0 / LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.Frequency;
-          StartTimeStamp := Trunc((TStopwatchAccessPrivate(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch).FStartTimeStamp - ALCodeProfilerAppStartTimeStamp) * LTickFrequency);
-          ElapsedTicks := Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * LTickFrequency);
+          StartTimeStamp := Trunc((TStopwatchAccessPrivate(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch).FStartTimeStamp - ALCodeProfilerAppStartTimeStamp) * ALTickFrequency);
+          ElapsedTicks := Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * ALTickFrequency);
           {$ELSEIF defined(POSIX)}
           StartTimeStamp := TStopwatchAccessPrivate(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch).FStartTimeStamp - ALCodeProfilerAppStartTimeStamp;
           ElapsedTicks := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks;
@@ -720,10 +746,7 @@ begin
             {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
           {$ENDIF}
           {$IF defined(MSWINDOWS)}
-          var LTickFrequency: Double;
-          if not TStopwatch.IsHighResolution then LTickFrequency := 1.0
-          else LTickFrequency := 10000000.0 / LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.Frequency;
-          AtomicIncrement(ElapsedTicks, Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * LTickFrequency));
+          AtomicIncrement(ElapsedTicks, Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * ALTickFrequency));
           {$ELSEIF defined(POSIX)}
           AtomicIncrement(ElapsedTicks, LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks);
           {$ELSE}
@@ -739,10 +762,7 @@ begin
             {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
           {$ENDIF}
           {$IF defined(MSWINDOWS)}
-          var LTickFrequency: Double;
-          if not TStopwatch.IsHighResolution then LTickFrequency := 1.0
-          else LTickFrequency := 10000000.0 / LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.Frequency;
-          ElapsedTicks := ElapsedTicks + Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * LTickFrequency);
+          ElapsedTicks := ElapsedTicks + Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * ALTickFrequency);
           {$ELSEIF defined(POSIX)}
           ElapsedTicks := ElapsedTicks + LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks;
           {$ELSE}
@@ -765,10 +785,7 @@ begin
               {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
             {$ENDIF}
             {$IF defined(MSWINDOWS)}
-            var LTickFrequency: Double;
-            if not TStopwatch.IsHighResolution then LTickFrequency := 1.0
-            else LTickFrequency := 10000000.0 / LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.Frequency;
-            ElapsedTicks := ElapsedTicks + Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * LTickFrequency);
+            ElapsedTicks := ElapsedTicks + Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * ALTickFrequency);
             {$ELSEIF defined(POSIX)}
             ElapsedTicks := ElapsedTicks + LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks;
             {$ELSE}
@@ -785,7 +802,9 @@ begin
           With LProcMetricsHistory.FArray[not LIndex] do begin
             HashCode := LHashCode;
             ProcID := LProcID;
-            MetricsID := not LIndex;
+            // MetricsID is the bucket index + 1, so that 0 is never a valid
+            // MetricsID and can safely be used as the root ParentMetricsID.
+            MetricsID := (not LIndex) + 1;
             ParentMetricsID := LParentMetricsID;
             ThreadID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ThreadID;
             CallCount := 1;
@@ -793,10 +812,7 @@ begin
               {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
             {$ENDIF}
             {$IF defined(MSWINDOWS)}
-            var LTickFrequency: Double;
-            if not TStopwatch.IsHighResolution then LTickFrequency := 1.0
-            else LTickFrequency := 10000000.0 / LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.Frequency;
-            ElapsedTicks := Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * LTickFrequency);
+            ElapsedTicks := Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * ALTickFrequency);
             {$ELSEIF defined(POSIX)}
             ElapsedTicks := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks;
             {$ELSE}
@@ -807,7 +823,8 @@ begin
         {$ENDIF}
         dec(LProcMetricsStack.FCount);
       finally
-        ALProcMetricsLock.EndRead;
+        if LReadLockAcquired then
+          ALProcMetricsLock.EndRead;
       end;
       if (LProcMetricsStack.FCount = 0) and
          (TThread.CurrentThread.ThreadID <> MainThreadID) then begin
@@ -842,10 +859,10 @@ procedure ALCodeProfilerApplicationEventHandler(const Sender: TObject; const M: 
 begin
   if (M is TApplicationEventMessage) and
      ((M as TApplicationEventMessage).value.Event = TApplicationEvent.BecameActive) then begin
-    if ALCodeProfilerAppActivatedBefore then
+    if ALAppActive then
       ALCodeProfilerPurgeHistories
     else
-      ALCodeProfilerAppActivatedBefore := True;
+      ALAppActive := True;
   end;
 end;
 {$ENDIF}
@@ -855,7 +872,12 @@ initialization
   {$IF defined(ALCodeProfilerHistoryGroupNone)}
   TALStopWatchProcMetrics.ExecutionIDSequence := 0;
   {$ENDIF}
+  {$IF not defined(ALCodeProfilerIgnoreThreadID)}
+  ALThreadIndex := 1;
+  ALThreadIndexSequence := 1;
+  {$ENDIF}
   //ALProcMetricsLock := ?? There is no TLightweightMREW.Create; initialization is done through the TLightweightMREW.Initialize class operator instead
+  ALProcMetricsLockActivated := False;
   ALProcMetricsFilename := '';
   //--
   ALProcMetricsHistory := TALProcMetricsHistory.Create;
@@ -869,9 +891,14 @@ initialization
   ALProcMetricsHistories.Add(ALProcMetricsHistory);
   //--
   {$IF defined(IOS) or defined(ANDROID)}
-  ALCodeProfilerAppActivatedBefore := False;
+  ALAppActive := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ALCodeProfilerApplicationEventHandler);
   {$ENDIF}
+  {$IFNDEF ALCompilerVersionSupported131}
+    {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
+  {$ENDIF}
+  if not TStopwatch.IsHighResolution then ALTickFrequency := 1.0
+  else ALTickFrequency := 10000000.0 / TStopwatch.Frequency;
 
 finalization
   {$IF (not defined(IOS)) and (not defined(ANDROID))}

@@ -332,7 +332,7 @@ begin
   FOverrideFilterThreadID := High(Cardinal);
 end;
 
-{*******************************************************************}
+{*******************************************}
 procedure TMainForm.ResetTreeListProcMetrics;
 begin
   TreeListProcMetrics.Clear;
@@ -348,7 +348,7 @@ begin
   FTreeListProcMetricsRootNode := FTreeListProcMetricsTailNode;
 end;
 
-{*******************************************************************}
+{**********************************************************************************}
 function TMainForm.GetSelectedHistoryGroupModeEnum: TALCodeProfilerHistoryGroupMode;
 begin
   if DoNotGroupRadioButton.Checked then Result := hgmNone
@@ -356,7 +356,7 @@ begin
   else Result := hgmByCallStack;
 end;
 
-{*******************************************************************}
+{*********************************************************}
 function TMainForm.GetSelectedHistoryGroupMode: AnsiString;
 begin
   case GetSelectedHistoryGroupModeEnum of
@@ -366,7 +366,7 @@ begin
   end;
 end;
 
-{*******************************************************************************}
+{**************************************************************************}
 procedure TMainForm.SelectHistoryGroupMode(const AHistoryGroupMode: String);
 begin
   if ALSameTextW(AHistoryGroupMode, 'ALCodeProfilerHistoryGroupNone') then DoNotGroupRadioButton.Checked := True
@@ -374,7 +374,7 @@ begin
   else GroupCallsByCallStackRadioButton.Checked := True;
 end;
 
-{*******************************************************************}
+{*******************************************}
 procedure TMainForm.UpdateHistoryGroupModeUI;
 begin
   case GetSelectedHistoryGroupModeEnum of
@@ -402,7 +402,7 @@ begin
   IgnoreThreadIDCheckBox.Enabled := GetSelectedHistoryGroupModeEnum = hgmByProcID;
 end;
 
-{*******************************************************************}
+{********************************************************}
 function TMainForm.GetSelectedProcMetricsFilename: String;
 begin
   case GetSelectedHistoryGroupModeEnum of
@@ -412,7 +412,7 @@ begin
   end;
 end;
 
-{*******************************************************************}
+{****************************************************************************************************************}
 function TMainForm.GetProcMetricsRawRecordSize(const AHistoryGroupMode: TALCodeProfilerHistoryGroupMode): Integer;
 begin
   case AHistoryGroupMode of
@@ -422,7 +422,7 @@ begin
   end;
 end;
 
-{*******************************************************************}
+{***************************************}
 procedure TMainForm.DecodeProcMetricsRaw(
             const AHistoryGroupMode: TALCodeProfilerHistoryGroupMode;
             const ARawBuffer: TBytes;
@@ -462,7 +462,7 @@ begin
   end;
 end;
 
-{*******************************************************************}
+{******************************************************************************************************************************************}
 function TMainForm.GetProcMetricsColumnsForMode(const AHistoryGroupMode: TALCodeProfilerHistoryGroupMode): TArray<TALProcMetricsColumnKind>;
 begin
   case AHistoryGroupMode of
@@ -472,7 +472,7 @@ begin
   end;
 end;
 
-{*******************************************************************}
+{*********************************************************************************************}
 function TMainForm.GetProcMetricsColumnName(const AKind: TALProcMetricsColumnKind): AnsiString;
 begin
   case AKind of
@@ -489,13 +489,13 @@ begin
   end;
 end;
 
-{*******************************************************************}
+{*******************************************}
 function TMainForm.GetProcMetricsColumnValue(
            const AKind: TALProcMetricsColumnKind;
            const ARec: TALProcMetrics;
            const AProcNames: TDictionary<Cardinal, AnsiString>): AnsiString;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _TicksToMillisecondsStr(const ATicks: Int64): AnsiString;
   begin
     // 1 tick equals 0.0001 millisecond (ALCodeProfilerMillisecondsPerTick),
@@ -522,7 +522,7 @@ begin
   end;
 end;
 
-{*******************************************************************}
+{***************************************************}
 function TMainForm.GetSelectedServerName: AnsiString;
 begin
   if (ALTrim(HttpServerNameEdit.Text) <> '') and (ALTrim(HttpServerPortEdit.Text) <> '') then
@@ -531,7 +531,7 @@ begin
     Result := '';
 end;
 
-{*******************************************************************}
+{**************************************************************}
 procedure TMainForm.SelectServerName(const AServerName: String);
 begin
   var LServerName := AServerName;
@@ -547,20 +547,20 @@ begin
   end;
 end;
 
-{*****************************************************************************}
+{********************************************************************}
 procedure TMainForm.HistoryGroupModeRadioButtonClick(Sender: TObject);
 begin
   UpdateHistoryGroupModeUI;
   SaveCodeProfilerIncFile;
 end;
 
-{*************************************************************************}
+{**************************************************************************}
 procedure TMainForm.IgnoreThreadIDCheckBoxPropertiesChange(Sender: TObject);
 begin
   SaveCodeProfilerIncFile;
 end;
 
-{**********************************************************}
+{****************************************************}
 function TMainForm.GetCodeProfilerIncFilename: String;
 begin
   Result := ALTrim(CodeProfilerIncFilenameEdit.Text);
@@ -572,7 +572,7 @@ begin
   Result := ExpandFileName(Result);
 end;
 
-{****************************************}
+{*********************************************}
 function TMainForm.GetHistoryCapacity: Integer;
 begin
   // With ALCodeProfilerHistoryGroupByProcID the history is a flat array
@@ -600,12 +600,12 @@ begin
   end;
 end;
 
-{*******************************************}
+{******************************************}
 procedure TMainForm.SaveCodeProfilerIncFile;
 var
   LHistoryGroupMode: AnsiString;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _DefineLine(const AHistoryGroupModeName: AnsiString): AnsiString;
   begin
     if ALSameTextA(AHistoryGroupModeName, LHistoryGroupMode) then Result := '{$DEFINE ' + AHistoryGroupModeName + '}'
@@ -694,7 +694,7 @@ begin
   ALSaveStringToFile(LContent, LIncFilename);
 end;
 
-{*******************************************}
+{******************************************}
 procedure TMainForm.LoadCodeProfilerIncFile;
 begin
   var LIncFilename := GetCodeProfilerIncFilename;
@@ -757,7 +757,7 @@ begin
   if TFile.Exists(GetCodeProfilerIncFilename) then LoadCodeProfilerIncFile;
 end;
 
-{***************************************************************************}
+{*************************************************************************}
 procedure TMainForm.BrowseCodeProfilerIncFilenameBtnClick(Sender: TObject);
 begin
   var LOpenDialog := TOpenDialog.Create(nil);
@@ -791,7 +791,11 @@ begin
   var P1 := AlPosA('{ALCodeProfiler>>}',LSourceCode);
   While P1 > 0 do begin
     var P2 := ALposA('{<<ALCodeProfiler}',LSourceCode,P1);
-    If P2 < 0 then raise Exception.Create('Error 206270E5-3304-46BE-9840-E010CC7BF148');
+    If P2 <= 0 then raise Exception.Create('Error 206270E5-3304-46BE-9840-E010CC7BF148');
+    // A missing closing marker would otherwise make P2 point to the closing
+    // marker of the next block, and everything in between would be deleted.
+    var P3 := ALposA('{ALCodeProfiler>>}',LSourceCode,P1 + 1);
+    If (P3 > 0) and (P3 < P2) then raise Exception.Create('Unbalanced ALCodeProfiler markers - Filename: ' + AFileName);
     inc(P2, length('{<<ALCodeProfiler}'));
     delete(LSourceCode, P1, P2 - P1);
     P1 := AlPosA('{ALCodeProfiler>>}',LSourceCode, P1);
@@ -947,12 +951,13 @@ type
     Text: AnsiString;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function IsIdentifierChar(const AChar: AnsiChar): Boolean;
   begin
     Result := AChar in ['a'..'z', 'A'..'Z', '0'..'9', '_'];
   end;
 
-  {*****************************************************}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function IsKeywordAt(const ALine, AKeyword: AnsiString; const ACol: Integer): Boolean;
   begin
     Result := False;
@@ -971,7 +976,7 @@ type
     Result := True;
   end;
 
-  {*************************************************************************}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function FindKeywordColumn(const ALine, AKeyword: AnsiString; const APreferredCol: Integer; const ASearchBackwards: Boolean): Integer;
   begin
     if IsKeywordAt(ALine, AKeyword, APreferredCol) then
@@ -989,7 +994,7 @@ type
     Result := 0;
   end;
 
-  {***********************************************************************************}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function FindBeginInsertionColumn(const ASourceCode: TALStringListA; const ALine, ACol: Integer): Integer;
   begin
     if (ALine < 1) or (ALine > ASourceCode.Count) then
@@ -1001,7 +1006,7 @@ type
     Result := LBeginCol + Length('begin');
   end;
 
-  {*********************************************************************************}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function FindEndInsertionColumn(const ASourceCode: TALStringListA; const ALine, ACol: Integer): Integer;
   begin
     if (ALine < 1) or (ALine > ASourceCode.Count) then
@@ -1010,7 +1015,7 @@ type
     Result := FindKeywordColumn(LLine, 'end', ACol - Length('end'), True);
   end;
 
-  {***********************************************************************************************************}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure AddInsertion(const AInsertions: TList<TMarkerInsertion>; const ASourceCode: TALStringListA; const ALine, ACol: Integer; const AText: AnsiString);
   begin
     if (ALine < 1) or (ALine > ASourceCode.Count) then
@@ -1024,7 +1029,7 @@ type
     AInsertions.Add(LInsertion);
   end;
 
-  {*************************************************************************************}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function FindFirstNode(const ANode: TSyntaxNode; const ANodeType: TSyntaxNodeType): TSyntaxNode;
   begin
     Result := nil;
@@ -1041,7 +1046,7 @@ type
     end;
   end;
 
-  {****************************************************************}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function GetMethodStatements(const ANode: TSyntaxNode): TCompoundSyntaxNode;
   begin
     Result := nil;
@@ -1053,7 +1058,7 @@ type
       end;
   end;
 
-  {**********************************************************************************************}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function GetMethodName(const ANode: TSyntaxNode; var AAnonymousMethodSequence: Integer): AnsiString;
   begin
     Result := ALTrim(AnsiString(ANode.GetAttribute(anName)));
@@ -1075,7 +1080,7 @@ type
     end;
   end;
 
-  {*********************************************************************************************************************************************************************}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure CollectMethodMarkers(const ANode: TSyntaxNode; const AParentProcName: AnsiString; const AUnitName: AnsiString; const ASourceCode: TALStringListA; const AInsertions: TList<TMarkerInsertion>; var AAnonymousMethodSequence: Integer);
   begin
     if not Assigned(ANode) then
@@ -1115,7 +1120,7 @@ type
       CollectMethodMarkers(LChild, LParentProcName, AUnitName, ASourceCode, AInsertions, AAnonymousMethodSequence);
   end;
 
-  {*****************************************************************************************************}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure ApplyInsertions(const ASourceCode: TALStringListA; const AInsertions: TList<TMarkerInsertion>);
   begin
     AInsertions.Sort(
@@ -1528,7 +1533,7 @@ var
   LCsvBuffer: AnsiString;
   LCsvBufferPos: Integer;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _WriteToCsvBuffer(const AStr: AnsiString);
   begin
     if LCsvBufferPos + length(AStr) > length(LCsvBuffer) then begin
@@ -1539,7 +1544,7 @@ var
     LCsvBufferPos := LCsvBufferPos + length(AStr);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _FlushCsvBuffer;
   begin
     if LCsvBufferPos > 0 then begin
@@ -1548,7 +1553,7 @@ var
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _AppendToCsvRow(var ARow: AnsiString; var AFirstColumn: Boolean; const AValue: AnsiString);
   begin
     if not AFirstColumn then ARow := ARow + ',';

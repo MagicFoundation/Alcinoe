@@ -686,7 +686,6 @@ function ALInterpolateMaterial3EmphasizedDecelerate(AElapsedTime, ADuration: Sin
 function ALInterpolateMaterial3EmphasizedAccelerate(AElapsedTime, ADuration: Single): Single;
 function ALInterpolateDecelerate(input: Single; const factor: Single = 1.0): Single;
 function ALInterpolateViscousFluid(input: Single): Single;
-function ALInterpolateColor(Start, Stop: TAlphaColor; T: Single): TAlphaColor;
 
 type
 
@@ -942,7 +941,8 @@ uses
   {$ENDIF}
   FMX.Ani,
   FMX.Forms,
-  FMX.Utils;
+  FMX.Utils,
+  Alcinoe.FMX.Graphics;
 
 {********************************************************}
 constructor TALCubicBezier.Create(X1, Y1, X2, Y2: Double);
@@ -1324,30 +1324,6 @@ begin
   if (interpolated > 0) then result := interpolated + ALVISCOUS_FLUID_OFFSET
   else result := interpolated;
 end;
-
-{****************************************************************************}
-function ALInterpolateColor(Start, Stop: TAlphaColor; T: Single): TAlphaColor;
-begin
-  T := EnsureRange(T,0,1);
-  // If start or stop is null, then perform the animation only on the alpha channel.
-  if Start = TALphaColors.Null then begin
-    TAlphaColorRec(Start).A := 0;
-    TAlphaColorRec(Start).R := TAlphaColorRec(Stop).R;
-    TAlphaColorRec(Start).G := TAlphaColorRec(Stop).G;
-    TAlphaColorRec(Start).B := TAlphaColorRec(Stop).B;
-  end;
-  if Stop = TALphaColors.Null then begin
-    TAlphaColorRec(Stop).A := 0;
-    TAlphaColorRec(Stop).R := TAlphaColorRec(Start).R;
-    TAlphaColorRec(Stop).G := TAlphaColorRec(Start).G;
-    TAlphaColorRec(Stop).B := TAlphaColorRec(Start).B;
-  end;
-  TAlphaColorRec(Result).A := TAlphaColorRec(Start).A + Trunc((TAlphaColorRec(Stop).A - TAlphaColorRec(Start).A) * T);
-  TAlphaColorRec(Result).R := TAlphaColorRec(Start).R + Trunc((TAlphaColorRec(Stop).R - TAlphaColorRec(Start).R) * T);
-  TAlphaColorRec(Result).G := TAlphaColorRec(Start).G + Trunc((TAlphaColorRec(Stop).G - TAlphaColorRec(Start).G) * T);
-  TAlphaColorRec(Result).B := TAlphaColorRec(Start).B + Trunc((TAlphaColorRec(Stop).B - TAlphaColorRec(Start).B) * T);
-end;
-
 
 {$IFDEF ANDROID}
 

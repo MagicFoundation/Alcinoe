@@ -234,6 +234,7 @@ function AlDetectImageExtension(const AStream: TStream; const AUri: String): Str
 function ALModulateColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
 function ALBlendColor(const ABaseColor, AOverlayColor: TAlphaColor): TAlphaColor; overload;
 function ALBlendColor(const ABaseColor, AOverlayColor: TAlphaColor; const AOverlayOpacity: Single): TAlphaColor; overload;
+function ALInterpolateColor(AFromColor, AToColor: TAlphaColor; AFactor: Single): TAlphaColor;
 function ALSetColorAlpha(const AColor: TAlphaColor; const AOpacity: Single): TAlphaColor;
 function ALMultiplyColorAlpha(const AColor: TAlphaColor; const AOpacity: Single): TAlphaColor;
 function ALConvertRadiusToSigma(const ARadius: Single): Single;
@@ -2476,6 +2477,29 @@ begin
   result := ALBlendColor(ABaseColor, LOverlayColorRec.Color);
 end;
 
+{*******************************************************************************************}
+function ALInterpolateColor(AFromColor, AToColor: TAlphaColor; AFactor: Single): TAlphaColor;
+begin
+  AFactor := EnsureRange(AFactor,0,1);
+  // If AFromColor or AToColor is null, then perform the animation only on the alpha channel.
+  if AFromColor = TALphaColors.Null then begin
+    TAlphaColorRec(AFromColor).A := 0;
+    TAlphaColorRec(AFromColor).R := TAlphaColorRec(AToColor).R;
+    TAlphaColorRec(AFromColor).G := TAlphaColorRec(AToColor).G;
+    TAlphaColorRec(AFromColor).B := TAlphaColorRec(AToColor).B;
+  end;
+  if AToColor = TALphaColors.Null then begin
+    TAlphaColorRec(AToColor).A := 0;
+    TAlphaColorRec(AToColor).R := TAlphaColorRec(AFromColor).R;
+    TAlphaColorRec(AToColor).G := TAlphaColorRec(AFromColor).G;
+    TAlphaColorRec(AToColor).B := TAlphaColorRec(AFromColor).B;
+  end;
+  TAlphaColorRec(Result).A := TAlphaColorRec(AFromColor).A + Trunc((TAlphaColorRec(AToColor).A - TAlphaColorRec(AFromColor).A) * AFactor);
+  TAlphaColorRec(Result).R := TAlphaColorRec(AFromColor).R + Trunc((TAlphaColorRec(AToColor).R - TAlphaColorRec(AFromColor).R) * AFactor);
+  TAlphaColorRec(Result).G := TAlphaColorRec(AFromColor).G + Trunc((TAlphaColorRec(AToColor).G - TAlphaColorRec(AFromColor).G) * AFactor);
+  TAlphaColorRec(Result).B := TAlphaColorRec(AFromColor).B + Trunc((TAlphaColorRec(AToColor).B - TAlphaColorRec(AFromColor).B) * AFactor);
+end;
+
 {***************************************************************************************}
 function ALSetColorAlpha(const AColor: TAlphaColor; const AOpacity: Single): TAlphaColor;
 begin
@@ -2883,7 +2907,7 @@ begin
           // Oval
           else if SameValue(LScaledXRadius, LScaledDstRect.Width / 2, TEpsilon.position) and
                   SameValue(LScaledYRadius, LScaledDstRect.Height / 2, TEpsilon.position) then begin
-            LRRect :=  ALSkCheckHandle(sk4d_rrect_create);
+            LRRect := ALSkCheckHandle(sk4d_rrect_create);
             sk4d_rrect_set_oval(
               LRRect, // self: sk_rrect_t;
               @LScaledDstRect); // const rect: psk_rect_t;
@@ -2897,7 +2921,7 @@ begin
           // RoundRect
           else if (compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) and
                   (compareValue(LScaledYRadius, 0, TEpsilon.position) > 0) then begin
-            LRRect :=  ALSkCheckHandle(sk4d_rrect_create);
+            LRRect := ALSkCheckHandle(sk4d_rrect_create);
             sk4d_rrect_set_rect3(
               LRRect, // self: sk_rrect_t;
               @LScaledDstRect, // const rect: psk_rect_t;
@@ -2917,7 +2941,7 @@ begin
             // later draw a slightly larger version of the image. This ensures that
             // the algorithm doesn't sample transparent pixels at the edges when
             // calculating the blur effect.
-            LRRect :=  ALSkCheckHandle(sk4d_rrect_create);
+            LRRect := ALSkCheckHandle(sk4d_rrect_create);
             sk4d_rrect_set_rect(
               LRRect, // self: sk_rrect_t;
               @LScaledDstRect); // const rect: psk_rect_t;
@@ -3408,7 +3432,7 @@ begin
           var LRS := getRenderScript;
           var LInput := TJAllocation.JavaClass.createFromBitmap(LRS, LTmpBitmap);
           var LOutPut := TJAllocation.JavaClass.createTyped(LRS, LInput.getType());
-          var LScript :=  TJScriptIntrinsicBlur.javaclass.create(LRS, TJElement.javaclass.U8_4(LRS));
+          var LScript := TJScriptIntrinsicBlur.javaclass.create(LRS, TJElement.javaclass.U8_4(LRS));
           LScript.setRadius(Min(25, LScaledBlurRadius)); // Set the radius of the Blur. Supported range 0 < radius <= 25
           LScript.setInput(LInput);
           LScript.forEach(LOutPut);
@@ -5878,7 +5902,7 @@ var
           LRect.Inflate(-1, -1);
       end;
       //--
-      var LRRect :=  ALSkCheckHandle(sk4d_rrect_create);
+      var LRRect := ALSkCheckHandle(sk4d_rrect_create);
       try
         var LRadii: array[0..4] of TPointF;
         if TCorner.TopLeft in FCorners then LRadii[0] := TPointF.Create(LScaledXRadius, LScaledYRadius)

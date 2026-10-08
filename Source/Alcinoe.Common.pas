@@ -952,6 +952,7 @@ Function AlUTCDateTimeToLocal(const aTimeZoneInformation: TDynamicTimeZoneInform
 {$IFDEF IOS}
 function ALNSDateToUTCDateTime(const ADateTime: NSDate): TDateTime;
 {$ENDIF}
+function ALGetIanaTimeZoneId: String;
 function ALUTCNow: TDateTime;
 function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
@@ -1047,6 +1048,8 @@ uses
   Macapi.Mach,
   {$ENDIF}
   {$IF defined(ALMacOS)}
+  Macapi.Foundation,
+  Macapi.Helpers,
   Macapi.Mach,
   {$ENDIF}
   system.DateUtils,
@@ -4107,6 +4110,20 @@ begin
     Result := 0.0;
 end;
 {$ENDIF}
+
+{***********************************}
+function ALGetIanaTimeZoneId: String;
+begin
+  {$IF Defined(ANDROID)}
+  Result := JStringToString(TJTimeZone.JavaClass.getDefault.getID);
+  {$ELSEIF Defined(IOS)}
+  Result := NSStrToStr(TNSTimeZone.OCClass.localTimeZone.name);
+  {$ELSEIF defined(ALMACOS)}
+  Result := NSStrToStr(TNSTimeZone.Wrap(TNSTimeZone.OCClass.localTimeZone).name);
+  {$ELSE}
+  Result := '';
+  {$ENDIF}
+end;
 
 {*************************}
 {The same like Now but used

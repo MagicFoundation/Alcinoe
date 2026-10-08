@@ -1091,6 +1091,7 @@ type
     class var NavigationBarColor: TAlphaColor;
     class var StatusBarUseLightIcons: Boolean;
     class var NavigationBarUseLightIcons: Boolean;
+    class function HasBeenCaptured: Boolean; static;
   end;
   TALLastSetSystemBarsColor = record
   public
@@ -6533,6 +6534,12 @@ begin
   // https://towardsdev.com/swiftui-sound-effect-2-ways-8ead163abe1b
   AudioServicesPlaySystemSound(1104); // key_press_click.caf
   {$ENDIF}
+end;
+
+{*****************************************************************}
+class function TALCapturedSystemBarsColor.HasBeenCaptured: Boolean;
+begin
+  Result := TALCapturedSystemBarsColor.CapturedCount >= 1;
 end;
 
 {*********************************}

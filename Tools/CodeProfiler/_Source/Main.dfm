@@ -420,6 +420,7 @@ object MainForm: TMainForm
           LookAndFeel.NativeStyle = False
           LookAndFeel.SkinName = 'Foggy'
           TabOrder = 4
+          ExplicitTop = 417
           object InsertProfilerMarkersBtn: TcxButton
             Left = 8
             Top = 12

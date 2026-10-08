@@ -161,10 +161,12 @@ threadvar
 var
   ALProcMetricsHistories: TList<TALProcMetricsHistory>;
   ALProcMetricsLock: TLightweightMREW;
+  ALProcMetricsLockActivated: Boolean;
   ALProcMetricsFilename: String;
   {$IF defined(IOS) or defined(ANDROID)}
-  ALCodeProfilerAppActivatedBefore: Boolean;
+  ALAppActive: Boolean;
   {$ENDIF}
+  ALTickFrequency: Double;
 
 {**}
 Type
@@ -426,8 +428,8 @@ begin
 end;
 {$ENDIF}
 
-{**********************************************************************************************}
-procedure ALCodeProfilerSaveHistory(const AProcMetricsHistory: TALProcMetricsHistory); overload;
+{************************************}
+procedure TALProcMetricsHistory.Clear;
 begin
   {$IF defined(ALCodeProfilerHistoryGroupNone) or defined(ALCodeProfilerHistoryGroupByCallStack)}
   if AProcMetricsHistory.FCount = 0 then exit;
@@ -481,6 +483,7 @@ begin
     LFileStream.Free;
   end;
 end;
+{$ENDIF}
 
 {*************************************}
 procedure ALCodeProfilerPurgeHistories;
@@ -671,7 +674,11 @@ begin
       end;
       {$ENDIF}
       //--
-      ALProcMetricsLock.BeginRead;
+      var LReadLockAcquired: Boolean := False;
+      if ALProcMetricsLockActivated then begin
+        LReadLockAcquired := true;
+        ALProcMetricsLock.BeginRead;
+      end;
       try
         {$IF defined(ALCodeProfilerHistoryGroupNone)}
         if (LProcMetricsHistory.FCount = LProcMetricsHistory.FCapacity) then begin
@@ -696,11 +703,8 @@ begin
             {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
           {$ENDIF}
           {$IF defined(MSWINDOWS)}
-          var LTickFrequency: Double;
-          if not TStopwatch.IsHighResolution then LTickFrequency := 1.0
-          else LTickFrequency := 10000000.0 / LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.Frequency;
-          StartTimeStamp := Trunc((TStopwatchAccessPrivate(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch).FStartTimeStamp - ALCodeProfilerAppStartTimeStamp) * LTickFrequency);
-          ElapsedTicks := Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * LTickFrequency);
+          StartTimeStamp := Trunc((TStopwatchAccessPrivate(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch).FStartTimeStamp - ALCodeProfilerAppStartTimeStamp) * ALTickFrequency);
+          ElapsedTicks := Trunc(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks * ALTickFrequency);
           {$ELSEIF defined(POSIX)}
           StartTimeStamp := TStopwatchAccessPrivate(LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch).FStartTimeStamp - ALCodeProfilerAppStartTimeStamp;
           ElapsedTicks := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].StopWatch.ElapsedTicks;
@@ -811,7 +815,8 @@ begin
         {$ENDIF}
         dec(LProcMetricsStack.FCount);
       finally
-        ALProcMetricsLock.EndRead;
+        if LReadLockAcquired then
+          ALProcMetricsLock.EndRead;
       end;
       if (LProcMetricsStack.FCount = 0) and
          (TThread.CurrentThread.ThreadID <> MainThreadID) then begin
@@ -849,7 +854,7 @@ begin
     if ALCodeProfilerAppActivatedBefore then
       ALCodeProfilerPurgeHistories;
     else
-      ALCodeProfilerAppActivatedBefore := True;
+      ALAppActive := True;
   end;
 end;
 {$ENDIF}
@@ -873,9 +878,14 @@ initialization
   ALProcMetricsHistories.Add(ALProcMetricsHistory);
   //--
   {$IF defined(IOS) or defined(ANDROID)}
-  ALCodeProfilerAppActivatedBefore := False;
+  ALAppActive := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ALCodeProfilerApplicationEventHandler);
   {$ENDIF}
+  {$IFNDEF ALCompilerVersionSupported131}
+    {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
+  {$ENDIF}
+  if not TStopwatch.IsHighResolution then ALTickFrequency := 1.0
+  else ALTickFrequency := 10000000.0 / TStopwatch.Frequency;
 
 finalization
   {$IF (not defined(IOS)) and (not defined(ANDROID))}

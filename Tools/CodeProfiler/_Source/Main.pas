@@ -791,7 +791,11 @@ begin
   var P1 := AlPosA('{ALCodeProfiler>>}',LSourceCode);
   While P1 > 0 do begin
     var P2 := ALposA('{<<ALCodeProfiler}',LSourceCode,P1);
-    If P2 < 0 then raise Exception.Create('Error 206270E5-3304-46BE-9840-E010CC7BF148');
+    If P2 <= 0 then raise Exception.Create('Error 206270E5-3304-46BE-9840-E010CC7BF148');
+    // A missing closing marker would otherwise make P2 point to the closing
+    // marker of the next block, and everything in between would be deleted.
+    var P3 := ALposA('{ALCodeProfiler>>}',LSourceCode,P1 + 1);
+    If (P3 > 0) and (P3 < P2) then raise Exception.Create('Unbalanced ALCodeProfiler markers - Filename: ' + AFileName);
     inc(P2, length('{<<ALCodeProfiler}'));
     delete(LSourceCode, P1, P2 - P1);
     P1 := AlPosA('{ALCodeProfiler>>}',LSourceCode, P1);

@@ -1,3 +1,14 @@
+This project was originally based on DelphiAST by Roman Yankovsky: 
+https://github.com/RomanYankovsky/DelphiAST
+
+As the original repository no longer appears to be actively maintained, 
+it was forked and has since been updated and developed independently.
+The codebase may now diverge significantly from the original project and
+should therefore be considered a standalone project rather than a maintained
+fork or drop-in replacement for the original DelphiAST repository.
+
+-------------------------------------------------------------------
+
 [![](https://tokei.rs/b1/github/RomanYankovsky/DelphiAST?category=lines)](https://github.com/RomanYankovsky/DelphiAST) [![](https://tokei.rs/b1/github/RomanYankovsky/DelphiAST?category=code)](https://github.com/RomanYankovsky/DelphiAST) [![](https://tokei.rs/b1/github/RomanYankovsky/DelphiAST?category=files)](https://github.com/RomanYankovsky/DelphiAST)
 ### Abstract Syntax Tree Builder for Delphi 
 With DelphiAST you can take real Delphi code and get an abstract syntax tree. One unit at time and without a symbol table though. 

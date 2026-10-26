@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="maplibre_attributionErrorNoBrowser">Não está nenhum navegador de Internet instalado no dispositivo. Não é possível abrir a página web.</string>
+    <string name="maplibre_attributionsDialogTitle">MapLibre Android</string>
+    <string name="maplibre_attributionsIconContentDescription">Ícone de atribuição. Ativar para mostrar a janela de atribuição.</string>
+    <string name="maplibre_compassContentDescription">Compasso do mapa. Ativar para virar o mapa para Norte.</string>
+    <string name="maplibre_mapActionDescription">A mostrar um Mapa criado com MapLibre. Desloque arrastanto com 2 dedos. Zoom afastando ou aproximando os 2 dedos.</string>
+    <string name="maplibre_myLocationViewContentDescription">Vista de localização. Isto mostra a sua localização no mapa.</string>
+    <string name="maplibre_offline_error_region_definition_invalid">O OfflineRegionDefinition não cabe nos limites do mundo: %s</string>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Atender"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Vídeo"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"Recusar"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Desligar"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"Chamada recebida"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Chamada em curso"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"A filtrar uma chamada recebida…"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+</resources>

@@ -24,10 +24,54 @@ REM -----------------
 REM Main Instructions
 REM -----------------
 
-Call :DOWNLOAD_FACEBOOK_LIBRARY "https://github.com/facebook/facebook-ios-sdk/releases/download/v18.0.0/FacebookSDK-Static_XCFramework.zip" "%ALBaseDir%\Libraries\ios\Facebook"
-Call :DOWNLOAD_FIREBASE_LIBRARY "https://github.com/firebase/firebase-ios-sdk/releases/download/10.12.0/Firebase.zip" "%ALBaseDir%\Libraries\ios\Firebase"
+Call :DOWNLOAD_FACEBOOK_LIBRARY "https://github.com/facebook/facebook-ios-sdk/releases/download/v18.0.0/FacebookSDK-Static_XCFramework.zip" "%ALBaseDir%\Libraries\ios\Facebook\Static"
+Call :DOWNLOAD_FACEBOOK_LIBRARY "https://github.com/facebook/facebook-ios-sdk/releases/download/v18.0.0/FacebookSDK_Dynamic.xcframework.zip" "%ALBaseDir%\Libraries\ios\Facebook\Dynamic"
+                                
+Call :DOWNLOAD_FIREBASE_LIBRARY "https://github.com/firebase/firebase-ios-sdk/releases/download/10.12.0/Firebase.zip" "%ALBaseDir%\Libraries\ios\Firebase\Static"
+
+Call :DOWNLOAD_MAPLIBRE_LIBRARY "https://github.com/maplibre/maplibre-native/releases/download/ios-v6.31.0/MapLibre.static.xcframework.zip" "%ALBaseDir%\Libraries\ios\MapLibre\Static"
+Call :DOWNLOAD_MAPLIBRE_LIBRARY "https://github.com/maplibre/maplibre-native/releases/download/ios-v6.31.0/MapLibre.dynamic.xcframework.zip" "%ALBaseDir%\Libraries\ios\MapLibre\Dynamic"
 
 goto FINISHED
+
+
+REM ----------------------------------
+REM Function DOWNLOAD_MAPLIBRE_LIBRARY
+REM ----------------------------------
+
+:DOWNLOAD_MAPLIBRE_LIBRARY
+
+REM %~1 the url where to download the library
+REM %~2 the Directory where to extract the library
+
+echo [36mDownload %~1[0m
+
+set SrcUrl=%~1
+Set DestDir=%~2
+IF EXIST "%DestDir%" rmdir /s /q "%DestDir%"
+IF EXIST "%DestDir%" goto ERROR
+mkdir "%DestDir%"
+
+SET TMPDir=%ALBaseDir%\Tmp
+IF EXIST "%TMPDir%" rmdir /s /q "%TMPDir%"
+IF EXIST "%TMPDir%" goto ERROR
+mkdir "%TMPDir%"
+
+curl --fail --location "%SrcUrl%" --output "%TMPDir%\tmp.zip"
+IF ERRORLEVEL 1 goto ERROR
+
+mkdir "%TMPDir%\Output"
+
+tar -xf "%TMPDir%\tmp.zip" -C "%TMPDir%\Output"
+IF ERRORLEVEL 1 goto ERROR
+
+Robocopy "%TMPDir%\Output" "%DestDir%" /MOVE /E /NFL /NDL /NJH /NJS
+IF %ERRORLEVEL% NEQ 1 goto ERROR
+
+IF EXIST "%TMPDir%" rmdir /s /q "%TMPDir%"
+IF EXIST "%TMPDir%" goto ERROR
+
+EXIT /B 0
 
 
 REM ----------------------------------

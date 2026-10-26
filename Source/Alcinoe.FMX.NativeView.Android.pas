@@ -107,6 +107,9 @@ var
   LayoutParams: JRelativeLayout_LayoutParams;
 begin
   inherited;
+
+  FVisible := True;
+
   FLayout := CreateLayout;
   FView := CreateView;
   FView.setClipToOutline(False);
@@ -121,8 +124,6 @@ begin
   FView.setClickable(True);
   FView.setFocusable(True);
   FView.setFocusableInTouchMode(True);
-
-  FVisible := True;
 
   TMessageManager.DefaultManager.SubscribeToMessage(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
   TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateHandleListener);

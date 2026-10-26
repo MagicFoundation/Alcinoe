@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="maplibre_attributionErrorNoBrowser">웹 브라우저가 설치 되어 있지 않아서 웹 페이지를 열 수 없습니다.</string>
+    <string name="maplibre_attributionsDialogTitle">MapLibre Android</string>
+    <string name="maplibre_attributionsIconContentDescription">속성 정보. 속성 대화를 표시합니다.</string>
+    <string name="maplibre_compassContentDescription"> 지도 나침반. 지도회전을 북쪽으로 재설정합니다.</string>
+    <string name="maplibre_mapActionDescription">MapLibre로 생성된 지도 표시. 두 손가락으로 드래그하여 화면을 위 아래로 움직이세요. 두 손가락을 이용해 화면을 확대 축소 하세요.</string>
+    <string name="maplibre_myLocationViewContentDescription">로케이션 뷰. 지도에서 현재 위치를 보여줍니다.</string>
+    <string name="maplibre_offline_error_region_definition_invalid">제공된 오프라인지역정의가 월드바운즈에 적합하지 않습니다: %s</string>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"통화"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"동영상"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"거절"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"전화 끊기"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"수신 전화"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"진행 중인 통화"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"수신 전화 검사 중"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+</resources>

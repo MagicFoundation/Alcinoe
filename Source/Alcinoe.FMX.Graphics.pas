@@ -127,6 +127,7 @@ function ALSkStreamAdapterGetLengthProc(context: Pointer): size_t; cdecl;
 function ALSkStreamAdapterGetPositionProc(context: Pointer): size_t; cdecl;
 function ALSkStreamAdapterReadProc(context: Pointer; buffer: Pointer; size: size_t): size_t; cdecl;
 function ALSkStreamAdapterSeekProc(context: Pointer; position: size_t): _bool; cdecl;
+function ALSkWStreamAdapterWriteProc(context: Pointer; const buffer: Pointer; size: size_t): _bool; cdecl;
 
 var
   ALGlobalUseRasterSkSurface: Boolean;
@@ -8994,6 +8995,14 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
+function ALSkWStreamAdapterWriteProc(context: Pointer; const buffer: Pointer; size: size_t): _bool; cdecl;
+begin
+  Result := TStream(context).Write(buffer^, size) = size;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
 function ALGetSkImageinfo(const W, H: int32_t): sk_imageinfo_t;
 begin
   {$IFNDEF ALCompilerVersionSupported131}
@@ -9901,6 +9910,10 @@ initialization
   LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
   LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
   sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+  //--
+  var LWStreamadapterProcs: sk_wstreamadapter_procs_t;
+  LWStreamadapterProcs.write := ALSkWStreamAdapterWriteProc;
+  sk4d_wstreamadapter_set_procs(@LWStreamadapterProcs);
   {$ENDIF}
   {$IF defined(ANDROID)}
   ALGlobalJColorSpace := nil;

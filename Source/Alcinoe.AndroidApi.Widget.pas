@@ -18,6 +18,31 @@ type
   JALDatePickerDialog = interface;
   JALKeyPreImeListener = interface;
   JALEditText = interface;
+  JProgressBar = interface;
+  JStyleSpan = interface;
+
+  JStyleSpanClass = interface(JObjectClass)
+    ['{72E179F0-032C-4D92-86A8-4498E8070101}']
+    {class} function init(style: Integer): JStyleSpan; cdecl;
+  end;
+  [JavaSignature('android/text/style/StyleSpan')]
+  JStyleSpan = interface(JObject)
+    ['{72E179F0-032C-4D92-86A8-4498E8070102}']
+  end;
+  TJStyleSpan = class(TJavaGenericImport<JStyleSpanClass, JStyleSpan>) end;
+
+  {*****************************************}
+  JProgressBarClass = interface(JViewClass)
+    ['{51D8E9CA-DB21-4741-9A62-9E2BEEB3C731}']
+    {class} function init(context: JContext): JProgressBar; cdecl;
+  end;
+  [JavaSignature('android/widget/ProgressBar')]
+  JProgressBar = interface(JView)
+    ['{A498BB20-0336-4180-A7CF-AC26AC54648E}']
+    procedure setIndeterminate(indeterminate: Boolean); cdecl;
+    function getIndeterminateDrawable: JDrawable; cdecl;
+  end;
+  TJProgressBar = class(TJavaGenericImport<JProgressBarClass, JProgressBar>) end;
 
   {******************************************************}
   JALDatePickerDialogListenerClass = interface(IJavaClass)
@@ -94,6 +119,8 @@ uses
 {**********************}
 procedure RegisterTypes;
 begin
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Widget.JStyleSpan', TypeInfo(Alcinoe.AndroidApi.Widget.JStyleSpan));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Widget.JProgressBar', TypeInfo(Alcinoe.AndroidApi.Widget.JProgressBar));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Widget.JALDatePickerDialogListener', TypeInfo(Alcinoe.AndroidApi.Widget.JALDatePickerDialogListener));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Widget.JALDatePickerDialog', TypeInfo(Alcinoe.AndroidApi.Widget.JALDatePickerDialog));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Widget.JALKeyPreImeListener', TypeInfo(Alcinoe.AndroidApi.Widget.JALKeyPreImeListener));

@@ -919,6 +919,13 @@ function ALElapsedTimeMillisAsInt64: int64;
 function ALElapsedTimeSecondsAsDouble: Double;
 function ALElapsedTimeSecondsAsInt64: int64;
 
+Type
+  TALLatLng = record
+    Latitude: Double;
+    Longitude: Double;
+    class function Create(const Latitude: Double; const Longitude: Double): TALLatLng; static; inline;
+  end;
+
 function ALIsValidLatlng(const ALatitude, ALongitude: Double): Boolean;
 function ALGetDistanceBetween2Points(const ALatitude1, ALongitude1, ALatitude2, ALongitude2: Double): Double{meters};
 
@@ -3802,6 +3809,13 @@ end;
 function ALElapsedTimeSecondsAsInt64: int64;
 begin
   Result := trunc(ALElapsedTimeNano / ALNanosPerSec);
+end;
+
+{******************************************************************************************}
+class function TALLatLng.Create(const Latitude: Double; const Longitude: Double): TALLatLng;
+begin
+  Result.Latitude := Latitude;
+  Result.Longitude := Longitude;
 end;
 
 {*********************************************************************}

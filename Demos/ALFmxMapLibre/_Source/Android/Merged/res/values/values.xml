@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <color name="maplibre_blue">#1E8CAB</color>
+    <color name="maplibre_gray">#7D7F80</color>
+    <color name="maplibre_gray_dark">#5F5F5F</color>
+    <color name="maplibre_location_layer_blue">#4A90E2</color>
+    <color name="maplibre_location_layer_gray">#A1B0C0</color>
+    <dimen name="maplibre_angular_velocity_multiplier">1.3dp</dimen>
+    <dimen name="maplibre_density_constant">0.29dp</dimen>
+    <dimen name="maplibre_eight_dp">8dp</dimen>
+    <dimen name="maplibre_four_dp">4dp</dimen>
+    <dimen name="maplibre_infowindow_margin">8dp</dimen>
+    <dimen name="maplibre_infowindow_tipview_width">8dp</dimen>
+    <dimen name="maplibre_locationComponentTrackingInitialMoveThreshold">25dp</dimen>
+    <dimen name="maplibre_locationComponentTrackingMultiFingerMoveThreshold">400dp</dimen>
+    <dimen name="maplibre_minimum_angled_scale_speed">0.9dp</dimen>
+    <dimen name="maplibre_minimum_angular_velocity">0.10dp</dimen>
+    <dimen name="maplibre_minimum_move_threshold">4dp</dimen>
+    <dimen name="maplibre_minimum_scale_span_when_rotating">75dp</dimen>
+    <dimen name="maplibre_minimum_scale_speed">0.6dp</dimen>
+    <dimen name="maplibre_minimum_scale_velocity">225dp</dimen>
+    <dimen name="maplibre_my_locationview_outer_circle">18dp</dimen>
+    <dimen name="maplibre_ninety_two_dp">92dp</dimen>
+    <string name="maplibre_attributionErrorNoBrowser">No web browser installed on device, can\'t open web page.</string>
+    <string name="maplibre_attributionsDialogTitle">MapLibre Android</string>
+    <string name="maplibre_attributionsIconContentDescription">Attribution icon. Activate to show attribution dialog.</string>
+    <string name="maplibre_compassContentDescription">Map compass. Activate to reset the map rotation to North.</string>
+    <string name="maplibre_mapActionDescription">Showing a Map created with MapLibre. Scroll by dragging two fingers. Zoom by pinching two fingers.</string>
+    <string name="maplibre_myLocationViewContentDescription">Location View. This shows your location on the map.</string>
+    <string name="maplibre_offline_error_region_definition_invalid">Provided OfflineRegionDefinition doesn\'t fit the world bounds: %s</string>
+    <style name="maplibre_LocationComponent">
+    <item name="maplibre_foregroundDrawable">@drawable/maplibre_user_icon</item>
+    <item name="maplibre_backgroundDrawable">@drawable/maplibre_user_stroke_icon</item>
+    <item name="maplibre_bearingDrawable">@drawable/maplibre_user_bearing_icon</item>
+    <item name="maplibre_gpsDrawable">@drawable/maplibre_user_puck_icon</item>
+
+    <item name="maplibre_foregroundDrawableStale">@drawable/maplibre_user_icon_stale</item>
+    <item name="maplibre_backgroundDrawableStale">@drawable/maplibre_user_stroke_icon</item>
+
+    <item name="maplibre_accuracyAlpha">0.15</item>
+    <item name="maplibre_accuracyColor">@color/maplibre_location_layer_blue</item>
+
+    <item name="maplibre_elevation">12dp</item>
+
+    <item name="maplibre_enableStaleState">true</item>
+    <item name="maplibre_staleStateTimeout">30000</item>
+
+    
+    <item name="maplibre_iconPaddingLeft">0</item>
+    <item name="maplibre_iconPaddingTop">0</item>
+    <item name="maplibre_iconPaddingRight">0</item>
+    <item name="maplibre_iconPaddingBottom">0</item>
+
+    
+    <item name="maplibre_maxZoomIconScale">1</item>
+    <item name="maplibre_minZoomIconScale">0.6</item>
+
+    
+    <item name="maplibre_trackingGesturesManagement">false</item>
+    <item name="maplibre_trackingInitialMoveThreshold">@dimen/maplibre_locationComponentTrackingInitialMoveThreshold</item>
+    <item name="maplibre_trackingMultiFingerMoveThreshold">@dimen/maplibre_locationComponentTrackingMultiFingerMoveThreshold</item>
+
+    
+    <item name="maplibre_pulsingLocationCircleEnabled">false</item>
+    <item name="maplibre_pulsingLocationCircleFadeEnabled">true</item>
+    <item name="maplibre_pulsingLocationCircleColor">@color/maplibre_location_layer_blue</item>
+    <item name="maplibre_pulsingLocationCircleDuration">2300</item>
+    <item name="maplibre_pulsingLocationCircleRadius">35</item>
+    <item name="maplibre_pulsingLocationCircleAlpha">0.4</item>
+    <item name="maplibre_pulsingLocationCircleInterpolator">decelerate</item>
+
+  </style>
+    <declare-styleable name="maplibre_BubbleLayout">
+        <attr format="dimension|reference" name="maplibre_bl_arrowWidth"/>
+        <attr format="dimension|reference" name="maplibre_bl_cornersRadius"/>
+        <attr format="dimension|reference" name="maplibre_bl_arrowHeight"/>
+        <attr format="dimension|reference" name="maplibre_bl_arrowPosition"/>
+        <attr format="color|reference" name="maplibre_bl_bubbleColor"/>
+        <attr format="dimension|reference" name="maplibre_bl_strokeWidth"/>
+        <attr format="color|reference" name="maplibre_bl_strokeColor"/>
+
+        <attr format="enum" name="maplibre_bl_arrowDirection">
+            <enum name="left" value="0"/>
+            <enum name="right" value="1"/>
+            <enum name="top" value="2"/>
+            <enum name="bottom" value="3"/>
+        </attr>
+    </declare-styleable>
+    <declare-styleable name="maplibre_LocationComponent">
+        <attr format="reference" name="maplibre_foregroundDrawable"/>
+        <attr format="color" name="maplibre_foregroundTintColor"/>
+        <attr format="reference" name="maplibre_backgroundDrawable"/>
+        <attr format="color" name="maplibre_backgroundTintColor"/>
+        <attr format="reference" name="maplibre_bearingDrawable"/>
+        <attr format="color" name="maplibre_bearingTintColor"/>
+        <attr format="reference" name="maplibre_gpsDrawable"/>
+
+        <attr format="reference" name="maplibre_foregroundDrawableStale"/>
+        <attr format="color" name="maplibre_foregroundStaleTintColor"/>
+        <attr format="reference" name="maplibre_backgroundDrawableStale"/>
+        <attr format="color" name="maplibre_backgroundStaleTintColor"/>
+
+        <attr format="float" name="maplibre_accuracyAlpha"/>
+        <attr format="color" name="maplibre_accuracyColor"/>
+
+        <attr format="dimension" name="maplibre_elevation"/>
+
+        
+        <attr format="boolean" name="maplibre_enableStaleState"/>
+        <attr format="integer" min="0" name="maplibre_staleStateTimeout"/>
+
+        
+        <attr format="integer" name="maplibre_iconPaddingLeft"/>
+        <attr format="integer" name="maplibre_iconPaddingTop"/>
+        <attr format="integer" name="maplibre_iconPaddingRight"/>
+        <attr format="integer" name="maplibre_iconPaddingBottom"/>
+
+        
+        <attr format="string" name="maplibre_layer_above"/>
+        <attr format="string" name="maplibre_layer_below"/>
+        <attr format="boolean" name="maplibre_bearing_on_top"/>
+
+        
+        <attr format="float" name="maplibre_maxZoomIconScale"/>
+        <attr format="float" name="maplibre_minZoomIconScale"/>
+
+        
+        <attr format="boolean" name="maplibre_trackingGesturesManagement"/>
+        <attr format="dimension" name="maplibre_trackingInitialMoveThreshold"/>
+        <attr format="dimension" name="maplibre_trackingMultiFingerMoveThreshold"/>
+
+        
+        <attr format="float" name="maplibre_trackingAnimationDurationMultiplier"/>
+
+        
+        <attr format="boolean" name="maplibre_compassAnimationEnabled"/>
+
+        
+        <attr format="boolean" name="maplibre_accuracyAnimationEnabled"/>
+
+        
+        <attr format="boolean" name="maplibre_pulsingLocationCircleEnabled"/>
+        <attr format="boolean" name="maplibre_pulsingLocationCircleFadeEnabled"/>
+        <attr format="color" name="maplibre_pulsingLocationCircleColor"/>
+        <attr format="float" name="maplibre_pulsingLocationCircleDuration"/>
+        <attr format="float" name="maplibre_pulsingLocationCircleRadius"/>
+        <attr format="float" name="maplibre_pulsingLocationCircleAlpha"/>
+        <attr format="string" name="maplibre_pulsingLocationCircleInterpolator"/>
+
+    </declare-styleable>
+    <declare-styleable name="maplibre_MapView">
+
+        
+        <attr format="string" name="maplibre_apiBaseUrl"/>
+
+        
+        <attr format="string" name="maplibre_apiBaseUri"/>
+        <attr format="boolean" name="maplibre_localIdeographEnabled"/>
+        <attr format="string" name="maplibre_localIdeographFontFamily"/>
+        <attr format="reference" name="maplibre_localIdeographFontFamilies"/>
+        <attr format="boolean" name="maplibre_cross_source_collisions"/>
+        <attr format="boolean" name="maplibre_fastPFOREnabled"/>
+
+        
+        <attr format="boolean" name="maplibre_actionJournalEnabled"/>
+        <attr format="integer" name="maplibre_actionJournalLogFileSize"/>
+        <attr format="integer" name="maplibre_actionJournalLogFileCount"/>
+        <attr format="integer" name="maplibre_actionJournalRenderingReportInterval"/>
+
+        <attr format="boolean" name="maplibre_asyncRendererCleanup"/>
+
+        
+        <attr format="float" name="maplibre_cameraTargetLat"/>
+        <attr format="float" name="maplibre_cameraTargetLng"/>
+        <attr format="float" name="maplibre_cameraCenterAltitude"/>
+        <attr format="float" name="maplibre_cameraZoom"/>
+        <attr format="float" name="maplibre_cameraBearing"/>
+        <attr format="float" name="maplibre_cameraTilt"/>
+        <attr format="float" name="maplibre_cameraRoll"/>
+        <attr format="float" name="maplibre_cameraFov"/>
+
+        
+        <attr format="float" name="maplibre_cameraZoomMax"/>
+        <attr format="float" name="maplibre_cameraZoomMin"/>
+
+        
+        <attr format="float" name="maplibre_cameraPitchMax"/>
+        <attr format="float" name="maplibre_cameraPitchMin"/>
+
+        
+        <attr format="boolean" name="maplibre_uiZoomGestures"/>
+        <attr format="boolean" name="maplibre_uiScrollGestures"/>
+        <attr format="boolean" name="maplibre_uiHorizontalScrollGestures"/>
+        <attr format="boolean" name="maplibre_uiRotateGestures"/>
+        <attr format="boolean" name="maplibre_uiTiltGestures"/>
+        <attr format="boolean" name="maplibre_uiDoubleTapGestures"/>
+        <attr format="boolean" name="maplibre_uiQuickZoomGestures"/>
+
+        
+        <attr format="boolean" name="maplibre_uiCompass"/>
+        <attr name="maplibre_uiCompassGravity">
+            <flag name="top" value="0x30"/>
+            <flag name="bottom" value="0x50"/>
+            <flag name="left" value="0x03"/>
+            <flag name="right" value="0x05"/>
+            <flag name="center_vertical" value="0x10"/>
+            <flag name="fill_vertical" value="0x70"/>
+            <flag name="center_horizontal" value="0x01"/>
+            <flag name="fill_horizontal" value="0x07"/>
+            <flag name="center" value="0x11"/>
+            <flag name="fill" value="0x77"/>
+            <flag name="clip_vertical" value="0x80"/>
+            <flag name="clip_horizontal" value="0x08"/>
+            <flag name="start" value="0x00800003"/>
+            <flag name="end" value="0x00800005"/>
+        </attr>
+        <attr format="dimension" name="maplibre_uiCompassMarginLeft"/>
+        <attr format="dimension" name="maplibre_uiCompassMarginTop"/>
+        <attr format="dimension" name="maplibre_uiCompassMarginRight"/>
+        <attr format="dimension" name="maplibre_uiCompassMarginBottom"/>
+        <attr format="boolean" name="maplibre_uiCompassFadeFacingNorth"/>
+        <attr format="reference" name="maplibre_uiCompassDrawable"/>
+
+        
+        <attr format="boolean" name="maplibre_uiLogo"/>
+        <attr name="maplibre_uiLogoGravity">
+            <flag name="top" value="0x30"/>
+            <flag name="bottom" value="0x50"/>
+            <flag name="left" value="0x03"/>
+            <flag name="right" value="0x05"/>
+            <flag name="center_vertical" value="0x10"/>
+            <flag name="fill_vertical" value="0x70"/>
+            <flag name="center_horizontal" value="0x01"/>
+            <flag name="fill_horizontal" value="0x07"/>
+            <flag name="center" value="0x11"/>
+            <flag name="fill" value="0x77"/>
+            <flag name="clip_vertical" value="0x80"/>
+            <flag name="clip_horizontal" value="0x08"/>
+            <flag name="start" value="0x00800003"/>
+            <flag name="end" value="0x00800005"/>
+        </attr>
+        <attr format="dimension" name="maplibre_uiLogoMarginLeft"/>
+        <attr format="dimension" name="maplibre_uiLogoMarginTop"/>
+        <attr format="dimension" name="maplibre_uiLogoMarginRight"/>
+        <attr format="dimension" name="maplibre_uiLogoMarginBottom"/>
+
+        
+        <attr format="boolean" name="maplibre_uiAttribution"/>
+        <attr name="maplibre_uiAttributionGravity">
+            <flag name="top" value="0x30"/>
+            <flag name="bottom" value="0x50"/>
+            <flag name="left" value="0x03"/>
+            <flag name="right" value="0x05"/>
+            <flag name="center_vertical" value="0x10"/>
+            <flag name="fill_vertical" value="0x70"/>
+            <flag name="center_horizontal" value="0x01"/>
+            <flag name="fill_horizontal" value="0x07"/>
+            <flag name="center" value="0x11"/>
+            <flag name="fill" value="0x77"/>
+            <flag name="clip_vertical" value="0x80"/>
+            <flag name="clip_horizontal" value="0x08"/>
+            <flag name="start" value="0x00800003"/>
+            <flag name="end" value="0x00800005"/>
+        </attr>
+        <attr format="dimension" name="maplibre_uiAttributionMarginLeft"/>
+        <attr format="dimension" name="maplibre_uiAttributionMarginTop"/>
+        <attr format="dimension" name="maplibre_uiAttributionMarginRight"/>
+        <attr format="dimension" name="maplibre_uiAttributionMarginBottom"/>
+        <attr format="color" name="maplibre_uiAttributionTintColor"/>
+
+        
+        <attr format="boolean" name="maplibre_renderTextureMode"/>
+        <attr format="boolean" name="maplibre_renderTextureTranslucentSurface"/>
+        <attr format="color" name="maplibre_foregroundLoadColor"/>
+
+        <attr format="boolean" name="maplibre_enableTilePrefetch"/>
+        <attr format="integer" name="maplibre_prefetchZoomDelta"/>
+        <attr format="boolean" name="maplibre_enableZMediaOverlay"/>
+        <attr format="float" name="maplibre_pixelRatio"/>
+
+    </declare-styleable>
+    <item name="report_drawn" type="id"/>
+    <id name="view_tree_on_back_pressed_dispatcher_owner"/>
+    <item name="fragment_container_view_tag" type="id"/>
+    <item name="special_effects_controller_view_tag" type="id"/>
+    <item name="visible_removing_fragment_view_tag" type="id"/>
+    <declare-styleable name="Fragment">
+        <attr name="android:name"/>
+        <attr name="android:id"/>
+        <attr name="android:tag"/>
+    </declare-styleable>
+    <declare-styleable name="FragmentContainerView">
+        <attr name="android:name"/>
+        <attr name="android:tag"/>
+    </declare-styleable>
+    <attr format="reference" name="nestedScrollViewStyle"/>
+    <color name="androidx_core_ripple_material_light">#1f000000</color>
+    <color name="androidx_core_secondary_text_default_material_light">#8a000000</color>
+    <color name="call_notification_answer_color">#1d873b</color>
+    <color name="call_notification_decline_color">#d93025</color>
+    <color name="notification_action_color_filter">#ffffffff</color>
+    <color name="notification_icon_bg_color">#ff9e9e9e</color>
+    <dimen name="compat_button_inset_horizontal_material">4dp</dimen>
+    <dimen name="compat_button_inset_vertical_material">6dp</dimen>
+    <dimen name="compat_button_padding_horizontal_material">8dp</dimen>
+    <dimen name="compat_button_padding_vertical_material">4dp</dimen>
+    <dimen name="compat_control_corner_material">2dp</dimen>
+    <dimen name="compat_notification_large_icon_max_height">320dp</dimen>
+    <dimen name="compat_notification_large_icon_max_width">320dp</dimen>
+    <dimen name="notification_action_icon_size">32dp</dimen>
+    <dimen name="notification_action_text_size">13sp</dimen>
+    <dimen name="notification_big_circle_margin">12dp</dimen>
+    <dimen name="notification_content_margin_start">8dp</dimen>
+    <dimen name="notification_large_icon_height">64dp</dimen>
+    <dimen name="notification_large_icon_width">64dp</dimen>
+    <dimen name="notification_main_column_padding_top">10dp</dimen>
+    <dimen name="notification_media_narrow_margin">@dimen/notification_content_margin_start</dimen>
+    <dimen name="notification_right_icon_size">16dp</dimen>
+    <dimen name="notification_right_side_padding_top">4dp</dimen>
+    <dimen name="notification_small_icon_background_padding">3dp</dimen>
+    <dimen name="notification_small_icon_size_as_large">24dp</dimen>
+    <dimen name="notification_subtext_size">13sp</dimen>
+    <dimen name="notification_top_pad">10dp</dimen>
+    <dimen name="notification_top_pad_large_text">5dp</dimen>
+    <drawable name="notification_template_icon_bg">#3333B5E5</drawable>
+    <drawable name="notification_template_icon_low_bg">#0cffffff</drawable>
+    <item name="accessibility_action_clickable_span" type="id"/>
+    <item name="accessibility_custom_action_0" type="id"/>
+    <item name="accessibility_custom_action_1" type="id"/>
+    <item name="accessibility_custom_action_10" type="id"/>
+    <item name="accessibility_custom_action_11" type="id"/>
+    <item name="accessibility_custom_action_12" type="id"/>
+    <item name="accessibility_custom_action_13" type="id"/>
+    <item name="accessibility_custom_action_14" type="id"/>
+    <item name="accessibility_custom_action_15" type="id"/>
+    <item name="accessibility_custom_action_16" type="id"/>
+    <item name="accessibility_custom_action_17" type="id"/>
+    <item name="accessibility_custom_action_18" type="id"/>
+    <item name="accessibility_custom_action_19" type="id"/>
+    <item name="accessibility_custom_action_2" type="id"/>
+    <item name="accessibility_custom_action_20" type="id"/>
+    <item name="accessibility_custom_action_21" type="id"/>
+    <item name="accessibility_custom_action_22" type="id"/>
+    <item name="accessibility_custom_action_23" type="id"/>
+    <item name="accessibility_custom_action_24" type="id"/>
+    <item name="accessibility_custom_action_25" type="id"/>
+    <item name="accessibility_custom_action_26" type="id"/>
+    <item name="accessibility_custom_action_27" type="id"/>
+    <item name="accessibility_custom_action_28" type="id"/>
+    <item name="accessibility_custom_action_29" type="id"/>
+    <item name="accessibility_custom_action_3" type="id"/>
+    <item name="accessibility_custom_action_30" type="id"/>
+    <item name="accessibility_custom_action_31" type="id"/>
+    <item name="accessibility_custom_action_4" type="id"/>
+    <item name="accessibility_custom_action_5" type="id"/>
+    <item name="accessibility_custom_action_6" type="id"/>
+    <item name="accessibility_custom_action_7" type="id"/>
+    <item name="accessibility_custom_action_8" type="id"/>
+    <item name="accessibility_custom_action_9" type="id"/>
+    <item name="line1" type="id"/>
+    <item name="line3" type="id"/>
+    <item name="tag_accessibility_actions" type="id"/>
+    <item name="tag_accessibility_clickable_spans" type="id"/>
+    <item name="tag_accessibility_heading" type="id"/>
+    <item name="tag_accessibility_pane_title" type="id"/>
+    <item name="tag_on_apply_window_listener" type="id"/>
+    <item name="tag_on_receive_content_listener" type="id"/>
+    <item name="tag_on_receive_content_mime_types" type="id"/>
+    <item name="tag_screen_reader_focusable" type="id"/>
+    <item name="tag_state_description" type="id"/>
+    <item name="tag_transition_group" type="id"/>
+    <item name="tag_unhandled_key_event_manager" type="id"/>
+    <item name="tag_unhandled_key_listeners" type="id"/>
+    <item name="tag_window_insets_animation_callback" type="id"/>
+    <item name="text" type="id"/>
+    <item name="text2" type="id"/>
+    <item name="title" type="id"/>
+    <integer name="status_bar_notification_info_maxnum">999</integer>
+    <string name="call_notification_answer_action">Answer</string>
+    <string name="call_notification_answer_video_action">Video</string>
+    <string name="call_notification_decline_action">Decline</string>
+    <string name="call_notification_hang_up_action">Hang Up</string>
+    <string name="call_notification_incoming_text">Incoming call</string>
+    <string name="call_notification_ongoing_text">Ongoing call</string>
+    <string name="call_notification_screening_text">Screening an incoming call</string>
+    <string name="status_bar_notification_info_overflow">999+</string>
+    <style name="TextAppearance.Compat.Notification" parent="@android:style/TextAppearance.StatusBar.EventContent"/>
+    <style name="TextAppearance.Compat.Notification.Info">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+    <style name="TextAppearance.Compat.Notification.Line2" parent="TextAppearance.Compat.Notification.Info"/>
+    <style name="TextAppearance.Compat.Notification.Time">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+    <style name="TextAppearance.Compat.Notification.Title" parent="@android:style/TextAppearance.StatusBar.EventContent.Title"/>
+    <style name="Widget.Compat.NotificationActionContainer" parent=""/>
+    <style name="Widget.Compat.NotificationActionText" parent=""/>
+    <declare-styleable name="Capability">
+        
+        <attr format="reference" name="queryPatterns"/>
+        
+        <attr format="boolean" name="shortcutMatchRequired"/>
+    </declare-styleable>
+    <declare-styleable name="ColorStateListItem">
+        
+        <attr name="android:color"/>
+        
+        <attr format="float" name="alpha"/>
+        <attr name="android:alpha"/>
+        
+        <attr format="float" name="lStar"/>
+        <attr name="android:lStar"/>
+    </declare-styleable>
+    <declare-styleable name="FontFamily">
+        
+        <attr format="string" name="fontProviderAuthority"/>
+        
+        <attr format="string" name="fontProviderPackage"/>
+        
+        <attr format="string" name="fontProviderQuery"/>
+        
+        <attr format="reference" name="fontProviderCerts"/>
+        
+        <attr name="fontProviderFetchStrategy">
+            <!-- The blocking font fetch works as follows.
+              First, check the local cache, then if the requested font is not cached, request the
+              font from the provider and wait until it is finished.  You can change the length of
+              the timeout by modifying fontProviderFetchTimeout.  If the timeout happens, the
+              default typeface will be used instead. -->
+            <enum name="blocking" value="0"/>
+            <!-- The async font fetch works as follows.
+              First, check the local cache, then if the requeted font is not cached, trigger a
+              request the font and continue with layout inflation. Once the font fetch succeeds, the
+              target text view will be refreshed with the downloaded font data. The
+              fontProviderFetchTimeout will be ignored if async loading is specified. -->
+            <enum name="async" value="1"/>
+        </attr>
+        
+        <attr format="integer" name="fontProviderFetchTimeout">
+            <!-- A special value for the timeout. In this case, the blocking font fetching will not
+              timeout and wait until a reply is received from the font provider. -->
+            <enum name="forever" value="-1"/>
+        </attr>
+        
+        <attr format="string" name="fontProviderSystemFontFamily"/>
+    </declare-styleable>
+    <declare-styleable name="FontFamilyFont">
+        
+        <attr name="fontStyle">
+            <enum name="normal" value="0"/>
+            <enum name="italic" value="1"/>
+        </attr>
+        
+        <attr format="reference" name="font"/>
+        
+        <attr format="integer" name="fontWeight"/>
+        
+        <attr format="string" name="fontVariationSettings"/>
+        
+        <attr format="integer" name="ttcIndex"/>
+        
+        <attr name="android:fontStyle"/>
+        <attr name="android:font"/>
+        <attr name="android:fontWeight"/>
+        <attr name="android:fontVariationSettings"/>
+        <attr name="android:ttcIndex"/>
+    </declare-styleable>
+    <declare-styleable name="GradientColor">
+        
+        <attr name="android:startColor"/>
+        
+        <attr name="android:centerColor"/>
+        
+        <attr name="android:endColor"/>
+        
+        <attr name="android:type"/>
+
+        
+        
+        <attr name="android:gradientRadius"/>
+
+        
+        
+        <attr name="android:centerX"/>
+        
+        <attr name="android:centerY"/>
+
+        
+        
+        <attr name="android:startX"/>
+        
+        <attr name="android:startY"/>
+        
+        <attr name="android:endX"/>
+        
+        <attr name="android:endY"/>
+
+        
+        <attr name="android:tileMode"/>
+    </declare-styleable>
+    <declare-styleable name="GradientColorItem">
+        
+        <attr name="android:offset"/>
+        
+        <attr name="android:color"/>
+    </declare-styleable>
+    <id name="view_tree_lifecycle_owner"/>
+    <id name="view_tree_view_model_store_owner"/>
+    <string name="androidx_startup" translatable="false">androidx.startup</string>
+    <id name="view_tree_saved_state_registry_owner"/>
+    <dimen name="mapbox_defaultMultiTapMovementThreshold">5dp</dimen>
+    <dimen name="mapbox_defaultScaleSpanSinceStartThreshold">7dp</dimen>
+    <dimen name="mapbox_defaultShovePixelThreshold">16dp</dimen>
+    <dimen name="mapbox_internalMinSpan23">10mm</dimen>
+    <dimen name="mapbox_internalMinSpan24">6mm</dimen>
+</resources>

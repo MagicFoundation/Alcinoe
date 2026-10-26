@@ -148,7 +148,7 @@ type
     {$ENDIF}
     property NativeViewMargins: TALBounds read FNativeViewMargins write SetNativeViewMargins;
     function GetNativeViewAbsoluteRect: TRectF; virtual;
-    function GetNativeViewBoundsRect: TRectF;
+    function GetNativeViewBoundsRect: TRectF; virtual;
     function GetNativeViewPosition: TPointF;
     function GetNativeViewWidth: Single;
     function GetNativeViewHeight: Single;
@@ -231,19 +231,17 @@ begin
   FNativeViewMargins.OnChanged := NativeViewMarginsChanged;
   FNativeViewScreenshot := ALNullDrawable;
   FFreezeNativeViewCount := 0;
-  {$IF defined(android)}
   // In Android we must first know the value of DefStyleAttr/DefStyleRes
   // before to create the FNativeView. I use this way to know that the compoment
-  // will load it's properties from the dfm
+  // will load it's properties from the dfm.
+  // On iOS, we sometimes also need to wait until all DFM properties have been
+  // loaded before creating the native view (e.g., MapLibre's StyleURL property,
+  // which must be available when constructing the native view).
   if not IsOwnerLoading then begin
     FNativeView := CreateNativeView;
     InitNativeView;
   end
   else FNativeView := nil;
-  {$ELSE}
-  FNativeView := CreateNativeView;
-  InitNativeView;
-  {$ENDIF}
   {$IF defined(android)}
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
   {$ENDIF}
@@ -688,6 +686,9 @@ end;
 {*********************************}
 procedure TALNativeControl.DoPaint;
 begin
+  {$IF defined(DEBUG)}
+  //ALLog(classname+'.DoPaint', 'control.name: ' + Name);
+  {$ENDIF}
   // DoPaint instead of paint to paint the FNativeViewScreenshot
   // After everything have been already painted (paint method already
   // called and PaintChildren too
@@ -699,6 +700,7 @@ begin
       LRect.TopLeft, // const ATopLeft: TpointF;
       AbsoluteOpacity); // const AOpacity: Single);
   end;
+  inherited;
 end;
 
 end.

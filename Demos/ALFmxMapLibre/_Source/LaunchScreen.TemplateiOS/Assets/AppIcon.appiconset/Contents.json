@@ -1,0 +1,9 @@
+{
+  "images" : [
+    <%AppIconImages%>
+  ],
+  "info" : {
+    "version" : 1,
+    "author" : "RAD Studio"
+  }
+}

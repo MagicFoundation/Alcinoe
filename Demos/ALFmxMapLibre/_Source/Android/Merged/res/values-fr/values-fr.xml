@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="maplibre_attributionErrorNoBrowser">Aucun navigateur web installé sur l’appareil, impossible d’ouvrir une page web.</string>
+    <string name="maplibre_attributionsDialogTitle">MapLibre Android</string>
+    <string name="maplibre_attributionsIconContentDescription">Icône d’attribution. Activer pour afficher le dialogue d’attribution.</string>
+    <string name="maplibre_compassContentDescription">Boussole. Activer pour rétablir l’orientation de la carte vers le nord.</string>
+    <string name="maplibre_mapActionDescription">Affichage d’une carte créée avec MapLibre. Faites la glisser en traînant deux doigts. Zoomez ou dézoomez en écartant ou rapprochant deux doigts.</string>
+    <string name="maplibre_myLocationViewContentDescription">Vue de géolocalisation. Ceci affiche votre localisation sur la carte.</string>
+    <string name="maplibre_offline_error_region_definition_invalid">Le cadre OfflineRegionDefinition pour définir la région de navigation ne tient pas dans les limites du monde : %s</string>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Répondre"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Vidéo"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"Refuser"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Raccrocher"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"Appel entrant"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Appel en cours"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"Filtrage d\'un appel entrant"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+</resources>

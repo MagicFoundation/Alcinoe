@@ -1,0 +1,16 @@
+object MainForm: TMainForm
+  Left = 0
+  Top = 0
+  Caption = 'MapLibre Demo'
+  ClientHeight = 819
+  ClientWidth = 360
+  Fill.Color = xFFFEF7FF
+  Fill.Kind = Solid
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnSafeAreaChanged = FormSafeAreaChanged
+  DesignerMasterStyle = 0
+end

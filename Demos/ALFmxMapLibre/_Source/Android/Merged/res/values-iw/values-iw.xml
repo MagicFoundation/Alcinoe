@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="maplibre_attributionErrorNoBrowser">לא מותקן דפדפן אינטרנט במכשיר, לא ניתן לפתוח את דף האינטרנט.</string>
+    <string name="maplibre_attributionsDialogTitle">MapLibre Android</string>
+    <string name="maplibre_attributionsIconContentDescription">סמל שיוך. הפעל כדי להציג תיבת דו-שיח של שיוך.</string>
+    <string name="maplibre_compassContentDescription">מצפן. הפעל בכדי לקבע את כיוון המפה צפונה.</string>
+    <string name="maplibre_mapActionDescription">מציג מפה שנוצרה עם MapLibre. גלול באמצעות גרירה עם שתי אצבעות, זום באמצעות צביטה עם שתי אצבעות.</string>
+    <string name="maplibre_myLocationViewContentDescription">סמן מיקום. מציג את המיקום הנוכחי שלך על המפה.</string>
+    <string name="maplibre_offline_error_region_definition_invalid">בתנאי ש- OfflineRegionDefinition אינו מתאים לגבולות העולם: %s</string>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"מענה"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"וידאו"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"דחייה"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"ניתוק"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"שיחה נכנסת"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"שיחה פעילה"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"סינון שיחה נכנסת"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+</resources>

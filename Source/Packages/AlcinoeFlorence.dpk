@@ -62,7 +62,6 @@ contains
   Alcinoe.FMX.Dynamic.VideoPlayer in 'Alcinoe.FMX.Dynamic.VideoPlayer.pas',
   Alcinoe.FMX.Edit in 'Alcinoe.FMX.Edit.pas',
   Alcinoe.FMX.FilterEffects in 'Alcinoe.FMX.FilterEffects.pas',
-  Alcinoe.FMX.FMXOverNativeLayout in 'Alcinoe.FMX.FMXOverNativeLayout.pas',
   Alcinoe.FMX.Graphics in 'Alcinoe.FMX.Graphics.pas',
   Alcinoe.FMX.Layouts in 'Alcinoe.FMX.Layouts.pas',
   Alcinoe.FMX.LoadingOverlay in 'Alcinoe.FMX.LoadingOverlay.pas',

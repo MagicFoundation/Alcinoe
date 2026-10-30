@@ -107,7 +107,7 @@ type
     //function performsPlacementTransitions: Boolean; cdecl;
     function sourceWithIdentifier(identifier: NSString): MLNSource; cdecl;
     procedure addSource(source: MLNSource); cdecl;
-    //procedure removeSource(source: MLNSource); cdecl;
+    procedure removeSource(source: MLNSource); cdecl;
     //function removeSource(source: MLNSource; error: NSError): Boolean; cdecl;
     //procedure setLayers(layers: NSArray); cdecl;
     //function layers: NSArray; cdecl;
@@ -116,7 +116,7 @@ type
     //procedure insertLayer(layer: MLNStyleLayer; atIndex: NSUInteger); cdecl; overload;
     //procedure insertLayer(layer: MLNStyleLayer; belowLayer: MLNStyleLayer); cdecl; overload;
     //procedure insertLayer(layer: MLNStyleLayer; aboveLayer: MLNStyleLayer); cdecl; overload;
-    //procedure removeLayer(layer: MLNStyleLayer); cdecl;
+    procedure removeLayer(layer: MLNStyleLayer); cdecl;
     //function imageForName(name: NSString): UIImage; cdecl;
     procedure setImage(image: UIImage; forName: NSString); cdecl;
     procedure removeImageForName(name: NSString); cdecl;

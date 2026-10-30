@@ -334,7 +334,7 @@ begin
   View.removeFromSuperview;
   if aRoot is TCommonCustomForm then begin
     FForm := TCommonCustomForm(aRoot);
-    GetFormView(FForm).insertSubview(View, 0);
+    GetFormView(FForm).addSubview(View);
     UpdateFrame;
   end
   else FForm := nil;

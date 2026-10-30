@@ -7044,7 +7044,7 @@ var
     if IsNaN(LScaledStateLayerXRadius) then LScaledStateLayerXRadius := FXRadius;
     if IsNaN(LScaledStateLayerYRadius) then LScaledStateLayerYRadius := FYRadius;
     if LScaledStateLayerXRadius > 0 then LScaledStateLayerXRadius := LScaledStateLayerXRadius * FScale;
-    if LScaledStateLayerYRadius > 0 then LScaledStateLayerYRadius := LScaledStateLayerYRadius* FScale;
+    if LScaledStateLayerYRadius > 0 then LScaledStateLayerYRadius := LScaledStateLayerYRadius * FScale;
 
     TALDrawRectangleHelper.Create(FCanvas)
       .SetAlignToPixel(FAlignToPixel)

@@ -469,6 +469,7 @@ begin
     FForm := TCommonCustomForm(aRoot);
     SetParent(Handle, GetFormHandle(Form));
     UpdateFrame;
+    SetWindowPos(Handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
   end
   else FForm := nil;
 end;

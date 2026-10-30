@@ -11,6 +11,7 @@ uses
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNI.Util,
   Androidapi.JNI.Os,
+  Androidapi.JNI.Java.Net,
   Androidapi.JNI.Location,
   Androidapi.JNI.JavaTypes,
   Androidapi.JNI.Widget,
@@ -18,7 +19,8 @@ uses
 
 type
 
-  {*************************}
+  {**********************}
+  JUiSettings = interface;
   JFeature = interface;
   JCameraPosition = interface;
   JVisibleRegion = interface;
@@ -28,8 +30,18 @@ type
   JPropertyFactory = interface;
   JLayer = interface;
   JSymbolLayer = interface;
+  JLineLayer = interface;
+  JCircleLayer = interface;
+  JFillLayer = interface;
+  JFillExtrusionLayer = interface;
+  JHeatmapLayer = interface;
+  JColorReliefLayer = interface;
+  JHillshadeLayer = interface;
+  JRasterLayer = interface;
   JSource = interface;
   JGeoJsonSource = interface;
+  JRasterSource = interface;
+  JTileSet = interface;
   JLatLng = interface;
   JLatLngBounds = interface;
   JLatLngBounds_Builder = interface;
@@ -51,6 +63,92 @@ type
   JMapView_OnCameraDidChangeListener = interface;
   JMapView_OnDidFinishLoadingStyleListener = interface;
   JOnMapReadyCallback = interface;
+
+  {*********************************************}
+  JUiSettingsClass = interface(JObjectClass)
+    //['{A4D03696-AE65-4D1E-8694-16BC0E40014F}']
+  end;
+  [JavaSignature('org/maplibre/android/maps/UiSettings')]
+  JUiSettings = interface(JObject)
+    //['{BC3F66EE-5565-4DC9-83C5-8581AF2CC59D}']
+    //function areAllGesturesEnabled: Boolean; cdecl;
+    //function getAttributionDialogManager: JAttributionDialogManager; cdecl;
+    //function getAttributionGravity: Integer; cdecl;
+    //function getAttributionMarginBottom: Integer; cdecl;
+    //function getAttributionMarginLeft: Integer; cdecl;
+    //function getAttributionMarginRight: Integer; cdecl;
+    //function getAttributionMarginTop: Integer; cdecl;
+    function getCompassGravity: Integer; cdecl;
+    function getCompassImage: JDrawable; cdecl;
+    function getCompassMarginBottom: Integer; cdecl;
+    function getCompassMarginLeft: Integer; cdecl;
+    function getCompassMarginRight: Integer; cdecl;
+    function getCompassMarginTop: Integer; cdecl;
+    //function getFlingAnimationBaseTime: Int64; cdecl;
+    //function getFlingThreshold: Int64; cdecl;
+    //function getFocalPoint: JPointF; cdecl;
+    //function getHeight: Single; cdecl;
+    //function getLogoGravity: Integer; cdecl;
+    //function getLogoMarginBottom: Integer; cdecl;
+    //function getLogoMarginLeft: Integer; cdecl;
+    //function getLogoMarginRight: Integer; cdecl;
+    //function getLogoMarginTop: Integer; cdecl;
+    //function getWidth: Single; cdecl;
+    //function getZoomRate: Single; cdecl;
+    //procedure invalidate; cdecl;
+    //function isAttributionEnabled: Boolean; cdecl;
+    function isCompassEnabled: Boolean; cdecl;
+    function isCompassFadeWhenFacingNorth: Boolean; cdecl;
+    //function isDeselectMarkersOnTap: Boolean; cdecl;
+    //function isDisableRotateWhenScaling: Boolean; cdecl;
+    //function isDoubleTapGesturesEnabled: Boolean; cdecl;
+    //function isFlingVelocityAnimationEnabled: Boolean; cdecl;
+    //function isHorizontalScrollGesturesEnabled: Boolean; cdecl;
+    //function isIncreaseRotateThresholdWhenScaling: Boolean; cdecl;//Deprecated
+    //function isIncreaseScaleThresholdWhenRotating: Boolean; cdecl;
+    //function isLogoEnabled: Boolean; cdecl;
+    //function isQuickZoomGesturesEnabled: Boolean; cdecl;
+    //function isRotateGesturesEnabled: Boolean; cdecl;
+    //function isRotateVelocityAnimationEnabled: Boolean; cdecl;
+    //function isScaleVelocityAnimationEnabled: Boolean; cdecl;
+    //function isScrollGesturesEnabled: Boolean; cdecl;
+    //function isTiltGesturesEnabled: Boolean; cdecl;
+    //function isZoomGesturesEnabled: Boolean; cdecl;
+    //procedure setAllGesturesEnabled(b: Boolean); cdecl;
+    //procedure setAllVelocityAnimationsEnabled(b: Boolean); cdecl;
+    //procedure setAttributionDialogManager(attributionDialogManager: JAttributionDialogManager); cdecl;
+    //procedure setAttributionEnabled(b: Boolean); cdecl;
+    //procedure setAttributionGravity(i: Integer); cdecl;
+    //procedure setAttributionMargins(i: Integer; i1: Integer; i2: Integer; i3: Integer); cdecl;
+    //procedure setAttributionTintColor(i: Integer); cdecl;
+    procedure setCompassEnabled(compassEnabled: Boolean); cdecl;
+    procedure setCompassFadeFacingNorth(b: Boolean); cdecl;
+    procedure setCompassGravity(compassFadeFacingNorth: Integer); cdecl;
+    procedure setCompassImage(compass: JDrawable); cdecl;
+    procedure setCompassMargins(left: Integer; top: Integer; right: Integer; bottom: Integer); cdecl;
+    //procedure setDeselectMarkersOnTap(b: Boolean); cdecl;
+    //procedure setDisableRotateWhenScaling(b: Boolean); cdecl;
+    //procedure setDoubleTapGesturesEnabled(b: Boolean); cdecl;
+    //procedure setFlingAnimationBaseTime(l: Int64); cdecl;
+    //procedure setFlingThreshold(l: Int64); cdecl;
+    //procedure setFlingVelocityAnimationEnabled(b: Boolean); cdecl;
+    //procedure setFocalPoint(pointF: JPointF); cdecl;
+    //procedure setHorizontalScrollGesturesEnabled(b: Boolean); cdecl;
+    //procedure setIncreaseRotateThresholdWhenScaling(b: Boolean); cdecl;//Deprecated
+    //procedure setIncreaseScaleThresholdWhenRotating(b: Boolean); cdecl;
+    //procedure setLogoEnabled(b: Boolean); cdecl;
+    //procedure setLogoGravity(i: Integer); cdecl;
+    //procedure setLogoMargins(i: Integer; i1: Integer; i2: Integer; i3: Integer); cdecl;
+    //procedure setQuickZoomGesturesEnabled(b: Boolean); cdecl;
+    //procedure setRotateGesturesEnabled(b: Boolean); cdecl;
+    //procedure setRotateVelocityAnimationEnabled(b: Boolean); cdecl;
+    //procedure setScaleVelocityAnimationEnabled(b: Boolean); cdecl;
+    //procedure setScrollGesturesEnabled(b: Boolean); cdecl;
+    //procedure setTiltGesturesEnabled(b: Boolean); cdecl;
+    //procedure setZoomGesturesEnabled(b: Boolean); cdecl;
+    //procedure setZoomRate(f: Single); cdecl;
+  end;
+  TJUiSettings = class(TJavaGenericImport<JUiSettingsClass, JUiSettings>) end;
 
   {*********************************************}
   JFeatureClass = interface(JObjectClass)
@@ -408,280 +506,280 @@ type
   JPropertyFactoryClass = interface(JObjectClass)
     ['{608444A7-923B-4062-965B-F1787D1DC6CC}']
     //{class} function init: JPropertyFactory; cdecl;
-    //{class} function backgroundColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function backgroundColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function backgroundColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function backgroundOpacity(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function backgroundOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function backgroundPattern(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function backgroundPattern(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function circleBlur(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function circleBlur(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function circleColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function circleColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function circleColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function circleOpacity(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function circleOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function circlePitchAlignment(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function circlePitchAlignment(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function circlePitchScale(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function circlePitchScale(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function circleRadius(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function circleRadius(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function circleSortKey(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function circleSortKey(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function circleStrokeColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function circleStrokeColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function circleStrokeColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function circleStrokeOpacity(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function circleStrokeOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function circleStrokeWidth(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function circleStrokeWidth(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function circleTranslate(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function circleTranslate(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function circleTranslateAnchor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function circleTranslateAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function colorReliefColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function colorReliefColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function colorReliefColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function colorReliefOpacity(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function colorReliefOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillAntialias(boolean: JBoolean): JPropertyValue; cdecl; overload;
-    //{class} function fillAntialias(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function fillColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function fillColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionBase(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionBase(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionHeight(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionHeight(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionOpacity(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionPattern(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionPattern(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionRoundedCornerDistance(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionRoundedCornerDistance(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionTranslate(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionTranslate(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionTranslateAnchor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionTranslateAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionVerticalGradient(boolean: JBoolean): JPropertyValue; cdecl; overload;
-    //{class} function fillExtrusionVerticalGradient(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillOpacity(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function fillOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillOutlineColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function fillOutlineColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function fillOutlineColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillPattern(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function fillPattern(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillSortKey(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function fillSortKey(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillTranslate(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function fillTranslate(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function fillTranslateAnchor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function fillTranslateAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function heatmapColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function heatmapColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function heatmapColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function heatmapIntensity(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function heatmapIntensity(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function heatmapOpacity(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function heatmapOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function heatmapRadius(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function heatmapRadius(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function heatmapWeight(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function heatmapWeight(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeAccentColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeAccentColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeAccentColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeExaggeration(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeExaggeration(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeHighlightColor(string_: TJavaObjectArray<JString>): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeHighlightColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeIlluminationAltitude(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeIlluminationAltitude(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeIlluminationAnchor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeIlluminationAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeIlluminationDirection(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeIlluminationDirection(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeMethod(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeMethod(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeShadowColor(string_: TJavaObjectArray<JString>): JPropertyValue; cdecl; overload;
-    //{class} function hillshadeShadowColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function backgroundColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function backgroundColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function backgroundColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function backgroundOpacity(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function backgroundOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function backgroundPattern(value: JString): JPropertyValue; cdecl; overload;
+    {class} function backgroundPattern(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function circleBlur(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function circleBlur(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function circleColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function circleColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function circleColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function circleOpacity(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function circleOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function circlePitchAlignment(value: JString): JPropertyValue; cdecl; overload;
+    {class} function circlePitchAlignment(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function circlePitchScale(value: JString): JPropertyValue; cdecl; overload;
+    {class} function circlePitchScale(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function circleRadius(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function circleRadius(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function circleSortKey(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function circleSortKey(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function circleStrokeColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function circleStrokeColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function circleStrokeColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function circleStrokeOpacity(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function circleStrokeOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function circleStrokeWidth(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function circleStrokeWidth(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function circleTranslate(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function circleTranslate(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function circleTranslateAnchor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function circleTranslateAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function colorReliefColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function colorReliefColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function colorReliefColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function colorReliefOpacity(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function colorReliefOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillAntialias(value: JBoolean): JPropertyValue; cdecl; overload;
+    {class} function fillAntialias(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function fillColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function fillColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionBase(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionBase(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionHeight(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionHeight(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionOpacity(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionPattern(value: JString): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionPattern(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionRoundedCornerDistance(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionRoundedCornerDistance(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionTranslate(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionTranslate(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionTranslateAnchor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionTranslateAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionVerticalGradient(value: JBoolean): JPropertyValue; cdecl; overload;
+    {class} function fillExtrusionVerticalGradient(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillOpacity(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function fillOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillOutlineColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function fillOutlineColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function fillOutlineColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillPattern(value: JString): JPropertyValue; cdecl; overload;
+    {class} function fillPattern(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillSortKey(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function fillSortKey(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillTranslate(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function fillTranslate(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function fillTranslateAnchor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function fillTranslateAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function heatmapColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function heatmapColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function heatmapColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function heatmapIntensity(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function heatmapIntensity(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function heatmapOpacity(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function heatmapOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function heatmapRadius(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function heatmapRadius(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function heatmapWeight(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function heatmapWeight(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function hillshadeAccentColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function hillshadeAccentColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function hillshadeAccentColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function hillshadeExaggeration(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function hillshadeExaggeration(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function hillshadeHighlightColor(value: TJavaObjectArray<JString>): JPropertyValue; cdecl; overload;
+    {class} function hillshadeHighlightColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function hillshadeIlluminationAltitude(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function hillshadeIlluminationAltitude(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function hillshadeIlluminationAnchor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function hillshadeIlluminationAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function hillshadeIlluminationDirection(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function hillshadeIlluminationDirection(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function hillshadeMethod(value: JString): JPropertyValue; cdecl; overload;
+    {class} function hillshadeMethod(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function hillshadeShadowColor(value: TJavaObjectArray<JString>): JPropertyValue; cdecl; overload;
+    {class} function hillshadeShadowColor(expression: JExpression): JPropertyValue; cdecl; overload;
     {class} function iconAllowOverlap(value: JBoolean): JPropertyValue; cdecl; overload;
     {class} function iconAllowOverlap(value: JExpression): JPropertyValue; cdecl; overload;
     {class} function iconAnchor(value: JString): JPropertyValue; cdecl; overload;
     {class} function iconAnchor(value: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconColor(value: Integer): JPropertyValue; cdecl; overload;
-    //{class} function iconColor(value: JString): JPropertyValue; cdecl; overload;
-    //{class} function iconColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconHaloBlur(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function iconHaloBlur(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconHaloColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function iconHaloColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function iconHaloColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconHaloWidth(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function iconHaloWidth(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconIgnorePlacement(boolean: JBoolean): JPropertyValue; cdecl; overload;
-    //{class} function iconIgnorePlacement(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function iconColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function iconColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconHaloBlur(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function iconHaloBlur(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconHaloColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function iconHaloColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function iconHaloColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconHaloWidth(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function iconHaloWidth(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconIgnorePlacement(value: JBoolean): JPropertyValue; cdecl; overload;
+    {class} function iconIgnorePlacement(value: JExpression): JPropertyValue; cdecl; overload;
     {class} function iconImage(value: JString): JPropertyValue; cdecl; overload;
     {class} function iconImage(value: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconKeepUpright(boolean: JBoolean): JPropertyValue; cdecl; overload;
-    //{class} function iconKeepUpright(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconOffset(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function iconOffset(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconOpacity(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function iconOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconOptional(boolean: JBoolean): JPropertyValue; cdecl; overload;
-    //{class} function iconOptional(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconPadding(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function iconPadding(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function iconPadding(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconPitchAlignment(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function iconPitchAlignment(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconRotate(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function iconRotate(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconRotationAlignment(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function iconRotationAlignment(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconKeepUpright(value: JBoolean): JPropertyValue; cdecl; overload;
+    {class} function iconKeepUpright(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconOffset(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function iconOffset(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconOpacity(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function iconOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconOptional(value: JBoolean): JPropertyValue; cdecl; overload;
+    {class} function iconOptional(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconPadding(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function iconPadding(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function iconPadding(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconPitchAlignment(value: JString): JPropertyValue; cdecl; overload;
+    {class} function iconPitchAlignment(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconRotate(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function iconRotate(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconRotationAlignment(value: JString): JPropertyValue; cdecl; overload;
+    {class} function iconRotationAlignment(value: JExpression): JPropertyValue; cdecl; overload;
     {class} function iconSize(value: JFloat): JPropertyValue; cdecl; overload;
     {class} function iconSize(value: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconTextFit(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function iconTextFit(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconTextFitPadding(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function iconTextFitPadding(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconTranslate(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function iconTranslate(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function iconTranslateAnchor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function iconTranslateAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineBlur(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function lineBlur(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineCap(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function lineCap(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function lineColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function lineColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineDasharray(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function lineDasharray(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineGapWidth(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function lineGapWidth(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineGradient(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function lineGradient(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function lineGradient(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineJoin(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function lineJoin(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineMiterLimit(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function lineMiterLimit(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineOffset(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function lineOffset(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineOpacity(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function lineOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function linePattern(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function linePattern(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineRoundLimit(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function lineRoundLimit(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineSortKey(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function lineSortKey(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineTranslate(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function lineTranslate(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineTranslateAnchor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function lineTranslateAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function lineWidth(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function lineWidth(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function rasterBrightnessMax(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function rasterBrightnessMax(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function rasterBrightnessMin(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function rasterBrightnessMin(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function rasterContrast(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function rasterContrast(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function rasterFadeDuration(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function rasterFadeDuration(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function rasterHueRotate(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function rasterHueRotate(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function rasterOpacity(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function rasterOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function rasterResampling(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function rasterResampling(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function rasterSaturation(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function rasterSaturation(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function symbolAvoidEdges(boolean: JBoolean): JPropertyValue; cdecl; overload;
-    //{class} function symbolAvoidEdges(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function symbolPlacement(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function symbolPlacement(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function symbolScreenSpace(boolean: JBoolean): JPropertyValue; cdecl; overload;
-    //{class} function symbolScreenSpace(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconTextFit(value: JString): JPropertyValue; cdecl; overload;
+    {class} function iconTextFit(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconTextFitPadding(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function iconTextFitPadding(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconTranslate(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function iconTranslate(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function iconTranslateAnchor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function iconTranslateAnchor(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineBlur(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function lineBlur(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineCap(value: JString): JPropertyValue; cdecl; overload;
+    {class} function lineCap(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function lineColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function lineColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineDasharray(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function lineDasharray(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineGapWidth(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function lineGapWidth(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineGradient(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function lineGradient(value: JString): JPropertyValue; cdecl; overload;
+    {class} function lineGradient(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineJoin(value: JString): JPropertyValue; cdecl; overload;
+    {class} function lineJoin(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineMiterLimit(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function lineMiterLimit(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineOffset(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function lineOffset(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineOpacity(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function lineOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function linePattern(value: JString): JPropertyValue; cdecl; overload;
+    {class} function linePattern(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineRoundLimit(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function lineRoundLimit(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineSortKey(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function lineSortKey(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineTranslate(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function lineTranslate(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineTranslateAnchor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function lineTranslateAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function lineWidth(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function lineWidth(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function rasterBrightnessMax(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function rasterBrightnessMax(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function rasterBrightnessMin(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function rasterBrightnessMin(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function rasterContrast(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function rasterContrast(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function rasterFadeDuration(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function rasterFadeDuration(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function rasterHueRotate(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function rasterHueRotate(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function rasterOpacity(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function rasterOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function rasterResampling(value: JString): JPropertyValue; cdecl; overload;
+    {class} function rasterResampling(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function rasterSaturation(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function rasterSaturation(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function symbolAvoidEdges(value: JBoolean): JPropertyValue; cdecl; overload;
+    {class} function symbolAvoidEdges(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function symbolPlacement(value: JString): JPropertyValue; cdecl; overload;
+    {class} function symbolPlacement(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function symbolScreenSpace(value: JBoolean): JPropertyValue; cdecl; overload;
+    {class} function symbolScreenSpace(value: JExpression): JPropertyValue; cdecl; overload;
     {class} function symbolSortKey(value: JFloat): JPropertyValue; cdecl; overload;
     {class} function symbolSortKey(value: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function symbolSpacing(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function symbolSpacing(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function symbolZOrder(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function symbolZOrder(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textAllowOverlap(boolean: JBoolean): JPropertyValue; cdecl; overload;
-    //{class} function textAllowOverlap(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textAnchor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function textAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function textColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function textColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textField(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function textField(formatted: JFormatted): JPropertyValue; cdecl; overload;
-    //{class} function textField(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textFont(string_: TJavaObjectArray<JString>): JPropertyValue; cdecl; overload;
-    //{class} function textFont(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textHaloBlur(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function textHaloBlur(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textHaloColor(i: Integer): JPropertyValue; cdecl; overload;
-    //{class} function textHaloColor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function textHaloColor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textHaloWidth(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function textHaloWidth(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textIgnorePlacement(boolean: JBoolean): JPropertyValue; cdecl; overload;
-    //{class} function textIgnorePlacement(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textJustify(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function textJustify(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textKeepUpright(boolean: JBoolean): JPropertyValue; cdecl; overload;
-    //{class} function textKeepUpright(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textLetterSpacing(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function textLetterSpacing(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textLineHeight(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function textLineHeight(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textMaxAngle(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function textMaxAngle(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textMaxWidth(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function textMaxWidth(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textOffset(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function textOffset(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textOpacity(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function textOpacity(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textOptional(boolean: JBoolean): JPropertyValue; cdecl; overload;
-    //{class} function textOptional(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textPadding(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function textPadding(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textPitchAlignment(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function textPitchAlignment(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textRadialOffset(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function textRadialOffset(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textRotate(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function textRotate(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textRotationAlignment(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function textRotationAlignment(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textSize(float: JFloat): JPropertyValue; cdecl; overload;
-    //{class} function textSize(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textTransform(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function textTransform(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textTranslate(float: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
-    //{class} function textTranslate(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textTranslateAnchor(string_: JString): JPropertyValue; cdecl; overload;
-    //{class} function textTranslateAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textVariableAnchor(string_: TJavaObjectArray<JString>): JPropertyValue; cdecl; overload;
-    //{class} function textVariableAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textVariableAnchorOffset(object_: TJavaObjectArray<JObject>): JPropertyValue; cdecl; overload;
-    //{class} function textVariableAnchorOffset(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function textWritingMode(string_: TJavaObjectArray<JString>): JPropertyValue; cdecl; overload;
-    //{class} function textWritingMode(expression: JExpression): JPropertyValue; cdecl; overload;
-    //{class} function visibility(string_: JString): JPropertyValue; cdecl;
+    {class} function symbolSpacing(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function symbolSpacing(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function symbolZOrder(value: JString): JPropertyValue; cdecl; overload;
+    {class} function symbolZOrder(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textAllowOverlap(value: JBoolean): JPropertyValue; cdecl; overload;
+    {class} function textAllowOverlap(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textAnchor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function textAnchor(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function textColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function textColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textField(value: JString): JPropertyValue; cdecl; overload;
+    //{class} function textField(value: JFormatted): JPropertyValue; cdecl; overload;
+    {class} function textField(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textFont(value: TJavaObjectArray<JString>): JPropertyValue; cdecl; overload;
+    {class} function textFont(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textHaloBlur(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function textHaloBlur(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textHaloColor(value: Integer): JPropertyValue; cdecl; overload;
+    {class} function textHaloColor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function textHaloColor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textHaloWidth(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function textHaloWidth(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textIgnorePlacement(value: JBoolean): JPropertyValue; cdecl; overload;
+    {class} function textIgnorePlacement(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textJustify(value: JString): JPropertyValue; cdecl; overload;
+    {class} function textJustify(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textKeepUpright(value: JBoolean): JPropertyValue; cdecl; overload;
+    {class} function textKeepUpright(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textLetterSpacing(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function textLetterSpacing(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textLineHeight(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function textLineHeight(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textMaxAngle(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function textMaxAngle(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textMaxWidth(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function textMaxWidth(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textOffset(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function textOffset(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textOpacity(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function textOpacity(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textOptional(value: JBoolean): JPropertyValue; cdecl; overload;
+    {class} function textOptional(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textPadding(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function textPadding(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textPitchAlignment(value: JString): JPropertyValue; cdecl; overload;
+    {class} function textPitchAlignment(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textRadialOffset(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function textRadialOffset(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textRotate(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function textRotate(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textRotationAlignment(value: JString): JPropertyValue; cdecl; overload;
+    {class} function textRotationAlignment(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textSize(value: JFloat): JPropertyValue; cdecl; overload;
+    {class} function textSize(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textTransform(value: JString): JPropertyValue; cdecl; overload;
+    {class} function textTransform(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textTranslate(value: TJavaObjectArray<JFloat>): JPropertyValue; cdecl; overload;
+    {class} function textTranslate(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textTranslateAnchor(value: JString): JPropertyValue; cdecl; overload;
+    {class} function textTranslateAnchor(expression: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textVariableAnchor(value: TJavaObjectArray<JString>): JPropertyValue; cdecl; overload;
+    {class} function textVariableAnchor(value: JExpression): JPropertyValue; cdecl; overload;
+    //{class} function textVariableAnchorOffset(value: TJavaObjectArray<JObject>): JPropertyValue; cdecl; overload;
+    //{class} function textVariableAnchorOffset(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function textWritingMode(value: TJavaObjectArray<JString>): JPropertyValue; cdecl; overload;
+    {class} function textWritingMode(value: JExpression): JPropertyValue; cdecl; overload;
+    {class} function visibility(value: JString): JPropertyValue; cdecl;
   end;
   [JavaSignature('org/maplibre/android/style/layers/PropertyFactory')]
   JPropertyFactory = interface(JObject)
@@ -814,6 +912,312 @@ type
   end;
   TJSymbolLayer = class(TJavaGenericImport<JSymbolLayerClass, JSymbolLayer>) end;
 
+  {**************************************}
+  JLineLayerClass = interface(JLayerClass)
+    ['{D38CAF21-B119-47FC-95EF-9F3B034CFD2F}']
+    {class} function init(layerId: JString; sourceId: JString): JLineLayer; cdecl;
+  end;
+  [JavaSignature('org/maplibre/android/style/layers/LineLayer')]
+  JLineLayer = interface(JLayer)
+    ['{22EF9E5A-9D06-4FE0-A81A-26A7DC3DBFFB}']
+    //function getFilter: JExpression; cdecl;
+    //function getLineBlur: JPropertyValue; cdecl;
+    //function getLineBlurTransition: JTransitionOptions; cdecl;
+    //function getLineCap: JPropertyValue; cdecl;
+    //function getLineColor: JPropertyValue; cdecl;
+    //function getLineColorAsInt: Integer; cdecl;
+    //function getLineColorTransition: JTransitionOptions; cdecl;
+    //function getLineDasharray: JPropertyValue; cdecl;
+    //function getLineDasharrayTransition: JTransitionOptions; cdecl;
+    //function getLineGapWidth: JPropertyValue; cdecl;
+    //function getLineGapWidthTransition: JTransitionOptions; cdecl;
+    //function getLineGradient: JPropertyValue; cdecl;
+    //function getLineGradientAsInt: Integer; cdecl;
+    //function getLineJoin: JPropertyValue; cdecl;
+    //function getLineMiterLimit: JPropertyValue; cdecl;
+    //function getLineOffset: JPropertyValue; cdecl;
+    //function getLineOffsetTransition: JTransitionOptions; cdecl;
+    //function getLineOpacity: JPropertyValue; cdecl;
+    //function getLineOpacityTransition: JTransitionOptions; cdecl;
+    //function getLinePattern: JPropertyValue; cdecl;
+    //function getLinePatternTransition: JTransitionOptions; cdecl;
+    //function getLineRoundLimit: JPropertyValue; cdecl;
+    //function getLineSortKey: JPropertyValue; cdecl;
+    //function getLineTranslate: JPropertyValue; cdecl;
+    //function getLineTranslateAnchor: JPropertyValue; cdecl;
+    //function getLineTranslateTransition: JTransitionOptions; cdecl;
+    //function getLineWidth: JPropertyValue; cdecl;
+    //function getLineWidthTransition: JTransitionOptions; cdecl;
+    //function getSourceId: JString; cdecl;
+    //function getSourceLayer: JString; cdecl;
+    //procedure setFilter(expression: JExpression); cdecl;
+    //procedure setLineBlurTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setLineColorTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setLineDasharrayTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setLineGapWidthTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setLineOffsetTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setLineOpacityTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setLinePatternTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setLineTranslateTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setLineWidthTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setSourceLayer(string_: JString); cdecl;
+    //function withFilter(expression: JExpression): JLineLayer; cdecl;
+    //function withProperties(propertyValue: TJavaObjectArray<JPropertyValue>): JLineLayer; cdecl;
+    //function withSourceLayer(string_: JString): JLineLayer; cdecl;
+  end;
+  TJLineLayer = class(TJavaGenericImport<JLineLayerClass, JLineLayer>) end;
+
+  {****************************************}
+  JCircleLayerClass = interface(JLayerClass)
+    ['{FBC962CF-1161-4023-8950-B5FE3FE0A7FB}']
+    {class} function init(layerId: JString; sourceId: JString): JCircleLayer; cdecl;
+  end;
+  [JavaSignature('org/maplibre/android/style/layers/CircleLayer')]
+  JCircleLayer = interface(JLayer)
+    ['{0185645D-07CC-49A2-84E8-553B5A3EE072}']
+    //function getCircleBlur: JPropertyValue; cdecl;
+    //function getCircleBlurTransition: JTransitionOptions; cdecl;
+    //function getCircleColor: JPropertyValue; cdecl;
+    //function getCircleColorAsInt: Integer; cdecl;
+    //function getCircleColorTransition: JTransitionOptions; cdecl;
+    //function getCircleOpacity: JPropertyValue; cdecl;
+    //function getCircleOpacityTransition: JTransitionOptions; cdecl;
+    //function getCirclePitchAlignment: JPropertyValue; cdecl;
+    //function getCirclePitchScale: JPropertyValue; cdecl;
+    //function getCircleRadius: JPropertyValue; cdecl;
+    //function getCircleRadiusTransition: JTransitionOptions; cdecl;
+    //function getCircleSortKey: JPropertyValue; cdecl;
+    //function getCircleStrokeColor: JPropertyValue; cdecl;
+    //function getCircleStrokeColorAsInt: Integer; cdecl;
+    //function getCircleStrokeColorTransition: JTransitionOptions; cdecl;
+    //function getCircleStrokeOpacity: JPropertyValue; cdecl;
+    //function getCircleStrokeOpacityTransition: JTransitionOptions; cdecl;
+    //function getCircleStrokeWidth: JPropertyValue; cdecl;
+    //function getCircleStrokeWidthTransition: JTransitionOptions; cdecl;
+    //function getCircleTranslate: JPropertyValue; cdecl;
+    //function getCircleTranslateAnchor: JPropertyValue; cdecl;
+    //function getCircleTranslateTransition: JTransitionOptions; cdecl;
+    //function getFilter: JExpression; cdecl;
+    //function getSourceId: JString; cdecl;
+    //function getSourceLayer: JString; cdecl;
+    //procedure setCircleBlurTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setCircleColorTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setCircleOpacityTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setCircleRadiusTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setCircleStrokeColorTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setCircleStrokeOpacityTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setCircleStrokeWidthTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setCircleTranslateTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFilter(expression: JExpression); cdecl;
+    //procedure setSourceLayer(string_: JString); cdecl;
+    //function withFilter(expression: JExpression): JCircleLayer; cdecl;
+    //function withProperties(propertyValue: TJavaObjectArray<JPropertyValue>): JCircleLayer; cdecl;
+    //function withSourceLayer(string_: JString): JCircleLayer; cdecl;
+  end;
+  TJCircleLayer = class(TJavaGenericImport<JCircleLayerClass, JCircleLayer>) end;
+
+  {**************************************}
+  JFillLayerClass = interface(JLayerClass)
+    ['{06091FE0-8320-42E6-84C9-E31766DA3AA6}']
+    {class} function init(layerId: JString; sourceId: JString): JFillLayer; cdecl;
+  end;
+  [JavaSignature('org/maplibre/android/style/layers/FillLayer')]
+  JFillLayer = interface(JLayer)
+    ['{ED890C3F-5905-4EF2-A3B7-2CD20BB65EB0}']
+    //function getFillAntialias: JPropertyValue; cdecl;
+    //function getFillColor: JPropertyValue; cdecl;
+    //function getFillColorAsInt: Integer; cdecl;
+    //function getFillColorTransition: JTransitionOptions; cdecl;
+    //function getFillOpacity: JPropertyValue; cdecl;
+    //function getFillOpacityTransition: JTransitionOptions; cdecl;
+    //function getFillOutlineColor: JPropertyValue; cdecl;
+    //function getFillOutlineColorAsInt: Integer; cdecl;
+    //function getFillOutlineColorTransition: JTransitionOptions; cdecl;
+    //function getFillPattern: JPropertyValue; cdecl;
+    //function getFillPatternTransition: JTransitionOptions; cdecl;
+    //function getFillSortKey: JPropertyValue; cdecl;
+    //function getFillTranslate: JPropertyValue; cdecl;
+    //function getFillTranslateAnchor: JPropertyValue; cdecl;
+    //function getFillTranslateTransition: JTransitionOptions; cdecl;
+    //function getFilter: JExpression; cdecl;
+    //function getSourceId: JString; cdecl;
+    //function getSourceLayer: JString; cdecl;
+    //procedure setFillColorTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFillOpacityTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFillOutlineColorTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFillPatternTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFillTranslateTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFilter(expression: JExpression); cdecl;
+    //procedure setSourceLayer(string_: JString); cdecl;
+    //function withFilter(expression: JExpression): JFillLayer; cdecl;
+    //function withProperties(propertyValue: TJavaObjectArray<JPropertyValue>): JFillLayer; cdecl;
+    //function withSourceLayer(string_: JString): JFillLayer; cdecl;
+  end;
+  TJFillLayer = class(TJavaGenericImport<JFillLayerClass, JFillLayer>) end;
+
+  {***********************************************}
+  JFillExtrusionLayerClass = interface(JLayerClass)
+    ['{7E9DF104-C1BF-447A-BA55-17A1D10ED76C}']
+    {class} function init(layerId: JString; sourceId: JString): JFillExtrusionLayer; cdecl;
+  end;
+  [JavaSignature('org/maplibre/android/style/layers/FillExtrusionLayer')]
+  JFillExtrusionLayer = interface(JLayer)
+    ['{24DA06AE-47BD-47B6-BFC6-93D1B7A554FD}']
+    //function getFillExtrusionBase: JPropertyValue; cdecl;
+    //function getFillExtrusionBaseTransition: JTransitionOptions; cdecl;
+    //function getFillExtrusionColor: JPropertyValue; cdecl;
+    //function getFillExtrusionColorAsInt: Integer; cdecl;
+    //function getFillExtrusionColorTransition: JTransitionOptions; cdecl;
+    //function getFillExtrusionHeight: JPropertyValue; cdecl;
+    //function getFillExtrusionHeightTransition: JTransitionOptions; cdecl;
+    //function getFillExtrusionOpacity: JPropertyValue; cdecl;
+    //function getFillExtrusionOpacityTransition: JTransitionOptions; cdecl;
+    //function getFillExtrusionPattern: JPropertyValue; cdecl;
+    //function getFillExtrusionPatternTransition: JTransitionOptions; cdecl;
+    //function getFillExtrusionRoundedCornerDistance: JPropertyValue; cdecl;
+    //function getFillExtrusionTranslate: JPropertyValue; cdecl;
+    //function getFillExtrusionTranslateAnchor: JPropertyValue; cdecl;
+    //function getFillExtrusionTranslateTransition: JTransitionOptions; cdecl;
+    //function getFillExtrusionVerticalGradient: JPropertyValue; cdecl;
+    //function getFilter: JExpression; cdecl;
+    //function getSourceId: JString; cdecl;
+    //function getSourceLayer: JString; cdecl;
+    //procedure setFillExtrusionBaseTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFillExtrusionColorTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFillExtrusionHeightTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFillExtrusionOpacityTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFillExtrusionPatternTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFillExtrusionTranslateTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFilter(expression: JExpression); cdecl;
+    //procedure setSourceLayer(string_: JString); cdecl;
+    //function withFilter(expression: JExpression): JFillExtrusionLayer; cdecl;
+    //function withProperties(propertyValue: TJavaObjectArray<JPropertyValue>): JFillExtrusionLayer; cdecl;
+    //function withSourceLayer(string_: JString): JFillExtrusionLayer; cdecl;
+  end;
+  TJFillExtrusionLayer = class(TJavaGenericImport<JFillExtrusionLayerClass, JFillExtrusionLayer>) end;
+
+  {*****************************************}
+  JHeatmapLayerClass = interface(JLayerClass)
+    ['{E62A05EA-BAF0-43AC-848B-F3C34604F51F}']
+    {class} function init(layerId: JString; sourceId: JString): JHeatmapLayer; cdecl;
+  end;
+  [JavaSignature('org/maplibre/android/style/layers/HeatmapLayer')]
+  JHeatmapLayer = interface(JLayer)
+    ['{6909BD8E-EBBE-40D6-B906-E98FA8035631}']
+    //function getFilter: JExpression; cdecl;
+    //function getHeatmapColor: JPropertyValue; cdecl;
+    //function getHeatmapColorAsInt: Integer; cdecl;
+    //function getHeatmapIntensity: JPropertyValue; cdecl;
+    //function getHeatmapIntensityTransition: JTransitionOptions; cdecl;
+    //function getHeatmapOpacity: JPropertyValue; cdecl;
+    //function getHeatmapOpacityTransition: JTransitionOptions; cdecl;
+    //function getHeatmapRadius: JPropertyValue; cdecl;
+    //function getHeatmapRadiusTransition: JTransitionOptions; cdecl;
+    //function getHeatmapWeight: JPropertyValue; cdecl;
+    //function getSourceId: JString; cdecl;
+    //function getSourceLayer: JString; cdecl;
+    //procedure setFilter(expression: JExpression); cdecl;
+    //procedure setHeatmapIntensityTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setHeatmapOpacityTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setHeatmapRadiusTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setSourceLayer(string_: JString); cdecl;
+    //function withFilter(expression: JExpression): JHeatmapLayer; cdecl;
+    //function withProperties(propertyValue: TJavaObjectArray<JPropertyValue>): JHeatmapLayer; cdecl;
+    //function withSourceLayer(string_: JString): JHeatmapLayer; cdecl;
+  end;
+  TJHeatmapLayer = class(TJavaGenericImport<JHeatmapLayerClass, JHeatmapLayer>) end;
+
+  {*********************************************}
+  JColorReliefLayerClass = interface(JLayerClass)
+    ['{9AC13837-56AF-4940-A72A-D44C43DE3294}']
+    {class} function init(layerId: JString; sourceId: JString): JColorReliefLayer; cdecl;
+  end;
+  [JavaSignature('org/maplibre/android/style/layers/ColorReliefLayer')]
+  JColorReliefLayer = interface(JLayer)
+    ['{76948547-770E-4335-98E6-BF1CD576AE6D}']
+    //function getColorReliefColor: JPropertyValue; cdecl;
+    //function getColorReliefColorAsInt: Integer; cdecl;
+    //function getColorReliefOpacity: JPropertyValue; cdecl;
+    //function getColorReliefOpacityTransition: JTransitionOptions; cdecl;
+    //function getFilter: JExpression; cdecl;
+    //function getSourceId: JString; cdecl;
+    //function getSourceLayer: JString; cdecl;
+    //procedure setColorReliefOpacityTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setFilter(expression: JExpression); cdecl;
+    //procedure setSourceLayer(string_: JString); cdecl;
+    //function withFilter(expression: JExpression): JColorReliefLayer; cdecl;
+    //function withProperties(propertyValue: TJavaObjectArray<JPropertyValue>): JColorReliefLayer; cdecl;
+    //function withSourceLayer(string_: JString): JColorReliefLayer; cdecl;
+  end;
+  TJColorReliefLayer = class(TJavaGenericImport<JColorReliefLayerClass, JColorReliefLayer>) end;
+
+  {*******************************************}
+  JHillshadeLayerClass = interface(JLayerClass)
+    ['{7347701B-B997-4F66-BD35-6C0D98EC8147}']
+    {class} function init(layerId: JString; sourceId: JString): JHillshadeLayer; cdecl;
+  end;
+  [JavaSignature('org/maplibre/android/style/layers/HillshadeLayer')]
+  JHillshadeLayer = interface(JLayer)
+    ['{CD1C7626-6062-46D2-944E-1B2899506B8B}']
+    //function getHillshadeAccentColor: JPropertyValue; cdecl;
+    //function getHillshadeAccentColorAsInt: Integer; cdecl;
+    //function getHillshadeAccentColorTransition: JTransitionOptions; cdecl;
+    //function getHillshadeExaggeration: JPropertyValue; cdecl;
+    //function getHillshadeExaggerationTransition: JTransitionOptions; cdecl;
+    //function getHillshadeHighlightColor: JPropertyValue; cdecl;
+    //function getHillshadeHighlightColorTransition: JTransitionOptions; cdecl;
+    //function getHillshadeIlluminationAltitude: JPropertyValue; cdecl;
+    //function getHillshadeIlluminationAnchor: JPropertyValue; cdecl;
+    //function getHillshadeIlluminationDirection: JPropertyValue; cdecl;
+    //function getHillshadeMethod: JPropertyValue; cdecl;
+    //function getHillshadeShadowColor: JPropertyValue; cdecl;
+    //function getHillshadeShadowColorTransition: JTransitionOptions; cdecl;
+    //function getSourceId: JString; cdecl;
+    //procedure setHillshadeAccentColorTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setHillshadeExaggerationTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setHillshadeHighlightColorTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setHillshadeShadowColorTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setSourceLayer(string_: JString); cdecl;
+    //function withProperties(propertyValue: TJavaObjectArray<JPropertyValue>): JHillshadeLayer; cdecl;
+    //function withSourceLayer(string_: JString): JHillshadeLayer; cdecl;
+  end;
+  TJHillshadeLayer = class(TJavaGenericImport<JHillshadeLayerClass, JHillshadeLayer>) end;
+
+  {****************************************}
+  JRasterLayerClass = interface(JLayerClass)
+    ['{5CE6D498-5D21-4681-81E3-17009C3E8A4B}']
+    {class} function init(layerId: JString; sourceId: JString): JRasterLayer; cdecl;
+  end;
+  [JavaSignature('org/maplibre/android/style/layers/RasterLayer')]
+  JRasterLayer = interface(JLayer)
+    ['{FB838FB6-C0D8-40FD-8B07-AED185246FC3}']
+    //function getRasterBrightnessMax: JPropertyValue; cdecl;
+    //function getRasterBrightnessMaxTransition: JTransitionOptions; cdecl;
+    //function getRasterBrightnessMin: JPropertyValue; cdecl;
+    //function getRasterBrightnessMinTransition: JTransitionOptions; cdecl;
+    //function getRasterContrast: JPropertyValue; cdecl;
+    //function getRasterContrastTransition: JTransitionOptions; cdecl;
+    //function getRasterFadeDuration: JPropertyValue; cdecl;
+    //function getRasterHueRotate: JPropertyValue; cdecl;
+    //function getRasterHueRotateTransition: JTransitionOptions; cdecl;
+    //function getRasterOpacity: JPropertyValue; cdecl;
+    //function getRasterOpacityTransition: JTransitionOptions; cdecl;
+    //function getRasterResampling: JPropertyValue; cdecl;
+    //function getRasterSaturation: JPropertyValue; cdecl;
+    //function getRasterSaturationTransition: JTransitionOptions; cdecl;
+    //function getSourceId: JString; cdecl;
+    //procedure setRasterBrightnessMaxTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setRasterBrightnessMinTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setRasterContrastTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setRasterHueRotateTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setRasterOpacityTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setRasterSaturationTransition(transitionOptions: JTransitionOptions); cdecl;
+    //procedure setSourceLayer(string_: JString); cdecl;
+    //function withProperties(propertyValue: TJavaObjectArray<JPropertyValue>): JRasterLayer; cdecl;
+    //function withSourceLayer(string_: JString): JRasterLayer; cdecl;
+  end;
+  TJRasterLayer = class(TJavaGenericImport<JRasterLayerClass, JRasterLayer>) end;
+
   {************************************}
   JSourceClass = interface(JObjectClass)
     ['{9D2D1C95-60A5-434E-A887-FAB17ADDD5E7}']
@@ -881,6 +1285,81 @@ type
     //procedure setUrl(string_: JString); cdecl; overload;
   end;
   TJGeoJsonSource = class(TJavaGenericImport<JGeoJsonSourceClass, JGeoJsonSource>) end;
+
+  {******************************************}
+  JRasterSourceClass = interface(JSourceClass)
+    ['{24F6B1F6-EEF7-4882-BE01-3C78AC25B128}']
+    //{class} function _GetCompanion: JRasterSource_Companion; cdecl;
+    //{class} function _GetDEFAULT_TILE_SIZE: Integer; cdecl;
+    //{class} function init(l: Int64): JRasterSource; cdecl; overload;
+    {class} function init(id: JString; url: JURL): JRasterSource; cdecl; overload;
+    {class} function init(id: JString; uri: JURI): JRasterSource; cdecl; overload;
+    {class} function init(id: JString; uri: JString): JRasterSource; cdecl; overload;
+    {class} function init(id: JString; uri: JString; tileSize: Integer): JRasterSource; cdecl; overload;
+    {class} function init(id: JString; tileSet: JTileSet): JRasterSource; cdecl; overload;
+    {class} function init(id: JString; tileSet: JTileSet; tileSize: Integer): JRasterSource; cdecl; overload;
+    //{class} property Companion: JRasterSource_Companion read _GetCompanion;
+    //{class} property DEFAULT_TILE_SIZE: Integer read _GetDEFAULT_TILE_SIZE;
+  end;
+  [JavaSignature('org/maplibre/android/style/sources/RasterSource')]
+  JRasterSource = interface(JSource)
+    ['{56B9F10D-B789-49A0-9F5D-8EAA7A71B444}']
+    //function getUri: JString; cdecl;
+    //function getUrl: JString; cdecl;
+  end;
+  TJRasterSource = class(TJavaGenericImport<JRasterSourceClass, JRasterSource>) end;
+
+  {*************************************}
+  JTileSetClass = interface(JObjectClass)
+    ['{CB746429-E55B-456B-9C23-83AC4780D18D}']
+    {class} function init(tilejson: JString; tiles: TJavaObjectArray<JString>): JTileSet; cdecl;
+  end;
+  [JavaSignature('org/maplibre/android/style/sources/TileSet')]
+  JTileSet = interface(JObject)
+    ['{36629FF1-E2DF-41C1-9BCF-86736490B288}']
+    //function _GetmaxZoom: JFloat; cdecl;
+    //procedure _SetmaxZoom(Value: JFloat); cdecl;
+    //function _GetminZoom: JFloat; cdecl;
+    //procedure _SetminZoom(Value: JFloat); cdecl;
+    //function getAttribution: JString; cdecl;
+    //function getBounds: TJavaObjectArray<JFloat>; cdecl;
+    //function getCenter: TJavaObjectArray<JFloat>; cdecl;
+    //function getData: TJavaObjectArray<JString>; cdecl;
+    //function getDescription: JString; cdecl;
+    //function getEncoding: JString; cdecl;
+    //function getGrids: TJavaObjectArray<JString>; cdecl;
+    //function getLegend: JString; cdecl;
+    //function getMaxZoom: Single; cdecl;
+    //function getMinZoom: Single; cdecl;
+    //function getName: JString; cdecl;
+    //function getScheme: JString; cdecl;
+    //function getTemplate: JString; cdecl;
+    //function getTilejson: JString; cdecl;
+    //function getTiles: TJavaObjectArray<JString>; cdecl;
+    //function getVersion: JString; cdecl;
+    //procedure setAttribution(string_: JString); cdecl;
+    //procedure setBounds(f: TJavaArray<Single>); cdecl; overload;
+    //procedure setBounds(f: Single; f1: Single; f2: Single; f3: Single); cdecl; overload;
+    //procedure setBounds(float: TJavaObjectArray<JFloat>); cdecl; overload;
+    //procedure setBounds(latLngBounds: Jgeometry_LatLngBounds); cdecl; overload;
+    //procedure setCenter(f: TJavaArray<Single>); cdecl; overload;
+    //procedure setCenter(latLng: Jgeometry_LatLng); cdecl; overload;
+    //procedure setData(string_: TJavaObjectArray<JString>); cdecl;
+    //procedure setDescription(string_: JString); cdecl;
+    //procedure setEncoding(string_: JString); cdecl;
+    //procedure setGrids(string_: TJavaObjectArray<JString>); cdecl;
+    //procedure setLegend(string_: JString); cdecl;
+    procedure setMaxZoom(maxZoom: Single); cdecl;
+    procedure setMinZoom(minZoom: Single); cdecl;
+    //procedure setName(string_: JString); cdecl;
+    //procedure setScheme(string_: JString); cdecl;
+    //procedure setTemplate(string_: JString); cdecl;
+    //procedure setVersion(string_: JString); cdecl;
+    //function toValueObject: JMap; cdecl;
+    //property maxZoom: JFloat read _GetmaxZoom write _SetmaxZoom;
+    //property minZoom: JFloat read _GetminZoom write _SetminZoom;
+  end;
+  TJTileSet = class(TJavaGenericImport<JTileSetClass, JTileSet>) end;
 
   {*********************************************}
   JLatLngClass = interface(JObjectClass)
@@ -1030,11 +1509,11 @@ type
     //function getUrl: JString; cdecl; // Deprecated
     //function isFullyLoaded: Boolean; cdecl;
     procedure removeImage(name: JString); cdecl;
-    //function removeLayer(string_: JString): Boolean; cdecl; overload;
-    //function removeLayer(layer: JLayer): Boolean; cdecl; overload;
+    function removeLayer(layerId: JString): Boolean; cdecl; overload;
+    function removeLayer(layer: JLayer): Boolean; cdecl; overload;
     //function removeLayerAt(i: Integer): Boolean; cdecl;
-    //function removeSource(string_: JString): Boolean; cdecl; overload;
-    //function removeSource(source: JSource): Boolean; cdecl; overload;
+    function removeSource(sourceId: JString): Boolean; cdecl; overload;
+    function removeSource(source: JSource): Boolean; cdecl; overload;
     //procedure setTransition(transitionOptions: JTransitionOptions); cdecl;
   end;
   TJStyle = class(TJavaGenericImport<JStyleClass, JStyle>) end;
@@ -1225,7 +1704,7 @@ type
     //function getTileLodPitchThreshold: Double; cdecl;
     //function getTileLodScale: Double; cdecl;
     //function getTileLodZoomShift: Double; cdecl;
-    //function getUiSettings: Jmaps_UiSettings; cdecl;
+    function getUiSettings: JUiSettings; cdecl;
     //function getWidth: Single; cdecl;
     //function getZoom: Double; cdecl;
     //function isAllowConcurrentMultipleOpenInfoWindows: Boolean; cdecl; // Deprecated

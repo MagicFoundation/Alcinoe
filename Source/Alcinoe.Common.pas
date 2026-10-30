@@ -86,6 +86,17 @@ type
   end;
   TALNameValueArrayA = Array of TALNameValuePairA;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALThreadQueueCleaner = Class(TThread)
+  protected
+    procedure Execute; override;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure AfterConstruction; override;
+    procedure BeforeDestruction; override;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALWorkerThreadRefProc = reference to procedure(var AContext: Tobject);
   TALWorkerThreadObjProc = procedure(var AContext: Tobject) of object;
@@ -963,7 +974,7 @@ function ALGetIanaTimeZoneId: String;
 function ALUTCNow: TDateTime;
 function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
-Function ALInc(var x: integer; Count: integer): Integer;
+Function ALInc(var x: integer; const Count: integer = 1): Integer;
 procedure ALAssignError(Const ASource: TObject; const ADest: Tobject);
 procedure ALMove(const Source; var Dest; Count: NativeInt); inline;
 function ALSameBytes(const ABytes1: TBytes; const ABytes2: TBytes): Boolean;
@@ -1201,6 +1212,39 @@ constructor TALNameValuePairA.Create(const AName, AValue: ansiString);
 begin
   Name := AName;
   Value := AValue;
+end;
+
+{*************************************}
+constructor TALThreadQueueCleaner.Create;
+begin
+  // No initialization required. This thread is
+  // used only as an owner for TThread.Queue callbacks.
+end;
+
+{*************************************}
+destructor TALThreadQueueCleaner.Destroy;
+begin
+  // Cancel any pending callbacks queued with this thread as their owner.
+  RemoveQueuedEvents(Self);
+end;
+
+{**********************************************}
+procedure TALThreadQueueCleaner.AfterConstruction;
+begin
+  // No post-construction processing required.
+end;
+
+{**********************************************}
+procedure TALThreadQueueCleaner.BeforeDestruction;
+begin
+  // No pre-destruction processing required.
+end;
+
+{************************************}
+procedure TALThreadQueueCleaner.Execute;
+begin
+  // No thread execution required. This instance is
+  // used solely to identify queued callbacks.
 end;
 
 {****************************************}
@@ -4147,8 +4191,8 @@ begin
   result := TTimeZone.Local.ToUniversalTime(NOW);
 end;
 
-{******************************************************}
-Function ALInc(var x: integer; Count: integer): Integer;
+{****************************************************************}
+Function ALInc(var x: integer; const Count: integer = 1): Integer;
 begin
   inc(X, count);
   result := X;

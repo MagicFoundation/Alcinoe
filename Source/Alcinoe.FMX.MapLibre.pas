@@ -1,4 +1,4 @@
-unit Alcinoe.FMX.MapLibre;
+﻿unit Alcinoe.FMX.MapLibre;
 
 interface
 
@@ -7,6 +7,7 @@ interface
 uses
   System.Classes,
   System.UITypes,
+  System.Types,
   FMX.Controls,
   {$IF defined(ANDROID)}
   System.Messaging,
@@ -26,248 +27,255 @@ uses
   {$ENDIF}
   {$IF defined(ALMacOS)}
   Alcinoe.FMX.WebBrowser,
+  Alcinoe.fmx.NativeView.Mac,
   {$ENDIF}
   {$IF defined(MSWINDOWS)}
   Alcinoe.FMX.NativeView.Win,
   Alcinoe.FMX.WebBrowser,
   {$ENDIF}
   Alcinoe.Common,
+  Alcinoe.StringList,
   Alcinoe.FMX.NativeControl;
 
 type
 
-  {******************}
-  TALMapLibre = class;
-
-  {********************************}
-  TALMapLibreCameraPosition = record
-    bearing: Double;
-    padding: TALRectD;
-    roll: Double;
-    target: TALLatLng;
-    tilt: Double;
-    zoom: Double;
-    constructor Create(
-                  const ABearing: Double;
-                  const APadding: TALRectD;
-                  const ARoll: Double;
-                  const ATarget: TALLatLng;
-                  const ATilt: Double;
-                  const AZoom: Double);
-  end;
-
-{$REGION ' ANDROID'}
-{$IF defined(android)}
-
-  {**************************************************}
-  TALAndroidMapLibreView = class(TALAndroidNativeView)
-  private
-    type
-      // -------------------
-      // TOnMapReadyCallback
-      TOnMapReadyCallback = class(TJavaLocal, JOnMapReadyCallback)
-      private
-        FMapLibreView: TALAndroidMapLibreView;
-      public
-        constructor Create(const AMapLibreView: TALAndroidMapLibreView);
-        procedure onMapReady(maplibreMap: JMapLibreMap); cdecl;
-      end;
-      // --------------------------------
-      // TOnDidFinishLoadingStyleListener
-      TOnDidFinishLoadingStyleListener = class(TJavaLocal, JMapView_OnDidFinishLoadingStyleListener)
-      private
-        FMapLibreView: TALAndroidMapLibreView;
-      public
-        constructor Create(const AMapLibreView: TALAndroidMapLibreView);
-        procedure onDidFinishLoadingStyle; cdecl;
-      end;
-      // ---------------------------
-      // TOnCameraMoveStartedListener
-      TOnCameraMoveStartedListener = class(TJavaLocal, JMapLibreMap_OnCameraMoveStartedListener)
-      private
-        FMapLibreView: TALAndroidMapLibreView;
-      public
-        constructor Create(const AMapLibreView: TALAndroidMapLibreView);
-        procedure onCameraMoveStarted(reason: Integer); cdecl;
-      end;
-      // ---------------------------
-      // TOnCameraMoveListener
-      TOnCameraMoveListener = class(TJavaLocal, JMapLibreMap_OnCameraMoveListener)
-      private
-        FMapLibreView: TALAndroidMapLibreView;
-      public
-        constructor Create(const AMapLibreView: TALAndroidMapLibreView);
-        procedure onCameraMove; cdecl;
-      end;
-      // --------------------------
-      // TOnCameraIdleListener
-      TOnCameraIdleListener = class(TJavaLocal, JMapLibreMap_OnCameraIdleListener)
-      private
-        FMapLibreView: TALAndroidMapLibreView;
-      public
-        constructor Create(const AMapLibreView: TALAndroidMapLibreView);
-        procedure onCameraIdle; cdecl;
-      end;
-      // -------------------
-      // TOnMapClickListener
-      TOnMapClickListener = class(TJavaLocal, JMapLibreMap_OnMapClickListener)
-      private
-        FMapLibreView: TALAndroidMapLibreView;
-      public
-        constructor Create(const AMapLibreView: TALAndroidMapLibreView);
-        function onMapClick(point: JLatLng): Boolean; cdecl;
-      end;
-  private
-    FMaplibreMap: JMapLibreMap;
-    FLoadingSpinnerView: JView;
-    FOnDidFinishLoadingStyleListener: TOnDidFinishLoadingStyleListener;
-    FOnCameraMoveStartedListener: TOnCameraMoveStartedListener;
-    FOnCameraMoveListener: TOnCameraMoveListener;
-    FOnCameraIdleListener: TOnCameraIdleListener;
-    FOnMapClickListener: TOnMapClickListener;
-    FOnMapReadyCallback: TOnMapReadyCallback;
-    function GetView: JMapView;
-    function GetControl: TALMapLibre;
-    procedure ApplicationEventHandler(const Sender: TObject; const M: TMessage);
-  protected
-    function CreateView: JView; override;
-  public
-    constructor Create; override;
-    destructor Destroy; override;
-    property View: JMapView read GetView;
-    property Control: TALMapLibre read GetControl;
-    procedure SetVisible(const Value: Boolean); override;
-    procedure ShowLoadingSpinner(const AView: JView); overload;
-    procedure ShowLoadingSpinner(const AColor: TAlphaColor = Talphacolors.null; const AWidth: Single = 0; const AHeight: Single = 0); overload;
-    procedure HideLoadingSpinner;
-    procedure SetCenterCoordinate(const ALatitude, ALongitude: Double; const AZoomLevel: double);
-    procedure SetImage(
-                const AResourceName: String;
-                const AStream: TStream;
-                const AScale: Single;
-                const W, H: single;
-                const AName: String);
-    procedure RemoveImage(const AName: String);
-    procedure SetMarkers(const AGeoJSON: String; const AIconAllowsOverlap: Boolean);
-    function GetViewportBounds: TALRectD;
-    function GetCameraPosition: TALMapLibreCameraPosition;
-    procedure ApplyStyle;
-  end;
-
-{$endif}
-{$ENDREGION}
-
-{$REGION ' IOS'}
-{$IF defined(ios)}
-
-  {****************************************}
-  IALIosMapLibreView = interface(MLNMapView)
-    ['{296C1058-9A89-4D71-A5B6-9F0EF1681435}']
-  end;
-
-  {********************************************}
-  TALIosMapLibreView = class(TALIosNativeView)
-  private
-    type
-      // -----------
-      // ITapHandler
-      IMapViewTapHandler = interface(IObjectiveC)
-        ['{B2608976-1C44-4573-AD58-8E441F9EC7FD}']
-        procedure mapViewTap(sender: UITapGestureRecognizer); cdecl;
-      end;
-      // -------------------
-      // TNavigationDelegate
-      TMapViewDelegate = class(TOCLocal, MLNMapViewDelegate, IMapViewTapHandler)
-      private
-        FMapLibreView: TALIosMapLibreView;
-      public
-        constructor Create(const AMapLibreView: TALIosMapLibreView);
-        procedure mapViewTap(sender: UITapGestureRecognizer); cdecl;
-        [MethodName('mapView:regionWillChangeWithReason:animated:')]
-        procedure mapViewRegionWillChangeWithReasonAnimated(mapView: MLNMapView; regionWillChangeWithReason: MLNCameraChangeReason; animated: Boolean); cdecl;
-        [MethodName('mapView:regionIsChangingWithReason:')]
-        procedure mapViewRegionIsChangingWithReason(mapView: MLNMapView; regionIsChangingWithReason: MLNCameraChangeReason); cdecl;
-        [MethodName('mapView:regionDidChangeWithReason:animated:')]
-        procedure mapViewRegionDidChangeWithReasonAnimated(mapView: MLNMapView; regionDidChangeWithReason: MLNCameraChangeReason; animated: Boolean); cdecl;
-        [MethodName('mapView:didFinishLoadingStyle:')]
-        procedure mapViewDidFinishLoadingStyle(mapView: MLNMapView; didFinishLoadingStyle: MLNStyle); cdecl;
-      end;
-  private
-    FMapViewDelegate: TMapViewDelegate;
-    FMapViewTapGestureRecognizer: UITapGestureRecognizer;
-    FLoadingSpinnerView: UIView;
-    function GetView: MLNMapView;
-    function GetControl: TALMapLibre;
-  protected
-    procedure InitView; override;
-    function GetObjectiveCClass: PTypeInfo; override;
-  public
-    constructor Create; override;
-    destructor Destroy; override;
-    property View: MLNMapView read GetView;
-    procedure ShowLoadingSpinner(const AView: UIView); overload;
-    procedure ShowLoadingSpinner(const AColor: TAlphaColor = Talphacolors.null; const AWidth: Single = 0; const AHeight: Single = 0); overload;
-    procedure HideLoadingSpinner;
-    property Control: TALMapLibre read GetControl;
-    procedure SetCenterCoordinate(const ALatitude, ALongitude: Double; const AZoomLevel: double);
-    procedure SetImage(
-                const AResourceName: String;
-                const AStream: TStream;
-                const AScale: Single;
-                const W, H: single;
-                const AName: String);
-    procedure RemoveImage(const AName: String);
-    procedure SetMarkers(const AGeoJSON: String; const AIconAllowsOverlap: Boolean);
-    function GetViewportBounds: TALRectD;
-    function GetCameraPosition: TALMapLibreCameraPosition;
-    procedure ApplyStyle;
-  end;
-
-{$endif}
-{$ENDREGION}
-
-{$REGION ' MSWINDOWS'}
-{$IF defined(MSWINDOWS)}
-
-  {**********************************************}
-  TALWinMapLibreView = class(TALWinWebBrowserView)
-  private
-    FMapReady: Boolean;
-    FApplyStyleWhenMapReady: Boolean;
-    function GetControl: TALMapLibre;
-  protected
-    function GetHtml: String;
-    procedure DoWebMessage(const AMessage: string); override;
-  public
-    constructor Create; override;
-    property Control: TALMapLibre read GetControl;
-    procedure ShowLoadingSpinner(const AHTML: String); overload;
-    procedure ShowLoadingSpinner(const AColor: TAlphaColor = Talphacolors.null; const AWidth: Single = 0; const AHeight: Single = 0); overload;
-    procedure HideLoadingSpinner;
-    procedure SetCenterCoordinate(const ALatitude, ALongitude: Double; const AZoomLevel: double);
-    procedure SetImage(
-                const AResourceName: String;
-                const AStream: TStream;
-                const AScale: Single;
-                const W, H: single;
-                const AName: String);
-    procedure RemoveImage(const AName: String);
-    procedure SetMarkers(const AGeoJSON: String; const AIconAllowsOverlap: Boolean);
-    function GetViewportBounds: TALRectD;
-    function GetCameraPosition: TALMapLibreCameraPosition;
-    procedure ApplyStyle;
-  end;
-
-{$endif}
-{$ENDREGION}
+  {********************}
+  {$IF defined(android)}
+  TALAndroidMapLibreView = class;
+  {$endif}
+  {$IF defined(ios)}
+  TALIosMapLibreView = class;
+  {$endif}
+  {$IF defined(ALMacOS)}
+  TALMacMapLibreView = class;
+  {$endif}
+  {$IF defined(MSWINDOWS)}
+  TALWinMapLibreView = class;
+  {$endif}
 
   {*************************}
   [ComponentPlatforms($FFFF)]
   TALMapLibre = class({$IF defined(MSWINDOWS) or defined(ALMacOS)}TALWebBrowser{$ELSE}TALNativeControl{$ENDIF}, IControlTypeSupportable, IALNativeControl)
   public
     type
-      TMarkerClickEvent = procedure(Sender: TObject; const AMarkerID: String) of object;
+      // -----------------
+      // TSymbolClickEvent
+      TSymbolClickEvent = procedure(Sender: TObject; const ALayerID: String; const ASymbolID: String) of object;
+      // --------------
+      // TMapClickEvent
       TMapClickEvent = procedure(Sender: TObject; const ALatitude: Double; Const ALongitude: Double) of object;
+      // ---------------
+      // TCameraPosition
+      TCameraPosition = record
+        bearing: Double;
+        padding: TALRectD;
+        roll: Double;
+        target: TALLatLng;
+        tilt: Double;
+        zoom: Double;
+        constructor Create(
+                      const ABearing: Double;
+                      const APadding: TALRectD;
+                      const ARoll: Double;
+                      const ATarget: TALLatLng;
+                      const ATilt: Double;
+                      const AZoom: Double);
+      end;
+      // -------------------
+      // TSymbolLayerOptions
+      PSymbolLayerOptions = ^TSymbolLayerOptions;
+      TSymbolLayerOptions = Record
+      private
+        FSymbolPlacement: String;
+        FSymbolSpacing: Single;
+        FSymbolAvoidEdges: Boolean;
+        FSymbolZOrder: String;
+        FIconAllowOverlap: Boolean;
+        FIconIgnorePlacement: Boolean;
+        FIconOptional: Boolean;
+        FIconRotationAlignment: String;
+        FIconPitchAlignment: String;
+        FIconPadding: Single;
+        FIconKeepUpright: Boolean;
+        FIconTextFit: String;
+        FIconTextFitPadding: TRectF;
+        FIconTranslate: TPointF;
+        FIconTranslateAnchor: String;
+        FTextAllowOverlap: Boolean;
+        FTextIgnorePlacement: Boolean;
+        FTextOptional: Boolean;
+        FTextFont: TArray<String>;
+        FTextRotationAlignment: String;
+        FTextPitchAlignment: String;
+        FTextPadding: Single;
+        FTextKeepUpright: Boolean;
+        FTextMaxAngle: Single;
+        FTextLineHeight: Single;
+        FTextWritingMode: TArray<String>;
+        FTextVariableAnchor: TArray<String>;
+        FTextTranslate: TPointF;
+        FTextTranslateAnchor: String;
+        FVisibility: String;
+      public
+        class operator Initialize (out Dest: TSymbolLayerOptions);
+        class function Create: TSymbolLayerOptions; static;
+        function SetSymbolPlacement(const AValue: String): PSymbolLayerOptions;
+        function SetSymbolSpacing(const AValue: Single): PSymbolLayerOptions;
+        function SetSymbolAvoidEdges(const AValue: Boolean): PSymbolLayerOptions;
+        function SetSymbolZOrder(const AValue: String): PSymbolLayerOptions;
+        function SetIconAllowOverlap(const AValue: Boolean): PSymbolLayerOptions; // → Can MY icon appear even if another symbol is already there?
+        function SetIconIgnorePlacement(const AValue: Boolean): PSymbolLayerOptions; // → Does MY icon prevent other symbols from appearing?
+        function SetIconOptional(const AValue: Boolean): PSymbolLayerOptions; // → Can MY text appear without my icon?
+        function SetIconRotationAlignment(const AValue: String): PSymbolLayerOptions;
+        function SetIconPitchAlignment(const AValue: String): PSymbolLayerOptions;
+        function SetIconPadding(const AValue: Single): PSymbolLayerOptions;
+        function SetIconKeepUpright(const AValue: Boolean): PSymbolLayerOptions;
+        function SetIconTextFit(const AValue: String): PSymbolLayerOptions;
+        function SetIconTextFitPadding(const AValue: TRectF): PSymbolLayerOptions;
+        function SetIconTranslate(const AValue: TPointF): PSymbolLayerOptions;
+        function SetIconTranslateAnchor(const AValue: String): PSymbolLayerOptions;
+        function SetTextAllowOverlap(const AValue: Boolean): PSymbolLayerOptions; // → Can MY text appear even if another symbol is already there?
+        function SetTextIgnorePlacement(const AValue: Boolean): PSymbolLayerOptions; // → Does MY text prevent other symbols from appearing?
+        function SetTextOptional(const AValue: Boolean): PSymbolLayerOptions; // → Can MY icon appear without my text?
+        function SetTextFont(const AValue: TArray<String>): PSymbolLayerOptions;
+        function SetTextRotationAlignment(const AValue: String): PSymbolLayerOptions;
+        function SetTextPitchAlignment(const AValue: String): PSymbolLayerOptions;
+        function SetTextPadding(const AValue: Single): PSymbolLayerOptions;
+        function SetTextKeepUpright(const AValue: Boolean): PSymbolLayerOptions;
+        function SetTextMaxAngle(const AValue: Single): PSymbolLayerOptions;
+        function SetTextLineHeight(const AValue: Single): PSymbolLayerOptions;
+        function SetTextWritingMode(const AValue: TArray<String>): PSymbolLayerOptions;
+        function SetTextVariableAnchor(const AValue: TArray<String>): PSymbolLayerOptions;
+        function SetTextTranslate(const AValue: TPointF): PSymbolLayerOptions;
+        function SetTextTranslateAnchor(const AValue: String): PSymbolLayerOptions;
+        function SetVisibility(const AValue: String): PSymbolLayerOptions;
+      end;
+      // -----------------
+      // TLineLayerOptions
+      PLineLayerOptions = ^TLineLayerOptions;
+      TLineLayerOptions = record
+      private
+        FLineCap: String;
+        FLineJoin: String;
+        FLineMiterLimit: Single;
+        FLineRoundLimit: Single;
+        FLineDasharray: TArray<Single>;
+        FLineTranslate: TPointF;
+        FLineTranslateAnchor: String;
+        FVisibility: String;
+      public
+        class operator Initialize(out Dest: TLineLayerOptions);
+        class function Create: TLineLayerOptions; static;
+        function SetLineCap(const AValue: String): PLineLayerOptions;
+        function SetLineJoin(const AValue: String): PLineLayerOptions;
+        function SetLineMiterLimit(const AValue: Single): PLineLayerOptions;
+        function SetLineRoundLimit(const AValue: Single): PLineLayerOptions;
+        function SetLineDasharray(const AValue: TArray<Single>): PLineLayerOptions;
+        function SetLineTranslate(const AValue: TPointF): PLineLayerOptions;
+        function SetLineTranslateAnchor(const AValue: String): PLineLayerOptions;
+        function SetVisibility(const AValue: String): PLineLayerOptions;
+      end;
+      // -------------------
+      // TCircleLayerOptions
+      PCircleLayerOptions = ^TCircleLayerOptions;
+      TCircleLayerOptions = record
+      private
+        FCirclePitchAlignment: String;
+        FCirclePitchScale: String;
+        FCircleTranslate: TPointF;
+        FCircleTranslateAnchor: String;
+        FVisibility: String;
+      public
+        class operator Initialize(out Dest: TCircleLayerOptions);
+        class function Create: TCircleLayerOptions; static;
+        function SetCirclePitchAlignment(const AValue: String): PCircleLayerOptions;
+        function SetCirclePitchScale(const AValue: String): PCircleLayerOptions;
+        function SetCircleTranslate(const AValue: TPointF): PCircleLayerOptions;
+        function SetCircleTranslateAnchor(const AValue: String): PCircleLayerOptions;
+        function SetVisibility(const AValue: String): PCircleLayerOptions;
+      end;
+      // -----------------
+      // TFillLayerOptions
+      PFillLayerOptions = ^TFillLayerOptions;
+      TFillLayerOptions = record
+      private
+        FFillAntialias: Boolean;
+        FFillTranslate: TPointF;
+        FFillTranslateAnchor: String;
+        FFillPattern: String;
+        FVisibility: String;
+      public
+        class operator Initialize(out Dest: TFillLayerOptions);
+        class function Create: TFillLayerOptions; static;
+        function SetFillAntialias(const AValue: Boolean): PFillLayerOptions;
+        function SetFillTranslate(const AValue: TPointF): PFillLayerOptions;
+        function SetFillTranslateAnchor(const AValue: String): PFillLayerOptions;
+        function SetFillPattern(const AValue: String): PFillLayerOptions;
+        function SetVisibility(const AValue: String): PFillLayerOptions;
+      end;
+      // --------------------------
+      // TFillExtrusionLayerOptions
+      PFillExtrusionLayerOptions = ^TFillExtrusionLayerOptions;
+      TFillExtrusionLayerOptions = record
+      private
+        FFillExtrusionOpacity: Single;
+        FFillExtrusionVerticalGradient: Boolean;
+        FFillExtrusionTranslate: TPointF;
+        FFillExtrusionTranslateAnchor: String;
+        FVisibility: String;
+      public
+        class operator Initialize(out Dest: TFillExtrusionLayerOptions);
+        class function Create: TFillExtrusionLayerOptions; static;
+        function SetFillExtrusionOpacity(const AValue: Single): PFillExtrusionLayerOptions;
+        function SetFillExtrusionVerticalGradient(const AValue: Boolean): PFillExtrusionLayerOptions;
+        function SetFillExtrusionTranslate(const AValue: TPointF): PFillExtrusionLayerOptions;
+        function SetFillExtrusionTranslateAnchor(const AValue: String): PFillExtrusionLayerOptions;
+        function SetVisibility(const AValue: String): PFillExtrusionLayerOptions;
+      end;
+      // --------------------
+      // THeatmapLayerOptions
+      PHeatmapLayerOptions = ^THeatmapLayerOptions;
+      THeatmapLayerOptions = record
+      private
+        FHeatmapRadius: Single;
+        FHeatmapIntensity: Single;
+        FHeatmapOpacity: Single;
+        FVisibility: String;
+      public
+        class operator Initialize(out Dest: THeatmapLayerOptions);
+        class function Create: THeatmapLayerOptions; static;
+        function SetHeatmapRadius(const AValue: Single): PHeatmapLayerOptions;
+        function SetHeatmapIntensity(const AValue: Single): PHeatmapLayerOptions;
+        function SetHeatmapOpacity(const AValue: Single): PHeatmapLayerOptions;
+        function SetVisibility(const AValue: String): PHeatmapLayerOptions;
+      end;
+      // -------------------
+      // TRasterLayerOptions
+      PRasterLayerOptions = ^TRasterLayerOptions;
+      TRasterLayerOptions = record
+      private
+        FRasterOpacity: Single;
+        FRasterHueRotate: Single;
+        FRasterBrightnessMin: Single;
+        FRasterBrightnessMax: Single;
+        FRasterSaturation: Single;
+        FRasterContrast: Single;
+        FRasterResampling: String;
+        FRasterFadeDuration: Single;
+        FVisibility: String;
+      public
+        class operator Initialize(out Dest: TRasterLayerOptions);
+        class function Create: TRasterLayerOptions; static;
+        function SetRasterOpacity(const AValue: Single): PRasterLayerOptions;
+        function SetRasterHueRotate(const AValue: Single): PRasterLayerOptions;
+        function SetRasterBrightnessMin(const AValue: Single): PRasterLayerOptions;
+        function SetRasterBrightnessMax(const AValue: Single): PRasterLayerOptions;
+        function SetRasterSaturation(const AValue: Single): PRasterLayerOptions;
+        function SetRasterContrast(const AValue: Single): PRasterLayerOptions;
+        function SetRasterResampling(const AValue: String): PRasterLayerOptions;
+        function SetRasterFadeDuration(const AValue: Single): PRasterLayerOptions;
+        function SetVisibility(const AValue: String): PRasterLayerOptions;
+      end;
   private
     FStyleJSON: String;
     FStyleUrl: String;
@@ -276,7 +284,7 @@ type
     FOnCameraWillChange: TNotifyEvent;
     FOnCameraIsChanging: TNotifyEvent;
     FOnCameraDidChange: TNotifyEvent;
-    FOnMarkerClick: TMarkerClickEvent;
+    FOnSymbolClick: TSymbolClickEvent;
     FOnMapClick: TMapClickEvent;
     {$IF defined(android)}
     function GetNativeView: TALAndroidMapLibreView;
@@ -322,9 +330,16 @@ type
                 const W, H: single;
                 const AName: String); overload;
     procedure RemoveImage(const AName: String);
-    procedure SetMarkers(const AGeoJSON: String; const AIconAllowsOverlap: Boolean = True);
+    procedure SetSymbolLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PSymbolLayerOptions = nil);
+    procedure SetLineLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PLineLayerOptions = nil);
+    procedure SetCircleLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PCircleLayerOptions = nil);
+    procedure SetFillLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillLayerOptions = nil);
+    procedure SetFillExtrusionLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillExtrusionLayerOptions = nil);
+    procedure SetHeatmapLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PHeatmapLayerOptions = nil);
+    procedure SetRasterLayer(const AId: String; const ATileURL: String; const AIsTileJSON: Boolean = False; const ATileSize: Integer = 256; const AOptions: TALMapLibre.PRasterLayerOptions = nil);
+    procedure RemoveLayer(const AId: String);
     function GetViewportBounds: TALRectD;
-    function GetCameraPosition: TALMapLibreCameraPosition;
+    function GetCameraPosition: TCameraPosition;
     {$IF defined(android)}
     procedure ShowLoadingSpinner(const AView: JView); overload;
     {$ELSEIF defined(IOS)}
@@ -404,9 +419,276 @@ type
     property OnCameraWillChange: TNotifyEvent read FOnCameraWillChange write FOnCameraWillChange;
     property OnCameraIsChanging: TNotifyEvent read FOnCameraIsChanging write FOnCameraIsChanging;
     property OnCameraDidChange: TNotifyEvent read FOnCameraDidChange write FOnCameraDidChange;
-    property OnMarkerClick: TMarkerClickEvent read FOnMarkerClick write FOnMarkerClick;
+    property OnSymbolClick: TSymbolClickEvent read FOnSymbolClick write FOnSymbolClick;
     property OnMapClick: TMapClickEvent read FOnMapClick write FOnMapClick;
   end;
+
+{$REGION ' ANDROID'}
+{$IF defined(android)}
+
+  {**************************************************}
+  TALAndroidMapLibreView = class(TALAndroidNativeView)
+  private
+    type
+      // -------------------
+      // TOnMapReadyCallback
+      TOnMapReadyCallback = class(TJavaLocal, JOnMapReadyCallback)
+      private
+        FMapLibreView: TALAndroidMapLibreView;
+      public
+        constructor Create(const AMapLibreView: TALAndroidMapLibreView);
+        procedure onMapReady(maplibreMap: JMapLibreMap); cdecl;
+      end;
+      // --------------------------------
+      // TOnDidFinishLoadingStyleListener
+      TOnDidFinishLoadingStyleListener = class(TJavaLocal, JMapView_OnDidFinishLoadingStyleListener)
+      private
+        FMapLibreView: TALAndroidMapLibreView;
+      public
+        constructor Create(const AMapLibreView: TALAndroidMapLibreView);
+        procedure onDidFinishLoadingStyle; cdecl;
+      end;
+      // ---------------------------
+      // TOnCameraMoveStartedListener
+      TOnCameraMoveStartedListener = class(TJavaLocal, JMapLibreMap_OnCameraMoveStartedListener)
+      private
+        FMapLibreView: TALAndroidMapLibreView;
+      public
+        constructor Create(const AMapLibreView: TALAndroidMapLibreView);
+        procedure onCameraMoveStarted(reason: Integer); cdecl;
+      end;
+      // ---------------------------
+      // TOnCameraMoveListener
+      TOnCameraMoveListener = class(TJavaLocal, JMapLibreMap_OnCameraMoveListener)
+      private
+        FMapLibreView: TALAndroidMapLibreView;
+      public
+        constructor Create(const AMapLibreView: TALAndroidMapLibreView);
+        procedure onCameraMove; cdecl;
+      end;
+      // --------------------------
+      // TOnCameraIdleListener
+      TOnCameraIdleListener = class(TJavaLocal, JMapLibreMap_OnCameraIdleListener)
+      private
+        FMapLibreView: TALAndroidMapLibreView;
+      public
+        constructor Create(const AMapLibreView: TALAndroidMapLibreView);
+        procedure onCameraIdle; cdecl;
+      end;
+      // -------------------
+      // TOnMapClickListener
+      TOnMapClickListener = class(TJavaLocal, JMapLibreMap_OnMapClickListener)
+      private
+        FMapLibreView: TALAndroidMapLibreView;
+      public
+        constructor Create(const AMapLibreView: TALAndroidMapLibreView);
+        function onMapClick(point: JLatLng): Boolean; cdecl;
+      end;
+  private
+    FMaplibreMap: JMapLibreMap;
+    FLoadingSpinnerView: JView;
+    FSymbolLayerIds: TALStringListW;
+    FOnDidFinishLoadingStyleListener: TOnDidFinishLoadingStyleListener;
+    FOnCameraMoveStartedListener: TOnCameraMoveStartedListener;
+    FOnCameraMoveListener: TOnCameraMoveListener;
+    FOnCameraIdleListener: TOnCameraIdleListener;
+    FOnMapClickListener: TOnMapClickListener;
+    FOnMapReadyCallback: TOnMapReadyCallback;
+    function GetView: JMapView;
+    function GetControl: TALMapLibre;
+    procedure ApplicationEventHandler(const Sender: TObject; const M: TMessage);
+  protected
+    function CreateView: JView; override;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    property View: JMapView read GetView;
+    property Control: TALMapLibre read GetControl;
+    procedure SetVisible(const Value: Boolean); override;
+    procedure ShowLoadingSpinner(const AView: JView); overload;
+    procedure ShowLoadingSpinner(const AColor: TAlphaColor = Talphacolors.null; const AWidth: Single = 0; const AHeight: Single = 0); overload;
+    procedure HideLoadingSpinner;
+    procedure SetCenterCoordinate(const ALatitude, ALongitude: Double; const AZoomLevel: double);
+    procedure SetImage(
+                const AResourceName: String;
+                const AStream: TStream;
+                const AScale: Single;
+                const W, H: single;
+                const AName: String);
+    procedure RemoveImage(const AName: String);
+    procedure SetSymbolLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PSymbolLayerOptions = nil);
+    procedure SetLineLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PLineLayerOptions = nil);
+    procedure SetCircleLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PCircleLayerOptions = nil);
+    procedure SetFillLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillLayerOptions = nil);
+    procedure SetFillExtrusionLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillExtrusionLayerOptions = nil);
+    procedure SetHeatmapLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PHeatmapLayerOptions = nil);
+    procedure SetRasterLayer(const AId: String; const ATileURL: String; const AIsTileJSON: Boolean = False; const ATileSize: Integer = 256; const AOptions: TALMapLibre.PRasterLayerOptions = nil);
+    procedure RemoveLayer(const AId: String);
+    function GetViewportBounds: TALRectD;
+    function GetCameraPosition: TALMapLibre.TCameraPosition;
+    procedure ApplyStyle;
+  end;
+
+{$endif}
+{$ENDREGION}
+
+{$REGION ' IOS'}
+{$IF defined(ios)}
+
+  {****************************************}
+  IALIosMapLibreView = interface(MLNMapView)
+    ['{296C1058-9A89-4D71-A5B6-9F0EF1681435}']
+  end;
+
+  {********************************************}
+  TALIosMapLibreView = class(TALIosNativeView)
+  private
+    type
+      // -----------
+      // ITapHandler
+      IMapViewTapHandler = interface(IObjectiveC)
+        ['{B2608976-1C44-4573-AD58-8E441F9EC7FD}']
+        procedure mapViewTap(sender: UITapGestureRecognizer); cdecl;
+      end;
+      // -------------------
+      // TNavigationDelegate
+      TMapViewDelegate = class(TOCLocal, MLNMapViewDelegate, IMapViewTapHandler)
+      private
+        FMapLibreView: TALIosMapLibreView;
+      public
+        constructor Create(const AMapLibreView: TALIosMapLibreView);
+        procedure mapViewTap(sender: UITapGestureRecognizer); cdecl;
+        [MethodName('mapView:regionWillChangeWithReason:animated:')]
+        procedure mapViewRegionWillChangeWithReasonAnimated(mapView: MLNMapView; regionWillChangeWithReason: MLNCameraChangeReason; animated: Boolean); cdecl;
+        [MethodName('mapView:regionIsChangingWithReason:')]
+        procedure mapViewRegionIsChangingWithReason(mapView: MLNMapView; regionIsChangingWithReason: MLNCameraChangeReason); cdecl;
+        [MethodName('mapView:regionDidChangeWithReason:animated:')]
+        procedure mapViewRegionDidChangeWithReasonAnimated(mapView: MLNMapView; regionDidChangeWithReason: MLNCameraChangeReason; animated: Boolean); cdecl;
+        [MethodName('mapView:didFinishLoadingStyle:')]
+        procedure mapViewDidFinishLoadingStyle(mapView: MLNMapView; didFinishLoadingStyle: MLNStyle); cdecl;
+      end;
+  private
+    FThreadQueueCleaner: TALThreadQueueCleaner;
+    FMapViewDelegate: TMapViewDelegate;
+    FMapViewTapGestureRecognizer: UITapGestureRecognizer;
+    FLoadingSpinnerView: UIView;
+    FSymbolLayerIds: TALStringListW;
+    function GetView: MLNMapView;
+    function GetControl: TALMapLibre;
+  protected
+    procedure InitView; override;
+    function GetObjectiveCClass: PTypeInfo; override;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    property View: MLNMapView read GetView;
+    procedure ShowLoadingSpinner(const AView: UIView); overload;
+    procedure ShowLoadingSpinner(const AColor: TAlphaColor = Talphacolors.null; const AWidth: Single = 0; const AHeight: Single = 0); overload;
+    procedure HideLoadingSpinner;
+    property Control: TALMapLibre read GetControl;
+    procedure SetCenterCoordinate(const ALatitude, ALongitude: Double; const AZoomLevel: double);
+    procedure SetImage(
+                const AResourceName: String;
+                const AStream: TStream;
+                const AScale: Single;
+                const W, H: single;
+                const AName: String);
+    procedure RemoveImage(const AName: String);
+    procedure SetSymbolLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PSymbolLayerOptions = nil);
+    procedure SetLineLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PLineLayerOptions = nil);
+    procedure SetCircleLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PCircleLayerOptions = nil);
+    procedure SetFillLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillLayerOptions = nil);
+    procedure SetFillExtrusionLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillExtrusionLayerOptions = nil);
+    procedure SetHeatmapLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PHeatmapLayerOptions = nil);
+    procedure SetRasterLayer(const AId: String; const ATileURL: String; const AIsTileJSON: Boolean = False; const ATileSize: Integer = 256; const AOptions: TALMapLibre.PRasterLayerOptions = nil);
+    procedure RemoveLayer(const AId: String);
+    function GetViewportBounds: TALRectD;
+    function GetCameraPosition: TALMapLibre.TCameraPosition;
+    procedure ApplyStyle;
+  end;
+
+{$endif}
+{$ENDREGION}
+
+{$REGION ' MacOS'}
+{$IF defined(ALMacOS)}
+
+  {**********************************************}
+  TALMacMapLibreView = class(TALMacWebBrowserView)
+  private
+    function GetControl: TALMapLibre;
+  public
+    property Control: TALMapLibre read GetControl;
+    procedure ShowLoadingSpinner(const AHTML: String); overload;
+    procedure ShowLoadingSpinner(const AColor: TAlphaColor = Talphacolors.null; const AWidth: Single = 0; const AHeight: Single = 0); overload;
+    procedure HideLoadingSpinner;
+    procedure SetCenterCoordinate(const ALatitude, ALongitude: Double; const AZoomLevel: double);
+    procedure SetImage(
+                const AResourceName: String;
+                const AStream: TStream;
+                const AScale: Single;
+                const W, H: single;
+                const AName: String);
+    procedure RemoveImage(const AName: String);
+    procedure SetSymbolLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PSymbolLayerOptions = nil);
+    procedure SetLineLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PLineLayerOptions = nil);
+    procedure SetCircleLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PCircleLayerOptions = nil);
+    procedure SetFillLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillLayerOptions = nil);
+    procedure SetFillExtrusionLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillExtrusionLayerOptions = nil);
+    procedure SetHeatmapLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PHeatmapLayerOptions = nil);
+    procedure SetRasterLayer(const AId: String; const ATileURL: String; const AIsTileJSON: Boolean = False; const ATileSize: Integer = 256; const AOptions: TALMapLibre.PRasterLayerOptions = nil);
+    procedure RemoveLayer(const AId: String);
+    function GetViewportBounds: TALRectD;
+    function GetCameraPosition: TALMapLibre.TCameraPosition;
+    procedure ApplyStyle;
+  end;
+
+{$endif}
+{$ENDREGION}
+
+{$REGION ' MSWINDOWS'}
+{$IF defined(MSWINDOWS)}
+
+  {**********************************************}
+  TALWinMapLibreView = class(TALWinWebBrowserView)
+  private
+    FThreadQueueCleaner: TALThreadQueueCleaner;
+    FMapReady: Boolean;
+    FApplyStyleWhenMapReady: Boolean;
+    function GetControl: TALMapLibre;
+  protected
+    function GetHtml: String;
+    procedure DoWebMessage(const AMessage: string); override;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    property Control: TALMapLibre read GetControl;
+    procedure ShowLoadingSpinner(const AHTML: String); overload;
+    procedure ShowLoadingSpinner(const AColor: TAlphaColor = Talphacolors.null; const AWidth: Single = 0; const AHeight: Single = 0); overload;
+    procedure HideLoadingSpinner;
+    procedure SetCenterCoordinate(const ALatitude, ALongitude: Double; const AZoomLevel: double);
+    procedure SetImage(
+                const AResourceName: String;
+                const AStream: TStream;
+                const AScale: Single;
+                const W, H: single;
+                const AName: String);
+    procedure RemoveImage(const AName: String);
+    procedure SetSymbolLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PSymbolLayerOptions = nil);
+    procedure SetLineLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PLineLayerOptions = nil);
+    procedure SetCircleLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PCircleLayerOptions = nil);
+    procedure SetFillLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillLayerOptions = nil);
+    procedure SetFillExtrusionLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillExtrusionLayerOptions = nil);
+    procedure SetHeatmapLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PHeatmapLayerOptions = nil);
+    procedure SetRasterLayer(const AId: String; const ATileURL: String; const AIsTileJSON: Boolean = False; const ATileSize: Integer = 256; const AOptions: TALMapLibre.PRasterLayerOptions = nil);
+    procedure RemoveLayer(const AId: String);
+    function GetViewportBounds: TALRectD;
+    function GetCameraPosition: TALMapLibre.TCameraPosition;
+    procedure ApplyStyle;
+  end;
+
+{$endif}
+{$ENDREGION}
 
 procedure Register;
 
@@ -414,7 +696,6 @@ implementation
 
 uses
   System.SysUtils,
-  System.types,
   System.Math,
   System.Math.Vectors,
   {$IF defined(ANDROID)}
@@ -422,6 +703,7 @@ uses
   Androidapi.JNI.JavaTypes,
   Androidapi.JNI.Widget,
   Androidapi.Jni,
+  Fmx.Helpers.Android,
   FMX.Platform,
   FMX.Forms,
   Alcinoe.fmx.Common,
@@ -448,7 +730,7 @@ uses
   Alcinoe.StringUtils;
 
 {*********************************************}
-constructor TALMapLibreCameraPosition.Create(
+constructor TALMapLibre.TCameraPosition.Create(
               const ABearing: Double;
               const APadding: TALRectD;
               const ARoll: Double;
@@ -462,6 +744,888 @@ begin
   target := ATarget;
   tilt := ATilt;
   zoom := AZoom;
+end;
+
+{**********************************************************************************}
+class operator TALMapLibre.TSymbolLayerOptions.Initialize (out Dest: TALMapLibre.TSymbolLayerOptions);
+begin
+  // Because of :
+  // https://stackoverflow.com/questions/79318689/why-does-copyrecord-get-called-in-some-cases-with-tmyrec-but-not-others
+end;
+
+{*************************************************************************}
+class function TALMapLibre.TSymbolLayerOptions.Create: TSymbolLayerOptions;
+begin
+  Result.FSymbolPlacement := 'point';
+  Result.FSymbolSpacing := 250;
+  Result.FSymbolAvoidEdges := False;
+  Result.FSymbolZOrder := 'auto';
+  Result.FIconAllowOverlap := False;
+  Result.FIconIgnorePlacement := False;
+  Result.FIconOptional := False;
+  Result.FIconRotationAlignment := 'auto';
+  Result.FIconPitchAlignment := 'auto';
+  Result.FIconPadding := 2;
+  Result.FIconKeepUpright := False;
+  Result.FIconTextFit := 'none';
+  Result.FIconTextFitPadding := TRectF.Empty;
+  Result.FIconTranslate := TPointF.Zero;
+  Result.FIconTranslateAnchor := 'map';
+  Result.FTextAllowOverlap := False;
+  Result.FTextIgnorePlacement := False;
+  Result.FTextOptional := False;
+  Result.FTextFont := nil;
+  Result.FTextRotationAlignment := 'auto';
+  Result.FTextPitchAlignment := 'auto';
+  Result.FTextPadding := 2;
+  Result.FTextKeepUpright := True;
+  Result.FTextMaxAngle := 45;
+  Result.FTextLineHeight := 1.2;
+  Result.FTextWritingMode := nil;
+  Result.FTextVariableAnchor := nil;
+  Result.FTextTranslate := TPointF.Zero;
+  Result.FTextTranslateAnchor := 'map';
+  Result.FVisibility := 'visible';
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetSymbolPlacement(const AValue: String): PSymbolLayerOptions;
+begin
+  FSymbolPlacement := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetSymbolSpacing(const AValue: Single): PSymbolLayerOptions;
+begin
+  FSymbolSpacing := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetSymbolAvoidEdges(const AValue: Boolean): PSymbolLayerOptions;
+begin
+  FSymbolAvoidEdges := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetSymbolZOrder(const AValue: String): PSymbolLayerOptions;
+begin
+  FSymbolZOrder := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetIconAllowOverlap(const AValue: Boolean): PSymbolLayerOptions;
+begin
+  FIconAllowOverlap := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetIconIgnorePlacement(const AValue: Boolean): PSymbolLayerOptions;
+begin
+  FIconIgnorePlacement := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetIconOptional(const AValue: Boolean): PSymbolLayerOptions;
+begin
+  FIconOptional := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetIconRotationAlignment(const AValue: String): PSymbolLayerOptions;
+begin
+  FIconRotationAlignment := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetIconPitchAlignment(const AValue: String): PSymbolLayerOptions;
+begin
+  FIconPitchAlignment := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetIconPadding(const AValue: Single): PSymbolLayerOptions;
+begin
+  FIconPadding := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetIconKeepUpright(const AValue: Boolean): PSymbolLayerOptions;
+begin
+  FIconKeepUpright := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetIconTextFit(const AValue: String): PSymbolLayerOptions;
+begin
+  FIconTextFit := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetIconTextFitPadding(const AValue: TRectF): PSymbolLayerOptions;
+begin
+  FIconTextFitPadding := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetIconTranslate(const AValue: TPointF): PSymbolLayerOptions;
+begin
+  FIconTranslate := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetIconTranslateAnchor(const AValue: String): PSymbolLayerOptions;
+begin
+  FIconTranslateAnchor := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextAllowOverlap(const AValue: Boolean): PSymbolLayerOptions;
+begin
+  FTextAllowOverlap := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextIgnorePlacement(const AValue: Boolean): PSymbolLayerOptions;
+begin
+  FTextIgnorePlacement := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextOptional(const AValue: Boolean): PSymbolLayerOptions;
+begin
+  FTextOptional := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextFont(const AValue: TArray<String>): PSymbolLayerOptions;
+begin
+  FTextFont := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextRotationAlignment(const AValue: String): PSymbolLayerOptions;
+begin
+  FTextRotationAlignment := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextPitchAlignment(const AValue: String): PSymbolLayerOptions;
+begin
+  FTextPitchAlignment := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextPadding(const AValue: Single): PSymbolLayerOptions;
+begin
+  FTextPadding := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextKeepUpright(const AValue: Boolean): PSymbolLayerOptions;
+begin
+  FTextKeepUpright := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextMaxAngle(const AValue: Single): PSymbolLayerOptions;
+begin
+  FTextMaxAngle := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextLineHeight(const AValue: Single): PSymbolLayerOptions;
+begin
+  FTextLineHeight := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextWritingMode(const AValue: TArray<String>): PSymbolLayerOptions;
+begin
+  FTextWritingMode := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextVariableAnchor(const AValue: TArray<String>): PSymbolLayerOptions;
+begin
+  FTextVariableAnchor := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextTranslate(const AValue: TPointF): PSymbolLayerOptions;
+begin
+  FTextTranslate := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetTextTranslateAnchor(const AValue: String): PSymbolLayerOptions;
+begin
+  FTextTranslateAnchor := AValue;
+  Result := @Self;
+end;
+
+{****************************************************************************************}
+function TALMapLibre.TSymbolLayerOptions.SetVisibility(const AValue: String): PSymbolLayerOptions;
+begin
+  FVisibility := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+class operator TALMapLibre.TLineLayerOptions.Initialize(out Dest: TALMapLibre.TLineLayerOptions);
+begin
+  // Because of :
+  // https://stackoverflow.com/questions/79318689/why-does-copyrecord-get-called-in-some-cases-with-tmyrec-but-not-others
+end;
+
+{****************************************************}
+class function TALMapLibre.TLineLayerOptions.Create: TALMapLibre.TLineLayerOptions;
+begin
+  Result.FLineCap := 'butt';
+  Result.FLineJoin := 'miter';
+  Result.FLineMiterLimit := 2;
+  Result.FLineRoundLimit := 1.05;
+  Result.FLineDasharray := nil;
+  Result.FLineTranslate := TPointF.Zero;
+  Result.FLineTranslateAnchor := 'map';
+  Result.FVisibility := 'visible';
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TLineLayerOptions.SetLineCap(const AValue: String): PLineLayerOptions;
+begin
+  FLineCap := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TLineLayerOptions.SetLineJoin(const AValue: String): PLineLayerOptions;
+begin
+  FLineJoin := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TLineLayerOptions.SetLineMiterLimit(const AValue: Single): PLineLayerOptions;
+begin
+  FLineMiterLimit := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TLineLayerOptions.SetLineRoundLimit(const AValue: Single): PLineLayerOptions;
+begin
+  FLineRoundLimit := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TLineLayerOptions.SetLineDasharray(const AValue: TArray<Single>): PLineLayerOptions;
+begin
+  FLineDasharray := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TLineLayerOptions.SetLineTranslate(const AValue: TPointF): PLineLayerOptions;
+begin
+  FLineTranslate := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TLineLayerOptions.SetLineTranslateAnchor(const AValue: String): PLineLayerOptions;
+begin
+  FLineTranslateAnchor := AValue;
+  Result := @Self;
+end;
+
+{************************************************************************************}
+function TALMapLibre.TLineLayerOptions.SetVisibility(const AValue: String): PLineLayerOptions;
+begin
+  FVisibility := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+class operator TALMapLibre.TCircleLayerOptions.Initialize(out Dest: TALMapLibre.TCircleLayerOptions);
+begin
+  // Because of :
+  // https://stackoverflow.com/questions/79318689/why-does-copyrecord-get-called-in-some-cases-with-tmyrec-but-not-others
+end;
+
+{****************************************************}
+class function TALMapLibre.TCircleLayerOptions.Create: TALMapLibre.TCircleLayerOptions;
+begin
+  Result.FCirclePitchAlignment := 'viewport';
+  Result.FCirclePitchScale := 'map';
+  Result.FCircleTranslate := TPointF.Zero;
+  Result.FCircleTranslateAnchor := 'map';
+  Result.FVisibility := 'visible';
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TCircleLayerOptions.SetCirclePitchAlignment(const AValue: String): PCircleLayerOptions;
+begin
+  FCirclePitchAlignment := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TCircleLayerOptions.SetCirclePitchScale(const AValue: String): PCircleLayerOptions;
+begin
+  FCirclePitchScale := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TCircleLayerOptions.SetCircleTranslate(const AValue: TPointF): PCircleLayerOptions;
+begin
+  FCircleTranslate := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TCircleLayerOptions.SetCircleTranslateAnchor(const AValue: String): PCircleLayerOptions;
+begin
+  FCircleTranslateAnchor := AValue;
+  Result := @Self;
+end;
+
+{****************************************************************************************}
+function TALMapLibre.TCircleLayerOptions.SetVisibility(const AValue: String): PCircleLayerOptions;
+begin
+  FVisibility := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+class operator TALMapLibre.TFillLayerOptions.Initialize(out Dest: TALMapLibre.TFillLayerOptions);
+begin
+  // Because of :
+  // https://stackoverflow.com/questions/79318689/why-does-copyrecord-get-called-in-some-cases-with-tmyrec-but-not-others
+end;
+
+{****************************************************}
+class function TALMapLibre.TFillLayerOptions.Create: TALMapLibre.TFillLayerOptions;
+begin
+  Result.FFillAntialias := True;
+  Result.FFillTranslate := TPointF.Zero;
+  Result.FFillTranslateAnchor := 'map';
+  Result.FFillPattern := '';
+  Result.FVisibility := 'visible';
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TFillLayerOptions.SetFillAntialias(const AValue: Boolean): PFillLayerOptions;
+begin
+  FFillAntialias := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TFillLayerOptions.SetFillTranslate(const AValue: TPointF): PFillLayerOptions;
+begin
+  FFillTranslate := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TFillLayerOptions.SetFillTranslateAnchor(const AValue: String): PFillLayerOptions;
+begin
+  FFillTranslateAnchor := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TFillLayerOptions.SetFillPattern(const AValue: String): PFillLayerOptions;
+begin
+  FFillPattern := AValue;
+  Result := @Self;
+end;
+
+{************************************************************************************}
+function TALMapLibre.TFillLayerOptions.SetVisibility(const AValue: String): PFillLayerOptions;
+begin
+  FVisibility := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+class operator TALMapLibre.TFillExtrusionLayerOptions.Initialize(out Dest: TALMapLibre.TFillExtrusionLayerOptions);
+begin
+  // Because of :
+  // https://stackoverflow.com/questions/79318689/why-does-copyrecord-get-called-in-some-cases-with-tmyrec-but-not-others
+end;
+
+{****************************************************}
+class function TALMapLibre.TFillExtrusionLayerOptions.Create: TALMapLibre.TFillExtrusionLayerOptions;
+begin
+  Result.FFillExtrusionOpacity := 1;
+  Result.FFillExtrusionVerticalGradient := True;
+  Result.FFillExtrusionTranslate := TPointF.Zero;
+  Result.FFillExtrusionTranslateAnchor := 'map';
+  Result.FVisibility := 'visible';
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TFillExtrusionLayerOptions.SetFillExtrusionOpacity(const AValue: Single): PFillExtrusionLayerOptions;
+begin
+  FFillExtrusionOpacity := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TFillExtrusionLayerOptions.SetFillExtrusionVerticalGradient(const AValue: Boolean): PFillExtrusionLayerOptions;
+begin
+  FFillExtrusionVerticalGradient := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TFillExtrusionLayerOptions.SetFillExtrusionTranslate(const AValue: TPointF): PFillExtrusionLayerOptions;
+begin
+  FFillExtrusionTranslate := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TFillExtrusionLayerOptions.SetFillExtrusionTranslateAnchor(const AValue: String): PFillExtrusionLayerOptions;
+begin
+  FFillExtrusionTranslateAnchor := AValue;
+  Result := @Self;
+end;
+
+{********************************************************************************************************}
+function TALMapLibre.TFillExtrusionLayerOptions.SetVisibility(const AValue: String): PFillExtrusionLayerOptions;
+begin
+  FVisibility := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+class operator TALMapLibre.THeatmapLayerOptions.Initialize(out Dest: TALMapLibre.THeatmapLayerOptions);
+begin
+  // Because of :
+  // https://stackoverflow.com/questions/79318689/why-does-copyrecord-get-called-in-some-cases-with-tmyrec-but-not-others
+end;
+
+{****************************************************}
+class function TALMapLibre.THeatmapLayerOptions.Create: TALMapLibre.THeatmapLayerOptions;
+begin
+  Result.FHeatmapRadius := 30;
+  Result.FHeatmapIntensity := 1;
+  Result.FHeatmapOpacity := 1;
+  Result.FVisibility := 'visible';
+end;
+
+{**********************************************************************************}
+function TALMapLibre.THeatmapLayerOptions.SetHeatmapRadius(const AValue: Single): PHeatmapLayerOptions;
+begin
+  FHeatmapRadius := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.THeatmapLayerOptions.SetHeatmapIntensity(const AValue: Single): PHeatmapLayerOptions;
+begin
+  FHeatmapIntensity := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.THeatmapLayerOptions.SetHeatmapOpacity(const AValue: Single): PHeatmapLayerOptions;
+begin
+  FHeatmapOpacity := AValue;
+  Result := @Self;
+end;
+
+{********************************************************************************************}
+function TALMapLibre.THeatmapLayerOptions.SetVisibility(const AValue: String): PHeatmapLayerOptions;
+begin
+  FVisibility := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+class operator TALMapLibre.TRasterLayerOptions.Initialize(out Dest: TALMapLibre.TRasterLayerOptions);
+begin
+  // Because of :
+  // https://stackoverflow.com/questions/79318689/why-does-copyrecord-get-called-in-some-cases-with-tmyrec-but-not-others
+end;
+
+{****************************************************}
+class function TALMapLibre.TRasterLayerOptions.Create: TALMapLibre.TRasterLayerOptions;
+begin
+  Result.FRasterOpacity := 1;
+  Result.FRasterHueRotate := 0;
+  Result.FRasterBrightnessMin := 0;
+  Result.FRasterBrightnessMax := 1;
+  Result.FRasterSaturation := 0;
+  Result.FRasterContrast := 0;
+  Result.FRasterResampling := 'linear';
+  Result.FRasterFadeDuration := 300;
+  Result.FVisibility := 'visible';
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TRasterLayerOptions.SetRasterOpacity(const AValue: Single): PRasterLayerOptions;
+begin
+  FRasterOpacity := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TRasterLayerOptions.SetRasterHueRotate(const AValue: Single): PRasterLayerOptions;
+begin
+  FRasterHueRotate := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TRasterLayerOptions.SetRasterBrightnessMin(const AValue: Single): PRasterLayerOptions;
+begin
+  FRasterBrightnessMin := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TRasterLayerOptions.SetRasterBrightnessMax(const AValue: Single): PRasterLayerOptions;
+begin
+  FRasterBrightnessMax := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TRasterLayerOptions.SetRasterSaturation(const AValue: Single): PRasterLayerOptions;
+begin
+  FRasterSaturation := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TRasterLayerOptions.SetRasterContrast(const AValue: Single): PRasterLayerOptions;
+begin
+  FRasterContrast := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TRasterLayerOptions.SetRasterResampling(const AValue: String): PRasterLayerOptions;
+begin
+  FRasterResampling := AValue;
+  Result := @Self;
+end;
+
+{**********************************************************************************}
+function TALMapLibre.TRasterLayerOptions.SetRasterFadeDuration(const AValue: Single): PRasterLayerOptions;
+begin
+  FRasterFadeDuration := AValue;
+  Result := @Self;
+end;
+
+{****************************************************************************************}
+function TALMapLibre.TRasterLayerOptions.SetVisibility(const AValue: String): PRasterLayerOptions;
+begin
+  FVisibility := AValue;
+  Result := @Self;
+end;
+
+{*************************************************}
+constructor TALMapLibre.Create(AOwner: TComponent);
+begin
+  inherited;
+  FOnMapReady := nil;
+  FOnStyleLoaded := nil;
+  FOnCameraWillChange := nil;
+  FOnCameraIsChanging := nil;
+  FOnCameraDidChange := nil;
+  FOnSymbolClick := nil;
+  FOnMapClick := nil;
+  FStyleJSON := '';
+  FStyleUrl := '';
+end;
+
+{********************}
+{$IF defined(android)}
+Function TALMapLibre.CreateNativeView: TALAndroidNativeView;
+begin
+  result := TALAndroidMapLibreView.create(self);
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(android)}
+function TALMapLibre.GetNativeView: TALAndroidMapLibreView;
+begin
+  result := TALAndroidMapLibreView(inherited NativeView);
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(IOS)}
+Function TALMapLibre.CreateNativeView: TALIosNativeView;
+begin
+  result := TALIosMapLibreView.create(self);
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(IOS)}
+function TALMapLibre.GetNativeView: TALIosMapLibreView;
+begin
+  result := TALIosMapLibreView(inherited NativeView);
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ALMacOS)}
+Function TALMapLibre.CreateNativeView: TALMacNativeView;
+begin
+  result := TALMacMapLibreView.create(self);
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ALMacOS)}
+function TALMapLibre.GetNativeView: TALMacMapLibreView;
+begin
+  result := TALMacMapLibreView(inherited NativeView);
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWindows)}
+Function TALMapLibre.CreateNativeView: TALWinNativeView;
+begin
+  {$IF defined(ALDPK)}
+  Result := nil;
+  {$ELSE}
+  result := TALWinMapLibreView.create(self);
+  {$ENDIF}
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWindows)}
+function TALMapLibre.GetNativeView: TALWinMapLibreView;
+begin
+  result := TALWinMapLibreView(inherited NativeView);
+end;
+{$ENDIF}
+
+{******************************************************}
+procedure TALMapLibre.SetStyleURL(const AValue: string);
+begin
+  if (FStyleURL = AValue) and (FStyleJSON = '') then Exit;
+  FStyleURL := AValue;
+  FStyleJSON := '';
+  if NativeView <> nil then
+    NativeView.ApplyStyle;
+end;
+
+{*******************************************************}
+procedure TALMapLibre.SetStyleJSON(const AValue: string);
+begin
+  if (FStyleJSON = AValue) and (FStyleURL = '') then Exit;
+  FStyleJSON := AValue;
+  FStyleURL := '';
+  if NativeView <> nil then
+    NativeView.ApplyStyle;
+end;
+
+{*******************************************************************************************************}
+procedure TALMapLibre.SetCenterCoordinate(const ALatitude, ALongitude: Double; const AZoomLevel: double);
+begin
+  if NativeView <> nil then
+    NativeView.SetCenterCoordinate(ALatitude, ALongitude, AZoomLevel);
+end;
+
+{*****************************}
+procedure TALMapLibre.SetImage(
+            const AStream: TStream;
+            const AScale: Single;
+            const W, H: single;
+            const AName: String);
+begin
+  if NativeView <> nil then
+    NativeView.SetImage(''{AResourceName}, AStream{AStream}, AScale, W, H, AName);
+end;
+
+{*****************************}
+procedure TALMapLibre.SetImage(
+            const AResourceName: String;
+            const AScale: Single;
+            const W, H: single;
+            const AName: String);
+begin
+  if NativeView <> nil then
+    NativeView.SetImage(AResourceName{AResourceName}, nil{AStream}, AScale, W, H, AName);
+end;
+
+{*****************************************************}
+procedure TALMapLibre.RemoveImage(const AName: String);
+begin
+  if NativeView <> nil then
+    NativeView.RemoveImage(AName);
+end;
+
+{***********************************}
+procedure TALMapLibre.SetSymbolLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PSymbolLayerOptions = nil);
+begin
+  if NativeView <> nil then
+    NativeView.SetSymbolLayer(AId, AGeoJSON, AOptions);
+end;
+
+{*******************************************************}
+procedure TALMapLibre.SetLineLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PLineLayerOptions = nil);
+begin
+  if NativeView <> nil then
+    NativeView.SetLineLayer(AId, AGeoJSON, AOptions);
+end;
+
+{*******************************************************}
+procedure TALMapLibre.SetCircleLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PCircleLayerOptions = nil);
+begin
+  if NativeView <> nil then
+    NativeView.SetCircleLayer(AId, AGeoJSON, AOptions);
+end;
+
+{*******************************************************}
+procedure TALMapLibre.SetFillLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillLayerOptions = nil);
+begin
+  if NativeView <> nil then
+    NativeView.SetFillLayer(AId, AGeoJSON, AOptions);
+end;
+
+{*******************************************************}
+procedure TALMapLibre.SetFillExtrusionLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillExtrusionLayerOptions = nil);
+begin
+  if NativeView <> nil then
+    NativeView.SetFillExtrusionLayer(AId, AGeoJSON, AOptions);
+end;
+
+{*******************************************************}
+procedure TALMapLibre.SetHeatmapLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PHeatmapLayerOptions = nil);
+begin
+  if NativeView <> nil then
+    NativeView.SetHeatmapLayer(AId, AGeoJSON, AOptions);
+end;
+
+{*******************************************************}
+procedure TALMapLibre.SetRasterLayer(const AId: String; const ATileURL: String; const AIsTileJSON: Boolean = False; const ATileSize: Integer = 256; const AOptions: TALMapLibre.PRasterLayerOptions = nil);
+begin
+  if NativeView <> nil then
+    NativeView.SetRasterLayer(AId, ATileURL, AIsTileJSON, ATileSize, AOptions);
+end;
+
+{*******************************************************}
+procedure TALMapLibre.RemoveLayer(const AId: String);
+begin
+  if NativeView <> nil then
+    NativeView.RemoveLayer(AId);
+end;
+
+{*******************************************************}
+function TALMapLibre.GetViewportBounds: TALRectD;
+begin
+  if NativeView <> nil then
+    result := NativeView.GetViewportBounds
+  else
+    Result := TAlRectD.Empty;
+end;
+
+{*******************************************************}
+function TALMapLibre.GetCameraPosition: TCameraPosition;
+begin
+  if NativeView <> nil then
+    result := NativeView.GetCameraPosition
+  else begin
+    Result := TCameraPosition.Create(
+                0, // const ABearing: Double;
+                TALRectD.Empty, // const APadding: TALRectD;
+                0, // const ARoll: Double;
+                TALLatLng.Create(ALNullLatLng, ALNullLatLng), // const ATarget: TALLatLng;
+                0, // const ATilt: Double;
+                0); // const AZoom: Double);;
+  end;
+end;
+
+{********************}
+{$IF defined(android)}
+procedure TALMapLibre.ShowLoadingSpinner(const AView: JView);
+begin
+  if NativeView <> nil then
+    NativeView.ShowLoadingSpinner(AView);
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(IOS)}
+procedure TALMapLibre.ShowLoadingSpinner(const AView: UIView);
+begin
+  if NativeView <> nil then
+    NativeView.ShowLoadingSpinner(AView);
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ALMacOS)}
+procedure TALMapLibre.ShowLoadingSpinner(const AHTML: String);
+begin
+  if NativeView <> nil then
+    NativeView.ShowLoadingSpinner(AHTML);
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWindows)}
+procedure TALMapLibre.ShowLoadingSpinner(const AHTML: String);
+begin
+  if NativeView <> nil then
+    NativeView.ShowLoadingSpinner(AHTML);
+end;
+{$ENDIF}
+
+{*************************************************************************************************************************}
+procedure TALMapLibre.ShowLoadingSpinner(const AColor: TAlphaColor = Talphacolors.null; const AWidth: Single = 0; const AHeight: Single = 0);
+begin
+  if NativeView <> nil then
+    NativeView.ShowLoadingSpinner(AColor, AWidth, AHeight);
+end;
+
+{***************************************}
+procedure TALMapLibre.HideLoadingSpinner;
+begin
+  if NativeView <> nil then
+    NativeView.HideLoadingSpinner;
 end;
 
 {$REGION ' ANDROID'}
@@ -516,6 +1680,7 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidMapLibreView.TOnDidFinishLoadingStyleListener.onDidFinishLoadingStyle');
   {$ENDIF}
+  FMapLibreView.FSymbolLayerIds.Clear;
   if Assigned(FMapLibreView.Control.FOnStyleLoaded) then
     FMapLibreView.Control.FOnStyleLoaded(FMapLibreView.Control);
 end;
@@ -590,25 +1755,42 @@ begin
   Result := True;
 
   if Assigned(FMapLibreView.Control.FOnMapClick) then
-    FMapLibreView.Control.FOnMapClick(FMapLibreView.Control, point.getLatitude, point.getLongitude);
+    FMapLibreView.Control.FOnMapClick(
+      FMapLibreView.Control,
+      point.getLatitude,
+      point.getLongitude);
 
-  if not Assigned(FMapLibreView.Control.FOnMarkerClick) then Exit;
-
+  if not Assigned(FMapLibreView.Control.FOnSymbolClick) then Exit;
   if FMapLibreView.FMaplibreMap = nil then Exit;
+  var LStyle := FMapLibreView.FMaplibreMap.getStyle;
+  if LStyle = nil then Exit;
+
   var LPoint := FMapLibreView.FMaplibreMap.getProjection.toScreenLocation(point);
-
   var LLayers := TJavaObjectArray<JString>.Create(1);
-  LLayers.Items[0] := StringToJString('ALMarkerLayer');
-  var LFeatures := FMapLibreView.FMaplibreMap.queryRenderedFeatures(LPoint, LLayers);
-  if (LFeatures = nil) or (LFeatures.size = 0) then Exit;
 
-  var LFeature := TJFeature.Wrap(TAndroidHelper.JObjectToID(LFeatures.get(0)));
-  if (LFeature = nil) or (not LFeature.hasProperty(StringToJString('id'))) then Exit;
-  var LMarkerID := LFeature.getStringProperty(StringToJString('id'));
+  for var LIndex := FMapLibreView.FSymbolLayerIds.Count - 1 downto 0 do begin
+    var LLayerIDStr := FMapLibreView.FSymbolLayerIds[LIndex];
+    var LLayerIDJStr := StringToJString(LLayerIDStr);
+    if LStyle.getLayer(LLayerIDJStr) = nil then Continue;
 
-  FMapLibreView.Control.FOnMarkerClick(
-    FMapLibreView.Control,
-    JStringToString(LMarkerID));
+    LLayers.Items[0] := LLayerIDJStr;
+    var LFeatures := FMapLibreView.FMaplibreMap.queryRenderedFeatures(LPoint, LLayers);
+    if (LFeatures = nil) or (LFeatures.size = 0) then Continue;
+
+    for var I := 0 to LFeatures.size - 1 do begin
+      var LFeature := TJFeature.Wrap(TAndroidHelper.JObjectToID(LFeatures.get(I)));
+      if (LFeature = nil) or (not LFeature.hasProperty(StringToJString('id'))) then Continue;
+      var LSymbolID := LFeature.getStringProperty(StringToJString('id'));
+      if LSymbolID = nil then Continue;
+
+      FMapLibreView.Control.FOnSymbolClick(
+        FMapLibreView.Control, // Sender: TObject;
+        LLayerIDStr, // const ALayerID: String;
+        JStringToString(LSymbolID)); // const ASymbolID: String
+
+      Exit;
+    end;
+  end;
 end;
 
 {****************************************}
@@ -618,6 +1800,8 @@ begin
 
   FMaplibreMap := nil;
   FLoadingSpinnerView := nil;
+
+  FSymbolLayerIds := TALStringListW.Create;
 
   FOnDidFinishLoadingStyleListener := TOnDidFinishLoadingStyleListener.Create(Self);
   View.addOnDidFinishLoadingStyleListener(FOnDidFinishLoadingStyleListener);
@@ -663,6 +1847,8 @@ begin
   View.onPause();
   View.onStop();
   View.onDestroy();
+
+  AlFreeAndNil(FSymbolLayerIds);
 
   inherited;
 end;
@@ -759,7 +1945,7 @@ end;
 {******************************************************************************************************************}
 procedure TALAndroidMapLibreView.SetCenterCoordinate(const ALatitude, ALongitude: Double; const AZoomLevel: double);
 begin
-  If FMaplibreMap = nil then raise Exception.Create('Cannot set the map center coordinate: MapLibre is not initialized');
+  If FMaplibreMap = nil then raise Exception.Create('MapLibre is not initialized');
   FMaplibreMap.moveCamera(
     TJCameraUpdateFactory.JavaClass.newLatLngZoom(
       TJLatLng.JavaClass.init(ALatitude, ALongitude), // latLng: JLatLng;
@@ -775,7 +1961,7 @@ procedure TALAndroidMapLibreView.SetImage(
             const AName: String);
 begin
   var LStyle := FMaplibreMap.getStyle;
-  if LStyle = nil then raise Exception.Create('Cannot register map image: MapLibre style is not loaded');
+  if LStyle = nil then raise Exception.Create('MapLibre style is not loaded');
   var LBitmap := ALCreateJBitmapFromResource(
                    AResourceName, // const AResourceName: String;
                    AStream, // const AResourceStream: TStream;
@@ -801,20 +1987,20 @@ end;
 procedure TALAndroidMapLibreView.RemoveImage(const AName: String);
 begin
   var LStyle := FMaplibreMap.getStyle;
-  if LStyle = nil then raise Exception.Create('Cannot unregister map image: MapLibre style is not loaded');
+  if LStyle = nil then raise Exception.Create('MapLibre style is not loaded');
   LStyle.removeImage(StringToJString(AName));
 end;
 
-{*******************************************}
-procedure TALAndroidMapLibreView.SetMarkers(const AGeoJSON: String; const AIconAllowsOverlap: Boolean);
+{**********************************************}
+procedure TALAndroidMapLibreView.SetSymbolLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PSymbolLayerOptions = nil);
 begin
   var LStyle := FMaplibreMap.getStyle;
-  if LStyle = nil then raise Exception.Create('Cannot set map markers: MapLibre style is not loaded');
+  if LStyle = nil then raise Exception.Create('MapLibre style is not loaded');
 
-  var LSource := LStyle.getSource(StringToJString('ALMarkerSource'));
+  var LSource := LStyle.getSource(StringToJString(AId));
   if LSource = nil then begin
     LSource := TJGeoJsonSource.JavaClass.init(
-                 StringToJString('ALMarkerSource'), // id
+                 StringToJString(AId), // id
                  StringToJString(AGeoJSON)); // geoJson
     LStyle.addSource(LSource);
   end
@@ -823,40 +2009,479 @@ begin
     LGeoJsonSource.setGeoJson(StringToJString(AGeoJSON));
   end;
 
-  if LStyle.getLayer(StringToJString('ALMarkerLayer')) = nil then begin
+  if LStyle.getLayer(StringToJString(AId)) = nil then begin
     var LLayer := TJSymbolLayer.JavaClass.init(
-                    StringToJString('ALMarkerLayer'), // layerId
-                    StringToJString('ALMarkerSource')); // sourceId
-    var LProperties := TJavaObjectArray<JPropertyValue>.Create(5);
+                    StringToJString(AId), // layerId
+                    StringToJString(AId)); // sourceId
+
+    var LOptions: TALMapLibre.TSymbolLayerOptions;
+    if AOptions <> nil then LOptions := AOptions^
+    else LOptions := TALMapLibre.TSymbolLayerOptions.Create;
+
+    var LCount := 53;
+    if Length(LOptions.FTextFont) > 0 then Inc(LCount);
+    if Length(LOptions.FTextWritingMode) > 0 then inc(LCount);
+    if Length(LOptions.FTextVariableAnchor) > 0 then inc(LCount);
+    var LProperties := TJavaObjectArray<JPropertyValue>.Create(LCount);
+
+    var LIdx: Integer := -1;
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.iconImage(TJExpression.JavaClass.get(StringToJString('_icon_image')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.iconColor(TJExpression.JavaClass.get(StringToJString('_icon_color')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.iconOpacity(TJExpression.JavaClass.get(StringToJString('_icon_opacity')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.iconSize(TJExpression.JavaClass.get(StringToJString('_icon_size')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.iconAnchor(TJExpression.JavaClass.get(StringToJString('_icon_anchor')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.iconOffset(TJExpression.JavaClass.get(StringToJString('_icon_offset')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.iconRotate(TJExpression.JavaClass.get(StringToJString('_icon_rotate')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.iconHaloColor(TJExpression.JavaClass.get(StringToJString('_icon_halo_color')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.iconHaloWidth(TJExpression.JavaClass.get(StringToJString('_icon_halo_width')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.iconHaloBlur(TJExpression.JavaClass.get(StringToJString('_icon_halo_blur')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textField(TJExpression.JavaClass.get(StringToJString('_text')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textColor(TJExpression.JavaClass.get(StringToJString('_text_color')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textOpacity(TJExpression.JavaClass.get(StringToJString('_text_opacity')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textSize(TJExpression.JavaClass.get(StringToJString('_text_size')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textLetterSpacing(TJExpression.JavaClass.get(StringToJString('_text_letter_spacing')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textJustify(TJExpression.JavaClass.get(StringToJString('_text_justify')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textAnchor(TJExpression.JavaClass.get(StringToJString('_text_anchor')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textOffset(TJExpression.JavaClass.get(StringToJString('_text_offset')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textMaxWidth(TJExpression.JavaClass.get(StringToJString('_text_max_width')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textHaloColor(TJExpression.JavaClass.get(StringToJString('_text_halo_color')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textHaloWidth(TJExpression.JavaClass.get(StringToJString('_text_halo_width')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textHaloBlur(TJExpression.JavaClass.get(StringToJString('_text_halo_blur')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textRotate(TJExpression.JavaClass.get(StringToJString('_text_rotate')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textRadialOffset(TJExpression.JavaClass.get(StringToJString('_text_radial_offset')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.textTransform(TJExpression.JavaClass.get(StringToJString('_text_transform')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.symbolSortKey(TJExpression.JavaClass.get(StringToJString('_symbol_sort_key')));
+
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.SymbolPlacement(StringToJString(LOptions.FSymbolPlacement));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.SymbolSpacing(TJFloat.JavaClass.valueOf(LOptions.FSymbolSpacing));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.SymbolAvoidEdges(TJBoolean.JavaClass.valueOf(LOptions.FSymbolAvoidEdges));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.SymbolZOrder(StringToJString(LOptions.FSymbolZOrder));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.IconAllowOverlap(TJBoolean.JavaClass.valueOf(LOptions.FIconAllowOverlap));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.IconIgnorePlacement(TJBoolean.JavaClass.valueOf(LOptions.FIconIgnorePlacement));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.IconOptional(TJBoolean.JavaClass.valueOf(LOptions.FIconOptional));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.IconRotationAlignment(StringToJString(LOptions.FIconRotationAlignment));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.IconPitchAlignment(StringToJString(LOptions.FIconPitchAlignment));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.IconPadding(TJFloat.JavaClass.valueOf(LOptions.FIconPadding));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.IconKeepUpright(TJBoolean.JavaClass.valueOf(LOptions.FIconKeepUpright));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.IconTextFit(StringToJString(LOptions.FIconTextFit));
     //--
-    LProperties.Items[0] := TJPropertyFactory.JavaClass.iconImage(
-                              TJExpression.JavaClass.get(
-                                StringToJString('_icon_image')));
+    var LIconTextFitPadding := TJavaObjectArray<JFloat>.Create(4);
+    LIconTextFitPadding.Items[0] := TJFloat.JavaClass.valueOf(LOptions.FIconTextFitPadding.Top);
+    LIconTextFitPadding.Items[1] := TJFloat.JavaClass.valueOf(LOptions.FIconTextFitPadding.Right);
+    LIconTextFitPadding.Items[2] := TJFloat.JavaClass.valueOf(LOptions.FIconTextFitPadding.Bottom);
+    LIconTextFitPadding.Items[3] := TJFloat.JavaClass.valueOf(LOptions.FIconTextFitPadding.Left);
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.IconTextFitPadding(LIconTextFitPadding);
     //--
-    LProperties.Items[1] := TJPropertyFactory.JavaClass.iconAnchor(
-                              TJExpression.JavaClass.raw(
-                                StringToJString('["coalesce",["get","_icon_anchor"],"bottom"]')));
+    var LIconTranslate := TJavaObjectArray<JFloat>.Create(2);
+    LIconTranslate.Items[0] := TJFloat.JavaClass.valueOf(LOptions.FIconTranslate.X);
+    LIconTranslate.Items[1] := TJFloat.JavaClass.valueOf(LOptions.FIconTranslate.Y);
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.IconTranslate(LIconTranslate);
     //--
-    LProperties.Items[2] := TJPropertyFactory.JavaClass.iconSize(
-      TJExpression.JavaClass.raw(
-        StringToJString('["coalesce",["get","_icon_size"],1.0]')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.IconTranslateAnchor(StringToJString(LOptions.FIconTranslateAnchor));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextAllowOverlap(TJBoolean.JavaClass.valueOf(LOptions.FTextAllowOverlap));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextIgnorePlacement(TJBoolean.JavaClass.valueOf(LOptions.FTextIgnorePlacement));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextOptional(TJBoolean.JavaClass.valueOf(LOptions.FTextOptional));
     //--
-    LProperties.Items[3] := TJPropertyFactory.JavaClass.symbolSortKey(
-      TJExpression.JavaClass.raw(
-        StringToJString('["coalesce",["get","_icon_size"],1.0]')));
+    if Length(LOptions.FTextFont) > 0 then begin
+      var LTextFont := TJavaObjectArray<JString>.Create(Length(LOptions.FTextFont));
+      for var I := 0 to High(LOptions.FTextFont) do
+        LTextFont.Items[I] := StringToJString(LOptions.FTextFont[I]);
+      LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextFont(LTextFont);
+    end;
     //--
-    LProperties.Items[4] := TJPropertyFactory.JavaClass.iconAllowOverlap(
-                              TJBoolean.JavaClass.valueOf(AIconAllowsOverlap));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextRotationAlignment(StringToJString(LOptions.FTextRotationAlignment));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextPitchAlignment(StringToJString(LOptions.FTextPitchAlignment));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextPadding(TJFloat.JavaClass.valueOf(LOptions.FTextPadding));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextKeepUpright(TJBoolean.JavaClass.valueOf(LOptions.FTextKeepUpright));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextMaxAngle(TJFloat.JavaClass.valueOf(LOptions.FTextMaxAngle));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextLineHeight(TJFloat.JavaClass.valueOf(LOptions.FTextLineHeight));
     //--
+    if Length(LOptions.FTextWritingMode) > 0 then begin
+      var LTextWritingMode := TJavaObjectArray<JString>.Create(Length(LOptions.FTextWritingMode));
+      for var I := 0 to High(LOptions.FTextWritingMode) do
+        LTextWritingMode.Items[I] := StringToJString(LOptions.FTextWritingMode[I]);
+      LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextWritingMode(LTextWritingMode);
+    end;
+    //--
+    if Length(LOptions.FTextVariableAnchor) > 0 then begin
+      var LTextVariableAnchor := TJavaObjectArray<JString>.Create(Length(LOptions.FTextVariableAnchor));
+      for var I := 0 to High(LOptions.FTextVariableAnchor) do
+        LTextVariableAnchor.Items[I] := StringToJString(LOptions.FTextVariableAnchor[I]);
+      LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextVariableAnchor(LTextVariableAnchor);
+    end;
+    //--
+    var LTextTranslate := TJavaObjectArray<JFloat>.Create(2);
+    LTextTranslate.Items[0] := TJFloat.JavaClass.valueOf(LOptions.FTextTranslate.X);
+    LTextTranslate.Items[1] := TJFloat.JavaClass.valueOf(LOptions.FTextTranslate.Y);
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextTranslate(LTextTranslate);
+    //--
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.TextTranslateAnchor(StringToJString(LOptions.FTextTranslateAnchor));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.Visibility(StringToJString(LOptions.FVisibility));
+
+    Assert(LIdx = LCount - 1);
+    LLayer.setProperties(LProperties);
+    LStyle.addLayer(LLayer);
+  end;
+
+  if not FSymbolLayerIds.Contains(AId) then
+    FSymbolLayerIds.Add(AId);
+end;
+
+{*********************************************************************************}
+procedure TALAndroidMapLibreView.SetLineLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PLineLayerOptions = nil);
+begin
+  var LStyle := FMaplibreMap.getStyle;
+  if LStyle = nil then raise Exception.Create('MapLibre style is not loaded');
+
+  var LSource := LStyle.getSource(StringToJString(AId));
+  if LSource = nil then begin
+    LSource := TJGeoJsonSource.JavaClass.init(
+                 StringToJString(AId), // id
+                 StringToJString(AGeoJSON)); // geoJson
+    LStyle.addSource(LSource);
+  end
+  else begin
+    var LGeoJsonSource := TJGeoJsonSource.Wrap(TAndroidHelper.JObjectToID(LSource));
+    LGeoJsonSource.setGeoJson(StringToJString(AGeoJSON));
+  end;
+
+  if LStyle.getLayer(StringToJString(AId)) = nil then begin
+    var LLayer := TJLineLayer.JavaClass.init(
+                    StringToJString(AId), // layerId
+                    StringToJString(AId)); // sourceId
+
+    var LOptions: TALMapLibre.TLineLayerOptions;
+    if AOptions <> nil then LOptions := AOptions^
+    else LOptions := TALMapLibre.TLineLayerOptions.Create;
+
+    var LCount := 14;
+    if Length(LOptions.FLineDasharray) > 0 then Inc(LCount);
+    var LProperties := TJavaObjectArray<JPropertyValue>.Create(LCount);
+
+    var LIdx: Integer := -1;
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineColor(TJExpression.JavaClass.get(StringToJString('_line_color')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineOpacity(TJExpression.JavaClass.get(StringToJString('_line_opacity')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineWidth(TJExpression.JavaClass.get(StringToJString('_line_width')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineBlur(TJExpression.JavaClass.get(StringToJString('_line_blur')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineGapWidth(TJExpression.JavaClass.get(StringToJString('_line_gap_width')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineOffset(TJExpression.JavaClass.get(StringToJString('_line_offset')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineSortKey(TJExpression.JavaClass.get(StringToJString('_line_sort_key')));
+
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineCap(StringToJString(LOptions.FLineCap));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineJoin(StringToJString(LOptions.FLineJoin));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineMiterLimit(TJFloat.JavaClass.valueOf(LOptions.FLineMiterLimit));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineRoundLimit(TJFloat.JavaClass.valueOf(LOptions.FLineRoundLimit));
+    //--
+    if Length(LOptions.FLineDasharray) > 0 then begin
+      var LLineDasharray := TJavaObjectArray<JFloat>.Create(Length(LOptions.FLineDasharray));
+      for var I := 0 to High(LOptions.FLineDasharray) do
+        LLineDasharray.Items[I] := TJFloat.JavaClass.valueOf(LOptions.FLineDasharray[I]);
+      LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineDasharray(LLineDasharray);
+    end;
+    //--
+    var LLineTranslate := TJavaObjectArray<JFloat>.Create(2);
+    LLineTranslate.Items[0] := TJFloat.JavaClass.valueOf(LOptions.FLineTranslate.X);
+    LLineTranslate.Items[1] := TJFloat.JavaClass.valueOf(LOptions.FLineTranslate.Y);
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineTranslate(LLineTranslate);
+    //--
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.LineTranslateAnchor(StringToJString(LOptions.FLineTranslateAnchor));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.Visibility(StringToJString(LOptions.FVisibility));
+
+    Assert(LIdx = LCount - 1);
     LLayer.setProperties(LProperties);
     LStyle.addLayer(LLayer);
   end;
 end;
 
+{***********************************************************************************}
+procedure TALAndroidMapLibreView.SetCircleLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PCircleLayerOptions = nil);
+begin
+  var LStyle := FMaplibreMap.getStyle;
+  if LStyle = nil then raise Exception.Create('MapLibre style is not loaded');
+
+  var LSource := LStyle.getSource(StringToJString(AId));
+  if LSource = nil then begin
+    LSource := TJGeoJsonSource.JavaClass.init(
+                 StringToJString(AId), // id
+                 StringToJString(AGeoJSON)); // geoJson
+    LStyle.addSource(LSource);
+  end
+  else begin
+    var LGeoJsonSource := TJGeoJsonSource.Wrap(TAndroidHelper.JObjectToID(LSource));
+    LGeoJsonSource.setGeoJson(StringToJString(AGeoJSON));
+  end;
+
+  if LStyle.getLayer(StringToJString(AId)) = nil then begin
+    var LLayer := TJCircleLayer.JavaClass.init(
+                    StringToJString(AId), // layerId
+                    StringToJString(AId)); // sourceId
+
+    var LOptions: TALMapLibre.TCircleLayerOptions;
+    if AOptions <> nil then LOptions := AOptions^
+    else LOptions := TALMapLibre.TCircleLayerOptions.Create;
+
+    var LCount := 13;
+    var LProperties := TJavaObjectArray<JPropertyValue>.Create(LCount);
+
+    var LIdx: Integer := -1;
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.CircleColor(TJExpression.JavaClass.get(StringToJString('_circle_color')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.CircleOpacity(TJExpression.JavaClass.get(StringToJString('_circle_opacity')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.CircleRadius(TJExpression.JavaClass.get(StringToJString('_circle_radius')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.CircleBlur(TJExpression.JavaClass.get(StringToJString('_circle_blur')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.CircleStrokeColor(TJExpression.JavaClass.get(StringToJString('_circle_stroke_color')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.CircleStrokeOpacity(TJExpression.JavaClass.get(StringToJString('_circle_stroke_opacity')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.CircleStrokeWidth(TJExpression.JavaClass.get(StringToJString('_circle_stroke_width')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.CircleSortKey(TJExpression.JavaClass.get(StringToJString('_circle_sort_key')));
+
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.CirclePitchAlignment(StringToJString(LOptions.FCirclePitchAlignment));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.CirclePitchScale(StringToJString(LOptions.FCirclePitchScale));
+    //--
+    var LCircleTranslate := TJavaObjectArray<JFloat>.Create(2);
+    LCircleTranslate.Items[0] := TJFloat.JavaClass.valueOf(LOptions.FCircleTranslate.X);
+    LCircleTranslate.Items[1] := TJFloat.JavaClass.valueOf(LOptions.FCircleTranslate.Y);
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.CircleTranslate(LCircleTranslate);
+    //--
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.CircleTranslateAnchor(StringToJString(LOptions.FCircleTranslateAnchor));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.Visibility(StringToJString(LOptions.FVisibility));
+
+    Assert(LIdx = LCount - 1);
+    LLayer.setProperties(LProperties);
+    LStyle.addLayer(LLayer);
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALAndroidMapLibreView.SetFillLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillLayerOptions = nil);
+begin
+  var LStyle := FMaplibreMap.getStyle;
+  if LStyle = nil then raise Exception.Create('MapLibre style is not loaded');
+
+  var LSource := LStyle.getSource(StringToJString(AId));
+  if LSource = nil then begin
+    LSource := TJGeoJsonSource.JavaClass.init(
+                 StringToJString(AId), // id
+                 StringToJString(AGeoJSON)); // geoJson
+    LStyle.addSource(LSource);
+  end
+  else begin
+    var LGeoJsonSource := TJGeoJsonSource.Wrap(TAndroidHelper.JObjectToID(LSource));
+    LGeoJsonSource.setGeoJson(StringToJString(AGeoJSON));
+  end;
+
+  if LStyle.getLayer(StringToJString(AId)) = nil then begin
+    var LLayer := TJFillLayer.JavaClass.init(
+                    StringToJString(AId), // layerId
+                    StringToJString(AId)); // sourceId
+
+    var LOptions: TALMapLibre.TFillLayerOptions;
+    if AOptions <> nil then LOptions := AOptions^
+    else LOptions := TALMapLibre.TFillLayerOptions.Create;
+
+    var LCount := 8;
+    if not LOptions.FFillPattern.IsEmpty then Inc(LCount);
+    var LProperties := TJavaObjectArray<JPropertyValue>.Create(LCount);
+
+    var LIdx: Integer := -1;
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillColor(TJExpression.JavaClass.get(StringToJString('_fill_color')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillOpacity(TJExpression.JavaClass.get(StringToJString('_fill_opacity')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillOutlineColor(TJExpression.JavaClass.get(StringToJString('_fill_outline_color')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillSortKey(TJExpression.JavaClass.get(StringToJString('_fill_sort_key')));
+
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillAntialias(TJBoolean.JavaClass.valueOf(LOptions.FFillAntialias));
+    //--
+    var LFillTranslate := TJavaObjectArray<JFloat>.Create(2);
+    LFillTranslate.Items[0] := TJFloat.JavaClass.valueOf(LOptions.FFillTranslate.X);
+    LFillTranslate.Items[1] := TJFloat.JavaClass.valueOf(LOptions.FFillTranslate.Y);
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillTranslate(LFillTranslate);
+    //--
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillTranslateAnchor(StringToJString(LOptions.FFillTranslateAnchor));
+    //--
+    if not LOptions.FFillPattern.IsEmpty then
+      LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillPattern(StringToJString(LOptions.FFillPattern));
+    //--
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.Visibility(StringToJString(LOptions.FVisibility));
+
+    Assert(LIdx = LCount - 1);
+    LLayer.setProperties(LProperties);
+    LStyle.addLayer(LLayer);
+  end;
+end;
+
+{******************************************************************************************}
+procedure TALAndroidMapLibreView.SetFillExtrusionLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PFillExtrusionLayerOptions = nil);
+begin
+  var LStyle := FMaplibreMap.getStyle;
+  if LStyle = nil then raise Exception.Create('MapLibre style is not loaded');
+
+  var LSource := LStyle.getSource(StringToJString(AId));
+  if LSource = nil then begin
+    LSource := TJGeoJsonSource.JavaClass.init(
+                 StringToJString(AId), // id
+                 StringToJString(AGeoJSON)); // geoJson
+    LStyle.addSource(LSource);
+  end
+  else begin
+    var LGeoJsonSource := TJGeoJsonSource.Wrap(TAndroidHelper.JObjectToID(LSource));
+    LGeoJsonSource.setGeoJson(StringToJString(AGeoJSON));
+  end;
+
+  if LStyle.getLayer(StringToJString(AId)) = nil then begin
+    var LLayer := TJFillExtrusionLayer.JavaClass.init(
+                    StringToJString(AId), // layerId
+                    StringToJString(AId)); // sourceId
+
+    var LOptions: TALMapLibre.TFillExtrusionLayerOptions;
+    if AOptions <> nil then LOptions := AOptions^
+    else LOptions := TALMapLibre.TFillExtrusionLayerOptions.Create;
+
+    var LCount := 8;
+    var LProperties := TJavaObjectArray<JPropertyValue>.Create(LCount);
+
+    var LIdx: Integer := -1;
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillExtrusionColor(TJExpression.JavaClass.get(StringToJString('_fill_extrusion_color')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillExtrusionHeight(TJExpression.JavaClass.get(StringToJString('_fill_extrusion_height')));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillExtrusionBase(TJExpression.JavaClass.get(StringToJString('_fill_extrusion_base')));
+
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillExtrusionOpacity(TJFloat.JavaClass.valueOf(LOptions.FFillExtrusionOpacity));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillExtrusionVerticalGradient(TJBoolean.JavaClass.valueOf(LOptions.FFillExtrusionVerticalGradient));
+    //--
+    var LFillExtrusionTranslate := TJavaObjectArray<JFloat>.Create(2);
+    LFillExtrusionTranslate.Items[0] := TJFloat.JavaClass.valueOf(LOptions.FFillExtrusionTranslate.X);
+    LFillExtrusionTranslate.Items[1] := TJFloat.JavaClass.valueOf(LOptions.FFillExtrusionTranslate.Y);
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillExtrusionTranslate(LFillExtrusionTranslate);
+    //--
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.FillExtrusionTranslateAnchor(StringToJString(LOptions.FFillExtrusionTranslateAnchor));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.Visibility(StringToJString(LOptions.FVisibility));
+
+    Assert(LIdx = LCount - 1);
+    LLayer.setProperties(LProperties);
+    LStyle.addLayer(LLayer);
+  end;
+end;
+
+{************************************************************************************}
+procedure TALAndroidMapLibreView.SetHeatmapLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PHeatmapLayerOptions = nil);
+begin
+  var LStyle := FMaplibreMap.getStyle;
+  if LStyle = nil then raise Exception.Create('MapLibre style is not loaded');
+
+  var LSource := LStyle.getSource(StringToJString(AId));
+  if LSource = nil then begin
+    LSource := TJGeoJsonSource.JavaClass.init(
+                 StringToJString(AId), // id
+                 StringToJString(AGeoJSON)); // geoJson
+    LStyle.addSource(LSource);
+  end
+  else begin
+    var LGeoJsonSource := TJGeoJsonSource.Wrap(TAndroidHelper.JObjectToID(LSource));
+    LGeoJsonSource.setGeoJson(StringToJString(AGeoJSON));
+  end;
+
+  if LStyle.getLayer(StringToJString(AId)) = nil then begin
+    var LLayer := TJHeatmapLayer.JavaClass.init(
+                    StringToJString(AId), // layerId
+                    StringToJString(AId)); // sourceId
+
+    var LOptions: TALMapLibre.THeatmapLayerOptions;
+    if AOptions <> nil then LOptions := AOptions^
+    else LOptions := TALMapLibre.THeatmapLayerOptions.Create;
+
+    var LCount := 5;
+    var LProperties := TJavaObjectArray<JPropertyValue>.Create(LCount);
+
+    var LIdx: Integer := -1;
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.HeatmapWeight(TJExpression.JavaClass.get(StringToJString('_heatmap_weight')));
+
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.HeatmapRadius(TJFloat.JavaClass.valueOf(LOptions.FHeatmapRadius));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.HeatmapIntensity(TJFloat.JavaClass.valueOf(LOptions.FHeatmapIntensity));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.HeatmapOpacity(TJFloat.JavaClass.valueOf(LOptions.FHeatmapOpacity));
+    LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.Visibility(StringToJString(LOptions.FVisibility));
+
+    Assert(LIdx = LCount - 1);
+    LLayer.setProperties(LProperties);
+    LStyle.addLayer(LLayer);
+  end;
+end;
+
+{*******************************************}
+procedure TALAndroidMapLibreView.SetRasterLayer(const AId: String; const ATileURL: String; const AIsTileJSON: Boolean = False; const ATileSize: Integer = 256; const AOptions: TALMapLibre.PRasterLayerOptions = nil);
+begin
+  var LStyle := FMaplibreMap.getStyle;
+  if LStyle = nil then raise Exception.Create('MapLibre style is not loaded');
+
+  if LStyle.getLayer(StringToJString(AId)) <> nil then
+    if not LStyle.removeLayer(StringToJString(AId)) then
+      raise Exception.Create('Cannot remove MapLibre raster layer: ' + AId);
+
+  if LStyle.getSource(StringToJString(AId)) <> nil then
+    if not LStyle.removeSource(StringToJString(AId)) then
+      raise Exception.Create('Cannot remove MapLibre raster source: ' + AId);
+
+  var LOptions: TALMapLibre.TRasterLayerOptions;
+  if AOptions <> nil then LOptions := AOptions^
+  else LOptions := TALMapLibre.TRasterLayerOptions.Create;
+
+  var LSource: JRasterSource;
+  if AIsTileJSON then begin
+    LSource := TJRasterSource.JavaClass.init(
+                 StringToJString(AId), // id
+                 StringToJString(ATileURL), // uri
+                 ATileSize); // tileSize
+  end
+  else begin
+    var LTiles := TJavaObjectArray<JString>.Create(1);
+    LTiles.Items[0] := StringToJString(ATileURL);
+    var LTileSet := TJTileSet.JavaClass.init(
+                      StringToJString('2.2.0'), // tilejson
+                      LTiles); // tiles
+    LSource := TJRasterSource.JavaClass.init(
+                 StringToJString(AId), // id
+                 LTileSet, // tileSet
+                 ATileSize); // tileSize
+  end;
+
+  LStyle.addSource(LSource);
+
+  var LLayer := TJRasterLayer.JavaClass.init(
+                  StringToJString(AId), // layerId
+                  StringToJString(AId)); // sourceId
+
+  var LCount := 9;
+  var LProperties := TJavaObjectArray<JPropertyValue>.Create(LCount);
+
+  var LIdx: Integer := -1;
+  LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.RasterOpacity(TJFloat.JavaClass.valueOf(LOptions.FRasterOpacity));
+  LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.RasterHueRotate(TJFloat.JavaClass.valueOf(LOptions.FRasterHueRotate));
+  LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.RasterBrightnessMin(TJFloat.JavaClass.valueOf(LOptions.FRasterBrightnessMin));
+  LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.RasterBrightnessMax(TJFloat.JavaClass.valueOf(LOptions.FRasterBrightnessMax));
+  LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.RasterSaturation(TJFloat.JavaClass.valueOf(LOptions.FRasterSaturation));
+  LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.RasterContrast(TJFloat.JavaClass.valueOf(LOptions.FRasterContrast));
+  LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.RasterResampling(StringToJString(LOptions.FRasterResampling));
+  LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.RasterFadeDuration(TJFloat.JavaClass.valueOf(LOptions.FRasterFadeDuration));
+  LProperties.Items[ALInc(LIdx)] := TJPropertyFactory.JavaClass.Visibility(StringToJString(LOptions.FVisibility));
+
+  Assert(LIdx = LCount - 1);
+  LLayer.setProperties(LProperties);
+  LStyle.addLayer(LLayer);
+end;
+
+{*******************************************}
+procedure TALAndroidMapLibreView.RemoveLayer(const AId: String);
+begin
+  var AIndex := FSymbolLayerIds.IndexOf(AId);
+  If AIndex >= 0 then FSymbolLayerIds.delete(AIndex);
+  if FMaplibreMap = nil then Exit;
+  var LStyle := FMaplibreMap.getStyle;
+  if LStyle = nil then Exit;
+  var LIDJStr := StringToJString(AId);
+  if LStyle.getLayer(LIDJStr) <> nil then LStyle.removeLayer(LIDJStr);
+  if LStyle.getSource(LIDJStr) <> nil then LStyle.removeSource(LIDJStr);
+end;
+
 {**********************************************************}
 function TALAndroidMapLibreView.GetViewportBounds: TALRectD;
 begin
-  if FMaplibreMap = nil then raise Exception.Create('Cannot get visible bounds: MapLibre is not initialized');
+  if FMaplibreMap = nil then raise Exception.Create('MapLibre is not initialized');
   var LBounds := FMaplibreMap.getProjection.getVisibleRegion.latLngBounds;
   Result := TALRectD.Create(
               LBounds.getLonWest,
@@ -865,10 +2490,10 @@ begin
               LBounds.getLatNorth);
 end;
 
-{***************************************************************************}
-function TALAndroidMapLibreView.GetCameraPosition: TALMapLibreCameraPosition;
+{*****************************************************************************}
+function TALAndroidMapLibreView.GetCameraPosition: TALMapLibre.TCameraPosition;
 begin
-  if FMaplibreMap = nil then raise Exception.Create('Cannot get camera position: MapLibre is not initialized');
+  if FMaplibreMap = nil then raise Exception.Create('MapLibre is not initialized');
   var LCameraPosition := FMaplibreMap.getCameraPosition;
   Result.bearing := LCameraPosition.bearing;
   var LPadding := LCameraPosition.padding;
@@ -1016,22 +2641,32 @@ begin
       LCoordinate.longitude);
   end;
 
-  if not Assigned(FMapLibreView.Control.FOnMarkerClick) then Exit;
+  if not Assigned(FMapLibreView.Control.FOnSymbolClick) then Exit;
   if LView.style = nil then Exit;
 
-  var LLayers := TNSSet.Wrap(TNSSet.OCClass.setWithObject(NSObjectToID(StrToNSStr('ALMarkerLayer'))));
-  var LFeatures := LView.visibleFeaturesAtPoint(LPoint, LLayers);
-  if (LFeatures = nil) or (LFeatures.count = 0) then Exit;
+  for var LIndex := FMapLibreView.FSymbolLayerIds.Count - 1 downto 0 do begin
+    var LLayerIDStr := FMapLibreView.FSymbolLayerIds[LIndex];
+    var LLayerIDNSStr := StrToNSStr(LLayerIDStr);
+    if LView.style.layerWithIdentifier(LLayerIDNSStr) = nil then Continue;
 
-  var LFeature := TMLNPointFeature.Wrap(LFeatures.objectAtIndex(0));
-  if LFeature = nil then Exit;
+    var LLayers := TNSSet.Wrap(TNSSet.OCClass.setWithObject(NSObjectToID(LLayerIDNSStr)));
+    var LFeatures := LView.visibleFeaturesAtPoint(LPoint, LLayers);
+    if (LFeatures = nil) or (LFeatures.count = 0) then Continue;
 
-  var LMarkerID := LFeature.attributeForKey(StrToNSStr('id'));
-  if LMarkerID = nil then Exit;
+    for var I := 0 to LFeatures.count - 1 do begin
+      var LFeature := TMLNPointFeature.Wrap(LFeatures.objectAtIndex(I));
+      if LFeature = nil then Continue;
+      var LSymbolID := LFeature.attributeForKey(StrToNSStr('id'));
+      if LSymbolID = nil then Continue;
 
-  FMapLibreView.Control.FOnMarkerClick(
-    FMapLibreView.Control,
-    NSStrToStr(TNSString.Wrap(LMarkerID)));
+      FMapLibreView.Control.FOnSymbolClick(
+        FMapLibreView.Control, // Sender: TObject;
+        LLayerIDStr, // const ALayerID: String;
+        NSStrToStr(TNSString.Wrap(LSymbolID))); // const ASymbolID: String
+
+      Exit;
+    end;
+  end;
 end;
 
 {************************************}
@@ -1070,6 +2705,7 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALIosMapLibreView.TMapViewDelegate.mapViewDidFinishLoadingStyle');
   {$ENDIF}
+  FMapLibreView.FSymbolLayerIds.Clear;
   if Assigned(FMapLibreView.Control.FOnStyleLoaded) then
     FMapLibreView.Control.FOnStyleLoaded(FMapLibreView.Control);
 end;
@@ -1077,6 +2713,8 @@ end;
 {**************************************}
 constructor TALIosMapLibreView.Create;
 begin
+  FThreadQueueCleaner := TALThreadQueueCleaner.Create;
+
   inherited; // This will call InitView
 
   FMapViewDelegate := TMapViewDelegate.Create(Self);
@@ -1091,6 +2729,8 @@ begin
   View.addGestureRecognizer(FMapViewTapGestureRecognizer);
 
   FLoadingSpinnerView := nil;
+
+  FSymbolLayerIds := TALStringListW.Create;
 end;
 
 {**************************************}
@@ -1098,12 +2738,16 @@ destructor TALIosMapLibreView.Destroy;
 begin
   HideLoadingSpinner;
 
+  ALFreeAndNil(FThreadQueueCleaner);
+
   View.removeGestureRecognizer(FMapViewTapGestureRecognizer);
   FMapViewTapGestureRecognizer.release;
   FMapViewTapGestureRecognizer := nil;
 
   View.setDelegate(nil);
   ALFreeAndNil(FMapViewDelegate);
+
+  ALFreeAndNil(FSymbolLayerIds);
 
   inherited Destroy;
 end;
@@ -1122,7 +2766,7 @@ begin
     UpdateObjectID(V);
   // Defer OnMapReady to the next main-thread cycle to allow event handlers
   // to be assigned after the control is created programmatically.
-  TThread.ForceQueue(nil,
+  TThread.ForceQueue(FThreadQueueCleaner,
     procedure
     begin
        {$IF defined(DEBUG)}
@@ -1172,7 +2816,7 @@ procedure TALIosMapLibreView.SetImage(
             const AName: String);
 begin
   var LStyle := View.style;
-  if LStyle = nil then raise Exception.Create('Cannot register map image: MapLibre style is not loaded');
+  if LStyle = nil then raise Exception.Create('MapLibre style is not loaded');
   var LCGImageRef := ALCreateCGImageRefFromResource(
                        AResourceName, // const AResourceName: String;
                        AStream, // const AResourceStream: TStream;
@@ -1199,15 +2843,15 @@ end;
 procedure TALIosMapLibreView.RemoveImage(const AName: String);
 begin
   var LStyle := View.style;
-  if LStyle = nil then raise Exception.Create('Cannot unregister map image: MapLibre style is not loaded');
+  if LStyle = nil then raise Exception.Create('MapLibre style is not loaded');
   LStyle.removeImageForName(StrToNSStr(AName));
 end;
 
 {**************************************************************}
-procedure TALIosMapLibreView.SetMarkers(const AGeoJSON: String; const AIconAllowsOverlap: Boolean);
+procedure TALIosMapLibreView.SetSymbolLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PSymbolLayerOptions = nil);
 begin
   var LStyle := View.style;
-  if LStyle = nil then raise Exception.Create('Cannot set map markers: MapLibre style is not loaded');
+  if LStyle = nil then raise Exception.Create('MapLibre style is not loaded');
 
   var LData := StrToNSStr(AGeoJSON).dataUsingEncoding(NSUTF8StringEncoding);
   var LError: Pointer := nil;
@@ -1218,15 +2862,15 @@ begin
   if LShape = nil then begin
     var LErrorMessage: String;
     if LError <> nil then LErrorMessage := NSStrToStr(TNSError.Wrap(LError).localizedDescription)
-    else LErrorMessage := 'Cannot set map markers: failed to parse GeoJSON';
+    else LErrorMessage := 'Failed to parse GeoJSON';
     raise Exception.Create(LErrorMessage);
   end;
 
-  var LSource := LStyle.sourceWithIdentifier(StrToNSStr('ALMarkerSource'));
+  var LSource := LStyle.sourceWithIdentifier(StrToNSStr(AId));
   if LSource = nil then begin
     LSource := TMLNShapeSource.Wrap(
                  TMLNShapeSource.Alloc.initWithIdentifier(
-                   StrToNSStr('ALMarkerSource'), // identifier: NSString;
+                   StrToNSStr(AId), // identifier: NSString;
                    LShape, // shape: MLNShape;
                    nil)); // options: NSDictionary;
     LStyle.addSource(LSource);
@@ -1234,10 +2878,10 @@ begin
   else
     TMLNShapeSource.wrap(LSource).setShape(LShape);
 
-  if LStyle.layerWithIdentifier(StrToNSStr('ALMarkerLayer')) = nil then begin
+  if LStyle.layerWithIdentifier(StrToNSStr(AId)) = nil then begin
     var LLayer := TMLNSymbolStyleLayer.Wrap(
                     TMLNSymbolStyleLayer.Alloc.initWithIdentifier(
-                      StrToNSStr('ALMarkerLayer'), // identifier: NSString;
+                      StrToNSStr(AId), // identifier: NSString;
                       LSource)); // source: MLNSource;
     LLayer.setIconImageName(
       TNSExpression.OCClass.expressionForKeyPath(
@@ -1257,10 +2901,27 @@ begin
     //--
     LLayer.setIconAllowsOverlap(
       TNSExpression.OCClass.expressionForConstantValue(
-        NSObjectToID(TNSNumber.OCClass.numberWithBool(AIconAllowsOverlap))));
+        NSObjectToID(TNSNumber.OCClass.numberWithBool(AAllowOverlap))));
     //--
     LStyle.addLayer(LLayer);
   end;
+
+  if not FSymbolLayerIds.Contains(AId) then
+    FSymbolLayerIds.Add(AId);
+end;
+
+{*******************************************}
+procedure TALIosMapLibreView.RemoveLayer(const AId: String);
+begin
+  var AIndex := FSymbolLayerIds.IndexOf(AId);
+  If AIndex >= 0 then FSymbolLayerIds.delete(AIndex);
+  var LStyle := View.style;
+  if LStyle = nil then Exit;
+  var LIDNSStr:= StrToNSStr(AId);
+  var LLayer := LStyle.layerWithIdentifier(LIDNSStr);
+  if LLayer <> nil then LStyle.removeLayer(LLayer);
+  var LSource := LStyle.sourceWithIdentifier(LIDNSStr);
+  if LSource <> nil then LStyle.removeSource(LSource);
 end;
 
 {******************************************************}
@@ -1275,10 +2936,10 @@ begin
 end;
 
 {***********************************************************************}
-function TALIosMapLibreView.GetCameraPosition: TALMapLibreCameraPosition;
+function TALIosMapLibreView.GetCameraPosition: TALMapLibre.TCameraPosition;
 begin
   var LCamera := View.camera;
-  if LCamera = nil then raise Exception.Create('Cannot get camera position: MapLibre camera is not initialized');
+  if LCamera = nil then raise Exception.Create('MapLibre camera is not initialized');
   Result.bearing := LCamera.heading;
   var LPadding := View.cameraEdgeInsets;
   Result.padding := TALRectD.Create(
@@ -1373,6 +3034,95 @@ end;
 {$endif}
 {$ENDREGION}
 
+{$REGION ' ALMACOS'}
+{$IF defined(ALMACOS)}
+
+{**************************************************}
+function TALMacMapLibreView.GetControl: TALMapLibre;
+begin
+  Result := TALMapLibre(inherited Control);
+end;
+
+{**************************************************************************************************************}
+procedure TALMacMapLibreView.SetCenterCoordinate(const ALatitude, ALongitude: Double; const AZoomLevel: double);
+begin
+  // Dummy
+end;
+
+{**************************************}
+procedure TALMacMapLibreView.SetImage(
+            const AResourceName: String;
+            const AStream: TStream;
+            const AScale: Single;
+            const W, H: single;
+            const   AName: String);
+begin
+  // Dummy
+end;
+
+{**************************************}
+procedure TALMacMapLibreView.RemoveImage(const AName: String);
+begin
+  // Dummy
+end;
+
+{**************************************}
+procedure TALMacMapLibreView.SetSymbolLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PSymbolLayerOptions = nil);
+begin
+  // Dummy
+end;
+
+{**************************************}
+procedure TALMacMapLibreView.RemoveLayer(const AId: String);
+begin
+  // Dummy
+end;
+
+{******************************************************}
+function TALMacMapLibreView.GetViewportBounds: TALRectD;
+begin
+  Result := TALRectD.Empty;
+end;
+
+{***********************************************************************}
+function TALMacMapLibreView.GetCameraPosition: TALMapLibre.TCameraPosition;
+begin
+  Result := TCameraPosition.Create(
+              0, // const ABearing: Double;
+              TALRectD.Empty, // APadding: TALRectD;
+              0, // const ARoll: Double;
+              TALLatLng.Create(ALNullLatLng, ALNullLatLng), // const ATarget: TALLatLng;
+              0, // const ATilt: Double;
+              0); // const AZoom: Double
+end;
+
+{**************************************}
+procedure TALMacMapLibreView.ApplyStyle;
+begin
+  // Dummy
+end;
+
+{***********************************************************************}
+procedure TALMacMapLibreView.ShowLoadingSpinner(const AHTML: String);
+begin
+  // Dummy
+end;
+
+{**************************************************************************************************************************************************}
+procedure TALMacMapLibreView.ShowLoadingSpinner(const AColor: TAlphaColor = Talphacolors.null; const AWidth: Single = 0; const AHeight: Single = 0);
+begin
+  // Dummy
+end;
+
+{******************************************************}
+procedure TALMacMapLibreView.HideLoadingSpinner;
+begin
+  // Dummy
+end;
+
+{$endif}
+{$ENDREGION}
+
 {$REGION ' MSWINDOWS'}
 {$IF defined(MSWINDOWS)}
 
@@ -1380,6 +3130,7 @@ end;
 constructor TALWinMapLibreView.Create;
 begin
   inherited;
+  FThreadQueueCleaner := TALThreadQueueCleaner.Create;
   FMapReady := False;
   FApplyStyleWhenMapReady := False;
   LoadData(
@@ -1387,6 +3138,13 @@ begin
     GetHtml, // AData
     'text/html', // AMimeType
     'UTF-8'); // AEncoding
+end;
+
+{************************************}
+destructor TALWinMapLibreView.Destroy;
+begin
+  ALFreeAndNil(FThreadQueueCleaner);
+  inherited;
 end;
 
 {**************************************************}
@@ -1410,7 +3168,7 @@ begin
   // ForceQueue defers event handling until after DoWebMessage has returned,
   // allowing Application.ProcessMessages to dispatch the ExecuteScript
   // completion callback and GetViewportBounds to finish.
-  TThread.ForceQueue(nil,
+  TThread.ForceQueue(FThreadQueueCleaner,
     procedure
     begin
       {$IF defined(DEBUG)}
@@ -1455,10 +3213,11 @@ begin
                 LJSON.GetChildNode('latitude').Float,
                 LJSON.GetChildNode('longitude').Float);
           end
-          else if LType = 'marker-click' then begin
-            if Assigned(Control.FOnMarkerClick) then
-              Control.FOnMarkerClick(
+          else if LType = 'symbol-click' then begin
+            if Assigned(Control.FOnSymbolClick) then
+              Control.FOnSymbolClick(
                 Control,
+                LJSON.GetChildNode('layerId').Text,
                 LJSON.GetChildNode('id').Text);
           end;
 
@@ -1524,6 +3283,7 @@ begin
                 });
 
                 window.map.on('style.load', function() {
+                  window.symbolLayerIds = [];
                   window.chrome.webview.postMessage({type: 'style-loaded'});
                 });
 
@@ -1539,6 +3299,8 @@ begin
                   window.chrome.webview.postMessage({type: 'camera-did-change'});
                 });
 
+                window.symbolLayerIds = [];
+
                 window.map.on('click', function(e) {
 
                   // Notify Delphi about the map click.
@@ -1548,24 +3310,29 @@ begin
                     longitude: e.lngLat.lng
                   });
 
-                  // Check if the click hit one of our markers.
-                  if (!window.map.getLayer('ALMarkerLayer')) return;
+                  // Query only symbol layers registered through SetSymbolLayer.
+                  const ids = window.symbolLayerIds || [];
+                  for (let i = ids.length - 1; i >= 0; i--) {
+                    const layerId = ids[i];
+                    if (!window.map.getLayer(layerId)) continue;
 
-                  const features = window.map.queryRenderedFeatures(
-                    e.point,
-                    { layers: ['ALMarkerLayer'] }
-                  );
+                    const features = window.map.queryRenderedFeatures(
+                      e.point,
+                      { layers: [layerId] }
+                    );
 
-                  if (features.length === 0) return;
+                    const feature = features.find(f =>
+                      f.properties?.id !== undefined && f.properties?.id !== null
+                    );
+                    if (!feature) continue;
 
-                  const markerID = features[0].properties?.id;
-                  if (markerID === undefined || markerID === null) return;
-
-                  // Notify Delphi about the marker click.
-                  window.chrome.webview.postMessage({
-                    type: 'marker-click',
-                    id: String(markerID)
-                  });
+                    window.chrome.webview.postMessage({
+                      type: 'symbol-click',
+                      layerId: layerId,
+                      id: String(feature.properties.id)
+                    });
+                    return;
+                  }
 
                 });
 
@@ -1580,7 +3347,7 @@ end;
 {**************************************************************************************************************}
 procedure TALWinMapLibreView.SetCenterCoordinate(const ALatitude, ALongitude: Double; const AZoomLevel: double);
 begin
-  if not FMapReady then raise Exception.Create('Cannot set the map center coordinate: MapLibre is not initialized');
+  if not FMapReady then raise Exception.Create('MapLibre is not initialized');
   ExecuteJavaScript(
     'window.map.jumpTo({' +
       'center: [' + ALFloatToStrW(ALongitude) + ',' + ALFloatToStrW(ALatitude) + '],' +
@@ -1596,7 +3363,7 @@ procedure TALWinMapLibreView.SetImage(
             const W, H: single;
             const   AName: String);
 begin
-  if not FMapReady then raise Exception.Create('Cannot register map image: MapLibre is not initialized');
+  if not FMapReady then raise Exception.Create('MapLibre is not initialized');
   var LBitmap := ALCreateBitmapFromResource(
                    AResourceName, // const AResourceName: String;
                    AStream, // const AResourceStream: TStream;
@@ -1685,60 +3452,68 @@ end;
 {**************************************}
 procedure TALWinMapLibreView.RemoveImage(const AName: String);
 begin
-  if not FMapReady then raise Exception.Create('Cannot unregister map image: MapLibre is not initialized');
+  if not FMapReady then raise Exception.Create('MapLibre is not initialized');
   ExecuteJavaScript('if (window.map.hasImage("'+ ALJavaScriptEncode(AName) + '")) {window.map.removeImage("' + ALJavaScriptEncode(AName) + '");}');
 end;
 
 {**************************************}
-procedure TALWinMapLibreView.SetMarkers(const AGeoJSON: String; const AIconAllowsOverlap: Boolean);
+procedure TALWinMapLibreView.SetSymbolLayer(const AId: String; const AGeoJSON: String; const AOptions: TALMapLibre.PSymbolLayerOptions = nil);
 begin
-  if not FMapReady then raise Exception.Create('Cannot set map markers: MapLibre is not initialized');
+  if not FMapReady then raise Exception.Create('MapLibre is not initialized');
   ExecuteJavaScript(
     '''
     (function() {
       const map = window.map;
+      const id = "
+    ''' + ALJavaScriptEncode(AId) + '''
+    ";
       const data = JSON.parse("
-    '''
-    + ALJavaScriptEncode(AGeoJSON) +
-    '''
+    ''' + ALJavaScriptEncode(AGeoJSON) + '''
     ");
 
-      if (!map.getSource('ALMarkerSource')) {
-        map.addSource('ALMarkerSource', {
-          type: 'geojson',
-          data: data
-        });
+      if (!map.getSource(id)) {
+        map.addSource(id, {type: 'geojson', data: data});
       }
       else {
-        map.getSource('ALMarkerSource').setData(data);
+        map.getSource(id).setData(data);
       }
 
-      if (!map.getLayer('ALMarkerLayer')) {
+      if (!map.getLayer(id)) {
         map.addLayer({
-          id: 'ALMarkerLayer',
+          id: id,
           type: 'symbol',
-          source: 'ALMarkerSource',
+          source: id,
           layout: {
             'icon-image': ['get', '_icon_image'],
             'icon-anchor': ['coalesce', ['get', '_icon_anchor'], 'bottom'],
             'icon-size': ['coalesce', ['get', '_icon_size'], 1.0],
             'symbol-sort-key': ['coalesce', ['get', '_icon_size'], 1.0],
             'icon-allow-overlap':
-    '''
-    + ALBoolToStrW(AIconAllowsOverlap, 'true', 'false') +
-    '''
+    ''' + ALBoolToStrW(AAllowOverlap, 'true', 'false') + '''
           }
         });
       }
-      else {
-        map.setLayoutProperty(
-          'ALMarkerLayer',
-          'icon-allow-overlap',
+
+      if (!window.symbolLayerIds.includes(id))
+        window.symbolLayerIds.push(id);
+    })();
+    ''');
+end;
+
+{*******************************************}
+procedure TALWinMapLibreView.RemoveLayer(const AId: String);
+begin
+  if not FMapReady then Exit;
+  ExecuteJavaScript(
     '''
-    + ALBoolToStrW(AIconAllowsOverlap, 'true', 'false') +
-    '''
-        );
-      }
+    (function() {
+      const map = window.map;
+      const id = "
+    ''' + ALJavaScriptEncode(AId) + '''
+    ";
+      if (map.getLayer(id)) map.removeLayer(id);
+      if (map.getSource(id)) map.removeSource(id);
+      window.symbolLayerIds = (window.symbolLayerIds || []).filter(x => x !== id);
     })();
     ''');
 end;
@@ -1746,7 +3521,7 @@ end;
 {******************************************************}
 function TALWinMapLibreView.GetViewportBounds: TALRectD;
 begin
-  if not FMapReady then raise Exception.Create('Cannot get viewport bounds: MapLibre is not initialized');
+  if not FMapReady then raise Exception.Create('MapLibre is not initialized');
 
   var LCompleted := False;
   var LResult := '';
@@ -1768,7 +3543,7 @@ begin
     if LForm <> nil then Winapi.Windows.EnableWindow(WindowHandleToPlatform(LForm.Handle).Wnd, True);
   end;
 
-  if (LResult = '') or (LResult = 'null') then raise Exception.Create('Cannot get viewport bounds: invalid JavaScript result');
+  if (LResult = '') or (LResult = 'null') then raise Exception.Create('Invalid JavaScript result');
   var LJSON := TALJsonDocumentW.CreateFromJSONString(LResult);
   try
     Result := TALRectD.Create(
@@ -1782,9 +3557,9 @@ begin
 end;
 
 {***********************************************************************}
-function TALWinMapLibreView.GetCameraPosition: TALMapLibreCameraPosition;
+function TALWinMapLibreView.GetCameraPosition: TALMapLibre.TCameraPosition;
 begin
-  if not FMapReady then raise Exception.Create('Cannot get camera position: MapLibre is not initialized');
+  if not FMapReady then raise Exception.Create('MapLibre is not initialized');
 
   var LCompleted := False;
   var LResult := '';
@@ -1825,7 +3600,7 @@ begin
     if LForm <> nil then Winapi.Windows.EnableWindow(WindowHandleToPlatform(LForm.Handle).Wnd, True);
   end;
 
-  if (LResult = '') or (LResult = 'null') then raise Exception.Create('Cannot get camera position: invalid JavaScript result');
+  if (LResult = '') or (LResult = 'null') then raise Exception.Create('Invalid JavaScript result');
   var LJSON := TALJsonDocumentW.CreateFromJSONString(LResult);
   try
     Result.bearing := LJSON.GetChildNode('bearing').Float;
@@ -1871,7 +3646,7 @@ end;
 {***********************************************************************}
 procedure TALWinMapLibreView.ShowLoadingSpinner(const AHTML: String);
 begin
-  if not FMapReady then raise Exception.Create('Cannot show loading spinner: MapLibre is not initialized');
+  if not FMapReady then raise Exception.Create('MapLibre is not initialized');
   ExecuteJavaScript(
     '''
     (function() {
@@ -1943,227 +3718,6 @@ end;
 
 {$endif}
 {$ENDREGION}
-
-{*************************************************}
-constructor TALMapLibre.Create(AOwner: TComponent);
-begin
-  inherited;
-  FOnMapReady := nil;
-  FOnStyleLoaded := nil;
-  FOnCameraWillChange := nil;
-  FOnCameraIsChanging := nil;
-  FOnCameraDidChange := nil;
-  FOnMarkerClick := nil;
-  FOnMapClick := nil;
-  FStyleJSON := '';
-  FStyleUrl := '';
-end;
-
-{********************}
-{$IF defined(android)}
-Function TALMapLibre.CreateNativeView: TALAndroidNativeView;
-begin
-  result := TALAndroidMapLibreView.create(self);
-end;
-{$ENDIF}
-
-{********************}
-{$IF defined(android)}
-function TALMapLibre.GetNativeView: TALAndroidMapLibreView;
-begin
-  result := TALAndroidMapLibreView(inherited NativeView);
-end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-Function TALMapLibre.CreateNativeView: TALIosNativeView;
-begin
-  result := TALIosMapLibreView.create(self);
-end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-function TALMapLibre.GetNativeView: TALIosMapLibreView;
-begin
-  result := TALIosMapLibreView(inherited NativeView);
-end;
-{$ENDIF}
-
-{********************}
-{$IF defined(ALMacOS)}
-Function TALMapLibre.CreateNativeView: TALMacNativeView;
-begin
-  result := TALMacMapLibreView.create(self);
-end;
-{$ENDIF}
-
-{********************}
-{$IF defined(ALMacOS)}
-function TALMapLibre.GetNativeView: TALMacMapLibreView;
-begin
-  result := TALMacMapLibreView(inherited NativeView);
-end;
-{$ENDIF}
-
-{**********************}
-{$IF defined(MSWindows)}
-Function TALMapLibre.CreateNativeView: TALWinNativeView;
-begin
-  {$IF defined(ALDPK)}
-  Result := nil;
-  {$ELSE}
-  result := TALWinMapLibreView.create(self);
-  {$ENDIF}
-end;
-{$ENDIF}
-
-{**********************}
-{$IF defined(MSWindows)}
-function TALMapLibre.GetNativeView: TALWinMapLibreView;
-begin
-  result := TALWinMapLibreView(inherited NativeView);
-end;
-{$ENDIF}
-
-{******************************************************}
-procedure TALMapLibre.SetStyleURL(const AValue: string);
-begin
-  if (FStyleURL = AValue) and (FStyleJSON = '') then Exit;
-  FStyleURL := AValue;
-  FStyleJSON := '';
-  if NativeView <> nil then
-    NativeView.ApplyStyle;
-end;
-
-{*******************************************************}
-procedure TALMapLibre.SetStyleJSON(const AValue: string);
-begin
-  if (FStyleJSON = AValue) and (FStyleURL = '') then Exit;
-  FStyleJSON := AValue;
-  FStyleURL := '';
-  if NativeView <> nil then
-    NativeView.ApplyStyle;
-end;
-
-{*******************************************************************************************************}
-procedure TALMapLibre.SetCenterCoordinate(const ALatitude, ALongitude: Double; const AZoomLevel: double);
-begin
-  if NativeView <> nil then
-    NativeView.SetCenterCoordinate(ALatitude, ALongitude, AZoomLevel);
-end;
-
-{*****************************}
-procedure TALMapLibre.SetImage(
-            const AStream: TStream;
-            const AScale: Single;
-            const W, H: single;
-            const AName: String);
-begin
-  if NativeView <> nil then
-    NativeView.SetImage(''{AResourceName}, AStream{AStream}, AScale, W, H, AName);
-end;
-
-{*****************************}
-procedure TALMapLibre.SetImage(
-            const AResourceName: String;
-            const AScale: Single;
-            const W, H: single;
-            const AName: String);
-begin
-  if NativeView <> nil then
-    NativeView.SetImage(AResourceName{AResourceName}, nil{AStream}, AScale, W, H, AName);
-end;
-
-{*****************************************************}
-procedure TALMapLibre.RemoveImage(const AName: String);
-begin
-  if NativeView <> nil then
-    NativeView.RemoveImage(AName);
-end;
-
-{*******************************************************}
-procedure TALMapLibre.SetMarkers(const AGeoJSON: String; const AIconAllowsOverlap: Boolean = True);
-begin
-  if NativeView <> nil then
-    NativeView.SetMarkers(AGeoJSON, AIconAllowsOverlap);
-end;
-
-{*******************************************************}
-function TALMapLibre.GetViewportBounds: TALRectD;
-begin
-  if NativeView <> nil then
-    result := NativeView.GetViewportBounds
-  else
-    Result := TAlRectD.Empty;
-end;
-
-{*******************************************************}
-function TALMapLibre.GetCameraPosition: TALMapLibreCameraPosition;
-begin
-  if NativeView <> nil then
-    result := NativeView.GetCameraPosition
-  else begin
-    Result := TALMapLibreCameraPosition.Create(
-                0, // const ABearing: Double;
-                TALRectD.Empty, // const APadding: TALRectD;
-                0, // const ARoll: Double;
-                TALLatLng.Create(ALNullLatLng, ALNullLatLng), // const ATarget: TALLatLng;
-                0, // const ATilt: Double;
-                0); // const AZoom: Double);;
-  end;
-end;
-
-{********************}
-{$IF defined(android)}
-procedure TALMapLibre.ShowLoadingSpinner(const AView: JView);
-begin
-  if NativeView <> nil then
-    NativeView.ShowLoadingSpinner(AView);
-end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-procedure TALMapLibre.ShowLoadingSpinner(const AView: UIView);
-begin
-  if NativeView <> nil then
-    NativeView.ShowLoadingSpinner(AView);
-end;
-{$ENDIF}
-
-{********************}
-{$IF defined(ALMacOS)}
-procedure TALMapLibre.ShowLoadingSpinner(const AHTML: String);
-begin
-  if NativeView <> nil then
-    NativeView.ShowLoadingSpinner(AHTML);
-end;
-{$ENDIF}
-
-{**********************}
-{$IF defined(MSWindows)}
-procedure TALMapLibre.ShowLoadingSpinner(const AHTML: String);
-begin
-  if NativeView <> nil then
-    NativeView.ShowLoadingSpinner(AHTML);
-end;
-{$ENDIF}
-
-{*************************************************************************************************************************}
-procedure TALMapLibre.ShowLoadingSpinner(const AColor: TAlphaColor = Talphacolors.null; const AWidth: Single = 0; const AHeight: Single = 0);
-begin
-  if NativeView <> nil then
-    NativeView.ShowLoadingSpinner(AColor, AWidth, AHeight);
-end;
-
-{***************************************}
-procedure TALMapLibre.HideLoadingSpinner;
-begin
-  if NativeView <> nil then
-    NativeView.HideLoadingSpinner;
-end;
 
 {*****************}
 procedure Register;

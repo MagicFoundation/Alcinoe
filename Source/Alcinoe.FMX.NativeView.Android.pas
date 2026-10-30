@@ -311,7 +311,7 @@ begin
     // FMX form consists from two parts: form's view and layout for other native controls. Form's view embedded into Layout.
     // So it should always holds 0 index. So when we rearrange native controls, we should keep in mind, that for native
     // controls first index is 1.
-    LParentGroup.addView(Layout, 1, LParam);
+    LParentGroup.addView(Layout, LParentGroup.getChildCount, LParam);
     UpdateFrame;
   end
   else FForm := nil;

@@ -1,4 +1,4 @@
-﻿unit Main;
+unit Main;
 
 interface
 
@@ -7,18 +7,11 @@ uses
   System.Types,
   System.UITypes,
   System.Classes,
-  System.Messaging,
   FMX.Types,
   FMX.Controls,
   FMX.Forms,
+  FMX.Layouts,
   FMX.Graphics,
-  FMX.Dialogs,
-  FMX.StdCtrls,
-  FMX.Memo.Types,
-  FMX.ScrollBox,
-  FMX.Memo,
-  Alcinoe.FMX.Edit,
-  Alcinoe.fmx.Memo,
   Alcinoe.FMX.FMXOverNativeContainer,
   Alcinoe.FMX.Controls,
   Alcinoe.FMX.Objects,
@@ -30,8 +23,9 @@ uses
 
 type
 
-  TRandomMapMarker = record
+  TMapMarker = record
     ID: Integer;
+    Name: String;
     Latitude: Double;
     Longitude: Double;
     Icon: Integer;
@@ -44,23 +38,55 @@ type
     procedure FormSafeAreaChanged(Sender: TObject; const AInsets: TRectF);
   private
     MapLibre: TALMapLibre;
-    FMarkers: TArray<TRandomMapMarker>;
-    FMarkersInitialized: Boolean;
+    FMarkers: TArray<TMapMarker>;
     FMarkersStyleLoaded: Boolean;
+    FRouteLayersInitialized: Boolean;
     FSelectedMarkerID: Integer;
+    FMapStyle: Integer;
+    FDemoLayer: Integer;
+    FAlternateLook: Boolean;
+    FUpdatingStatus: Boolean;
+    FCameraMoveCount: Integer;
     FMarkerPopup: TALFMXOverNativeContainer;
-    FMapLayersButtonContainer: TALFMXOverNativeContainer;
-    procedure UpdateMapMarkers;
-    procedure ShowMarkerPopup(const AMarker: TRandomMapMarker);
+    FHeaderLayout: FMX.Layouts.TLayout;
+    FMapLayout: FMX.Layouts.TLayout;
+    FToolbar: TALRectangle;
+    FLayerTitle: TALText;
+    FLayerDescription: TALText;
+    FStatus: TALText;
+    FStyleButton: TALButton;
+    FLookButton: TALButton;
+    FSpinnerButton: TALButton;
+    FSpinnerTimer: TTimer;
+    FCameraStatusTimer: TTimer;
+    procedure ScheduleCameraStatusUpdate;
+    procedure InitializeMarkers;
+    procedure CreateToolbar;
+    procedure UpdateToolbar;
+    procedure ShowDemoLayer;
+    procedure ClearDemoLayers;
+    procedure HideRouteLayers;
+    function BuildDemoGeoJSON(const AGeometry: String): String;
+    procedure UpdateMapMarkers(const ARouteOnly: Boolean = False);
+    procedure ShowMarkerPopup(const AMarker: TMapMarker);
   public
   published
     procedure MapLibreMapReady(Sender: TObject);
     procedure MapLibreStyleLoaded(Sender: TObject);
+    procedure MapLibreCameraWillChange(Sender: TObject);
+    procedure MapLibreCameraIsChanging(Sender: TObject);
     procedure MapLibreCameraDidChange(Sender: TObject);
     procedure MapLibreMapClick(Sender: TObject; const ALatitude: Double; const ALongitude: Double);
     procedure MapLibreSymbolClick(Sender: TObject; const ALayerID: String; const ASymbolID: String);
     procedure MarkerPopupCloseButtonClick(Sender: TObject);
-    procedure MapLayersButtonClick(Sender: TObject);
+    procedure LayerButtonClick(Sender: TObject);
+    procedure MapStyleButtonClick(Sender: TObject);
+    procedure LookButtonClick(Sender: TObject);
+    procedure SpinnerButtonClick(Sender: TObject);
+    procedure SpinnerTimerTimer(Sender: TObject);
+    procedure CameraStatusTimerTimer(Sender: TObject);
+    procedure InfoButtonClick(Sender: TObject);
+    procedure ToolbarRowResized(Sender: TObject);
   end;
 
 var
@@ -69,23 +95,361 @@ var
 implementation
 
 uses
-  System.Net.URLClient,
-  System.IOUtils,
-  System.TypInfo,
   System.Math,
-  Alcinoe.FMX.UserPreferences,
   Alcinoe.FMX.Styles,
-  Alcinoe.FMX.Snackbar,
   Alcinoe.JSONDoc,
   Alcinoe.Common,
   Alcinoe.FMX.Common,
-  Alcinoe.fmx.Sheets,
-  Alcinoe.FileUtils,
-  Alcinoe.FMX.ErrorReporting,
   Alcinoe.Localization,
+  Alcinoe.FMX.ErrorReporting,
   Alcinoe.StringUtils;
 
 {$R *.fmx}
+
+const
+  // All sample geometry is fixed around central Paris. Coordinates are lon/lat
+  // in GeoJSON, and lat/lon in SetCenterCoordinate.
+  CDemoLatitude = 48.8566;
+  CDemoLongitude = 2.3370;
+  CDemoZoom = 12.6;
+  CLayerNames: array[0..7] of String = (
+    'Symbols + route', 'Line', 'Circle', 'Fill',
+    '3D extrusion', 'Heatmap', 'Raster', 'Base map only');
+  CLayerDescriptions: array[0..7] of String = (
+    'Fixed Paris landmarks. Tap a pin for details; arrows follow the route.',
+    'A route through the landmarks. Look switches to a dashed line.',
+    'Circles with data-driven radii, colors and white outlines.',
+    'Sample polygons around landmarks; these are not real boundaries.',
+    'Synthetic towers. Tilt with two fingers to see their height.',
+    'Weighted landmark points. Zoom out to see the density blend.',
+    'Satellite: Esri, Maxar, Earthstar Geographics. Look changes opacity.',
+    'Custom layers removed. Next returns to the fixed landmarks.');
+  CStyleNames: array[0..1] of String = ('Dark', 'Bright');
+  CEmptyGeoJSON = '{"type":"FeatureCollection","features":[]}';
+  // Do not return Esri's 'Data not available' placeholder for missing tiles.
+  CRasterURL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?blankTile=false';
+
+{*************************************}
+procedure TMainForm.InitializeMarkers;
+const
+  CNames: array[0..6] of String = (
+    'Louvre', 'Orsay', 'Notre-Dame', 'Pantheon',
+    'Luxembourg', 'Pompidou', 'Concorde');
+  CLatitudes: array[0..6] of Double = (
+    48.86061, 48.85996, 48.85297, 48.84622,
+    48.84622, 48.86064, 48.86563);
+  CLongitudes: array[0..6] of Double = (
+    2.33764, 2.32656, 2.34990, 2.34641,
+    2.33716, 2.35224, 2.32124);
+  CImageIDs: array[0..6] of Integer = (10, 20, 30, 40, 50, 60, 80);
+begin
+  SetLength(FMarkers, Length(CNames));
+  for var I := 0 to High(FMarkers) do begin
+    FMarkers[I].ID := I + 1;
+    FMarkers[I].Name := CNames[I];
+    FMarkers[I].Latitude := CLatitudes[I];
+    FMarkers[I].Longitude := CLongitudes[I];
+    FMarkers[I].Icon := (I mod 4) + 1;
+    FMarkers[I].ImageURL := 'https://picsum.photos/id/' + ALIntToStrW(CImageIDs[I]) + '/150';
+  end;
+end;
+
+{**********************************}
+procedure TMainForm.CreateToolbar;
+
+  function _AddRow: TALLayout;
+  begin
+    Result := TALLayout.Create(FToolbar);
+    Result.Parent := FToolbar;
+    Result.Height := 42;
+    Result.Margins.Top := 4;
+    // Set position before alignment to preserve the row order.
+    Result.Position.Y := 1000;
+    Result.Align := TALAlignLayout.Top;
+    Result.OnResized := ToolbarRowResized;
+  end;
+
+  function _AddButton(const ARow: TALLayout; const AText: String;
+    const AClick: TNotifyEvent; const ATag: Integer = 0): TALButton;
+  begin
+    Result := TALButton.Create(ARow);
+    Result.Parent := ARow;
+    TALStyleManager.Instance.ApplyButtonStyle('Material3.Button.Filled', Result, 13);
+    Result.AutoSize := TALAutoSizeMode.None;
+    Result.Height := 40;
+    Result.Width := 92;
+    Result.Margins.Right := 4;
+    Result.Position.X := 1000;
+    Result.Align := TALAlignLayout.Left;
+    Result.TextSettings.IsHtml := False;
+    Result.Text := AText;
+    Result.Tag := ATag;
+    Result.OnClick := AClick;
+  end;
+
+begin
+  // The form owns two non-overlapping layouts: header above, map below.
+  // Header controls never cover the native map or its compass.
+  FToolbar := TALRectangle.Create(Self);
+  FToolbar.Parent := FHeaderLayout;
+  FToolbar.Fill.ColorKey := 'Material3.Color.SurfaceContainer';
+  FToolbar.Stroke.Color := TAlphaColors.Null;
+  FToolbar.XRadius := 16;
+  FToolbar.YRadius := 16;
+  FToolbar.Padding.Rect := TRectF.Create(8,8,8,8);
+  FToolbar.Margins.Rect := TRectF.Create(8,8,8,0);
+  FToolbar.Height := 234;
+  FToolbar.Align := TALAlignLayout.Client;
+
+  FLayerTitle := TALText.Create(FToolbar);
+  FLayerTitle.Parent := FToolbar;
+  FLayerTitle.AutoSize := TALAutoSizeMode.None;
+  FLayerTitle.Height := 26;
+  FLayerTitle.Align := TALAlignLayout.Top;
+  FLayerTitle.HitTest := False;
+  FLayerTitle.TextSettings.Font.Size := 17;
+  FLayerTitle.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface';
+
+  FLayerDescription := TALText.Create(FToolbar);
+  FLayerDescription.Parent := FToolbar;
+  FLayerDescription.AutoSize := TALAutoSizeMode.None;
+  FLayerDescription.Position.Y := 1000;
+  FLayerDescription.Height := 44;
+  FLayerDescription.Align := TALAlignLayout.Top;
+  FLayerDescription.HitTest := False;
+  FLayerDescription.TextSettings.Font.Size := 13;
+  FLayerDescription.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface';
+
+  var LRow := _AddRow;
+  _AddButton(LRow, 'Previous', LayerButtonClick, -1);
+  _AddButton(LRow, 'Next', LayerButtonClick, 1);
+  FStyleButton := _AddButton(LRow, 'Dark', MapStyleButtonClick);
+  ToolbarRowResized(LRow);
+
+  LRow := _AddRow;
+  FLookButton := _AddButton(LRow, 'Look: A', LookButtonClick);
+  FSpinnerButton := _AddButton(LRow, 'Spinner', SpinnerButtonClick);
+  ToolbarRowResized(LRow);
+
+  FStatus := TALText.Create(FToolbar);
+  FStatus.Parent := FToolbar;
+  FStatus.AutoSize := TALAutoSizeMode.None;
+  FStatus.Position.Y := 1000;
+  FStatus.Height := 38;
+  FStatus.Margins.Top := 8;
+  FStatus.Align := TALAlignLayout.Top;
+  FStatus.HitTest := False;
+  FStatus.TextSettings.Font.Size := 12;
+  FStatus.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface';
+  FStatus.Text := 'Loading map...';
+  UpdateToolbar;
+end;
+
+procedure TMainForm.ToolbarRowResized(Sender: TObject);
+begin
+  var LRow := TALLayout(Sender);
+  if LRow.ControlsCount = 0 then Exit;
+  for var I := 0 to LRow.ControlsCount - 1 do
+    LRow.Controls[I].Width := Max(1, LRow.Width / LRow.ControlsCount - 4);
+end;
+
+procedure TMainForm.UpdateToolbar;
+begin
+  FLayerTitle.Text := ALIntToStrW(FDemoLayer + 1) + '/8  ' + CLayerNames[FDemoLayer];
+  FLayerDescription.Text := CLayerDescriptions[FDemoLayer];
+  FStyleButton.Text := CStyleNames[FMapStyle];
+  if FAlternateLook then FLookButton.Text := 'Look: B'
+  else FLookButton.Text := 'Look: A';
+end;
+
+{********************************************}
+function TMainForm.BuildDemoGeoJSON(const AGeometry: String): String;
+const
+  CColors: array[0..3] of String = ('#38BDF8', '#FB7185', '#A78BFA', '#FBBF24');
+  // A closed, counterclockwise ring. The footprints are deliberately synthetic.
+  COffsetX: array[0..4] of Double = (-0.00065, 0.00065, 0.00065, -0.00065, -0.00065);
+  COffsetY: array[0..4] of Double = (-0.00045, -0.00045, 0.00045, 0.00045, -0.00045);
+begin
+  var LJSON := TALJsonDocumentW.Create;
+  try
+    LJSON.SetChildValueText('type', 'FeatureCollection');
+    var LFeatures := LJSON.AddChild('features', ntArray);
+    for var I := 0 to High(FMarkers) do begin
+      var LMarker := FMarkers[I];
+      var LFeature := LFeatures.AddChild(ntObject);
+      LFeature.SetChildValueText('type', 'Feature');
+      var LProperties := LFeature.AddChild('properties', ntObject);
+      LProperties.SetChildValueText('id', ALIntToStrW(LMarker.ID));
+      // Keep the same property schema on every feature and on every update.
+      LProperties.SetChildValueText('_circle_color', CColors[I mod 4]);
+      LProperties.SetChildValueFloat('_circle_radius', 10 + I * 2);
+      LProperties.SetChildValueFloat('_circle_opacity', 0.8);
+      LProperties.SetChildValueText('_circle_stroke_color', '#FFFFFF');
+      LProperties.SetChildValueFloat('_circle_stroke_width', 2);
+      LProperties.SetChildValueText('_fill_color', CColors[I mod 4]);
+      LProperties.SetChildValueFloat('_fill_opacity', 0.55);
+      LProperties.SetChildValueText('_fill_outline_color', '#FFFFFF');
+      LProperties.SetChildValueText('_fill_extrusion_color', CColors[I mod 4]);
+      LProperties.SetChildValueFloat('_fill_extrusion_base', 0);
+      LProperties.SetChildValueFloat('_fill_extrusion_height', 100 + I * 100);
+      LProperties.SetChildValueFloat('_heatmap_weight', (I + 1) / Length(FMarkers));
+      if FAlternateLook then begin
+        LProperties.SetChildValueFloat('_circle_radius', 18 + I * 3);
+        LProperties.SetChildValueFloat('_fill_opacity', 0.85);
+        LProperties.SetChildValueFloat('_fill_extrusion_height', 200 + I * 180);
+      end;
+      var LGeometry := LFeature.AddChild('geometry', ntObject);
+      LGeometry.SetChildValueText('type', AGeometry);
+      var LCoordinates := LGeometry.AddChild('coordinates', ntArray);
+      if AGeometry = 'Polygon' then begin
+        var LRing := LCoordinates.AddChild(ntArray);
+        for var J := 0 to High(COffsetX) do begin
+          var LCoordinate := LRing.AddChild(ntArray);
+          LCoordinate.AddChild.Float := LMarker.Longitude + COffsetX[J];
+          LCoordinate.AddChild.Float := LMarker.Latitude + COffsetY[J];
+        end;
+      end
+      else begin
+        LCoordinates.AddChild.Float := LMarker.Longitude;
+        LCoordinates.AddChild.Float := LMarker.Latitude;
+      end;
+    end;
+    Result := LJSON.SaveToJSONString([soStandardJson]);
+  finally
+    ALFreeAndNil(LJSON);
+  end;
+end;
+
+procedure TMainForm.ClearDemoLayers;
+const
+  CIDs: array[0..6] of String = (
+    'Markers', 'MarkerRouteArrows', 'DemoCircle',
+    'DemoFill', 'DemoExtrusion', 'DemoHeatmap', 'DemoRaster');
+begin
+  for var LID in CIDs do MapLibre.RemoveLayer(LID);
+  if not (FDemoLayer in [0, 1]) then HideRouteLayers;
+  if FMarkerPopup <> nil then FMarkerPopup.Visible := False;
+end;
+
+procedure TMainForm.HideRouteLayers;
+begin
+  if not FRouteLayersInitialized then Exit;
+  // Keep native layers and their dash configuration alive. An empty source
+  // hides the route without removing/recreating layers during Look changes.
+  MapLibre.SetLineLayer('MarkerRouteSolid', CEmptyGeoJSON);
+  MapLibre.SetLineLayer('MarkerRouteDashed', CEmptyGeoJSON);
+end;
+
+procedure TMainForm.ShowDemoLayer;
+begin
+  if not FMarkersStyleLoaded then Exit;
+  // Other layer demos are recreated for option changes. Route layers keep
+  // fixed solid/dashed options and only update their GeoJSON data.
+  ClearDemoLayers;
+  case FDemoLayer of
+    0: UpdateMapMarkers;
+    1: UpdateMapMarkers(True);
+    2: MapLibre.SetCircleLayer('DemoCircle', BuildDemoGeoJSON('Point'));
+    3: MapLibre.SetFillLayer('DemoFill', BuildDemoGeoJSON('Polygon'));
+    4: MapLibre.SetFillExtrusionLayer('DemoExtrusion', BuildDemoGeoJSON('Polygon'));
+    5: begin
+      var LOptions := TALMapLibre.THeatmapLayerOptions.Create;
+      if FAlternateLook then LOptions.SetHeatmapRadius(80).SetHeatmapIntensity(2)
+      else LOptions.SetHeatmapRadius(50).SetHeatmapIntensity(1);
+      MapLibre.SetHeatmapLayer('DemoHeatmap', BuildDemoGeoJSON('Point'), @LOptions);
+    end;
+    6: begin
+      var LOptions := TALMapLibre.TRasterLayerOptions.Create;
+      if FAlternateLook then LOptions.SetRasterOpacity(0.55).SetRasterSaturation(-1)
+      else LOptions.SetRasterOpacity(1);
+      MapLibre.SetRasterLayer('DemoRaster', CRasterURL, False, 256, @LOptions);
+    end;
+  end;
+  UpdateToolbar;
+  InfoButtonClick(nil);
+end;
+
+procedure TMainForm.LayerButtonClick(Sender: TObject);
+begin
+  var LStep := TALButton(Sender).Tag;
+  if LStep = 0 then FDemoLayer := High(CLayerNames)
+  else FDemoLayer := (FDemoLayer + LStep + Length(CLayerNames)) mod Length(CLayerNames);
+  FAlternateLook := False;
+  UpdateToolbar;
+  ShowDemoLayer;
+end;
+
+procedure TMainForm.MapStyleButtonClick(Sender: TObject);
+begin
+  FMapStyle := (FMapStyle + 1) mod Length(CStyleNames);
+  FMarkersStyleLoaded := False;
+  if FMarkerPopup <> nil then FMarkerPopup.Visible := False;
+  UpdateToolbar;
+  FStatus.Text := 'Loading ' + CStyleNames[FMapStyle] + ' style...';
+  // Each style load destroys custom images/sources/layers. OnStyleLoaded
+  // restores the selected demo, its look and the selected marker.
+  case FMapStyle of
+    0: MapLibre.StyleURL := 'https://tiles.openfreemap.org/styles/dark';
+    1: MapLibre.StyleURL := 'https://tiles.openfreemap.org/styles/bright';
+  end;
+end;
+
+procedure TMainForm.LookButtonClick(Sender: TObject);
+begin
+  FAlternateLook := not FAlternateLook;
+  UpdateToolbar;
+  ShowDemoLayer;
+end;
+
+procedure TMainForm.SpinnerButtonClick(Sender: TObject);
+begin
+  if not FMarkersStyleLoaded then Exit;
+  FSpinnerTimer.Enabled := False;
+  MapLibre.ShowLoadingSpinner(TAlphaColors.Deepskyblue, 48, 48);
+  FSpinnerButton.Text := 'Loading...';
+  FSpinnerTimer.Enabled := True;
+end;
+
+procedure TMainForm.SpinnerTimerTimer(Sender: TObject);
+begin
+  FSpinnerTimer.Enabled := False;
+  MapLibre.HideLoadingSpinner;
+  FSpinnerButton.Text := 'Spinner';
+end;
+
+procedure TMainForm.ScheduleCameraStatusUpdate;
+begin
+  if FCameraStatusTimer = nil then Exit;
+  // Also settle a start event with no following move/idle event, as can
+  // happen when the compass is tapped while already pointing north.
+  FCameraStatusTimer.Enabled := False;
+  FCameraStatusTimer.Enabled := True;
+end;
+
+procedure TMainForm.CameraStatusTimerTimer(Sender: TObject);
+begin
+  // Desktop getters process messages. Retry if another read is in progress.
+  if FUpdatingStatus then Exit;
+  FCameraStatusTimer.Enabled := False;
+  if FMarkersStyleLoaded then InfoButtonClick(nil);
+end;
+
+procedure TMainForm.InfoButtonClick(Sender: TObject);
+begin
+  if not FMarkersStyleLoaded or FUpdatingStatus then Exit;
+  // Desktop getters wait for JavaScript; guard against message-loop reentry.
+  FUpdatingStatus := True;
+  try
+    var LCamera := MapLibre.GetCameraPosition;
+    var LBounds := MapLibre.GetViewportBounds;
+    FStatus.Text := Format('Zoom %.1f | bearing %.0f | tilt %.0f | moves %d',
+      [LCamera.zoom, LCamera.bearing, LCamera.tilt, FCameraMoveCount]) + sLineBreak +
+      Format('Bounds %.3f, %.3f - %.3f, %.3f',
+      [LBounds.Left, LBounds.Top, LBounds.Right, LBounds.Bottom]);
+  finally
+    FUpdatingStatus := False;
+  end;
+end;
 
 {**********************************************}
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -101,28 +465,61 @@ begin
     TALStyleManager.Instance.IsDarkMode, // const AStatusBarUseLightIcons: TAlphaColor
     TALStyleManager.Instance.IsDarkMode); // const ANavigationBarUseLightIcons: TAlphaColor
 
-  Randomize;
-  FMarkersInitialized := False;
   FMarkersStyleLoaded := False;
   FSelectedMarkerID := 0;
-  SetLength(FMarkers, 0);
+  FMapStyle := 0;
+  FDemoLayer := 0;
+  FAlternateLook := False;
+  FCameraMoveCount := 0;
+  InitializeMarkers;
 
   FMarkerPopup := Nil;
 
+  FHeaderLayout := FMX.Layouts.TLayout.Create(Self);
+  FHeaderLayout.Height := 242;
+  FHeaderLayout.Align := TAlignLayout.Top;
+  FHeaderLayout.Parent := Self;
+
+  FMapLayout := FMX.Layouts.TLayout.Create(Self);
+  FMapLayout.Align := TAlignLayout.Client;
+  FMapLayout.Parent := Self;
+
   MapLibre := TALMapLibre.Create(Self);
-  MapLibre.Parent := Self;
   MapLibre.Align := TALAlignLayout.Client;
   MapLibre.StyleURL := 'https://tiles.openfreemap.org/styles/dark';
+
+  // The compass stays within the map, below the separate form header.
+  MapLibre.Compass.Gravity := TALMapLibre.TOrnamentGravity.TopRight;
+  MapLibre.Compass.Margins.Top := 16;
+  MapLibre.Compass.Margins.Right := 16;
+  MapLibre.Compass.Enabled := True;
+  MapLibre.Compass.FadeFacingNorth := False;
+
   MapLibre.OnMapReady := MapLibreMapReady;
   MapLibre.OnStyleLoaded := MapLibreStyleLoaded;
+  MapLibre.OnCameraWillChange := MapLibreCameraWillChange;
+  MapLibre.OnCameraIsChanging := MapLibreCameraIsChanging;
   MapLibre.OnCameraDidChange := MapLibreCameraDidChange;
   MapLibre.OnMapClick := MapLibreMapClick;
   MapLibre.OnSymbolClick := MapLibreSymbolClick;
+
+  FSpinnerTimer := TTimer.Create(Self);
+  FSpinnerTimer.Enabled := False;
+  FSpinnerTimer.Interval := 1500;
+  FSpinnerTimer.OnTimer := SpinnerTimerTimer;
+  FCameraStatusTimer := TTimer.Create(Self);
+  FCameraStatusTimer.Enabled := False;
+  FCameraStatusTimer.Interval := 250;
+  FCameraStatusTimer.OnTimer := CameraStatusTimerTimer;
+  CreateToolbar;
+  MapLibre.Parent := FMapLayout;
 end;
 
 {***********************************************}
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
+  if FSpinnerTimer <> nil then FSpinnerTimer.Enabled := False;
+  if FCameraStatusTimer <> nil then FCameraStatusTimer.Enabled := False;
   ALLog('TMainForm.FormDestroy');
 end;
 
@@ -136,65 +533,31 @@ end;
 {****************************************************}
 procedure TMainForm.MapLibreMapReady(Sender: TObject);
 begin
-  MapLibre.SetCenterCoordinate(48.8566, 2.3522, 15);
+  MapLibre.SetCenterCoordinate(CDemoLatitude, CDemoLongitude, CDemoZoom);
 end;
 
 {*******************************************************}
 procedure TMainForm.MapLibreStyleLoaded(Sender: TObject);
 begin
+
   MapLibre.SetImage('location_pin_1', ALGetScreenScale, 64, 64, 'location_pin_1');
   MapLibre.SetImage('location_pin_2', ALGetScreenScale, 64, 64, 'location_pin_2');
   MapLibre.SetImage('location_pin_3', ALGetScreenScale, 64, 64, 'location_pin_3');
   MapLibre.SetImage('location_pin_4', ALGetScreenScale, 64, 64, 'location_pin_4');
   MapLibre.SetImage('route_arrow', ALGetScreenScale, 16, 16, 'route_arrow');
 
+  FRouteLayersInitialized := False;
   FMarkersStyleLoaded := True;
 
-  if FMapLayersButtonContainer = nil then begin
-    FMapLayersButtonContainer := TALFMXOverNativeContainer.Create(MapLibre);
-    FMapLayersButtonContainer.Parent := MapLibre;
-    FMapLayersButtonContainer.Fill.Color := TalphaColors.Null;
-    FMapLayersButtonContainer.Stroke.Color := TalphaColors.Null;
-    FMapLayersButtonContainer.Align := TALAlignLayout.TopRight;
-    FMapLayersButtonContainer.Margins.Top := 16;
-    FMapLayersButtonContainer.Margins.Right := 8;
-    FMapLayersButtonContainer.AutoSize := TALAutoSizeMode.Both;
-
-    var LButton := TALButton.Create(FMapLayersButtonContainer);
-    LButton.Parent := FMapLayersButtonContainer;
-    TALStyleManager.Instance.ApplyButtonIconStyle('Material3.Button.Icon.Filled', LButton, 40);
-    LButton.Fill.ImageNoRadius := False;
-    LButton.Fill.ResourceName := 'map_layers';
-    LButton.OnClick := MapLayersButtonClick;
-  end;
-
-  FMapLayersButtonContainer.Visible := True;
-
-  if FMarkersInitialized then begin
-    UpdateMapMarkers;
-    Exit;
-  end;
-
-  MapLibreCameraDidChange(MapLibre);
+  SpinnerTimerTimer(nil);
+  ShowDemoLayer;
 end;
 
 {***********************************}
-procedure TMainForm.UpdateMapMarkers;
+procedure TMainForm.UpdateMapMarkers(const ARouteOnly: Boolean);
 begin
-  if not FMarkersStyleLoaded then Exit;
-  if not FMarkersInitialized then Exit;
 
-  // ---------------------------
-  // Create the satellite layer.
-  MapLibre.SetRasterLayer(
-    'Satellite', // const AId: String;
-    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?blankTile=false', // const ATileURL: String;
-    False, // const AIsTileJSON: Boolean = False;
-    256, // const ATileSize: Integer = 256;
-    TALMapLibre.TRasterLayerOptions.Create
-      .SetRasterOpacity(1.0)
-      .SetRasterResampling('linear')
-      .SetVisibility('none')); // const AOptions: TALMapLibre.PRasterLayerOptions = nil
+  if not FMarkersStyleLoaded then Exit;
 
   // Create the route connecting all markers.
   if Length(FMarkers) >= 2 then begin
@@ -210,9 +573,11 @@ begin
       LFeature.SetChildValueText('type', 'Feature');
 
       var LProperties := LFeature.AddChild('properties', ntObject);
-      LProperties.SetChildValueText('_line_color', '#' + ALAlphaColorToRGBHex(TALStyleManager.Instance.GetColor('Material3.Color.Outline')));
-      LProperties.SetChildValueFloat('_line_width', 3.0);
-      LProperties.SetChildValueFloat('_line_opacity', 0.5);
+      // Both looks keep the same visible width and opacity on either base style.
+      if FMapStyle = 0 then LProperties.SetChildValueText('_line_color', '#38BDF8')
+      else LProperties.SetChildValueText('_line_color', '#0369A1');
+      LProperties.SetChildValueFloat('_line_width', 4);
+      LProperties.SetChildValueFloat('_line_opacity', 1);
 
       var LGeometry := LFeature.AddChild('geometry', ntObject);
       LGeometry.SetChildValueText('type', 'LineString');
@@ -224,14 +589,33 @@ begin
         LCoordinate.AddChild.Float := LMarker.Latitude;
       end;
 
-      MapLibre.SetLineLayer(
-        'MarkerRoute',
-        LLineJSON.SaveToJSONString([soStandardJson]),
-        TALMapLibre.TLineLayerOptions.Create.SetLineCap('round'));
+      var LSolidOptions := TALMapLibre.TLineLayerOptions.Create;
+      LSolidOptions.SetLineCap('round').SetLineJoin('round');
+      var LDashedOptions := TALMapLibre.TLineLayerOptions.Create;
+      LDashedOptions.SetLineCap('butt').SetLineJoin('round').SetLineDasharray([2, 2]);
+      var LRouteJSON := LLineJSON.SaveToJSONString([soStandardJson]);
+      if not FRouteLayersInitialized then begin
+        // Initialize BOTH with real geometry so all data-driven properties
+        // are bound, even if that look starts hidden. Each ID has one fixed
+        // dash configuration for the entire lifetime of the style.
+        MapLibre.SetLineLayer('MarkerRouteSolid', LRouteJSON, @LSolidOptions);
+        MapLibre.SetLineLayer('MarkerRouteDashed', LRouteJSON, @LDashedOptions);
+        FRouteLayersInitialized := True;
+      end;
+      if FAlternateLook then begin
+        MapLibre.SetLineLayer('MarkerRouteSolid', CEmptyGeoJSON);
+        MapLibre.SetLineLayer('MarkerRouteDashed', LRouteJSON, @LDashedOptions);
+      end
+      else begin
+        MapLibre.SetLineLayer('MarkerRouteDashed', CEmptyGeoJSON);
+        MapLibre.SetLineLayer('MarkerRouteSolid', LRouteJSON, @LSolidOptions);
+      end;
 
     finally
       ALFreeAndNil(LLineJSON);
     end;
+
+    if ARouteOnly then Exit;
 
     // -------------------------------------------
     // Create one arrow for each segment using
@@ -292,10 +676,13 @@ begin
       LProperties.SetChildValueText('image_url', LMarker.ImageURL);
       LProperties.SetChildValueText('_icon_image', 'location_pin_' + ALIntToStrW(LMarker.Icon));
       LProperties.SetChildValueText('_icon_anchor', 'bottom');
-      LProperties.SetChildValueText('_text', '#' + ALIntToStrW(LMarker.ID));
-      LProperties.SetChildValueFloat('_text_size', 16);
+      LProperties.SetChildValueText('_text', LMarker.Name);
+      if FAlternateLook then LProperties.SetChildValueFloat('_text_size', 20)
+      else LProperties.SetChildValueFloat('_text_size', 14);
       LProperties.SetChildValueText('_text_color', '#FFFFFF');
       LProperties.SetChildValueText('_text_anchor', 'top');
+      LProperties.SetChildValueFloat('_text_halo_width', 1);
+      LProperties.SetChildValueText('_text_halo_color', '#111827');
 
       // Enlarge the selected marker by 25%.
       if LMarker.ID = FSelectedMarkerID then begin
@@ -322,6 +709,8 @@ begin
         .SetTextFont(['Noto Sans Regular'])
         .SetIconAllowOverlap(True)
         .SetIconIgnorePlacement(True)
+        .SetIconRotationAlignment('viewport')
+        .SetIconPitchAlignment('viewport')
         .SetTextOptional(True));
 
   finally
@@ -330,52 +719,26 @@ begin
 end;
 
 {********************************************************}
-procedure TMainForm.MapLibreCameraDidChange(Sender: TObject);
-const
-  CImageIDs: array[0..7] of Integer = (10, 20, 30, 40, 50, 60, 70, 80);
+procedure TMainForm.MapLibreCameraWillChange(Sender: TObject);
 begin
-  // Generate the markers only once.
-  if not FMarkersStyleLoaded then Exit;
-  if FMarkersInitialized then Exit;
+  if FStatus <> nil then FStatus.Text := 'Moving camera...';
+  ScheduleCameraStatusUpdate;
+end;
 
-  var LBounds := MapLibre.GetViewportBounds;
+procedure TMainForm.MapLibreCameraIsChanging(Sender: TObject);
+begin
+  Inc(FCameraMoveCount);
+  ScheduleCameraStatusUpdate;
+end;
 
-  var LWest := LBounds.Left;
-  var LEast := LBounds.Right;
-  var LSouth := EnsureRange(LBounds.Top, -90.0, 90.0);
-  var LNorth := EnsureRange(LBounds.Bottom, -90.0, 90.0);
-
-  // Support viewports crossing the antimeridian.
-  while LEast < LWest do
-    LEast := LEast + 360;
-
-  // Generate exactly 8 random markers.
-  SetLength(FMarkers, 8);
-
-  for var I := 0 to High(FMarkers) do begin
-    FMarkers[I].ID := I + 1;
-    FMarkers[I].Latitude := LSouth + Random * (LNorth - LSouth);
-    FMarkers[I].Longitude := LWest + Random * (LEast - LWest);
-
-    // Normalize longitude to [-180, 180].
-    while FMarkers[I].Longitude > 180 do
-      FMarkers[I].Longitude := FMarkers[I].Longitude - 360;
-    while FMarkers[I].Longitude < -180 do
-      FMarkers[I].Longitude := FMarkers[I].Longitude + 360;
-
-    FMarkers[I].Icon := Random(4) + 1;
-    // Stable image URL, different for each marker.
-    FMarkers[I].ImageURL :=
-      'https://picsum.photos/id/' + ALIntToStrW(CImageIDs[I]) + '/150';
-  end;
-
-  FMarkersInitialized := True;
-
-  UpdateMapMarkers;
+procedure TMainForm.MapLibreCameraDidChange(Sender: TObject);
+begin
+  // Read camera state after the native callback has finished.
+  ScheduleCameraStatusUpdate;
 end;
 
 {****************************************************************}
-procedure TMainForm.ShowMarkerPopup(const AMarker: TRandomMapMarker);
+procedure TMainForm.ShowMarkerPopup(const AMarker: TMapMarker);
 begin
 
   if FMarkerPopup = nil then begin
@@ -385,7 +748,7 @@ begin
     FMarkerPopup.Width := MapLibre.Width - 32;
     FMarkerPopup.Fill.ColorKey := 'Material3.Color.SurfaceContainer';
     FMarkerPopup.Stroke.Color := TalphaColors.Null;
-    FMarkerPopup.Margins.Rect := TRectF.Create(16,16,16,16);
+    FMarkerPopup.Margins.Rect := TRectF.Create(16,16,16,48);
     FMarkerPopup.Align := TALAlignLayout.Bottom;
     FMarkerPopup.XRadius := 16;
     FMarkerPopup.YRadius := 16;
@@ -422,7 +785,7 @@ begin
   TALImage(FMarkerPopup.Controls[0]).ResourceName := AMarker.ImageURL;
 
   TALText(FMarkerPopup.controls[1]).Text :=
-    'Marker #' + ALIntToStrW(AMarker.ID) + sLineBreak +
+    AMarker.Name + sLineBreak +
     'Latitude: ' + ALFloatToStrW(AMarker.Latitude) + sLineBreak +
     'Longitude: ' + ALFloatToStrW(AMarker.Longitude);
 
@@ -435,71 +798,17 @@ begin
   FMarkerPopup.Visible := False;
 end;
 
-{********************************************************}
-procedure TMainForm.MapLayersButtonClick(Sender: TObject);
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _addIcon(const AParent: TALLayout; const AResName: String);
-  begin
-    var LIcon := TALRectangle.Create(AParent);
-    LIcon.Parent := AParent;
-    LIcon.Align := TALAlignLayout.LeftCenter;
-    LIcon.Width := 50;
-    LIcon.Height := 50;
-    LIcon.Fill.ResourceName := AResName;
-    LIcon.Fill.Color := TalphaColors.Null;
-    LIcon.Stroke.Color := TAlphaColors.Null;
-    LIcon.Margins.Left := (width - 150) / 6;
-    LIcon.Margins.right := LIcon.Margins.Left;
-  end;
-
-
-begin
-(*
-  // Build a sample content layout for demonstration purposes.
-  // In a real application, it is recommended to use a dedicated TFrame
-  // for better structure and reusability.
-  Var LContent := TALRectangle.Create(nil);
-  LContent.AutoSize := TALAutoSizeMode.Height;
-  LContent.Stroke.Color := TAlphaColors.Null;
-  LContent.Fill.Color := TAlphaColors.Null;
-
-  var LBar1 := TALLayout.Create(LContent);
-  LBar1.Parent := LContent;
-  LBar1.AutoSize := TALAutoSizeMode.Both;
-  LBar1.Align := TALAlignLayout.MosttopCenter;
-  LBar1.Margins.top := 8;
-  LBar1.Margins.Bottom := 48;
-  _addIcon(LBar1, 'location_pin_1');
-  _addIcon(LBar1, 'location_pin_1');
-  _addIcon(LBar1, 'location_pin_1');
-
-  var LBar2 := TALLayout.Create(LContent);
-  LBar2.Parent := LContent;
-  LBar2.AutoSize := TALAutoSizeMode.Both;
-  LBar2.Align := TALAlignLayout.topCenter;
-  LBar2.Margins.Bottom := 32;
-  _addIcon(LBar2, 'location_pin_1');
-  _addIcon(LBar2, 'location_pin_1');
-  _addIcon(LBar2, 'location_pin_1');
-*)
-  Maplibre.FreezeNativeView;
-(*
-  TALBottomSheet.Builder
-    .Setcontent(LContent)
-    .Show;
-*)
-end;
-
 {****************************************************************************************************}
 procedure TMainForm.MapLibreMapClick(Sender: TObject; const ALatitude: Double; const ALongitude: Double);
 begin
-  ALLog('MapLibreClick', 'Latitude: ' + ALFloatToStrW(ALatitude) + ' - Longitude: ' + ALFloatToStrW(ALongitude));
+  if FMarkerPopup <> nil then FMarkerPopup.Visible := False;
+  FStatus.Text := Format('Tap: %.5f, %.5f', [ALatitude, ALongitude]);
 end;
 
 {********************************************}
 procedure TMainForm.MapLibreSymbolClick(Sender: TObject; const ALayerID: String; const ASymbolID: String);
 begin
+  if (FDemoLayer <> 0) or (ALayerID <> 'Markers') then Exit;
   var LMarkerID := StrToIntDef(ASymbolID, 0);
   if (LMarkerID < 1) or (LMarkerID > Length(FMarkers)) then Exit;
   if FSelectedMarkerID <> LMarkerID then begin

@@ -112,9 +112,9 @@ type
   TALJSONNodeListA = class;
   TALJSONDocumentA = class;
 
-  TALJSONParseTextEventA = reference to procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType);
-  TALJSONParseObjectEventA = reference to procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString);
-  TALJSONParseArrayEventA = reference to procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString);
+  TALJSONParseTextEventA = reference to procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType; var Abort: Boolean);
+  TALJSONParseObjectEventA = reference to procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean);
+  TALJSONParseArrayEventA = reference to procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean);
   TALJSONNodeListSortCompareA = reference to function(List: TALJSONNodeListA; Index1, Index2: Integer): Integer;
   TALJSONPointerListA = array of TALJSONNodeA;
 
@@ -698,9 +698,9 @@ type
   TALJSONNodeListW = class;
   TALJSONDocumentW = class;
 
-  TALJSONParseTextEventW = reference to procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType);
-  TALJSONParseObjectEventW = reference to procedure (Sender: TObject; const Path: String; const Name: String);
-  TALJSONParseArrayEventW = reference to procedure (Sender: TObject; const Path: String; const Name: String);
+  TALJSONParseTextEventW = reference to procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType; var Abort: Boolean);
+  TALJSONParseObjectEventW = reference to procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean);
+  TALJSONParseArrayEventW = reference to procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean);
   TALJSONNodeListSortCompareW = reference to function(List: TALJSONNodeListW; Index1, Index2: Integer): Integer;
   TALJSONPointerListW = array of TALJSONNodeW;
 
@@ -3386,6 +3386,7 @@ Var
   CurrIndex: Integer;
   CurrValue: AnsiString;
   NotSaxMode: Boolean;
+  Aborted: Boolean;
   WorkingNode: TALJSONNodeA;
   NamePaths: TALNVStringListA;
   ObjectPaths: TList<TPair<Integer, TALJSONNodeA>>;
@@ -3475,7 +3476,7 @@ Var
               const Args: array of const;
               const NodeSubType: TALJSONNodeSubType);
   begin
-    if Assigned(OnParseText) then OnParseText(Self, GetPathStr('[' + ALIntToStrA(index) + ']'), '', Args, NodeSubType)
+    if Assigned(OnParseText) then OnParseText(Self, GetPathStr('[' + ALIntToStrA(index) + ']'), '', Args, NodeSubType, Aborted)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -3484,7 +3485,7 @@ Var
               const Args: array of const;
               const NodeSubType: TALJSONNodeSubType);
   begin
-    if Assigned(OnParseText) then OnParseText(Self, GetPathStr(Name), Name, Args, NodeSubType)
+    if Assigned(OnParseText) then OnParseText(Self, GetPathStr(Name), Name, Args, NodeSubType, Aborted)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~}
@@ -3510,7 +3511,7 @@ Var
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseStartObject(const Name: AnsiString);
   begin
-    if Assigned(OnParseStartObject) then OnParseStartObject(Self, GetPathStr, Name);
+    if Assigned(OnParseStartObject) then OnParseStartObject(Self, GetPathStr, Name, Aborted);
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -3518,14 +3519,14 @@ Var
   begin
     if Assigned(OnParseEndObject) then begin
       if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
-      OnParseEndObject(Self, GetPathStr, NamePaths.Names[NamePaths.Count - 1]);
+      OnParseEndObject(Self, GetPathStr, NamePaths.Names[NamePaths.Count - 1], Aborted);
     end;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseStartArray(const index: AnsiString);
   begin
-    if Assigned(OnParseStartArray) then OnParseStartArray(Self, GetPathStr, index)
+    if Assigned(OnParseStartArray) then OnParseStartArray(Self, GetPathStr, index, Aborted)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -3533,7 +3534,7 @@ Var
   begin
     if Assigned(OnParseEndArray) then begin
       if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
-      OnParseEndArray(Self, GetPathStr, NamePaths.Names[NamePaths.Count - 1]);
+      OnParseEndArray(Self, GetPathStr, NamePaths.Names[NamePaths.Count - 1], Aborted);
     end;
   end;
 
@@ -4469,6 +4470,7 @@ begin
   //init WorkingNode and NotSaxMode and DecodeJSONReferences
   WorkingNode := Self;
   NotSaxMode := not SaxMode;
+  Aborted := False;
   DecodeJSONReferences := not (poIgnoreControlCharacters in Options);
 
   //init ObjectPaths or NamePaths
@@ -4544,7 +4546,7 @@ begin
     //analyze all the nodes
     if poAllowComments in Options then begin
       var InCommentLine: Integer := 0;
-      While (BufferPos <= BufferLength) or ExpandBuffer do begin
+      While (not Aborted) and ((BufferPos <= BufferLength) or ExpandBuffer) do begin
         var c: ansiChar := Buffer[BufferPos];
         If (InCommentLine = 0) and ((c <= ' ') or (c = ',')) then inc(bufferPos)
         else if (InCommentLine <= 1) and (c = '/')  then begin
@@ -4565,12 +4567,15 @@ begin
       end;
     end
     else begin
-      While (BufferPos <= BufferLength) or ExpandBuffer do begin
+      While (not Aborted) and ((BufferPos <= BufferLength) or ExpandBuffer) do begin
         var c: ansiChar := Buffer[BufferPos];
         If (c <= ' ') or (c = ',') then inc(bufferPos)
         else AnalyzeNode;
       end;
     end;
+
+    //the parsing was aborted by one of the events
+    if Aborted then Exit;
 
     //some tags are not closed
     if assigned(ObjectPaths) then begin
@@ -4615,6 +4620,7 @@ Var
   BufferPos: Integer;
   CurrName: AnsiString;
   NotSaxMode: Boolean;
+  Aborted: Boolean;
   BinaryAsPtrStream: Boolean;
   WorkingNode: TALJSONNodeA;
   NamePaths: TALStringListA;
@@ -4705,7 +4711,7 @@ Var
               const Args: array of const;
               const NodeSubType: TALJSONNodeSubType);
   begin
-    if Assigned(OnParseText) then OnParseText(Self, GetPathStr('[' + index + ']'), '', Args, NodeSubType)
+    if Assigned(OnParseText) then OnParseText(Self, GetPathStr('[' + index + ']'), '', Args, NodeSubType, Aborted)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -4714,7 +4720,7 @@ Var
               const Args: array of const;
               const NodeSubType: TALJSONNodeSubType);
   begin
-    if Assigned(OnParseText) then OnParseText(Self, GetPathStr(Name), Name, Args, NodeSubType)
+    if Assigned(OnParseText) then OnParseText(Self, GetPathStr(Name), Name, Args, NodeSubType, Aborted)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~}
@@ -4739,7 +4745,7 @@ Var
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseStartObject(const Name: AnsiString);
   begin
-    if Assigned(OnParseStartObject) then OnParseStartObject(Self, GetPathStr, Name);
+    if Assigned(OnParseStartObject) then OnParseStartObject(Self, GetPathStr, Name, Aborted);
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -4747,14 +4753,14 @@ Var
   begin
     if Assigned(OnParseEndObject) then begin
       if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
-      OnParseEndObject(Self, GetPathStr, NamePaths[NamePaths.Count - 1]);
+      OnParseEndObject(Self, GetPathStr, NamePaths[NamePaths.Count - 1], Aborted);
     end;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseStartArray(const index: AnsiString);
   begin
-    if Assigned(OnParseStartArray) then OnParseStartArray(Self, GetPathStr, index)
+    if Assigned(OnParseStartArray) then OnParseStartArray(Self, GetPathStr, index, Aborted)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -4762,7 +4768,7 @@ Var
   begin
     if Assigned(OnParseEndArray) then begin
       if NamePaths.Count = 0 then AlJSONDocErrorA(ALJSONParseError);
-      OnParseEndArray(Self, GetPathStr, NamePaths[NamePaths.Count - 1]);
+      OnParseEndArray(Self, GetPathStr, NamePaths[NamePaths.Count - 1], Aborted);
     end;
   end;
 
@@ -5505,6 +5511,7 @@ begin
   //init WorkingNode and NotSaxMode
   WorkingNode := Self;
   NotSaxMode := not SaxMode;
+  Aborted := False;
 
   //init ObjectPaths or NamePaths
   if (NotSaxMode) and
@@ -5544,8 +5551,11 @@ begin
     if not notSaxMode then _DoParseStartObject('');
 
     //analyze all the nodes
-    While (BufferPos < BufferLength) or ExpandBuffer do
+    While (not Aborted) and ((BufferPos < BufferLength) or ExpandBuffer) do
       AnalyzeNode;
+
+    //the parsing was aborted by one of the events
+    if Aborted then Exit;
 
     //some tags are not closed
     if assigned(ObjectPaths) then begin
@@ -7604,7 +7614,7 @@ begin
   TALJSONDocumentA.ParseJSONString(
     AJsonStr,
     //--
-    procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
+    procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType; var Abort: Boolean)
     begin
       if (NodeSubType = nstFloat) then          aLst.Add(aPath + Path + aLst.NameValueSeparator + ALFloatToStrA(Args[0].VExtended^, aFormatSettings))
       else if (NodeSubType = nstDateTime) then  aLst.Add(aPath + Path + aLst.NameValueSeparator + ALDateTimeToStrA(Args[0].VExtended^, aFormatSettings))
@@ -7614,23 +7624,23 @@ begin
       LContainChilds := True;
     end{OnParseText},
     //--
-    procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+    procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean)
     begin
       LContainChilds := False;
     end{OnParseStartObject},
     //--
-    procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+    procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean)
     begin
       if (not LContainChilds) and (aPath + Path <> ''{Path = '' mean it's the root object}) then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '{}');
       LContainChilds := True;
     end{OnParseEndObject},
     //--
-    procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+    procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean)
     begin
       LContainChilds := False;
     end{OnParseStartArray},
     //--
-    procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+    procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean)
     begin
       if not LContainChilds then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '[]');
       LContainChilds := True;
@@ -9946,6 +9956,7 @@ Var
   CurrIndex: Integer;
   CurrValue: String;
   NotSaxMode: Boolean;
+  Aborted: Boolean;
   WorkingNode: TALJSONNodeW;
   NamePaths: TALNVStringListW;
   ObjectPaths: TList<TPair<Integer, TALJSONNodeW>>;
@@ -9990,7 +10001,7 @@ Var
               const Args: array of const;
               const NodeSubType: TALJSONNodeSubType);
   begin
-    if Assigned(OnParseText) then OnParseText(Self, GetPathStr('[' + ALIntToStrW(index) + ']'), '', Args, NodeSubType)
+    if Assigned(OnParseText) then OnParseText(Self, GetPathStr('[' + ALIntToStrW(index) + ']'), '', Args, NodeSubType, Aborted)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -9999,7 +10010,7 @@ Var
               const Args: array of const;
               const NodeSubType: TALJSONNodeSubType);
   begin
-    if Assigned(OnParseText) then OnParseText(Self, GetPathStr(Name), Name, Args, NodeSubType)
+    if Assigned(OnParseText) then OnParseText(Self, GetPathStr(Name), Name, Args, NodeSubType, Aborted)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~}
@@ -10025,7 +10036,7 @@ Var
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseStartObject(const Name: String);
   begin
-    if Assigned(OnParseStartObject) then OnParseStartObject(Self, GetPathStr, Name);
+    if Assigned(OnParseStartObject) then OnParseStartObject(Self, GetPathStr, Name, Aborted);
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -10033,14 +10044,14 @@ Var
   begin
     if Assigned(OnParseEndObject) then begin
       if NamePaths.Count = 0 then ALJSONDocErrorW(ALJSONParseError);
-      OnParseEndObject(Self, GetPathStr, NamePaths.Names[NamePaths.Count - 1]);
+      OnParseEndObject(Self, GetPathStr, NamePaths.Names[NamePaths.Count - 1], Aborted);
     end;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseStartArray(const index: String);
   begin
-    if Assigned(OnParseStartArray) then OnParseStartArray(Self, GetPathStr, index)
+    if Assigned(OnParseStartArray) then OnParseStartArray(Self, GetPathStr, index, Aborted)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -10048,7 +10059,7 @@ Var
   begin
     if Assigned(OnParseEndArray) then begin
       if NamePaths.Count = 0 then ALJSONDocErrorW(ALJSONParseError);
-      OnParseEndArray(Self, GetPathStr, NamePaths.Names[NamePaths.Count - 1]);
+      OnParseEndArray(Self, GetPathStr, NamePaths.Names[NamePaths.Count - 1], Aborted);
     end;
   end;
 
@@ -10978,6 +10989,7 @@ begin
   //init WorkingNode and NotSaxMode and DecodeJSONReferences
   WorkingNode := Self;
   NotSaxMode := not SaxMode;
+  Aborted := False;
   DecodeJSONReferences := not (poIgnoreControlCharacters in Options);
 
   //init ObjectPaths or NamePaths
@@ -11031,7 +11043,7 @@ begin
     //analyze all the nodes
     if poAllowComments in Options then begin
       var InCommentLine: Integer := 0;
-      While (BufferPos <= BufferLength) do begin
+      While (not Aborted) and (BufferPos <= BufferLength) do begin
         var c: Char := Buffer[BufferPos];
         If (InCommentLine = 0) and ((c <= ' ') or (c = ',')) then inc(bufferPos)
         else if (InCommentLine <= 1) and (c = '/')  then begin
@@ -11052,12 +11064,15 @@ begin
       end;
     end
     else begin
-      While (BufferPos <= BufferLength) do begin
+      While (not Aborted) and (BufferPos <= BufferLength) do begin
         var c: Char := Buffer[BufferPos];
         If (c <= ' ') or (c = ',') then inc(bufferPos)
         else AnalyzeNode;
       end;
     end;
+
+    //the parsing was aborted by one of the events
+    if Aborted then Exit;
 
     //some tags are not closed
     if assigned(ObjectPaths) then begin
@@ -11103,6 +11118,7 @@ Var
   BufferPos: Integer;
   CurrName: String;
   NotSaxMode: Boolean;
+  Aborted: Boolean;
   BinaryAsPtrStream: Boolean;
   WorkingNode: TALJSONNodeW;
   NamePaths: TALStringListW;
@@ -11193,7 +11209,7 @@ Var
               const Args: array of const;
               const NodeSubType: TALJSONNodeSubType);
   begin
-    if Assigned(OnParseText) then OnParseText(Self, GetPathStr('[' + index + ']'), '', Args, NodeSubType)
+    if Assigned(OnParseText) then OnParseText(Self, GetPathStr('[' + index + ']'), '', Args, NodeSubType, Aborted)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -11202,7 +11218,7 @@ Var
               const Args: array of const;
               const NodeSubType: TALJSONNodeSubType);
   begin
-    if Assigned(OnParseText) then OnParseText(Self, GetPathStr(Name), Name, Args, NodeSubType)
+    if Assigned(OnParseText) then OnParseText(Self, GetPathStr(Name), Name, Args, NodeSubType, Aborted)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~}
@@ -11227,7 +11243,7 @@ Var
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseStartObject(const Name: String);
   begin
-    if Assigned(OnParseStartObject) then OnParseStartObject(Self, GetPathStr, Name);
+    if Assigned(OnParseStartObject) then OnParseStartObject(Self, GetPathStr, Name, Aborted);
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -11235,14 +11251,14 @@ Var
   begin
     if Assigned(OnParseEndObject) then begin
       if NamePaths.Count = 0 then AlJSONDocErrorW(ALJSONParseError);
-      OnParseEndObject(Self, GetPathStr, NamePaths[NamePaths.Count - 1]);
+      OnParseEndObject(Self, GetPathStr, NamePaths[NamePaths.Count - 1], Aborted);
     end;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoParseStartArray(const index: String);
   begin
-    if Assigned(OnParseStartArray) then OnParseStartArray(Self, GetPathStr, index)
+    if Assigned(OnParseStartArray) then OnParseStartArray(Self, GetPathStr, index, Aborted)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -11250,7 +11266,7 @@ Var
   begin
     if Assigned(OnParseEndArray) then begin
       if NamePaths.Count = 0 then AlJSONDocErrorW(ALJSONParseError);
-      OnParseEndArray(Self, GetPathStr, NamePaths[NamePaths.Count - 1]);
+      OnParseEndArray(Self, GetPathStr, NamePaths[NamePaths.Count - 1], Aborted);
     end;
   end;
 
@@ -11991,6 +12007,7 @@ begin
   //init WorkingNode and NotSaxMode
   WorkingNode := Self;
   NotSaxMode := not SaxMode;
+  Aborted := False;
 
   //init ObjectPaths or NamePaths
   if (NotSaxMode) and
@@ -12030,8 +12047,11 @@ begin
     if not notSaxMode then _DoParseStartObject('');
 
     //analyze all the nodes
-    While (BufferPos < BufferLength) or ExpandBuffer do
+    While (not Aborted) and ((BufferPos < BufferLength) or ExpandBuffer) do
       AnalyzeNode;
+
+    //the parsing was aborted by one of the events
+    if Aborted then Exit;
 
     //some tags are not closed
     if assigned(ObjectPaths) then begin
@@ -14052,7 +14072,7 @@ begin
   TALJSONDocumentW.ParseJSONString(
     AJsonStr,
     //--
-    procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
+    procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType; var Abort: Boolean)
     begin
       if (NodeSubType = nstFloat) then          aLst.Add(aPath + Path + aLst.NameValueSeparator + ALFloatToStrW(Args[0].VExtended^, aFormatSettings))
       else if (NodeSubType = nstDateTime) then  aLst.Add(aPath + Path + aLst.NameValueSeparator + ALDateTimeToStrW(Args[0].VExtended^, aFormatSettings))
@@ -14062,23 +14082,23 @@ begin
       LContainChilds := True;
     end{OnParseText},
     //--
-    procedure (Sender: TObject; const Path: String; const Name: String)
+    procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean)
     begin
       LContainChilds := False;
     end{OnParseStartObject},
     //--
-    procedure (Sender: TObject; const Path: String; const Name: String)
+    procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean)
     begin
       if (not LContainChilds) and (aPath + Path <> ''{Path = '' mean it's the root object}) then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '{}');
       LContainChilds := True;
     end{OnParseEndObject},
     //--
-    procedure (Sender: TObject; const Path: String; const Name: String)
+    procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean)
     begin
       LContainChilds := False;
     end{OnParseStartArray},
     //--
-    procedure (Sender: TObject; const Path: String; const Name: String)
+    procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean)
     begin
       if not LContainChilds then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '[]');
       LContainChilds := True;

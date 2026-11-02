@@ -120,7 +120,7 @@ begin
     TALJSONDocumentA.ParseJSONString(
       AnsiString(MemoJSON.Lines.Text),
       //--
-      procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
+      procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType; var Abort: Boolean)
       begin
         case NodeSubType of
           nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFloatToStrW(Args[0].VExtended^));
@@ -140,22 +140,22 @@ begin
         end;
       end{OnParseText},
       //--
-      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('STARTOBJECT  =>  ' + String(Name));
       end{OnParseStartObject},
       //--
-      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('ENDOBJECT    =>  ' + String(Name));
       end{OnParseEndObject},
       //--
-      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('STARTARRAY   =>  ' + String(Name));
       end{OnParseStartArray},
       //--
-      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('ENDARRAY     =>  ' + String(Name));
       end{OnParseEndArray});
@@ -183,7 +183,7 @@ begin
     TALJSONDocumentW.ParseJSONString(
       MemoJSON.Lines.Text,
       //--
-      procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
+      procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType; var Abort: Boolean)
       begin
         case NodeSubType of
           nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFloatToStrW(Args[0].VExtended^));
@@ -203,22 +203,22 @@ begin
         end;
       end{OnParseText},
       //--
-      procedure (Sender: TObject; const Path: String; const Name: String)
+      procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('STARTOBJECT  =>  ' + Name);
       end{OnParseStartObject},
       //--
-      procedure (Sender: TObject; const Path: String; const Name: String)
+      procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('ENDOBJECT    =>  ' + Name);
       end{OnParseEndObject},
       //--
-      procedure (Sender: TObject; const Path: String; const Name: String)
+      procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('STARTARRAY   =>  ' + Name);
       end{OnParseStartArray},
       //--
-      procedure (Sender: TObject; const Path: String; const Name: String)
+      procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('ENDARRAY     =>  ' + Name);
       end{OnParseEndArray});
@@ -393,7 +393,7 @@ begin
     TALJSONDocumentA.ParseBSONBytes(
       LBsonBytes,
       //--
-      procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
+      procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType; var Abort: Boolean)
       begin
         case NodeSubType of
           nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFloatToStrW(Args[0].VExtended^));
@@ -413,22 +413,22 @@ begin
         end;
       end{OnParseText},
       //--
-      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('STARTOBJECT  =>  ' + String(Name));
       end{OnParseStartObject},
       //--
-      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('ENDOBJECT    =>  ' + String(Name));
       end{OnParseEndObject},
       //--
-      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('STARTARRAY   =>  ' + String(Name));
       end{OnParseStartArray},
       //--
-      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+      procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('ENDARRAY     =>  ' + String(Name));
       end{OnParseEndArray});
@@ -454,7 +454,7 @@ begin
     TALJSONDocumentW.ParseBSONBytes(
       LBsonBytes,
       //--
-      procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
+      procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType; var Abort: Boolean)
       begin
         case NodeSubType of
           nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + ALFloatToStrW(Args[0].VExtended^));
@@ -474,22 +474,22 @@ begin
         end;
       end{OnParseText},
       //--
-      procedure (Sender: TObject; const Path: String; const Name: String)
+      procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('STARTOBJECT  =>  ' + Name);
       end{OnParseStartObject},
       //--
-      procedure (Sender: TObject; const Path: String; const Name: String)
+      procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('ENDOBJECT    =>  ' + Name);
       end{OnParseEndObject},
       //--
-      procedure (Sender: TObject; const Path: String; const Name: String)
+      procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('STARTARRAY   =>  ' + Name);
       end{OnParseStartArray},
       //--
-      procedure (Sender: TObject; const Path: String; const Name: String)
+      procedure (Sender: TObject; const Path: String; const Name: String; var Abort: Boolean)
       begin
         MemoSaxModeEvents.Lines.Add('ENDARRAY     =>  ' + Name);
       end{OnParseEndArray});

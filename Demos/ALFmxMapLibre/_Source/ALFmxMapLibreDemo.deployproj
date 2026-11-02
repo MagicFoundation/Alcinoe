@@ -4,14 +4,55 @@
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
     <PropertyGroup>
-        <DeviceId Condition="'$(Platform)'=='Android'"/>
+        <DeviceId Condition="'$(Platform)'=='Android'">2B011FDH200DHE</DeviceId>
         <DeviceId Condition="'$(Platform)'=='Android64'">2B011FDH200DHE</DeviceId>
         <DeviceId Condition="'$(Platform)'=='iOSDevice64'">00008112-001679590AC1A01E</DeviceId>
         <DeviceId Condition="'$(Platform)'=='iOSSimARM64'">0B0CDF57-4FA4-474F-BB9D-A481F23B323D</DeviceId>
     </PropertyGroup>
     <ItemGroup Condition="'$(Platform)'=='WinARM64EC'"/>
     <ItemGroup Condition="'$(Platform)'=='OSX64'"/>
-    <ItemGroup Condition="'$(Platform)'=='Win32'"/>
+    <ItemGroup Condition="'$(Platform)'=='Win32'">
+        <DeployFile Include="$(SKIADIR)\Binary\Shared\Win32\sk4d.dll" Condition="'$(Config)'=='Release' And '$(SKIADIR)'!=''">
+            <RemoteDir>ALFmxMapLibreDemo\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+            <DeployClass>Skia</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\sk4d.dll" Condition="'$(Config)'=='Debug' And '$(SKIADIR)'==''">
+            <RemoteDir>ALFmxMapLibreDemo\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+            <DeployClass>Skia</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\sk4d.dll" Condition="'$(Config)'=='Release' And '$(SKIADIR)'==''">
+            <RemoteDir>ALFmxMapLibreDemo\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+            <DeployClass>Skia</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(SKIADIR)\Binary\Shared\Win32\sk4d.dll" Condition="'$(Config)'=='Debug' And '$(SKIADIR)'!=''">
+            <RemoteDir>ALFmxMapLibreDemo\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+            <DeployClass>Skia</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+    </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='Android64'">
         <DeployFile Include="Android\Merged\res\values-ru\values-ru.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxMapLibreDemo\res\values-ru\</RemoteDir>
@@ -2246,18 +2287,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\drawable-xhdpi-v4\ic_call_decline_low.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFmxMapLibreDemo\res\drawable-xhdpi-v4\</RemoteDir>
-            <RemoteName>ic_call_decline_low.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\notification_bg_normal_pressed.9.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxMapLibreDemo\res\drawable-mdpi-v4\</RemoteDir>
+            <RemoteName>notification_bg_normal_pressed.9.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\notification_bg_normal_pressed.9.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFmxMapLibreDemo\res\drawable-mdpi-v4\</RemoteDir>
-            <RemoteName>notification_bg_normal_pressed.9.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\drawable-xhdpi-v4\ic_call_decline_low.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFmxMapLibreDemo\res\drawable-xhdpi-v4\</RemoteDir>
+            <RemoteName>ic_call_decline_low.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6793,18 +6834,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\drawable-xhdpi-v4\ic_call_decline_low.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFmxMapLibreDemo\res\drawable-xhdpi-v4\</RemoteDir>
-            <RemoteName>ic_call_decline_low.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\notification_bg_normal_pressed.9.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxMapLibreDemo\res\drawable-mdpi-v4\</RemoteDir>
+            <RemoteName>notification_bg_normal_pressed.9.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\notification_bg_normal_pressed.9.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFmxMapLibreDemo\res\drawable-mdpi-v4\</RemoteDir>
-            <RemoteName>notification_bg_normal_pressed.9.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\drawable-xhdpi-v4\ic_call_decline_low.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFmxMapLibreDemo\res\drawable-xhdpi-v4\</RemoteDir>
+            <RemoteName>ic_call_decline_low.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -9099,7 +9140,48 @@
         </DeployFile>
     </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='OSXARM64'"/>
-    <ItemGroup Condition="'$(Platform)'=='Win64'"/>
+    <ItemGroup Condition="'$(Platform)'=='Win64'">
+        <DeployFile Include="$(SKIADIR)\Binary\Shared\Win64\sk4d.dll" Condition="'$(Config)'=='Debug' And '$(SKIADIR)'!=''">
+            <RemoteDir>ALFmxMapLibreDemo\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+            <DeployClass>Skia</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin64\sk4d.dll" Condition="'$(Config)'=='Debug' And '$(SKIADIR)'==''">
+            <RemoteDir>ALFmxMapLibreDemo\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+            <DeployClass>Skia</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(SKIADIR)\Binary\Shared\Win64\sk4d.dll" Condition="'$(Config)'=='Release' And '$(SKIADIR)'!=''">
+            <RemoteDir>ALFmxMapLibreDemo\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+            <DeployClass>Skia</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin64\sk4d.dll" Condition="'$(Config)'=='Release' And '$(SKIADIR)'==''">
+            <RemoteDir>ALFmxMapLibreDemo\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+            <DeployClass>Skia</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+    </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='iOSDevice64'">
         <DeployFile Include="..\..\..\Libraries\ios\MapLibre\Dynamic\MapLibre.xcframework\ios-arm64\MapLibre.framework\Headers\MLNMapView.h" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxMapLibreDemo.app\Frameworks\MapLibre.framework\Headers\</RemoteDir>

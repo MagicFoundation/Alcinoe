@@ -8997,7 +8997,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALSkWStreamAdapterWriteProc(context: Pointer; const buffer: Pointer; size: size_t): _bool; cdecl;
 begin
-  Result := TStream(context).Write(buffer^, size) = size;
+  Result := TStream(context).Write(buffer^, size) = Longint(size);
 end;
 {$ENDIF}
 

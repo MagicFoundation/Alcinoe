@@ -51,10 +51,10 @@ Type
   TALAndroidEditView = class;
   {$endif}
   {$IF defined(ios)}
-  TALIosEditView = class;
+  TALIosBaseEditView = class;
   {$endif}
   {$IF defined(ALMacOS)}
-  TALMacEditView = class;
+  TALMacBaseEditView = class;
   {$endif}
   {$IF defined(MSWINDOWS)}
   TALWinEditView = class;

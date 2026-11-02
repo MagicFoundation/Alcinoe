@@ -122,7 +122,7 @@ type
     //procedure setAttributionMargins(i: Integer; i1: Integer; i2: Integer; i3: Integer); cdecl;
     //procedure setAttributionTintColor(i: Integer); cdecl;
     procedure setCompassEnabled(compassEnabled: Boolean); cdecl;
-    procedure setCompassFadeFacingNorth(b: Boolean); cdecl;
+    procedure setCompassFadeFacingNorth(compassFadeFacingNorth: Boolean); cdecl;
     procedure setCompassGravity(compassFadeFacingNorth: Integer); cdecl;
     procedure setCompassImage(compass: JDrawable); cdecl;
     procedure setCompassMargins(left: Integer; top: Integer; right: Integer; bottom: Integer); cdecl;
@@ -1993,7 +1993,7 @@ type
     //procedure addOnWillStartRenderingMapListener(onWillStartRenderingMapListener: JMapView_OnWillStartRenderingMapListener); cdecl;
     procedure getMapAsync(callback: JOnMapReadyCallback); cdecl;
     //function getPixelRatio: Single; cdecl;
-    //function getRenderView: JView; cdecl;
+    function getRenderView: JView; cdecl;
     //function getRenderingRefreshMode: JMapRenderer_RenderingRefreshMode; cdecl;
     //function getViewContent: JBitmap; cdecl;
     //function isDestroyed: Boolean; cdecl;

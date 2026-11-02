@@ -13,73 +13,14 @@ uses
 
 {$M+}
 
-//const
-  //PHLivePhotoBadgeOptionsOverContent = 1 shl 0;
-  //PHLivePhotoBadgeOptionsLiveOff = 1 shl 1;
-  //PHLivePhotoViewPlaybackStyleUndefined = 0;
-  //PHLivePhotoViewPlaybackStyleFull = 1;
-  //PHLivePhotoViewPlaybackStyleHint = 2;
-  //PHPickerConfigurationAssetRepresentationModeAutomatic = 0;
-  //PHPickerConfigurationAssetRepresentationModeCurrent = 1;
-  //PHPickerConfigurationAssetRepresentationModeCompatible = 2;
-  //PHPickerConfigurationSelectionDefault = 0;
-  //PHPickerConfigurationSelectionOrdered = 1;
-  //PHPickerConfigurationSelectionContinuous = 2;
-  //PHPickerConfigurationSelectionContinuousAndOrdered = 3;
-  //PHPickerModeDefault = 0;
-  //PHPickerModeCompact = 1;
-  //PHPickerCapabilitiesNone = 0;
-  //PHPickerCapabilitiesSearch = 1 shl 0;
-  //PHPickerCapabilitiesStagingArea = 1 shl 1;
-  //PHPickerCapabilitiesCollectionNavigation = 1 shl 2;
-  //PHPickerCapabilitiesSelectionActions = 1 shl 3;
-  //PHPickerCapabilitiesSensitivityAnalysisIntervention = 1 shl 4;
-
 type
 
-  //PHContentEditingController = interface;
-  //PHLivePhotoViewDelegate = interface;
-  //PHLivePhotoView = interface;
+  {*************************}
   PHPickerFilter = interface;
-  //PHPickerUpdateConfiguration = interface;
   PHPickerConfiguration = interface;
   PHPickerResult = interface;
   PHPickerViewController = interface;
   PHPickerViewControllerDelegate = interface;
-  //PhotosUISupport = interface;
-
-  //TPhotosUICompletionHandler = procedure(param1: PHContentEditingOutput) of object;
-  //PHLivePhotoBadgeOptions = NSUInteger;
-  //PHLivePhotoViewPlaybackStyle = NSInteger;
-  //PHPickerConfigurationAssetRepresentationMode = NSInteger;
-  //PHPickerConfigurationSelection = NSInteger;
-  //PHPickerMode = NSInteger;
-  //PHPickerCapabilities = NSUInteger;
-  //PHAssetPlaybackStyle = NSInteger;
-  //NSDirectionalRectEdge = NSUInteger;
-  //TPhotosUICompletionHandler1 = procedure(param1: NSArray) of object;
-
-  {*********************************************}
-  //PHLivePhotoViewClass = interface(UIViewClass)
-    //['{F43FF751-4E8C-4A99-942E-228195274105}']
-    //{class} function livePhotoBadgeImageWithOptions(badgeOptions: PHLivePhotoBadgeOptions): UIImage; cdecl;
-  //end;
-  //PHLivePhotoView = interface(UIView)
-    //['{29F3DC17-16D4-45E8-83CB-EB27F3DB995B}']
-    //procedure setDelegate(delegate: id); cdecl;
-    //function delegate: id; cdecl;
-    //procedure setLivePhoto(livePhoto: PHLivePhoto); cdecl;
-    //function livePhoto: PHLivePhoto; cdecl;
-    //procedure setContentsRect(contentsRect: CGRect); cdecl;
-    //function contentsRect: CGRect; cdecl;
-    //procedure setMuted(muted: BOOL); cdecl;
-    //function isMuted: BOOL; cdecl;
-    //function playbackGestureRecognizer: UIGestureRecognizer; cdecl;
-    //procedure startPlaybackWithStyle(playbackStyle: PHLivePhotoViewPlaybackStyle); cdecl;
-    //procedure stopPlayback; cdecl;
-  //end;
-  //TPHLivePhotoView = class(TOCGenericImport<PHLivePhotoViewClass, PHLivePhotoView>) end;
-  //PPHLivePhotoView = Pointer;
 
   {********************************************}
   PHPickerFilterClass = interface(NSObjectClass)
@@ -106,20 +47,6 @@ type
   end;
   TPHPickerFilter = class(TOCGenericImport<PHPickerFilterClass, PHPickerFilter>) end;
   PPHPickerFilter = Pointer;
-
-  {***********************************************************}
-  //PHPickerUpdateConfigurationClass = interface(NSObjectClass)
-    //['{CCD5DFA3-6C86-4B2D-BAB4-04DF368B6B22}']
-  //end;
-  //PHPickerUpdateConfiguration = interface(NSObject)
-    //['{81C905C3-E538-444E-9A21-28C81005256C}']
-    //procedure setSelectionLimit(selectionLimit: NSInteger); cdecl;
-    //function selectionLimit: NSInteger; cdecl;
-    //procedure setEdgesWithoutContentMargins(edgesWithoutContentMargins: NSDirectionalRectEdge); cdecl;
-    //function edgesWithoutContentMargins: NSDirectionalRectEdge; cdecl;
-  //end;
-  //TPHPickerUpdateConfiguration = class(TOCGenericImport<PHPickerUpdateConfigurationClass, PHPickerUpdateConfiguration>) end;
-  //PPHPickerUpdateConfiguration = Pointer;
 
   {***************************************************}
   PHPickerConfigurationClass = interface(NSObjectClass)
@@ -180,38 +107,6 @@ type
   end;
   TPHPickerViewController = class(TOCGenericImport<PHPickerViewControllerClass, PHPickerViewController>) end;
   PPHPickerViewController = Pointer;
-
-  {****************************************}
-  //PhotosUISupport = interface(IObjectiveC)
-    //['{5220A509-13A8-467D-8B1D-BA2720AB2AF3}']
-    //[MethodName('presentLimitedLibraryPickerFromViewController:')]
-    //procedure presentLimitedLibraryPickerFromViewController(controller: UIViewController); cdecl;
-    //[MethodName('presentLimitedLibraryPickerFromViewController:completionHandler:')]
-    //procedure presentLimitedLibraryPickerFromViewControllerCompletionHandler(controller: UIViewController; completionHandler: TPhotosUICompletionHandler1); cdecl;
-  //end;
-
-  {***************************************************}
-  //PHContentEditingController = interface(IObjectiveC)
-    //['{5606540A-E904-4239-B7FB-1AF686CAD292}']
-    //function canHandleAdjustmentData(adjustmentData: PHAdjustmentData): BOOL; cdecl;
-    //procedure startContentEditingWithInput(contentEditingInput: PHContentEditingInput; placeholderImage: UIImage); cdecl;
-    //procedure finishContentEditingWithCompletionHandler(completionHandler: TPhotosUICompletionHandler); cdecl;
-    //procedure cancelContentEditing; cdecl;
-    //function shouldShowCancelConfirmation: BOOL; cdecl;
-  //end;
-
-  {************************************************}
-  //PHLivePhotoViewDelegate = interface(IObjectiveC)
-    //['{F99664CF-757B-4411-BB0D-4153963DFA2E}']
-    //[MethodName('livePhotoView:canBeginPlaybackWithStyle:')]
-    //function livePhotoViewCanBeginPlaybackWithStyle(livePhotoView: PHLivePhotoView; canBeginPlaybackWithStyle: PHLivePhotoViewPlaybackStyle): BOOL; cdecl;
-    //[MethodName('livePhotoView:willBeginPlaybackWithStyle:')]
-    //procedure livePhotoViewWillBeginPlaybackWithStyle(livePhotoView: PHLivePhotoView; willBeginPlaybackWithStyle: PHLivePhotoViewPlaybackStyle); cdecl;
-    //[MethodName('livePhotoView:didEndPlaybackWithStyle:')]
-    //procedure livePhotoViewDidEndPlaybackWithStyle(livePhotoView: PHLivePhotoView; didEndPlaybackWithStyle: PHLivePhotoViewPlaybackStyle); cdecl;
-    //[MethodName('livePhotoView:extraMinimumTouchDurationForTouch:withStyle:')]
-    //function livePhotoViewExtraMinimumTouchDurationForTouchWithStyle(livePhotoView: PHLivePhotoView; extraMinimumTouchDurationForTouch: UITouch; withStyle: PHLivePhotoViewPlaybackStyle): NSTimeInterval; cdecl;
-  //end;
 
   {*****************************************************}
   PHPickerViewControllerDelegate = interface(IObjectiveC)

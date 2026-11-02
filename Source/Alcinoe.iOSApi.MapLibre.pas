@@ -27,7 +27,16 @@ uses
 
 {$M+}
 
+type
+
+  {*********************************}
+  MLNCameraChangeReason = NSUInteger;
+  MLNOrnamentVisibility = NSInteger;
+  MLNOrnamentPosition = NSUInteger;
+
 const
+
+  {****************************}
   MLNCameraChangeReasonNone = 0;
   MLNCameraChangeReasonProgrammatic = 1 shl 0;
   MLNCameraChangeReasonResetNorth = 1 shl 1;
@@ -39,11 +48,15 @@ const
   MLNCameraChangeReasonGestureOneFingerZoom = 1 shl 7;
   MLNCameraChangeReasonGestureTilt = 1 shl 8;
   MLNCameraChangeReasonTransitionCancelled = 1 shl 16;
+  MLNOrnamentVisibilityAdaptive = 0; // Adapts to the current map state.
+  MLNOrnamentVisibilityHidden   = 1; // Always hidden.
+  MLNOrnamentVisibilityVisible  = 2; // Always visible.
+  MLNOrnamentPositionTopLeft     = 0; // Top left of the map view.
+  MLNOrnamentPositionTopRight    = 1; // Top right of the map view.
+  MLNOrnamentPositionBottomLeft  = 2; // Bottom left of the map view.
+  MLNOrnamentPositionBottomRight = 3; // Bottom right of the map view.
 
 type
-
-  {*********************************}
-  MLNCameraChangeReason = NSUInteger;
 
   {********************}
   MLNTransition = record
@@ -59,21 +72,41 @@ type
   end;
   PMLNCoordinateBounds = ^MLNCoordinateBounds;
 
-  {*********************}
+  {***************************}
+  MLNCompassButton = interface;
   MLNFeature = interface;
   MLNStyle = interface;
   MLNStyleLayer = interface;
   MLNForegroundStyleLayer = interface;
   MLNVectorStyleLayer = interface;
   MLNSymbolStyleLayer = interface;
+  MLNLineStyleLayer = interface;
+  MLNCircleStyleLayer = interface;
+  MLNFillStyleLayer = interface;
+  MLNFillExtrusionStyleLayer = interface;
+  MLNHeatmapStyleLayer = interface;
+  MLNRasterStyleLayer = interface;
   MLNShape = interface;
   MLNPointAnnotation = interface;
   MLNPointFeature = interface;
   MLNSource = interface;
   MLNShapeSource = interface;
+  MLNTileSource = interface;
+  MLNRasterTileSource = interface;
   MLNMapCamera = interface;
   MLNMapView = interface;
   MLNMapViewDelegate = interface;
+
+  {************************************}
+  MLNCompassButtonClass = interface(UIImageViewClass)
+    ['{2097358F-0EFE-4C29-A12C-0A870BB82162}']
+  end;
+  MLNCompassButton = interface(UIImageView)
+    ['{0AEAD950-90FE-4212-A3AE-1AC479CD1664}']
+    function compassVisibility: MLNOrnamentVisibility; cdecl;
+    procedure setCompassVisibility(compassVisibility: MLNOrnamentVisibility); cdecl;
+  end;
+  TMLNCompassButton = class(TOCGenericImport<MLNCompassButtonClass, MLNCompassButton>)  end;
 
   {*********************************}
   MLNFeature = interface(IObjectiveC)
@@ -124,6 +157,7 @@ type
     //function light: MLNLight; cdecl;
     //procedure localizeLabelsIntoLocale(locale: NSLocale); cdecl;
   end;
+  TMLNStyle = class(TOCGenericImport<MLNStyleClass, MLNStyle>)  end;
 
   {*******************************************}
   MLNStyleLayerClass = interface(NSObjectClass)
@@ -132,8 +166,8 @@ type
   MLNStyleLayer = interface(NSObject)
     ['{87555918-40E5-4EC0-A877-A88E54529E6F}']
     //function identifier: NSString; cdecl;
-    //procedure setVisible(visible: Boolean); cdecl;
-    //function isVisible: Boolean; cdecl;
+    procedure setVisible(visible: Boolean); cdecl;
+    function isVisible: Boolean; cdecl;
     //procedure setMaximumZoomLevel(maximumZoomLevel: float); cdecl;
     //function maximumZoomLevel: float; cdecl;
     //procedure setMinimumZoomLevel(minimumZoomLevel: float); cdecl;
@@ -164,6 +198,7 @@ type
   end;
   TMLNVectorStyleLayer = class(TOCGenericImport<MLNVectorStyleLayerClass, MLNVectorStyleLayer>)  end;
 
+  {************************************************************}
   MLNSymbolStyleLayerClass = interface(MLNVectorStyleLayerClass)
     ['{2C691DB1-CA33-4E6F-B30C-66E5E6566C33}']
   end;
@@ -311,6 +346,256 @@ type
   end;
   TMLNSymbolStyleLayer = class(TOCGenericImport<MLNSymbolStyleLayerClass, MLNSymbolStyleLayer>) end;
 
+  {**********************************************************}
+  MLNLineStyleLayerClass = interface(MLNVectorStyleLayerClass)
+    ['{B3E54735-4129-4315-932B-8EA14F95D191}']
+  end;
+  MLNLineStyleLayer = interface(MLNVectorStyleLayer)
+    ['{B48CAC0C-4E08-4446-90D1-3FF3E3B0EB92}']
+    function initWithIdentifier(identifier: NSString; source: MLNSource): MLNLineStyleLayer; cdecl;
+    procedure setLineCap(lineCap: NSExpression); cdecl;
+    function lineCap: NSExpression; cdecl;
+    procedure setLineJoin(lineJoin: NSExpression); cdecl;
+    function lineJoin: NSExpression; cdecl;
+    procedure setLineMiterLimit(lineMiterLimit: NSExpression); cdecl;
+    function lineMiterLimit: NSExpression; cdecl;
+    procedure setLineRoundLimit(lineRoundLimit: NSExpression); cdecl;
+    function lineRoundLimit: NSExpression; cdecl;
+    procedure setLineSortKey(lineSortKey: NSExpression); cdecl;
+    function lineSortKey: NSExpression; cdecl;
+    procedure setLineBlur(lineBlur: NSExpression); cdecl;
+    function lineBlur: NSExpression; cdecl;
+    procedure setLineBlurTransition(lineBlurTransition: MLNTransition); cdecl;
+    function lineBlurTransition: MLNTransition; cdecl;
+    procedure setLineColor(lineColor: NSExpression); cdecl;
+    function lineColor: NSExpression; cdecl;
+    procedure setLineColorTransition(lineColorTransition: MLNTransition); cdecl;
+    function lineColorTransition: MLNTransition; cdecl;
+    procedure setLineDashPattern(lineDashPattern: NSExpression); cdecl;
+    function lineDashPattern: NSExpression; cdecl;
+    procedure setLineDashPatternTransition(lineDashPatternTransition: MLNTransition); cdecl;
+    function lineDashPatternTransition: MLNTransition; cdecl;
+    procedure setLineGapWidth(lineGapWidth: NSExpression); cdecl;
+    function lineGapWidth: NSExpression; cdecl;
+    procedure setLineGapWidthTransition(lineGapWidthTransition: MLNTransition); cdecl;
+    function lineGapWidthTransition: MLNTransition; cdecl;
+    procedure setLineGradient(lineGradient: NSExpression); cdecl;
+    function lineGradient: NSExpression; cdecl;
+    procedure setLineOffset(lineOffset: NSExpression); cdecl;
+    function lineOffset: NSExpression; cdecl;
+    procedure setLineOffsetTransition(lineOffsetTransition: MLNTransition); cdecl;
+    function lineOffsetTransition: MLNTransition; cdecl;
+    procedure setLineOpacity(lineOpacity: NSExpression); cdecl;
+    function lineOpacity: NSExpression; cdecl;
+    procedure setLineOpacityTransition(lineOpacityTransition: MLNTransition); cdecl;
+    function lineOpacityTransition: MLNTransition; cdecl;
+    procedure setLinePattern(linePattern: NSExpression); cdecl;
+    function linePattern: NSExpression; cdecl;
+    procedure setLinePatternTransition(linePatternTransition: MLNTransition); cdecl;
+    function linePatternTransition: MLNTransition; cdecl;
+    procedure setLineTranslation(lineTranslation: NSExpression); cdecl;
+    function lineTranslation: NSExpression; cdecl;
+    procedure setLineTranslationTransition(lineTranslationTransition: MLNTransition); cdecl;
+    function lineTranslationTransition: MLNTransition; cdecl;
+    procedure setLineTranslationAnchor(lineTranslationAnchor: NSExpression); cdecl;
+    function lineTranslationAnchor: NSExpression; cdecl;
+    procedure setLineWidth(lineWidth: NSExpression); cdecl;
+    function lineWidth: NSExpression; cdecl;
+    procedure setLineWidthTransition(lineWidthTransition: MLNTransition); cdecl;
+    function lineWidthTransition: MLNTransition; cdecl;
+  end;
+  TMLNLineStyleLayer = class(TOCGenericImport<MLNLineStyleLayerClass, MLNLineStyleLayer>)  end;
+
+  {************************************************************}
+  MLNCircleStyleLayerClass = interface(MLNVectorStyleLayerClass)
+    ['{1B8C3A7B-3BEF-4335-A32D-278EA3A4916A}']
+  end;
+  MLNCircleStyleLayer = interface(MLNVectorStyleLayer)
+    ['{67BA860C-76CD-4D6C-ADAA-79A526DFB1AC}']
+    function initWithIdentifier(identifier: NSString; source: MLNSource): MLNCircleStyleLayer; cdecl;
+    procedure setCircleSortKey(circleSortKey: NSExpression); cdecl;
+    function circleSortKey: NSExpression; cdecl;
+    procedure setCircleBlur(circleBlur: NSExpression); cdecl;
+    function circleBlur: NSExpression; cdecl;
+    procedure setCircleBlurTransition(circleBlurTransition: MLNTransition); cdecl;
+    function circleBlurTransition: MLNTransition; cdecl;
+    procedure setCircleColor(circleColor: NSExpression); cdecl;
+    function circleColor: NSExpression; cdecl;
+    procedure setCircleColorTransition(circleColorTransition: MLNTransition); cdecl;
+    function circleColorTransition: MLNTransition; cdecl;
+    procedure setCircleOpacity(circleOpacity: NSExpression); cdecl;
+    function circleOpacity: NSExpression; cdecl;
+    procedure setCircleOpacityTransition(circleOpacityTransition: MLNTransition); cdecl;
+    function circleOpacityTransition: MLNTransition; cdecl;
+    procedure setCirclePitchAlignment(circlePitchAlignment: NSExpression); cdecl;
+    function circlePitchAlignment: NSExpression; cdecl;
+    procedure setCircleRadius(circleRadius: NSExpression); cdecl;
+    function circleRadius: NSExpression; cdecl;
+    procedure setCircleRadiusTransition(circleRadiusTransition: MLNTransition); cdecl;
+    function circleRadiusTransition: MLNTransition; cdecl;
+    procedure setCircleScaleAlignment(circleScaleAlignment: NSExpression); cdecl;
+    function circleScaleAlignment: NSExpression; cdecl;
+    procedure setCircleStrokeColor(circleStrokeColor: NSExpression); cdecl;
+    function circleStrokeColor: NSExpression; cdecl;
+    procedure setCircleStrokeColorTransition(circleStrokeColorTransition: MLNTransition); cdecl;
+    function circleStrokeColorTransition: MLNTransition; cdecl;
+    procedure setCircleStrokeOpacity(circleStrokeOpacity: NSExpression); cdecl;
+    function circleStrokeOpacity: NSExpression; cdecl;
+    procedure setCircleStrokeOpacityTransition(circleStrokeOpacityTransition: MLNTransition); cdecl;
+    function circleStrokeOpacityTransition: MLNTransition; cdecl;
+    procedure setCircleStrokeWidth(circleStrokeWidth: NSExpression); cdecl;
+    function circleStrokeWidth: NSExpression; cdecl;
+    procedure setCircleStrokeWidthTransition(circleStrokeWidthTransition: MLNTransition); cdecl;
+    function circleStrokeWidthTransition: MLNTransition; cdecl;
+    procedure setCircleTranslation(circleTranslation: NSExpression); cdecl;
+    function circleTranslation: NSExpression; cdecl;
+    procedure setCircleTranslationTransition(circleTranslationTransition: MLNTransition); cdecl;
+    function circleTranslationTransition: MLNTransition; cdecl;
+    procedure setCircleTranslationAnchor(circleTranslationAnchor: NSExpression); cdecl;
+    function circleTranslationAnchor: NSExpression; cdecl;
+  end;
+  TMLNCircleStyleLayer = class(TOCGenericImport<MLNCircleStyleLayerClass, MLNCircleStyleLayer>)  end;
+
+  {**********************************************************}
+  MLNFillStyleLayerClass = interface(MLNVectorStyleLayerClass)
+    ['{1924100B-473F-4B95-BFAB-0D9E05D53BC4}']
+  end;
+  MLNFillStyleLayer = interface(MLNVectorStyleLayer)
+    ['{E11435B7-0829-4560-9054-072DE05FB7A2}']
+    function initWithIdentifier(identifier: NSString; source: MLNSource): MLNFillStyleLayer; cdecl;
+    procedure setFillSortKey(fillSortKey: NSExpression); cdecl;
+    function fillSortKey: NSExpression; cdecl;
+    procedure setFillAntialiased(fillAntialiased: NSExpression); cdecl;
+    function isFillAntialiased: NSExpression; cdecl;
+    procedure setFillColor(fillColor: NSExpression); cdecl;
+    function fillColor: NSExpression; cdecl;
+    procedure setFillColorTransition(fillColorTransition: MLNTransition); cdecl;
+    function fillColorTransition: MLNTransition; cdecl;
+    procedure setFillOpacity(fillOpacity: NSExpression); cdecl;
+    function fillOpacity: NSExpression; cdecl;
+    procedure setFillOpacityTransition(fillOpacityTransition: MLNTransition); cdecl;
+    function fillOpacityTransition: MLNTransition; cdecl;
+    procedure setFillOutlineColor(fillOutlineColor: NSExpression); cdecl;
+    function fillOutlineColor: NSExpression; cdecl;
+    procedure setFillOutlineColorTransition(fillOutlineColorTransition: MLNTransition); cdecl;
+    function fillOutlineColorTransition: MLNTransition; cdecl;
+    procedure setFillPattern(fillPattern: NSExpression); cdecl;
+    function fillPattern: NSExpression; cdecl;
+    procedure setFillPatternTransition(fillPatternTransition: MLNTransition); cdecl;
+    function fillPatternTransition: MLNTransition; cdecl;
+    procedure setFillTranslation(fillTranslation: NSExpression); cdecl;
+    function fillTranslation: NSExpression; cdecl;
+    procedure setFillTranslationTransition(fillTranslationTransition: MLNTransition); cdecl;
+    function fillTranslationTransition: MLNTransition; cdecl;
+    procedure setFillTranslationAnchor(fillTranslationAnchor: NSExpression); cdecl;
+    function fillTranslationAnchor: NSExpression; cdecl;
+  end;
+  TMLNFillStyleLayer = class(TOCGenericImport<MLNFillStyleLayerClass, MLNFillStyleLayer>)  end;
+
+  {*******************************************************************}
+  MLNFillExtrusionStyleLayerClass = interface(MLNVectorStyleLayerClass)
+    ['{9A598704-25A4-4C19-89D4-152503603E4B}']
+  end;
+  MLNFillExtrusionStyleLayer = interface(MLNVectorStyleLayer)
+    ['{9913E369-4858-48AD-933F-AE70F408A0CC}']
+    function initWithIdentifier(identifier: NSString; source: MLNSource): MLNFillExtrusionStyleLayer; cdecl;
+    procedure setFillExtrusionRoundedCornerDistance(fillExtrusionRoundedCornerDistance: NSExpression); cdecl;
+    function fillExtrusionRoundedCornerDistance: NSExpression; cdecl;
+    procedure setFillExtrusionBase(fillExtrusionBase: NSExpression); cdecl;
+    function fillExtrusionBase: NSExpression; cdecl;
+    procedure setFillExtrusionBaseTransition(fillExtrusionBaseTransition: MLNTransition); cdecl;
+    function fillExtrusionBaseTransition: MLNTransition; cdecl;
+    procedure setFillExtrusionColor(fillExtrusionColor: NSExpression); cdecl;
+    function fillExtrusionColor: NSExpression; cdecl;
+    procedure setFillExtrusionColorTransition(fillExtrusionColorTransition: MLNTransition); cdecl;
+    function fillExtrusionColorTransition: MLNTransition; cdecl;
+    procedure setFillExtrusionHasVerticalGradient(fillExtrusionHasVerticalGradient: NSExpression); cdecl;
+    function fillExtrusionHasVerticalGradient: NSExpression; cdecl;
+    procedure setFillExtrusionHeight(fillExtrusionHeight: NSExpression); cdecl;
+    function fillExtrusionHeight: NSExpression; cdecl;
+    procedure setFillExtrusionHeightTransition(fillExtrusionHeightTransition: MLNTransition); cdecl;
+    function fillExtrusionHeightTransition: MLNTransition; cdecl;
+    procedure setFillExtrusionOpacity(fillExtrusionOpacity: NSExpression); cdecl;
+    function fillExtrusionOpacity: NSExpression; cdecl;
+    procedure setFillExtrusionOpacityTransition(fillExtrusionOpacityTransition: MLNTransition); cdecl;
+    function fillExtrusionOpacityTransition: MLNTransition; cdecl;
+    procedure setFillExtrusionPattern(fillExtrusionPattern: NSExpression); cdecl;
+    function fillExtrusionPattern: NSExpression; cdecl;
+    procedure setFillExtrusionPatternTransition(fillExtrusionPatternTransition: MLNTransition); cdecl;
+    function fillExtrusionPatternTransition: MLNTransition; cdecl;
+    procedure setFillExtrusionTranslation(fillExtrusionTranslation: NSExpression); cdecl;
+    function fillExtrusionTranslation: NSExpression; cdecl;
+    procedure setFillExtrusionTranslationTransition(fillExtrusionTranslationTransition: MLNTransition); cdecl;
+    function fillExtrusionTranslationTransition: MLNTransition; cdecl;
+    procedure setFillExtrusionTranslationAnchor(fillExtrusionTranslationAnchor: NSExpression); cdecl;
+    function fillExtrusionTranslationAnchor: NSExpression; cdecl;
+  end;
+  TMLNFillExtrusionStyleLayer = class(TOCGenericImport<MLNFillExtrusionStyleLayerClass, MLNFillExtrusionStyleLayer>)  end;
+
+  {*************************************************************}
+  MLNHeatmapStyleLayerClass = interface(MLNVectorStyleLayerClass)
+    ['{9F4BBD9D-33B0-4A2D-A6F3-D69F44C36AE3}']
+  end;
+  MLNHeatmapStyleLayer = interface(MLNVectorStyleLayer)
+    ['{0D12F3B0-B7D3-4EB1-8843-15F3404FC9D7}']
+    function initWithIdentifier(identifier: NSString; source: MLNSource): MLNHeatmapStyleLayer; cdecl;
+    procedure setHeatmapColor(heatmapColor: NSExpression); cdecl;
+    function heatmapColor: NSExpression; cdecl;
+    procedure setHeatmapIntensity(heatmapIntensity: NSExpression); cdecl;
+    function heatmapIntensity: NSExpression; cdecl;
+    procedure setHeatmapIntensityTransition(heatmapIntensityTransition: MLNTransition); cdecl;
+    function heatmapIntensityTransition: MLNTransition; cdecl;
+    procedure setHeatmapOpacity(heatmapOpacity: NSExpression); cdecl;
+    function heatmapOpacity: NSExpression; cdecl;
+    procedure setHeatmapOpacityTransition(heatmapOpacityTransition: MLNTransition); cdecl;
+    function heatmapOpacityTransition: MLNTransition; cdecl;
+    procedure setHeatmapRadius(heatmapRadius: NSExpression); cdecl;
+    function heatmapRadius: NSExpression; cdecl;
+    procedure setHeatmapRadiusTransition(heatmapRadiusTransition: MLNTransition); cdecl;
+    function heatmapRadiusTransition: MLNTransition; cdecl;
+    procedure setHeatmapWeight(heatmapWeight: NSExpression); cdecl;
+    function heatmapWeight: NSExpression; cdecl;
+  end;
+  TMLNHeatmapStyleLayer = class(TOCGenericImport<MLNHeatmapStyleLayerClass, MLNHeatmapStyleLayer>)  end;
+
+  {****************************************************************}
+  MLNRasterStyleLayerClass = interface(MLNForegroundStyleLayerClass)
+    ['{CF6C48C6-92A2-4DA6-9A87-EBD33808F8C3}']
+  end;
+  MLNRasterStyleLayer = interface(MLNForegroundStyleLayer)
+    ['{399E1855-AC1E-4DD2-B297-F0CD2300A18D}']
+    function initWithIdentifier(identifier: NSString; source: MLNSource): MLNRasterStyleLayer; cdecl;
+    procedure setMaximumRasterBrightness(maximumRasterBrightness: NSExpression); cdecl;
+    function maximumRasterBrightness: NSExpression; cdecl;
+    procedure setMaximumRasterBrightnessTransition(maximumRasterBrightnessTransition: MLNTransition); cdecl;
+    function maximumRasterBrightnessTransition: MLNTransition; cdecl;
+    procedure setMinimumRasterBrightness(minimumRasterBrightness: NSExpression); cdecl;
+    function minimumRasterBrightness: NSExpression; cdecl;
+    procedure setMinimumRasterBrightnessTransition(minimumRasterBrightnessTransition: MLNTransition); cdecl;
+    function minimumRasterBrightnessTransition: MLNTransition; cdecl;
+    procedure setRasterContrast(rasterContrast: NSExpression); cdecl;
+    function rasterContrast: NSExpression; cdecl;
+    procedure setRasterContrastTransition(rasterContrastTransition: MLNTransition); cdecl;
+    function rasterContrastTransition: MLNTransition; cdecl;
+    procedure setRasterFadeDuration(rasterFadeDuration: NSExpression); cdecl;
+    function rasterFadeDuration: NSExpression; cdecl;
+    procedure setRasterHueRotation(rasterHueRotation: NSExpression); cdecl;
+    function rasterHueRotation: NSExpression; cdecl;
+    procedure setRasterHueRotationTransition(rasterHueRotationTransition: MLNTransition); cdecl;
+    function rasterHueRotationTransition: MLNTransition; cdecl;
+    procedure setRasterOpacity(rasterOpacity: NSExpression); cdecl;
+    function rasterOpacity: NSExpression; cdecl;
+    procedure setRasterOpacityTransition(rasterOpacityTransition: MLNTransition); cdecl;
+    function rasterOpacityTransition: MLNTransition; cdecl;
+    procedure setRasterResamplingMode(rasterResamplingMode: NSExpression); cdecl;
+    function rasterResamplingMode: NSExpression; cdecl;
+    procedure setRasterSaturation(rasterSaturation: NSExpression); cdecl;
+    function rasterSaturation: NSExpression; cdecl;
+    procedure setRasterSaturationTransition(rasterSaturationTransition: MLNTransition); cdecl;
+    function rasterSaturationTransition: MLNTransition; cdecl;
+  end;
+  TMLNRasterStyleLayer = class(TOCGenericImport<MLNRasterStyleLayerClass, MLNRasterStyleLayer>)  end;
+
   {**************************************}
   MLNShapeClass = interface(NSObjectClass)
     ['{6D9CE278-458C-43F4-87BB-CC96DA6C7D17}']
@@ -385,6 +670,30 @@ type
   end;
   TMLNShapeSource = class(TOCGenericImport<MLNShapeSourceClass, MLNShapeSource>) end;
 
+  {********************************************}
+  MLNTileSourceClass = interface(MLNSourceClass)
+    ['{AB54F643-3B87-47F5-98E6-AC37A601A631}']
+  end;
+  MLNTileSource = interface(MLNSource)
+    ['{7696A661-89B0-4889-946E-E2ECE8DD1328}']
+    //function configurationURL: NSURL; cdecl;
+    //function attributionInfos: NSArray; cdecl;
+    //function attributionHTMLString: NSString; cdecl;
+  end;
+  TMLNTileSource = class(TOCGenericImport<MLNTileSourceClass, MLNTileSource>)  end;
+
+  {******************************************************}
+  MLNRasterTileSourceClass = interface(MLNTileSourceClass)
+    ['{E372EC24-53B5-4DE9-88C1-328124C45078}']
+  end;
+  MLNRasterTileSource = interface(MLNTileSource)
+    ['{B0225237-DF47-43C7-A3DB-7C1ADF8D8F73}']
+    function initWithIdentifier(identifier: NSString; configurationURL: NSURL): MLNRasterTileSource; cdecl; overload;
+    function initWithIdentifier(identifier: NSString; configurationURL: NSURL; tileSize: CGFloat): MLNRasterTileSource; cdecl; overload;
+    function initWithIdentifier(identifier: NSString; tileURLTemplates: NSArray; options: NSDictionary): MLNRasterTileSource; cdecl; overload;
+  end;
+  TMLNRasterTileSource = class(TOCGenericImport<MLNRasterTileSourceClass, MLNRasterTileSource>)  end;
+
   {**************************************}
   MLNMapCameraClass = interface(NSObjectClass)
     ['{A5EE03EF-C80C-4E7D-AF37-4DAE5D36CD63}']
@@ -443,13 +752,13 @@ type
     //procedure setScaleBarPosition(scaleBarPosition: MLNOrnamentPosition); cdecl;
     //function scaleBarMargins: CGPoint; cdecl;
     //procedure setScaleBarMargins(scaleBarMargins: CGPoint); cdecl;
-    //function showsCompassView: Boolean; cdecl;
-    //procedure setShowsCompassView(showsCompassView: Boolean); cdecl;
-    //function compassView: MLNCompassButton; cdecl;
-    //function compassViewPosition: MLNOrnamentPosition; cdecl;
-    //procedure setCompassViewPosition(compassViewPosition: MLNOrnamentPosition); cdecl;
-    //function compassViewMargins: CGPoint; cdecl;
-    //procedure setCompassViewMargins(compassViewMargins: CGPoint); cdecl;
+    function showsCompassView: Boolean; cdecl;
+    procedure setShowsCompassView(showsCompassView: Boolean); cdecl;
+    function compassView: MLNCompassButton; cdecl;
+    function compassViewPosition: MLNOrnamentPosition; cdecl;
+    procedure setCompassViewPosition(compassViewPosition: MLNOrnamentPosition); cdecl;
+    function compassViewMargins: CGPoint; cdecl;
+    procedure setCompassViewMargins(compassViewMargins: CGPoint); cdecl;
     //function showsLogoView: Boolean; cdecl;
     //procedure setShowsLogoView(showsLogoView: Boolean); cdecl;
     //function logoView: UIImageView; cdecl;

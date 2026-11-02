@@ -61,7 +61,6 @@ type
   TALFMXOverNativeContainer = class(TALNativeControl, IControlTypeSupportable, IALNativeControl)
   private
     FBitmap: FMX.Graphics.TBitmap;
-    FIsPaintingToBitmap: Boolean;
     {$IF defined(android)}
     function GetNativeView: TALAndroidFMXOverNativeView;
     {$ELSEIF defined(IOS)}
@@ -290,7 +289,6 @@ constructor TALFMXOverNativeContainer.Create(AOwner: TComponent);
 begin
   inherited;
   FBitmap := nil;
-  FIsPaintingToBitmap := False;
 end;
 
 {****************************************}

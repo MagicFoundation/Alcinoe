@@ -7,8 +7,8 @@ interface
 uses
   System.Types,
   system.SyncObjs,
-  Alcinoe.GuardianThread,
-  Alcinoe.FMX.Graphics;
+  Alcinoe.FMX.Graphics,
+  Alcinoe.Common;
 
 type
   TALBufDrawableCacheEngine = class(TALRefCountObject)

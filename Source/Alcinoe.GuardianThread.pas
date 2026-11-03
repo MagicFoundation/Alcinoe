@@ -15,18 +15,6 @@ uses
 type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALRefCountObject = Class(TObject)
-  private
-    FRefCount: Integer;
-  public
-    constructor Create; virtual;
-    destructor Destroy; override;
-    function GetRefCount: Integer;
-    function IncreaseRefCount: TALRefCountObject; virtual;
-    procedure DecreaseRefCount;
-  End;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALGuardianThread = class(TThread)
   private
     class function CreateInstance: TALGuardianThread;
@@ -40,8 +28,6 @@ type
     class property Instance: TALGuardianThread read GetInstance;
     class function HasInstance: Boolean; inline;
   private
-    FRefCountObjectsList: TObjectList<TALRefCountObject>;
-    //-
     FFreeObjectsLock: TObject;
     FFreeObjectsCurrList: TObjectList<Tobject>;
     fFreeObjectsEmptyList: TObjectList<Tobject>;
@@ -71,12 +57,9 @@ type
     procedure FreeBitmaps;
     procedure FreeBitmap(var aBitmap: TALBitmap);
     {$ENDIF}
-    //-
-    procedure PurgeRefCountObjectsList;
   protected
     procedure Execute; override;
     procedure DoExecute; virtual;
-    procedure AddRefCountObject(const ARefCountObject: TALRefCountObject);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -118,47 +101,9 @@ uses
   Alcinoe.Common;
 
 {***********************************}
-constructor TALRefCountObject.Create;
-begin
-  inherited;
-  FRefCount := 1;
-  TALGuardianThread.Instance.AddRefCountObject(Self);
-end;
-
-{***********************************}
-destructor TALRefCountObject.Destroy;
-begin
-  If FRefCount > 0 then
-    ALLog('TALRefCountObject.Destroy', 'Reference count is greater than zero', TALLogType.WARN);
-  inherited;
-end;
-
-{**********************************************}
-function TALRefCountObject.GetRefCount: Integer;
-begin
-  Result := AtomicCmpExchange(FRefCount, -1{NewValue}, -1{Comparand});
-end;
-
-{*************************************************************}
-function TALRefCountObject.IncreaseRefCount: TALRefCountObject;
-begin
-  // When calling IncreaseRefCount, it means that we already have
-  // a valid, strong reference to the object.
-  AtomicIncrement(FRefCount);
-  Result := Self;
-end;
-
-{*******************************************}
-procedure TALRefCountObject.DecreaseRefCount;
-begin
-  AtomicDecrement(FRefCount);
-end;
-
-{***********************************}
 constructor TALGuardianThread.Create;
 begin
   inherited Create(true{CreateSuspended});
-  FRefCountObjectsList := TObjectList<TALRefCountObject>.create(false{aOwnObject});
   //-
   FFreeObjectsLock := TObject.Create;
   FFreeObjectsCurrList := TObjectList<Tobject>.create(false{aOwnObject});
@@ -191,8 +136,6 @@ begin
   FSignal.setevent;
   WaitFor;
   ALfreeandNil(FSignal);
-  FRefCountObjectsList.OwnsObjects := True;
-  ALfreeandnil(FRefCountObjectsList);
   //-
   ALFreeAndNil(FFreeObjectsLock);
   FFreeObjectsCurrList.OwnsObjects := True;
@@ -285,10 +228,6 @@ begin
     end;
     FForceExecute := False;
     FSignal.ResetEvent;
-    if Terminated then Break;
-
-    // Free unreferenced refcount objects
-    PurgeRefCountObjectsList;
     if Terminated then Break;
 
     // Free the objects
@@ -586,32 +525,6 @@ begin
   end;
 end;
 {$ENDIF}
-
-{***************************************************}
-procedure TALGuardianThread.PurgeRefCountObjectsList;
-begin
-  ALMonitorEnter(FRefCountObjectsList{$IF defined(DEBUG)}, 'TALGuardianThread.PurgeRefCountObjectsList'{$ENDIF});
-  try
-    For var I := FRefCountObjectsList.Count - 1 downto 0 do
-      if FRefCountObjectsList[I].GetRefCount <= 0 then begin
-        var LRefCountObject: TObject := FRefCountObjectsList.ExtractAt(I);
-        FreeObject(LRefCountObject);
-      end;
-  finally
-    ALMonitorExit(FRefCountObjectsList{$IF defined(DEBUG)}, 'TALGuardianThread.PurgeRefCountObjectsList'{$ENDIF});
-  end;
-end;
-
-{**************************************************************************************}
-procedure TALGuardianThread.AddRefCountObject(const ARefCountObject: TALRefCountObject);
-begin
-  ALMonitorEnter(FRefCountObjectsList{$IF defined(DEBUG)}, 'TALGuardianThread.AddRefCountObject'{$ENDIF});
-  try
-    fRefCountObjectsList.Add(ARefCountObject);
-  finally
-    ALMonitorExit(FRefCountObjectsList{$IF defined(DEBUG)}, 'TALGuardianThread.AddRefCountObject'{$ENDIF});
-  end;
-end;
 
 {*****************************************************************}
 procedure TALGuardianThread.SetForceExecute(const AValue: Boolean);

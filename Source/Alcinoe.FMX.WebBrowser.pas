@@ -40,9 +40,9 @@ uses
   Winapi.WebView2,
   FMX.Controls.Win,
   Alcinoe.FMX.NativeView.Win,
-  Alcinoe.GuardianThread,
   {$ENDIF}
   Fmx.controls,
+  Alcinoe.common,
   Alcinoe.FMX.NativeControl;
 
 Type
@@ -420,24 +420,6 @@ Type
       // -------------------
       // TControllerCallback
       TControllerCallback = reference to procedure(AResult: HRESULT; const AController: ICoreWebView2Controller);
-      // ----------------------------------------------
-      // TCreateCoreWebView2EnvironmentCompletedHandler
-      TCreateCoreWebView2EnvironmentCompletedHandler = class(TInterfacedObject, ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler)
-      private
-        FProc: TEnvironmentCallback;
-      public
-        constructor Create(const AProc: TEnvironmentCallback);
-        function Invoke(errorCode: HResult; const createdEnvironment: ICoreWebView2Environment): HResult; stdcall;
-      end;
-      // ---------------------------------------------
-      // TCreateCoreWebView2ControllerCompletedHandler
-      TCreateCoreWebView2ControllerCompletedHandler = class(TInterfacedObject, ICoreWebView2CreateCoreWebView2ControllerCompletedHandler)
-      private
-        FProc: TControllerCallback;
-      public
-        constructor Create(const AProc: TControllerCallback);
-        function Invoke(errorCode: HResult; const createdController: ICoreWebView2Controller): HResult; stdcall;
-      end;
       // -------------------------------
       // TNavigationStartingEventHandler
       TNavigationStartingEventHandler = class(TInterfacedObject, ICoreWebView2NavigationStartingEventHandler)
@@ -504,7 +486,6 @@ implementation
 
 uses
   System.SysUtils,
-  FMX.types,
   {$IF defined(android)}
   Androidapi.Helpers,
   Androidapi.JNI.App,
@@ -533,7 +514,7 @@ uses
   {$IFDEF ALDPK}
   DesignIntf,
   {$ENDIF}
-  Alcinoe.Common;
+  FMX.types;
 
 {***************************************************}
 constructor TALBaseWebBrowser.Create(AOwner: TComponent);
@@ -1528,34 +1509,6 @@ end;
 {$REGION ' MSWINDOWS'}
 {$IF defined(MSWINDOWS)}
 
-{************************************************************************************************************************}
-constructor TALWinWebBrowserView.TCreateCoreWebView2EnvironmentCompletedHandler.Create(const AProc: TEnvironmentCallback);
-begin
-  inherited Create;
-  FProc := AProc;
-end;
-
-{****************************************************************************************************************************************************************************}
-function TALWinWebBrowserView.TCreateCoreWebView2EnvironmentCompletedHandler.Invoke(errorCode: HResult; const createdEnvironment: ICoreWebView2Environment): HResult; stdcall;
-begin
-  FProc(errorCode, createdEnvironment);
-  Result := S_OK;
-end;
-
-{**********************************************************************************************************************}
-constructor TALWinWebBrowserView.TCreateCoreWebView2ControllerCompletedHandler.Create(const AProc: TControllerCallback);
-begin
-  inherited Create;
-  FProc := AProc;
-end;
-
-{****************************************************************************************************************************************************************}
-function TALWinWebBrowserView.TCreateCoreWebView2ControllerCompletedHandler.Invoke(errorCode: HResult; const createdController: ICoreWebView2Controller): HResult;
-begin
-  FProc(errorCode, createdController);
-  Result := S_OK;
-end;
-
 {*******************************************************************************************************************}
 constructor TALWinWebBrowserView.TNavigationStartingEventHandler.Create(const AWebBrowserView: TALWinWebBrowserView);
 begin
@@ -1587,10 +1540,9 @@ end;
 
 {*******************************************************************************************************************************************************************}
 function TALWinWebBrowserView.TWebResourceRequestedEventHandler.Invoke(const sender: ICoreWebView2; const args: ICoreWebView2WebResourceRequestedEventArgs): HResult;
-var
-  Request: ICoreWebView2WebResourceRequest;
-  Headers: ICoreWebView2HttpRequestHeaders;
 begin
+  var Request: ICoreWebView2WebResourceRequest;
+  var Headers: ICoreWebView2HttpRequestHeaders;
   if (FWebBrowserView.FReferrer <> '') and
      Succeeded(args.Get_Request(Request)) and
      Succeeded(Request.Get_Headers(Headers)) then
@@ -1612,9 +1564,12 @@ end;
 function TALWinWebBrowserView.TWebMessageReceivedEventHandler.Invoke(const sender: ICoreWebView2; const args: ICoreWebView2WebMessageReceivedEventArgs): HRESULT;
 begin
   var LMessage: PWideChar := nil;
-  if Succeeded(args.Get_webMessageAsJson(LMessage)) and (LMessage <> nil) then
-    FWebBrowserView.DoWebMessage(string(LMessage));
-  CoTaskMemFree(LMessage);
+  try
+    if Succeeded(args.Get_webMessageAsJson(LMessage)) and (LMessage <> nil) then
+      FWebBrowserView.DoWebMessage(string(LMessage));
+  finally
+    CoTaskMemFree(LMessage);
+  end;
   Result := S_OK;
 end;
 
@@ -1629,51 +1584,59 @@ begin
 
   FWebView2Lifetime := TALRefCountObject.Create;
   var LWebView2Lifetime := FWebView2Lifetime.IncreaseRefCount;
-
-  var LEnvCompletedHandler := TCreateCoreWebView2EnvironmentCompletedHandler.Create(
-                                procedure(Result: HRESULT; const Env: ICoreWebView2Environment)
-                                begin
-                                  if LWebView2Lifetime.GetRefCount > 1 then begin
-                                    Try
-                                      ALCheckWinApiHResult(
-                                        Env.CreateCoreWebView2Controller(
-                                          Handle,
-                                          TCreateCoreWebView2ControllerCompletedHandler.Create(
-                                            procedure(Result: HRESULT; const Controller: ICoreWebView2Controller)
-                                            begin
-                                              if LWebView2Lifetime.GetRefCount > 1 then begin
-                                                Try
-                                                  FWebView2Controller := Controller;
-                                                  ALCheckWinApiHResult(Controller.get_CoreWebView2(FWebView2));
-                                                  ALCheckWinApiHResult(Controller.Set_IsVisible(1));
-                                                  var Bounds: tagRECT;
-                                                  Bounds.Left := round(Control.GetNativeViewPosition.X);
-                                                  Bounds.Top := round(Control.GetNativeViewPosition.Y);
-                                                  Bounds.Right := round(Control.GetNativeViewWidth);
-                                                  Bounds.Bottom := round(Control.GetNativeViewHeight);
-                                                  ALCheckWinApiHResult(Controller.Set_Bounds(Bounds));
-                                                  ALCheckWinApiHResult(FWebView2.add_NavigationStarting(TNavigationStartingEventHandler.Create(Self), FNavigationStartingToken));
-                                                  ALCheckWinApiHResult(FWebView2.AddWebResourceRequestedFilter('*', COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL));
-                                                  ALCheckWinApiHResult(FWebView2.add_WebResourceRequested(TWebResourceRequestedEventHandler.Create(Self), FWebResourceRequestedToken));
-                                                  ALCheckWinApiHResult(FWebView2.add_WebMessageReceived(TWebMessageReceivedEventHandler.Create(Self), FWebMessageReceivedToken));
-                                                  if FPendingUrl <> '' then ALCheckWinApiHResult(FWebView2.Navigate(PWideChar(FPendingUrl)))
-                                                  else if FPendingHtml <> '' then ALCheckWinApiHResult(FWebView2.NavigateToString(PWideChar(FPendingHtml)));
-                                                Except
-                                                  LWebView2Lifetime.DecreaseRefCount;
-                                                  Raise;
-                                                End;
-                                              end;
-                                              LWebView2Lifetime.DecreaseRefCount;
-                                            end)));
-                                    except
-                                      LWebView2Lifetime.DecreaseRefCount;
-                                      Raise;
-                                    end;
-                                  end
-                                  else LWebView2Lifetime.DecreaseRefCount;
-                                end);
-
-  ALCheckWinApiHResult(CreateCoreWebView2EnvironmentWithOptions(nil, nil, nil, LEnvCompletedHandler));
+  Try
+    ALCheckWinApiHResult(
+      CreateCoreWebView2EnvironmentWithOptions(
+        nil, // BrowserExecutableFolder: LPCWSTR;
+        nil, // UserDataFolder: LPCWSTR;
+        nil, // const EnvironmentOptions: ICoreWebView2EnvironmentOptions;
+        Callback<HResult, ICoreWebView2Environment>.CreateAs<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
+          function (errorCode: HResult; const createdEnvironment: ICoreWebView2Environment): HResult stdcall
+          begin
+            Result := S_OK;
+            if LWebView2Lifetime.GetRefCount > 1 then begin
+              Try
+                ALCheckWinApiHResult(errorCode);
+                ALCheckWinApiHResult(
+                  createdEnvironment.CreateCoreWebView2Controller(
+                    Handle, // ParentWindow: HWND;
+                    Callback<HResult, ICoreWebView2Controller>.CreateAs<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
+                      function (errorCode: HRESULT; const createdController: ICoreWebView2Controller): HResult stdcall
+                      begin
+                        Result := S_OK;
+                        if LWebView2Lifetime.GetRefCount > 1 then begin
+                          LWebView2Lifetime.DecreaseRefCount;
+                          ALCheckWinApiHResult(errorCode);
+                          FWebView2Controller := createdController;
+                          ALCheckWinApiHResult(createdController.get_CoreWebView2(FWebView2));
+                          ALCheckWinApiHResult(createdController.Set_IsVisible(1));
+                          var Bounds: tagRECT;
+                          Bounds.Left := round(Control.GetNativeViewPosition.X);
+                          Bounds.Top := round(Control.GetNativeViewPosition.Y);
+                          Bounds.Right := Bounds.Left + round(Control.GetNativeViewWidth);
+                          Bounds.Bottom := Bounds.Top + round(Control.GetNativeViewHeight);
+                          ALCheckWinApiHResult(createdController.Set_Bounds(Bounds));
+                          ALCheckWinApiHResult(FWebView2.add_NavigationStarting(TNavigationStartingEventHandler.Create(Self), FNavigationStartingToken));
+                          ALCheckWinApiHResult(FWebView2.AddWebResourceRequestedFilter('*', COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL));
+                          ALCheckWinApiHResult(FWebView2.add_WebResourceRequested(TWebResourceRequestedEventHandler.Create(Self), FWebResourceRequestedToken));
+                          ALCheckWinApiHResult(FWebView2.add_WebMessageReceived(TWebMessageReceivedEventHandler.Create(Self), FWebMessageReceivedToken));
+                          if FPendingUrl <> '' then ALCheckWinApiHResult(FWebView2.Navigate(PWideChar(FPendingUrl)))
+                          else if FPendingHtml <> '' then ALCheckWinApiHResult(FWebView2.NavigateToString(PWideChar(FPendingHtml)));
+                        end
+                        else LWebView2Lifetime.DecreaseRefCount;
+                      end)));
+              except
+                if LWebView2Lifetime.GetRefCount > 1 then
+                  LWebView2Lifetime.DecreaseRefCount;
+                Raise;
+              end;
+            end;
+          end))); // const Environment_created_handler: ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler
+  Except
+    if LWebView2Lifetime.GetRefCount > 1 then
+      LWebView2Lifetime.DecreaseRefCount;
+    raise;
+  end;
 end;
 
 {*********************************************************************}
@@ -1729,7 +1692,7 @@ procedure TALWinWebBrowserView.LoadData(
             const AHistoryUrl: String = '');
 begin
   FReferrer := ABaseUrl;
-  if IsWebView2Ready then FWebView2.NavigateToString(PWideChar(AData))
+  if IsWebView2Ready then ALCheckWinApiHResult(FWebView2.NavigateToString(PWideChar(AData)))
   else FPendingHtml := AData;
 end;
 
@@ -1737,7 +1700,7 @@ end;
 procedure TALWinWebBrowserView.LoadUrl(const AURL: string);
 begin
   FReferrer := '';
-  if IsWebView2Ready then FWebView2.Navigate(PWideChar(AURL))
+  if IsWebView2Ready then ALCheckWinApiHResult(FWebView2.Navigate(PWideChar(AURL)))
   else FPendingUrl := AURL;
 end;
 
@@ -1745,22 +1708,24 @@ end;
 procedure TALWinWebBrowserView.EvaluateJavaScript(const ACode: string);
 begin
   if IsWebView2Ready then
-    FWebView2.ExecuteScript(PWideChar(ACode), nil);
+    ALCheckWinApiHResult(FWebView2.ExecuteScript(PWideChar(ACode), nil));
 end;
 
 {*********************************************************}
 procedure TALWinWebBrowserView.EvaluateJavaScript(const ACode: string; const AValueCallback: TALBaseWebBrowser.TJavaScriptResultCallback);
 begin
   if IsWebView2Ready then
-    FWebView2.ExecuteScript(
-      PWideChar(ACode),
-      Callback<HResult, PWideChar>.CreateAs<ICoreWebView2ExecuteScriptCompletedHandler>(
-        function(ErrorCode: HResult; ResultObjectAsJson: PWideChar): HResult stdcall
-        begin
-          Result := S_OK;
-          if Assigned(AValueCallback) then
-            AValueCallback(string(ResultObjectAsJson));
-        end));
+    ALCheckWinApiHResult(
+      FWebView2.ExecuteScript(
+        PWideChar(ACode),
+        Callback<HResult, PWideChar>.CreateAs<ICoreWebView2ExecuteScriptCompletedHandler>(
+          function(ErrorCode: HResult; ResultObjectAsJson: PWideChar): HResult stdcall
+          begin
+            Result := S_OK;
+            ALCheckWinApiHResult(errorCode);
+            if Assigned(AValueCallback) then
+              AValueCallback(string(ResultObjectAsJson));
+          end)));
 end;
 
 {$endif}

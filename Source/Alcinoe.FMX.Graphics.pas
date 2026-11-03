@@ -39,7 +39,6 @@ uses
   FMX.types,
   fmx.types3D,
   FMX.graphics,
-  Alcinoe.GuardianThread,
   Alcinoe.FMX.Common,
   Alcinoe.Common;
 

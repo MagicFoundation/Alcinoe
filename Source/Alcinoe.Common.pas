@@ -878,7 +878,20 @@ procedure ALLog(Const Tag: AnsiString; const Args: array of const; const &Type: 
 procedure ALLog(Const Tag: AnsiString; const Args: array of const; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR); overload;
 function ALGetLogHistory(const AIgnoreLastLogItemMsg: Boolean = False): String;
 
-{~~}
+type
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALRefCountObject = Class(TObject)
+  private
+    FRefCount: Integer;
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    function GetRefCount: Integer;
+    function IncreaseRefCount: TALRefCountObject; virtual;
+    procedure DecreaseRefCount;
+  End;
+
 type
   TALCustomDelayedFreeObjectProc = procedure(var aObject: Tobject) of object;
 
@@ -4480,6 +4493,47 @@ begin
   ALSetConsoleColors(LForegroundColor, LBackgroundColor);
 end;
 {$ENDIF}
+
+{***********************************}
+constructor TALRefCountObject.Create;
+begin
+  inherited;
+  FRefCount := 1;
+end;
+
+{***********************************}
+destructor TALRefCountObject.Destroy;
+begin
+  {$IF defined(debug)}
+  If FRefCount > 0 then
+    ALLog('TALRefCountObject.Destroy', 'Reference count is greater than zero', TALLogType.WARN);
+  {$ENDIF}
+  inherited;
+end;
+
+{**********************************************}
+function TALRefCountObject.GetRefCount: Integer;
+begin
+  Result := AtomicCmpExchange(FRefCount, -1{NewValue}, -1{Comparand});
+end;
+
+{*************************************************************}
+function TALRefCountObject.IncreaseRefCount: TALRefCountObject;
+begin
+  // When calling IncreaseRefCount, it means that we already have
+  // a valid, strong reference to the object.
+  AtomicIncrement(FRefCount);
+  Result := Self;
+end;
+
+{*******************************************}
+procedure TALRefCountObject.DecreaseRefCount;
+begin
+  if AtomicDecrement(FRefCount) = 0 then begin
+    var LSelf := Self;
+    ALFreeAndNil(LSelf, True{ADelayed});
+  end;
+end;
 
 {***********************************}
 {$IF CompilerVersion >= 34} // sydney

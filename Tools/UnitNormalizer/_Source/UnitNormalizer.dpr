@@ -147,6 +147,7 @@ begin
         var LInCurlyBracketComment: boolean := False; {}
         var LInRoundBracketComment: boolean := False; (* *)
         var LInSimpleQuote: boolean := False; // '
+        var LInMultilineString: Boolean := False; // '''
         var LInRoundBracket: integer := 0;
         var LRoundBracketStartAt: integer := 0;
         Var LSourceStrIdx: integer := 0;
@@ -159,6 +160,24 @@ begin
           var LCurrChar := LSourceStr[LSourceStrIdx];
           var LNextChar: ansiChar := #0;
           if (LSourceStrIdx < high(LSourceStr)) then LNextChar := LSourceStr[LSourceStrIdx+1];
+
+          //Delphi multiline strings (''')
+          if (LCurrChar = '''') and
+             (LNextChar = '''') and
+             (LSourceStrIdx + 2 <= High(LSourceStr)) and
+             (LSourceStr[LSourceStrIdx + 2] = '''') and
+             ((LSourceStrIdx + 3 > High(LSourceStr)) or
+              (LSourceStr[LSourceStrIdx + 3] <> '''')) and
+             (not LInDoubleSlashComment) and
+             (not LInCurlyBracketComment) and
+             (not LInRoundBracketComment) and
+             (not LInSimpleQuote) then begin
+            LInMultilineString := not LInMultilineString;
+            Inc(LSourceStrIdx, 2);
+            continue;
+          end;
+
+          if LInMultilineString then continue;
 
           //#13,#10
           if LCurrChar in [#13,#10] then begin

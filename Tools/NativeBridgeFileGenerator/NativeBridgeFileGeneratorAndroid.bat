@@ -1,18 +1,6 @@
 @echo off
 SETLOCAL
 
-for /f "tokens=3" %%a in ('java -version 2^>^&1') do (
-    set "java_version=%%a"
-    goto compare_version
-)
-
-:compare_version
-echo Detected Java version: %java_version%
-if not "%java_version:~1,3%"=="1.8" (
-    echo Java2OP requires Java 1.8, please set your %%JAVA_HOME%% to
-    echo your Java 1.8 bin directory and the same for your %%PATH%%
-    echo.
-)
 
 REM ----------------
 REM Init Environment
@@ -69,7 +57,7 @@ REM -----------------------------------
 REM call java2op via AndroidMerger Tool
 REM -----------------------------------
 
-call "..\AndroidMerger\AndroidMerger.exe" -LocalMavenRepositoryDir="%ALBaseDir%\Libraries\jar\" -Libraries="%Library%" -DownloadDependencies=1 -OutputDir="%TMPDir%" -GenerateNativeBridgeFile=1 -NoInteraction=1
+call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe" -LocalMavenRepositoryDir="%ALBaseDir%\Libraries\jar\" -Libraries="%Library%" -DownloadDependencies=1 -OutputDir="%TMPDir%" -GenerateNativeBridgeFile=1 -NoInteraction=1
 IF ERRORLEVEL 1 goto ERROR
 
 xcopy "%TMPDir%\JavaInterfaces*.pas" "%OutputDir%\" /V

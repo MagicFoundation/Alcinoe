@@ -203,7 +203,7 @@ type
     ['{78236BEB-FA19-4CD8-A5D4-6D31D8D6CA93}']
   end;
   PHVideoRequestOptions = interface(NSObject)
-    //['{D07B6FA6-5AC3-4886-903D-A511FBB6EBCC}']
+    ['{D07B6FA6-5AC3-4886-903D-A511FBB6EBCC}']
     procedure setNetworkAccessAllowed(networkAccessAllowed: Boolean); cdecl;
     function isNetworkAccessAllowed: Boolean; cdecl;
     //procedure setVersion(version: PHVideoRequestOptionsVersion); cdecl;

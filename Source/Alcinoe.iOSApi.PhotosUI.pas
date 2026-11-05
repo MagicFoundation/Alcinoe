@@ -93,7 +93,7 @@ type
     ['{FAA694A3-AFCC-4C71-AA83-F26E45A36720}']
   end;
   PHPickerViewController = interface(UIViewController)
-    //['{141707F3-217C-4A54-8749-BFD071C83032}']
+    ['{141707F3-217C-4A54-8749-BFD071C83032}']
     function configuration: PHPickerConfiguration; cdecl;
     procedure setDelegate(delegate: PHPickerViewControllerDelegate); cdecl;
     function delegate: PHPickerViewControllerDelegate; cdecl;

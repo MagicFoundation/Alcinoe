@@ -508,6 +508,16 @@ begin
           LSrcChildNode.Attributes['android:name']); // const aKeyAttributeValue: AnsiString;
       end
 
+      //<uses-feature android:name="string" ... />
+      //https://developer.android.com/guide/topics/manifest/uses-feature-element
+      else if ALSameTextA(ASrcNode.NodeName, 'manifest') and
+              ALSameTextA(LSrcChildNode.NodeName, 'uses-feature') then begin
+        _SwapNodeToDest(
+          LSrcChildNode, // const ANode: TALXmlNode;
+          'android:name', // const aKeyAttributeName: AnsiString;
+          LSrcChildNode.Attributes['android:name']); // const aKeyAttributeValue: AnsiString;
+      end
+
       //<queries ... >
       //https://developer.android.com/guide/topics/manifest/queries-element
       else if ALSameTextA(ASrcNode.NodeName, 'manifest') and
@@ -1279,6 +1289,11 @@ Procedure ExpandPOM(const aPomXmlDoc: TalXmlDocument; const ALocalRepositoryBase
 
 begin
 
+  // Packaging is not inherited. Missing packaging defaults to jar even when
+  // the parent declares pom (for example, gson-parent).
+  if aPomXmlDoc.DocumentElement.ChildNodes.FindNode('packaging') = nil then
+    aPomXmlDoc.DocumentElement.AddChild('packaging').Text := 'jar';
+
   //if no parent node then nothing to do
   Var LParentNode := aPomXmlDoc.DocumentElement.ChildNodes.FindNode('parent');
   if LParentNode = nil then exit;
@@ -1317,7 +1332,6 @@ begin
     _SwapTextNode(LParentPomXmlDoc, aPomXmlDoc, 'groupId');
     _SwapTextNode(LParentPomXmlDoc, aPomXmlDoc, 'artifactId');
     _SwapTextNode(LParentPomXmlDoc, aPomXmlDoc, 'version');
-    _SwapTextNode(LParentPomXmlDoc, aPomXmlDoc, 'packaging');
     _SwapPropertiesNodes(LParentPomXmlDoc, aPomXmlDoc);
     _SwapDependenciesNode(LParentPomXmlDoc, aPomXmlDoc, ['dependencyManagement', 'dependencies']);
     _SwapDependenciesNode(LParentPomXmlDoc, aPomXmlDoc, ['dependencies']);
@@ -2281,16 +2295,22 @@ begin
           LInputStream := TMemorystream.Create;
           LOutputStream := TStringStream.Create;
           try
-            var LTmpcmdLine := LdelphiRootDir + '\bin\converters\java2op\Java2OP.exe -jar "'+LJarFile+'" -unit "'+LOutputDir+'\JavaInterfaces_'+ALExtractFileName(LJarFile, true{RemoveFileExt})+'_'+ALIntToStrW(ALDateTimeToUnixMs(Now))+'"';
+            var LJavaInterfacesFilename := 'JavaInterfaces_'+ALStringReplaceW(ALStringReplaceW(ALExtractFileName(LJarFile, true{RemoveFileExt}),'.','_', [rfReplaceALL]),'-','_', [rfReplaceALL])+'_'+ALIntToStrW(ALDateTimeToUnixMs(Now));
+            var LTmpcmdLine := LdelphiRootDir + '\bin\converters\java2op\Java2OP.exe -jar "'+LJarFile+'" -unit "'+LJavaInterfacesFilename+'"';
             OverWrite(LTmpCmdLine);
-            Var LTmpCmdLineResult := ALWinExecW(
-                                       LTmpcmdLine, // const aCommandLine: String;
-                                       LInputStream, // const aInputStream: Tstream;
-                                       LOutputStream); //const aOutputStream: TStream;
-            if LTmpCmdLineResult <> 0 then
-              Writeln('Skip ' + ALExtractFileName(LJarFile) + ' (not compatible with Java2OP)', TALConsoleColor.ccAqua)
-            else
-              LcmdLine := LcmdLine+' "'+LJarFile+'"';
+            try
+              Var LTmpCmdLineResult := ALWinExecW(
+                                         LTmpcmdLine, // const aCommandLine: String;
+                                         LInputStream, // const aInputStream: Tstream;
+                                         LOutputStream); //const aOutputStream: TStream;
+             if LTmpCmdLineResult <> 0 then
+                Writeln('Skip ' + ALExtractFileName(LJarFile) + ' (not compatible with Java2OP)', TALConsoleColor.ccAqua)
+              else
+                LcmdLine := LcmdLine+' "'+LJarFile+'"';
+            finally
+              If TFile.Exists(GetCurrentDir + '\' + LJavaInterfacesFilename + '.pas') then
+                TFile.Move(GetCurrentDir + '\' + LJavaInterfacesFilename + '.pas', LOutputDir+'\'+LJavaInterfacesFilename + '.pas');
+            end;
           finally
             ALFreeandNil(LInputStream);
             ALFreeandNil(LOutputStream);

@@ -158,7 +158,7 @@ type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.annotation" "annotation" "1.3.0"
 SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\webkit\*.java
-Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-webkit" "1.0.0"
+Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-webkit" "1.0.1"
 if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 

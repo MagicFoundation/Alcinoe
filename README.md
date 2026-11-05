@@ -594,6 +594,24 @@ Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/t
 <br/>
 <br/>
 
+TALMapLibre for FireMonkey
+--------------------------
+
+`TALMapLibre` embeds an interactive map in a Delphi FireMonkey form. It uses
+MapLibre Native on Android and iOS and MapLibre GL JS in WebView2 on Windows.
+
+<p>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/maplibre.png?raw=true" alt="MapLibre" width="600" style="width:600px;"/>
+</p>
+
+MapLibre is an open-source mapping library for displaying interactive, 
+customizable maps. It supports vector and raster tiles, custom map styles, 
+markers, GeoJSON layers, and 3D visualizations.
+
+Open the [ALFmxMapLibre demo project](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxMapLibre)
+for examples of switching styles, drawing routes, and using custom marker images.
+<br/>
+<br/>
 
 TALMediaPicker — Unified Media Picker
 =====================================

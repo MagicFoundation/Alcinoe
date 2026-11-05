@@ -53,6 +53,7 @@ Dcu
 /Libraries/bpl
 /Libraries/ios/Firebase
 /Libraries/ios/Facebook
+/Libraries/ios/MapLibre
 /Libraries/jar/*
 !/Libraries/jar/org
 /Libraries/jar/org/*

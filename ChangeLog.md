@@ -1,3 +1,19 @@
+## 05/11/2026
+
+- Added the **MapLibre** control (`TALMapLibre`) and the `ALFmxMapLibre` demo
+  for Android, iOS, and Windows.
+- Added `TALFMXOverNativeContainer` to render FMX controls above native views.
+- Extended `TALWebBrowser` with JavaScript evaluation and result callbacks,
+  page-to-Delphi messages through `OnWebMessage`, and navigation filtering
+  through `OnShouldStartLoadUrl`. Added the `ALFmxWebBrowser` demo.
+- Added early cancellation to ANSI and Unicode JSON and BSON SAX parsing.
+  Existing parse event handlers must add a trailing `var Abort: Boolean`
+  parameter. Set it to `True` to stop parsing.
+- Moved `TALRefCountObject` to `Alcinoe.Common`.
+- Updated the iOS library downloader to install Facebook, Firebase, and
+  MapLibre under separate static and dynamic directories where available.
+- Updated AndroidMerger.
+
 ## 23/10/2026
 
 - Fully redesigned the Alcinoe Code Profiler with new history grouping modes 

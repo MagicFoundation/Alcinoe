@@ -1,0 +1,91 @@
+object MainForm: TMainForm
+  Left = 0
+  Top = 0
+  Caption = 'WebBrowser Demo'
+  ClientHeight = 819
+  ClientWidth = 360
+  Fill.Color = xFFFEF7FF
+  Fill.Kind = Solid
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnSafeAreaChanged = FormSafeAreaChanged
+  DesignerMasterStyle = 0
+  object HeaderLayout: TALLayout
+    Align = Top
+    Padding.Left = 8.000000000000000000
+    Padding.Top = 8.000000000000000000
+    Padding.Right = 8.000000000000000000
+    Padding.Bottom = 8.000000000000000000
+    Size.Width = 360.000000000000000000
+    Size.Height = 120.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object StatusText: TALText
+      Align = Client
+      Margins.Top = 8.000000000000000000
+      Size.Width = 344.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Loading page...'
+      TextSettings.Font.Size = 12.000000000000000000
+      TextSettings.Font.Color = xFF1D1B20
+      TextSettings.Font.ColorKey = 'Material3.Color.OnSurface'
+    end
+    object RunJSButton: TALButton
+      Align = Top
+      Fill.Color = xFF6750A4
+      Fill.ColorKey = 'Material3.Color.Primary'
+      Padding.Left = 27.430000305175780000
+      Padding.Top = 11.430000305175780000
+      Padding.Right = 27.430000305175780000
+      Padding.Bottom = 11.430000305175780000
+      Position.X = 8.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 344.000000000000000000
+      Size.Height = 46.000000000000000000
+      Size.PlatformDefault = False
+      StateStyles.Disabled.Fill.Color = x1F1D1B20
+      StateStyles.Disabled.Fill.ColorKey = 'Material3.Color.OnSurface.Alpha12'
+      StateStyles.Disabled.Fill.Inherit = False
+      StateStyles.Disabled.TextSettings.Inherit = False
+      StateStyles.Disabled.TextSettings.Font.Size = 16.000000000000000000
+      StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey = 'Material3.Color.OnSurface.Alpha38'
+      StateStyles.Disabled.Opacity = 1.000000000000000000
+      StateStyles.Hovered.Shadow.blur = 2.289999961853027000
+      StateStyles.Hovered.Shadow.OffsetY = 1.139999985694885000
+      StateStyles.Hovered.Shadow.Color = x80000000
+      StateStyles.Hovered.Shadow.ColorKey = 'Material3.Color.Shadow.Alpha50'
+      StateStyles.Hovered.Shadow.Inherit = False
+      StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
+      StateStyles.Hovered.StateLayer.UseContentColor = True
+      StateStyles.Pressed.StateLayer.Opacity = 0.119999997317791000
+      StateStyles.Pressed.StateLayer.UseContentColor = True
+      StateStyles.Focused.StateLayer.Opacity = 0.119999997317791000
+      StateStyles.Focused.StateLayer.UseContentColor = True
+      StateStyles.Transition.Duration = 0.200000002980232200
+      StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
+      Stroke.Color = claNull
+      Stroke.Thickness = 1.139999985694885000
+      Text = 'Evaluate JavaScript'
+      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.Font.Color = claWhite
+      TextSettings.Font.ColorKey = 'Material3.Color.OnPrimary'
+      TextSettings.LineHeightMultiplier = 1.500000000000000000
+      XRadius = -50.000000000000000000
+      YRadius = -50.000000000000000000
+      OnClick = RunJSButtonClick
+    end
+  end
+  object WebBrowser: TALWebBrowser
+    Align = Client
+    Size.Width = 360.000000000000000000
+    Size.Height = 699.000000000000000000
+    Size.PlatformDefault = False
+    OnShouldStartLoadUrl = WebBrowserShouldStartLoadUrl
+    OnWebMessage = WebBrowserWebMessage
+  end
+end

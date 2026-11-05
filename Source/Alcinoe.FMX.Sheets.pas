@@ -1522,7 +1522,7 @@ begin
            (TCorner.TopLeft not in Container.Corners) and
            (TCorner.bottomLeft not in Container.Corners) then begin
           var LRect := Container.BoundsRect;
-          LRect.Offset(0, -LRect.Width);
+          LRect.Offset(-LRect.Width, 0);
           LRect.Left := -65535;
           var LLocalRect := LocalRect;
           LLocalRect.Left := LLocalRect.Left - margins.Left;
@@ -1541,7 +1541,7 @@ begin
            (TCorner.TopRight not in Container.Corners) and
            (TCorner.bottomRight not in Container.Corners) then begin
           var LRect := Container.BoundsRect;
-          LRect.Offset(0, LRect.Width);
+          LRect.Offset(LRect.Width, 0);
           LRect.Right := 65535;
           var LLocalRect := LocalRect;
           LLocalRect.Right := LLocalRect.Right + margins.Right;

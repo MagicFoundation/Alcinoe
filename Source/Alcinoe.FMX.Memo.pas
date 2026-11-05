@@ -41,8 +41,116 @@ uses
 
 Type
 
-  {**************}
-  TALMemo = class;
+  {****************}
+  {$IF defined(ios)}
+  TALIosMemoView = class;
+  {$endif}
+  {$IF defined(ALMacOS)}
+  TALMacMemoView = class;
+  {$endif}
+  {$IF defined(MSWINDOWS)}
+  TALWinMemoView = class;
+  {$endif}
+
+  {*************************}
+  [ComponentPlatforms($FFFF)]
+  TALMemo = class(TALBaseEdit)
+  public
+    type
+      // -------------
+      // TTextSettings
+      TTextSettings = class(TALBaseEdit.TTextSettings)
+      protected
+        function GetDefaultVertAlign: TALTextVertAlign; override;
+      published
+        property LineHeightMultiplier;
+      end;
+      // -------------------
+      // TDisabledStateStyle
+      TDisabledStateStyle = class(TALBaseEdit.TDisabledStateStyle)
+      public
+        type
+          TTextSettings = class(TALBaseEdit.TDisabledStateStyle.TTextSettings)
+          protected
+            function GetDefaultVertAlign: TALTextVertAlign; override;
+          end;
+      protected
+        function CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings; override;
+      end;
+      // ------------------
+      // THoveredStateStyle
+      THoveredStateStyle = class(TALBaseEdit.THoveredStateStyle)
+      public
+        type
+          TTextSettings = class(TALBaseEdit.THoveredStateStyle.TTextSettings)
+          protected
+            function GetDefaultVertAlign: TALTextVertAlign; override;
+          end;
+      protected
+        function CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings; override;
+      end;
+      // ------------------
+      // TFocusedStateStyle
+      TFocusedStateStyle = class(TALBaseEdit.TFocusedStateStyle)
+      public
+        type
+          TTextSettings = class(TALBaseEdit.TFocusedStateStyle.TTextSettings)
+          protected
+            function GetDefaultVertAlign: TALTextVertAlign; override;
+          end;
+      protected
+        function CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings; override;
+      end;
+      // ------------
+      // TStateStyles
+      TStateStyles = class(TALBaseEdit.TStateStyles)
+      protected
+        function CreateDisabledStateStyle(const AParent: TObject): TALBaseEdit.TDisabledStateStyle; override;
+        function CreateHoveredStateStyle(const AParent: TObject): TALBaseEdit.THoveredStateStyle; override;
+        function CreateFocusedStateStyle(const AParent: TObject): TALBaseEdit.TFocusedStateStyle; override;
+      end;
+  private
+    FAutosizeLineCount: Integer;
+    function GetTextSettings: TTextSettings;
+    procedure SetTextSettings(const Value: TTextSettings);
+  protected
+    {$IF defined(android)}
+    Function CreateNativeView: TALAndroidNativeView; override;
+    {$ELSEIF defined(IOS)}
+    Function CreateNativeView: TALIosNativeView; override;
+    {$ELSEIF defined(ALMacOS)}
+    Function CreateNativeView: TALMacNativeView; override;
+    {$ELSEIF defined(MSWindows)}
+    Function CreateNativeView: TALWinNativeView; override;
+    {$ENDIF}
+    function GetDefaultSize: TSizeF; override;
+    function GetAutoSize: TALAutoSizeMode; override;
+    procedure SetAutosizeLineCount(const Value: Integer); virtual;
+    function CreateStateStyles: TALBaseEdit.TStateStyles; override;
+    function CreateTextSettings: TALBaseEdit.TTextSettings; override;
+    procedure AdjustSize; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure Assign(Source: TPersistent); override;
+    function HasUnconstrainedAutosizeWidth: Boolean; override;
+  published
+    property AutoSizeLineCount: Integer read FAutosizeLineCount write SetAutosizeLineCount Default 0;
+    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+  end;
+
+  {***************************}
+  TALDummyMemo = class(TALMemo)
+  protected
+    {$IF defined(android)}
+    Function CreateNativeView: TALAndroidNativeView; override;
+    {$ELSEIF defined(IOS)}
+    Function CreateNativeView: TALIosNativeView; override;
+    {$ELSEIF defined(ALMacOS)}
+    Function CreateNativeView: TALMacNativeView; override;
+    {$ELSEIF defined(MSWindows)}
+    Function CreateNativeView: TALWinNativeView; override;
+    {$ENDIF}
+  end;
 
 {$REGION ' IOS'}
 {$IF defined(ios)}
@@ -307,106 +415,6 @@ Type
 {$endif}
 {$ENDREGION}
 
-  {*************************}
-  [ComponentPlatforms($FFFF)]
-  TALMemo = class(TALBaseEdit)
-  public
-    type
-      // -------------
-      // TTextSettings
-      TTextSettings = class(TALBaseEdit.TTextSettings)
-      protected
-        function GetDefaultVertAlign: TALTextVertAlign; override;
-      published
-        property LineHeightMultiplier;
-      end;
-      // -------------------
-      // TDisabledStateStyle
-      TDisabledStateStyle = class(TALBaseEdit.TDisabledStateStyle)
-      public
-        type
-          TTextSettings = class(TALBaseEdit.TDisabledStateStyle.TTextSettings)
-          protected
-            function GetDefaultVertAlign: TALTextVertAlign; override;
-          end;
-      protected
-        function CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings; override;
-      end;
-      // ------------------
-      // THoveredStateStyle
-      THoveredStateStyle = class(TALBaseEdit.THoveredStateStyle)
-      public
-        type
-          TTextSettings = class(TALBaseEdit.THoveredStateStyle.TTextSettings)
-          protected
-            function GetDefaultVertAlign: TALTextVertAlign; override;
-          end;
-      protected
-        function CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings; override;
-      end;
-      // ------------------
-      // TFocusedStateStyle
-      TFocusedStateStyle = class(TALBaseEdit.TFocusedStateStyle)
-      public
-        type
-          TTextSettings = class(TALBaseEdit.TFocusedStateStyle.TTextSettings)
-          protected
-            function GetDefaultVertAlign: TALTextVertAlign; override;
-          end;
-      protected
-        function CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings; override;
-      end;
-      // ------------
-      // TStateStyles
-      TStateStyles = class(TALBaseEdit.TStateStyles)
-      protected
-        function CreateDisabledStateStyle(const AParent: TObject): TALBaseEdit.TDisabledStateStyle; override;
-        function CreateHoveredStateStyle(const AParent: TObject): TALBaseEdit.THoveredStateStyle; override;
-        function CreateFocusedStateStyle(const AParent: TObject): TALBaseEdit.TFocusedStateStyle; override;
-      end;
-  private
-    FAutosizeLineCount: Integer;
-    function GetTextSettings: TTextSettings;
-    procedure SetTextSettings(const Value: TTextSettings);
-  protected
-    {$IF defined(android)}
-    Function CreateNativeView: TALAndroidNativeView; override;
-    {$ELSEIF defined(IOS)}
-    Function CreateNativeView: TALIosNativeView; override;
-    {$ELSEIF defined(ALMacOS)}
-    Function CreateNativeView: TALMacNativeView; override;
-    {$ELSEIF defined(MSWindows)}
-    Function CreateNativeView: TALWinNativeView; override;
-    {$ENDIF}
-    function GetDefaultSize: TSizeF; override;
-    function GetAutoSize: TALAutoSizeMode; override;
-    procedure SetAutosizeLineCount(const Value: Integer); virtual;
-    function CreateStateStyles: TALBaseEdit.TStateStyles; override;
-    function CreateTextSettings: TALBaseEdit.TTextSettings; override;
-    procedure AdjustSize; override;
-  public
-    constructor Create(AOwner: TComponent); override;
-    procedure Assign(Source: TPersistent); override;
-    function HasUnconstrainedAutosizeWidth: Boolean; override;
-  published
-    property AutoSizeLineCount: Integer read FAutosizeLineCount write SetAutosizeLineCount Default 0;
-    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
-  end;
-
-  {***************************}
-  TALDummyMemo = class(TALMemo)
-  protected
-    {$IF defined(android)}
-    Function CreateNativeView: TALAndroidNativeView; override;
-    {$ELSEIF defined(IOS)}
-    Function CreateNativeView: TALIosNativeView; override;
-    {$ELSEIF defined(ALMacOS)}
-    Function CreateNativeView: TALMacNativeView; override;
-    {$ELSEIF defined(MSWindows)}
-    Function CreateNativeView: TALWinNativeView; override;
-    {$ENDIF}
-  end;
-
 procedure Register;
 
 implementation
@@ -439,6 +447,325 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.FMX.Graphics,
   Alcinoe.Common;
+
+{***************************************************************************************}
+function TALMemo.TDisabledStateStyle.TTextSettings.GetDefaultVertAlign: TALTextVertAlign;
+begin
+  Result := TALTextVertAlign.Leading;
+end;
+
+{*************************************************************************************************************************************}
+function TALMemo.TDisabledStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings;
+begin
+  Result := TTextSettings.Create(AParent);
+end;
+
+{**************************************************************************************}
+function TALMemo.THoveredStateStyle.TTextSettings.GetDefaultVertAlign: TALTextVertAlign;
+begin
+  Result := TALTextVertAlign.Leading;
+end;
+
+{************************************************************************************************************************************}
+function TALMemo.THoveredStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings;
+begin
+  Result := TTextSettings.Create(AParent);
+end;
+
+{**************************************************************************************}
+function TALMemo.TFocusedStateStyle.TTextSettings.GetDefaultVertAlign: TALTextVertAlign;
+begin
+  Result := TALTextVertAlign.Leading;
+end;
+
+{************************************************************************************************************************************}
+function TALMemo.TFocusedStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings;
+begin
+  Result := TTextSettings.Create(AParent);
+end;
+
+{**************************************************************************************************************}
+function TALMemo.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TALBaseEdit.TDisabledStateStyle;
+begin
+  result := TDisabledStateStyle.Create(AParent);
+end;
+
+{************************************************************************************************************}
+function TALMemo.TStateStyles.CreateHoveredStateStyle(const AParent: TObject): TALBaseEdit.THoveredStateStyle;
+begin
+  result := THoveredStateStyle.Create(AParent);
+end;
+
+{************************************************************************************************************}
+function TALMemo.TStateStyles.CreateFocusedStateStyle(const AParent: TObject): TALBaseEdit.TFocusedStateStyle;
+begin
+  Result := TFocusedStateStyle.Create(AParent);
+end;
+
+{*******************************************************************}
+function TALMemo.TTextSettings.GetDefaultVertAlign: TALTextVertAlign;
+begin
+  result := TALTextVertAlign.Leading;
+end;
+
+{*********************************************}
+constructor TALMemo.Create(AOwner: TComponent);
+begin
+  inherited;
+  FAutosizeLineCount := 0;
+end;
+
+{********************************************}
+procedure TALMemo.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALMemo then begin
+      AutosizeLineCount := TALMemo(Source).AutoSizeLineCount;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
+{********************}
+{$IF defined(android)}
+Function TALMemo.CreateNativeView: TALAndroidNativeView;
+begin
+  result := TALAndroidEditView.create(self, True{FIsMultiline}, DefStyleAttr, DefStyleRes);
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(IOS)}
+Function TALMemo.CreateNativeView: TALIosNativeView;
+begin
+
+  // [NOTE] This workaround is no longer necessary, as the delphi framework (e.g., the virtual
+  // keyboard service) already instantiates a UITextView internally during app startup,
+  // which ensures that the Objective-C class is properly loaded and registered by the Delphi runtime.
+  //
+  // Originally, we had to create a UITextView instance explicitly to force the Objective-C class
+  // (UITextView) to be registered. Without this, calling `TALIosWebView(inherited GetNativeView)`
+  // could raise the following error:
+  //   Unhandled Exception | Item not found
+  //   At address: $0000000100365670
+  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
+  //
+  // Attempting to register the class manually like this:
+  //   RegisterObjectiveCClass(TUITextView, TypeInfo(UITextView));
+  // also fails with:
+  //   Unhandled Exception | Method function someUITextViewMethod of class TUITextView not found
+  //   At address: $00000001XXXXXXX
+  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
+  //
+  // Attempting to register our own wrapper class:
+  //   RegisterObjectiveCClass(TALIosWebView, TypeInfo(IALIosWebView));
+  // fails as well, with:
+  //   Unhandled Exception | Objective-C class UITextView could not be found
+  //   At address: $00000001046CA014
+  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
+  //
+  // The only reliable workaround is to instantiate a UITextView explicitly to force
+  // the UIKit framework to be loaded and the class to be registered:
+  //
+  //if not IsUITextViewClassRegistered then begin
+  //  var LUITextView := TUITextView.Wrap(TUITextView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0)));
+  //  LUITextView.release;
+  //  IsUITextViewClassRegistered := True;
+  //end;
+
+  result := TALIosMemoView.create(self);
+
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ALMacOS)}
+Function TALMemo.CreateNativeView: TALMacNativeView;
+begin
+  result := TALMacMemoView.create(self);
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWindows)}
+Function TALMemo.CreateNativeView: TALWinNativeView;
+begin
+  {$IF defined(ALDPK)}
+  Result := nil;
+  {$ELSE}
+  Result := TALWinMemoView.create(self);
+  {$ENDIF}
+end;
+{$ENDIF}
+
+{***********************************************************}
+function TALMemo.CreateStateStyles: TALBaseEdit.TStateStyles;
+begin
+  Result := TStateStyles.Create(self);
+end;
+
+{*************************************************************}
+function TALMemo.CreateTextSettings: TALBaseEdit.TTextSettings;
+begin
+  result := TTextSettings.Create;
+end;
+
+{**********************************************}
+function TALMemo.GetTextSettings: TTextSettings;
+begin
+  result := TTextSettings(inherited TextSettings);
+end;
+
+{************************************************************}
+procedure TALMemo.SetTextSettings(const Value: TTextSettings);
+begin
+  inherited TextSettings := Value;
+end;
+
+{***************************}
+procedure TALMemo.AdjustSize;
+begin
+  if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
+     (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
+     (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
+    try
+
+      if isupdating then begin
+        FAdjustSizeOnEndUpdate := True;
+        Exit;
+      end
+      else
+        FAdjustSizeOnEndUpdate := False;
+
+      {$IF defined(debug)}
+      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeHeight));
+      {$ENDIF}
+
+      Var LInlinedLabelText := (LabelText <> '') and (LabelTextSettings.Layout = TLabelTextLayout.Inline);
+      if LInlinedLabelText then MakeBufLabelTextDrawable;
+
+      var LStrokeSize := TRectF.Empty;
+      if Stroke.HasStroke then begin
+        if (TSide.Top in Sides) then    LStrokeSize.Top :=    max(Stroke.Thickness - Padding.top,    0);
+        if (TSide.bottom in Sides) then LStrokeSize.bottom := max(Stroke.Thickness - Padding.bottom, 0);
+        if (TSide.right in Sides) then  LStrokeSize.right :=  max(Stroke.Thickness - Padding.right,  0);
+        if (TSide.left in Sides) then   LStrokeSize.left :=   max(Stroke.Thickness - Padding.left,   0);
+      end;
+
+      if HasUnconstrainedAutosizeHeight then begin
+
+        var LLineHeight: Single := GetLineHeight;
+        if AutoAlignToPixel then LLineHeight := ALAlignDimensionToPixelRound(LLineHeight, ALGetScreenScale, TEpsilon.Position);
+
+        var LAdjustement: Single;
+        {$IF defined(IOS)}
+        // On iOS, without this small adjustment, the edit control may slightly shift
+        // when text is entered.
+        LAdjustement := 1;
+        {$ELSE}
+        LAdjustement := 0;
+        {$ENDIF}
+        if AutoAlignToPixel then LAdjustement := ALAlignDimensionToPixelRound(LAdjustement, ALGetScreenScale, TEpsilon.Position);
+
+        If LInlinedLabelText then begin
+          SetFixedSizeBounds(
+            Position.X,
+            Position.Y,
+            Width,
+            (LLineHeight * AutoSizeLineCount) + LAdjustement + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom + BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom);
+        end
+        else begin
+          SetFixedSizeBounds(
+            Position.X,
+            Position.Y,
+            Width,
+            (LLineHeight * AutoSizeLineCount) + LAdjustement + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom);
+        end;
+
+      end;
+
+      var LMarginRect := TRectF.Empty;
+
+      if LInlinedLabelText then
+        LMarginRect.top := BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom;
+
+      LMarginRect.left :=   Max(LMarginRect.left   + LStrokeSize.left,   0);
+      LMarginRect.Top :=    Max(LMarginRect.Top    + LStrokeSize.Top,    0);
+      LMarginRect.Right :=  Max(LMarginRect.Right  + LStrokeSize.Right,  0);
+      LMarginRect.Bottom := Max(LMarginRect.Bottom + LStrokeSize.Bottom, 0);
+
+      NativeViewMargins.Rect := LMarginRect;
+
+    finally
+      TNonReentrantHelper.LeaveSection(FIsAdjustingSize)
+    end;
+  end;
+end;
+
+{******************************************************}
+function TALMemo.HasUnconstrainedAutosizeWidth: Boolean;
+begin
+  result := False;
+end;
+
+{**************************************}
+function TALMemo.GetDefaultSize: TSizeF;
+begin
+  Result := TSizeF.Create(200, 75);
+end;
+
+{********************************************}
+function TALMemo.GetAutoSize: TALAutoSizeMode;
+begin
+  if FAutoSizeLineCount > 0 then Result := TALAutoSizeMode.Height
+  else Result := TALAutoSizeMode.None;
+end;
+
+{***********************************************************}
+procedure TALMemo.SetAutosizeLineCount(const Value: Integer);
+begin
+  if FAutoSizeLineCount <> Value then begin
+    FAutoSizeLineCount := Max(0, Value);
+    AdjustSize;
+  end;
+end;
+
+{********************}
+{$IF defined(android)}
+Function TALDummyMemo.CreateNativeView: TALAndroidNativeView;
+begin
+  result := nil;
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(IOS)}
+Function TALDummyMemo.CreateNativeView: TALIosNativeView;
+begin
+  result := nil;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ALMacOS)}
+Function TALDummyMemo.CreateNativeView: TALMacNativeView;
+begin
+  result := nil;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWindows)}
+Function TALDummyMemo.CreateNativeView: TALWinNativeView;
+begin
+  Result := nil;
+end;
+{$ENDIF}
 
 {$REGION ' IOS'}
 {$IF defined(ios)}
@@ -1642,325 +1969,6 @@ end;
 
 {$endif}
 {$ENDREGION}
-
-{***************************************************************************************}
-function TALMemo.TDisabledStateStyle.TTextSettings.GetDefaultVertAlign: TALTextVertAlign;
-begin
-  Result := TALTextVertAlign.Leading;
-end;
-
-{*************************************************************************************************************************************}
-function TALMemo.TDisabledStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings;
-begin
-  Result := TTextSettings.Create(AParent);
-end;
-
-{**************************************************************************************}
-function TALMemo.THoveredStateStyle.TTextSettings.GetDefaultVertAlign: TALTextVertAlign;
-begin
-  Result := TALTextVertAlign.Leading;
-end;
-
-{************************************************************************************************************************************}
-function TALMemo.THoveredStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings;
-begin
-  Result := TTextSettings.Create(AParent);
-end;
-
-{**************************************************************************************}
-function TALMemo.TFocusedStateStyle.TTextSettings.GetDefaultVertAlign: TALTextVertAlign;
-begin
-  Result := TALTextVertAlign.Leading;
-end;
-
-{************************************************************************************************************************************}
-function TALMemo.TFocusedStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings;
-begin
-  Result := TTextSettings.Create(AParent);
-end;
-
-{**************************************************************************************************************}
-function TALMemo.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TALBaseEdit.TDisabledStateStyle;
-begin
-  result := TDisabledStateStyle.Create(AParent);
-end;
-
-{************************************************************************************************************}
-function TALMemo.TStateStyles.CreateHoveredStateStyle(const AParent: TObject): TALBaseEdit.THoveredStateStyle;
-begin
-  result := THoveredStateStyle.Create(AParent);
-end;
-
-{************************************************************************************************************}
-function TALMemo.TStateStyles.CreateFocusedStateStyle(const AParent: TObject): TALBaseEdit.TFocusedStateStyle;
-begin
-  Result := TFocusedStateStyle.Create(AParent);
-end;
-
-{*******************************************************************}
-function TALMemo.TTextSettings.GetDefaultVertAlign: TALTextVertAlign;
-begin
-  result := TALTextVertAlign.Leading;
-end;
-
-{*********************************************}
-constructor TALMemo.Create(AOwner: TComponent);
-begin
-  inherited;
-  FAutosizeLineCount := 0;
-end;
-
-{********************************************}
-procedure TALMemo.Assign(Source: TPersistent);
-begin
-  BeginUpdate;
-  Try
-    if Source is TALMemo then begin
-      AutosizeLineCount := TALMemo(Source).AutoSizeLineCount;
-    end
-    else
-      ALAssignError(Source{ASource}, Self{ADest});
-    inherited Assign(Source);
-  Finally
-    EndUpdate;
-  End;
-end;
-
-{********************}
-{$IF defined(android)}
-Function TALMemo.CreateNativeView: TALAndroidNativeView;
-begin
-  result := TALAndroidEditView.create(self, True{FIsMultiline}, DefStyleAttr, DefStyleRes);
-end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-Function TALMemo.CreateNativeView: TALIosNativeView;
-begin
-
-  // [NOTE] This workaround is no longer necessary, as the delphi framework (e.g., the virtual
-  // keyboard service) already instantiates a UITextView internally during app startup,
-  // which ensures that the Objective-C class is properly loaded and registered by the Delphi runtime.
-  //
-  // Originally, we had to create a UITextView instance explicitly to force the Objective-C class
-  // (UITextView) to be registered. Without this, calling `TALIosWebView(inherited GetNativeView)`
-  // could raise the following error:
-  //   Unhandled Exception | Item not found
-  //   At address: $0000000100365670
-  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
-  //
-  // Attempting to register the class manually like this:
-  //   RegisterObjectiveCClass(TUITextView, TypeInfo(UITextView));
-  // also fails with:
-  //   Unhandled Exception | Method function someUITextViewMethod of class TUITextView not found
-  //   At address: $00000001XXXXXXX
-  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
-  //
-  // Attempting to register our own wrapper class:
-  //   RegisterObjectiveCClass(TALIosWebView, TypeInfo(IALIosWebView));
-  // fails as well, with:
-  //   Unhandled Exception | Objective-C class UITextView could not be found
-  //   At address: $00000001046CA014
-  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
-  //
-  // The only reliable workaround is to instantiate a UITextView explicitly to force
-  // the UIKit framework to be loaded and the class to be registered:
-  //
-  //if not IsUITextViewClassRegistered then begin
-  //  var LUITextView := TUITextView.Wrap(TUITextView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0)));
-  //  LUITextView.release;
-  //  IsUITextViewClassRegistered := True;
-  //end;
-
-  result := TALIosMemoView.create(self);
-
-end;
-{$ENDIF}
-
-{********************}
-{$IF defined(ALMacOS)}
-Function TALMemo.CreateNativeView: TALMacNativeView;
-begin
-  result := TALMacMemoView.create(self);
-end;
-{$ENDIF}
-
-{**********************}
-{$IF defined(MSWindows)}
-Function TALMemo.CreateNativeView: TALWinNativeView;
-begin
-  {$IF defined(ALDPK)}
-  Result := nil;
-  {$ELSE}
-  Result := TALWinMemoView.create(self);
-  {$ENDIF}
-end;
-{$ENDIF}
-
-{***********************************************************}
-function TALMemo.CreateStateStyles: TALBaseEdit.TStateStyles;
-begin
-  Result := TStateStyles.Create(self);
-end;
-
-{*************************************************************}
-function TALMemo.CreateTextSettings: TALBaseEdit.TTextSettings;
-begin
-  result := TTextSettings.Create;
-end;
-
-{**********************************************}
-function TALMemo.GetTextSettings: TTextSettings;
-begin
-  result := TTextSettings(inherited TextSettings);
-end;
-
-{************************************************************}
-procedure TALMemo.SetTextSettings(const Value: TTextSettings);
-begin
-  inherited TextSettings := Value;
-end;
-
-{***************************}
-procedure TALMemo.AdjustSize;
-begin
-  if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
-     (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
-     (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
-    try
-
-      if isupdating then begin
-        FAdjustSizeOnEndUpdate := True;
-        Exit;
-      end
-      else
-        FAdjustSizeOnEndUpdate := False;
-
-      {$IF defined(debug)}
-      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeHeight));
-      {$ENDIF}
-
-      Var LInlinedLabelText := (LabelText <> '') and (LabelTextSettings.Layout = TLabelTextLayout.Inline);
-      if LInlinedLabelText then MakeBufLabelTextDrawable;
-
-      var LStrokeSize := TRectF.Empty;
-      if Stroke.HasStroke then begin
-        if (TSide.Top in Sides) then    LStrokeSize.Top :=    max(Stroke.Thickness - Padding.top,    0);
-        if (TSide.bottom in Sides) then LStrokeSize.bottom := max(Stroke.Thickness - Padding.bottom, 0);
-        if (TSide.right in Sides) then  LStrokeSize.right :=  max(Stroke.Thickness - Padding.right,  0);
-        if (TSide.left in Sides) then   LStrokeSize.left :=   max(Stroke.Thickness - Padding.left,   0);
-      end;
-
-      if HasUnconstrainedAutosizeHeight then begin
-
-        var LLineHeight: Single := GetLineHeight;
-        if AutoAlignToPixel then LLineHeight := ALAlignDimensionToPixelRound(LLineHeight, ALGetScreenScale, TEpsilon.Position);
-
-        var LAdjustement: Single;
-        {$IF defined(IOS)}
-        // On iOS, without this small adjustment, the edit control may slightly shift
-        // when text is entered.
-        LAdjustement := 1;
-        {$ELSE}
-        LAdjustement := 0;
-        {$ENDIF}
-        if AutoAlignToPixel then LAdjustement := ALAlignDimensionToPixelRound(LAdjustement, ALGetScreenScale, TEpsilon.Position);
-
-        If LInlinedLabelText then begin
-          SetFixedSizeBounds(
-            Position.X,
-            Position.Y,
-            Width,
-            (LLineHeight * AutoSizeLineCount) + LAdjustement + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom + BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom);
-        end
-        else begin
-          SetFixedSizeBounds(
-            Position.X,
-            Position.Y,
-            Width,
-            (LLineHeight * AutoSizeLineCount) + LAdjustement + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom);
-        end;
-
-      end;
-
-      var LMarginRect := TRectF.Empty;
-
-      if LInlinedLabelText then
-        LMarginRect.top := BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom;
-
-      LMarginRect.left :=   Max(LMarginRect.left   + LStrokeSize.left,   0);
-      LMarginRect.Top :=    Max(LMarginRect.Top    + LStrokeSize.Top,    0);
-      LMarginRect.Right :=  Max(LMarginRect.Right  + LStrokeSize.Right,  0);
-      LMarginRect.Bottom := Max(LMarginRect.Bottom + LStrokeSize.Bottom, 0);
-
-      NativeViewMargins.Rect := LMarginRect;
-
-    finally
-      TNonReentrantHelper.LeaveSection(FIsAdjustingSize)
-    end;
-  end;
-end;
-
-{******************************************************}
-function TALMemo.HasUnconstrainedAutosizeWidth: Boolean;
-begin
-  result := False;
-end;
-
-{**************************************}
-function TALMemo.GetDefaultSize: TSizeF;
-begin
-  Result := TSizeF.Create(200, 75);
-end;
-
-{********************************************}
-function TALMemo.GetAutoSize: TALAutoSizeMode;
-begin
-  if FAutoSizeLineCount > 0 then Result := TALAutoSizeMode.Height
-  else Result := TALAutoSizeMode.None;
-end;
-
-{***********************************************************}
-procedure TALMemo.SetAutosizeLineCount(const Value: Integer);
-begin
-  if FAutoSizeLineCount <> Value then begin
-    FAutoSizeLineCount := Max(0, Value);
-    AdjustSize;
-  end;
-end;
-
-{********************}
-{$IF defined(android)}
-Function TALDummyMemo.CreateNativeView: TALAndroidNativeView;
-begin
-  result := nil;
-end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-Function TALDummyMemo.CreateNativeView: TALIosNativeView;
-begin
-  result := nil;
-end;
-{$ENDIF}
-
-{********************}
-{$IF defined(ALMacOS)}
-Function TALDummyMemo.CreateNativeView: TALMacNativeView;
-begin
-  result := nil;
-end;
-{$ENDIF}
-
-{**********************}
-{$IF defined(MSWindows)}
-Function TALDummyMemo.CreateNativeView: TALWinNativeView;
-begin
-  Result := nil;
-end;
-{$ENDIF}
 
 {*****************}
 procedure Register;

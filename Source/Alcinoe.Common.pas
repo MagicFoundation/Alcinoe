@@ -86,6 +86,17 @@ type
   end;
   TALNameValueArrayA = Array of TALNameValuePairA;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALThreadQueueCleaner = Class(TThread)
+  protected
+    procedure Execute; override;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure AfterConstruction; override;
+    procedure BeforeDestruction; override;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALWorkerThreadRefProc = reference to procedure(var AContext: Tobject);
   TALWorkerThreadObjProc = procedure(var AContext: Tobject) of object;
@@ -867,7 +878,20 @@ procedure ALLog(Const Tag: AnsiString; const Args: array of const; const &Type: 
 procedure ALLog(Const Tag: AnsiString; const Args: array of const; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR); overload;
 function ALGetLogHistory(const AIgnoreLastLogItemMsg: Boolean = False): String;
 
-{~~}
+type
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALRefCountObject = Class(TObject)
+  private
+    FRefCount: Integer;
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    function GetRefCount: Integer;
+    function IncreaseRefCount: TALRefCountObject; virtual;
+    procedure DecreaseRefCount;
+  End;
+
 type
   TALCustomDelayedFreeObjectProc = procedure(var aObject: Tobject) of object;
 
@@ -919,6 +943,13 @@ function ALElapsedTimeMillisAsInt64: int64;
 function ALElapsedTimeSecondsAsDouble: Double;
 function ALElapsedTimeSecondsAsInt64: int64;
 
+Type
+  TALLatLng = record
+    Latitude: Double;
+    Longitude: Double;
+    class function Create(const ALatitude: Double; const ALongitude: Double): TALLatLng; static; inline;
+  end;
+
 function ALIsValidLatlng(const ALatitude, ALongitude: Double): Boolean;
 function ALGetDistanceBetween2Points(const ALatitude1, ALongitude1, ALatitude2, ALongitude2: Double): Double{meters};
 
@@ -956,7 +987,7 @@ function ALGetIanaTimeZoneId: String;
 function ALUTCNow: TDateTime;
 function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
-Function ALInc(var x: integer; Count: integer): Integer;
+Function ALInc(var x: integer; const Count: integer = 1): Integer;
 procedure ALAssignError(Const ASource: TObject; const ADest: Tobject);
 procedure ALMove(const Source; var Dest; Count: NativeInt); inline;
 function ALSameBytes(const ABytes1: TBytes; const ABytes2: TBytes): Boolean;
@@ -1194,6 +1225,39 @@ constructor TALNameValuePairA.Create(const AName, AValue: ansiString);
 begin
   Name := AName;
   Value := AValue;
+end;
+
+{***************************************}
+constructor TALThreadQueueCleaner.Create;
+begin
+  // No initialization required. This thread is
+  // used only as an owner for TThread.Queue callbacks.
+end;
+
+{***************************************}
+destructor TALThreadQueueCleaner.Destroy;
+begin
+  // Cancel any pending callbacks queued with this thread as their owner.
+  RemoveQueuedEvents(Self);
+end;
+
+{************************************************}
+procedure TALThreadQueueCleaner.AfterConstruction;
+begin
+  // No post-construction processing required.
+end;
+
+{************************************************}
+procedure TALThreadQueueCleaner.BeforeDestruction;
+begin
+  // No pre-destruction processing required.
+end;
+
+{**************************************}
+procedure TALThreadQueueCleaner.Execute;
+begin
+  // No thread execution required. This instance is
+  // used solely to identify queued callbacks.
 end;
 
 {****************************************}
@@ -3804,6 +3868,13 @@ begin
   Result := trunc(ALElapsedTimeNano / ALNanosPerSec);
 end;
 
+{********************************************************************************************}
+class function TALLatLng.Create(const ALatitude: Double; const ALongitude: Double): TALLatLng;
+begin
+  Result.Latitude := ALatitude;
+  Result.Longitude := ALongitude;
+end;
+
 {*********************************************************************}
 function ALIsValidLatlng(const ALatitude, ALongitude: Double): Boolean;
 begin
@@ -4133,8 +4204,8 @@ begin
   result := TTimeZone.Local.ToUniversalTime(NOW);
 end;
 
-{******************************************************}
-Function ALInc(var x: integer; Count: integer): Integer;
+{****************************************************************}
+Function ALInc(var x: integer; const Count: integer = 1): Integer;
 begin
   inc(X, count);
   result := X;
@@ -4422,6 +4493,47 @@ begin
   ALSetConsoleColors(LForegroundColor, LBackgroundColor);
 end;
 {$ENDIF}
+
+{***********************************}
+constructor TALRefCountObject.Create;
+begin
+  inherited;
+  FRefCount := 1;
+end;
+
+{***********************************}
+destructor TALRefCountObject.Destroy;
+begin
+  {$IF defined(debug)}
+  If FRefCount > 0 then
+    ALLog('TALRefCountObject.Destroy', 'Reference count is greater than zero', TALLogType.WARN);
+  {$ENDIF}
+  inherited;
+end;
+
+{**********************************************}
+function TALRefCountObject.GetRefCount: Integer;
+begin
+  Result := AtomicCmpExchange(FRefCount, -1{NewValue}, -1{Comparand});
+end;
+
+{*************************************************************}
+function TALRefCountObject.IncreaseRefCount: TALRefCountObject;
+begin
+  // When calling IncreaseRefCount, it means that we already have
+  // a valid, strong reference to the object.
+  AtomicIncrement(FRefCount);
+  Result := Self;
+end;
+
+{*******************************************}
+procedure TALRefCountObject.DecreaseRefCount;
+begin
+  if AtomicDecrement(FRefCount) = 0 then begin
+    var LSelf := Self;
+    ALFreeAndNil(LSelf, True{ADelayed});
+  end;
+end;
 
 {***********************************}
 {$IF CompilerVersion >= 34} // sydney

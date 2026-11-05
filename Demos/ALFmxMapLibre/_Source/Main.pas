@@ -370,8 +370,8 @@ begin
     var LCamera := MapLibre.GetCameraPosition;
     var LBounds := MapLibre.GetViewportBounds;
     StatusText.Text := Format(
-                      'Zoom %.1f | bearing %.0f | tilt %.0f | moves %d',
-                      [LCamera.zoom, LCamera.bearing, LCamera.tilt, FCameraMoveCount]) + sLineBreak +
+                         'Zoom %.1f | bearing %.0f | tilt %.0f | moves %d',
+                         [LCamera.zoom, LCamera.bearing, LCamera.tilt, FCameraMoveCount]) + sLineBreak +
       Format(
         'Bounds %.3f, %.3f - %.3f, %.3f',
         [LBounds.Left, LBounds.Top, LBounds.Right, LBounds.Bottom]);

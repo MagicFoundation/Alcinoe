@@ -70,6 +70,7 @@ type
     procedure AncestorVisibleChanged; virtual; //procedure PMAncestorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
     procedure RootChanged(const aRoot: IRoot); virtual; //procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
     procedure ChangeOrder; virtual; //procedure PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
+    procedure BringToFront; virtual;
   protected
     procedure WMSetFocus(var Message: TWMSetFocus); message WM_SETFOCUS;
     procedure WMKillFocus(var Message: TWMKillFocus); message WM_KILLFOCUS;
@@ -279,7 +280,7 @@ end;
 procedure TALWinNativeView.DestroyHandle;
 begin
   RootChanged(nil);
-  if FHandle <> NullHWnd then
+  if HandleAllocated then
   try
     if not Winapi.Windows.DestroyWindow(FHandle) then
       RaiseLastOSError;
@@ -293,7 +294,7 @@ end;
 procedure TALWinNativeView.RecreateWnd;
 begin
   // to-do recreate all children
-  if FHandle <> NullHWnd then
+  if HandleAllocated then
   begin
     DestroyHandle;
     CreateHandle;
@@ -385,7 +386,7 @@ end;
 {*****************************************************}
 procedure TALWinNativeView.DefaultHandler(var Message);
 begin
-  if (FHandle <> NullHWnd) then
+  if HandleAllocated then
     TMessage(Message).Result := CallWindowProc(
                                   FDefWndProc, FHandle, TMessage(Message).Msg, TMessage(Message).WParam,
                                   TMessage(Message).LParam)
@@ -439,6 +440,12 @@ begin
   //  ZOrderManager.UpdateOrder(Control);
 end;
 
+{**************************************}
+procedure TALWinNativeView.BringToFront;
+begin
+  SetWindowPos(Handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
+end;
+
 {************************************************}
 procedure TALWinNativeView.AncestorVisibleChanged;
 begin
@@ -469,6 +476,7 @@ begin
     FForm := TCommonCustomForm(aRoot);
     SetParent(Handle, GetFormHandle(Form));
     UpdateFrame;
+    BringToFront;
   end
   else FForm := nil;
 end;

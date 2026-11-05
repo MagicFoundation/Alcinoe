@@ -39,7 +39,6 @@ uses
   FMX.types,
   fmx.types3D,
   FMX.graphics,
-  Alcinoe.GuardianThread,
   Alcinoe.FMX.Common,
   Alcinoe.Common;
 
@@ -127,6 +126,7 @@ function ALSkStreamAdapterGetLengthProc(context: Pointer): size_t; cdecl;
 function ALSkStreamAdapterGetPositionProc(context: Pointer): size_t; cdecl;
 function ALSkStreamAdapterReadProc(context: Pointer; buffer: Pointer; size: size_t): size_t; cdecl;
 function ALSkStreamAdapterSeekProc(context: Pointer; position: size_t): _bool; cdecl;
+function ALSkWStreamAdapterWriteProc(context: Pointer; const buffer: Pointer; size: size_t): _bool; cdecl;
 
 var
   ALGlobalUseRasterSkSurface: Boolean;
@@ -7043,7 +7043,7 @@ var
     if IsNaN(LScaledStateLayerXRadius) then LScaledStateLayerXRadius := FXRadius;
     if IsNaN(LScaledStateLayerYRadius) then LScaledStateLayerYRadius := FYRadius;
     if LScaledStateLayerXRadius > 0 then LScaledStateLayerXRadius := LScaledStateLayerXRadius * FScale;
-    if LScaledStateLayerYRadius > 0 then LScaledStateLayerYRadius := LScaledStateLayerYRadius* FScale;
+    if LScaledStateLayerYRadius > 0 then LScaledStateLayerYRadius := LScaledStateLayerYRadius * FScale;
 
     TALDrawRectangleHelper.Create(FCanvas)
       .SetAlignToPixel(FAlignToPixel)
@@ -8994,6 +8994,14 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
+function ALSkWStreamAdapterWriteProc(context: Pointer; const buffer: Pointer; size: size_t): _bool; cdecl;
+begin
+  Result := TStream(context).Write(buffer^, size) = Longint(size);
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
 function ALGetSkImageinfo(const W, H: int32_t): sk_imageinfo_t;
 begin
   {$IFNDEF ALCompilerVersionSupported131}
@@ -9901,6 +9909,10 @@ initialization
   LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
   LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
   sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+  //--
+  var LWStreamadapterProcs: sk_wstreamadapter_procs_t;
+  LWStreamadapterProcs.write := ALSkWStreamAdapterWriteProc;
+  sk4d_wstreamadapter_set_procs(@LWStreamadapterProcs);
   {$ENDIF}
   {$IF defined(ANDROID)}
   ALGlobalJColorSpace := nil;

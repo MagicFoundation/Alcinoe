@@ -44,6 +44,7 @@ type
     procedure AncestorVisibleChanged; virtual; //procedure PMAncesstorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
     procedure RootChanged(const aRoot: IRoot); virtual; //procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
     procedure ChangeOrder; virtual; //procedure PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
+    procedure BringToFront; virtual;
     function acceptsFirstResponder: Boolean; virtual; cdecl;
     function becomeFirstResponder: Boolean; virtual; cdecl;
   protected
@@ -196,6 +197,16 @@ procedure TALMacNativeView.ChangeOrder;
 begin
   //if HasZOrderManager then
   //  ZOrderManager.UpdateOrder(Control);
+end;
+
+{**************************************}
+procedure TALMacNativeView.BringToFront;
+begin
+  var LSuperview := View.superview;
+  if LSuperview <> nil then begin
+    View.removeFromSuperview;
+    TNSView.Wrap(LSuperview).addSubview(View);
+  end;
 end;
 
 {************************************************}

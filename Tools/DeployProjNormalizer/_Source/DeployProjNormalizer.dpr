@@ -380,8 +380,8 @@ begin
       if (LPropertyGroupNode.NodeName = 'PropertyGroup') and
          (LPropertyGroupNode.attributes['Condition'] <> '') then begin
         var Lcondition := LPropertyGroupNode.attributes['Condition']; // '$(Base_iOSDevice64)'!=''
-        Lcondition := ALStringReplaceA(Lcondition,'''$(','',[]); // // Base_iOSDevice64)'!=''
-        Lcondition := ALStringReplaceA(Lcondition,')''!=''''','',[]); // // Base_iOSDevice64
+        Lcondition := ALStringReplaceA(Lcondition,'''$(','',[]); // Base_iOSDevice64)'!=''
+        Lcondition := ALStringReplaceA(Lcondition,')''!=''''','',[]); // Base_iOSDevice64
         for var J := 0 to LPropertyGroupNode.ChildNodes.Count - 1 do begin
           var LPropertyNode := LPropertyGroupNode.ChildNodes[J]; // <Icns_MainIcns>icons\ico_round_16_32_48_128_256_512.icns</Icns_MainIcns>
           if LPropertyNode.Text <> '' then LProperties.AddNameValue(Lcondition+'#'+LPropertyNode.NodeName, LPropertyNode.Text); // Cfg_1_iOSDevice64#Icns_MainIcns=icons\ico_round_16_32_48_128_256_512.icns

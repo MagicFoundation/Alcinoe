@@ -49,6 +49,7 @@ type
     procedure AncestorVisibleChanged; virtual; //procedure PMAncesstorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
     procedure RootChanged(const aRoot: IRoot); virtual; //procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
     procedure ChangeOrder; virtual; //procedure PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
+    procedure BringToFront; virtual;
     procedure touchesBegan(touches: NSSet; withEvent: UIEvent); virtual; cdecl;
     procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); virtual; cdecl;
     procedure touchesEnded(touches: NSSet; withEvent: UIEvent); virtual; cdecl;
@@ -315,6 +316,14 @@ begin
   //  ZOrderManager.UpdateOrder(Control);
 end;
 
+{**************************************}
+procedure TALIosNativeView.BringToFront;
+begin
+  var LSuperview := View.superview;
+  if LSuperview <> nil then
+    LSuperview.bringSubviewToFront(View);
+end;
+
 {************************************************}
 procedure TALIosNativeView.AncestorVisibleChanged;
 begin
@@ -334,7 +343,7 @@ begin
   View.removeFromSuperview;
   if aRoot is TCommonCustomForm then begin
     FForm := TCommonCustomForm(aRoot);
-    GetFormView(FForm).insertSubview(View, 0);
+    GetFormView(FForm).addSubview(View);
     UpdateFrame;
   end
   else FForm := nil;

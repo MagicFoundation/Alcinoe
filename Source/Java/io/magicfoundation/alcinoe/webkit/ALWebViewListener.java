@@ -21,4 +21,5 @@ public interface ALWebViewListener {
 	public void onUnhandledKeyEvent(WebView view, KeyEvent event);
 	public boolean shouldOverrideKeyEvent(WebView view, KeyEvent event);
 	public boolean shouldOverrideUrlLoading(WebView view, String url);
+	public void onWebMessage(WebView view, String message);
 }

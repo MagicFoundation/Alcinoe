@@ -45,6 +45,7 @@ uses
   FMX.Filter,
   FMX.Effects,
   FMX.controls,
+  FMX.Platform,
   Alcinoe.Common,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Controls,
@@ -1383,6 +1384,9 @@ var
 procedure ALInitFillTextFlags;
 function ALGetFillTextFlags: TFillTextFlags; Inline;
 
+var
+  ALApplicationState: TApplicationEvent;
+
 implementation
 
 uses
@@ -1391,12 +1395,12 @@ uses
   System.IOutils,
   System.UIConsts,
   System.Generics.Defaults,
+  System.Messaging,
   System.Hash,
   {$IF defined(ALBackwardCompatible)}
   System.TypInfo,
   {$ENDIF}
   FMX.Utils,
-  Fmx.Platform,
   {$IF defined(ALSkiaEngine)}
   FMX.Skia,
   {$ENDIF}
@@ -7276,6 +7280,21 @@ begin
   result := ALFillTextFlags;
 end;
 
+{*****************************************************************************}
+procedure _ALApplicationEventHandler(const Sender: TObject; const M: TMessage);
+begin
+  if M is TApplicationEventMessage then begin
+    var LEvent := TApplicationEventMessage(M).Value.Event;
+    case LEvent of
+      TApplicationEvent.BecameActive,
+      TApplicationEvent.WillBecomeInactive,
+      TApplicationEvent.EnteredBackground,
+      TApplicationEvent.WillBecomeForeground:
+        ALApplicationState := LEvent;
+    end;
+  end;
+end;
+
 initialization
   {$IF defined(DEBUG)}
   ALLog('Alcinoe.FMX.Common','initialization');
@@ -7310,6 +7329,12 @@ initialization
   TALLastSetSystemBarsColor.NavigationBarColor := TAlphaColors.Null;
   TALLastSetSystemBarsColor.StatusBarUseLightIcons := False;
   TALLastSetSystemBarsColor.NavigationBarUseLightIcons := False;
+  {$IFDEF MSWindows}
+  ALApplicationState := TApplicationEvent.BecameActive;
+  {$ELSE}
+  ALApplicationState := TApplicationEvent.EnteredBackground;
+  {$ENDIF}
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, _ALApplicationEventHandler);
 
 finalization
   {$IF defined(DEBUG)}
@@ -7319,5 +7344,6 @@ finalization
   {$IF (not defined(ALSkiaEngine)) and (defined(Android))}
   ALFreeAndNil(TALFontManager.FCustomTypeFaces);
   {$ENDIF}
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, _ALApplicationEventHandler);
 
 end.

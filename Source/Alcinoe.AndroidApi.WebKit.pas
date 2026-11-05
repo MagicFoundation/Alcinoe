@@ -37,6 +37,7 @@ type
     procedure onUnhandledKeyEvent(view: JWebView; event: JKeyEvent); cdecl;
     function shouldOverrideKeyEvent(view: JWebView; event: JKeyEvent): Boolean; cdecl;
     function shouldOverrideUrlLoading(view: JWebView; url: JString): Boolean; cdecl;
+    procedure onWebMessage(view: JWebView; message: JString); cdecl;
   end;
   TJALWebViewListener = class(TJavaGenericImport<JALWebViewListenerClass, JALWebViewListener>) end;
 

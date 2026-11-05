@@ -20,7 +20,8 @@ uses
   Alcinoe.FMX.NativeView.Win,
   {$ENDIF}
   Alcinoe.FMX.Objects,
-  Alcinoe.FMX.Common;
+  Alcinoe.FMX.Common,
+  Alcinoe.Common;
 
 type
 
@@ -57,9 +58,12 @@ type
   private
     fDefStyleAttr: String;
     fDefStyleRes: String;
+    FThreadQueueCleaner: TALThreadQueueCleaner;
     FNativeViewMargins: TALBounds;
     FNativeViewScreenshot: TALDrawable;
     FFreezeNativeViewCount: Integer;
+    FHideNativeViewAfterPaint: Integer;
+    FFreeNativeViewScreenshotAfterPaint: Integer;
     {$IF defined(android)}
     function GetNativeView: TALAndroidNativeView;
     procedure ApplicationEventHandler(const Sender: TObject; const M : TMessage);
@@ -148,7 +152,7 @@ type
     {$ENDIF}
     property NativeViewMargins: TALBounds read FNativeViewMargins write SetNativeViewMargins;
     function GetNativeViewAbsoluteRect: TRectF; virtual;
-    function GetNativeViewBoundsRect: TRectF;
+    function GetNativeViewBoundsRect: TRectF; virtual;
     function GetNativeViewPosition: TPointF;
     function GetNativeViewWidth: Single;
     function GetNativeViewHeight: Single;
@@ -171,8 +175,8 @@ uses
   FMX.Types3D,
   FMX.Graphics,
   FMX.Forms,
-  Alcinoe.FMX.Graphics,
-  Alcinoe.Common;
+  Alcinoe.FMX.FMXOverNativeContainer,
+  Alcinoe.FMX.Graphics;
 
 {*********************************************************************************}
 procedure ALFreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl>);
@@ -180,15 +184,13 @@ procedure ALFreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _FreezeNativeViews(const AControl: TControl);
   begin
-    for var I := 0 to AControl.ControlsCount - 1 do begin
-      if (AControl.Controls[i] is TALNativeControl) and
-         (TALNativeControl(AControl.Controls[i]).FreezeNativeView) then begin
-        setlength(AFrozenNativeControls, Length(AFrozenNativeControls) + 1);
-        AFrozenNativeControls[High(AFrozenNativeControls)] := TALNativeControl(AControl.Controls[i]);
-      end
-      else
-        _FreezeNativeViews(AControl.Controls[i]);
+    if (AControl is TALNativeControl) and
+       (TALNativeControl(AControl).FreezeNativeView) then begin
+      setlength(AFrozenNativeControls, Length(AFrozenNativeControls) + 1);
+      AFrozenNativeControls[High(AFrozenNativeControls)] := TALNativeControl(AControl);
     end;
+    for var I := 0 to AControl.ControlsCount - 1 do
+      _FreezeNativeViews(AControl.Controls[I]);
   end;
 
 begin
@@ -227,23 +229,24 @@ begin
   inherited create(AOwner);
   fDefStyleAttr := '';
   fDefStyleRes := '';
+  FThreadQueueCleaner := TALThreadQueueCleaner.Create;
   FNativeViewMargins := TALBounds.Create;
   FNativeViewMargins.OnChanged := NativeViewMarginsChanged;
   FNativeViewScreenshot := ALNullDrawable;
   FFreezeNativeViewCount := 0;
-  {$IF defined(android)}
+  FHideNativeViewAfterPaint := 0;
+  FFreeNativeViewScreenshotAfterPaint := 0;
   // In Android we must first know the value of DefStyleAttr/DefStyleRes
   // before to create the FNativeView. I use this way to know that the compoment
-  // will load it's properties from the dfm
+  // will load it's properties from the dfm.
+  // On iOS, we sometimes also need to wait until all DFM properties have been
+  // loaded before creating the native view (e.g., MapLibre's StyleURL property,
+  // which must be available when constructing the native view).
   if not IsOwnerLoading then begin
     FNativeView := CreateNativeView;
     InitNativeView;
   end
   else FNativeView := nil;
-  {$ELSE}
-  FNativeView := CreateNativeView;
-  InitNativeView;
-  {$ENDIF}
   {$IF defined(android)}
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
   {$ENDIF}
@@ -256,6 +259,7 @@ begin
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
   {$ENDIF}
   ALFreeAndNil(FNativeView);
+  ALFreeAndNil(FThreadQueueCleaner);
   ALFreeAndNil(FNativeViewMargins);
   ALFreeAndNilDrawable(FNativeViewScreenshot);
   inherited Destroy;
@@ -263,12 +267,27 @@ end;
 
 {********************************}
 procedure TALNativeControl.Loaded;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _BringDescendantNativeViewsToFront(const AControl: TControl);
+  begin
+    for var I := 0 to AControl.ControlsCount - 1 do begin
+      var LChild := AControl.Controls[I];
+      if (LChild is TALNativeControl) and
+         (TALNativeControl(LChild).FNativeView <> nil) then
+        TALNativeControl(LChild).FNativeView.BringToFront;
+      _BringDescendantNativeViewsToFront(LChild);
+    end;
+  end;
+
 begin
   inherited;
   if FNativeView = nil then begin
     FNativeView := CreateNativeView;
     InitNativeView;
   end;
+  if FNativeView <> nil then
+    _BringDescendantNativeViewsToFront(Self);
   if IsNativeViewVisible then
     // Because AncestorParentChanged is not called during loading,
     // we must call NativeView.SetVisible(true) in Loaded
@@ -358,6 +377,7 @@ begin
   for var I := 0 to ControlsCount - 1 do begin
     var LControl := Controls[i];
     if not LControl.Visible then continue;
+    if LControl is TALFMXOverNativeContainer then continue;
     {$IFNDEF ALCompilerVersionSupported131}
       {$MESSAGE WARN 'Check if FMX.Types.TAlignLayout was not updated and adjust the IFDEF'}
     {$ENDIF}
@@ -600,7 +620,20 @@ begin
   inc(FFreezeNativeViewCount);
   ALFreeAndNilDrawable(FNativeViewScreenshot);
   FNativeViewScreenshot := FNativeView.CaptureScreenshot;
-  HideNativeView;
+  // FMX and Android native views render on separate surfaces, and their frames
+  // are not synchronized (setVisibility takes effect during a later traversal,
+  // and some views render on their own GL thread). Switching immediately
+  // between the native view and its screenshot may therefore cause a black
+  // frame to appear. To avoid this:
+  //  * Freeze: hide the native view only after the screenshot has been painted.
+  //  * Unfreeze: continue displaying the screenshot for a few more paint cycles
+  //    to give the native view time to render its content.
+  // Android provides no reliable callback to confirm that a view's content is
+  // actually visible on screen, so we count paint cycles instead. This is a
+  // heuristic, not a guarantee.
+  FHideNativeViewAfterPaint := 2;
+  FFreeNativeViewScreenshotAfterPaint := 0;
+  Repaint;
   Result := True;
 end;
 
@@ -610,8 +643,11 @@ begin
   if not IsNativeViewFrozen then exit;
   dec(FFreezeNativeViewCount);
   if FFreezeNativeViewCount = 0 then begin
-    ALFreeAndNilDrawable(FNativeViewScreenshot);
+    // See FreezeNativeView for why we delay
+    FHideNativeViewAfterPaint := 0;
+    FFreeNativeViewScreenshotAfterPaint := 5;
     ShowNativeView;
+    Repaint;
   end;
 end;
 
@@ -687,17 +723,111 @@ end;
 
 {*********************************}
 procedure TALNativeControl.DoPaint;
+
+  {~~~~~~~~~~~~~~~~~~~~}
+  procedure _Invalidate;
+  begin
+    // We cannot call Repaint from within a paint method,
+    // but we can call Form.Invalidate. We use Form.Invalidate
+    // to avoid using any TALFloatAnimation object
+    {$IF defined(ANDROID)}
+    If Form <> nil then
+      Form.Invalidate;
+    {$ELSE}
+    If Form <> nil then begin
+      var LForm := Form;
+      TThread.ForceQueue(nil,
+        procedure
+        begin
+          If (Screen <> nil) then
+            for var I := 0 to Screen.FormCount - 1 do
+              if LForm = Screen.Forms[I] then begin
+                LForm.Invalidate;
+                Break;
+              end;
+        end);
+    end;
+    {$ENDIF}
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _AncestorHasScreenshot: Boolean;
+  begin
+    var LParent := ParentControl;
+    while LParent <> nil do begin
+      if (LParent is TALNativeControl) and
+         (not ALIsDrawableNull(TALNativeControl(LParent).FNativeViewScreenshot)) then
+        exit(True);
+      LParent := LParent.ParentControl;
+    end;
+    Result := False;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _PaintFrozenOverlays(const AControl: TControl);
+  begin
+    for var I := 0 to AControl.ControlsCount - 1 do begin
+      var LChild := AControl.Controls[I];
+      if not LChild.Visible then continue;
+      if (LChild is TALNativeControl) and
+         (not ALIsDrawableNull(TALNativeControl(LChild).FNativeViewScreenshot)) then begin
+        var LSaveState := Canvas.SaveState;
+        try
+          Canvas.SetMatrix(LChild.AbsoluteMatrix);
+          ALDrawDrawable(
+            Canvas, // const ACanvas: Tcanvas;
+            TALNativeControl(LChild).FNativeViewScreenshot, // const ADrawable: TALDrawable;
+            TALNativeControl(LChild).GetNativeViewBoundsRect.TopLeft, // const ATopLeft: TpointF;
+            LChild.AbsoluteOpacity); // const AOpacity: Single);
+        finally
+          Canvas.RestoreState(LSaveState);
+        end;
+      end;
+      _PaintFrozenOverlays(LChild);
+    end;
+  end;
+
 begin
-  // DoPaint instead of paint to paint the FNativeViewScreenshot
-  // After everything have been already painted (paint method already
-  // called and PaintChildren too
-  if IsNativeViewFrozen then begin
+  {$IF defined(DEBUG)}
+  //ALLog(classname+'.DoPaint', 'control.name: ' + Name);
+  {$ENDIF}
+  // Override DoPaint instead of Paint to draw FNativeViewScreenshot
+  // after all other painting operations have completed, including children.
+  // The painting order is:
+  //   1. Paint         - Paint the control itself.
+  //   2. PaintChildren - Paint all child controls.
+  //   3. DoPaint       - Paint FNativeViewScreenshot last.
+  // This ensures the screenshot appears above everything else, matching
+  // the native view's behavior, which always has a higher Z-order.
+  inherited;
+  if (not ALIsDrawableNull(FNativeViewScreenshot)) and
+     (not _AncestorHasScreenshot) then begin
     var LRect := GetNativeViewBoundsRect;
     ALDrawDrawable(
       Canvas, // const ACanvas: Tcanvas;
       FNativeViewScreenshot, // const ADrawable: TALDrawable;
       LRect.TopLeft, // const ATopLeft: TpointF;
       AbsoluteOpacity); // const AOpacity: Single);
+    _PaintFrozenOverlays(Self);
+  end;
+  if FHideNativeViewAfterPaint = 2 then begin
+    FHideNativeViewAfterPaint := 1;
+    TThread.ForceQueue(
+      FThreadQueueCleaner,
+      procedure
+      begin
+        if FHideNativeViewAfterPaint = 1 then begin
+          FHideNativeViewAfterPaint := 0;
+          HideNativeView;
+          Repaint;
+        end;
+      end);
+  end;
+  If FFreeNativeViewScreenshotAfterPaint > 0 then begin
+    dec(FFreeNativeViewScreenshotAfterPaint);
+    if FFreeNativeViewScreenshotAfterPaint = 0 then
+      ALFreeAndNilDrawable(FNativeViewScreenshot);
+    _Invalidate;
   end;
 end;
 

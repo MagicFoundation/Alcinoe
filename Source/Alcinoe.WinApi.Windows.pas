@@ -123,6 +123,7 @@ procedure ALCheckWinApiErrorCode(const AExtraInfo: String; const AErrorCode: DWO
 procedure ALCheckWinApiWSAErrorCode(const AExtraInfo: String; const AErrorCode: Integer; const AModuleHandle: HMODULE = 0); overload; inline;
 procedure ALCheckWinApiNTStatus(const AExtraInfo: String; const AStatus: NTSTATUS; const AModuleHandle: HMODULE = 0); overload; inline;
 procedure ALCheckWinApiSecurityStatus(const AExtraInfo: String; const AStatus: SECURITY_STATUS; const AModuleHandle: HMODULE = 0); overload; inline;
+procedure ALCheckWinApiHResult(const AExtraInfo: String; const AResult: HRESULT; const AModuleHandle: HMODULE = 0); overload; inline;
 procedure ALCheckWinApiBoolean(const AExtraInfo: String; const ABoolean: Boolean; const AModuleHandle: HMODULE = 0); overload; inline;
 function  ALCheckWinApiHandle(const AExtraInfo: String; const AHandle: THandle; const AModuleHandle: HMODULE = 0): THandle; overload; inline;
 function  ALCheckWinApiPointer(const AExtraInfo: String; const APointer: Pointer; const AModuleHandle: HMODULE = 0): Pointer; overload; inline;
@@ -130,6 +131,7 @@ procedure ALCheckWinApiErrorCode(const AErrorCode: DWORD; const AModuleHandle: H
 procedure ALCheckWinApiWSAErrorCode(const AErrorCode: Integer; const AModuleHandle: HMODULE = 0); overload; inline;
 procedure ALCheckWinApiNTStatus(const AStatus: NTSTATUS; const AModuleHandle: HMODULE = 0); overload; inline;
 procedure ALCheckWinApiSecurityStatus(const AStatus: SECURITY_STATUS; const AModuleHandle: HMODULE = 0); overload; inline;
+procedure ALCheckWinApiHResult(const AResult: HRESULT; const AModuleHandle: HMODULE = 0); overload; inline;
 procedure ALCheckWinApiBoolean(const ABoolean: Boolean; const AModuleHandle: HMODULE = 0); overload; inline;
 function  ALCheckWinApiHandle(const AHandle: THandle; const AModuleHandle: HMODULE = 0): THandle; overload; inline;
 function  ALCheckWinApiPointer(const APointer: Pointer; const AModuleHandle: HMODULE = 0): Pointer; overload; inline;
@@ -199,6 +201,18 @@ begin
   end;
 end;
 
+{*****************************************************************************************************************}
+procedure ALCheckWinApiHResult(const AExtraInfo: String; const AResult: HRESULT; const AModuleHandle: HMODULE = 0);
+begin
+  if Failed(AResult) then begin
+    var LErrorMessage := SysErrorMessage(DWORD(AResult), AModuleHandle);
+    if (LErrorMessage = '') and (AModuleHandle <> 0) then LErrorMessage := SysErrorMessage(DWORD(AResult));
+    if LErrorMessage = '' then LErrorMessage := 'A call to a COM/OLE function failed';
+    if AExtraInfo <> '' then raise Exception.CreateFmt('%s (hresult=%d, hex=0x%.8x) - %s', [LErrorMessage, AResult, DWORD(AResult), AExtraInfo])
+    else raise Exception.CreateFmt('%s (hresult=%d, hex=0x%.8x)', [LErrorMessage, AResult, DWORD(AResult)]);
+  end;
+end;
+
 {******************************************************************************************************************}
 procedure ALCheckWinApiBoolean(const AExtraInfo: String; const ABoolean: Boolean; const AModuleHandle: HMODULE = 0);
 begin
@@ -255,6 +269,12 @@ end;
 procedure ALCheckWinApiSecurityStatus(const AStatus: SECURITY_STATUS; const AModuleHandle: HMODULE = 0);
 begin
   ALCheckWinApiSecurityStatus(''{AExtraInfo}, AStatus, AModuleHandle);
+end;
+
+{***************************************************************************************}
+procedure ALCheckWinApiHResult(const AResult: HRESULT; const AModuleHandle: HMODULE = 0);
+begin
+  ALCheckWinApiHResult(''{AExtraInfo}, AResult, AModuleHandle);
 end;
 
 {****************************************************************************************}

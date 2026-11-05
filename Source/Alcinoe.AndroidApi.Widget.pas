@@ -18,6 +18,20 @@ type
   JALDatePickerDialog = interface;
   JALKeyPreImeListener = interface;
   JALEditText = interface;
+  JProgressBar = interface;
+
+  {***************************************}
+  JProgressBarClass = interface(JViewClass)
+    ['{242903D2-87EA-45F3-BC34-40096947DC68}']
+    {class} function init(context: JContext): JProgressBar; cdecl;
+  end;
+  [JavaSignature('android/widget/ProgressBar')]
+  JProgressBar = interface(JView)
+    ['{7BC10EFA-3D20-420C-9D7B-C2C6953938DF}']
+    procedure setIndeterminate(indeterminate: Boolean); cdecl;
+    function getIndeterminateDrawable: JDrawable; cdecl;
+  end;
+  TJProgressBar = class(TJavaGenericImport<JProgressBarClass, JProgressBar>) end;
 
   {******************************************************}
   JALDatePickerDialogListenerClass = interface(IJavaClass)
@@ -94,6 +108,7 @@ uses
 {**********************}
 procedure RegisterTypes;
 begin
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Widget.JProgressBar', TypeInfo(Alcinoe.AndroidApi.Widget.JProgressBar));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Widget.JALDatePickerDialogListener', TypeInfo(Alcinoe.AndroidApi.Widget.JALDatePickerDialogListener));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Widget.JALDatePickerDialog', TypeInfo(Alcinoe.AndroidApi.Widget.JALDatePickerDialog));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Widget.JALKeyPreImeListener', TypeInfo(Alcinoe.AndroidApi.Widget.JALKeyPreImeListener));

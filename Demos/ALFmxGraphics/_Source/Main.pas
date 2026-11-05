@@ -480,7 +480,8 @@ begin
     ButtonCheckForMemoryLeaks.Text := 'Check for Memory Leaks';
   end
   Else begin
-    TDialogService.ShowMessage('''
+    TDialogService.ShowMessage(
+      '''
       We will now initiate a loop to create a large number of images. It is
       necessary to keep the application running for a sufficient duration to
       observe if there's an increase in memory usage or if the application
@@ -641,21 +642,21 @@ begin
                   var LText := ALRandomStrW(Random(2048),[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']);
                   LRawTextStopWatch.Start;
                   var LDrawable := ALCreateMultiLineTextDrawable(
-                                    LText,
-                                    LRect,
-                                    LOptions);
+                                     LText,
+                                     LRect,
+                                     LOptions);
                   LRawTextStopWatch.Stop;
                   ALFreeAndNilDrawable(LDrawable);
 
                   if I mod 50 = 0 then begin
                     TThread.Synchronize(nil,
-                    procedure
-                    begin
-                      StatusLabel3.Text := ALInttostrW(i) + ' images created in: ' + ALFormatFloatW('0.00', LRawTextStopWatch.Elapsed.TotalMilliseconds) + ' ms';
-                      StatusLabel3.Visible := True;
-                      OrderStatusLabels;
-                      Invalidate;
-                    end);
+                      procedure
+                      begin
+                        StatusLabel3.Text := ALInttostrW(i) + ' images created in: ' + ALFormatFloatW('0.00', LRawTextStopWatch.Elapsed.TotalMilliseconds) + ' ms';
+                        StatusLabel3.Visible := True;
+                        OrderStatusLabels;
+                        Invalidate;
+                      end);
                   end;
                 Finally
                   ALFreeAndNil(LOptions);
@@ -798,21 +799,21 @@ begin
                         'font-family="GoodDog Plain">font fallbacks '#29233#21644#31119'</span>';
                   LHtmlTextStopWatch.Start;
                   var LDrawable := ALCreateMultiLineTextDrawable(
-                                    LText,
-                                    LRect,
-                                    LOptions);
+                                     LText,
+                                     LRect,
+                                     LOptions);
                   LHtmlTextStopWatch.Stop;
                   ALFreeAndNilDrawable(LDrawable);
 
                   if I mod 50 = 0 then begin
                     TThread.Synchronize(nil,
-                    procedure
-                    begin
-                      StatusLabel3.Text := ALInttostrW(i) + ' images created in: ' + ALFormatFloatW('0.00', LRawTextStopWatch.Elapsed.TotalMilliseconds + LHtmlTextStopWatch.Elapsed.TotalMilliseconds) + ' ms';
-                      StatusLabel3.Visible := True;
-                      OrderStatusLabels;
-                      Invalidate;
-                    end);
+                      procedure
+                      begin
+                        StatusLabel3.Text := ALInttostrW(i) + ' images created in: ' + ALFormatFloatW('0.00', LRawTextStopWatch.Elapsed.TotalMilliseconds + LHtmlTextStopWatch.Elapsed.TotalMilliseconds) + ' ms';
+                        StatusLabel3.Visible := True;
+                        OrderStatusLabels;
+                        Invalidate;
+                      end);
                   end;
 
                 Finally
@@ -826,18 +827,18 @@ begin
             end;
 
             TThread.Synchronize(nil,
-            procedure
-            begin
-              StatusLabel1.Text := '500 text images created in: ' + ALFormatFloatW('0', LRawTextStopWatch.Elapsed.TotalMilliseconds) + ' ms ('+ALFormatFloatW('0', LRawTextStopWatch.Elapsed.TotalMilliseconds / 500) +' ms/image)';
-              StatusLabel1.Visible := True;
-              StatusLabel2.Text := '500 Html images created in: ' + ALFormatFloatW('0', LHtmlTextStopWatch.Elapsed.TotalMilliseconds) + ' ms ('+ALFormatFloatW('0', LHtmlTextStopWatch.Elapsed.TotalMilliseconds / 500) +' ms/image)';
-              StatusLabel2.Visible := True;
-              OrderStatusLabels;
-              ButtonTestMultilineText.Tag := 0;
-              ButtonTestMultilineText.Text := 'Test Multiline Text';
-              EnableButtons;
-              Invalidate;
-            end);
+              procedure
+              begin
+                StatusLabel1.Text := '500 text images created in: ' + ALFormatFloatW('0', LRawTextStopWatch.Elapsed.TotalMilliseconds) + ' ms ('+ALFormatFloatW('0', LRawTextStopWatch.Elapsed.TotalMilliseconds / 500) +' ms/image)';
+                StatusLabel1.Visible := True;
+                StatusLabel2.Text := '500 Html images created in: ' + ALFormatFloatW('0', LHtmlTextStopWatch.Elapsed.TotalMilliseconds) + ' ms ('+ALFormatFloatW('0', LHtmlTextStopWatch.Elapsed.TotalMilliseconds / 500) +' ms/image)';
+                StatusLabel2.Visible := True;
+                OrderStatusLabels;
+                ButtonTestMultilineText.Tag := 0;
+                ButtonTestMultilineText.Text := 'Test Multiline Text';
+                EnableButtons;
+                Invalidate;
+              end);
 
           End);
       end);
@@ -878,17 +879,17 @@ begin
           Begin
             var LTotalMilliseconds := InitTestFPSDrawables(Lcount, 0);
             TThread.Synchronize(nil,
-            procedure
-            begin
-              MainScrollBox.Visible := False;
-              ButtonStop.Visible := True;
-              StatusLabel2.Text := ALIntToStrW(Lcount)+' images created in: ' + ALFormatFloatW('0.00', LTotalMilliseconds) + ' ms';
-              StatusLabel2.Visible := True;
-              OrderStatusLabels;
-              ButtonTestFPS.Tag := 2;
-              ButtonTestFPS.Text := 'Stop FPS Test';
-              Invalidate;
-            end);
+              procedure
+              begin
+                MainScrollBox.Visible := False;
+                ButtonStop.Visible := True;
+                StatusLabel2.Text := ALIntToStrW(Lcount)+' images created in: ' + ALFormatFloatW('0.00', LTotalMilliseconds) + ' ms';
+                StatusLabel2.Visible := True;
+                OrderStatusLabels;
+                ButtonTestFPS.Tag := 2;
+                ButtonTestFPS.Text := 'Stop FPS Test';
+                Invalidate;
+              end);
           End);
       end);
     //--

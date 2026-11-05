@@ -153,7 +153,7 @@ const
     </html>
     ''';
 
-{***********************************************************************}
+{**********************************************************************}
 function UrlQueryParam(const AURL: String; const AName: String): String;
 begin
   Result := '';
@@ -164,7 +164,7 @@ begin
       Exit(ALUrlDecode(Copy(LPair, Length(AName) + 2, MaxInt), False));
 end;
 
-{*********************************************************************}
+{************************************************************}
 // Return the host of a URL like scheme://host:port/path?query
 function UrlHost(const AURL: String): String;
 begin
@@ -224,7 +224,7 @@ begin
   StatusText.Text := String.Join('<br>', FLog);
 end;
 
-{******************************************************************************************}
+{*******************************************************************************************}
 procedure TMainForm.SendToPage(const AType: String; const AText: String; const AID: Integer);
 begin
   // A JSON object is also a valid JavaScript literal.
@@ -239,7 +239,7 @@ begin
   end;
 end;
 
-{***********************************************************************************}
+{************************************************************************************}
 procedure TMainForm.HandlePageMessage(const AMessage: String; const AChannel: String);
 begin
   var LJSON: TALJSONNodeW;
@@ -268,7 +268,7 @@ begin
   end;
 end;
 
-{*************************************************************************************************************}
+{**********************************************************************************************************}
 procedure TMainForm.WebBrowserShouldStartLoadUrl(ASender: TObject; const AURL: string; var AAllow: Boolean);
 begin
   // This runs inside the native navigation callback: decide right away,
@@ -318,7 +318,7 @@ begin
     end);
 end;
 
-{*********************************************************************************}
+{********************************************************************************}
 procedure TMainForm.WebBrowserWebMessage(Sender: TObject; const AMessage: string);
 begin
   HandlePageMessage(AMessage, 'postMessage');

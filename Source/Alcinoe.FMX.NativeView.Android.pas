@@ -47,6 +47,7 @@ type
     procedure AncestorVisibleChanged; virtual; // procedure PMAncestorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
     procedure RootChanged(const aRoot: IRoot); virtual; // procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
     procedure ChangeOrder; virtual; // PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
+    procedure BringToFront; virtual;
   protected
     function GetView<T: JView>: T; overload;
     function CreateView: JView; virtual;
@@ -107,6 +108,9 @@ var
   LayoutParams: JRelativeLayout_LayoutParams;
 begin
   inherited;
+
+  FVisible := True;
+
   FLayout := CreateLayout;
   FView := CreateView;
   FView.setClipToOutline(False);
@@ -121,8 +125,6 @@ begin
   FView.setClickable(True);
   FView.setFocusable(True);
   FView.setFocusableInTouchMode(True);
-
-  FVisible := True;
 
   TMessageManager.DefaultManager.SubscribeToMessage(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
   TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateHandleListener);
@@ -269,6 +271,13 @@ begin
   //  ZOrderManager.UpdateOrder(Control);
 end;
 
+{******************************************}
+procedure TALAndroidNativeView.BringToFront;
+begin
+  if Layout.getParent <> nil then
+    Layout.bringToFront;
+end;
+
 {****************************************************}
 procedure TALAndroidNativeView.AncestorVisibleChanged;
 begin
@@ -308,9 +317,9 @@ begin
     else
       LParam := TJRelativeLayout_LayoutParams.Wrap(Layout.getLayoutParams);
     // FMX form consists from two parts: form's view and layout for other native controls. Form's view embedded into Layout.
-    // So it should always holds 0 index. So when we rearrange native controls, we should keep in mind, that for native
-    // controls first index is 1.
-    LParentGroup.addView(Layout, 1, LParam);
+    // So it should always holds 0 index. Native controls are appended at the end of the list so that the most recently
+    // attached native control is displayed above the others (e.g. TALFMXOverNativeContainer above a TALMapLibre).
+    LParentGroup.addView(Layout, LParentGroup.getChildCount, LParam);
     UpdateFrame;
   end
   else FForm := nil;

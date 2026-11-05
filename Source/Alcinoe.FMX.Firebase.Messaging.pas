@@ -20,14 +20,14 @@ Setup (IOS)
 
 2) In project > option > Building > Delphi Compiler > FRAMEWORK search path
    you need to add the following path:
-   <Alcinoe>\Libraries\ios\Firebase\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64
-   <Alcinoe>\Libraries\ios\Firebase\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64
-   <Alcinoe>\Libraries\ios\Firebase\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64
-   <Alcinoe>\Libraries\ios\Firebase\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64
-   <Alcinoe>\Libraries\ios\Firebase\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64
-   <Alcinoe>\Libraries\ios\Firebase\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64
-   <Alcinoe>\Libraries\ios\Firebase\FirebaseAnalytics\nanopb.xcframework\ios-arm64
-   <Alcinoe>\Libraries\ios\Firebase\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Firebase\Static\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Firebase\Static\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Firebase\Static\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Firebase\Static\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Firebase\Static\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Firebase\Static\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Firebase\Static\FirebaseAnalytics\nanopb.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Firebase\Static\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64
 
 3) Under Tools, Options, SDK Manager you will need to add the following frameworks
 

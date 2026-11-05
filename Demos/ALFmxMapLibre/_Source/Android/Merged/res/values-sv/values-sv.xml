@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="maplibre_attributionErrorNoBrowser">Ingen webbläsare installerad på enheten. Kan inte visa sidan.</string>
+    <string name="maplibre_attributionsDialogTitle">MapLibre Android</string>
+    <string name="maplibre_attributionsIconContentDescription">Tillskrivningsikon. Aktivera för att visa tillskrivningsdialog.</string>
+    <string name="maplibre_compassContentDescription">Kompass. Aktivera för att nollställa kartans rotation mot norr.</string>
+    <string name="maplibre_mapActionDescription">Visar en karta skapad med MapLibre. Scrolla genom att dra med två fingrar. Zooma genom att nypa med två fingrar.</string>
+    <string name="maplibre_myLocationViewContentDescription">Positionsvy. Denna visar din position på kartan.</string>
+    <string name="maplibre_offline_error_region_definition_invalid">Försedd OfflineRegionDefinition passar inte världens gränser: %s</string>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Svara"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Video"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"Avvisa"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Lägg på"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"Inkommande samtal"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Pågående samtal"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"Ett inkommande samtal filtreras"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+</resources>

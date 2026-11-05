@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="maplibre_attributionErrorNoBrowser">Non podes abrir a páxina web porque non hai un navegador web no dispositivo.</string>
+    <string name="maplibre_attributionsDialogTitle">MapLibre Android</string>
+    <string name="maplibre_attributionsIconContentDescription">Icona de atribución. Actívaa para amosar o diálogo de atribución.</string>
+    <string name="maplibre_compassContentDescription">Compás do mapa. Actívao para restabelecer a rotación do mapa cara o norte.</string>
+    <string name="maplibre_mapActionDescription">Estase a amosar un mapa feito co MapLibre. Belisca dous dedos para desprazarte ou belisca para achegar.</string>
+    <string name="maplibre_myLocationViewContentDescription">Vista de ubicación. Amosa a túa ubicación no mapa.</string>
+    <string name="maplibre_offline_error_region_definition_invalid">O parámetro OfflineRegionDefinition que se ingresou non coincide cos límites mundiais: %s</string>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Contestar"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Vídeo"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"Rexeitar"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Colgar"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"Chamada entrante"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Chamada en curso"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"Filtrando chamada entrante"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">">999"</string>
+</resources>

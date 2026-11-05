@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="maplibre_attributionErrorNoBrowser">На устройстве нет веб-браузера, нельзя показать веб-страницу.</string>
+    <string name="maplibre_attributionsDialogTitle">MapLibre Android</string>
+    <string name="maplibre_attributionsIconContentDescription">Значок атрибутов. Активируйте, чтобы показать диалог.</string>
+    <string name="maplibre_compassContentDescription">Компас. Активируйте, чтобы развернуть карту на север.</string>
+    <string name="maplibre_mapActionDescription">Отображает карту, созданную при помощи MapLibre. Пролистывайте двумя пальцами. Меняйте масштаб сведением пальцев.</string>
+    <string name="maplibre_myLocationViewContentDescription">Местоположение. Отображает вашу позицию на карте.</string>
+    <string name="maplibre_offline_error_region_definition_invalid">Запрошенный OfflineRegionDefinition не входит в допустимые границы: %s</string>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Ответить"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Видео"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"Отклонить"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Завершить"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"Входящий вызов"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Текущий вызов"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"Фильтрация входящего вызова"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">">999"</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="maplibre_attributionsDialogTitle">MapLibre Android</string>
+    <string name="maplibre_attributionsIconContentDescription">Attributie icoon. Activeer voor het tonen van het attributie dialoog. </string>
+    <string name="maplibre_compassContentDescription">Kompas van de map. Activeer om de map rotatie te herzetten naar het noorden.</string>
+    <string name="maplibre_mapActionDescription">Toont een map gemaakt met MapLibre. Scroll door het slepen met twee vingers. Zoom door vingers te nijpen.</string>
+    <string name="maplibre_myLocationViewContentDescription">Locatie Element. Dit toont jouw locatie op de map.</string>
+    <string name="maplibre_offline_error_region_definition_invalid">Aangeleverde OfflineRegionDefinition past niet in de wereld omtrek: %s</string>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Beantwoorden"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Video"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"Weigeren"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Ophangen"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"Inkomend gesprek"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Actief gesprek"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"Een inkomend gesprek screenen"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+</resources>

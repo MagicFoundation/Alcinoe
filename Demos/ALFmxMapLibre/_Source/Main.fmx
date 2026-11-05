@@ -331,11 +331,11 @@ object MainForm: TMainForm
     TabOrder = 1
     object MapLibre: TALMapLibre
       Align = Client
+      Compass.Margins.Top = 16.000000000000000000
+      Compass.Margins.Right = 16.000000000000000000
       Size.Width = 360.000000000000000000
       Size.Height = 577.000000000000000000
       Size.PlatformDefault = False
-      Compass.Margins.Top = 16.000000000000000000
-      Compass.Margins.Right = 16.000000000000000000
       StyleURL = 'https://tiles.openfreemap.org/styles/dark'
       OnMapReady = MapLibreMapReady
       OnStyleLoaded = MapLibreStyleLoaded
@@ -362,7 +362,6 @@ object MainForm: TMainForm
         Size.Width = 328.000000000000000000
         Size.Height = 182.000000000000000000
         Size.PlatformDefault = False
-        Visible = False
         XRadius = 16.000000000000000000
         YRadius = 16.000000000000000000
         object MarkerPopupImage: TALImage

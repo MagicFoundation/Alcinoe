@@ -375,7 +375,11 @@ end;
 {****************************************}
 procedure TALFMXOverNativeContainer.Paint;
 begin
-  if FInPaintTo or (csDesigning in ComponentState) or (FNativeView = nil) then inherited
+  if (csDesigning in ComponentState) and not Locked then begin
+    DrawDesignBorder;
+    inherited;
+  end
+  else if (FInPaintTo) or (FNativeView = nil) then inherited
   else begin
     var LBitmapWidth := Round(Width * ALGetScreenScale);
     var LBitmapHeight := Round(Height * ALGetScreenScale);

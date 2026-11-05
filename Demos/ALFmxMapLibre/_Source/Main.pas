@@ -402,6 +402,8 @@ begin
   FCameraMoveCount := 0;
   InitializeMarkers;
 
+  MarkerPopup.Visible := False;
+
   // All visual components (header, toolbar, map, marker popup) and timers are
   // defined in Main.fmx. The form owns two non-overlapping layouts: header
   // above, map below. Header controls never cover the native map or its

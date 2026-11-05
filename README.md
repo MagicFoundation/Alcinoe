@@ -601,7 +601,7 @@ TALMapLibre for FireMonkey
 MapLibre Native on Android and iOS and MapLibre GL JS in WebView2 on Windows.
 
 <p>
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/maplibre.png?raw=true" alt="MapLibre" width="600" style="width:600px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/maplibre.webp?raw=true" alt="MapLibre" width="600" style="width:600px;"/>
 </p>
 
 MapLibre is an open-source mapping library for displaying interactive, 

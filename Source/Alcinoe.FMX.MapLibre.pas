@@ -5183,215 +5183,215 @@ begin
   var LCompleted := False;
   var LResult := '';
   EvaluateJavaScript(
-    '''
-    (function() {
-      const map = window.map;
-      const center = map.getCenter();
-      const padding = map.getPadding();
-      return {
-        bearing: map.getBearing(),
-        padding: [
-          padding.left,
-          padding.top,
-          padding.right,
-          padding.bottom
-        ],
-        roll: map.getRoll(),
-        target: [center.lat, center.lng],
-        tilt: map.getPitch(),
-        zoom: map.getZoom()
-      };
-    })()
-    ''',
-    procedure(const AResult: String)
-    begin
-      LResult := AResult;
-      LCompleted := True;
-    end);
+        '''
+        (function() {
+          const map = window.map;
+          const center = map.getCenter();
+          const padding = map.getPadding();
+          return {
+            bearing: map.getBearing(),
+            padding: [
+              padding.left,
+              padding.top,
+              padding.right,
+              padding.bottom
+            ],
+            roll: map.getRoll(),
+            target: [center.lat, center.lng],
+            tilt: map.getPitch(),
+            zoom: map.getZoom()
+          };
+        })()
+        ''',
+        procedure(const AResult: String)
+        begin
+          LResult := AResult;
+          LCompleted := True;
+        end);
 
-  var LForm := Screen.ActiveForm;
-  if LForm = nil then LForm := Application.MainForm;
-  if LForm <> nil then Winapi.Windows.EnableWindow(WindowHandleToPlatform(LForm.Handle).Wnd, False);
-  try
-    while not LCompleted do
-      Application.ProcessMessages;
-  finally
-    if LForm <> nil then Winapi.Windows.EnableWindow(WindowHandleToPlatform(LForm.Handle).Wnd, True);
-  end;
+      var LForm := Screen.ActiveForm;
+      if LForm = nil then LForm := Application.MainForm;
+      if LForm <> nil then Winapi.Windows.EnableWindow(WindowHandleToPlatform(LForm.Handle).Wnd, False);
+      try
+        while not LCompleted do
+          Application.ProcessMessages;
+      finally
+        if LForm <> nil then Winapi.Windows.EnableWindow(WindowHandleToPlatform(LForm.Handle).Wnd, True);
+      end;
 
-  if (LResult = '') or (LResult = 'null') then raise Exception.Create('Invalid JavaScript result');
-  var LJSON := TALJsonDocumentW.CreateFromJSONString(LResult);
-  try
-    Result.bearing := LJSON.GetChildNode('bearing').Float;
-    var LPadding := LJSON.GetChildNode('padding');
-    Result.padding := TALRectD.Create(
-                        LPadding.ChildNodes[0].Float, // Left
-                        LPadding.ChildNodes[1].Float, // Top
-                        LPadding.ChildNodes[2].Float, // Right
-                        LPadding.ChildNodes[3].Float); // Bottom
-    Result.roll := LJSON.GetChildNode('roll').Float;
-    var LTarget := LJSON.GetChildNode('target');
-    Result.target := TALLatLng.Create(
-                       LTarget.ChildNodes[0].Float, // Latitude
-                       LTarget.ChildNodes[1].Float); // Longitude
-    Result.tilt := LJSON.GetChildNode('tilt').Float;
-    Result.zoom := LJSON.GetChildNode('zoom').Float;
-  finally
-    ALFreeAndNil(LJSON);
-  end;
-end;
-
-{**************************************}
-procedure TALWinMapLibreView.ApplyStyle;
-begin
-  if FMapReady then begin
-    var LStyle: string;
-    if Control.StyleJSON <> '' then LStyle := Control.StyleJSON
-    else if Control.StyleURL <> '' then LStyle := '"' + ALJAvascriptEncode(Control.StyleURL) + '"'
-    else Exit;
-    EvaluateJavaScript('window.map.setStyle('+Lstyle+');');
-  end
-  else if not IsWebView2Ready then begin
-    LoadData(
-      '', // ABaseUrl
-      GetHtml, // AData
-      'text/html', // AMimeType
-      'UTF-8'); // AEncoding
-  end
-  else
-    FApplyStyleWhenMapReady := True;
-end;
-
-{****************************************}
-procedure TALWinMapLibreView.ApplyCompass;
-begin
-  // Called again on 'map-ready'
-  if not FMapReady then Exit;
-  {$IF defined(DEBUG)}
-  ALLog('TALWinMapLibreView.ApplyCompass');
-  {$ENDIF}
-  var LCompass := Control.Compass;
-
-  var LPosition: String;
-  case LCompass.Gravity of
-    TALMapLibre.TOrnamentGravity.TopLeft: LPosition := 'top-left';
-    TALMapLibre.TOrnamentGravity.TopRight: LPosition := 'top-right';
-    TALMapLibre.TOrnamentGravity.BottomLeft: LPosition := 'bottom-left';
-    TALMapLibre.TOrnamentGravity.BottomRight: LPosition := 'bottom-right';
-    else raise Exception.Create('Error 5C8E1A3F-7B2D-4E96-A0F4-3D9B6E1C7A52');
-  end;
-
-  var LImage := '';
-  if LCompass.Enabled and (LCompass.ResourceName <> '') then begin
-    var LBitmap := ALCreateBitmapFromResource(
-                     LCompass.ResourceName, // const AResourceName: String;
-                     nil, // const AResourceStream: TStream;
-                     '', // const AMaskResourceName: String;
-                     ALGetScreenScale, // const AScale: Single;
-                     TRectF.Empty, // const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
-                     LCompass.Width, LCompass.Height, // const W, H: single;
-                     True, // const AApplyMetadataOrientation: Boolean;
-                     TALImageWrapMode.fit, // const AWrapMode: TALImageWrapMode;
-                     TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
-                     TalphaColors.null, // const ATintColor: TalphaColor;
-                     0, // const ABlurRadius: single;
-                     0, // const AXRadius: Single;
-                     0); // const AYRadius: Single): TALBitmap;
-    try
-      LImage := ALMapLibreBitmapToPngBase64(LBitmap);
-    finally
-      ALFreeAndNilBitmap(LBitmap);
+      if (LResult = '') or (LResult = 'null') then raise Exception.Create('Invalid JavaScript result');
+      var LJSON := TALJsonDocumentW.CreateFromJSONString(LResult);
+      try
+        Result.bearing := LJSON.GetChildNode('bearing').Float;
+        var LPadding := LJSON.GetChildNode('padding');
+        Result.padding := TALRectD.Create(
+                            LPadding.ChildNodes[0].Float, // Left
+                            LPadding.ChildNodes[1].Float, // Top
+                            LPadding.ChildNodes[2].Float, // Right
+                            LPadding.ChildNodes[3].Float); // Bottom
+        Result.roll := LJSON.GetChildNode('roll').Float;
+        var LTarget := LJSON.GetChildNode('target');
+        Result.target := TALLatLng.Create(
+                           LTarget.ChildNodes[0].Float, // Latitude
+                           LTarget.ChildNodes[1].Float); // Longitude
+        Result.tilt := LJSON.GetChildNode('tilt').Float;
+        Result.zoom := LJSON.GetChildNode('zoom').Float;
+      finally
+        ALFreeAndNil(LJSON);
+      end;
     end;
-  end;
 
-  // The compass is the compass button of a maplibregl.NavigationControl,
-  // wrapped in a custom control to be able to style its container.
-  EvaluateJavaScript(
-    '(function() {' +
-      'const map = window.map;' +
-      'if (window.compassControl) {' +
-        'map.removeControl(window.compassControl);' +
-        'window.compassControl = null;' +
-      '}' +
-      'if (!' + ALMapLibreJSBoolean(LCompass.Enabled) + ') return;' +
-      'const fadeFacingNorth = ' + ALMapLibreJSBoolean(LCompass.FadeFacingNorth) + ';' +
-      'const image = ' + ALMapLibreJSString(LImage) + ';' +
-      'const width = ' + ALMapLibreJSNumber(LCompass.Width) + ';' +
-      'const height = ' + ALMapLibreJSNumber(LCompass.Height) + ';' +
-      'const margin = "' + ALMapLibreJSNumber(LCompass.Margins.Top) + 'px ' +
-                           ALMapLibreJSNumber(LCompass.Margins.Right) + 'px ' +
-                           ALMapLibreJSNumber(LCompass.Margins.Bottom) + 'px ' +
-                           ALMapLibreJSNumber(LCompass.Margins.Left) + 'px";' +
-      'const nav = new maplibregl.NavigationControl({showCompass: true, showZoom: false, visualizePitch: false});' +
-      'window.compassControl = {' +
-        'onAdd: function(m) {' +
-          'const el = nav.onAdd(m);' +
-          'el.style.margin = margin;' +
-          'if (image !== "") {' +
-            'el.style.background = "transparent";' +
-            'el.style.boxShadow = "none";' +
-            'const button = el.querySelector(".maplibregl-ctrl-compass");' +
-            'if (button) {' +
-              'button.style.width = width + "px";' +
-              'button.style.height = height + "px";' +
-              'button.style.background = "transparent";' +
-            '}' +
-            'const icon = el.querySelector(".maplibregl-ctrl-icon");' +
-            'if (icon) {' +
-              'icon.style.backgroundImage = "url(data:image/png;base64," + image + ")";' +
-              'icon.style.backgroundSize = "contain";' +
-              'icon.style.backgroundRepeat = "no-repeat";' +
-              'icon.style.backgroundPosition = "center";' +
-            '}' +
-          '}' +
-          'if (fadeFacingNorth) {' +
-            'el.style.transition = "opacity 0.3s";' +
-            'this._update = function() {' +
-              'const north = Math.abs(m.getBearing()) < 0.01;' +
-              'el.style.opacity = north ? "0" : "1";' +
-              'el.style.pointerEvents = north ? "none" : "auto";' +
-            '};' +
-            'm.on("rotate", this._update);' +
-            'this._update();' +
-          '}' +
-          'return el;' +
-        '},' +
-        'onRemove: function(m) {' +
-          'if (this._update) m.off("rotate", this._update);' +
-          'nav.onRemove();' +
-        '}' +
-      '};' +
-      'map.addControl(window.compassControl, "' + LPosition + '");' +
-    '})();');
-end;
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure TALWinMapLibreView.ApplyStyle;
+    begin
+      if FMapReady then begin
+        var LStyle: string;
+        if Control.StyleJSON <> '' then LStyle := Control.StyleJSON
+        else if Control.StyleURL <> '' then LStyle := '"' + ALJAvascriptEncode(Control.StyleURL) + '"'
+        else Exit;
+        EvaluateJavaScript('window.map.setStyle('+Lstyle+');');
+      end
+      else if not IsWebView2Ready then begin
+        LoadData(
+          '', // ABaseUrl
+          GetHtml, // AData
+          'text/html', // AMimeType
+          'UTF-8'); // AEncoding
+      end
+      else
+        FApplyStyleWhenMapReady := True;
+    end;
 
-{*******************************************************************}
-procedure TALWinMapLibreView.ShowLoadingSpinner(const AHTML: String);
-begin
-  if not FMapReady then raise Exception.Create('MapLibre is not initialized');
-  EvaluateJavaScript(
-    '''
-    (function() {
-      let container = document.getElementById('loadingSpinner');
-      if (container) container.remove();
-      container = document.createElement('div');
-      container.id = 'loadingSpinner';
-      container.innerHTML = "
-    '''
-    + ALJavaScriptEncode(AHTML) +
-    '''
-    ";
-      document.body.appendChild(container);
-      // Scripts inserted with innerHTML are never executed: recreate them
-      // so that JavaScript-driven animations work as well.
-      container.querySelectorAll('script').forEach(function(oldScript) {
-        const newScript = document.createElement('script');
-        for (const attr of oldScript.attributes)
-          newScript.setAttribute(attr.name, attr.value);
-        newScript.textContent = oldScript.textContent;
-        oldScript.replaceWith(newScript);
-      });
-    })();
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure TALWinMapLibreView.ApplyCompass;
+    begin
+      // Called again on 'map-ready'
+      if not FMapReady then Exit;
+      {$IF defined(DEBUG)}
+      ALLog('TALWinMapLibreView.ApplyCompass');
+      {$ENDIF}
+      var LCompass := Control.Compass;
+
+      var LPosition: String;
+      case LCompass.Gravity of
+        TALMapLibre.TOrnamentGravity.TopLeft: LPosition := 'top-left';
+        TALMapLibre.TOrnamentGravity.TopRight: LPosition := 'top-right';
+        TALMapLibre.TOrnamentGravity.BottomLeft: LPosition := 'bottom-left';
+        TALMapLibre.TOrnamentGravity.BottomRight: LPosition := 'bottom-right';
+        else raise Exception.Create('Error 5C8E1A3F-7B2D-4E96-A0F4-3D9B6E1C7A52');
+      end;
+
+      var LImage := '';
+      if LCompass.Enabled and (LCompass.ResourceName <> '') then begin
+        var LBitmap := ALCreateBitmapFromResource(
+                         LCompass.ResourceName, // const AResourceName: String;
+                         nil, // const AResourceStream: TStream;
+                         '', // const AMaskResourceName: String;
+                         ALGetScreenScale, // const AScale: Single;
+                         TRectF.Empty, // const ASrcRect: TRectF; // In source image coordinates (real pixels). Use TRectF.Empty to use the full image
+                         LCompass.Width, LCompass.Height, // const W, H: single;
+                         True, // const AApplyMetadataOrientation: Boolean;
+                         TALImageWrapMode.fit, // const AWrapMode: TALImageWrapMode;
+                         TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
+                         TalphaColors.null, // const ATintColor: TalphaColor;
+                         0, // const ABlurRadius: single;
+                         0, // const AXRadius: Single;
+                         0); // const AYRadius: Single): TALBitmap;
+        try
+          LImage := ALMapLibreBitmapToPngBase64(LBitmap);
+        finally
+          ALFreeAndNilBitmap(LBitmap);
+        end;
+      end;
+
+      // The compass is the compass button of a maplibregl.NavigationControl,
+      // wrapped in a custom control to be able to style its container.
+      EvaluateJavaScript(
+        '(function() {' +
+          'const map = window.map;' +
+          'if (window.compassControl) {' +
+            'map.removeControl(window.compassControl);' +
+            'window.compassControl = null;' +
+          '}' +
+          'if (!' + ALMapLibreJSBoolean(LCompass.Enabled) + ') return;' +
+          'const fadeFacingNorth = ' + ALMapLibreJSBoolean(LCompass.FadeFacingNorth) + ';' +
+          'const image = ' + ALMapLibreJSString(LImage) + ';' +
+          'const width = ' + ALMapLibreJSNumber(LCompass.Width) + ';' +
+          'const height = ' + ALMapLibreJSNumber(LCompass.Height) + ';' +
+          'const margin = "' + ALMapLibreJSNumber(LCompass.Margins.Top) + 'px ' +
+                               ALMapLibreJSNumber(LCompass.Margins.Right) + 'px ' +
+                               ALMapLibreJSNumber(LCompass.Margins.Bottom) + 'px ' +
+                               ALMapLibreJSNumber(LCompass.Margins.Left) + 'px";' +
+          'const nav = new maplibregl.NavigationControl({showCompass: true, showZoom: false, visualizePitch: false});' +
+          'window.compassControl = {' +
+            'onAdd: function(m) {' +
+              'const el = nav.onAdd(m);' +
+              'el.style.margin = margin;' +
+              'if (image !== "") {' +
+                'el.style.background = "transparent";' +
+                'el.style.boxShadow = "none";' +
+                'const button = el.querySelector(".maplibregl-ctrl-compass");' +
+                'if (button) {' +
+                  'button.style.width = width + "px";' +
+                  'button.style.height = height + "px";' +
+                  'button.style.background = "transparent";' +
+                '}' +
+                'const icon = el.querySelector(".maplibregl-ctrl-icon");' +
+                'if (icon) {' +
+                  'icon.style.backgroundImage = "url(data:image/png;base64," + image + ")";' +
+                  'icon.style.backgroundSize = "contain";' +
+                  'icon.style.backgroundRepeat = "no-repeat";' +
+                  'icon.style.backgroundPosition = "center";' +
+                '}' +
+              '}' +
+              'if (fadeFacingNorth) {' +
+                'el.style.transition = "opacity 0.3s";' +
+                'this._update = function() {' +
+                  'const north = Math.abs(m.getBearing()) < 0.01;' +
+                  'el.style.opacity = north ? "0" : "1";' +
+                  'el.style.pointerEvents = north ? "none" : "auto";' +
+                '};' +
+                'm.on("rotate", this._update);' +
+                'this._update();' +
+              '}' +
+              'return el;' +
+            '},' +
+            'onRemove: function(m) {' +
+              'if (this._update) m.off("rotate", this._update);' +
+              'nav.onRemove();' +
+            '}' +
+          '};' +
+          'map.addControl(window.compassControl, "' + LPosition + '");' +
+        '})();');
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure TALWinMapLibreView.ShowLoadingSpinner(const AHTML: String);
+    begin
+      if not FMapReady then raise Exception.Create('MapLibre is not initialized');
+      EvaluateJavaScript(
+        '''
+        (function() {
+          let container = document.getElementById('loadingSpinner');
+          if (container) container.remove();
+          container = document.createElement('div');
+          container.id = 'loadingSpinner';
+          container.innerHTML = "
+        '''
+        + ALJavaScriptEncode(AHTML) +
+        '''
+        ";
+          document.body.appendChild(container);
+          // Scripts inserted with innerHTML are never executed: recreate them
+          // so that JavaScript-driven animations work as well.
+          container.querySelectorAll('script').forEach(function(oldScript) {
+            const newScript = document.createElement('script');
+            for (const attr of oldScript.attributes)
+              newScript.setAttribute(attr.name, attr.value);
+            newScript.textContent = oldScript.textContent;
+            oldScript.replaceWith(newScript);
+          });
+        })();
     ''');
 end;
 

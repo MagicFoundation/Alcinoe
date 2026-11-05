@@ -167,7 +167,14 @@ begin
              (LSourceStrIdx + 2 <= High(LSourceStr)) and
              (LSourceStr[LSourceStrIdx + 2] = '''') and
              ((LSourceStrIdx + 3 > High(LSourceStr)) or
-              (LSourceStr[LSourceStrIdx + 3] <> '''')) and
+              (LSourceStr[LSourceStrIdx + 3] in [#13, #10]) or
+              (((LSourceStr[LSourceStrIdx + 3] = '+') and
+                (LSourceStrIdx + 4 <= High(LSourceStr)) and
+                (LSourceStr[LSourceStrIdx + 4] in [#13, #10])) or
+               ((LSourceStr[LSourceStrIdx + 3] = ' ') and
+                (LSourceStrIdx + 5 <= High(LSourceStr)) and
+                (LSourceStr[LSourceStrIdx + 4] = '+') and
+                (LSourceStr[LSourceStrIdx + 5] in [#13, #10])))) and
              (not LInDoubleSlashComment) and
              (not LInCurlyBracketComment) and
              (not LInRoundBracketComment) and

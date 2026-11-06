@@ -1,3 +1,8 @@
+## 06/11/2026
+
+- Added support for Delphi 13.2. For older Delphi versions, please use a 
+  release specifically targeting your version.
+
 ## 05/11/2026
 
 - Added the **MapLibre** control (`TALMapLibre`) and the `ALFmxMapLibre` demo

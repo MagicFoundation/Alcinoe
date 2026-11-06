@@ -26,6 +26,7 @@ uses
   {$ENDIF }
   {$IFDEF MSWINDOWS}
   //Alcinoe.TbbMM,
+  //Alcinoe.MimallocMM,
   Alcinoe.Execute,
   Alcinoe.FMX.NativeView.Win,
   Alcinoe.FMX.Trayicon,

@@ -26,7 +26,7 @@ interface
 implementation
 
 type
-  size_t = Cardinal;
+  size_t = NativeUInt;
 
 const
   tbbmallocDLL = 'tbbmalloc.dll';
@@ -34,6 +34,7 @@ const
 {****************************************************************************}
 function scalable_malloc(Size: size_t): Pointer; cdecl; external tbbmallocDLL;
 function scalable_realloc(P: Pointer; Size: size_t): Pointer; cdecl; external tbbmallocDLL;
+function scalable_calloc(Count, Size: size_t): Pointer; cdecl; external tbbmallocDLL;
 procedure scalable_free(P: Pointer); cdecl; external tbbmallocDLL;
 
 {****************************************}
@@ -58,8 +59,7 @@ end;
 {******************************************}
 function AllocMem(Size: NativeInt): Pointer;
 begin
-  Result := GetMem(Size);
-  if Assigned(Result) then FillChar(Result^, Size, 0);
+  Result := scalable_calloc(1, Size);
 end;
 
 {*****************************************************************}

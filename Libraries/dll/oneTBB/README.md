@@ -1,11 +1,8 @@
 Download the framework from 
 https://github.com/oneapi-src/oneTBB/releases
-or
-https://www.intel.com/content/www/us/en/developer/tools/oneapi/onetbb.html
 
 Current version
-Intel(R) Threading Building Blocks 2018 Update 2
-https://github.com/oneapi-src/oneTBB/releases/download/2018_U2/tbb2018_20171205oss_win.zip
+https://github.com/uxlfoundation/oneTBB/releases/tag/v2023.2.0
 
-Win32: \bin\ia32\vc14\tbbmalloc.dll
-Win64: \bin\intel64\vc14\tbbmalloc.dll
+Win32: oneapi-tbb-2023.2.0\redist\ia32\vc14\tbbmalloc.dll
+Win64: oneapi-tbb-2023.2.0\redist\intel64\vc14\tbbmalloc.dll

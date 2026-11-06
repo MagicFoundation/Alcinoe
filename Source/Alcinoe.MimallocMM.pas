@@ -28,7 +28,7 @@ type
 const
   mimallocDLL = 'mimalloc.dll';
 
-{*******************************************************************}
+{*********************************************************************}
 function mi_malloc(Size: size_t): Pointer; cdecl; external mimallocDLL;
 function mi_realloc(P: Pointer; Size: size_t): Pointer; cdecl; external mimallocDLL;
 function mi_calloc(Count, Size: size_t): Pointer; cdecl; external mimallocDLL;

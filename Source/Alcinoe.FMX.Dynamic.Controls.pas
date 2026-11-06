@@ -429,8 +429,8 @@ type
     function IsDisplayed: Boolean; override;
     property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     //**property Form: TCommonCustomForm read FForm;
-    {$IFNDEF ALCompilerVersionSupported131}
-      {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed still not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
+    {$IFNDEF ALCompilerVersionSupported132}
+      {$MESSAGE WARN 'Check if FMX.Controls.TControl.Pressed still not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
     {$ENDIF}
     property Pressed: Boolean read GetPressed write SetPressed;
     procedure AlignToPixel; virtual;
@@ -758,7 +758,7 @@ end;
 procedure TALDynamicControl.BeforeDestruction;
 begin
   fIsDestroying := True;
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Types.TFmxObject.BeforeDestruction was not updated and adjust the IFDEF'}
   {$ENDIF}
   if FNotifyList <> nil then begin
@@ -1069,7 +1069,7 @@ end;
 {**************************************************************************************************}
 procedure TALDynamicControl.EnumControls(const Proc: TFunc<TALDynamicControl, TEnumControlsResult>);
 
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.EnumControls was not updated and adjust the IFDEF'}
   {$ENDIF}
 
@@ -1402,7 +1402,7 @@ end;
 {*******************************************************************}
 function TALDynamicControl.PointInObjectLocal(X, Y: Double): Boolean;
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.PointInObjectLocal was not updated and adjust the IFDEF'}
   {$ENDIF}
   Result := (X >= (0 - TouchTargetExpansion.Left)) and
@@ -1493,7 +1493,7 @@ end;
 {**********************************************************}
 procedure TALDynamicControl.SetOpacity(const Value: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.SetOpacity was not updated and adjust the IFDEF'}
   {$ENDIF}
   if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
@@ -1666,7 +1666,7 @@ end;
 {*******************************************************}
 function TALDynamicControl.FillTextFlags: TFillTextFlags;
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.FillTextFlags was not updated and adjust the IFDEF'}
   {$ENDIF}
   if (Form = nil) then result := ALGetFillTextFlags
@@ -1782,7 +1782,7 @@ end;
 {**********************************}
 procedure TALDynamicControl.Realign;
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.Realign was not updated and adjust the IFDEF'}
   {$ENDIF}
   if IsDestroying then
@@ -2459,7 +2459,7 @@ end;
 {*************************************}
 procedure TALDynamicControl.MouseEnter;
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMouseEnter was not updated and adjust the IFDEF'}
   {$ENDIF}
   FIsMouseOver := True;
@@ -2470,7 +2470,7 @@ end;
 {*************************************}
 procedure TALDynamicControl.MouseLeave;
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMouseLeave was not updated and adjust the IFDEF'}
   {$ENDIF}
   FIsMouseOver := False;
@@ -2481,7 +2481,7 @@ end;
 {********************************************************************************************}
 procedure TALDynamicControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseDown was not updated and adjust the IFDEF'}
   {$ENDIF}
   if Assigned(FOnMouseDown) then
@@ -2497,7 +2497,7 @@ end;
 {**********************************************************************}
 procedure TALDynamicControl.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseMove was not updated and adjust the IFDEF'}
   {$ENDIF}
   if Assigned(FOnMouseMove) then
@@ -2507,7 +2507,7 @@ end;
 {******************************************************************************************}
 procedure TALDynamicControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseUp was not updated and adjust the IFDEF'}
   {$ENDIF}
   ReleaseCapture;
@@ -2519,7 +2519,7 @@ end;
 {*********************************************************************************************}
 procedure TALDynamicControl.MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseClick was not updated and adjust the IFDEF'}
   {$ENDIF}
   if AbsoluteEnabled and FPressed and PointInObjectLocal(X, Y) then begin
@@ -2531,7 +2531,7 @@ end;
 {****************************************************************************************************}
 procedure TALDynamicControl.MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseWheel was not updated and adjust the IFDEF'}
   {$ENDIF}
   //if Assigned(FOnMouseWheel) then
@@ -2800,7 +2800,7 @@ end;
 // This series of operations results in the BufDrawable being
 // recalculated multiple times, leading to significant performance
 // overhead.
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   {$MESSAGE WARN 'Check if FMX.Controls.TControl.EndUpdate was not updated and adjust the IFDEF'}
 {$ENDIF}
 procedure TALDynamicExtendedControl.EndUpdate;
@@ -2857,23 +2857,6 @@ end;
 //**    FAlign := Value;
 //**    var LLegacyAlign: TAlignLayout;
 //**    Case Value of
-//**
-//**      {$IFNDEF ALCompilerVersionSupported131}
-//**        {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4335 was correct and if yes delete the code below'}
-//**      {$ENDIF}
-//**      TALAlignLayout.TopCenter: LLegacyAlign := TAlignLayout.Top;
-//**      TALAlignLayout.TopLeft: LLegacyAlign := TAlignLayout.Top;
-//**      TALAlignLayout.TopRight: LLegacyAlign := TAlignLayout.Top;
-//**      TALAlignLayout.LeftCenter: LLegacyAlign := TAlignLayout.Left;
-//**      TALAlignLayout.LeftTop: LLegacyAlign := TAlignLayout.Left;
-//**      TALAlignLayout.LeftBottom: LLegacyAlign := TAlignLayout.Left;
-//**      TALAlignLayout.RightCenter: LLegacyAlign := TAlignLayout.Right;
-//**      TALAlignLayout.RightTop: LLegacyAlign := TAlignLayout.Right;
-//**      TALAlignLayout.RightBottom: LLegacyAlign := TAlignLayout.Right;
-//**      TALAlignLayout.BottomCenter: LLegacyAlign := TAlignLayout.Bottom;
-//**      TALAlignLayout.BottomLeft: LLegacyAlign := TAlignLayout.Bottom;
-//**      TALAlignLayout.BottomRight: LLegacyAlign := TAlignLayout.Bottom;
-//**
 //**      TALAlignLayout.MostTopCenter: LLegacyAlign := TAlignLayout.MostTop;
 //**      TALAlignLayout.MostTopLeft: LLegacyAlign := TAlignLayout.MostTop;
 //**      TALAlignLayout.MostTopRight: LLegacyAlign := TAlignLayout.MostTop;
@@ -2886,9 +2869,7 @@ end;
 //**      TALAlignLayout.MostBottomCenter: LLegacyAlign := TAlignLayout.MostBottom;
 //**      TALAlignLayout.MostBottomLeft: LLegacyAlign := TAlignLayout.MostBottom;
 //**      TALAlignLayout.MostBottomRight: LLegacyAlign := TAlignLayout.MostBottom;
-//**
 //**      else LLegacyAlign := TAlignLayout(Value);
-//**
 //**    end;
 //**    Inherited SetAlign(LLegacyAlign);
 //**  end;
@@ -2919,17 +2900,13 @@ begin
   //ALLog(ClassName+'.DoRealign', 'Name: ' + Name);
   {$ENDIF}
 
-  {$IFNDEF ALCompilerVersionSupported131}
-    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-15768 was implemented and adjust the IFDEF'}
-  {$ENDIF}
+  //https://quality.embarcadero.com/browse/RSP-15768
   // I decided to remove this workaround because it doesn't
   // work well with TContent (e.g., ScrollBox).
   // The TContent size is always updated during realignment,
   // causing the process to be applied twice.
-  //https://quality.embarcadero.com/browse/RSP-15768
   //var LOriginalSize: TPointF := Size.Size;
   inherited;
-  //https://quality.embarcadero.com/browse/RSP-15768
   //if not LOriginalSize.EqualsTo(Size.Size) then DoRealign;
 
   // Unfortunately, FNeedAlign is set to true when any child control with
@@ -2976,58 +2953,43 @@ begin
   If LParentRealigning then
     ParentRealigning;
 
-  {$IFNDEF ALCompilerVersionSupported131}
-    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4335 was correct and if yes uncomment the code below'}
-  {$ENDIF}
-  If (LParentRealigning) // and
-     //(integer(FAlign) >= integer(TALAlignLayout.MostTopCenter)) and
-     //(integer(FAlign) <= integer(TALAlignLayout.MostBottomRight))
-  then begin
-    case FAlign of
-      TALAlignLayout.TopCenter,
-      TALAlignLayout.BottomCenter,
-      TALAlignLayout.MostTopCenter,
-      TALAlignLayout.MostBottomCenter: begin
-        X := X + ((AWidth - Width) / 2);
-        AWidth := Width;
-      end;
-      TALAlignLayout.TopLeft,
-      TALAlignLayout.BottomLeft,
-      TALAlignLayout.MostTopLeft,
-      TALAlignLayout.MostBottomLeft: begin
-        AWidth := Width;
-      end;
-      TALAlignLayout.TopRight,
-      TALAlignLayout.BottomRight,
-      TALAlignLayout.MostTopRight,
-      TALAlignLayout.MostBottomRight: begin
-        X := X + (AWidth - Width);
-        AWidth := Width;
-      end;
-      TALAlignLayout.LeftCenter,
-      TALAlignLayout.RightCenter,
-      TALAlignLayout.MostLeftCenter,
-      TALAlignLayout.MostRightCenter: begin
-        Y := Y + ((AHeight - Height) / 2);
-        AHeight := Height;
-      end;
-      TALAlignLayout.LeftTop,
-      TALAlignLayout.RightTop,
-      TALAlignLayout.MostLeftTop,
-      TALAlignLayout.MostRightTop: begin
-        AHeight := Height;
-      end;
-      TALAlignLayout.LeftBottom,
-      TALAlignLayout.RightBottom,
-      TALAlignLayout.MostLeftBottom,
-      TALAlignLayout.MostRightBottom: begin
-        Y := Y + (AHeight - Height);
-        AHeight := Height;
-      end;
-      //else
-      //  raise Exception.Create('Error 9431A388-3F2F-4F06-8296-210708F60C66');
-    end;
-  end;
+  //**If (LParentRealigning) and
+  //**   (integer(FAlign) >= integer(TALAlignLayout.MostTopCenter)) and
+  //**   (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight))
+  //**then begin
+  //**  case FAlign of
+  //**    TALAlignLayout.MostTopCenter,
+  //**    TALAlignLayout.MostBottomCenter: begin
+  //**      X := X + ((AWidth - Width) / 2);
+  //**      AWidth := Width;
+  //**    end;
+  //**    TALAlignLayout.MostTopLeft,
+  //**    TALAlignLayout.MostBottomLeft: begin
+  //**      AWidth := Width;
+  //**    end;
+  //**    TALAlignLayout.MostTopRight,
+  //**    TALAlignLayout.MostBottomRight: begin
+  //**      X := X + (AWidth - Width);
+  //**      AWidth := Width;
+  //**    end;
+  //**    TALAlignLayout.MostLeftCenter,
+  //**    TALAlignLayout.MostRightCenter: begin
+  //**      Y := Y + ((AHeight - Height) / 2);
+  //**      AHeight := Height;
+  //**    end;
+  //**    TALAlignLayout.MostLeftTop,
+  //**    TALAlignLayout.MostRightTop: begin
+  //**      AHeight := Height;
+  //**    end;
+  //**    TALAlignLayout.MostLeftBottom,
+  //**    TALAlignLayout.MostRightBottom: begin
+  //**      Y := Y + (AHeight - Height);
+  //**      AHeight := Height;
+  //**    end
+  //**    else
+  //**      raise Exception.Create('Error 85B34A7D-4830-4D87-B0CD-E86977068BA5');
+  //**  end;
+  //**end;
 
   if FIsSetBoundsLocked then begin
     AWidth := Width;
@@ -3684,7 +3646,7 @@ end;
 {*********************************************************}
 //**function TALDynamicExtendedControl.GetScale: TPosition;
 //**begin
-//**  {$IFNDEF ALCompilerVersionSupported131}
+//**  {$IFNDEF ALCompilerVersionSupported132}
 //**    {$MESSAGE WARN 'Check if FMX.Types.ArrangeControl(const Control: IAlignableObject... was not updated and adjust the IFDEF'}
 //**  {$ENDIF}
 //**  // ArrangeControl calls IRotatedControl.GetScale to determine the control’s scale
@@ -3842,7 +3804,7 @@ end;
 {******************************************************************}
 //**procedure TALDynamicExtendedControl.SetNewScene(AScene: IScene);
 //**begin
-//**  {$IFNDEF ALCompilerVersionSupported131}
+//**  {$IFNDEF ALCompilerVersionSupported132}
 //**    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
 //**    {$MESSAGE WARN 'Check if FMX.Controls.TControl.Pressed is still changed only in SetNewScene/MouseDown/MouseUp/MouseClick'}
 //**    {$MESSAGE WARN 'Check if FMX.Controls.TControl.IsFocused is still changed only in SetNewScene/DoEnter/DoExit'}
@@ -4117,7 +4079,7 @@ end;
 {***********************************************************************}
 //**procedure TALDynamicExtendedControl.DoMatrixChanged(Sender: TObject);
 //**begin
-//**  {$IFNDEF ALCompilerVersionSupported131}
+//**  {$IFNDEF ALCompilerVersionSupported132}
 //**    {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMatrixChanged was not updated and adjust the IFDEF'}
 //**    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2823 was not corrected and adjust the IFDEF'}
 //**  {$ENDIF}

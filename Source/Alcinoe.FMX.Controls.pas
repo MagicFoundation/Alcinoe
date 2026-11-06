@@ -16,7 +16,7 @@ uses
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Types.TAlignLayout was not updated and adjust the IFDEF'}
   {$ENDIF}
   // ⚠ Important:
@@ -81,7 +81,7 @@ type
   TALClickSoundMode = (Default, Always, Never);
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALControl = class(TControl, IRotatedControl)
@@ -180,8 +180,8 @@ type
     function IsDisplayed: Boolean; virtual;
     property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     property Form: TCommonCustomForm read FForm;
-    {$IFNDEF ALCompilerVersionSupported131}
-      {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed still not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
+    {$IFNDEF ALCompilerVersionSupported132}
+      {$MESSAGE WARN 'Check if FMX.Controls.TControl.Pressed still not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
     {$ENDIF}
     property Pressed: Boolean read GetPressed write SetPressed;
     procedure AlignToPixel; virtual;
@@ -213,7 +213,7 @@ type
   end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TContent was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALContent = class(TALControl, IContent)
@@ -459,7 +459,7 @@ end;
 // This series of operations results in the BufDrawable being
 // recalculated multiple times, leading to significant performance
 // overhead.
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   {$MESSAGE WARN 'Check if FMX.Controls.TControl.EndUpdate was not updated and adjust the IFDEF'}
 {$ENDIF}
 procedure TALControl.EndUpdate;
@@ -516,23 +516,6 @@ begin
     FAlign := Value;
     var LLegacyAlign: TAlignLayout;
     Case Value of
-
-      {$IFNDEF ALCompilerVersionSupported131}
-        {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4335 was correct and if yes delete the code below'}
-      {$ENDIF}
-      TALAlignLayout.TopCenter: LLegacyAlign := TAlignLayout.Top;
-      TALAlignLayout.TopLeft: LLegacyAlign := TAlignLayout.Top;
-      TALAlignLayout.TopRight: LLegacyAlign := TAlignLayout.Top;
-      TALAlignLayout.LeftCenter: LLegacyAlign := TAlignLayout.Left;
-      TALAlignLayout.LeftTop: LLegacyAlign := TAlignLayout.Left;
-      TALAlignLayout.LeftBottom: LLegacyAlign := TAlignLayout.Left;
-      TALAlignLayout.RightCenter: LLegacyAlign := TAlignLayout.Right;
-      TALAlignLayout.RightTop: LLegacyAlign := TAlignLayout.Right;
-      TALAlignLayout.RightBottom: LLegacyAlign := TAlignLayout.Right;
-      TALAlignLayout.BottomCenter: LLegacyAlign := TAlignLayout.Bottom;
-      TALAlignLayout.BottomLeft: LLegacyAlign := TAlignLayout.Bottom;
-      TALAlignLayout.BottomRight: LLegacyAlign := TAlignLayout.Bottom;
-
       TALAlignLayout.MostTopCenter: LLegacyAlign := TAlignLayout.MostTop;
       TALAlignLayout.MostTopLeft: LLegacyAlign := TAlignLayout.MostTop;
       TALAlignLayout.MostTopRight: LLegacyAlign := TAlignLayout.MostTop;
@@ -545,9 +528,7 @@ begin
       TALAlignLayout.MostBottomCenter: LLegacyAlign := TAlignLayout.MostBottom;
       TALAlignLayout.MostBottomLeft: LLegacyAlign := TAlignLayout.MostBottom;
       TALAlignLayout.MostBottomRight: LLegacyAlign := TAlignLayout.MostBottom;
-
       else LLegacyAlign := TAlignLayout(Value);
-
     end;
     Inherited SetAlign(LLegacyAlign);
   end;
@@ -578,17 +559,13 @@ begin
   //ALLog(ClassName+'.DoRealign', 'Name: ' + Name);
   {$ENDIF}
 
-  {$IFNDEF ALCompilerVersionSupported131}
-    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-15768 was implemented and adjust the IFDEF'}
-  {$ENDIF}
+  //https://quality.embarcadero.com/browse/RSP-15768
   // I decided to remove this workaround because it doesn't
   // work well with TContent (e.g., ScrollBox).
   // The TContent size is always updated during realignment,
   // causing the process to be applied twice.
-  //https://quality.embarcadero.com/browse/RSP-15768
   //var LOriginalSize: TPointF := Size.Size;
   inherited;
-  //https://quality.embarcadero.com/browse/RSP-15768
   //if not LOriginalSize.EqualsTo(Size.Size) then DoRealign;
 
   // Unfortunately, FNeedAlign is set to true when any child control with
@@ -635,56 +612,41 @@ begin
   If LParentRealigning then
     ParentRealigning;
 
-  {$IFNDEF ALCompilerVersionSupported131}
-    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4335 was correct and if yes uncomment the code below'}
-  {$ENDIF}
-  If (LParentRealigning) // and
-     //(integer(FAlign) >= integer(TALAlignLayout.MostTopCenter)) and
-     //(integer(FAlign) <= integer(TALAlignLayout.MostBottomRight))
+  If (LParentRealigning) and
+     (integer(FAlign) >= integer(TALAlignLayout.MostTopCenter)) and
+     (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight))
   then begin
     case FAlign of
-      TALAlignLayout.TopCenter,
-      TALAlignLayout.BottomCenter,
       TALAlignLayout.MostTopCenter,
       TALAlignLayout.MostBottomCenter: begin
         X := X + ((AWidth - Width) / 2);
         AWidth := Width;
       end;
-      TALAlignLayout.TopLeft,
-      TALAlignLayout.BottomLeft,
       TALAlignLayout.MostTopLeft,
       TALAlignLayout.MostBottomLeft: begin
         AWidth := Width;
       end;
-      TALAlignLayout.TopRight,
-      TALAlignLayout.BottomRight,
       TALAlignLayout.MostTopRight,
       TALAlignLayout.MostBottomRight: begin
         X := X + (AWidth - Width);
         AWidth := Width;
       end;
-      TALAlignLayout.LeftCenter,
-      TALAlignLayout.RightCenter,
       TALAlignLayout.MostLeftCenter,
       TALAlignLayout.MostRightCenter: begin
         Y := Y + ((AHeight - Height) / 2);
         AHeight := Height;
       end;
-      TALAlignLayout.LeftTop,
-      TALAlignLayout.RightTop,
       TALAlignLayout.MostLeftTop,
       TALAlignLayout.MostRightTop: begin
         AHeight := Height;
       end;
-      TALAlignLayout.LeftBottom,
-      TALAlignLayout.RightBottom,
       TALAlignLayout.MostLeftBottom,
       TALAlignLayout.MostRightBottom: begin
         Y := Y + (AHeight - Height);
         AHeight := Height;
-      end;
-      //else
-      //  raise Exception.Create('Error 9431A388-3F2F-4F06-8296-210708F60C66');
+      end
+      else
+        raise Exception.Create('Error 85B34A7D-4830-4D87-B0CD-E86977068BA5');
     end;
   end;
 
@@ -1343,7 +1305,7 @@ end;
 {**************************************}
 function TALControl.GetScale: TPosition;
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Types.ArrangeControl(const Control: IAlignableObject... was not updated and adjust the IFDEF'}
   {$ENDIF}
   // ArrangeControl calls IRotatedControl.GetScale to determine the control’s scale
@@ -1500,7 +1462,7 @@ end;
 {***********************************************}
 procedure TALControl.SetNewScene(AScene: IScene);
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.Pressed is still changed only in SetNewScene/MouseDown/MouseUp/MouseClick'}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.IsFocused is still changed only in SetNewScene/DoEnter/DoExit'}
@@ -1776,7 +1738,7 @@ end;
 {****************************************************}
 procedure TALControl.DoMatrixChanged(Sender: TObject);
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMatrixChanged was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2823 was not corrected and adjust the IFDEF'}
   {$ENDIF}
@@ -1912,7 +1874,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   {$MESSAGE WARN 'Check if FMX.Controls.TContentTabList was not updated and adjust the IFDEF'}
 {$ENDIF}
 type

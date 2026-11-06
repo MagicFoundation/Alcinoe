@@ -378,7 +378,7 @@ begin
     var LControl := Controls[i];
     if not LControl.Visible then continue;
     if LControl is TALFMXOverNativeContainer then continue;
-    {$IFNDEF ALCompilerVersionSupported131}
+    {$IFNDEF ALCompilerVersionSupported132}
       {$MESSAGE WARN 'Check if FMX.Types.TAlignLayout was not updated and adjust the IFDEF'}
     {$ENDIF}
     case Lcontrol.Align of

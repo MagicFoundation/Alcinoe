@@ -7,7 +7,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   //Please run <Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorAndroid.bat
   //with the library identifiers com.facebook.android:facebook-android-sdk:xx.xx.xx where xx.xx.xx
   //is the last version of the facebook-android-sdk (You can find this version at

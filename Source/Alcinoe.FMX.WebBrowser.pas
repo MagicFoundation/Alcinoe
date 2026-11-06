@@ -4,7 +4,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   {$MESSAGE WARN 'Check if FMX.WebBrowser.Delegate.iOS.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -1112,7 +1112,7 @@ type
   TAuthenticationResponseProc = reference to procedure(const ACredential: NSURLCredential);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.WebBrowser.Delegate.Cocoa.TBaseWebViewDelegate.AuthenticateForHost was not updated and adjust the IFDEF'}
   {$ENDIF}
   procedure AuthenticateForHost(const AHost: NSString; const AResponseProc: TAuthenticationResponseProc);
@@ -1446,7 +1446,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   {$MESSAGE WARN 'Check if FMX.WebBrowser.Cocoa.TCommonWebBrowserService.DoNavigate.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 procedure TALIosWebBrowserView.LoadUrl(const AURL: string);
@@ -1460,8 +1460,14 @@ procedure TALIosWebBrowserView.LoadUrl(const AURL: string);
     // 1. In application bundle resources
     // 2. In root of disk.
     // For this case we start looking for this file in application bundle resources and after in global file system.
-    var LBundle := TNSBundle.OCClass.mainBundle;
-    var LPath := LBundle.pathForResource(StrToNSStr(LFileName), nil);
+    var LPath: NSString;
+    var LBundle: NSBundle;
+    {$IFDEF IOS}
+    LPath := TNSBundle.OCClass.mainBundle.pathForResource(StrToNSStr(LFileName), nil);
+    {$ELSE}
+    LBundle := TNSBundle.OCClass.mainBundle;
+    LPath := LBundle.pathForResource(StrToNSStr(LFileName), nil);
+    {$ENDIF}
     if LPath = nil then begin
       LBundle := TNSBundle.Wrap(TNSBundle.OCClass.bundleWithPath(StrToNSStr(LDir)));
       LPath := LBundle.pathForResource(StrToNSStr(LFileName), nil);
@@ -1620,7 +1626,7 @@ type
   TAuthenticationResponseProc = reference to procedure(const ACredential: NSURLCredential);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.WebBrowser.Delegate.Cocoa.TBaseWebViewDelegate.AuthenticateForHost was not updated and adjust the IFDEF'}
   {$ENDIF}
   procedure AuthenticateForHost(const AHost: NSString; const AResponseProc: TAuthenticationResponseProc);
@@ -1826,7 +1832,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   {$MESSAGE WARN 'Check if FMX.WebBrowser.Cocoa.TCommonWebBrowserService.DoNavigate.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 procedure TALMacWebBrowserView.LoadUrl(const AURL: string);
@@ -1840,13 +1846,19 @@ procedure TALMacWebBrowserView.LoadUrl(const AURL: string);
     // 1. In application bundle resources
     // 2. In root of disk.
     // For this case we start looking for this file in application bundle resources and after in global file system.
-    var LBundle: Pointer := TNSBundle.OCClass.mainBundle;
-    var LPath := TNSBundle.Wrap(LBundle).pathForResource(StrToNSStr(LFileName), nil);
+    var LPath: NSString;
+    var LBundle: Pointer;
+    {$IFDEF IOS}
+    Path := TNSBundle.OCClass.mainBundle.pathForResource(StrToNSStr(FileName), nil);
+    {$ELSE}
+    LBundle := TNSBundle.OCClass.mainBundle;
+    LPath := TNSBundle.Wrap(LBundle).pathForResource(StrToNSStr(LFileName), nil);
+    {$ENDIF}
     if LPath = nil then begin
       LBundle := TNSBundle.OCClass.bundleWithPath(StrToNSStr(LDir));
       LPath := TNSBundle.Wrap(LBundle).pathForResource(StrToNSStr(LFileName), nil);
     end;
-    {$IFNDEF ALCompilerVersionSupported131}
+    {$IFNDEF ALCompilerVersionSupported132}
       {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4402 is corrected, if yes remove the TNSURL.Wrap(), and adjust the IFDEF'}
     {$ENDIF}
     if LPath <> nil then

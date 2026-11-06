@@ -264,7 +264,7 @@ procedure TALProcMetricsHistory.Grow;
 begin
   {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
 
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.Grow was not updated and adjust the IFDEF'}
   {$ENDIF}
 
@@ -285,7 +285,7 @@ procedure TALProcMetricsHistory.SetCapacity(NewCapacity: NativeInt);
 begin
   {$IF defined(ALCodeProfilerHistoryGroupByCallStack)}
 
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.SetCapacity was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.InternalSetCapacity was not updated and adjust the IFDEF'}
   {$ENDIF}
@@ -339,7 +339,7 @@ end;
 procedure TALProcMetricsHistory.Rehash(NewCapPow2: NativeInt);
 begin
 
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.Rehash was not updated and adjust the IFDEF'}
   {$ENDIF}
 
@@ -381,7 +381,7 @@ end;
 function TALProcMetricsHistory.GetBucketIndex(const AProcID, AParentMetricsID: Cardinal; const AHashCode: Integer): NativeInt;
 begin
 
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.GetBucketIndex was not updated and adjust the IFDEF'}
   {$ENDIF}
 
@@ -420,7 +420,7 @@ const
   PositiveMask = Integer.MaxValue;
 begin
 
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.GetBucketIndex was not updated and adjust the IFDEF'}
   {$ENDIF}
 
@@ -623,7 +623,7 @@ begin
               MetricsID := LParentMetricsID + 1;
               ParentMetricsID := LParentParentMetricsID;
               ThreadID := LProcMetricsStack.FArray[LProcMetricsStack.FCount - 2].ThreadID;
-              {$IFNDEF ALCompilerVersionSupported131}
+              {$IFNDEF ALCompilerVersionSupported132}
                 {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
               {$ENDIF}
               CallCount := 0;
@@ -667,7 +667,7 @@ end;
 procedure ALCodeProfilerExitProc(const aProcID : Cardinal);
 
   type
-    {$IFNDEF ALCompilerVersionSupported131}
+    {$IFNDEF ALCompilerVersionSupported132}
       {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch was not updated and adjust the IFDEF'}
     {$ENDIF}
     TStopwatchAccessPrivate = record
@@ -717,7 +717,7 @@ begin
           ParentExecutionID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ParentExecutionID;
           ProcID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ProcID;
           ThreadID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ThreadID;
-          {$IFNDEF ALCompilerVersionSupported131}
+          {$IFNDEF ALCompilerVersionSupported132}
             {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
           {$ENDIF}
           {$IF defined(MSWINDOWS)}
@@ -732,7 +732,7 @@ begin
         end;
         {$ELSEIF defined(ALCodeProfilerHistoryGroupByProcID)}
         var LProcID: Cardinal := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ProcID;
-        {$IFNDEF ALCompilerVersionSupported131}
+        {$IFNDEF ALCompilerVersionSupported132}
           {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.TryAdd was not updated and adjust the IFDEF'}
         {$ENDIF}
         {$IF defined(ALCodeProfilerIgnoreThreadID)}
@@ -742,7 +742,7 @@ begin
           ProcID := LProcID;
           ThreadID := 0;
           AtomicIncrement(CallCount);
-          {$IFNDEF ALCompilerVersionSupported131}
+          {$IFNDEF ALCompilerVersionSupported132}
             {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
           {$ENDIF}
           {$IF defined(MSWINDOWS)}
@@ -758,7 +758,7 @@ begin
           ProcID := LProcID;
           ThreadID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ThreadID;
           Inc(CallCount);
-          {$IFNDEF ALCompilerVersionSupported131}
+          {$IFNDEF ALCompilerVersionSupported132}
             {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
           {$ENDIF}
           {$IF defined(MSWINDOWS)}
@@ -773,7 +773,7 @@ begin
         {$ELSEIF defined(ALCodeProfilerHistoryGroupByCallStack)}
         var LProcID: Cardinal := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ProcID;
         var LParentMetricsID: Cardinal := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ParentMetricsID;
-        {$IFNDEF ALCompilerVersionSupported131}
+        {$IFNDEF ALCompilerVersionSupported132}
           {$MESSAGE WARN 'Check if System.Generics.Collections.TDictionary<K,V>.TryAdd was not updated and adjust the IFDEF'}
         {$ENDIF}
         var LHashCode: Integer := LProcMetricsHistory.Hash(LProcID, LParentMetricsID);
@@ -781,7 +781,7 @@ begin
         if LIndex >= 0 then begin
           With LProcMetricsHistory.FArray[LIndex] do begin
             Inc(CallCount);
-            {$IFNDEF ALCompilerVersionSupported131}
+            {$IFNDEF ALCompilerVersionSupported132}
               {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
             {$ENDIF}
             {$IF defined(MSWINDOWS)}
@@ -808,7 +808,7 @@ begin
             ParentMetricsID := LParentMetricsID;
             ThreadID := LProcMetricsStack.FArray[LProcMetricsStackLastIndex].ThreadID;
             CallCount := 1;
-            {$IFNDEF ALCompilerVersionSupported131}
+            {$IFNDEF ALCompilerVersionSupported132}
               {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
             {$ENDIF}
             {$IF defined(MSWINDOWS)}
@@ -894,7 +894,7 @@ initialization
   ALAppActive := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ALCodeProfilerApplicationEventHandler);
   {$ENDIF}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch.InitStopwatchType was not updated and adjust the IFDEF'}
   {$ENDIF}
   if not TStopwatch.IsHighResolution then ALTickFrequency := 1.0

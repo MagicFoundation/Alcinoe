@@ -4732,7 +4732,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   {$MESSAGE WARN 'Check if FMX.Presentation.Android.TAndroidNativeView.ProcessTouch was not updated and adjust the IFDEF'}
 {$ENDIF}
 function TALAndroidEditView.TTouchListener.onTouch(v: JView; event: JMotionEvent): Boolean;
@@ -5945,7 +5945,7 @@ begin
   View.setDrawsBackground(false);
   View.setFocusRingType(NSFocusRingTypeNone);
   FTextFieldDelegate := TTextFieldDelegate.Create(Self);
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4352 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   View.setDelegate(FTextFieldDelegate);

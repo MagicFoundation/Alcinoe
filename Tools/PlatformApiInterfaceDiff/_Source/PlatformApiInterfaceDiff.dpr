@@ -470,7 +470,7 @@ begin
 
     Writeln;
 
-    {$IFNDEF ALCompilerVersionSupported131}
+    {$IFNDEF ALCompilerVersionSupported132}
       {$MESSAGE WARN 'Update the paths below and adjust the IFDEF'}
       {$MESSAGE WARN 'Also run PlatformApiInterfaceDiff to detect changes in iOSApi/Macapi and adjust the IFDEF'}
     {$ENDIF}

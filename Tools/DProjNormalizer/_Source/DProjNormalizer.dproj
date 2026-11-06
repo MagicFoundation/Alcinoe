@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{75AD9D04-FB1F-4585-AA4B-90AA3BC92190}</ProjectGuid>
-    <ProjectVersion>20.4</ProjectVersion>
+    <ProjectVersion>20.5</ProjectVersion>
     <FrameworkType>None</FrameworkType>
     <MainSource>DProjNormalizer.dpr</MainSource>
     <Base>True</Base>

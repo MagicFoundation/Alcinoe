@@ -7,7 +7,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   {$MESSAGE WARN 'Check whether MapLibre can be compiled as a static library alongside Skia. Verify that the compilation produces no warnings or linker issues. If everything works correctly, switch from dynamic libraries to static libraries.'}
 {$ENDIF}
 

@@ -484,7 +484,7 @@ type
   TALPointDType = array [0..1] of Double;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Types.TPointf still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   PALPointD = ^TALPointD;
@@ -562,7 +562,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Types.TPointf still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   TALPointFHelper = record helper for TPointF
@@ -571,7 +571,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Types.TSizef still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   PALSizeD = ^TALSizeD;
@@ -616,7 +616,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Types.TSizef still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   TALSizeFHelper = record helper for TSizeF
@@ -624,7 +624,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Types.TRectf still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   PALRectD = ^TALRectD;
@@ -776,7 +776,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Types.TRectf still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   TALRectFHelper = record helper for TRectF
@@ -785,7 +785,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if System.Types.TRect still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   TALRectHelper = record helper for TRect
@@ -794,8 +794,8 @@ type
 
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-{$IFNDEF ALCompilerVersionSupported131}
-  {$MESSAGE WARN 'Check if functions below implemented in System.Types still having the same implementation and adjust the IFDEF'}
+{$IFNDEF ALCompilerVersionSupported132}
+  {$MESSAGE WARN 'Check if System.Types.xxx functions below still have the same implementations and adjust the IFDEF'}
 {$ENDIF}
 function ALRectWidth(const Rect: TRect): Integer; inline; overload;
 function ALRectWidth(const Rect: TRectF): Single; inline; overload;
@@ -960,7 +960,7 @@ function  ALInt64ToSemanticVersionA(const AVersion: Int64): AnsiString; overload
 function  ALInt64ToSemanticVersionW(const AVersion: Int64): string; overload;
 
 {$IFDEF MSWINDOWS}
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   {$MESSAGE WARN 'Check if EnumDynamicTimeZoneInformation/SystemTimeToTzSpecificLocalTimeEx/TzSpecificLocalTimeToSystemTimeEx are still not declared in Winapi.Windows and adjust the IFDEF'}
 {$ENDIF}
 {$WARNINGS OFF}

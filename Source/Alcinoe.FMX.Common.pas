@@ -4,7 +4,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4349 was corrected, if yes remove the MACOS conditional define around TNSNumber, else adjust the IFDEF'}
 {$ENDIF}
 
@@ -88,7 +88,7 @@ type
   TALShadow = class;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Types.TBounds was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALBounds = class(TPersistent)
@@ -135,7 +135,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Types.TPosition was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALPosition = class(TPersistent)
@@ -1147,7 +1147,7 @@ function ALNSSetToStrings(const ANSSet: NSSet): TArray<String>;
 
 Type
 
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALControlAccessPrivate = class(TFmxObject)
@@ -1318,7 +1318,7 @@ Type
 
 {$IF defined(IOS)}
 type
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Platform.iOS.TFMXViewBase still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALFMXViewBaseAccessPrivate = class(TOCLocal)
@@ -5850,7 +5850,7 @@ Function ALGetSkFontStyle(
            const AFontSlant: TFontSlant;
            const AFontStretch: TFontStretch): sk_fontstyle_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_fontstyle_t didn''t changed'}
   {$ENDIF}
   //--
@@ -6113,7 +6113,7 @@ begin
   var LQuery := TNSMutableDictionary.Create;
   try
     {$IF defined(ALMacOS)}
-    {$IFNDEF ALCompilerVersionSupported131}
+    {$IFNDEF ALCompilerVersionSupported132}
       {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4404 was corrected and adjust the IFDEF'}
     {$ENDIF}
     LQuery.setObject(NSStringToID(kSecClassGenericPassword), NSStringToID(kSecClass));
@@ -6157,7 +6157,7 @@ begin
   var LQuery := TNSMutableDictionary.Create;
   Try
     {$IF defined(ALMacOS)}
-    {$IFNDEF ALCompilerVersionSupported131}
+    {$IFNDEF ALCompilerVersionSupported132}
       {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4404 was corrected and adjust the IFDEF'}
     {$ENDIF}
     LQuery.setObject(NSStringToID(kSecClassGenericPassword), NSStringToID(kSecClass));
@@ -6172,7 +6172,7 @@ begin
     var LAttrs := TNSMutableDictionary.Create;
     Try
       {$IF defined(ALMacOS)}
-      {$IFNDEF ALCompilerVersionSupported131}
+      {$IFNDEF ALCompilerVersionSupported132}
         {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4404 was corrected and adjust the IFDEF'}
       {$ENDIF}
       LAttrs.setObject(NSObjectToID(LDataObj), NSStringToID(kSecValueData));
@@ -6449,7 +6449,7 @@ end;
 // This is what is returned by canvas.matrix by default.
 function  ALAlignToPixelRound(const Point: TPointF; const Matrix: TMatrix; const Scale: single; const Epsilon: Single = 0): TpointF; overload;
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.SetMatrix was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixelHorizontally was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixelVertically was not updated and adjust the IFDEF'}
@@ -6472,7 +6472,7 @@ end;
 // This is what is returned by canvas.matrix by default.
 function  ALAlignToPixelRound(const Rect: TRectF; const Matrix: TMatrix; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
 begin
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.SetMatrix was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixelHorizontally was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixelVertically was not updated and adjust the IFDEF'}
@@ -6646,7 +6646,7 @@ end;
 
 {$IF defined(IOS)}
 
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5587 was correct and if yes delete the code below'}
 {$ENDIF}
 

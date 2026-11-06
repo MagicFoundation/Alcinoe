@@ -57,7 +57,7 @@ type
   TJKeyGenerator = class(TJavaGenericImport<JKeyGeneratorClass, JKeyGenerator>) end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3921 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALCipherClass = interface(JCipherClass)

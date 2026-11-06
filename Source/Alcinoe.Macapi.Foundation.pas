@@ -14,7 +14,7 @@ uses
 Type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if NSJSONReadingOptions/NSJSONWritingOptions are not defined in Macapi.Foundation.pas. If yes, remove the class definition below.'}
   {$ENDIF}
   NSJSONReadingOptions = NSInteger;
@@ -37,7 +37,7 @@ const
 Type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if NSJSONSerialization is not defined in Macapi.Foundation.pas. If yes, remove the class definition below.'}
   {$ENDIF}
   NSJSONSerializationClass = interface(NSObjectClass)

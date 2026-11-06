@@ -269,7 +269,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5343 is corrected and if yes remove all occurrences of RSS-5343 from the codebase'}
 {$ENDIF}
 
@@ -497,7 +497,7 @@ begin
   ALFIRAppConfigure;
 
   fUserNotificationCenterDelegate := TUserNotificationCenterDelegate.Create(self);
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4344 is corrected and if yes remove .GetObjectID below'}
   {$ENDIF}
   TUNUserNotificationCenter.OCClass.currentNotificationCenter.setdelegate(fUserNotificationCenterDelegate.GetObjectID);
@@ -1103,7 +1103,7 @@ begin
       var LMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJsonDoc.JSON));
       TMessageManager.DefaultManager.SendMessage(nil, LMessage);
 
-      {$IFNDEF ALCompilerVersionSupported131}
+      {$IFNDEF ALCompilerVersionSupported132}
         {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4325 is corrected and if yes remove the UNNotificationPresentationOptionNone declaration below'}
       {$ENDIF}
       const UNNotificationPresentationOptionNone = 0;

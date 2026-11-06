@@ -14,7 +14,7 @@ type
   JOnBackInvokedDispatcher = interface;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5362 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JOnBackInvokedCallbackClass = interface(IJavaClass)
@@ -28,7 +28,7 @@ type
   TJOnBackInvokedCallback = class(TJavaGenericImport<JOnBackInvokedCallbackClass, JOnBackInvokedCallback>) end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5362 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JOnBackInvokedDispatcherClass = interface(IJavaClass)

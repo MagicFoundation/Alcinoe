@@ -43,7 +43,7 @@ type
   TJUiModeManager = class(TJavaGenericImport<JUiModeManagerClass, JUiModeManager>) end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-21296 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALNotificationClass = interface(JNotificationClass)
@@ -58,7 +58,7 @@ type
   TJALNotification = class(TJavaGenericImport<JALNotificationClass, JALNotification>) end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-21296 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALNotificationChannelClass = interface(JNotificationChannelClass)
@@ -72,7 +72,7 @@ type
   TJALNotificationChannel = class(TJavaGenericImport<JALNotificationChannelClass, JALNotificationChannel>) end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5425 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALNotificationManagerClass = interface(JNotificationManagerClass)
@@ -86,7 +86,7 @@ type
   TJALNotificationManager = class(TJavaGenericImport<JALNotificationManagerClass, JALNotificationManager>) end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported131}
+  {$IFNDEF ALCompilerVersionSupported132}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5362 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALActivityClass = interface(JActivityClass)

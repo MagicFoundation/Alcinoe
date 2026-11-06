@@ -903,7 +903,7 @@ begin
                          'alcinoe_notification_'+ALNewGUIDStringW(true{WithoutBracket}, false{WithoutHyphen}).tolower + ALIfThenW(LFileExt <> '', '.') + LFileExt);
       ANotification.FLargeIconStream.SaveToFile(LFileName);
       var LErrorPtr: PNSError := nil;
-      {$IFNDEF ALCompilerVersionSupported131}
+      {$IFNDEF ALCompilerVersionSupported132}
         {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4411 was corrected and adjust the IFDEF'}
       {$ENDIF}
       var LNotificationAttachment := TUNNotificationAttachment.OCClass.attachmentWithIdentifier(
@@ -923,7 +923,7 @@ begin
               LNotificationAttachment)));
     end;
     //-----
-    {$IFNDEF ALCompilerVersionSupported131}
+    {$IFNDEF ALCompilerVersionSupported132}
       {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4412 was corrected and adjust the IFDEF'}
     {$ENDIF}
     var LNotificationRequest := TUNNotificationRequest.Wrap(

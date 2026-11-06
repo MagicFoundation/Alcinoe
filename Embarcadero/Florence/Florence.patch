@@ -42,7 +42,7 @@ Index: Embarcadero/Florence/fmx/FMX.Controls.pas
 diff --git a/Embarcadero/Florence/fmx/FMX.Controls.pas b/Embarcadero/Florence/fmx/FMX.Controls.pas
 --- a/Embarcadero/Florence/fmx/FMX.Controls.pas	(revision 1)
 +++ b/Embarcadero/Florence/fmx/FMX.Controls.pas	(working copy)
-@@ -5264,7 +5264,7 @@
+@@ -5281,7 +5281,7 @@
              FParentControl.RecalcUpdateRect;
        UpdateExplicitBounds;
        UpdateAnchorRules;
@@ -83,19 +83,6 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Filter.pas b/Embarcadero/Florence/fmx/
 +  //else
      Result := FTarget;
  end;
- 
-Index: Embarcadero/Florence/fmx/FMX.Forms.pas
-===================================================================
-diff --git a/Embarcadero/Florence/fmx/FMX.Forms.pas b/Embarcadero/Florence/fmx/FMX.Forms.pas
---- a/Embarcadero/Florence/fmx/FMX.Forms.pas	(revision 1)
-+++ b/Embarcadero/Florence/fmx/FMX.Forms.pas	(working copy)
-@@ -6708,6 +6708,7 @@
-   if AObject is TControl then
-   begin
-     Child := TControl(AObject);
-+    ResetUpdatingState(Child); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4302
-     if FControls <> nil  then
-       FControls.Remove(Child);
  
 Index: Embarcadero/Florence/fmx/FMX.MultiTouch.pas
 ===================================================================
@@ -626,7 +613,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/
      property Render: TFormRender read FRender;
      property SafeAreaInsets: TRectF read FSafeAreaInsets;
    end;
-@@ -2198,6 +2253,8 @@
+@@ -2226,6 +2281,8 @@
  
  begin
    { Pre initialization }
@@ -635,7 +622,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/
    ReadMotionEvent(AEvent, FMotionEvents);
    UpdateMousePosition;
  
-@@ -2216,6 +2273,8 @@
+@@ -2244,6 +2301,8 @@
    end;
  
    Result := True;
@@ -644,34 +631,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/
  end;
  
  procedure TAndroidMotionManager.HandleMultiTouch;
-@@ -2301,13 +2360,24 @@
-         FLastClickTime := MotionEvent.EventTime;
-       end;
- 
--      AMOTION_EVENT_ACTION_UP,
--      AMOTION_EVENT_ACTION_CANCEL:
-+      AMOTION_EVENT_ACTION_UP:
-       begin
-         PlatformAndroid.WindowService.MouseUp(FHandle.Form, TMouseButton.mbLeft, MotionEvent.Shift + FAdditionalShift, MotionEvent.Position, True);
-         FAdditionalShift := [];
-       end;
- 
-+      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-5611
-+      // When the system takes ownership of the touch stream (e.g. the predictive
-+      // back gesture starting at the screen edge), it sends ACTION_CANCEL. The
-+      // pointer-up must then release the captured/pressed controls WITHOUT
-+      // generating a click, otherwise both the click and the back navigation
-+      // are performed simultaneously.
-+      AMOTION_EVENT_ACTION_CANCEL:
-+      begin
-+        PlatformAndroid.WindowService.MouseUp(FHandle.Form, TMouseButton.mbLeft, MotionEvent.Shift + FAdditionalShift, MotionEvent.Position, False);
-+        FAdditionalShift := [];
-+      end;
-+
-       AMOTION_EVENT_ACTION_MOVE:
-         PlatformAndroid.WindowService.MouseMove(FHandle.Form, MotionEvent.Shift + FAdditionalShift, MotionEvent.Position);
-     else
-@@ -2978,7 +3048,8 @@
+@@ -3012,7 +3071,8 @@
  begin
    inherited Create;
    FContext := AContext;
@@ -681,7 +641,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/
    TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
  end;
  
-@@ -2985,19 +3056,23 @@
+@@ -3019,19 +3079,23 @@
  destructor TRender<T>.Destroy;
  begin
    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
@@ -690,7 +650,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/
 -  AtomicDecrement(FRefCount);
 +  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
 +  //AtomicIncrement(FRefCount);
-+  //TJChoreographer.JavaClass.getInstance.removeFrameCallback(Self); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //TAndroidHelper.MainHandler.removeCallbacks(Self);
 +  //AtomicDecrement(FRefCount);
 +  TChoreographer.Instance.RemoveRenderFrameCallback(doFrame);
    inherited;
@@ -713,7 +673,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/
  end;
  
  procedure TRender<T>.Render;
-@@ -3004,10 +3079,134 @@
+@@ -3038,12 +3102,132 @@
  begin
  end;
  
@@ -845,6 +805,13 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/
 +  FRenderFrameCallbackCurrList.Remove(callback);
 +end;
 +
+ { TAndroidActivityBackPressedListener }
+ 
+ constructor TAndroidActivityBackPressedListener.Create(const ATextInputManager: TAndroidTextInputManager);
+@@ -3072,4 +3256,8 @@
+   FTextInputManager.KeyUp(KeyCode, KeyChar, [], (KeyCode = 0) and (KeyChar = #0));
+ end;
+ 
 +initialization
 +finalization
 +  TChoreographer.DestroyInstance;
@@ -1479,7 +1446,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Flore
 -        Exit;
 -      glGetIntegerv(GL_FRAMEBUFFER_BINDING, @GLuint(LGrGlFramebufferInfo.FBOID));
 -      LGrGlFramebufferInfo.Format := {$IF DEFINED(IOS) or DEFINED(ANDROID)}GL_RGBA8_OES{$ELSE}GL_RGBA8{$ENDIF};
--      LGrBackendRenderTarget := TGrBackendRenderTarget.CreateGl(Round(Width * Scale), Round(Height * Scale), Min(CanvasQualitySampleCount[Quality], FGrDirectContext.GetMaxSurfaceSampleCountForColorType(TSkColorType.RGBA8888)), TGlSharedContext(SharedContext).StencilBits, LGrGlFramebufferInfo);
+-      LGrBackendRenderTarget := TGrBackendRenderTarget.CreateGl(Integer(Round(Width * Scale)), Integer(Round(Height * Scale)), Min(CanvasQualitySampleCount[Quality], FGrDirectContext.GetMaxSurfaceSampleCountForColorType(TSkColorType.RGBA8888)), TGlSharedContext(SharedContext).StencilBits, LGrGlFramebufferInfo);
 -      FBackBufferSurface     := TSkSurface.MakeFromRenderTarget(FGrDirectContext, LGrBackendRenderTarget, TGrSurfaceOrigin.BottomLeft, TSkColorType.RGBA8888);
 -    end;
 -    Result := TSkSurface(FBackBufferSurface);
@@ -1559,7 +1526,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Flore
 -              LEnd := LExtensions;
 -              while (LEnd^ <> ' ') and (LEnd^ <> #0) do
 -                Inc(LEnd);
--              if (LEnd - LExtensions = Length(WGLARBPixelFormatExtName)) and (System.AnsiStrings.StrLIComp(LExtensions, WGLARBPixelFormatExtName, LEnd - LExtensions) = 0) then
+-              if (LEnd - LExtensions = Length(WGLARBPixelFormatExtName)) and (System.AnsiStrings.StrLIComp(LExtensions, WGLARBPixelFormatExtName, UInt32(LEnd - LExtensions)) = 0) then
 -                Exit(True);
 -              if LEnd^ = #0 then
 -                Break;
@@ -1632,7 +1599,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Flore
 +    LGrGlFramebufferInfo.Format := {$IF DEFINED(IOS) or DEFINED(ANDROID)}GL_RGBA8_OES{$ELSE}GL_RGBA8{$ENDIF};
 +    var LStencilBits: GLint;
 +    glGetIntegerv(GL_STENCIL_BITS, @LStencilBits);
-+    var LGrBackendRenderTarget: IGrBackendRenderTarget := TGrBackendRenderTarget.CreateGl(Round(Width * Scale), Round(Height * Scale), Min(CanvasQualitySampleCount[Quality], FGrDirectContext.GetMaxSurfaceSampleCountForColorType(TSkColorType.RGBA8888)), LStencilBits, LGrGlFramebufferInfo);
++    var LGrBackendRenderTarget: IGrBackendRenderTarget := TGrBackendRenderTarget.CreateGl(Integer(Round(Width * Scale)), Integer(Round(Height * Scale)), Min(CanvasQualitySampleCount[Quality], FGrDirectContext.GetMaxSurfaceSampleCountForColorType(TSkColorType.RGBA8888)), LStencilBits, LGrGlFramebufferInfo);
 +    FBackBufferSurface     := TSkSurface.MakeFromRenderTarget(FGrDirectContext, LGrBackendRenderTarget, TGrSurfaceOrigin.BottomLeft, TSkColorType.RGBA8888);
 +  end;
 +
@@ -1731,7 +1698,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Flore
 -      LEnd := LExtensions;
 -      while (LEnd^ <> ' ') and (LEnd^ <> #0) do
 -        Inc(LEnd);
--      if (LEnd - LExtensions = Length(AName)) and (System.AnsiStrings.StrLIComp(LExtensions, AName, LEnd - LExtensions) = 0) then
+-      if (LEnd - LExtensions = Length(AName)) and (System.AnsiStrings.StrLIComp(LExtensions, AName, UInt32(LEnd - LExtensions)) = 0) then
 -        Exit(True);
 -      if LEnd^ = #0 then
 -        Break;
@@ -1871,7 +1838,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Flore
 -      LCount            := Min(LCount, 64);
 -      LRankPixelFormats := TList<TRankPixelFormat>.Create;
 -      try
--        for I := 0 to LCount - 1 do
+-        for I := 0 to Integer(LCount) - 1 do
 -        begin
 -          LRankPixelFormat.Index := I;
 -          LRankPixelFormat.PixelFormat := LPixelFormats[I];

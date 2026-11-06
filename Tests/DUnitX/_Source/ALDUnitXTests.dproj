@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{A71306CE-ED42-498D-A1CD-107EEF3E99CE}</ProjectGuid>
-    <ProjectVersion>20.4</ProjectVersion>
+    <ProjectVersion>20.5</ProjectVersion>
     <FrameworkType>None</FrameworkType>
     <Base>True</Base>
     <Config Condition="'$(Config)'==''">Debug</Config>
@@ -466,7 +466,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Base_Android)'!=''">
     <DCC_UsePackage>fmx;DbxCommonDriver;bindengine;IndyIPCommon;emsclient;IndyProtocols;dbxcds;FmxTeeUI;FireDACSqliteDriver;DbxClientDriver;soapmidas;dbexpress;inet;FireDACDBXDriver;CustomIPTransport;IndySystem;ibxbindings;FireDACCommon;bindcompdbx;rtl;DBXSqliteDriver;DataSnapFireDAC;FireDAC;xmlrtl;ibxpress;dsnap;DataSnapNativeClient;FireDACCommonDriver;IndyIPClient;bindcompfmx;ibmonitor;fmxFireDAC;DataSnapCommon;fmxase;dbrtl;DBXInterBaseDriver;bindcomp;IndyCore;RESTBackendComponents;RESTComponents;IndyIPServer;dsnapxml;DataSnapClient;DataSnapProviderClient;emsclientfiredac;FireDACDSDriver;tethering;CloudService;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Android_LauncherIcon36>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png</Android_LauncherIcon36>
@@ -492,7 +492,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Base_Android64)'!=''">
     <DCC_UsePackage>fmx;DbxCommonDriver;bindengine;IndyIPCommon;emsclient;IndyProtocols;dbxcds;FmxTeeUI;FireDACSqliteDriver;DbxClientDriver;soapmidas;dbexpress;inet;FireDACDBXDriver;CustomIPTransport;IndySystem;ibxbindings;FireDACCommon;bindcompdbx;rtl;DBXSqliteDriver;DataSnapFireDAC;FireDAC;xmlrtl;ibxpress;dsnap;DataSnapNativeClient;FireDACCommonDriver;IndyIPClient;bindcompfmx;ibmonitor;fmxFireDAC;DataSnapCommon;dbrtl;DBXInterBaseDriver;bindcomp;IndyCore;RESTBackendComponents;RESTComponents;IndyIPServer;dsnapxml;DataSnapClient;DataSnapProviderClient;emsclientfiredac;FireDACDSDriver;tethering;CloudService;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Android_LauncherIcon36>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png</Android_LauncherIcon36>
@@ -625,13 +625,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_1_Android)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_1_Android64)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -667,13 +667,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_3_Android)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_3_Android64)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -701,13 +701,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_5_Android)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_5_Android64)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -735,13 +735,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_7_Android)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_7_Android64)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -772,13 +772,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_2_Android)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_2_Android64)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -809,13 +809,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_4_Android)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_4_Android64)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -843,13 +843,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_6_Android)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_6_Android64)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -877,13 +877,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_8_Android)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_8_Android64)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=24;targetSdkVersion=36</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>

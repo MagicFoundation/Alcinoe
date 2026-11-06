@@ -12,7 +12,7 @@ built with the philosophy that every developer deserves the
 platforms—all while maintaining **independence** from the 
 dominance of GAFA (Google, Apple, Facebook, Amazon). 
 
-**Alcinoe** is fully compatible with **Delphi Florence 13.1**.
+**Alcinoe** is fully compatible with **Delphi Florence 13.2**.
 If you are using an older version of Delphi, please refer to the
 releases section to find the latest Alcinoe version compatible with
 your Delphi version.
@@ -127,7 +127,6 @@ forced to apply patches to the original Delphi source files:
 * [Improve Rendering Timing by Using Choreographer Instead of Runnable](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865)
 * [Allow TTexture to Define a Material (GLSL Shader) to Use](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549)
 * [TControl.SetBounds: Missing ParentContentChanged Call on Size-Only Updates](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3264)
-* [Missing ResetUpdatingState call in TCustomForm.DoRemoveObject](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4302)
 * [Effect ProcessTexture is not working and function TFilter.InputTexture: TTexture do unecessary work](https://quality.embarcadero.com/browse/RSP-20825)
 * [Add ExtractContentStream to TURLResponse / IURLResponse to allow taking ownership without copying.](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4664)
 * [Architectural Issues in FMX.Skia.Canvas.GL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1541)
@@ -144,7 +143,6 @@ forced to apply patches to the original Delphi source files:
 * [ForceQueue with Delay Does Not Work on Android](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3206)
 * [AndroidManifest merge in Delphi does not respect tools:node="remove" directive for uses-permission](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3867)
 * [Uncomment missing init overloads in JCipher to enable standard Android Crypto API usage](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3921)
-* [FMX: TAlignLayout.TopLeft ignores Margins on child control](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4335)
 * [iOS: UNNotificationPresentationOptionNone removed from iOSapi.UserNotifications in Delphi 13](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4325)
 * [CVOpenGLESTextureCacheCreate expects raw Obj-C pointer for eaglContext](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4333)
 * [macOS: Align NSTextField.setDelegate signature with other AppKit setters](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4352)

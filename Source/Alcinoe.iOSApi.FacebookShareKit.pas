@@ -7,7 +7,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported131}
+{$IFNDEF ALCompilerVersionSupported132}
   //Pleast update <Alcinoe>\Libraries\ios\Facebook\ to the last one and then run
   //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
   //and gave the path to <Alcinoe>\Source\Alcinoe.iOSApi.FacebookShareKit.pas to build

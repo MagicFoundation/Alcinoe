@@ -1,6 +1,6 @@
 //https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Compiler_Versions
-{$IF (CompilerVersion <= 37.0) and (not declared(RTLVersion132))} // Delphi Florence 13.1
-  {$DEFINE ALCompilerVersionSupported131}
+{$IF (CompilerVersion <= 37.0) and (not declared(RTLVersion133))} // Delphi Florence 13.2
+  {$DEFINE ALCompilerVersionSupported132}
 {$ENDIF}
 
 {$IF defined(CPUX86) or defined(CPUX64)} // CPU is an Intel 386 or later on any platform.

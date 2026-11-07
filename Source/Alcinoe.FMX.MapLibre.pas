@@ -4457,129 +4457,6 @@ end;
 {$REGION ' MSWINDOWS'}
 {$IF defined(MSWINDOWS)}
 
-{*****************************************************************}
-// Layout properties among the data-driven keys (all the others are
-// paint properties). See https://maplibre.org/maplibre-style-spec/layers/
-const
-  ALLayoutLayerDataKeys: TALLayerDataKeys = [
-    TALLayerDataKey.IconImage,
-    TALLayerDataKey.IconSize,
-    TALLayerDataKey.IconAnchor,
-    TALLayerDataKey.IconOffset,
-    TALLayerDataKey.IconRotate,
-    TALLayerDataKey.Text,
-    TALLayerDataKey.TextSize,
-    TALLayerDataKey.TextLetterSpacing,
-    TALLayerDataKey.TextJustify,
-    TALLayerDataKey.TextAnchor,
-    TALLayerDataKey.TextOffset,
-    TALLayerDataKey.TextMaxWidth,
-    TALLayerDataKey.TextRotate,
-    TALLayerDataKey.TextRadialOffset,
-    TALLayerDataKey.TextTransform,
-    TALLayerDataKey.SymbolSortKey,
-    TALLayerDataKey.LineSortKey,
-    TALLayerDataKey.CircleSortKey,
-    TALLayerDataKey.FillSortKey];
-
-{***************************************************************************}
-// Returns the style property bound to a data key (_icon_color -> icon-color)
-function ALGetLayerDataKeyStyleProperty(const AKey: TALLayerDataKey): String;
-begin
-  if AKey = TALLayerDataKey.Text then Result := 'text-field'
-  else Result := ALLayerDataKeyNames[AKey].Substring(1).Replace('_', '-');
-end;
-
-{********************************************************}
-function ALMapLibreJSString(const AValue: String): String;
-begin
-  Result := '"' + ALJavaScriptEncode(AValue) + '"';
-end;
-
-{********************************************************}
-function ALMapLibreJSNumber(const AValue: Double): String;
-begin
-  Result := ALFloatToStrW(AValue);
-end;
-
-{**********************************************************}
-function ALMapLibreJSBoolean(const AValue: Boolean): String;
-begin
-  Result := ALBoolToStrW(AValue, 'true', 'false');
-end;
-
-{**********************************************************************}
-function ALMapLibreJSStringArray(const AValues: TArray<String>): String;
-begin
-  Result := '';
-  for var LValue in AValues do begin
-    if Result <> '' then Result := Result + ',';
-    Result := Result + ALMapLibreJSString(LValue);
-  end;
-  Result := '[' + Result + ']';
-end;
-
-{***********************************************************************}
-function ALMapLibreJSNumberArray(const AValues: array of Single): String;
-begin
-  Result := '';
-  for var LValue in AValues do begin
-    if Result <> '' then Result := Result + ',';
-    Result := Result + ALMapLibreJSNumber(LValue);
-  end;
-  Result := '[' + Result + ']';
-end;
-
-{**************************************************************************************}
-procedure ALMapLibreJSAddProperty(var AProperties: String; const AName, AValue: String);
-begin
-  if AProperties <> '' then AProperties := AProperties + ',';
-  AProperties := AProperties + '"' + AName + '":' + AValue;
-end;
-
-{*********************************************************************************}
-// Binds every data key to its style property: "icon-color": ["get", "_icon_color"]
-procedure ALMapLibreJSAddDataKeys(const ADataKeys: TALLayerDataKeys; var ALayout, APaint: String);
-begin
-  for var LDataKey in ADataKeys do begin
-    var LExpr := '["get",' + ALMapLibreJSString(ALLayerDataKeyNames[LDataKey]) + ']';
-    if LDataKey in ALLayoutLayerDataKeys then ALMapLibreJSAddProperty(ALayout, ALGetLayerDataKeyStyleProperty(LDataKey), LExpr)
-    else ALMapLibreJSAddProperty(APaint, ALGetLayerDataKeyStyleProperty(LDataKey), LExpr);
-  end;
-end;
-
-{*********************************************************************}
-function ALMapLibreBitmapToPngBase64(const ABitmap: TALBitmap): String;
-begin
-  {$IF defined(ALSkiaEngine)}
-  var LOutputStream := TMemoryStream.Create;
-  try
-    var LSkStream := sk4d_wstreamadapter_create(LOutputStream);
-    if LSkStream = 0 then raise Exception.Create('Cannot create Skia write stream');
-    try
-      if not sk4d_image_encode_to_stream(
-               ABitmap,
-               LSkStream,
-               PNG_SK_ENCODEDIMAGEFORMAT,
-               100) then raise Exception.Create('Cannot encode Skia image to PNG');
-    finally
-      sk4d_wstreamadapter_destroy(LSkStream);
-    end;
-    Result := ALBase64EncodeBytesW(LOutputStream.Memory, LOutputStream.Size);
-  finally
-    ALFreeAndNil(LOutputStream);
-  end;
-  {$ELSE}
-  var LOutputStream := TMemoryStream.Create;
-  try
-    ABitmap.SaveToStream(LOutputStream);
-    Result := ALBase64EncodeBytesW(LOutputStream.Memory, LOutputStream.Size);
-  finally
-    ALFreeAndNil(LOutputStream);
-  end;
-  {$ENDIF}
-end;
-
 {************************************}
 constructor TALWinMapLibreView.Create;
 begin
@@ -4832,7 +4709,7 @@ begin
                    0); // const AYRadius: Single): CGImageRef;
   try
 
-    var LBase64 := ALMapLibreBitmapToPngBase64(LBitmap);
+    var LBase64 := ALBitmapToBase64(LBitmap, 'PNG', 100);
 
     EvaluateJavaScript(
       '''
@@ -4896,15 +4773,15 @@ begin
   var LScript :=
     '(function() {' +
       'const map = window.map;' +
-      'const id = ' + ALMapLibreJSString(AId) + ';' +
-      'const data = JSON.parse(' + ALMapLibreJSString(AGeoJSON) + ');' +
+      'const id = ' + ALJsonEncodeTextW(AId) + ';' +
+      'const data = JSON.parse(' + ALJsonEncodeTextW(AGeoJSON) + ');' +
       'const source = map.getSource(id);' +
       'if (!source) map.addSource(id, {type: "geojson", data: data});' +
       'else source.setData(data);' +
       'if (!map.getLayer(id)) {' +
         'map.addLayer({' +
           'id: id,' +
-          'type: ' + ALMapLibreJSString(AType) + ',' +
+          'type: ' + ALJsonEncodeTextW(AType) + ',' +
           'source: id,' +
           'layout: {' + ALayout + '},' +
           'paint: {' + APaint + '}' +
@@ -4926,42 +4803,70 @@ begin
 
   var LLayout := '';
   var LPaint := '';
-  ALMapLibreJSAddDataKeys(ALGetLayerDataKeys(AGeoJSON, ALSymbolLayerDataKeys), LLayout, LPaint);
-
-  ALMapLibreJSAddProperty(LLayout, 'symbol-placement', ALMapLibreJSString(LOptions.FSymbolPlacement));
-  ALMapLibreJSAddProperty(LLayout, 'symbol-spacing', ALMapLibreJSNumber(LOptions.FSymbolSpacing));
-  ALMapLibreJSAddProperty(LLayout, 'symbol-avoid-edges', ALMapLibreJSBoolean(LOptions.FSymbolAvoidEdges));
-  ALMapLibreJSAddProperty(LLayout, 'symbol-z-order', ALMapLibreJSString(LOptions.FSymbolZOrder));
-  ALMapLibreJSAddProperty(LLayout, 'icon-allow-overlap', ALMapLibreJSBoolean(LOptions.FIconAllowOverlap));
-  ALMapLibreJSAddProperty(LLayout, 'icon-ignore-placement', ALMapLibreJSBoolean(LOptions.FIconIgnorePlacement));
-  ALMapLibreJSAddProperty(LLayout, 'icon-optional', ALMapLibreJSBoolean(LOptions.FIconOptional));
-  ALMapLibreJSAddProperty(LLayout, 'icon-rotation-alignment', ALMapLibreJSString(LOptions.FIconRotationAlignment));
-  ALMapLibreJSAddProperty(LLayout, 'icon-pitch-alignment', ALMapLibreJSString(LOptions.FIconPitchAlignment));
-  ALMapLibreJSAddProperty(LLayout, 'icon-padding', ALMapLibreJSNumber(LOptions.FIconPadding));
-  ALMapLibreJSAddProperty(LLayout, 'icon-keep-upright', ALMapLibreJSBoolean(LOptions.FIconKeepUpright));
-  ALMapLibreJSAddProperty(LLayout, 'icon-text-fit', ALMapLibreJSString(LOptions.FIconTextFit));
-  ALMapLibreJSAddProperty(LLayout, 'icon-text-fit-padding', ALMapLibreJSNumberArray([LOptions.FIconTextFitPadding.Top, LOptions.FIconTextFitPadding.Right, LOptions.FIconTextFitPadding.Bottom, LOptions.FIconTextFitPadding.Left]));
-  ALMapLibreJSAddProperty(LLayout, 'text-allow-overlap', ALMapLibreJSBoolean(LOptions.FTextAllowOverlap));
-  ALMapLibreJSAddProperty(LLayout, 'text-ignore-placement', ALMapLibreJSBoolean(LOptions.FTextIgnorePlacement));
-  ALMapLibreJSAddProperty(LLayout, 'text-optional', ALMapLibreJSBoolean(LOptions.FTextOptional));
+  for var LDataKey in ALGetLayerDataKeys(AGeoJSON, ALSymbolLayerDataKeys) do begin
+    var LName := ALLayerDataKeyNames[LDataKey].Substring(1).Replace('_', '-');
+    if LDataKey = TALLayerDataKey.Text then LName := 'text-field';
+    var LExpr := '["get",' + ALJsonEncodeTextW(ALLayerDataKeyNames[LDataKey]) + ']';
+    if LDataKey in [TALLayerDataKey.IconImage, TALLayerDataKey.IconSize, TALLayerDataKey.IconAnchor, TALLayerDataKey.IconOffset, TALLayerDataKey.IconRotate, TALLayerDataKey.Text, TALLayerDataKey.TextSize, TALLayerDataKey.TextLetterSpacing, TALLayerDataKey.TextJustify, TALLayerDataKey.TextAnchor, TALLayerDataKey.TextOffset, TALLayerDataKey.TextMaxWidth, TALLayerDataKey.TextRotate, TALLayerDataKey.TextRadialOffset, TALLayerDataKey.TextTransform, TALLayerDataKey.SymbolSortKey] then
+      LLayout := LLayout + '"' + LName + '":' + LExpr + ','
+    else
+      LPaint := LPaint + '"' + LName + '":' + LExpr + ',';
+  end;
+  LLayout := LLayout + '"symbol-placement":' + ALJsonEncodeTextW(LOptions.FSymbolPlacement) + ',';
+  LLayout := LLayout + '"symbol-spacing":' + ALJsonEncodeFloatW(LOptions.FSymbolSpacing, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LLayout := LLayout + '"symbol-avoid-edges":' + ALJsonEncodeBooleanW(LOptions.FSymbolAvoidEdges) + ',';
+  LLayout := LLayout + '"symbol-z-order":' + ALJsonEncodeTextW(LOptions.FSymbolZOrder) + ',';
+  LLayout := LLayout + '"icon-allow-overlap":' + ALJsonEncodeBooleanW(LOptions.FIconAllowOverlap) + ',';
+  LLayout := LLayout + '"icon-ignore-placement":' + ALJsonEncodeBooleanW(LOptions.FIconIgnorePlacement) + ',';
+  LLayout := LLayout + '"icon-optional":' + ALJsonEncodeBooleanW(LOptions.FIconOptional) + ',';
+  LLayout := LLayout + '"icon-rotation-alignment":' + ALJsonEncodeTextW(LOptions.FIconRotationAlignment) + ',';
+  LLayout := LLayout + '"icon-pitch-alignment":' + ALJsonEncodeTextW(LOptions.FIconPitchAlignment) + ',';
+  LLayout := LLayout + '"icon-padding":' + ALJsonEncodeFloatW(LOptions.FIconPadding, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LLayout := LLayout + '"icon-keep-upright":' + ALJsonEncodeBooleanW(LOptions.FIconKeepUpright) + ',';
+  LLayout := LLayout + '"icon-text-fit":' + ALJsonEncodeTextW(LOptions.FIconTextFit) + ',';
+  LLayout := LLayout + '"icon-text-fit-padding":' + '[' + ALJsonEncodeFloatW(LOptions.FIconTextFitPadding.Top, TALJSONInterchangeFormat.icfStandardJson) + ',' + ALJsonEncodeFloatW(LOptions.FIconTextFitPadding.Right, TALJSONInterchangeFormat.icfStandardJson) + ',' + ALJsonEncodeFloatW(LOptions.FIconTextFitPadding.Bottom, TALJSONInterchangeFormat.icfStandardJson) + ',' + ALJsonEncodeFloatW(LOptions.FIconTextFitPadding.Left, TALJSONInterchangeFormat.icfStandardJson) + '],';
+  LLayout := LLayout + '"text-allow-overlap":' + ALJsonEncodeBooleanW(LOptions.FTextAllowOverlap) + ',';
+  LLayout := LLayout + '"text-ignore-placement":' + ALJsonEncodeBooleanW(LOptions.FTextIgnorePlacement) + ',';
+  LLayout := LLayout + '"text-optional":' + ALJsonEncodeBooleanW(LOptions.FTextOptional) + ',';
   if Length(LOptions.FTextFont) > 0 then
-    ALMapLibreJSAddProperty(LLayout, 'text-font', ALMapLibreJSStringArray(LOptions.FTextFont));
-  ALMapLibreJSAddProperty(LLayout, 'text-rotation-alignment', ALMapLibreJSString(LOptions.FTextRotationAlignment));
-  ALMapLibreJSAddProperty(LLayout, 'text-pitch-alignment', ALMapLibreJSString(LOptions.FTextPitchAlignment));
-  ALMapLibreJSAddProperty(LLayout, 'text-padding', ALMapLibreJSNumber(LOptions.FTextPadding));
-  ALMapLibreJSAddProperty(LLayout, 'text-keep-upright', ALMapLibreJSBoolean(LOptions.FTextKeepUpright));
-  ALMapLibreJSAddProperty(LLayout, 'text-max-angle', ALMapLibreJSNumber(LOptions.FTextMaxAngle));
-  ALMapLibreJSAddProperty(LLayout, 'text-line-height', ALMapLibreJSNumber(LOptions.FTextLineHeight));
+    begin
+      LLayout := LLayout + '"text-font":[';
+      for var LValue in LOptions.FTextFont do
+        LLayout := LLayout + ALJsonEncodeTextW(LValue) + ',';
+      Delete(LLayout, Length(LLayout), 1);
+      LLayout := LLayout + '],';
+    end;
+  LLayout := LLayout + '"text-rotation-alignment":' + ALJsonEncodeTextW(LOptions.FTextRotationAlignment) + ',';
+  LLayout := LLayout + '"text-pitch-alignment":' + ALJsonEncodeTextW(LOptions.FTextPitchAlignment) + ',';
+  LLayout := LLayout + '"text-padding":' + ALJsonEncodeFloatW(LOptions.FTextPadding, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LLayout := LLayout + '"text-keep-upright":' + ALJsonEncodeBooleanW(LOptions.FTextKeepUpright) + ',';
+  LLayout := LLayout + '"text-max-angle":' + ALJsonEncodeFloatW(LOptions.FTextMaxAngle, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LLayout := LLayout + '"text-line-height":' + ALJsonEncodeFloatW(LOptions.FTextLineHeight, TALJSONInterchangeFormat.icfStandardJson) + ',';
   if Length(LOptions.FTextWritingMode) > 0 then
-    ALMapLibreJSAddProperty(LLayout, 'text-writing-mode', ALMapLibreJSStringArray(LOptions.FTextWritingMode));
+    begin
+      LLayout := LLayout + '"text-writing-mode":[';
+      for var LValue in LOptions.FTextWritingMode do
+        LLayout := LLayout + ALJsonEncodeTextW(LValue) + ',';
+      Delete(LLayout, Length(LLayout), 1);
+      LLayout := LLayout + '],';
+    end;
   if Length(LOptions.FTextVariableAnchor) > 0 then
-    ALMapLibreJSAddProperty(LLayout, 'text-variable-anchor', ALMapLibreJSStringArray(LOptions.FTextVariableAnchor));
-  ALMapLibreJSAddProperty(LLayout, 'visibility', ALMapLibreJSString(LOptions.FVisibility));
+    begin
+      LLayout := LLayout + '"text-variable-anchor":[';
+      for var LValue in LOptions.FTextVariableAnchor do
+        LLayout := LLayout + ALJsonEncodeTextW(LValue) + ',';
+      Delete(LLayout, Length(LLayout), 1);
+      LLayout := LLayout + '],';
+    end;
+  LLayout := LLayout + '"visibility":' + ALJsonEncodeTextW(LOptions.FVisibility) + ',';
   //--
-  ALMapLibreJSAddProperty(LPaint, 'icon-translate', ALMapLibreJSNumberArray([LOptions.FIconTranslate.X, LOptions.FIconTranslate.Y]));
-  ALMapLibreJSAddProperty(LPaint, 'icon-translate-anchor', ALMapLibreJSString(LOptions.FIconTranslateAnchor));
-  ALMapLibreJSAddProperty(LPaint, 'text-translate', ALMapLibreJSNumberArray([LOptions.FTextTranslate.X, LOptions.FTextTranslate.Y]));
-  ALMapLibreJSAddProperty(LPaint, 'text-translate-anchor', ALMapLibreJSString(LOptions.FTextTranslateAnchor));
+  LPaint := LPaint + '"icon-translate":' + '[' + ALJsonEncodeFloatW(LOptions.FIconTranslate.X, TALJSONInterchangeFormat.icfStandardJson) + ',' + ALJsonEncodeFloatW(LOptions.FIconTranslate.Y, TALJSONInterchangeFormat.icfStandardJson) + '],';
+  LPaint := LPaint + '"icon-translate-anchor":' + ALJsonEncodeTextW(LOptions.FIconTranslateAnchor) + ',';
+  LPaint := LPaint + '"text-translate":' + '[' + ALJsonEncodeFloatW(LOptions.FTextTranslate.X, TALJSONInterchangeFormat.icfStandardJson) + ',' + ALJsonEncodeFloatW(LOptions.FTextTranslate.Y, TALJSONInterchangeFormat.icfStandardJson) + '],';
+  LPaint := LPaint + '"text-translate-anchor":' + ALJsonEncodeTextW(LOptions.FTextTranslateAnchor) + ',';
+
+  if LLayout <> '' then Delete(LLayout, Length(LLayout), 1);
+  if LPaint <> '' then Delete(LPaint, Length(LPaint), 1);
 
   SetGeoJsonLayer(AId, 'symbol', AGeoJSON, LLayout, LPaint, True{AIsSymbolLayer});
 end;
@@ -4975,18 +4880,33 @@ begin
 
   var LLayout := '';
   var LPaint := '';
-  ALMapLibreJSAddDataKeys(ALGetLayerDataKeys(AGeoJSON, ALLineLayerDataKeys), LLayout, LPaint);
-
-  ALMapLibreJSAddProperty(LLayout, 'line-cap', ALMapLibreJSString(LOptions.FLineCap));
-  ALMapLibreJSAddProperty(LLayout, 'line-join', ALMapLibreJSString(LOptions.FLineJoin));
-  ALMapLibreJSAddProperty(LLayout, 'line-miter-limit', ALMapLibreJSNumber(LOptions.FLineMiterLimit));
-  ALMapLibreJSAddProperty(LLayout, 'line-round-limit', ALMapLibreJSNumber(LOptions.FLineRoundLimit));
-  ALMapLibreJSAddProperty(LLayout, 'visibility', ALMapLibreJSString(LOptions.FVisibility));
+  for var LDataKey in ALGetLayerDataKeys(AGeoJSON, ALLineLayerDataKeys) do begin
+    var LName := ALLayerDataKeyNames[LDataKey].Substring(1).Replace('_', '-');
+    var LExpr := '["get",' + ALJsonEncodeTextW(ALLayerDataKeyNames[LDataKey]) + ']';
+    if LDataKey in [TALLayerDataKey.LineSortKey] then
+      LLayout := LLayout + '"' + LName + '":' + LExpr + ','
+    else
+      LPaint := LPaint + '"' + LName + '":' + LExpr + ',';
+  end;
+  LLayout := LLayout + '"line-cap":' + ALJsonEncodeTextW(LOptions.FLineCap) + ',';
+  LLayout := LLayout + '"line-join":' + ALJsonEncodeTextW(LOptions.FLineJoin) + ',';
+  LLayout := LLayout + '"line-miter-limit":' + ALJsonEncodeFloatW(LOptions.FLineMiterLimit, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LLayout := LLayout + '"line-round-limit":' + ALJsonEncodeFloatW(LOptions.FLineRoundLimit, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LLayout := LLayout + '"visibility":' + ALJsonEncodeTextW(LOptions.FVisibility) + ',';
   //--
   if Length(LOptions.FLineDasharray) > 0 then
-    ALMapLibreJSAddProperty(LPaint, 'line-dasharray', ALMapLibreJSNumberArray(LOptions.FLineDasharray));
-  ALMapLibreJSAddProperty(LPaint, 'line-translate', ALMapLibreJSNumberArray([LOptions.FLineTranslate.X, LOptions.FLineTranslate.Y]));
-  ALMapLibreJSAddProperty(LPaint, 'line-translate-anchor', ALMapLibreJSString(LOptions.FLineTranslateAnchor));
+    begin
+      LPaint := LPaint + '"line-dasharray":[';
+      for var LValue in LOptions.FLineDasharray do
+        LPaint := LPaint + ALJsonEncodeFloatW(LValue, TALJSONInterchangeFormat.icfStandardJson) + ',';
+      Delete(LPaint, Length(LPaint), 1);
+      LPaint := LPaint + '],';
+    end;
+  LPaint := LPaint + '"line-translate":' + '[' + ALJsonEncodeFloatW(LOptions.FLineTranslate.X, TALJSONInterchangeFormat.icfStandardJson) + ',' + ALJsonEncodeFloatW(LOptions.FLineTranslate.Y, TALJSONInterchangeFormat.icfStandardJson) + '],';
+  LPaint := LPaint + '"line-translate-anchor":' + ALJsonEncodeTextW(LOptions.FLineTranslateAnchor) + ',';
+
+  if LLayout <> '' then Delete(LLayout, Length(LLayout), 1);
+  if LPaint <> '' then Delete(LPaint, Length(LPaint), 1);
 
   SetGeoJsonLayer(AId, 'line', AGeoJSON, LLayout, LPaint, False{AIsSymbolLayer});
 end;
@@ -5000,14 +4920,23 @@ begin
 
   var LLayout := '';
   var LPaint := '';
-  ALMapLibreJSAddDataKeys(ALGetLayerDataKeys(AGeoJSON, ALCircleLayerDataKeys), LLayout, LPaint);
-
-  ALMapLibreJSAddProperty(LLayout, 'visibility', ALMapLibreJSString(LOptions.FVisibility));
+  for var LDataKey in ALGetLayerDataKeys(AGeoJSON, ALCircleLayerDataKeys) do begin
+    var LName := ALLayerDataKeyNames[LDataKey].Substring(1).Replace('_', '-');
+    var LExpr := '["get",' + ALJsonEncodeTextW(ALLayerDataKeyNames[LDataKey]) + ']';
+    if LDataKey in [TALLayerDataKey.CircleSortKey] then
+      LLayout := LLayout + '"' + LName + '":' + LExpr + ','
+    else
+      LPaint := LPaint + '"' + LName + '":' + LExpr + ',';
+  end;
+  LLayout := LLayout + '"visibility":' + ALJsonEncodeTextW(LOptions.FVisibility) + ',';
   //--
-  ALMapLibreJSAddProperty(LPaint, 'circle-pitch-alignment', ALMapLibreJSString(LOptions.FCirclePitchAlignment));
-  ALMapLibreJSAddProperty(LPaint, 'circle-pitch-scale', ALMapLibreJSString(LOptions.FCirclePitchScale));
-  ALMapLibreJSAddProperty(LPaint, 'circle-translate', ALMapLibreJSNumberArray([LOptions.FCircleTranslate.X, LOptions.FCircleTranslate.Y]));
-  ALMapLibreJSAddProperty(LPaint, 'circle-translate-anchor', ALMapLibreJSString(LOptions.FCircleTranslateAnchor));
+  LPaint := LPaint + '"circle-pitch-alignment":' + ALJsonEncodeTextW(LOptions.FCirclePitchAlignment) + ',';
+  LPaint := LPaint + '"circle-pitch-scale":' + ALJsonEncodeTextW(LOptions.FCirclePitchScale) + ',';
+  LPaint := LPaint + '"circle-translate":' + '[' + ALJsonEncodeFloatW(LOptions.FCircleTranslate.X, TALJSONInterchangeFormat.icfStandardJson) + ',' + ALJsonEncodeFloatW(LOptions.FCircleTranslate.Y, TALJSONInterchangeFormat.icfStandardJson) + '],';
+  LPaint := LPaint + '"circle-translate-anchor":' + ALJsonEncodeTextW(LOptions.FCircleTranslateAnchor) + ',';
+
+  if LLayout <> '' then Delete(LLayout, Length(LLayout), 1);
+  if LPaint <> '' then Delete(LPaint, Length(LPaint), 1);
 
   SetGeoJsonLayer(AId, 'circle', AGeoJSON, LLayout, LPaint, False{AIsSymbolLayer});
 end;
@@ -5021,15 +4950,24 @@ begin
 
   var LLayout := '';
   var LPaint := '';
-  ALMapLibreJSAddDataKeys(ALGetLayerDataKeys(AGeoJSON, ALFillLayerDataKeys), LLayout, LPaint);
-
-  ALMapLibreJSAddProperty(LLayout, 'visibility', ALMapLibreJSString(LOptions.FVisibility));
+  for var LDataKey in ALGetLayerDataKeys(AGeoJSON, ALFillLayerDataKeys) do begin
+    var LName := ALLayerDataKeyNames[LDataKey].Substring(1).Replace('_', '-');
+    var LExpr := '["get",' + ALJsonEncodeTextW(ALLayerDataKeyNames[LDataKey]) + ']';
+    if LDataKey in [TALLayerDataKey.FillSortKey] then
+      LLayout := LLayout + '"' + LName + '":' + LExpr + ','
+    else
+      LPaint := LPaint + '"' + LName + '":' + LExpr + ',';
+  end;
+  LLayout := LLayout + '"visibility":' + ALJsonEncodeTextW(LOptions.FVisibility) + ',';
   //--
-  ALMapLibreJSAddProperty(LPaint, 'fill-antialias', ALMapLibreJSBoolean(LOptions.FFillAntialias));
-  ALMapLibreJSAddProperty(LPaint, 'fill-translate', ALMapLibreJSNumberArray([LOptions.FFillTranslate.X, LOptions.FFillTranslate.Y]));
-  ALMapLibreJSAddProperty(LPaint, 'fill-translate-anchor', ALMapLibreJSString(LOptions.FFillTranslateAnchor));
+  LPaint := LPaint + '"fill-antialias":' + ALJsonEncodeBooleanW(LOptions.FFillAntialias) + ',';
+  LPaint := LPaint + '"fill-translate":' + '[' + ALJsonEncodeFloatW(LOptions.FFillTranslate.X, TALJSONInterchangeFormat.icfStandardJson) + ',' + ALJsonEncodeFloatW(LOptions.FFillTranslate.Y, TALJSONInterchangeFormat.icfStandardJson) + '],';
+  LPaint := LPaint + '"fill-translate-anchor":' + ALJsonEncodeTextW(LOptions.FFillTranslateAnchor) + ',';
   if not LOptions.FFillPattern.IsEmpty then
-    ALMapLibreJSAddProperty(LPaint, 'fill-pattern', ALMapLibreJSString(LOptions.FFillPattern));
+    LPaint := LPaint + '"fill-pattern":' + ALJsonEncodeTextW(LOptions.FFillPattern) + ',';
+
+  if LLayout <> '' then Delete(LLayout, Length(LLayout), 1);
+  if LPaint <> '' then Delete(LPaint, Length(LPaint), 1);
 
   SetGeoJsonLayer(AId, 'fill', AGeoJSON, LLayout, LPaint, False{AIsSymbolLayer});
 end;
@@ -5043,14 +4981,20 @@ begin
 
   var LLayout := '';
   var LPaint := '';
-  ALMapLibreJSAddDataKeys(ALGetLayerDataKeys(AGeoJSON, ALFillExtrusionLayerDataKeys), LLayout, LPaint);
-
-  ALMapLibreJSAddProperty(LLayout, 'visibility', ALMapLibreJSString(LOptions.FVisibility));
+  for var LDataKey in ALGetLayerDataKeys(AGeoJSON, ALFillExtrusionLayerDataKeys) do begin
+    var LName := ALLayerDataKeyNames[LDataKey].Substring(1).Replace('_', '-');
+    var LExpr := '["get",' + ALJsonEncodeTextW(ALLayerDataKeyNames[LDataKey]) + ']';
+    LPaint := LPaint + '"' + LName + '":' + LExpr + ',';
+  end;
+  LLayout := LLayout + '"visibility":' + ALJsonEncodeTextW(LOptions.FVisibility) + ',';
   //--
-  ALMapLibreJSAddProperty(LPaint, 'fill-extrusion-opacity', ALMapLibreJSNumber(LOptions.FFillExtrusionOpacity));
-  ALMapLibreJSAddProperty(LPaint, 'fill-extrusion-vertical-gradient', ALMapLibreJSBoolean(LOptions.FFillExtrusionVerticalGradient));
-  ALMapLibreJSAddProperty(LPaint, 'fill-extrusion-translate', ALMapLibreJSNumberArray([LOptions.FFillExtrusionTranslate.X, LOptions.FFillExtrusionTranslate.Y]));
-  ALMapLibreJSAddProperty(LPaint, 'fill-extrusion-translate-anchor', ALMapLibreJSString(LOptions.FFillExtrusionTranslateAnchor));
+  LPaint := LPaint + '"fill-extrusion-opacity":' + ALJsonEncodeFloatW(LOptions.FFillExtrusionOpacity, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LPaint := LPaint + '"fill-extrusion-vertical-gradient":' + ALJsonEncodeBooleanW(LOptions.FFillExtrusionVerticalGradient) + ',';
+  LPaint := LPaint + '"fill-extrusion-translate":' + '[' + ALJsonEncodeFloatW(LOptions.FFillExtrusionTranslate.X, TALJSONInterchangeFormat.icfStandardJson) + ',' + ALJsonEncodeFloatW(LOptions.FFillExtrusionTranslate.Y, TALJSONInterchangeFormat.icfStandardJson) + '],';
+  LPaint := LPaint + '"fill-extrusion-translate-anchor":' + ALJsonEncodeTextW(LOptions.FFillExtrusionTranslateAnchor) + ',';
+
+  if LLayout <> '' then Delete(LLayout, Length(LLayout), 1);
+  if LPaint <> '' then Delete(LPaint, Length(LPaint), 1);
 
   SetGeoJsonLayer(AId, 'fill-extrusion', AGeoJSON, LLayout, LPaint, False{AIsSymbolLayer});
 end;
@@ -5064,13 +5008,19 @@ begin
 
   var LLayout := '';
   var LPaint := '';
-  ALMapLibreJSAddDataKeys(ALGetLayerDataKeys(AGeoJSON, ALHeatmapLayerDataKeys), LLayout, LPaint);
-
-  ALMapLibreJSAddProperty(LLayout, 'visibility', ALMapLibreJSString(LOptions.FVisibility));
+  for var LDataKey in ALGetLayerDataKeys(AGeoJSON, ALHeatmapLayerDataKeys) do begin
+    var LName := ALLayerDataKeyNames[LDataKey].Substring(1).Replace('_', '-');
+    var LExpr := '["get",' + ALJsonEncodeTextW(ALLayerDataKeyNames[LDataKey]) + ']';
+    LPaint := LPaint + '"' + LName + '":' + LExpr + ',';
+  end;
+  LLayout := LLayout + '"visibility":' + ALJsonEncodeTextW(LOptions.FVisibility) + ',';
   //--
-  ALMapLibreJSAddProperty(LPaint, 'heatmap-radius', ALMapLibreJSNumber(LOptions.FHeatmapRadius));
-  ALMapLibreJSAddProperty(LPaint, 'heatmap-intensity', ALMapLibreJSNumber(LOptions.FHeatmapIntensity));
-  ALMapLibreJSAddProperty(LPaint, 'heatmap-opacity', ALMapLibreJSNumber(LOptions.FHeatmapOpacity));
+  LPaint := LPaint + '"heatmap-radius":' + ALJsonEncodeFloatW(LOptions.FHeatmapRadius, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LPaint := LPaint + '"heatmap-intensity":' + ALJsonEncodeFloatW(LOptions.FHeatmapIntensity, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LPaint := LPaint + '"heatmap-opacity":' + ALJsonEncodeFloatW(LOptions.FHeatmapOpacity, TALJSONInterchangeFormat.icfStandardJson) + ',';
+
+  if LLayout <> '' then Delete(LLayout, Length(LLayout), 1);
+  if LPaint <> '' then Delete(LPaint, Length(LPaint), 1);
 
   SetGeoJsonLayer(AId, 'heatmap', AGeoJSON, LLayout, LPaint, False{AIsSymbolLayer});
 end;
@@ -5085,27 +5035,30 @@ begin
   else LOptions := TALMapLibre.TRasterLayerOptions.Create;
 
   var LSource: String;
-  if AIsTileJSON then LSource := 'url: ' + ALMapLibreJSString(ATileURL)
-  else LSource := 'tiles: [' + ALMapLibreJSString(ATileURL) + ']';
+  if AIsTileJSON then LSource := 'url: ' + ALJsonEncodeTextW(ATileURL)
+  else LSource := 'tiles: [' + ALJsonEncodeTextW(ATileURL) + ']';
 
   var LLayout := '';
-  ALMapLibreJSAddProperty(LLayout, 'visibility', ALMapLibreJSString(LOptions.FVisibility));
+  LLayout := LLayout + '"visibility":' + ALJsonEncodeTextW(LOptions.FVisibility) + ',';
 
   var LPaint := '';
-  ALMapLibreJSAddProperty(LPaint, 'raster-opacity', ALMapLibreJSNumber(LOptions.FRasterOpacity));
-  ALMapLibreJSAddProperty(LPaint, 'raster-hue-rotate', ALMapLibreJSNumber(LOptions.FRasterHueRotate));
-  ALMapLibreJSAddProperty(LPaint, 'raster-brightness-min', ALMapLibreJSNumber(LOptions.FRasterBrightnessMin));
-  ALMapLibreJSAddProperty(LPaint, 'raster-brightness-max', ALMapLibreJSNumber(LOptions.FRasterBrightnessMax));
-  ALMapLibreJSAddProperty(LPaint, 'raster-saturation', ALMapLibreJSNumber(LOptions.FRasterSaturation));
-  ALMapLibreJSAddProperty(LPaint, 'raster-contrast', ALMapLibreJSNumber(LOptions.FRasterContrast));
-  ALMapLibreJSAddProperty(LPaint, 'raster-resampling', ALMapLibreJSString(LOptions.FRasterResampling));
-  ALMapLibreJSAddProperty(LPaint, 'raster-fade-duration', ALMapLibreJSNumber(LOptions.FRasterFadeDuration));
+  LPaint := LPaint + '"raster-opacity":' + ALJsonEncodeFloatW(LOptions.FRasterOpacity, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LPaint := LPaint + '"raster-hue-rotate":' + ALJsonEncodeFloatW(LOptions.FRasterHueRotate, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LPaint := LPaint + '"raster-brightness-min":' + ALJsonEncodeFloatW(LOptions.FRasterBrightnessMin, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LPaint := LPaint + '"raster-brightness-max":' + ALJsonEncodeFloatW(LOptions.FRasterBrightnessMax, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LPaint := LPaint + '"raster-saturation":' + ALJsonEncodeFloatW(LOptions.FRasterSaturation, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LPaint := LPaint + '"raster-contrast":' + ALJsonEncodeFloatW(LOptions.FRasterContrast, TALJSONInterchangeFormat.icfStandardJson) + ',';
+  LPaint := LPaint + '"raster-resampling":' + ALJsonEncodeTextW(LOptions.FRasterResampling) + ',';
+  LPaint := LPaint + '"raster-fade-duration":' + ALJsonEncodeFloatW(LOptions.FRasterFadeDuration, TALJSONInterchangeFormat.icfStandardJson) + ',';
+
+  if LLayout <> '' then Delete(LLayout, Length(LLayout), 1);
+  if LPaint <> '' then Delete(LPaint, Length(LPaint), 1);
 
   // Like on Android/iOS, the layer and the source are always recreated
   EvaluateJavaScript(
     '(function() {' +
       'const map = window.map;' +
-      'const id = ' + ALMapLibreJSString(AId) + ';' +
+      'const id = ' + ALJsonEncodeTextW(AId) + ';' +
       'if (map.getLayer(id)) map.removeLayer(id);' +
       'if (map.getSource(id)) map.removeSource(id);' +
       'map.addSource(id, {type: "raster", ' + LSource + ', tileSize: ' + ALIntToStrW(ATileSize) + '});' +
@@ -5298,7 +5251,7 @@ begin
                          0, // const AXRadius: Single;
                          0); // const AYRadius: Single): TALBitmap;
         try
-          LImage := ALMapLibreBitmapToPngBase64(LBitmap);
+          LImage := ALBitmapToBase64(LBitmap, 'PNG', 100);
         finally
           ALFreeAndNilBitmap(LBitmap);
         end;
@@ -5313,15 +5266,15 @@ begin
             'map.removeControl(window.compassControl);' +
             'window.compassControl = null;' +
           '}' +
-          'if (!' + ALMapLibreJSBoolean(LCompass.Enabled) + ') return;' +
-          'const fadeFacingNorth = ' + ALMapLibreJSBoolean(LCompass.FadeFacingNorth) + ';' +
-          'const image = ' + ALMapLibreJSString(LImage) + ';' +
-          'const width = ' + ALMapLibreJSNumber(LCompass.Width) + ';' +
-          'const height = ' + ALMapLibreJSNumber(LCompass.Height) + ';' +
-          'const margin = "' + ALMapLibreJSNumber(LCompass.Margins.Top) + 'px ' +
-                               ALMapLibreJSNumber(LCompass.Margins.Right) + 'px ' +
-                               ALMapLibreJSNumber(LCompass.Margins.Bottom) + 'px ' +
-                               ALMapLibreJSNumber(LCompass.Margins.Left) + 'px";' +
+          'if (!' + ALJsonEncodeBooleanW(LCompass.Enabled) + ') return;' +
+          'const fadeFacingNorth = ' + ALJsonEncodeBooleanW(LCompass.FadeFacingNorth) + ';' +
+          'const image = ' + ALJsonEncodeTextW(LImage) + ';' +
+          'const width = ' + ALJsonEncodeFloatW(LCompass.Width, TALJSONInterchangeFormat.icfStandardJson) + ';' +
+          'const height = ' + ALJsonEncodeFloatW(LCompass.Height, TALJSONInterchangeFormat.icfStandardJson) + ';' +
+          'const margin = "' + ALJsonEncodeFloatW(LCompass.Margins.Top, TALJSONInterchangeFormat.icfStandardJson) + 'px ' +
+                               ALJsonEncodeFloatW(LCompass.Margins.Right, TALJSONInterchangeFormat.icfStandardJson) + 'px ' +
+                               ALJsonEncodeFloatW(LCompass.Margins.Bottom, TALJSONInterchangeFormat.icfStandardJson) + 'px ' +
+                               ALJsonEncodeFloatW(LCompass.Margins.Left, TALJSONInterchangeFormat.icfStandardJson) + 'px";' +
           'const nav = new maplibregl.NavigationControl({showCompass: true, showZoom: false, visualizePitch: false});' +
           'window.compassControl = {' +
             'onAdd: function(m) {' +

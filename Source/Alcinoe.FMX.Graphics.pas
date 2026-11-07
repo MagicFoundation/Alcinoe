@@ -459,6 +459,10 @@ procedure ALSaveBitmapToFile(
             const AFilename: String;
             const ABitmap: TALBitmap;
             const AQuality: integer);
+function ALBitmapToBase64(
+            const ABitmap: TALBitmap;
+            const AFormat: String;
+            const AQuality: integer): String;
 
 {***********************}
 procedure ALDrawDrawable(
@@ -736,6 +740,7 @@ uses
   FMX.Canvas.GPU,
   {$ENDIF}
   {$IF defined(ANDROID)}
+  Androidapi.Jni,
   Androidapi.JNIBridge,
   Androidapi.JNI.JavaTypes,
   Androidapi.JNI.Hardware,
@@ -768,6 +773,9 @@ uses
   Macapi.Helpers,
   Macapi.ImageIO,
   Alcinoe.Macapi.QuartzCore,
+  {$ENDIF}
+  {$IF defined(MSWindows)}
+  Fmx.Surfaces,
   {$ENDIF}
   {$IF defined(DEBUG)}
   System.TypInfo,
@@ -5146,6 +5154,139 @@ begin
   var LBitmapCodecSaveParams: TBitmapCodecSaveParams;
   LBitmapCodecSaveParams.Quality := LQuality;
   Abitmap.SaveToFile(AFilename, @LBitmapCodecSaveParams);
+
+  {$ENDIF}
+
+end;
+
+{************************}
+function ALBitmapToBase64(
+            const ABitmap: TALBitmap;
+            const AFormat: String;
+            const AQuality: integer): String;
+begin
+
+  if ALIsBitmapNull(ABitmap) then
+    raise Exception.Create('ABitmap must not be nil');
+
+  if AFormat = '' then
+    raise Exception.Create('AFormat must not be empty');
+
+  var LQuality: Integer := EnsureRange(AQuality, 0, 100);
+
+  {$IF defined(ALSkiaEngine)}
+
+  var LOutputStream := TMemoryStream.Create;
+  try
+    var LSkStream := ALSkCheckHandle(sk4d_wstreamadapter_create(LOutputStream));
+    try
+      if not sk4d_image_encode_to_stream(
+               ABitmap,  // const self: sk_image_t;
+               LSkStream, // w_stream: sk_wstream_t;
+               ALFileExtensionToSkEncodedImageFormat(AFormat), // format: sk_encodedimageformat_t;
+               LQuality) then raise Exception.Create('Cannot encode Skia image to PNG'); // quality: int32_t
+    finally
+      sk4d_wstreamadapter_destroy(LSkStream);
+    end;
+    Result := ALBase64EncodeBytesW(LOutputStream.Memory, LOutputStream.Size);
+  finally
+    ALFreeAndNil(LOutputStream);
+  end;
+
+  {$ELSEIF defined(ANDROID)}
+
+  var LStream := TJByteArrayOutputStream.JavaClass.init;
+  try
+    if not ABitmap.compress(
+             ALFileExtensionToJBitmapCompressFormat(AFormat), // format: JBitmap_CompressFormat;
+             LQuality, // quality: Integer;
+             LStream) then  // stream: JOutputStream
+      raise Exception.Create('JBitmap.compress failed');
+
+    var LJavaBytes := LStream.toByteArray;
+    Try
+      Result := ALBase64EncodeBytesW(LJavaBytes.Data, LJavaBytes.Length);
+    finally
+      ALFreeAndNil(LJavaBytes);
+    end;
+  finally
+    LStream.close;
+  end;
+
+  {$ELSEIF defined(ALAppleOS)}
+
+
+  var LData := CFDataCreateMutable(nil, 0);
+  if LData = nil then raise Exception.Create('Unable to create CFMutableData');
+  try
+    var LImageDestinationRef := CGImageDestinationCreateWithData(
+                                  LData, // data: CFMutableDataRef;
+                                  ALFileExtensionToUTTypeImage(AFormat), // &type: CFStringRef;
+                                  1, // count: NativeUInt;
+                                  nil); // options: CFDictionaryRef
+    if LImageDestinationRef = nil then raise Exception.Create('Unable to create CGImageDestination');
+    try
+      var LKeys: array [0..0] of Pointer;
+      var LValue: array [0..0] of Pointer;
+      var LFloatVal: Single := LQuality / 100;
+      LKeys[0] := kCGImageDestinationLossyCompressionQuality;
+      LValue[0] := CFNumberCreate(nil{allocator}, kCFNumberFloat32Type{theType}, @LFloatVal{valuePtr});
+      try
+        var LProperties := CFDictionaryCreate(nil{allocator}, @LKeys[0]{keys}, @LValue[0]{values}, 1{numValues}, nil{keyCallBacks}, nil{valueCallBacks});
+        if LProperties = nil then raise Exception.Create('Unable to create export properties');
+        try
+          CGImageDestinationAddImage(LImageDestinationRef{idst}, ABitmap{image}, LProperties{properties});
+          {$IFNDEF ALCompilerVersionSupported132}
+            {$MESSAGE WARN 'Check the status of https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4714 and adjust the IFDEF'}
+          {$ENDIF}
+          {$IF defined(IOS)}
+          if not CGImageDestinationFinalize(LImageDestinationRef{idst}) then
+          {$ELSE}
+          if not Boolean(CGImageDestinationFinalize(LImageDestinationRef{idst})) then
+          {$ENDIF}
+            raise Exception.Create('Unable to finalize image export');
+        finally
+          CFRelease(LProperties);
+        end;
+      finally
+        CFRelease(LValue[0]);
+      end;
+    finally
+      CFRelease(LImageDestinationRef);
+    end;
+
+    Result := ALBase64EncodeBytesW(CFDataGetBytePtr(CFDataRef(LData)), Integer(CFDataGetLength(CFDataRef(LData))));
+
+  finally
+    CFRelease(LData);
+  end;
+
+  {$ELSE}
+
+  var LStream := TMemoryStream.Create;
+  try
+    var LSurface := TBitmapSurface.Create;
+    try
+      LSurface.Assign(ABitmap);
+
+      var LParams: TBitmapCodecSaveParams;
+      LParams.Quality := LQuality;
+
+      if not TBitmapCodecManager.SaveToStream(
+               LStream, // const AStream: TStream;
+               LSurface, // const ABitmap: TBitmapSurface;
+               AFormat, // const AExtension: string;
+               @LParams) then // const ASaveParams: PBitmapCodecSaveParams = nil
+        raise Exception.Create('TBitmapCodecManager.SaveToStream failed');
+    finally
+      ALFreeAndNil(LSurface);
+    end;
+
+    Result := ALBase64EncodeBytesW(LStream.Memory, LStream.Size);
+
+  finally
+    ALFreeAndNil(LStream);
+  end;
 
   {$ENDIF}
 

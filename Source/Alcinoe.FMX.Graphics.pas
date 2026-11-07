@@ -460,9 +460,9 @@ procedure ALSaveBitmapToFile(
             const ABitmap: TALBitmap;
             const AQuality: integer);
 function ALBitmapToBase64(
-            const ABitmap: TALBitmap;
-            const AFormat: String;
-            const AQuality: integer): String;
+           const ABitmap: TALBitmap;
+           const AFormat: String;
+           const AQuality: integer): String;
 
 {***********************}
 procedure ALDrawDrawable(
@@ -5161,9 +5161,9 @@ end;
 
 {************************}
 function ALBitmapToBase64(
-            const ABitmap: TALBitmap;
-            const AFormat: String;
-            const AQuality: integer): String;
+           const ABitmap: TALBitmap;
+           const AFormat: String;
+           const AQuality: integer): String;
 begin
 
   if ALIsBitmapNull(ABitmap) then

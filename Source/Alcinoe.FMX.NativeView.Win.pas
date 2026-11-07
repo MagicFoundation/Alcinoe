@@ -444,6 +444,12 @@ end;
 procedure TALWinNativeView.BringToFront;
 begin
   SetWindowPos(Handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
+  for var I := 0 to Control.ControlsCount - 1 do begin
+    var LControl := Control.Controls[I];
+    if (LControl is TALNativeControl) and
+       (TALNativeControl(LControl).HasNativeView) then
+      TALNativeControl(LControl).NativeView.BringToFront;
+  end;
 end;
 
 {************************************************}
@@ -475,8 +481,14 @@ begin
   if aRoot is TCommonCustomForm then begin
     FForm := TCommonCustomForm(aRoot);
     SetParent(Handle, GetFormHandle(Form));
+    SetWindowPos(Handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
     UpdateFrame;
-    BringToFront;
+    for var I := 0 to Control.ControlsCount - 1 do begin
+      var LControl := Control.Controls[I];
+      if (LControl is TALNativeControl) and
+         (TALNativeControl(LControl).HasNativeView) then
+        TALNativeControl(LControl).NativeView.BringToFront;
+    end;
   end
   else FForm := nil;
 end;

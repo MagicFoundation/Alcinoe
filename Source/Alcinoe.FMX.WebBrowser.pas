@@ -806,14 +806,14 @@ end;
 {******************************************************************}
 procedure TALBaseWebBrowser.EvaluateJavaScript(const ACode: string);
 begin
-  if FNativeView <> nil then
+  if HasNativeView then
     NativeView.EvaluateJavaScript(ACode);
 end;
 
 {*******************************************************************************************************************}
 procedure TALBaseWebBrowser.EvaluateJavaScript(const ACode: string; const AValueCallback: TJavaScriptResultCallback);
 begin
-  if FNativeView <> nil then
+  if HasNativeView then
     NativeView.EvaluateJavaScript(ACode, AValueCallback);
 end;
 

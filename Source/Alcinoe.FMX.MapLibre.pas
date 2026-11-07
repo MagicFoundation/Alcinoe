@@ -1937,7 +1937,7 @@ begin
   if (FStyleURL = AValue) and (FStyleJSON = '') then Exit;
   FStyleURL := AValue;
   FStyleJSON := '';
-  if FNativeView <> nil then
+  if HasNativeView then
     NativeView.ApplyStyle;
 end;
 
@@ -1947,7 +1947,7 @@ begin
   if (FStyleJSON = AValue) and (FStyleURL = '') then Exit;
   FStyleJSON := AValue;
   FStyleURL := '';
-  if FNativeView <> nil then
+  if HasNativeView then
     NativeView.ApplyStyle;
 end;
 
@@ -1960,7 +1960,7 @@ end;
 {****************************************************}
 procedure TALMapLibre.CompassChanged(Sender: TObject);
 begin
-  if FNativeView <> nil then
+  if HasNativeView then
     NativeView.ApplyCompass;
 end;
 

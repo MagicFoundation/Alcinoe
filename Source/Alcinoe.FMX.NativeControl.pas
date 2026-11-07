@@ -141,6 +141,7 @@ type
     Procedure UnFreezeNativeView; virtual;
     property IsNativeViewFrozen: Boolean read GetIsNativeViewFrozen;
     function IsNativeViewVisible: boolean; virtual;
+    function HasNativeView: boolean;
     {$IF defined(android)}
     property NativeView: TALAndroidNativeView read GetNativeView;
     {$ELSEIF defined(IOS)}
@@ -267,27 +268,12 @@ end;
 
 {********************************}
 procedure TALNativeControl.Loaded;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _BringDescendantNativeViewsToFront(const AControl: TControl);
-  begin
-    for var I := 0 to AControl.ControlsCount - 1 do begin
-      var LChild := AControl.Controls[I];
-      if (LChild is TALNativeControl) and
-         (TALNativeControl(LChild).FNativeView <> nil) then
-        TALNativeControl(LChild).FNativeView.BringToFront;
-      _BringDescendantNativeViewsToFront(LChild);
-    end;
-  end;
-
 begin
   inherited;
   if FNativeView = nil then begin
     FNativeView := CreateNativeView;
     InitNativeView;
   end;
-  if FNativeView <> nil then
-    _BringDescendantNativeViewsToFront(Self);
   if IsNativeViewVisible then
     // Because AncestorParentChanged is not called during loading,
     // we must call NativeView.SetVisible(true) in Loaded
@@ -584,6 +570,12 @@ end;
 function TALNativeControl.IsNativeViewVisible: boolean;
 begin
   Result := (FNativeView <> nil) and (FNativeView.Visible);
+end;
+
+{***********************************************}
+function TALNativeControl.HasNativeView: boolean;
+begin
+  Result := FNativeView <> nil;
 end;
 
 {****************************************}

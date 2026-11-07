@@ -276,6 +276,12 @@ procedure TALAndroidNativeView.BringToFront;
 begin
   if Layout.getParent <> nil then
     Layout.bringToFront;
+  for var I := 0 to Control.ControlsCount - 1 do begin
+    var LControl := Control.Controls[I];
+    if (LControl is TALNativeControl) and
+       (TALNativeControl(LControl).HasNativeView) then
+      TALNativeControl(LControl).NativeView.BringToFront;
+  end;
 end;
 
 {****************************************************}
@@ -321,6 +327,12 @@ begin
     // attached native control is displayed above the others (e.g. TALFMXOverNativeContainer above a TALMapLibre).
     LParentGroup.addView(Layout, LParentGroup.getChildCount, LParam);
     UpdateFrame;
+    for var I := 0 to Control.ControlsCount - 1 do begin
+      var LControl := Control.Controls[I];
+      if (LControl is TALNativeControl) and
+         (TALNativeControl(LControl).HasNativeView) then
+        TALNativeControl(LControl).NativeView.BringToFront;
+    end;
   end
   else FForm := nil;
 end;

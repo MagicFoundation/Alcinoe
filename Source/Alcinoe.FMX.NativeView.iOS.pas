@@ -29,7 +29,6 @@ type
   TALIosNativeView = class(TOCLocal)
   private
     FControl: TALControl;
-    FForm: TCommonCustomForm;
     FVisible: Boolean;
     FIgnoreResetFocus: Boolean;
     function GetView: UIView; overload;
@@ -64,6 +63,7 @@ type
     destructor Destroy; override;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
+    procedure UpdateParent; virtual;
     procedure UpdateFrame; virtual;
     function CaptureScreenshot: TALDrawable; virtual;
     property Form: TCommonCustomForm read FForm;
@@ -322,12 +322,6 @@ begin
   var LSuperview := View.superview;
   if LSuperview <> nil then
     LSuperview.bringSubviewToFront(View);
-  for var I := 0 to Control.ControlsCount - 1 do begin
-    var LControl := Control.Controls[I];
-    if (LControl is TALNativeControl) and
-       (TALNativeControl(LControl).HasNativeView) then
-      TALNativeControl(LControl).NativeView.BringToFront;
-  end;
 end;
 
 {************************************************}
@@ -351,12 +345,6 @@ begin
     FForm := TCommonCustomForm(aRoot);
     GetFormView(FForm).addSubview(View);
     UpdateFrame;
-    for var I := 0 to Control.ControlsCount - 1 do begin
-      var LControl := Control.Controls[I];
-      if (LControl is TALNativeControl) and
-         (TALNativeControl(LControl).HasNativeView) then
-        TALNativeControl(LControl).NativeView.BringToFront;
-    end;
   end
   else FForm := nil;
 end;

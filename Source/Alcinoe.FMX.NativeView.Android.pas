@@ -58,6 +58,7 @@ type
     destructor Destroy; override;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
+    procedure UpdateParent; virtual;
     procedure UpdateFrame; virtual;
     function CaptureScreenshot: TALDrawable; virtual;
     property Form: TCommonCustomForm read FForm;
@@ -112,6 +113,8 @@ begin
   FVisible := True;
 
   FLayout := CreateLayout;
+  FLayout.setClipChildren(False);
+  FLayout.setClipToPadding(False);
   FView := CreateView;
   FView.setClipToOutline(False);
 
@@ -276,12 +279,6 @@ procedure TALAndroidNativeView.BringToFront;
 begin
   if Layout.getParent <> nil then
     Layout.bringToFront;
-  for var I := 0 to Control.ControlsCount - 1 do begin
-    var LControl := Control.Controls[I];
-    if (LControl is TALNativeControl) and
-       (TALNativeControl(LControl).HasNativeView) then
-      TALNativeControl(LControl).NativeView.BringToFront;
-  end;
 end;
 
 {****************************************************}
@@ -318,6 +315,8 @@ begin
     FForm := TCommonCustomForm(aRoot);
     var LParam: JRelativeLayout_LayoutParams;
     var LParentGroup: JViewGroup := TJViewGroup.Wrap(GetFormView(FForm));
+    LParentGroup.setClipChildren(False);
+    LParentGroup.setClipToPadding(False);
     if Layout.getLayoutParams = nil then
       LParam := TJRelativeLayout_LayoutParams.JavaClass.init(0, 0)
     else
@@ -327,12 +326,6 @@ begin
     // attached native control is displayed above the others (e.g. TALFMXOverNativeContainer above a TALMapLibre).
     LParentGroup.addView(Layout, LParentGroup.getChildCount, LParam);
     UpdateFrame;
-    for var I := 0 to Control.ControlsCount - 1 do begin
-      var LControl := Control.Controls[I];
-      if (LControl is TALNativeControl) and
-         (TALNativeControl(LControl).HasNativeView) then
-        TALNativeControl(LControl).NativeView.BringToFront;
-    end;
   end
   else FForm := nil;
 end;

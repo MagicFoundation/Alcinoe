@@ -282,6 +282,7 @@ uses
   DesignIntf,
   {$ENDIF}
   Alcinoe.Common,
+  Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Common;
 
 {***************************************************************}
@@ -369,7 +370,12 @@ end;
 {*****************************************************************}
 function TALFMXOverNativeContainer.GetNativeViewBoundsRect: TRectF;
 begin
-  Result := LocalRect;
+  Result := ALGetShapeSurfaceRect(
+              LocalRect, // const ARect: TRectF;
+              AutoAlignToPixel, // const AAlignToPixel: Boolean;
+              Fill, // const AFill: TALBrush;
+              nil, // const AStateLayer: TALStateLayer;
+              Shadow); // const AShadow: TALShadow): TRectF;
 end;
 
 {****************************************}
@@ -381,8 +387,9 @@ begin
   end
   else if (FInPaintTo) or (FNativeView = nil) then inherited
   else begin
-    var LBitmapWidth := Round(Width * ALGetScreenScale);
-    var LBitmapHeight := Round(Height * ALGetScreenScale);
+    var LBoundsRect := GetNativeViewBoundsRect;
+    var LBitmapWidth := Round(LBoundsRect.Width * ALGetScreenScale);
+    var LBitmapHeight := Round(LBoundsRect.Height * ALGetScreenScale);
     if (LBitmapWidth <= 0) or (LBitmapHeight <= 0) then exit;
 
     if FBitmap = nil then FBitmap := TBitmap.Create(LBitmapWidth, LBitmapHeight)
@@ -394,7 +401,7 @@ begin
 
     if not FBitmap.Canvas.BeginScene then exit;
     try
-      PaintTo(FBitmap.Canvas, TRectF.Create(0, 0, FBitmap.Width / ALGetScreenScale, FBitmap.Height / ALGetScreenScale));
+      PaintTo(FBitmap.Canvas, TRectF.Create(-LBoundsRect.Left, -LBoundsRect.Top, -LBoundsRect.Left + Width, -LBoundsRect.Top + Height));
     finally
       FBitmap.Canvas.EndScene;
     end;
@@ -438,7 +445,7 @@ constructor TALAndroidFMXOverNativeView.Create;
 begin
   inherited; // This will call CreateView
   FBitmap := nil;
-  View.setScaleType(TJImageView_ScaleType.JavaClass.FIT_XY);
+  View.setScaleType(TJImageView_ScaleType.JavaClass.MATRIX);
   FTouchListener := TTouchListener.Create(Self);
   View.setOnTouchListener(FTouchListener);
 end;

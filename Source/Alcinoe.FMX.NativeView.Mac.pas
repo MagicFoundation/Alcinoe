@@ -26,7 +26,6 @@ type
   TALMacNativeView = class(TOCLocal)
   private
     FControl: TALControl;
-    FForm: TCommonCustomForm;
     FVisible: Boolean;
     function GetView: NSView; overload;
     function GetAbsoluteRect: TRectF;
@@ -55,6 +54,7 @@ type
     destructor Destroy; override;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
+    procedure UpdateParent; virtual;
     procedure UpdateFrame; virtual;
     function CaptureScreenshot: TALDrawable; virtual;
     property Form: TCommonCustomForm read FForm;
@@ -207,12 +207,6 @@ begin
     View.removeFromSuperview;
     TNSView.Wrap(LSuperview).addSubview(View);
   end;
-  for var I := 0 to Control.ControlsCount - 1 do begin
-    var LControl := Control.Controls[I];
-    if (LControl is TALNativeControl) and
-       (TALNativeControl(LControl).HasNativeView) then
-      TALNativeControl(LControl).NativeView.BringToFront;
-  end;
 end;
 
 {************************************************}
@@ -236,12 +230,6 @@ begin
     FForm := TCommonCustomForm(aRoot);
     GetFormView(FForm).addSubview(View);
     UpdateFrame;
-    for var I := 0 to Control.ControlsCount - 1 do begin
-      var LControl := Control.Controls[I];
-      if (LControl is TALNativeControl) and
-         (TALNativeControl(LControl).HasNativeView) then
-        TALNativeControl(LControl).NativeView.BringToFront;
-    end;
   end
   else FForm := nil;
 end;

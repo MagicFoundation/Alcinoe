@@ -206,7 +206,7 @@ end;
 {***********************************************************************************}
 procedure ALUnfreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl>);
 begin
-  For var I := low(AFrozenNativeControls) to high(AFrozenNativeControls) do
+  For var I := high(AFrozenNativeControls) downto low(AFrozenNativeControls) do
     if AFrozenNativeControls[I] <> nil then
       AFrozenNativeControls[I].UnFreezeNativeView;
   setlength(AFrozenNativeControls, 0);
@@ -498,7 +498,7 @@ begin
   inherited;
   if csDestroying in ComponentState then exit;
   if FNativeView <> nil then
-    FNativeView.RootChanged(Root);
+    FNativeView.UpdateParent;
 end;
 
 {***********************************}
@@ -514,6 +514,7 @@ procedure TALNativeControl.DoAbsoluteChanged;
 begin
   inherited;
   if (not (csLoading in ComponentState)) and
+     (not FInPaintTo) and
      (FNativeView <> nil) then
     FNativeView.UpdateFrame;
 end;
@@ -553,7 +554,12 @@ end;
 {****************************************}
 procedure TALNativeControl.InitNativeView;
 begin
-  // Virtual
+  for var I := 0 to controls.Count - 1 do begin
+    var LControl := Controls[I];
+    if (LControl is TALNativeControl) and
+       (TALNativeControl(LControl).HasNativeView) then
+      TALNativeControl(LControl).NativeView.UpdateParent;
+  end;
 end;
 
 {********************************************}
@@ -609,6 +615,9 @@ begin
   if FNativeView = nil then exit(false);
   if not FNativeView.visible then exit(false);
   if not ParentedVisible then exit(false);
+  {$IF defined(DEBUG)}
+  ALLog(classname+'.FreezeNativeView', 'control.name: ' + Name);
+  {$ENDIF}
   inc(FFreezeNativeViewCount);
   ALFreeAndNilDrawable(FNativeViewScreenshot);
   FNativeViewScreenshot := FNativeView.CaptureScreenshot;
@@ -635,9 +644,17 @@ begin
   if not IsNativeViewFrozen then exit;
   dec(FFreezeNativeViewCount);
   if FFreezeNativeViewCount = 0 then begin
+    {$IF defined(DEBUG)}
+    ALLog(classname+'.UnFreezeNativeView', 'control.name: ' + Name);
+    {$ENDIF}
     // See FreezeNativeView for why we delay
     FHideNativeViewAfterPaint := 0;
-    FFreeNativeViewScreenshotAfterPaint := 5;
+    if (Fill.Color <> TALphaColors.Null) and
+       (TAlphaColorRec(Fill.Color).A <> 255) then begin
+      FFreeNativeViewScreenshotAfterPaint := 0;
+      ALFreeAndNilDrawable(FNativeViewScreenshot, True{ADelayed});
+    end
+    else FFreeNativeViewScreenshotAfterPaint := 5;
     ShowNativeView;
     Repaint;
   end;
@@ -654,10 +671,10 @@ end;
 {***********************************************}
 procedure TALNativeControl.AncestorParentChanged;
 begin
+  if (not (csDestroying in ComponentState)) and
+     (FNativeView <> nil) then
+    FNativeView.UpdateParent;
   inherited;
-  if csDestroying in ComponentState then exit;
-  if FNativeView <> nil then
-    FNativeView.UpdateFrame;
 end;
 
 {***************************************}
@@ -818,7 +835,11 @@ begin
   If FFreeNativeViewScreenshotAfterPaint > 0 then begin
     dec(FFreeNativeViewScreenshotAfterPaint);
     if FFreeNativeViewScreenshotAfterPaint = 0 then
-      ALFreeAndNilDrawable(FNativeViewScreenshot);
+      // Free the screenshot with a delay. Drawing it only records a draw command
+      // that the GPU executes later, when the frame is submitted. Freeing it right
+      // away deletes the texture while that command is still queued, and the GPU
+      // then samples an invalid texture, which renders as an opaque black rectangle.
+      ALFreeAndNilDrawable(FNativeViewScreenshot, true{ADelayed});
     _Invalidate;
   end;
 end;

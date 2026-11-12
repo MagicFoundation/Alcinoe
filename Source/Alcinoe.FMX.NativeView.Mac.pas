@@ -117,7 +117,7 @@ begin
   inherited;
 end;
 
-{******************************************************************************************************}
+{**********************************************************************************************************}
 procedure TALMacNativeView.BeforeDestroyFormHandleListener(const Sender: TObject; const AMessage: TMessage);
 begin
   if (AMessage is TBeforeDestroyFormHandle) and
@@ -133,7 +133,7 @@ begin
   end;
 end;
 
-{****************************************************************************************************}
+{********************************************************************************************************}
 procedure TALMacNativeView.AfterCreateFormHandleListener(const Sender: TObject; const AMessage: TMessage);
 begin
   // This event is called only when the window's handle is recreated.
@@ -178,7 +178,7 @@ begin
   Result := TypeInfo(NSView);
 end;
 
-{****************************************************************************}
+{********************************************}
 function TALMacNativeView.GetFormView: NSView;
 begin
   var LFormHandle: TMacWindowHandle := WindowHandleToPlatform(Control.Form.Handle);

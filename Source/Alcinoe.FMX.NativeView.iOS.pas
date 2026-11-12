@@ -129,7 +129,7 @@ begin
   inherited;
 end;
 
-{******************************************************************************************************}
+{**********************************************************************************************************}
 procedure TALIosNativeView.BeforeDestroyFormHandleListener(const Sender: TObject; const AMessage: TMessage);
 begin
   if (AMessage is TBeforeDestroyFormHandle) and
@@ -145,7 +145,7 @@ begin
   end;
 end;
 
-{****************************************************************************************************}
+{********************************************************************************************************}
 procedure TALIosNativeView.AfterCreateFormHandleListener(const Sender: TObject; const AMessage: TMessage);
 begin
   // This event is called only when the window's handle is recreated.
@@ -208,7 +208,7 @@ begin
   Result := TypeInfo(UIView);
 end;
 
-{****************************************************************************}
+{********************************************}
 function TALIosNativeView.GetFormView: UIView;
 begin
   var LFormHandle: TiOSWindowHandle := WindowHandleToPlatform(Control.Form.Handle);

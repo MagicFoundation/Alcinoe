@@ -235,7 +235,7 @@ begin
   inherited Destroy;
 end;
 
-{************************************************************************************************************************}
+{***************************************************************************************************************************}
 procedure TALWinNativeView.BeforeDestroyFormHandleListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
 begin
   if (AMessage is TBeforeDestroyFormHandle) and
@@ -248,7 +248,7 @@ begin
   end;
 end;
 
-{**********************************************************************************************************************}
+{*************************************************************************************************************************}
 procedure TALWinNativeView.AfterCreateFormHandleListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
 begin
   // This event is called only when the window's handle is recreated.
@@ -415,7 +415,7 @@ begin
   Result := TALNativeControl(Control).GetNativeViewAbsoluteRect;
 end;
 
-{*************************************}
+{**************************************}
 procedure TALWinNativeView.UpdateParent;
 begin
 

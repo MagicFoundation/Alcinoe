@@ -212,7 +212,7 @@ begin
   Result := TJView.JavaClass.init(TAndroidHelper.Activity);
 end;
 
-{*******************************************************************************}
+{***********************************************}
 function TALAndroidNativeView.GetFormView: JView;
 begin
   var LFormHandle: TAndroidWindowHandle := WindowHandleToPlatform(Control.Form.Handle);
@@ -231,7 +231,7 @@ begin
   Result := TALNativeControl(Control).GetNativeViewAbsoluteRect;
 end;
 
-{**************************************}
+{******************************************}
 procedure TALAndroidNativeView.UpdateParent;
 begin
 

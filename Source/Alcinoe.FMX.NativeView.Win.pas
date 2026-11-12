@@ -39,8 +39,7 @@ type
     FHandle: HWND;
     FObjectInstance: Pointer;
     procedure WndProc(var Message: TMessage);
-    function GetHandle: HWND;
-    function GetFormHandle(const AForm: TCommonCustomForm): HWND;
+    function GetFormHandle: HWND;
   protected
     class property ContainerHandle: HWnd read GetContainerHandle;
     const NullHWnd = 0;
@@ -51,25 +50,25 @@ type
     property DefWndProc: Pointer read FDefWndProc;
   public
     procedure DefaultHandler(var Message); override;
-    procedure RecreateWnd;
-    function HandleAllocated: Boolean; inline;
-    property Handle: HWND read GetHandle;
+    property Handle: HWND read FHandle;
   private
     FControl: TALControl;
-    FForm: TCommonCustomForm;
     FVisible: Boolean;
-    function GetAbsoluteRect: TRectF;
-    procedure BeforeDestroyMessageListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
-    procedure AfterCreateMessageListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
+    FCaptureDC: HDC;
+    FCaptureBitmap: HBITMAP;
+    FCaptureOldBitmap: HGDIOBJ;
+    FCaptureBits: Pointer;
+    FCaptureWidth: Integer;
+    FCaptureHeight: Integer;
+    procedure BeforeDestroyFormHandleListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
+    procedure AfterCreateFormHandleListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
   protected
     function ExtractPoint(var Message: TWMMouse): TPointF; virtual;
   public
+    function GetAbsoluteRect: TRectF;
     procedure SetEnabled(const value: Boolean); virtual; //procedure PMSetAbsoluteEnabled(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_ABSOLUTE_ENABLED;
     procedure SetVisible(const Value: Boolean); virtual; //procedure PMSetVisible(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_VISIBLE;
     procedure SetAlpha(const Value: Single); virtual;
-    procedure AncestorVisibleChanged; virtual; //procedure PMAncestorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
-    procedure RootChanged(const aRoot: IRoot); virtual; //procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
-    procedure ChangeOrder; virtual; //procedure PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
     procedure BringToFront; virtual;
   protected
     procedure WMSetFocus(var Message: TWMSetFocus); message WM_SETFOCUS;
@@ -91,10 +90,10 @@ type
     destructor Destroy; override;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
+    procedure UpdateParent; virtual;
     procedure UpdateFrame; virtual;
     function CaptureScreenshot: TALDrawable; virtual;
     procedure Invalidate;
-    property Form: TCommonCustomForm read FForm;
     property Control: TALControl read FControl;
     property Visible: Boolean read FVisible;
   end;
@@ -105,10 +104,15 @@ implementation
 uses
   System.SysUtils,
   System.UITypes,
+  {$IF defined(ALSkiaCanvas)}
+  System.Skia.API,
+  {$ENDIF}
+  Winapi.WinSpool,
   FMX.Platform.Win,
   FMX.Helpers.Win,
-  Alcinoe.Common,
-  Alcinoe.FMX.NativeControl;
+  Alcinoe.FMX.Common,
+  Alcinoe.FMX.NativeControl,
+  Alcinoe.Common;
 
 {***********************************************************************************************}
 function InitWndProc(HWindow: HWND; Msg: UINT; WParam: WParam; LParam: LParam): LRESULT; stdcall;
@@ -196,8 +200,15 @@ begin
   inherited;
   FObjectInstance := MakeObjectInstance(WndProc);
   FVisible := True;
-  TMessageManager.DefaultManager.SubscribeToMessage(TBeforeDestroyFormHandle, BeforeDestroyMessageListener);
-  TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateMessageListener);
+  FCaptureDC := 0;
+  FCaptureBitmap := 0;
+  FCaptureOldBitmap := 0;
+  FCaptureBits := nil;
+  FCaptureWidth := 0;
+  FCaptureHeight := 0;
+  TMessageManager.DefaultManager.SubscribeToMessage(TBeforeDestroyFormHandle, BeforeDestroyFormHandleListener);
+  TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateFormHandleListener);
+  CreateHandle;
 end;
 
 {**************************************************************}
@@ -205,34 +216,49 @@ constructor TALWinNativeView.Create(const AControl: TALControl);
 begin
   FControl := AControl;
   Create;
-  RootChanged(Control.Root);
+  UpdateParent;
 end;
 
 {**********************************}
 destructor TALWinNativeView.Destroy;
 begin
-  TMessageManager.DefaultManager.Unsubscribe(TBeforeDestroyFormHandle, BeforeDestroyMessageListener);
-  TMessageManager.DefaultManager.Unsubscribe(TAfterCreateFormHandle, AfterCreateMessageListener);
+  TMessageManager.DefaultManager.Unsubscribe(TBeforeDestroyFormHandle, BeforeDestroyFormHandleListener);
+  TMessageManager.DefaultManager.Unsubscribe(TAfterCreateFormHandle, AfterCreateFormHandleListener);
   DestroyHandle;
   FreeObjectInstance(FObjectInstance);
+  if FCaptureBitmap <> 0 then begin
+    SelectObject(FCaptureDC, FCaptureOldBitmap);
+    DeleteObject(FCaptureBitmap);
+  end;
+  if FCaptureDC <> 0 then
+    DeleteDC(FCaptureDC);
   inherited Destroy;
 end;
 
 {************************************************************************************************************************}
-procedure TALWinNativeView.BeforeDestroyMessageListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
+procedure TALWinNativeView.BeforeDestroyFormHandleListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
 begin
-  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then begin
-    if TFmxFormState.Recreating in Form.FormState then SetParent(Handle, 0)
-    else DestroyHandle;
+  if (AMessage is TBeforeDestroyFormHandle) and
+     (TBeforeDestroyFormHandle(AMessage).Value = Control.Form) and
+     (GetParent(Handle) = GetFormHandle) then begin
+    {$IF defined(DEBUG)}
+    ALLog(Classname + '.BeforeDestroyFormHandleListener');
+    {$ENDIF}
+    SetParent(Handle, NullHWnd);
   end;
 end;
 
 {**********************************************************************************************************************}
-procedure TALWinNativeView.AfterCreateMessageListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
+procedure TALWinNativeView.AfterCreateFormHandleListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
 begin
   // This event is called only when the window's handle is recreated.
-  if (AMessage is TAfterCreateFormHandle) and (TAfterCreateFormHandle(AMessage).Value = Form) then
-    RootChanged(Form);
+  if (AMessage is TAfterCreateFormHandle) and
+     (TAfterCreateFormHandle(AMessage).Value = Control.Form) then begin
+    {$IF defined(DEBUG)}
+    ALLog(Classname + '.AfterCreateFormHandleListener');
+    {$ENDIF}
+    UpdateParent;
+  end;
 end;
 
 {**************************************}
@@ -279,25 +305,19 @@ end;
 {***************************************}
 procedure TALWinNativeView.DestroyHandle;
 begin
-  RootChanged(nil);
-  if HandleAllocated then
+  if FHandle <> NullHWnd then
   try
+
+    var LNativeChildControls := TALNativeControl(Control).GetNativeChildControls;
+    for var I := Low(LNativeChildControls) to High(LNativeChildControls) do
+      SetParent(LNativeChildControls[I].NativeView.Handle, NullHWnd);
+
     if not Winapi.Windows.DestroyWindow(FHandle) then
       RaiseLastOSError;
+
   finally
     FHandle := NullHWnd;
     FDefWndProc := nil;
-  end;
-end;
-
-{*************************************}
-procedure TALWinNativeView.RecreateWnd;
-begin
-  // to-do recreate all children
-  if HandleAllocated then
-  begin
-    DestroyHandle;
-    CreateHandle;
   end;
 end;
 
@@ -362,31 +382,16 @@ begin
     end;
 end;
 
-{*************************************************}
-function TALWinNativeView.HandleAllocated: Boolean;
+{********************************************}
+function TALWinNativeView.GetFormHandle: HWND;
 begin
-  Result := FHandle <> NullHWnd;
-end;
-
-{****************************************}
-function TALWinNativeView.GetHandle: HWND;
-begin
-  if (FHandle = NullHWnd) {and not (csDestroying in ComponentState)} then
-    CreateHandle;
-  Result := FHandle;
-end;
-
-{****************************************************************************}
-function TALWinNativeView.GetFormHandle(const AForm: TCommonCustomForm): HWND;
-begin
-  var LFormHandle: TWinWindowHandle := WindowHandleToPlatform(AForm.Handle);
-  Result := LFormHandle.Wnd;
+  Result := FormToHWND(Control.Form);
 end;
 
 {*****************************************************}
 procedure TALWinNativeView.DefaultHandler(var Message);
 begin
-  if HandleAllocated then
+  if FHandle <> NullHWnd then
     TMessage(Message).Result := CallWindowProc(
                                   FDefWndProc, FHandle, TMessage(Message).Msg, TMessage(Message).WParam,
                                   TMessage(Message).LParam)
@@ -411,51 +416,198 @@ begin
 end;
 
 {*************************************}
+procedure TALWinNativeView.UpdateParent;
+begin
+
+  {$IF defined(DEBUG)}
+  ALLog(Classname + '.UpdateParent');
+  {$ENDIF}
+
+  var LParentHandle: HWND;
+  if Control.Form = nil then LParentHandle := NullHWnd
+  else LParentHandle := GetFormHandle;
+
+  var LParentControl := Control.ParentControl;
+  while LParentControl <> nil do begin
+    if LParentControl is TALNativeControl then begin
+      if not TALNativeControl(LParentControl).HasNativeView then exit;
+      LParentHandle := TALNativeControl(LParentControl).NativeView.Handle;
+      break;
+    end;
+    LParentControl := LParentControl.ParentControl;
+  end;
+
+  if GetParent(Handle) = LParentHandle then exit;
+  Winapi.Windows.SetParent(Handle, LParentHandle);
+
+  if LParentHandle <> NullHWnd then
+    UpdateFrame;
+
+end;
+
+{*************************************}
 procedure TALWinNativeView.UpdateFrame;
 begin
-  // We cannot use ZOrderManager.UpdateBounds(Control) because it updates not
-  // only the bounds but also the visibility! Code below is taken from
-  // TWinZOrderManager.UpdateBounds
-  if FForm = nil then exit;
+  {$IF defined(DEBUG)}
+  //ALLog(Classname + '.UpdateFrame');
+  {$ENDIF}
   var LAbsoluteRect := GetAbsoluteRect;
-  var LScreenScale: Single := FForm.Handle.Scale;
+  var LParentControl := Control.ParentControl;
+  while LParentControl <> nil do begin
+    if LParentControl is TALNativeControl then begin
+      if not TALNativeControl(LParentControl).HasNativeView then exit;
+      var LParentRect := TALNativeControl(LParentControl).GetNativeViewAbsoluteRect;
+      LAbsoluteRect.Offset(-LParentRect.Left, -LParentRect.Top);
+      break;
+    end;
+    LParentControl := LParentControl.ParentControl;
+  end;
+
   var LWinBounds := TRectF.Create(
-                      LAbsoluteRect.Left * LScreenScale,
-                      LAbsoluteRect.Top * LScreenScale,
-                      LAbsoluteRect.Right * LScreenScale,
-                      LAbsoluteRect.Bottom * LScreenScale).Round;
+                      LAbsoluteRect.Left * ALGetScreenScale,
+                      LAbsoluteRect.Top * ALGetScreenScale,
+                      LAbsoluteRect.Right * ALGetScreenScale,
+                      LAbsoluteRect.Bottom * ALGetScreenScale).Round;
   SetWindowPos(Handle, 0, LWinBounds.Left, LWinBounds.Top, LWinBounds.Width, LWinBounds.Height, SWP_NOZORDER or SWP_NOACTIVATE);
 end;
 
 {*******************************************************}
 function TALWinNativeView.CaptureScreenshot: TALDrawable;
+const
+  PW_RENDERFULLCONTENT = $00000002; // Windows 8.1+
 begin
-  Result := AlNullDrawable;
-end;
+  var LClientRect: TRect;
+  if not GetClientRect(Handle, LClientRect) then exit(ALNullDrawable);
+  var LWidth: Integer := LClientRect.Width;
+  var LHeight: Integer := LClientRect.Height;
+  if (LWidth <= 0) or (LHeight <= 0) then exit(ALNullDrawable);
 
-{*************************************}
-procedure TALWinNativeView.ChangeOrder;
-begin
-  //if HasZOrderManager then
-  //  ZOrderManager.UpdateOrder(Control);
+  // Create the memory DC once.
+  if FCaptureDC = 0 then begin
+    FCaptureDC := CreateCompatibleDC(0{DC: HDC});
+    if FCaptureDC = 0 then RaiseLastOSError;
+  end;
+
+  // Recreate the DIB section only when its dimensions change
+  // (like FCaptureBitmap / FCaptureCanvas on Android).
+  if (FCaptureBitmap = 0) or
+     (FCaptureWidth <> LWidth) or
+     (FCaptureHeight <> LHeight) then begin
+
+    if FCaptureBitmap <> 0 then begin
+      SelectObject(FCaptureDC, FCaptureOldBitmap);
+      DeleteObject(FCaptureBitmap);
+      FCaptureBitmap := 0;
+      FCaptureBits := nil;
+      FCaptureWidth := 0;
+      FCaptureHeight := 0;
+    end;
+
+    var LBitmapInfo: TBitmapInfo;
+    FillChar(LBitmapInfo, SizeOf(LBitmapInfo), 0);
+    LBitmapInfo.bmiHeader.biSize := SizeOf(TBitmapInfoHeader);
+    LBitmapInfo.bmiHeader.biWidth := LWidth;
+    LBitmapInfo.bmiHeader.biHeight := -LHeight; // Top-down
+    LBitmapInfo.bmiHeader.biPlanes := 1;
+    LBitmapInfo.bmiHeader.biBitCount := 32;
+    LBitmapInfo.bmiHeader.biCompression := BI_RGB;
+
+    FCaptureBitmap := CreateDIBSection(
+                        FCaptureDC, // DC: HDC;
+                        LBitmapInfo, // const p2: TBitmapInfo;
+                        DIB_RGB_COLORS, // p3: UINT;
+                        FCaptureBits, // var p4: Pointer;
+                        0, // p5: THandle;
+                        0); // p6: DWORD
+    if FCaptureBitmap = 0 then RaiseLastOSError;
+
+    FCaptureOldBitmap := SelectObject(FCaptureDC, FCaptureBitmap);
+    if (FCaptureOldBitmap = 0) or
+       (FCaptureOldBitmap = HGDI_ERROR) then begin
+      DeleteObject(FCaptureBitmap);
+      FCaptureBitmap := 0;
+      FCaptureBits := nil;
+      RaiseLastOSError;
+    end;
+    FCaptureWidth := LWidth;
+    FCaptureHeight := LHeight;
+  end;
+
+  // Render the window together with its child windows (the child native
+  // views are child HWNDs of Handle). PW_RENDERFULLCONTENT is required to
+  // capture DirectComposition content such as WebView2.
+  if not PrintWindow(Handle, FCaptureDC, PW_RENDERFULLCONTENT) then
+    exit(ALNullDrawable);
+  GdiFlush;
+
+  // GDI leaves the alpha channel undefined, and the native views are
+  // opaque, so force alpha to 255 while copying the pixels.
+  var LPixelCount: NativeInt := NativeInt(LWidth) * LHeight;
+
+  {$IF defined(ALSkiaCanvas)}
+  var LPixelData: Pointer;
+  GetMem(LPixelData, LPixelCount * 4);
+  try
+    var LSrc := PCardinal(FCaptureBits);
+    var LDst := PCardinal(LPixelData);
+    for var I := 0 to LPixelCount - 1 do begin
+      LDst^ := LSrc^ or $FF000000;
+      inc(LSrc);
+      inc(LDst);
+    end;
+    var LImageInfo := ALGetSkImageinfo(LWidth, LHeight);
+    LImageInfo.color_type := sk_colortype_t.BGRA8888_SK_COLORTYPE;
+    var LPixmap: sk_pixmap_t := ALSkCheckHandle(
+                                  sk4d_pixmap_create(
+                                    @LImageInfo,
+                                    LPixelData,
+                                    LWidth * 4));
+    try
+      Result := ALSkCheckHandle(
+                  sk4d_image_make_from_raster(
+                    LPixmap, // const pixmap: sk_pixmap_t;
+                    @ALReleaseMemPixelBufferProc, // proc: sk_image_raster_release_proc;
+                    LPixelData)); // proc_context: Pointer
+    finally
+      sk4d_refcnt_unref(LPixmap);
+    end;
+  except
+    FreeMem(LPixelData);
+    raise;
+  end;
+  {$ELSE}
+  Result := FMX.Graphics.TBitmap.Create(LWidth, LHeight);
+  try
+    var LBitmapData: TBitmapData;
+    if not Result.Map(TMapAccess.Write, LBitmapData) then
+      raise Exception.Create('Cannot map bitmap');
+    try
+      if (LBitmapData.PixelFormat <> TPixelFormat.BGRA) or
+         (LBitmapData.BytesPerPixel <> 4) then
+        raise Exception.Create('Expected a 32-bit BGRA bitmap');
+      for var Y := 0 to LHeight - 1 do begin
+        var LSrc := PCardinal(NativeUInt(FCaptureBits) + NativeUInt(Y) * NativeUInt(LWidth * 4));
+        var LDst := PCardinal(LBitmapData.GetScanline(Y));
+        for var X := 0 to LWidth - 1 do begin
+          LDst^ := LSrc^ or $FF000000;
+          inc(LSrc);
+          inc(LDst);
+        end;
+      end;
+    finally
+      Result.Unmap(LBitmapData);
+    end;
+  except
+    ALFreeAndNil(Result);
+    raise;
+  end;
+  {$ENDIF}
 end;
 
 {**************************************}
 procedure TALWinNativeView.BringToFront;
 begin
   SetWindowPos(Handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
-  for var I := 0 to Control.ControlsCount - 1 do begin
-    var LControl := Control.Controls[I];
-    if (LControl is TALNativeControl) and
-       (TALNativeControl(LControl).HasNativeView) then
-      TALNativeControl(LControl).NativeView.BringToFront;
-  end;
-end;
-
-{************************************************}
-procedure TALWinNativeView.AncestorVisibleChanged;
-begin
-  SetVisible(Visible);
 end;
 
 {**********************************************************}
@@ -474,25 +626,6 @@ begin
   // Not supported under Windows
 end;
 
-{*********************************************************}
-procedure TALWinNativeView.RootChanged(const aRoot: IRoot);
-begin
-  SetParent(Handle, 0);
-  if aRoot is TCommonCustomForm then begin
-    FForm := TCommonCustomForm(aRoot);
-    SetParent(Handle, GetFormHandle(Form));
-    SetWindowPos(Handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
-    UpdateFrame;
-    for var I := 0 to Control.ControlsCount - 1 do begin
-      var LControl := Control.Controls[I];
-      if (LControl is TALNativeControl) and
-         (TALNativeControl(LControl).HasNativeView) then
-        TALNativeControl(LControl).NativeView.BringToFront;
-    end;
-  end
-  else FForm := nil;
-end;
-
 {**********************************************************}
 procedure TALWinNativeView.SetEnabled(const value: Boolean);
 begin
@@ -509,8 +642,8 @@ end;
 procedure TALWinNativeView.ResetFocus;
 begin
   if GetFocus = Handle then begin
-    if (Form <> nil) and Form.IsHandleAllocated then
-      WinApi.Windows.SetFocus(FormToHWND(Form))
+    if (Control.Form <> nil) then
+      WinApi.Windows.SetFocus(GetFormHandle)
     else
       SendMessage(Handle, WM_KILLFOCUS, 0, 0);
   end;
@@ -535,8 +668,8 @@ procedure TALWinNativeView.WMMouseWheel(var Message: TWMMouseWheel);
 begin
   var LHandled: Boolean := False;
   try
-    if Form <> nil then
-      Form.Mousewheel(KeysToShiftState(Message.Keys), Message.WheelDelta, LHandled);
+    if Control.Form <> nil then
+      Control.Form.Mousewheel(KeysToShiftState(Message.Keys), Message.WheelDelta, LHandled);
   finally
     If not LHandled then
       inherited;
@@ -549,11 +682,11 @@ var
   KeyCode: Word;
   KeyChar: Char;
 begin
-  if Form <> nil then
+  if Control.Form <> nil then
   begin
     KeyCode := Message.CharCode;
     KeyChar := Char(Message.CharCode);
-    Form.KeyDown(KeyCode, KeyChar, KeyDataToShiftState(Message.KeyData));
+    Control.Form.KeyDown(KeyCode, KeyChar, KeyDataToShiftState(Message.KeyData));
     if (KeyCode <> Message.CharCode) or (KeyChar <> Char(Message.CharCode)) then
       Message.Result := 0
     else
@@ -569,11 +702,11 @@ var
   KeyCode: Word;
   KeyChar: Char;
 begin
-  if Form <> nil then
+  if Control.Form <> nil then
   begin
     KeyCode := Message.CharCode;
     KeyChar := Char(Message.CharCode);
-    Form.KeyUp(KeyCode, KeyChar, KeyDataToShiftState(Message.KeyData));
+    Control.Form.KeyUp(KeyCode, KeyChar, KeyDataToShiftState(Message.KeyData));
     if (KeyCode <> Message.CharCode) or (KeyChar <> Char(Message.CharCode)) then
       Message.Result := 0
     else
@@ -587,11 +720,11 @@ end;
 procedure TALWinNativeView.WMLButtonDown(var Message: TWMLButtonDown);
 begin
   try
-    if Form <> nil then
+    if Control.Form <> nil then
     begin
       var FormPoint := ExtractPoint(Message); // dp
-      Form.MouseMove([], FormPoint.X, FormPoint.Y); // Require for correct IsMouseOver handle
-      Form.MouseDown(TMouseButton.mbLeft, KeysToShiftState(Message.Keys), FormPoint.X, FormPoint.Y);
+      Control.Form.MouseMove([], FormPoint.X, FormPoint.Y); // Require for correct IsMouseOver handle
+      Control.Form.MouseDown(TMouseButton.mbLeft, KeysToShiftState(Message.Keys), FormPoint.X, FormPoint.Y);
     end;
   finally
     inherited;
@@ -602,14 +735,14 @@ end;
 procedure TALWinNativeView.WMLButtonUp(var Message: TWMLButtonUp);
 begin
   try
-    if Form <> nil then
+    if Control.Form <> nil then
     begin
       var FormPoint := ExtractPoint(Message); // dp
-      Form.MouseUp(TMouseButton.mbLeft, KeysToShiftState(Message.Keys), FormPoint.X, FormPoint.Y);
+      Control.Form.MouseUp(TMouseButton.mbLeft, KeysToShiftState(Message.Keys), FormPoint.X, FormPoint.Y);
     end;
     // Don't combine these if statements because in MouseUp the form can unload presentation!
-    if Form <> nil then
-      Form.MouseLeave;
+    if Control.Form <> nil then
+      Control.Form.MouseLeave;
   finally
     inherited;
   end;
@@ -619,10 +752,10 @@ end;
 procedure TALWinNativeView.WMMButtonDblClick(var Message: TWMMButtonDblClk);
 begin
   try
-    if Form <> nil then
+    if Control.Form <> nil then
     begin
       var FormPoint := ExtractPoint(Message); // dp
-      Form.MouseDown(TMouseButton.mbMiddle, KeysToShiftState(Message.Keys) + [ssDouble], FormPoint.X, FormPoint.Y);
+      Control.Form.MouseDown(TMouseButton.mbMiddle, KeysToShiftState(Message.Keys) + [ssDouble], FormPoint.X, FormPoint.Y);
     end;
   finally
     inherited;
@@ -633,10 +766,10 @@ end;
 procedure TALWinNativeView.WMMouseMove(var Message: TWMMouseMove);
 begin
   try
-    if Form <> nil then
+    if Control.Form <> nil then
     begin
       var FormPoint := ExtractPoint(Message); // dp
-      Form.MouseMove(KeysToShiftState(Message.Keys), FormPoint.X, FormPoint.Y);
+      Control.Form.MouseMove(KeysToShiftState(Message.Keys), FormPoint.X, FormPoint.Y);
     end;
   finally
     inherited;
@@ -647,10 +780,10 @@ end;
 procedure TALWinNativeView.WMLButtonDblClick(var Message: TWMLButtonDblClk);
 begin
   try
-    if Form <> nil then
+    if Control.Form <> nil then
     begin
       var FormPoint := ExtractPoint(Message); // dp
-      Form.MouseDown(TMouseButton.mbLeft, KeysToShiftState(Message.Keys) + [ssDouble], FormPoint.X, FormPoint.Y);
+      Control.Form.MouseDown(TMouseButton.mbLeft, KeysToShiftState(Message.Keys) + [ssDouble], FormPoint.X, FormPoint.Y);
     end;
   finally
     inherited;
@@ -661,10 +794,10 @@ end;
 procedure TALWinNativeView.WMRButtonDblClick(var Message: TWMRButtonDblClk);
 begin
   try
-    if Form <> nil then
+    if Control.Form <> nil then
     begin
       var FormPoint := ExtractPoint(Message); // dp
-      Form.MouseDown(TMouseButton.mbRight, KeysToShiftState(Message.Keys) + [ssDouble], FormPoint.X, FormPoint.Y);
+      Control.Form.MouseDown(TMouseButton.mbRight, KeysToShiftState(Message.Keys) + [ssDouble], FormPoint.X, FormPoint.Y);
     end;
   finally
     inherited;
@@ -677,16 +810,16 @@ var
   ScreenPoint: TPointF;
 begin
   try
-    if Form <> nil then
+    if Control.Form <> nil then
     begin
       var FormPoint := ExtractPoint(Message);
       if (Control <> nil) and (Control.PopupMenu <> nil) then
       begin
-        ScreenPoint := Form.ClientToScreen(FormPoint);
+        ScreenPoint := Control.Form.ClientToScreen(FormPoint);
         IControl(Control).ShowContextMenu(ScreenPoint);
       end;
-      Form.MouseMove([], FormPoint.X, FormPoint.Y); // Require for correct IsMouseOver handle
-      Form.MouseDown(TMouseButton.mbRight, KeysToShiftState(Message.Keys), FormPoint.X, FormPoint.Y);
+      Control.Form.MouseMove([], FormPoint.X, FormPoint.Y); // Require for correct IsMouseOver handle
+      Control.Form.MouseDown(TMouseButton.mbRight, KeysToShiftState(Message.Keys), FormPoint.X, FormPoint.Y);
     end;
   finally
     if (Control = nil) or (Control.PopupMenu = nil) then
@@ -698,14 +831,14 @@ end;
 procedure TALWinNativeView.WMRButtonUp(var Message: TWMLButtonUp);
 begin
   try
-    if Form <> nil then
+    if Control.Form <> nil then
     begin
       var FormPoint := ExtractPoint(Message); // dp
-      Form.MouseUp(TMouseButton.mbRight, KeysToShiftState(Message.Keys), FormPoint.X, FormPoint.Y);
+      Control.Form.MouseUp(TMouseButton.mbRight, KeysToShiftState(Message.Keys), FormPoint.X, FormPoint.Y);
     end;
     // Don't combine these if statements because in MouseUp the form can unload presentation!
-    if Form <> nil then
-      Form.MouseLeave;
+    if Control.Form <> nil then
+      Control.Form.MouseLeave;
   finally
     if (Control = nil) or (Control.PopupMenu = nil) then
       inherited;
@@ -719,12 +852,12 @@ var
 begin
   Point := TPoint.Create(Message.XPos, Message.YPos); // px
   ClientToScreen(Handle, Point); // px
-  if Form = nil then
+  if Control.Form = nil then
     Result := Point
   else
   begin
-    ScreenToClient(GetFormHandle(Form), Point); // px
-    Result := TPointF.Create(Point.X / Form.Handle.Scale, Point.Y / Form.Handle.Scale); // dp
+    ScreenToClient(GetFormHandle, Point); // px
+    Result := TPointF.Create(Point.X / Control.Form.Handle.Scale, Point.Y / Control.Form.Handle.Scale); // dp
   end;
 end;
 

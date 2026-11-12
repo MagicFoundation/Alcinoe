@@ -1,4 +1,4 @@
-unit Alcinoe.FMX.NativeView.Android;
+﻿unit Alcinoe.FMX.NativeView.Android;
 
 interface
 
@@ -30,23 +30,21 @@ type
   TALAndroidNativeView = class
   private
     FControl: TALControl;
-    FForm: TCommonCustomForm;
     FView: JView;
     FLayout: JViewGroup;
+    FCaptureBitmap: JBitmap;
+    FCaptureCanvas: JCanvas;
     FVisible: Boolean;
     FFocusChangedListener: TALAndroidFocusChangedListener;
-    function GetAbsoluteRect: TRectF;
-    procedure BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
-    procedure AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
+    procedure BeforeDestroyFormHandleListener(const Sender: TObject; const AMessage: TMessage);
+    procedure AfterCreateFormHandleListener(const Sender: TObject; const AMessage: TMessage);
   protected
-    function GetFormView(const AForm: TCommonCustomForm): JView;
+    function GetFormView: JView;
   public
+    function GetAbsoluteRect: TRectF;
     procedure SetEnabled(const value: Boolean); virtual; //procedure PMSetAbsoluteEnabled(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_ABSOLUTE_ENABLED;
     procedure SetVisible(const Value: Boolean); virtual; // procedure PMSetVisible(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_VISIBLE;
     procedure SetAlpha(const Value: Single); virtual; // procedure PMSetAlpha(var AMessage: TDispatchMessageWithValue<Single>); message PM_SET_ABSOLUTE_OPACITY;
-    procedure AncestorVisibleChanged; virtual; // procedure PMAncestorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
-    procedure RootChanged(const aRoot: IRoot); virtual; // procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
-    procedure ChangeOrder; virtual; // PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
     procedure BringToFront; virtual;
   protected
     function GetView<T: JView>: T; overload;
@@ -58,9 +56,10 @@ type
     destructor Destroy; override;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
+    procedure UpdateParent; virtual;
     procedure UpdateFrame; virtual;
+    procedure Draw(const ACanvas: JCanvas); virtual;
     function CaptureScreenshot: TALDrawable; virtual;
-    property Form: TCommonCustomForm read FForm;
     property Control: TALControl read FControl;
     property Layout: JViewGroup read FLayout;
     property View: JView read FView;
@@ -95,12 +94,14 @@ uses
   System.SysUtils,
   Androidapi.Helpers,
   Androidapi.JNI.App,
+  AndroidApi.Jni,
   FMX.Platform.Android,
   FMX.Platform.UI.Android,
   FMX.Consts,
   Alcinoe.StringUtils,
-  Alcinoe.Common,
-  Alcinoe.FMX.NativeControl;
+  Alcinoe.FMX.Common,
+  Alcinoe.FMX.NativeControl,
+  Alcinoe.Common;
 
 {**************************************}
 constructor TALAndroidNativeView.Create;
@@ -112,13 +113,17 @@ begin
   FVisible := True;
 
   FLayout := CreateLayout;
+  FLayout.setClipChildren(False);
+  FLayout.setClipToPadding(False);
   FView := CreateView;
   FView.setClipToOutline(False);
+
+  FCaptureBitmap := nil;
+  FCaptureCanvas := nil;
 
   FFocusChangedListener := TALAndroidFocusChangedListener.Create(Self);
   FView.setOnFocusChangeListener(FFocusChangedListener);
 
-  { Tree view structure }
   LayoutParams := TJRelativeLayout_LayoutParams.JavaClass.init(TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT, TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT);
   FLayout.addView(FView, LayoutParams);
 
@@ -126,8 +131,8 @@ begin
   FView.setFocusable(True);
   FView.setFocusableInTouchMode(True);
 
-  TMessageManager.DefaultManager.SubscribeToMessage(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
-  TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateHandleListener);
+  TMessageManager.DefaultManager.SubscribeToMessage(TBeforeDestroyFormHandle, BeforeDestroyFormHandleListener);
+  TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateFormHandleListener);
 end;
 
 {******************************************************************}
@@ -135,7 +140,7 @@ constructor TALAndroidNativeView.Create(const AControl: TALControl);
 begin
   FControl := AControl;
   Create;
-  RootChanged(Control.Root);
+  UpdateParent;
 end;
 
 {**************************************}
@@ -143,33 +148,56 @@ destructor TALAndroidNativeView.Destroy;
 begin
   // setOnFocusChangeListener(nil) must come first: both setVisibility(INVISIBLE) and RootChanged(nil)
   // can cause Android to fire onFocusChange, which calls Control.ResetFocus, which accesses
-  // Control.NativeView � but ALFreeAndNil already zeroed FNativeView, so GetNativeView would
+  // Control.NativeView — but ALFreeAndNil already zeroed FNativeView, so GetNativeView would
   // lazily recreate a new TALAndroidNativeView mid-destruction.
   View.setOnFocusChangeListener(nil);
   ALFreeAndNil(FFocusChangedListener);
   View.setVisibility(TJView.JavaClass.INVISIBLE);
-  TMessageManager.DefaultManager.Unsubscribe(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
-  TMessageManager.DefaultManager.Unsubscribe(TAfterCreateFormHandle, AfterCreateHandleListener);
-  RootChanged(nil);
+  TMessageManager.DefaultManager.Unsubscribe(TBeforeDestroyFormHandle, BeforeDestroyFormHandleListener);
+  TMessageManager.DefaultManager.Unsubscribe(TAfterCreateFormHandle, AfterCreateFormHandleListener);
+
+  var LNativeChildControls := TALNativeControl(Control).GetNativeChildControls;
+  for var I := Low(LNativeChildControls) to High(LNativeChildControls) do
+    Layout.removeView(LNativeChildControls[I].NativeView.Layout);
+
+  var LParent := Layout.getParent;
+  if LParent <> nil then
+    TJViewGroup.Wrap(LParent).removeView(Layout);
+
+  if FCaptureBitmap <> nil then
+    FCaptureBitmap.recycle;
+  FCaptureCanvas := nil;
+
   inherited;
 end;
 
-{**********************************************************************************************************}
-procedure TALAndroidNativeView.BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
+{**************************************************************************************************************}
+procedure TALAndroidNativeView.BeforeDestroyFormHandleListener(const Sender: TObject; const AMessage: TMessage);
 begin
-  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then begin
-    var LParent: JViewParent := Layout.getParent;
-    if LParent <> nil then
+  if (AMessage is TBeforeDestroyFormHandle) and
+     (TBeforeDestroyFormHandle(AMessage).Value = Control.Form) then begin
+    var LParent := Layout.getParent;
+    if (LParent <> nil) and
+       (TJNIResolver.IsSameObject(LParent, GetFormView)) then begin
+      {$IF defined(DEBUG)}
+      ALLog(Classname + '.BeforeDestroyFormHandleListener');
+      {$ENDIF}
       TJViewGroup.Wrap(LParent).removeView(Layout);
+    end;
   end;
 end;
 
-{********************************************************************************************************}
-procedure TALAndroidNativeView.AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
+{************************************************************************************************************}
+procedure TALAndroidNativeView.AfterCreateFormHandleListener(const Sender: TObject; const AMessage: TMessage);
 begin
   // This event is called only when the window's handle is recreated.
-  if (AMessage is TAfterCreateFormHandle) and (TAfterCreateFormHandle(AMessage).Value = Form) then
-    RootChanged(Form);
+  if (AMessage is TAfterCreateFormHandle) and
+     (TAfterCreateFormHandle(AMessage).Value = Control.Form) then begin
+    {$IF defined(DEBUG)}
+    ALLog(Classname + '.AfterCreateFormHandleListener');
+    {$ENDIF}
+    UpdateParent;
+  end;
 end;
 
 {*****************************************************}
@@ -185,9 +213,9 @@ begin
 end;
 
 {*******************************************************************************}
-function TALAndroidNativeView.GetFormView(const AForm: TCommonCustomForm): JView;
+function TALAndroidNativeView.GetFormView: JView;
 begin
-  var LFormHandle: TAndroidWindowHandle := WindowHandleToPlatform(AForm.Handle);
+  var LFormHandle: TAndroidWindowHandle := WindowHandleToPlatform(Control.Form.Handle);
   Result := LFormHandle.FormLayout;
 end;
 
@@ -203,26 +231,100 @@ begin
   Result := TALNativeControl(Control).GetNativeViewAbsoluteRect;
 end;
 
+{**************************************}
+procedure TALAndroidNativeView.UpdateParent;
+begin
+
+  {$IF defined(DEBUG)}
+  ALLog(Classname + '.UpdateParent');
+  {$ENDIF}
+
+  // Example:
+  //
+  // FormView
+  //   └── MapLibre.Layout
+  //        |  | └── MapLibre.View
+  //        |  └── FMXOverNative.Layout
+  //        |       └── ImageView
+  //        └── FMXOverNative.Layout
+  //              └── ImageView
+  //
+
+  var LParentGroup: JViewGroup;
+  if Control.Form = nil then LParentGroup := nil
+  else LParentGroup := TJViewGroup.Wrap(GetFormView); // Ex: FormLayout
+
+  var LParentControl := Control.ParentControl;
+  while LParentControl <> nil do begin
+    if LParentControl is TALNativeControl then begin
+      if not TALNativeControl(LParentControl).HasNativeView then exit;
+      LParentGroup := TALNativeControl(LParentControl).NativeView.Layout; // Ex: MapLibre.Layout
+      break;
+    end;
+    LParentControl := LParentControl.ParentControl;
+  end;
+
+  var LCurrentParent := Layout.getParent;
+  if ((LCurrentParent = nil) and
+      (LParentGroup = nil)) or
+     ((LCurrentParent <> nil) and
+      (LParentGroup <> nil) and
+      (TJNIResolver.IsSameObject(LCurrentParent, LParentGroup))) then exit;
+
+  if LCurrentParent <> nil then
+    TJViewGroup.Wrap(LCurrentParent).removeView(Layout);
+
+  if LParentGroup <> nil then begin
+    var LParams: JRelativeLayout_LayoutParams;
+    if Layout.getLayoutParams = nil then LParams := TJRelativeLayout_LayoutParams.JavaClass.init(0, 0)
+    else LParams := TJRelativeLayout_LayoutParams.Wrap(Layout.getLayoutParams);
+    LParentGroup.addView(Layout, LParentGroup.getChildCount, LParams);
+    UpdateFrame;
+  end;
+
+end;
+
 {*****************************************}
 procedure TALAndroidNativeView.UpdateFrame;
 begin
-  // We cannot use ZOrderManager.UpdateOrderAndBounds(Control) as it causes the edit control to lose focus
-  // every time it is moved, which is particularly problematic when moving the edit from the bottom to the top
-  // to accommodate the virtual keyboard display. Additionally, we cannot use ZOrderManager.UpdateBounds(Control)
-  // because it updates not only the bounds but also the visibility! Code below is taken from
-  // TAndroidZOrderManager.UpdateBounds
-  if FForm = nil then exit;
+  {$IF defined(DEBUG)}
+  //ALLog(Classname + '.UpdateFrame');
+  {$ENDIF}
   var LAbsoluteRect := GetAbsoluteRect;
-  var LScreenScale: Single := FForm.Handle.Scale;
+  var LParentControl := Control.ParentControl;
+  while LParentControl <> nil do begin
+    if LParentControl is TALNativeControl then begin
+      if not TALNativeControl(LParentControl).HasNativeView then exit;
+      var LParentRect := TALNativeControl(LParentControl).GetNativeViewAbsoluteRect;
+      LAbsoluteRect.Offset(-LParentRect.Left, -LParentRect.Top);
+      break;
+    end;
+    LParentControl := LParentControl.ParentControl;
+  end;
   var R := TRectF.Create(
-             LAbsoluteRect.Left * LScreenScale,
-             LAbsoluteRect.Top * LScreenScale,
-             LAbsoluteRect.Right * LScreenScale,
-             LAbsoluteRect.Bottom * LScreenScale).Round;
-  If (R.Width <> Layout.getWidth) or (R.Height <> Layout.getHeight) then begin
-    var LParam: JRelativeLayout_LayoutParams := TJRelativeLayout_LayoutParams.Wrap(Layout.getLayoutParams);
+             LAbsoluteRect.Left * ALGetScreenScale,
+             LAbsoluteRect.Top * ALGetScreenScale,
+             LAbsoluteRect.Right * ALGetScreenScale,
+             LAbsoluteRect.Bottom * ALGetScreenScale).Round;
+  if Layout.getLayoutParams = nil then exit;
+  var LParam := TJRelativeLayout_LayoutParams.Wrap(Layout.getLayoutParams);
+  // RelativeLayout clamps the measured size of a child to the space available
+  // in the parent: Min(LParam.width, ParentWidth - leftMargin - rightMargin)
+  // (same for the height). The position is applied with setX/setY (translation),
+  // not with margins, so a native view larger than its parent (for example a
+  // TALFMXOverNativeContainer whose bounds include a large shadow, or any view
+  // bigger than the form or than a parent TALMapLibre) would be measured
+  // smaller than requested. The ImageView would still draw the full bitmap
+  // (clipChildren is False), but its hit-test area would be the clamped size,
+  // so touches would never reach it. A negative right/bottom margin as large as
+  // the view itself guarantees that the available space is never smaller than
+  // the requested size, and it has no effect on the position.
+  if (R.Width <> LParam.width) or (R.Height <> LParam.height) or
+     (LParam.rightMargin <> -R.Width) or (LParam.bottomMargin <> -R.Height) then begin
     LParam.width := R.Width;
     LParam.height := R.Height;
+    LParam.rightMargin := -R.Width;
+    LParam.bottomMargin := -R.Height;
     Layout.setLayoutParams(LParam);
   end;
   if Layout.getX <> R.Left then
@@ -241,34 +343,69 @@ begin
     Layout.requestLayout;
 end;
 
+{**********************************************************}
+procedure TALAndroidNativeView.Draw(const ACanvas: JCanvas);
+begin
+
+  // Draw the current native view.
+  // When a view is drawn by its parent, the parent first translates the canvas
+  // by (-scrollX, -scrollY). Calling View.draw directly skips that step, so it
+  // must be done here. Otherwise a scrolled view (e.g. a multiline EditText
+  // scrolled to the bottom) clips its content outside the bitmap and the
+  // capture is empty.
+  ACanvas.save;
+  try
+    ACanvas.translate(-View.getScrollX, -View.getScrollY);
+    View.draw(ACanvas);
+  finally
+    ACanvas.restore;
+  end;
+
+  // Draw native child controls.
+  var LParentRect := GetAbsoluteRect;
+  var LNativeChildControls := TALNativeControl(Control).GetNativeChildControls;
+  for var I := Low(LNativeChildControls) to High(LNativeChildControls) do begin
+    var LNativeView := LNativeChildControls[I].NativeView;
+    if LNativeView.Layout.getVisibility <> TJView.JavaClass.VISIBLE then continue;
+    var LChildRect := LNativeView.GetAbsoluteRect;
+    ACanvas.save;
+    try
+      ACanvas.translate(
+        (LChildRect.Left - LParentRect.Left) * ALGetScreenScale,
+        (LChildRect.Top - LParentRect.Top) * ALGetScreenScale);
+      LNativeView.Draw(ACanvas);
+    finally
+      ACanvas.restore;
+    end;
+  end;
+
+end;
+
 {***********************************************************}
 function TALAndroidNativeView.CaptureScreenshot: TALDrawable;
 begin
-  var LOldCacheEnabledValue := View.isDrawingCacheEnabled;
-  var LOldCacheQualityValue := View.getDrawingCacheQuality;
-  View.setDrawingCacheEnabled(True);
-  View.setDrawingCacheQuality(TJView.JavaClass.DRAWING_CACHE_QUALITY_HIGH);
-  try
-    var LBitmap := View.getDrawingCache;
-    if LBitmap <> nil then
-      {$IF defined(ALSkiaCanvas)}
-      Result := ALCreateSkImageFromJBitmap(LBitmap)
-      {$ELSE}
-      Result := ALCreateTextureFromJBitmap(LBitmap)
-      {$ENDIF}
-    else
-      Result := ALNullDrawable;
-  finally
-    View.setDrawingCacheEnabled(LOldCacheEnabledValue);
-    View.setDrawingCacheQuality(LOldCacheQualityValue);
-  end;
-end;
+  if (Layout.getWidth <= 0) or (Layout.getHeight <= 0) then exit(ALNullDrawable);
 
-{*****************************************}
-procedure TALAndroidNativeView.ChangeOrder;
-begin
-  //if ZOrderManager <> nil then
-  //  ZOrderManager.UpdateOrder(Control);
+  if (FCaptureBitmap = nil) or
+     (FCaptureBitmap.getWidth <> Layout.getWidth) or
+     (FCaptureBitmap.getHeight <> Layout.getHeight) then begin
+
+    if FCaptureBitmap <> nil then FCaptureBitmap.recycle;
+    FCaptureBitmap := TJBitmap.JavaClass.createBitmap(
+                        Layout.getWidth,
+                        Layout.getHeight,
+                        TJBitmap_Config.JavaClass.ARGB_8888);
+    FCaptureCanvas := TJCanvas.JavaClass.init(FCaptureBitmap);
+  end
+  else
+    FCaptureBitmap.eraseColor(TJColor.JavaClass.TRANSPARENT);
+
+  Draw(FCaptureCanvas);
+  {$IF defined(ALSkiaCanvas)}
+  Result := ALCreateSkImageFromJBitmap(FCaptureBitmap);
+  {$ELSE}
+  Result := ALCreateTextureFromJBitmap(FCaptureBitmap);
+  {$ENDIF}
 end;
 
 {******************************************}
@@ -276,18 +413,6 @@ procedure TALAndroidNativeView.BringToFront;
 begin
   if Layout.getParent <> nil then
     Layout.bringToFront;
-  for var I := 0 to Control.ControlsCount - 1 do begin
-    var LControl := Control.Controls[I];
-    if (LControl is TALNativeControl) and
-       (TALNativeControl(LControl).HasNativeView) then
-      TALNativeControl(LControl).NativeView.BringToFront;
-  end;
-end;
-
-{****************************************************}
-procedure TALAndroidNativeView.AncestorVisibleChanged;
-begin
-  SetVisible(Visible);
 end;
 
 {**************************************************************}
@@ -306,35 +431,6 @@ begin
   // the EditView becomes visible again.
   if FVisible and (not Layout.isInLayout) then
     Layout.requestLayout;
-end;
-
-{*************************************************************}
-procedure TALAndroidNativeView.RootChanged(const aRoot: IRoot);
-begin
-  var LParent: JViewParent := Layout.getParent;
-  if LParent <> nil then
-    TJViewGroup.Wrap(LParent).removeView(Layout);
-  if aRoot is TCommonCustomForm then begin
-    FForm := TCommonCustomForm(aRoot);
-    var LParam: JRelativeLayout_LayoutParams;
-    var LParentGroup: JViewGroup := TJViewGroup.Wrap(GetFormView(FForm));
-    if Layout.getLayoutParams = nil then
-      LParam := TJRelativeLayout_LayoutParams.JavaClass.init(0, 0)
-    else
-      LParam := TJRelativeLayout_LayoutParams.Wrap(Layout.getLayoutParams);
-    // FMX form consists from two parts: form's view and layout for other native controls. Form's view embedded into Layout.
-    // So it should always holds 0 index. Native controls are appended at the end of the list so that the most recently
-    // attached native control is displayed above the others (e.g. TALFMXOverNativeContainer above a TALMapLibre).
-    LParentGroup.addView(Layout, LParentGroup.getChildCount, LParam);
-    UpdateFrame;
-    for var I := 0 to Control.ControlsCount - 1 do begin
-      var LControl := Control.Controls[I];
-      if (LControl is TALNativeControl) and
-         (TALNativeControl(LControl).HasNativeView) then
-        TALNativeControl(LControl).NativeView.BringToFront;
-    end;
-  end
-  else FForm := nil;
 end;
 
 {**************************************************************}

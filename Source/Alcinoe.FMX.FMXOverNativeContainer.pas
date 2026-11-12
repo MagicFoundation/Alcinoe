@@ -26,6 +26,7 @@ uses
   {$ELSEIF defined(IOS)}
   System.TypInfo,
   iOSapi.UIKit,
+  iOSapi.CoreGraphics,
   Alcinoe.FMX.NativeView.iOS,
   {$ELSEIF defined(ALMacOS)}
   System.TypInfo,
@@ -201,6 +202,7 @@ type
   {*****************************************}
   IALIosFMXOverNativeView = interface(UIView)
     ['{0C4B6E8B-6B0B-4D2B-9A55-2C1E3F2C9D41}']
+    function hitTest(point: CGPoint; withEvent: UIEvent): UIView; cdecl;
   end;
 
   {***********************************************}
@@ -209,6 +211,7 @@ type
     function GetObjectiveCClass: PTypeInfo; override;
   public
     constructor Create; override;
+    function hitTest(point: CGPoint; withEvent: UIEvent): UIView; cdecl;
     procedure PresentBitmap(const ABitmap: FMX.Graphics.TBitmap);
   end;
 
@@ -221,6 +224,7 @@ type
   {*****************************************}
   IALMacFMXOverNativeView = interface(NSView)
     ['{6F0E3B1C-2D4A-4C7B-8E2F-5A9B7C1D3E6F}']
+    function hitTest(aPoint: NSPoint): NSView; cdecl;
   end;
 
   {***********************************************}
@@ -229,6 +233,7 @@ type
     function GetObjectiveCClass: PTypeInfo; override;
   public
     constructor Create; override;
+    function hitTest(aPoint: NSPoint): NSView; cdecl;
     procedure PresentBitmap(const ABitmap: FMX.Graphics.TBitmap);
   end;
 
@@ -273,8 +278,6 @@ uses
   Androidapi.Bitmap,
   Androidapi.jni.App,
   FMX.Platform.Android,
-  {$ELSEIF defined(IOS)}
-  iOSapi.CoreGraphics,
   {$ELSEIF defined(ALMacOS)}
   Macapi.CoreGraphics,
   {$ENDIF}
@@ -282,6 +285,7 @@ uses
   DesignIntf,
   {$ENDIF}
   Alcinoe.Common,
+  Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Common;
 
 {***************************************************************}
@@ -369,7 +373,12 @@ end;
 {*****************************************************************}
 function TALFMXOverNativeContainer.GetNativeViewBoundsRect: TRectF;
 begin
-  Result := LocalRect;
+  Result := ALGetShapeSurfaceRect(
+              LocalRect, // const ARect: TRectF;
+              AutoAlignToPixel, // const AAlignToPixel: Boolean;
+              Fill, // const AFill: TALBrush;
+              nil, // const AStateLayer: TALStateLayer;
+              Shadow); // const AShadow: TALShadow): TRectF;
 end;
 
 {****************************************}
@@ -381,8 +390,18 @@ begin
   end
   else if (FInPaintTo) or (FNativeView = nil) then inherited
   else begin
-    var LBitmapWidth := Round(Width * ALGetScreenScale);
-    var LBitmapHeight := Round(Height * ALGetScreenScale);
+
+    if IsNativeViewFrozen then exit;
+    var LParentControl := ParentControl;
+    while LParentControl <> nil do begin
+      if (LParentControl is TALNativeControl) and
+         (TALNativeControl(LParentControl).IsNativeViewFrozen) then exit;
+      LParentControl := LParentControl.ParentControl;
+    end;
+
+    var LBoundsRect := GetNativeViewBoundsRect;
+    var LBitmapWidth := Round(LBoundsRect.Width * ALGetScreenScale);
+    var LBitmapHeight := Round(LBoundsRect.Height * ALGetScreenScale);
     if (LBitmapWidth <= 0) or (LBitmapHeight <= 0) then exit;
 
     if FBitmap = nil then FBitmap := TBitmap.Create(LBitmapWidth, LBitmapHeight)
@@ -394,12 +413,13 @@ begin
 
     if not FBitmap.Canvas.BeginScene then exit;
     try
-      PaintTo(FBitmap.Canvas, TRectF.Create(0, 0, FBitmap.Width / ALGetScreenScale, FBitmap.Height / ALGetScreenScale));
+      PaintTo(FBitmap.Canvas, TRectF.Create(-LBoundsRect.Left, -LBoundsRect.Top, -LBoundsRect.Left + Width, -LBoundsRect.Top + Height));
     finally
       FBitmap.Canvas.EndScene;
     end;
 
     NativeView.PresentBitmap(FBitmap);
+
   end;
 end;
 
@@ -422,11 +442,34 @@ end;
 {**************************************************************************************************}
 function TALAndroidFMXOverNativeView.TTouchListener.onTouch(v: JView; event: JMotionEvent): Boolean;
 begin
-  if FNativeView.Form = nil then exit(False);
+  if FNativeView.Control.Form = nil then exit(False);
+
+  if event.getActionMasked = TJMotionEvent.JavaClass.ACTION_DOWN then begin
+    var LNativeViewBoundsRect := TALFMXOverNativeContainer(FNativeView.Control).GetNativeViewBoundsRect;
+    if not FNativeView.Control.PointInObjectLocal(
+             (event.getX / ALGetScreenScale) + LNativeViewBoundsRect.Left,
+             (event.getY / ALGetScreenScale) + LNativeViewBoundsRect.Top) then
+      exit(False);
+  end;
+
+  var LHandle := WindowHandleToPlatform(FNativeView.Control.Form.Handle);
   var LEvent := TJMotionEvent.JavaClass.obtain(Event);
   try
-    LEvent.offsetLocation(FNativeView.Layout.getX, FNativeView.Layout.getY);
-    WindowHandleToPlatform(FNativeView.Form.Handle).MotionManager.HandleMotionEvent(LEvent);
+    // Translate the event from the ImageView coordinates into the FormLayout
+    // coordinates. We can not simply use Layout.getX/getY because the layout
+    // is not always a direct child of the FormLayout (e.g. when the container
+    // is a child of TALMapLibre, it is a child of MapLibre.Layout).
+    var LViewLocation := TJavaArray<Integer>.Create(2);
+    var LFormLocation := TJavaArray<Integer>.Create(2);
+    try
+      v.getLocationOnScreen(LViewLocation);
+      LHandle.FormLayout.getLocationOnScreen(LFormLocation);
+      LEvent.offsetLocation(LViewLocation[0] - LFormLocation[0], LViewLocation[1] - LFormLocation[1]);
+    finally
+      ALFreeAndNil(LViewLocation);
+      ALFreeAndNil(LFormLocation);
+    end;
+    LHandle.MotionManager.HandleMotionEvent(LEvent);
   finally
     LEvent.recycle;
   end;
@@ -437,8 +480,14 @@ end;
 constructor TALAndroidFMXOverNativeView.Create;
 begin
   inherited; // This will call CreateView
+  // TALAndroidNativeView.Create makes the view clickable. When onTouch returns
+  // False (ACTION_DOWN in the shadow area), Android then calls View.onTouchEvent,
+  // and a clickable view consumes the event, so it would never reach the views
+  // behind (e.g. the map). The view must therefore not be clickable.
+  View.setClickable(False);
+  View.setLongClickable(False);
   FBitmap := nil;
-  View.setScaleType(TJImageView_ScaleType.JavaClass.FIT_XY);
+  View.setScaleType(TJImageView_ScaleType.JavaClass.MATRIX);
   FTouchListener := TTouchListener.Create(Self);
   View.setOnTouchListener(FTouchListener);
 end;
@@ -468,6 +517,9 @@ end;
 {***************************************************************************************}
 procedure TALAndroidFMXOverNativeView.PresentBitmap(const ABitmap: FMX.Graphics.TBitmap);
 begin
+  {$IF defined(DEBUG)}
+  ALLog(Classname + '.PresentBitmap');
+  {$ENDIF}
   var LNewBitmap := False;
   if (FBitmap = nil) or (FBitmap.getWidth <> ABitmap.Width) or (FBitmap.getHeight <> ABitmap.Height) then begin
     // We don't recycle the previous bitmap because the RenderThread
@@ -515,8 +567,21 @@ begin
 end;
 
 {***********************************************************************************}
+function TALIosFMXOverNativeView.hitTest(point: CGPoint; withEvent: UIEvent): UIView;
+begin
+  Result := nil;
+  if Control.Form = nil then exit;
+  var LNativeViewBoundsRect := TALFMXOverNativeContainer(Control).GetNativeViewBoundsRect;
+  if Control.PointInObjectLocal(point.x + LNativeViewBoundsRect.Left, point.y + LNativeViewBoundsRect.Top) then
+    Result := GetFormView;
+end;
+
+{***********************************************************************************}
 procedure TALIosFMXOverNativeView.PresentBitmap(const ABitmap: FMX.Graphics.TBitmap);
 begin
+  {$IF defined(DEBUG)}
+  ALLog(Classname + '.PresentBitmap');
+  {$ENDIF}
   var LColorSpace := CGColorSpaceCreateDeviceRGB;
   try
     var LbitmapInfo: CGBitmapInfo;
@@ -570,9 +635,30 @@ begin
   Result := TypeInfo(IALMacFMXOverNativeView);
 end;
 
+{****************************************************************}
+function TALMacFMXOverNativeView.hitTest(aPoint: NSPoint): NSView;
+begin
+  Result := nil;
+  if (Control.Form = nil) or (View.superview = nil) then exit;
+  var LLocalPoint := View.convertPoint(aPoint, TNSView.Wrap(View.superview));
+  var LBounds := View.bounds;
+  if (LLocalPoint.x < 0) or (LLocalPoint.y < 0) or
+     (LLocalPoint.x > LBounds.size.width) or (LLocalPoint.y > LBounds.size.height) then exit;
+  // NSView coordinates are bottom-left based (the view is not flipped) and
+  // relative to the native view frame, which includes the shadow.
+  var LNativeViewBoundsRect := TALFMXOverNativeContainer(Control).GetNativeViewBoundsRect;
+  var LX: Single := LLocalPoint.x + LNativeViewBoundsRect.Left;
+  var LY: Single := (LBounds.size.height - LLocalPoint.y) + LNativeViewBoundsRect.Top;
+  if Control.PointInObjectLocal(LX, LY) then
+    Result := GetFormView;
+end;
+
 {***********************************************************************************}
 procedure TALMacFMXOverNativeView.PresentBitmap(const ABitmap: FMX.Graphics.TBitmap);
 begin
+  {$IF defined(DEBUG)}
+  ALLog(Classname + '.PresentBitmap');
+  {$ENDIF}
   var LColorSpace := CGColorSpaceCreateDeviceRGB;
   try
     var LbitmapInfo: CGBitmapInfo;
@@ -657,6 +743,9 @@ end;
 {***********************************************************************************}
 procedure TALWinFMXOverNativeView.PresentBitmap(const ABitmap: FMX.Graphics.TBitmap);
 begin
+  {$IF defined(DEBUG)}
+  ALLog(Classname + '.PresentBitmap');
+  {$ENDIF}
   // Create the memory DC once.
   if FLayerDC = 0 then begin
     FLayerDC := CreateCompatibleDC(0{DC: HDC});

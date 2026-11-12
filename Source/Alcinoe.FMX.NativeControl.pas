@@ -109,7 +109,6 @@ type
     procedure DoRootChanged; override;
     procedure DoResized; override;
     procedure VisibleChanged; override;
-    procedure ChangeOrder; override;
     procedure DoRealign; override;
     procedure DoEndUpdate; override;
     procedure DoEnter; override;
@@ -152,6 +151,7 @@ type
     property NativeView: TALWinNativeView read GetNativeView;
     {$ENDIF}
     property NativeViewMargins: TALBounds read FNativeViewMargins write SetNativeViewMargins;
+    function GetNativeChildControls: TArray<TALNativeControl>;
     function GetNativeViewAbsoluteRect: TRectF; virtual;
     function GetNativeViewBoundsRect: TRectF; virtual;
     function GetNativeViewPosition: TPointF;
@@ -189,9 +189,11 @@ procedure ALFreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl
        (TALNativeControl(AControl).FreezeNativeView) then begin
       setlength(AFrozenNativeControls, Length(AFrozenNativeControls) + 1);
       AFrozenNativeControls[High(AFrozenNativeControls)] := TALNativeControl(AControl);
+    end
+    else begin
+      for var I := 0 to AControl.ControlsCount - 1 do
+        _FreezeNativeViews(AControl.Controls[I]);
     end;
-    for var I := 0 to AControl.ControlsCount - 1 do
-      _FreezeNativeViews(AControl.Controls[I]);
   end;
 
 begin
@@ -206,7 +208,7 @@ end;
 {***********************************************************************************}
 procedure ALUnfreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl>);
 begin
-  For var I := low(AFrozenNativeControls) to high(AFrozenNativeControls) do
+  For var I := high(AFrozenNativeControls) downto low(AFrozenNativeControls) do
     if AFrozenNativeControls[I] <> nil then
       AFrozenNativeControls[I].UnFreezeNativeView;
   setlength(AFrozenNativeControls, 0);
@@ -348,6 +350,32 @@ procedure TALNativeControl.NativeViewMarginsChanged(Sender: TObject);
 begin
   if FNativeView <> nil then
     FNativeView.UpdateFrame;
+end;
+
+{*************************************************************************}
+function TALNativeControl.GetNativeChildControls: TArray<TALNativeControl>;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _GetNativeChildControls(const AControl: TControl; var ANativeChildControls: TArray<TALNativeControl>);
+  begin
+    for var I := 0 to AControl.ControlsCount - 1 do begin
+      var LControl := AControl.Controls[I];
+      if LControl is TALNativeControl then begin
+        // A native control without a native view is not attached to us, and
+        // its own descendants are attached to it (not to us), so stop here.
+        if TALNativeControl(LControl).HasNativeView then begin
+          setlength(ANativeChildControls, length(ANativeChildControls) + 1);
+          ANativeChildControls[high(ANativeChildControls)] := TALNativeControl(LControl);
+        end;
+      end
+      else
+        _GetNativeChildControls(LControl, ANativeChildControls);
+    end;
+  end;
+
+begin
+  Result := nil;
+  _GetNativeChildControls(Self, Result);
 end;
 
 {**********************************************************}
@@ -498,7 +526,7 @@ begin
   inherited;
   if csDestroying in ComponentState then exit;
   if FNativeView <> nil then
-    FNativeView.RootChanged(Root);
+    FNativeView.UpdateParent;
 end;
 
 {***********************************}
@@ -514,6 +542,7 @@ procedure TALNativeControl.DoAbsoluteChanged;
 begin
   inherited;
   if (not (csLoading in ComponentState)) and
+     (not FInPaintTo) and
      (FNativeView <> nil) then
     FNativeView.UpdateFrame;
 end;
@@ -524,14 +553,6 @@ begin
   inherited;
   if FNativeView <> nil then
     FNativeView.SetVisible(Visible);
-end;
-
-{*************************************}
-procedure TALNativeControl.ChangeOrder;
-begin
-  inherited;
-  if FNativeView <> nil then
-    FNativeView.ChangeOrder;
 end;
 
 {***************************************}
@@ -553,12 +574,17 @@ end;
 {****************************************}
 procedure TALNativeControl.InitNativeView;
 begin
-  // Virtual
+  var LNativeChildControls := GetNativeChildControls;
+  for var I := Low(LNativeChildControls) to High(LNativeChildControls) do
+    LNativeChildControls[I].NativeView.UpdateParent;
 end;
 
 {********************************************}
 procedure TALNativeControl.RecreateNativeView;
 begin
+  {$IF defined(DEBUG)}
+  ALLog(Classname + '.RecreateNativeView');
+  {$ENDIF}
   ResetFocus;
   if fNativeView = nil then exit;
   ALFreeAndNil(fNativeView);
@@ -609,6 +635,9 @@ begin
   if FNativeView = nil then exit(false);
   if not FNativeView.visible then exit(false);
   if not ParentedVisible then exit(false);
+  {$IF defined(DEBUG)}
+  ALLog(classname+'.FreezeNativeView', 'control.name: ' + Name);
+  {$ENDIF}
   inc(FFreezeNativeViewCount);
   ALFreeAndNilDrawable(FNativeViewScreenshot);
   FNativeViewScreenshot := FNativeView.CaptureScreenshot;
@@ -635,9 +664,12 @@ begin
   if not IsNativeViewFrozen then exit;
   dec(FFreezeNativeViewCount);
   if FFreezeNativeViewCount = 0 then begin
+    {$IF defined(DEBUG)}
+    ALLog(classname+'.UnFreezeNativeView', 'control.name: ' + Name);
+    {$ENDIF}
     // See FreezeNativeView for why we delay
     FHideNativeViewAfterPaint := 0;
-    FFreeNativeViewScreenshotAfterPaint := 5;
+    FFreeNativeViewScreenshotAfterPaint := 6;
     ShowNativeView;
     Repaint;
   end;
@@ -648,16 +680,16 @@ procedure TALNativeControl.AncestorVisibleChanged(const Visible: Boolean);
 begin
   inherited;
   if FNativeView <> nil then
-    FNativeView.AncestorVisibleChanged;
+    FNativeView.SetVisible(FNativeView.Visible);
 end;
 
 {***********************************************}
 procedure TALNativeControl.AncestorParentChanged;
 begin
+  if (not (csDestroying in ComponentState)) and
+     (FNativeView <> nil) then
+    FNativeView.UpdateParent;
   inherited;
-  if csDestroying in ComponentState then exit;
-  if FNativeView <> nil then
-    FNativeView.UpdateFrame;
 end;
 
 {***************************************}
@@ -742,47 +774,15 @@ procedure TALNativeControl.DoPaint;
     {$ENDIF}
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _AncestorHasScreenshot: Boolean;
-  begin
-    var LParent := ParentControl;
-    while LParent <> nil do begin
-      if (LParent is TALNativeControl) and
-         (not ALIsDrawableNull(TALNativeControl(LParent).FNativeViewScreenshot)) then
-        exit(True);
-      LParent := LParent.ParentControl;
-    end;
-    Result := False;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _PaintFrozenOverlays(const AControl: TControl);
-  begin
-    for var I := 0 to AControl.ControlsCount - 1 do begin
-      var LChild := AControl.Controls[I];
-      if not LChild.Visible then continue;
-      if (LChild is TALNativeControl) and
-         (not ALIsDrawableNull(TALNativeControl(LChild).FNativeViewScreenshot)) then begin
-        var LSaveState := Canvas.SaveState;
-        try
-          Canvas.SetMatrix(LChild.AbsoluteMatrix);
-          ALDrawDrawable(
-            Canvas, // const ACanvas: Tcanvas;
-            TALNativeControl(LChild).FNativeViewScreenshot, // const ADrawable: TALDrawable;
-            TALNativeControl(LChild).GetNativeViewBoundsRect.TopLeft, // const ATopLeft: TpointF;
-            LChild.AbsoluteOpacity); // const AOpacity: Single);
-        finally
-          Canvas.RestoreState(LSaveState);
-        end;
-      end;
-      _PaintFrozenOverlays(LChild);
-    end;
-  end;
-
 begin
+
   {$IF defined(DEBUG)}
   //ALLog(classname+'.DoPaint', 'control.name: ' + Name);
   {$ENDIF}
+
+  inherited;
+
+  //
   // Override DoPaint instead of Paint to draw FNativeViewScreenshot
   // after all other painting operations have completed, including children.
   // The painting order is:
@@ -791,16 +791,28 @@ begin
   //   3. DoPaint       - Paint FNativeViewScreenshot last.
   // This ensures the screenshot appears above everything else, matching
   // the native view's behavior, which always has a higher Z-order.
-  inherited;
-  if (not ALIsDrawableNull(FNativeViewScreenshot)) and
-     (not _AncestorHasScreenshot) then begin
+  //
+
+  // The screenshot must be freed BEFORE it is drawn in the current scene, never
+  // after. Drawing only records a command that the canvas flushes to the GPU at
+  // EndScene. Freeing the texture after drawing it in the same scene deletes it
+  // while that command is still queued, and the GPU then samples an invalid
+  // texture, which renders as an opaque black rectangle. Freeing it here is
+  // safe because the previous scene (the last one that drew it) is already flushed.
+  If FFreeNativeViewScreenshotAfterPaint > 0 then begin
+    dec(FFreeNativeViewScreenshotAfterPaint);
+    if FFreeNativeViewScreenshotAfterPaint = 0 then
+      ALFreeAndNilDrawable(FNativeViewScreenshot)
+    else
+      _Invalidate;
+  end;
+  if not ALIsDrawableNull(FNativeViewScreenshot) then begin
     var LRect := GetNativeViewBoundsRect;
     ALDrawDrawable(
       Canvas, // const ACanvas: Tcanvas;
       FNativeViewScreenshot, // const ADrawable: TALDrawable;
       LRect.TopLeft, // const ATopLeft: TpointF;
       AbsoluteOpacity); // const AOpacity: Single);
-    _PaintFrozenOverlays(Self);
   end;
   if FHideNativeViewAfterPaint = 2 then begin
     FHideNativeViewAfterPaint := 1;
@@ -815,12 +827,7 @@ begin
         end;
       end);
   end;
-  If FFreeNativeViewScreenshotAfterPaint > 0 then begin
-    dec(FFreeNativeViewScreenshotAfterPaint);
-    if FFreeNativeViewScreenshotAfterPaint = 0 then
-      ALFreeAndNilDrawable(FNativeViewScreenshot);
-    _Invalidate;
-  end;
+
 end;
 
 end.

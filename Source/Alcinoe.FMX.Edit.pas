@@ -1067,7 +1067,7 @@ Type
         function controlTextViewDoCommandBySelector(control: NSControl; textView: NSTextView; doCommandBySelector: SEL): Boolean; cdecl;
       end;
   private
-    FTextFieldDelegate: TTextFieldDelegate;
+    FTextFieldDelegate: NSTextFieldDelegate;
     FTextSettings: TALBaseTextSettings;
     FFillColor: TAlphaColor;
     fMaxLength: integer;
@@ -2475,6 +2475,7 @@ end;
 {***********************************}
 procedure TALBaseEdit.InitNativeView;
 begin
+  inherited;
   if FNativeView = nil then exit;
   NativeView.Password := false; // noops operation
   NativeView.ReturnKeyType := tReturnKeyType.Default;  // noops operation
@@ -4737,44 +4738,69 @@ end;
 {$ENDIF}
 function TALAndroidEditView.TTouchListener.onTouch(v: JView; event: JMotionEvent): Boolean;
 begin
-  if (FEditView.Form <> nil) and
+  if (FEditView.Control.Form <> nil) and
      (not FEditView.view.hasFocus) and
      ((not FEditView.fIsMultiline) or
       (FEditView.getLineCount < FEditView.Control.GetNativeViewHeight / FEditView.getLineHeight)) then begin
 
     var LHandle: TAndroidWindowHandle;
-    if FEditView.Form.IsHandleAllocated then
-      LHandle := WindowHandleToPlatform(FEditView.Form.Handle)
+    if FEditView.Control.Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(FEditView.Control.Form.Handle)
     else
       LHandle := nil;
 
-    if LHandle <> nil then
-      LHandle.CurrentMotionEvent := event;
-
-    var LTouchPoint := TPointF.Create(event.getRawX / ALGetScreenScale, event.getRawY / ALGetScreenScale);
-    LTouchPoint := FEditView.Form.ScreenToClient(LTouchPoint);
-    var LEventAction := event.getAction;
-    if LEventAction = TJMotionEvent.JavaClass.ACTION_DOWN then begin
-      FEditView.Form.MouseMove([ssTouch], LTouchPoint.X, LTouchPoint.Y);
-      FEditView.Form.MouseMove([], LTouchPoint.X, LTouchPoint.Y); // Require for correct IsMouseOver handle
-      FEditView.Form.MouseDown(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
-    end
-    else if LEventAction = TJMotionEvent.JavaClass.ACTION_MOVE then begin
-      FEditView.Form.MouseMove([ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y)
-    end
-    else if LEventAction = TJMotionEvent.JavaClass.ACTION_CANCEL then begin
-      FEditView.Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y, False);
-      FEditView.Form.MouseLeave;
-    end
-    else if LEventAction = TJMotionEvent.JavaClass.ACTION_UP then
-    begin
-      FEditView.Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
-      FEditView.Form.MouseLeave;
+    // TALScrollEngine reads the coordinates directly from CurrentMotionEvent
+    // (getX/getY). Those are relative to the view that received the event, i.e.
+    // the EditText, which moves while the scrollbox scrolls. Passing the raw event
+    // would make every scroll step cancel part of the next finger movement (slow
+    // and jerky scrolling, wrong fling velocity). So we pass a copy translated
+    // into the coordinate space of the form's view.
+    var LEvent: JMotionEvent := nil;
+    if LHandle <> nil then begin
+      LEvent := TJMotionEvent.JavaClass.obtain(event);
+      var LViewLocation := TJavaArray<Integer>.Create(2);
+      var LFormLocation := TJavaArray<Integer>.Create(2);
+      try
+        FEditView.View.getLocationOnScreen(LViewLocation);
+        LHandle.FormLayout.getLocationOnScreen(LFormLocation);
+        LEvent.offsetLocation(LViewLocation[0] - LFormLocation[0], LViewLocation[1] - LFormLocation[1]);
+      finally
+        ALFreeAndNil(LViewLocation);
+        ALFreeAndNil(LFormLocation);
+      end;
+      LHandle.CurrentMotionEvent := LEvent;
     end;
-    Result := True;
 
-    if LHandle <> nil then
-      LHandle.CurrentMotionEvent := nil;
+    try
+
+      var LTouchPoint := TPointF.Create(event.getRawX / ALGetScreenScale, event.getRawY / ALGetScreenScale);
+      LTouchPoint := FEditView.Control.Form.ScreenToClient(LTouchPoint);
+      var LEventAction := event.getAction;
+      if LEventAction = TJMotionEvent.JavaClass.ACTION_DOWN then begin
+        FEditView.Control.Form.MouseMove([ssTouch], LTouchPoint.X, LTouchPoint.Y);
+        FEditView.Control.Form.MouseMove([], LTouchPoint.X, LTouchPoint.Y); // Require for correct IsMouseOver handle
+        FEditView.Control.Form.MouseDown(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+      end
+      else if LEventAction = TJMotionEvent.JavaClass.ACTION_MOVE then begin
+        FEditView.Control.Form.MouseMove([ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y)
+      end
+      else if LEventAction = TJMotionEvent.JavaClass.ACTION_CANCEL then begin
+        FEditView.Control.Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y, False);
+        FEditView.Control.Form.MouseLeave;
+      end
+      else if LEventAction = TJMotionEvent.JavaClass.ACTION_UP then
+      begin
+        FEditView.Control.Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+        FEditView.Control.Form.MouseLeave;
+      end;
+      Result := True;
+
+    finally
+      if LHandle <> nil then begin
+        LHandle.CurrentMotionEvent := nil;
+        LEvent.recycle;
+      end;
+    end;
 
   end
   else begin
@@ -5966,7 +5992,7 @@ end;
 destructor TALMacEditView.Destroy;
 begin
   View.setDelegate(nil);
-  ALFreeAndNil(FTextFieldDelegate);
+  FTextFieldDelegate := nil;
   ALFreeAndNil(FTextSettings);
   inherited Destroy;
 end;

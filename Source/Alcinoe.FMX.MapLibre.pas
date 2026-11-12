@@ -571,7 +571,7 @@ type
     destructor Destroy; override;
     property View: JMapView read GetView;
     property Control: TALMapLibre read GetControl;
-    function CaptureScreenshot: TALDrawable; override;
+    procedure Draw(const ACanvas: JCanvas); override;
     procedure SetVisible(const Value: Boolean); override;
     procedure ShowLoadingSpinner(const AView: JView); overload;
     procedure ShowLoadingSpinner(const AColor: TAlphaColor = Talphacolors.null; const AWidth: Single = 0; const AHeight: Single = 0); overload;
@@ -2428,23 +2428,53 @@ begin
   end;
 end;
 
-{*************************************************************}
-function TALAndroidMapLibreView.CaptureScreenshot: TALDrawable;
+{************************************************************}
+procedure TALAndroidMapLibreView.Draw(const ACanvas: JCanvas);
 begin
+
   var LRenderView := TJMapView.Wrap(View).getRenderView;
   if (LRenderView = nil) or
-     (not TJNIResolver.IsInstanceOf(LRenderView, TJTextureView.GetClsID)) then exit(inherited CaptureScreenshot);
-  var LBitmap := TJTextureView.Wrap(LRenderView).getBitmap;
-  if LBitmap = nil then exit(ALNullDrawable);
-  try
-    {$IF defined(ALSkiaCanvas)}
-    Result := ALCreateSkImageFromJBitmap(LBitmap);
-    {$ELSE}
-    Result := ALCreateTextureFromJBitmap(LBitmap);
-    {$ENDIF}
-  finally
-    LBitmap.recycle;
+     (not TJNIResolver.IsInstanceOf(LRenderView, TJTextureView.GetClsID)) then begin
+    inherited;
+    exit;
   end;
+
+  var LBitmap := TJTextureView.Wrap(LRenderView).getBitmap;
+  if LBitmap <> nil then begin
+    try
+
+      // Draw the MapLibre TextureView
+      ACanvas.drawBitmap(
+        LBitmap, // bitmap: JBitmap;
+        View.getX + LRenderView.getX, // left: Single;
+        View.getY + LRenderView.getY, // top: Single;
+        nil); // paint: JPaint
+
+      // Draw overlays inside MapView
+      var LMapView := TJViewGroup.Wrap(View);
+      for var I := 0 to LMapView.getChildCount - 1 do begin
+        var LChild := LMapView.getChildAt(I);
+        if LChild.equals(LRenderView) then continue;
+        if LChild.getVisibility <> TJView.JavaClass.VISIBLE then continue;
+        ACanvas.save;
+        try
+          ACanvas.translate(
+            View.getX + LChild.getX,
+            View.getY + LChild.getY);
+          LChild.draw(ACanvas);
+        finally
+          ACanvas.restore;
+        end;
+      end;
+
+    finally
+      LBitmap.recycle;
+    end;
+  end;
+
+  // Draw native child controls
+  DrawNativeChildViews(ACanvas);
+
 end;
 
 {****************************************************************}

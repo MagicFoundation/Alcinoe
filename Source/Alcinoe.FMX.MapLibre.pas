@@ -2472,8 +2472,23 @@ begin
     end;
   end;
 
-  // Draw native child controls
-  DrawNativeChildViews(ACanvas);
+  // Draw native child controls.
+  var LParentRect := GetAbsoluteRect;
+  var LNativeChildControls := TALNativeControl(Control).GetNativeChildControls;
+  for var I := Low(LNativeChildControls) to High(LNativeChildControls) do begin
+    var LNativeView := LNativeChildControls[I].NativeView;
+    if LNativeView.Layout.getVisibility <> TJView.JavaClass.VISIBLE then continue;
+    var LChildRect := LNativeView.GetAbsoluteRect;
+    ACanvas.save;
+    try
+      ACanvas.translate(
+        (LChildRect.Left - LParentRect.Left) * ALGetScreenScale,
+        (LChildRect.Top - LParentRect.Top) * ALGetScreenScale);
+      LNativeView.Draw(ACanvas);
+    finally
+      ACanvas.restore;
+    end;
+  end;
 
 end;
 

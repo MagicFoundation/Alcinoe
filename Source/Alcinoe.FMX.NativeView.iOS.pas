@@ -41,28 +41,26 @@ type
     procedure InitView; virtual;
     function GetFormView: UIView;
     function GetObjectiveCClass: PTypeInfo; override;
+    function GetView<T: UIView>: T; overload;
   public
+    constructor Create; overload; virtual;
+    constructor Create(const AControl: TALControl); overload; virtual;
+    destructor Destroy; override;
     function GetAbsoluteRect: TRectF;
-    procedure SetEnabled(const value: Boolean); virtual; //procedure PMSetAbsoluteEnabled(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_ABSOLUTE_ENABLED;
-    procedure SetVisible(const Value: Boolean); virtual; //procedure PMSetVisible(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_VISIBLE;
-    procedure SetAlpha(const Value: Single); virtual; //procedure PMSetAlpha(var AMessage: TDispatchMessageWithValue<Single>); message PM_SET_ABSOLUTE_OPACITY;
-    procedure BringToFront; virtual;
+    procedure SetEnabled(const value: Boolean); virtual;
+    procedure SetVisible(const Value: Boolean); virtual;
+    procedure SetAlpha(const Value: Single); virtual;
     procedure touchesBegan(touches: NSSet; withEvent: UIEvent); virtual; cdecl;
     procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); virtual; cdecl;
     procedure touchesEnded(touches: NSSet; withEvent: UIEvent); virtual; cdecl;
     procedure touchesMoved(touches: NSSet; withEvent: UIEvent); virtual; cdecl;
     function canBecomeFirstResponder: Boolean; virtual; cdecl;
     function becomeFirstResponder: Boolean; virtual; cdecl;
-  protected
-    function GetView<T: UIView>: T; overload;
-  public
-    constructor Create; overload; virtual;
-    constructor Create(const AControl: TALControl); overload; virtual;
-    destructor Destroy; override;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
     procedure UpdateParent; virtual;
     procedure UpdateFrame; virtual;
+    procedure BringToFront; virtual;
     function CaptureScreenshot: TALDrawable; virtual;
     property Control: TALControl read FControl;
     property View: UIView read GetView;
@@ -292,6 +290,14 @@ begin
   View.setFrame(CGRectFromRect(LAbsoluteRect));
 end;
 
+{**************************************}
+procedure TALIosNativeView.BringToFront;
+begin
+  var LSuperview := View.superview;
+  if LSuperview <> nil then
+    LSuperview.bringSubviewToFront(View);
+end;
+
 {*******************************************************}
 function TALIosNativeView.CaptureScreenshot: TALDrawable;
 begin
@@ -359,14 +365,6 @@ begin
   {$ELSE}
   Result := ALCreateTextureFromCGContextRef(FCaptureContext);
   {$ENDIF}
-end;
-
-{**************************************}
-procedure TALIosNativeView.BringToFront;
-begin
-  var LSuperview := View.superview;
-  if LSuperview <> nil then
-    LSuperview.bringSubviewToFront(View);
 end;
 
 {**********************************************************}

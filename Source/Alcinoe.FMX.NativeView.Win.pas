@@ -64,13 +64,6 @@ type
     procedure AfterCreateFormHandleListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
   protected
     function ExtractPoint(var Message: TWMMouse): TPointF; virtual;
-  public
-    function GetAbsoluteRect: TRectF;
-    procedure SetEnabled(const value: Boolean); virtual; //procedure PMSetAbsoluteEnabled(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_ABSOLUTE_ENABLED;
-    procedure SetVisible(const Value: Boolean); virtual; //procedure PMSetVisible(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_VISIBLE;
-    procedure SetAlpha(const Value: Single); virtual;
-    procedure BringToFront; virtual;
-  protected
     procedure WMSetFocus(var Message: TWMSetFocus); message WM_SETFOCUS;
     procedure WMKillFocus(var Message: TWMKillFocus); message WM_KILLFOCUS;
     procedure WMMouseWheel(var Message: TWMMouseWheel); message WM_MOUSEWHEEL;
@@ -88,10 +81,15 @@ type
     constructor Create; overload; virtual;
     constructor Create(const AControl: TALControl); overload; virtual;
     destructor Destroy; override;
+    function GetAbsoluteRect: TRectF;
+    procedure SetEnabled(const value: Boolean); virtual;
+    procedure SetVisible(const Value: Boolean); virtual;
+    procedure SetAlpha(const Value: Single); virtual;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
     procedure UpdateParent; virtual;
     procedure UpdateFrame; virtual;
+    procedure BringToFront; virtual;
     function CaptureScreenshot: TALDrawable; virtual;
     procedure Invalidate;
     property Control: TALControl read FControl;
@@ -471,6 +469,12 @@ begin
   SetWindowPos(Handle, 0, LWinBounds.Left, LWinBounds.Top, LWinBounds.Width, LWinBounds.Height, SWP_NOZORDER or SWP_NOACTIVATE);
 end;
 
+{**************************************}
+procedure TALWinNativeView.BringToFront;
+begin
+  SetWindowPos(Handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
+end;
+
 {*******************************************************}
 function TALWinNativeView.CaptureScreenshot: TALDrawable;
 const
@@ -602,12 +606,6 @@ begin
     raise;
   end;
   {$ENDIF}
-end;
-
-{**************************************}
-procedure TALWinNativeView.BringToFront;
-begin
-  SetWindowPos(Handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOACTIVATE);
 end;
 
 {**********************************************************}

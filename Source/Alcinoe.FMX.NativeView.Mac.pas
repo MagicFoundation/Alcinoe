@@ -38,24 +38,22 @@ type
     procedure InitView; virtual;
     function GetFormView: NSView;
     function GetObjectiveCClass: PTypeInfo; override;
-  public
-    function GetAbsoluteRect: TRectF;
-    procedure SetEnabled(const value: Boolean); virtual; //procedure PMSetAbsoluteEnabled(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_ABSOLUTE_ENABLED;
-    procedure SetVisible(const Value: Boolean); virtual; //procedure PMSetVisible(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_VISIBLE;
-    procedure SetAlpha(const Value: Single); virtual; //procedure PMSetAlpha(var AMessage: TDispatchMessageWithValue<Single>); message PM_SET_ABSOLUTE_OPACITY;
-    procedure BringToFront; virtual;
-    function acceptsFirstResponder: Boolean; virtual; cdecl;
-    function becomeFirstResponder: Boolean; virtual; cdecl;
-  protected
     function GetView<T: NSView>: T; overload;
   public
     constructor Create; overload; virtual;
     constructor Create(const AControl: TALControl); overload; virtual;
     destructor Destroy; override;
+    function GetAbsoluteRect: TRectF;
+    procedure SetEnabled(const value: Boolean); virtual;
+    procedure SetVisible(const Value: Boolean); virtual;
+    procedure SetAlpha(const Value: Single); virtual;
+    function acceptsFirstResponder: Boolean; virtual; cdecl;
+    function becomeFirstResponder: Boolean; virtual; cdecl;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
     procedure UpdateParent; virtual;
     procedure UpdateFrame; virtual;
+    procedure BringToFront; virtual;
     function CaptureScreenshot: TALDrawable; virtual;
     property Control: TALControl read FControl;
     property View: NSView read GetView;
@@ -269,6 +267,16 @@ begin
       TNSView.Wrap(LParentView).bounds.size.height));
 end;
 
+{**************************************}
+procedure TALMacNativeView.BringToFront;
+begin
+  var LSuperview := View.superview;
+  if LSuperview <> nil then begin
+    View.removeFromSuperview;
+    TNSView.Wrap(LSuperview).addSubview(View);
+  end;
+end;
+
 {*******************************************************}
 function TALMacNativeView.CaptureScreenshot: TALDrawable;
 begin
@@ -335,16 +343,6 @@ begin
   {$ELSE}
   Result := ALCreateTBitmapFromCGContextRef(FCaptureContext);
   {$ENDIF}
-end;
-
-{**************************************}
-procedure TALMacNativeView.BringToFront;
-begin
-  var LSuperview := View.superview;
-  if LSuperview <> nil then begin
-    View.removeFromSuperview;
-    TNSView.Wrap(LSuperview).addSubview(View);
-  end;
 end;
 
 {**********************************************************}

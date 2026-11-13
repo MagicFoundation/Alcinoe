@@ -40,13 +40,6 @@ type
     procedure AfterCreateFormHandleListener(const Sender: TObject; const AMessage: TMessage);
   protected
     function GetFormView: JView;
-  public
-    function GetAbsoluteRect: TRectF;
-    procedure SetEnabled(const value: Boolean); virtual; //procedure PMSetAbsoluteEnabled(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_ABSOLUTE_ENABLED;
-    procedure SetVisible(const Value: Boolean); virtual; // procedure PMSetVisible(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_VISIBLE;
-    procedure SetAlpha(const Value: Single); virtual; // procedure PMSetAlpha(var AMessage: TDispatchMessageWithValue<Single>); message PM_SET_ABSOLUTE_OPACITY;
-    procedure BringToFront; virtual;
-  protected
     function GetView<T: JView>: T; overload;
     function CreateView: JView; virtual;
     function CreateLayout: JViewGroup; virtual;
@@ -54,10 +47,15 @@ type
     constructor Create; overload; virtual;
     constructor Create(const AControl: TALControl); overload; virtual;
     destructor Destroy; override;
+    function GetAbsoluteRect: TRectF;
+    procedure SetEnabled(const value: Boolean); virtual;
+    procedure SetVisible(const Value: Boolean); virtual;
+    procedure SetAlpha(const Value: Single); virtual;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
     procedure UpdateParent; virtual;
     procedure UpdateFrame; virtual;
+    procedure BringToFront; virtual;
     procedure Draw(const ACanvas: JCanvas); virtual;
     function CaptureScreenshot: TALDrawable; virtual;
     property Control: TALControl read FControl;
@@ -343,6 +341,13 @@ begin
     Layout.requestLayout;
 end;
 
+{******************************************}
+procedure TALAndroidNativeView.BringToFront;
+begin
+  if Layout.getParent <> nil then
+    Layout.bringToFront;
+end;
+
 {**********************************************************}
 procedure TALAndroidNativeView.Draw(const ACanvas: JCanvas);
 begin
@@ -406,13 +411,6 @@ begin
   {$ELSE}
   Result := ALCreateTextureFromJBitmap(FCaptureBitmap);
   {$ENDIF}
-end;
-
-{******************************************}
-procedure TALAndroidNativeView.BringToFront;
-begin
-  if Layout.getParent <> nil then
-    Layout.bringToFront;
 end;
 
 {**************************************************************}

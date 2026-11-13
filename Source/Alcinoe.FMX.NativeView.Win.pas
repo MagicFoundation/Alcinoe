@@ -108,6 +108,7 @@ uses
   Winapi.WinSpool,
   FMX.Platform.Win,
   FMX.Helpers.Win,
+  FMX.Graphics,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.NativeControl,
   Alcinoe.Common;
@@ -493,7 +494,6 @@ begin
   end;
 
   // Recreate the DIB section only when its dimensions change
-  // (like FCaptureBitmap / FCaptureCanvas on Android).
   if (FCaptureBitmap = 0) or
      (FCaptureWidth <> LWidth) or
      (FCaptureHeight <> LHeight) then begin
@@ -544,11 +544,8 @@ begin
     exit(ALNullDrawable);
   GdiFlush;
 
-  // GDI leaves the alpha channel undefined, and the native views are
-  // opaque, so force alpha to 255 while copying the pixels.
-  var LPixelCount: NativeInt := NativeInt(LWidth) * LHeight;
-
   {$IF defined(ALSkiaCanvas)}
+  var LPixelCount: NativeInt := NativeInt(LWidth) * LHeight;
   var LPixelData: Pointer;
   GetMem(LPixelData, LPixelCount * 4);
   try

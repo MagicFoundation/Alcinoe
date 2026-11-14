@@ -2090,13 +2090,13 @@ begin
     Result := 0;
 end;
 
-{*******************************************************************************************************}
+{*************************************************************************************************}
 function TALDynamicListBox.TView.TMainContent.ItemWidthFor(const AItem: TALDynamicControl): Double;
 begin
   Result := Width - Padding.Left - AItem.Margins.Left - AItem.Margins.Right - Padding.Right;
 end;
 
-{**************************************************************************************************}
+{*********************************************************************************************}
 procedure TALDynamicListBox.TView.TMainContent.EnsureItemWidth(const AItem: TALDynamicControl);
 begin
   // Lazy width fixup for the items that WidthOnlyRealign skipped; called
@@ -2116,7 +2116,7 @@ begin
   end;
 end;
 
-{***************************************************************}
+{**************************************************************}
 procedure TALDynamicListBox.TView.TMainContent.WidthOnlyRealign;
 begin
   // Width-only resize of a vertical list: every item Top stays valid, so
@@ -2147,7 +2147,7 @@ begin
     Owner.UpdateScrollEngineLimits;
 end;
 
-{*************************************************************}
+{*********************************************************}
 procedure TALDynamicListBox.TView.TMainContent.SizeChanged;
 begin
   // A live window-resize of a vertical list only changes the content WIDTH

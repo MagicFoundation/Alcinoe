@@ -20,6 +20,40 @@ REM --------------
 if not exist "%ALBaseDir%\Source\Alcinoe.inc" goto ERROR
 
 
+REM -------------------------------------
+REM Check if symbolic links can be created
+REM -------------------------------------
+
+REM The Mac Catalyst slices of the frameworks contain symbolic links, which
+REM Windows can only create as administrator or in Developer Mode. Otherwise
+REM tar fails on them, so the Mac Catalyst slices are skipped.
+
+set TarExclude=
+set SymlinkTest=%TEMP%\ALSymlinkTest.tmp
+del "%SymlinkTest%" >nul 2>&1
+mklink "%SymlinkTest%" "%SymlinkTest%.target" >nul 2>&1
+IF ERRORLEVEL 1 (
+  set TarExclude=--exclude "*maccatalyst*"
+  echo [33mWARNING: the Mac Catalyst slices of the frameworks will be skipped.[0m
+  echo.
+  echo [33mMac Catalyst is the platform used to run iPad apps on macOS. Its slices in the[0m
+  echo [33mxcframeworks use the standard macOS framework layout, which relies on symbolic[0m
+  echo [33mlinks, e.g. Headers is a link to Versions/Current/Headers.[0m
+  echo.
+  echo [33mWindows only allows creating symbolic links when running as administrator or[0m
+  echo [33mwhen Developer Mode is enabled, which is not the case here, so tar would fail[0m
+  echo [33mto extract these slices.[0m
+  echo.
+  echo [33mThis has no impact on Delphi iOS apps: the iOS device and iOS Simulator slices[0m
+  echo [33mare downloaded as usual. To also download the Mac Catalyst slices, enable[0m
+  echo [33mDeveloper Mode in Settings ^> System ^> For developers, or run this script[0m
+  echo [33mas administrator.[0m
+  echo.
+) ELSE (
+  del "%SymlinkTest%"
+)
+
+
 REM -----------------
 REM Main Instructions
 REM -----------------
@@ -62,7 +96,7 @@ IF ERRORLEVEL 1 goto ERROR
 
 mkdir "%TMPDir%\Output"
 
-tar -xf "%TMPDir%\tmp.zip" -C "%TMPDir%\Output"
+tar -xf "%TMPDir%\tmp.zip" -C "%TMPDir%\Output" %TarExclude%
 IF ERRORLEVEL 1 goto ERROR
 
 Robocopy "%TMPDir%\Output" "%DestDir%" /MOVE /E /NFL /NDL /NJH /NJS
@@ -99,7 +133,7 @@ mkdir "%TMPDir%"
 curl --fail --location "%SrcUrl%" --output "%TMPDir%\tmp.zip"
 IF ERRORLEVEL 1 goto ERROR
 
-tar -xf "%TMPDir%\tmp.zip" -C "%TMPDir%"
+tar -xf "%TMPDir%\tmp.zip" -C "%TMPDir%" %TarExclude%
 IF ERRORLEVEL 1 goto ERROR
 
 Robocopy "%TMPDir%\Firebase" "%DestDir%" /MOVE /E /NFL /NDL /NJH /NJS
@@ -136,7 +170,7 @@ mkdir "%TMPDir%"
 curl --fail --location "%SrcUrl%" --output "%TMPDir%\tmp.zip"
 IF ERRORLEVEL 1 goto ERROR
 
-tar -xf "%TMPDir%\tmp.zip" -C "%TMPDir%"
+tar -xf "%TMPDir%\tmp.zip" -C "%TMPDir%" %TarExclude%
 IF ERRORLEVEL 1 goto ERROR
 
 Robocopy "%TMPDir%\XCFrameworks" "%DestDir%" /MOVE /E /NFL /NDL /NJH /NJS
